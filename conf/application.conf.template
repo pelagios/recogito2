@@ -31,7 +31,7 @@ play.i18n.langs = [ "en" ]
 # By convention, the default datasource is named `default`
 #
 db.default.driver="org.sqlite.JDBC"
-db.default.url="jdbc:sqlite:db/recogito.db"
+db.default.url="jdbc:sqlite:recogito.db"
 db.default.username="sa"
 db.default.password=""
 
