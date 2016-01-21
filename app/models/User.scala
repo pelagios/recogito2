@@ -1,31 +1,15 @@
 package models
 
-import java.sql.Timestamp
+import db.DB
+import javax.inject.Inject    
+import generated.tables.records.UsersRecord
+ 
+class User @Inject() (db: DB) {
+  
+  import generated.Tables._
 
-case class User(
-
-  /** We're using the username as the unique key **/
-  username: String,
-
-  /** For verification and notifications **/
-  email: String,
-
-  /** Time when account was created **/
-  memberSince: Timestamp)
-
-  /** Login verification via salted password hash **
-  passwordHash: String,
-
-  salt: String)*/
-
-/*
-  object User {
-
-    def listAll: List[User] = DB.withConnection { conn =>
-      for (r: DataRecord <- conn
-        selectFrom DATA
-        fetch
-      ) yield r
-
+  def listAll() = db.query { sql => 
+    sql.select().from(USERS).fetch().into(classOf[UsersRecord])
   }
-  */
+
+}

@@ -1,10 +1,14 @@
-@()
+@(users: List[generated.tables.records.UsersRecord])
 <!DOCTYPE html>
 <html>
   <head>
     <title>LOGIN</title>
   </head>
   <body>
-    <!-- TODO -->
+    <ul>
+      @for(user <- users) {
+        <li>@user.getUsername</li>
+      }
+    </ul>
   </body>
 </html>

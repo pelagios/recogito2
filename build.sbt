@@ -10,9 +10,9 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
   ws,
-  "org.jooq" % "jooq" % "3.7.0",
-  "org.jooq" % "jooq-codegen-maven" % "3.7.0",
-  "org.jooq" % "jooq-meta" % "3.7.0",
+  "org.jooq" % "jooq" % "3.7.2",
+  "org.jooq" % "jooq-codegen-maven" % "3.7.2",
+  "org.jooq" % "jooq-meta" % "3.7.2",
   "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
   specs2 % Test
 )
