@@ -1,8 +1,6 @@
 package models
 
 import java.sql.Timestamp
-import play.api.db.slick.Config.driver.simple._
-import scala.slick.lifted.Tag
 
 case class User(
 
@@ -19,7 +17,3 @@ case class User(
   passwordHash: String,
 
   salt: String)
-
-class Users(tag: Tag) extends Table[User](tag, "users") {
-
-}

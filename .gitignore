@@ -1,5 +1,7 @@
 /logs
 /target
+/bin
 .classpath
 .project
 .settings
+.cache-*

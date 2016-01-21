@@ -10,6 +10,8 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
   ws,
+  "com.typesafe.play" %% "play-slick" % "1.1.1",
+  "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
   specs2 % Test
 )
 
