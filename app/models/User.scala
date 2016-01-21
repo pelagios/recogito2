@@ -11,9 +11,21 @@ case class User(
   email: String,
 
   /** Time when account was created **/
-  memberSince: Timestamp,
+  memberSince: Timestamp)
 
-  /** Login verification via salted password hash **/
+  /** Login verification via salted password hash **
   passwordHash: String,
 
-  salt: String)
+  salt: String)*/
+
+/*
+  object User {
+
+    def listAll: List[User] = DB.withConnection { conn =>
+      for (r: DataRecord <- conn
+        selectFrom DATA
+        fetch
+      ) yield r
+
+  }
+  */
