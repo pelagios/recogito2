@@ -1,6 +1,7 @@
 /logs
 /target
 /bin
+/conf/application.conf
 .classpath
 .project
 .settings
