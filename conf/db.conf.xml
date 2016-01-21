@@ -80,10 +80,10 @@
            jOOQ may append the schema name to this package if generating multiple schemas,
            e.g. org.jooq.your.packagename.schema1
                 org.jooq.your.packagename.schema2 -->
-      <packageName>generated</packageName>
+      <packageName>models.generated</packageName>
 
       <!-- The destination directory of your generated classes -->
-      <directory>target/scala-2.11/src_managed/main</directory>
+      <directory>app</directory>
     </target>
   </generator>
 </configuration>
