@@ -27,9 +27,7 @@ val generateJOOQ = taskKey[Seq[File]]("Generate JooQ classes")
 
 val generateJOOQTask = (sourceManaged, fullClasspath in Compile, runner in Compile, streams) map { (src, cp, r, s) =>
   toError(r.run("org.jooq.util.GenerationTool", cp.files, Array("conf/db.conf.xml"), s.log))
-  ((src / "main/generated") ** "*.scala").get
+  (src ** "*.scala").get
 }
 
 generateJOOQ <<= generateJOOQTask
-
-unmanagedSourceDirectories in Compile += sourceManaged.value / "main/generated"
