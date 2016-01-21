@@ -15,6 +15,7 @@
   </jdbc>
 
   <generator>
+    <name>org.jooq.util.ScalaGenerator</name>
     <database>
       <!-- The database dialect from jooq-meta. Available dialects are
            named org.util.[database].[database]Database. Known values are:

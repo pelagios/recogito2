@@ -1,14 +1,13 @@
 package db
 
-import javax.inject.Inject
-
 import akka.actor.ActorSystem
-import org.jooq.{ SQLDialect, DSLContext }
+import javax.inject.Inject
 import org.jooq.impl.DSL
+import org.jooq.{ SQLDialect, DSLContext }
 import play.api.db.Database
-
 import scala.concurrent.{ ExecutionContext, Future }
 
+/** cf. http://blog.jooq.org/2016/01/14/reactive-database-access-part-3-using-jooq-with-scala-futures-and-actors/ **/
 class DB @Inject() (db: Database, system: ActorSystem) {
 
   val databaseContext: ExecutionContext = system.dispatchers.lookup("contexts.database")

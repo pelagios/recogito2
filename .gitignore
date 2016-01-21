@@ -1,7 +1,8 @@
 /logs
-/target
 /bin
 /conf/application.conf
+/target/*
+!/target/scala-2.11/src_managed/*
 .classpath
 .project
 .settings

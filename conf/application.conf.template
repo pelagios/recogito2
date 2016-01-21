@@ -42,3 +42,11 @@ db.default.password=""
 
 # You can disable evolutions for a specific datasource if necessary
 # play.evolutions.db.default.enabled=false
+
+contexts {
+    database {
+        fork-join-executor {
+          parallelism-max = 9
+        }
+    }
+}
