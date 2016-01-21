@@ -11,9 +11,9 @@ object Global extends GlobalSettings {
   
   private val SCHEMA_SQL = "conf/schema.sql"
 
-  override def onStart(app: Application) {    
+  override def onStart(app: Application) {   
     DB.withConnection { connection =>
-      if (DSL.using(connection, SQLDialect.POSTGRES_9_4).meta().getTables.isEmpty()) {
+      if (DSL.using(connection, SQLDialect.SQLITE).meta().getTables.isEmpty()) {
         Logger.info("Empty database - initializing...")
         initDB(connection)
       }
