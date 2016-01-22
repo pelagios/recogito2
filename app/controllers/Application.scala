@@ -1,6 +1,6 @@
 package controllers
 
-import db.DB
+import database.DB
 import models.Users
 import javax.inject.Inject
 import play.api.mvc.{ Action, Controller }

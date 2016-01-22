@@ -1,6 +1,6 @@
 package models
 
-import db.DB
+import database.DB
 import models.generated.Tables._
 import models.generated.tables.records.UsersRecord
 import scala.collection.JavaConversions._

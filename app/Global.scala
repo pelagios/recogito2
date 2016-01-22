@@ -13,7 +13,7 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {   
     DB.withConnection { connection =>
-      if (DSL.using(connection, SQLDialect.SQLITE).meta().getTables.isEmpty()) {
+      if (DSL.using(connection, database.DB.CURRENT_SQLDIALECT).meta().getTables.isEmpty()) {
         Logger.info("Empty database - initializing...")
         initDB(connection)
       }

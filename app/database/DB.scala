@@ -1,4 +1,4 @@
-package db
+package database
 
 import akka.actor.ActorSystem
 import javax.inject.Inject
@@ -14,16 +14,22 @@ class DB @Inject() (db: Database, system: ActorSystem) {
 
   def query[A](block: DSLContext => A): Future[A] = Future {
     db.withConnection { connection =>
-      val sql = DSL.using(connection, SQLDialect.POSTGRES_9_4)
+      val sql = DSL.using(connection, DB.CURRENT_SQLDIALECT)
       block(sql)
     }
   }(databaseContext)
 
   def withTransaction[A](block: DSLContext => A): Future[A] = Future {
     db.withTransaction { connection =>
-      val sql = DSL.using(connection, SQLDialect.POSTGRES_9_4)
+      val sql = DSL.using(connection, DB.CURRENT_SQLDIALECT)
       block(sql)
     }
   }(databaseContext)
 
+}
+
+object DB {
+  
+  val CURRENT_SQLDIALECT = SQLDialect.SQLITE
+  
 }
