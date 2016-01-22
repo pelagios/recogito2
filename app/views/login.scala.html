@@ -7,9 +7,8 @@
   <body>
     @helper.form(action = routes.Login.processLogin()) {
       @helper.inputText(loginForm("name"))
-      @helper.inputText(loginForm("email"))
       @helper.inputPassword(loginForm("password"))
-      <input type="submit">
+      <input type="submit" />
     }
   </body>
 </html>
