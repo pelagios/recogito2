@@ -1,11 +1,11 @@
-import play.api._
-import scala.concurrent.ExecutionContext
-import play.api.db.DB
+import java.sql.Connection
 import org.jooq.impl.DSL
 import org.jooq.{ SQLDialect, DSLContext }
+import play.api.db.DB
 import play.api.Play.current
+import play.api.{ Application, GlobalSettings, Logger }
 import scala.io.Source
-import java.sql.Connection
+import scala.concurrent.ExecutionContext
 
 object Global extends GlobalSettings {
   

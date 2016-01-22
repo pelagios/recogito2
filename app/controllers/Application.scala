@@ -13,10 +13,6 @@ class Application @Inject() (implicit db: DB) extends Controller {
     Ok(views.html.landingPage())
   }
 
-  def login = Action {
-    Ok(views.html.login())
-  }
-
   def createAccount = Action {
     Ok(views.html.signUp())
   }

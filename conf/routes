@@ -9,7 +9,8 @@ GET     /assets/*file                      controllers.Assets.versioned(path="/p
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /create-account                    controllers.Application.createAccount
-GET     /login                             controllers.Application.login
+GET     /login                             controllers.Login.showLoginForm
+POST    /login                             controllers.Login.processLogin
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Frontpage

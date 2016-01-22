@@ -1,10 +1,15 @@
-@()
+@(loginForm: Form[LoginData])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Welcome to Recogito</title>
   </head>
   <body>
-
+    @helper.form(action = routes.Login.processLogin()) {
+      @helper.inputText(loginForm("name"))
+      @helper.inputText(loginForm("email"))
+      @helper.inputPassword(loginForm("password"))
+      <input type="submit">
+    }
   </body>
 </html>
