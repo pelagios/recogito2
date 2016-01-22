@@ -36,9 +36,8 @@ class Signup @Inject() (implicit db: DB) extends Controller {
       },
 
       signupData => {
-        Logger.info(signupData.toString)
-        Users.createUser(signupData.username, signupData.password)
-        Redirect(routes.Application.landingPage()) // .flashing("success" -> "Contact saved!")
+        Users.insertUser(signupData.username, signupData.email, signupData.password)
+        Redirect(routes.Application.landingPage()) // .flashing("success" -> "Account Created!")
       }
     )
   }

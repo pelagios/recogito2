@@ -10,6 +10,8 @@ import java.util.List
 
 import javax.annotation.Generated
 
+import models.generated.tables.Documents
+import models.generated.tables.SqliteSequence
 import models.generated.tables.Users
 
 import org.jooq.Table
@@ -44,6 +46,8 @@ class DefaultSchema extends SchemaImpl("") {
 
 	private def getTables0() : List[Table[_]] = {
 		return Arrays.asList[Table[_]](
+			Documents.DOCUMENTS,
+			SqliteSequence.SQLITE_SEQUENCE,
 			Users.USERS)
 	}
 }

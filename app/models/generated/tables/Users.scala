@@ -61,6 +61,16 @@ class Users(alias : String, aliased : Table[UsersRecord], parameters : Array[ Fi
 	val EMAIL : TableField[UsersRecord, String] = createField("email", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
 
 	/**
+	 * The column <code>users.password_hash</code>.
+	 */
+	val PASSWORD_HASH : TableField[UsersRecord, String] = createField("password_hash", org.jooq.impl.SQLDataType.VARCHAR, "")
+
+	/**
+	 * The column <code>users.salt</code>.
+	 */
+	val SALT : TableField[UsersRecord, String] = createField("salt", org.jooq.impl.SQLDataType.VARCHAR, "")
+
+	/**
 	 * The column <code>users.member_since</code>.
 	 */
 	val MEMBER_SINCE : TableField[UsersRecord, OffsetDateTime] = createField("member_since", org.jooq.impl.SQLDataType.TIMESTAMPWITHTIMEZONE.nullable(false), "")

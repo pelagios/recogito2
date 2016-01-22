@@ -1,6 +1,8 @@
 CREATE TABLE users (
   username varchar primary key,
   email varchar NOT NULL,
+  password_hash varchar,
+  salt varchar,
   member_since timestamp with time zone NOT NULL
 );
 

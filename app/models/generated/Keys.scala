@@ -6,9 +6,12 @@ package models.generated
 
 import javax.annotation.Generated
 
+import models.generated.tables.Documents
 import models.generated.tables.Users
+import models.generated.tables.records.DocumentsRecord
 import models.generated.tables.records.UsersRecord
 
+import org.jooq.ForeignKey
 import org.jooq.UniqueKey
 import org.jooq.impl.AbstractKeys
 
@@ -35,18 +38,25 @@ object Keys {
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
+	val PK_DOCUMENTS = UniqueKeys0.PK_DOCUMENTS
 	val PK_USERS = UniqueKeys0.PK_USERS
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
+	val FK_DOCUMENTS_USERS_1 = ForeignKeys0.FK_DOCUMENTS_USERS_1
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
 	// -------------------------------------------------------------------------
 
 	private object UniqueKeys0 extends AbstractKeys {
+		val PK_DOCUMENTS : UniqueKey[DocumentsRecord] = AbstractKeys.createUniqueKey(Documents.DOCUMENTS, Documents.DOCUMENTS.ID)
 		val PK_USERS : UniqueKey[UsersRecord] = AbstractKeys.createUniqueKey(Users.USERS, Users.USERS.USERNAME)
+	}
+
+	private object ForeignKeys0 extends AbstractKeys {
+		val FK_DOCUMENTS_USERS_1 : ForeignKey[DocumentsRecord, UsersRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USERS, Documents.DOCUMENTS, Documents.DOCUMENTS.USERNAME)
 	}
 }
