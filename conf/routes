@@ -8,9 +8,10 @@ GET     /assets/*file                      controllers.Assets.versioned(path="/p
 # Authentication & user-related
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /create-account                    controllers.Application.createAccount
 GET     /login                             controllers.Login.showLoginForm
 POST    /login                             controllers.Login.processLogin
+GET     /signup                            controllers.Signup.showSignupForm
+POST    /signup                            controllers.Signup.processSignup
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Frontpage

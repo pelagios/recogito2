@@ -1,0 +1,15 @@
+@(signupForm: Form[SignupData])(implicit messages: Messages)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito Signup</title>
+  </head>
+ <body>
+    @helper.form(action = routes.Signup.processSignup()) {
+    @helper.inputText(signupForm("username"))
+    @helper.inputText(signupForm("email"))
+    @helper.inputPassword(signupForm("password"))
+      <input type="submit" />
+    }
+  </body>
+</html>

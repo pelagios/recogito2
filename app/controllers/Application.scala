@@ -13,10 +13,6 @@ class Application @Inject() (implicit db: DB) extends Controller {
     Ok(views.html.landingPage())
   }
 
-  def createAccount = Action {
-    Ok(views.html.signUp())
-  }
-
   def listUsers = Action.async {
     val users = Users.listAll()
     users.map(u => Ok(views.html.users(u)))
