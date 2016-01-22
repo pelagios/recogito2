@@ -6,9 +6,9 @@
   </head>
  <body>
     @helper.form(action = routes.Signup.processSignup()) {
-    @helper.inputText(signupForm("username"))
-    @helper.inputText(signupForm("email"))
-    @helper.inputPassword(signupForm("password"))
+      @helper.inputText(signupForm("username"))
+      @helper.inputText(signupForm("email"))
+      @helper.inputPassword(signupForm("password"))
       <input type="submit" />
     }
   </body>
