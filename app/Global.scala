@@ -8,10 +8,10 @@ import scala.io.Source
 import scala.concurrent.ExecutionContext
 
 object Global extends GlobalSettings {
-  
+
   private val SCHEMA_SQL = "conf/schema.sql"
 
-  override def onStart(app: Application) {   
+  override def onStart(app: Application) {
     DB.withConnection { connection =>
       if (DSL.using(connection, database.DB.CURRENT_SQLDIALECT).meta().getTables.isEmpty()) {
         Logger.info("Empty database - initializing...")
@@ -19,11 +19,15 @@ object Global extends GlobalSettings {
       }
     }
   }
-  
+
   private def initDB(connection: Connection) = {
-    val sql = Source.fromFile(SCHEMA_SQL)("UTF-8").getLines().mkString("\n")
-    val stmt = connection.createStatement
-    stmt.execute(sql)
+    // Splitting by ; is not 100% robust - but should be sufficient for our own schema file
+    val statement = connection.createStatement
+    Source.fromFile(SCHEMA_SQL)("UTF-8").getLines().mkString("\n").split(";").foreach(s => {
+      statement.addBatch(s + ";")
+    })
+    statement.executeBatch()
+    statement.close()
   }
 
 }

@@ -34,8 +34,7 @@ class Login @Inject() (implicit db: DB) extends Controller {
       },
 
       loginData => {
-        val loginData = request.body
-        Logger.info(loginData.toString)
+        Logger.info(loginData.name + ", " + loginData.password)
         Redirect(routes.Application.landingPage()) // .flashing("success" -> "Contact saved!")
       }
     )
