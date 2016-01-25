@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
   "org.jooq" % "jooq-meta" % "3.7.2",
   "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
+  "jp.t2v" %% "play2-auth" % "0.14.1",
   specs2 % Test
 )
 

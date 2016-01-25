@@ -22,9 +22,13 @@ object Users {
   }
 
   def listAll()(implicit db: DB) = db.query { sql =>
-    sql.select().from(USERS).fetch().into(classOf[UsersRecord]).toSeq
+    sql.selectFrom(USERS).fetch().into(classOf[UsersRecord]).toSeq
   }
 
+  def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
+    Option(sql.selectFrom(USERS).where(USERS.USERNAME.equal(username)).fetchOne())
+  }
+  
   /** Utility function to create new random salt for password hashing **/
   private def randomSalt = {
     val r = new SecureRandom()
