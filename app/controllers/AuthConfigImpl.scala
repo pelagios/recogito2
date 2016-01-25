@@ -36,18 +36,12 @@ trait AuthConfigImpl extends AuthConfig { self: HasDB =>
   def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Results.Redirect(routes.Application.landingPage))
 
-  /** If the user is not logged in and tries to access a protected resource **/
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Results.Redirect(routes.Application.landingPage))
 
-  /** If authorization failed (usually incorrect password) **/
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit context: ExecutionContext): Future[Result] =
     Future.successful(Results.Forbidden(NO_PERMISSION))
 
-  /**
-   * TODO A function that determines what `Authority` a user has.
-   * You should alter this procedure to suit your application.
-   */
   def authorize(user: User, authority: Authority)(implicit ctx: ExecutionContext): Future[Boolean] = Future.successful {
     true
     /*

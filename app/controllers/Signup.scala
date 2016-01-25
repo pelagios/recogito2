@@ -33,17 +33,12 @@ class Signup @Inject() (implicit val db: DB) extends Controller with LoginLogout
 
   def processSignup = Action.async { implicit request =>
     signupForm.bindFromRequest.fold(
-      formWithErrors => {
-        Logger.info("Bad request!")
-        Future.successful(BadRequest(views.html.signup(formWithErrors)))
-      },
+      formWithErrors =>
+        Future.successful(BadRequest(views.html.signup(formWithErrors))),
 
-      signupData => {
-        val user = Users.insertUser(signupData.username, signupData.email, signupData.password)
-        user.flatMap(u => {
-          gotoLoginSucceeded(u.getUsername)
-        })
-      }
+      signupData =>
+        Users.insertUser(signupData.username, signupData.email, signupData.password).flatMap(user =>
+          gotoLoginSucceeded(user.getUsername))
     )
   }
 
