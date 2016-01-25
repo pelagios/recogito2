@@ -1,10 +1,11 @@
-@(loginForm: Form[LoginData])(implicit messages: Messages)
+@(loginForm: Form[LoginData])(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Welcome to Recogito</title>
   </head>
   <body>
+    <p><strong>@flash.get("message").getOrElse("")</strong></p>
     @helper.form(action = routes.Login.processLogin()) {
       @helper.inputText(loginForm("name"))
       @helper.inputPassword(loginForm("password"))
