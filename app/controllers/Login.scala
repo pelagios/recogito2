@@ -2,6 +2,7 @@ package controllers
 
 import database.DB
 import javax.inject.Inject
+import jp.t2v.lab.play2.auth.LoginLogout
 import models.Users
 import play.api.Logger
 import play.api.mvc.{ Action, Controller }
@@ -10,19 +11,20 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
-import jp.t2v.lab.play2.auth.LoginLogout
-import scala.util.{ Success, Failure }
-import scala.concurrent.{ Future, Await }
-import scala.concurrent.duration._
+import scala.concurrent.Future
 
-case class LoginData(name: String, password: String)
+case class LoginData(username: String, password: String)
 
 /** Just temporary container for everything while we're still hacking on the basics **/
 class Login @Inject() (implicit val db: DB) extends Controller with LoginLogout with HasDB with AuthConfigImpl {
 
+  private val MESSAGE = "message"
+  
+  private val INVALID_LOGIN = "Invalid Username or Password"
+  
   val loginForm = Form(
     mapping(
-      "name" -> nonEmptyText,
+      "username" -> nonEmptyText,
       "password" -> nonEmptyText
     )(LoginData.apply)(LoginData.unapply)
   )
@@ -31,19 +33,20 @@ class Login @Inject() (implicit val db: DB) extends Controller with LoginLogout 
     Ok(views.html.login(loginForm))
   }
 
-  def processLogin = Action { implicit request =>
+  def processLogin = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors => {
         Logger.info("Bad request!")
-        BadRequest(views.html.login(formWithErrors))
+        Future(BadRequest(views.html.login(formWithErrors)))
       },
 
       loginData => {
-        val isValid = Await.result(Users.validateUser(loginData.name,loginData.password), 10 seconds)
-        if (isValid)
-          Await.result(gotoLoginSucceeded(loginData.name), 10 seconds)
-        else
-          Redirect(routes.Login.showLoginForm()).flashing("message" -> "Invalid username or password")
+        Users.validateUser(loginData.username, loginData.password).flatMap(isValid => {
+          if (isValid)
+            gotoLoginSucceeded(loginData.username)
+          else
+            Future(Redirect(routes.Login.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))       
+        })
       }
     )
   }

@@ -5,9 +5,12 @@
     <title>Welcome to Recogito</title>
   </head>
   <body>
-    <p><strong>@flash.get("message").getOrElse("")</strong></p>
+    @flash.get("message").map { msg =>
+      <p><strong>@msg</strong></p>
+    }
+
     @helper.form(action = routes.Login.processLogin()) {
-      @helper.inputText(loginForm("name"))
+      @helper.inputText(loginForm("username"))
       @helper.inputPassword(loginForm("password"))
       <input type="submit" />
     }
