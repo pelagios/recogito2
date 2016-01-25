@@ -9,6 +9,7 @@ import models.generated.tables.records.UsersRecord
 import org.apache.commons.codec.binary.Base64
 import scala.collection.JavaConversions._
 import sun.security.provider.SecureRandom
+import play.api.Logger
 
 object Users {
   
@@ -26,6 +27,7 @@ object Users {
   }
 
   def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
+    Logger.info("fetching " + username)
     Option(sql.selectFrom(USERS).where(USERS.USERNAME.equal(username)).fetchOne())
   }
   

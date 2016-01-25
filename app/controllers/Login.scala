@@ -9,11 +9,13 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import jp.t2v.lab.play2.auth.LoginLogout
+import scala.concurrent.Future
 
 case class LoginData(name: String, password: String)
 
 /** Just temporary container for everything while we're still hacking on the basics **/
-class Login @Inject() (implicit db: DB) extends Controller {
+class Login @Inject() (implicit val db: DB) extends Controller with LoginLogout with HasDB with AuthConfigImpl {
 
   val loginForm = Form(
     mapping(
@@ -26,16 +28,17 @@ class Login @Inject() (implicit db: DB) extends Controller {
     Ok(views.html.login(loginForm))
   }
 
-  def processLogin = Action { implicit request =>
+  def processLogin = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors => {
         Logger.info("Bad request!")
-        BadRequest(views.html.login(formWithErrors))
+        Future.successful(BadRequest(views.html.login(formWithErrors)))
       },
 
       loginData => {
         Logger.info(loginData.name + ", " + loginData.password)
-        Redirect(routes.Application.landingPage()) // .flashing("success" -> "Contact saved!")
+        gotoLoginSucceeded(loginData.name)
+        // Redirect(routes.Application.landingPage()) // .flashing("success" -> "Contact saved!")
       }
     )
   }

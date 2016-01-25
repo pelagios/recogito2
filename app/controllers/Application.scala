@@ -3,11 +3,13 @@ package controllers
 import database.DB
 import models.Users
 import javax.inject.Inject
+import jp.t2v.lab.play2.auth.AuthElement
 import play.api.mvc.{ Action, Controller }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
+
 /** Just temporary container for everything while we're still hacking on the basics **/
-class Application @Inject() (implicit db: DB) extends Controller {
+class Application @Inject() (implicit val db: DB) extends Controller with HasDB with AuthElement with AuthConfigImpl {
 
   def landingPage = Action {
     Ok(views.html.landingPage())
@@ -16,6 +18,10 @@ class Application @Inject() (implicit db: DB) extends Controller {
   def listUsers = Action.async {
     val users = Users.listAll()
     users.map(u => Ok(views.html.users(u)))
+  }
+  
+  def restricted = StackAction(AuthorityKey -> Normal) { implicit request =>
+    Ok("You have access to the restricted area!")
   }
 
 }
