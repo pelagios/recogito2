@@ -12,7 +12,6 @@ GET     /login                             controllers.Login.showLoginForm
 POST    /login                             controllers.Login.processLogin
 GET     /signup                            controllers.Signup.showSignupForm
 POST    /signup                            controllers.Signup.processSignup
-GET     /restricted                        controllers.Application.restricted
 GET     /my-recogito					   controllers.MyRecogito.index
 GET     /logout                            controllers.Logout.logout
 
