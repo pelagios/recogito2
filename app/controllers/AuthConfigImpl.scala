@@ -3,7 +3,8 @@ package controllers
 import database.DB
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthConfig
-import models.{ Role, Users }
+import models.Users
+import models.Roles._
 import models.generated.tables.records.UsersRecord
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.reflect.{ ClassTag, classTag }

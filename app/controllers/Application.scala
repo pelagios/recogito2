@@ -1,7 +1,8 @@
 package controllers
 
 import database.DB
-import models.{ Normal, Users }
+import models.Users
+import models.Roles._
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import play.api.mvc.{ Action, Controller }
