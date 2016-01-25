@@ -3,12 +3,18 @@
 <html>
   <head>
     <title>Welcome to Recogito</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")"/>
   </head>
   <body>
-    <h1>Welcome to Recogito</h1>
-    <p>
-      <a href="@routes.Login.showLoginForm">Login</a>
-      <a href="@routes.Signup.showSignupForm">Create Account</a>
-    </p>
+    <div id="header-section">
+      <h1>Recogito</h1>
+      <p>
+        <a href="@routes.Login.showLoginForm" class="btn btn-large btn-blue">
+          <span class="icon">&#xf090;</span>
+          LOG IN
+        </a>
+        <a href="@routes.Signup.showSignupForm" class="btn btn-large">CREATE ACCOUNT</a>
+      </p>
+    </div>
   </body>
 </html>
