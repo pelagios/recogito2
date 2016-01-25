@@ -27,7 +27,6 @@ object Users {
   }
 
   def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
-    Logger.info("fetching " + username)
     Option(sql.selectFrom(USERS).where(USERS.USERNAME.equal(username)).fetchOne())
   }
   

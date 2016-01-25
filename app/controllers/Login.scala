@@ -36,9 +36,7 @@ class Login @Inject() (implicit val db: DB) extends Controller with LoginLogout 
       },
 
       loginData => {
-        Logger.info(loginData.name + ", " + loginData.password)
         gotoLoginSucceeded(loginData.name)
-        // Redirect(routes.Application.landingPage()) // .flashing("success" -> "Contact saved!")
       }
     )
   }
