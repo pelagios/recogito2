@@ -26,6 +26,7 @@ object Users {
     sql.selectFrom(USERS).fetch().into(classOf[UsersRecord]).toSeq
   }
 
+  /** TODO this is accessed for every request - should cache this at some point **/
   def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(USERS).where(USERS.USERNAME.equal(username)).fetchOne())
   }
