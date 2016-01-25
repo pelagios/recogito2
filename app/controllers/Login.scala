@@ -2,6 +2,7 @@ package controllers
 
 import database.DB
 import javax.inject.Inject
+import models.Users
 import play.api.Logger
 import play.api.mvc.{ Action, Controller }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -36,7 +37,13 @@ class Login @Inject() (implicit val db: DB) extends Controller with LoginLogout 
       },
 
       loginData => {
-        gotoLoginSucceeded(loginData.name)
+        Users.validateUser(loginData.name,loginData.password).flatMap(isValid => {
+          if (isValid)
+            gotoLoginSucceeded(loginData.name)
+          else
+            Future.successful(Redirect(routes.Login.showLoginForm()).flashing("message" -> "Invalid username or password"))
+        })
+        
       }
     )
   }

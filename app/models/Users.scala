@@ -10,6 +10,8 @@ import org.apache.commons.codec.binary.Base64
 import scala.collection.JavaConversions._
 import sun.security.provider.SecureRandom
 import play.api.Logger
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
 
 object Users {
   
@@ -29,6 +31,15 @@ object Users {
   /** TODO this is accessed for every request - should cache this at some point **/
   def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(USERS).where(USERS.USERNAME.equal(username)).fetchOne())
+  }
+  
+  def validateUser(username: String, password: String)(implicit db: DB) = {
+    findByUsername(username).map(_ match {
+      case Some(user) => 
+        computeHash(user.getSalt+password)==user.getPasswordHash
+      case None => false
+    })
+    
   }
   
   /** Utility function to create new random salt for password hashing **/
