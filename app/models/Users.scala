@@ -17,9 +17,9 @@ object Users {
 
   def insertUser(username: String, email: String, password: String)(implicit db: DB) = db.withTransaction { sql =>
     val salt = randomSalt
-    sql.insertInto(USERS, USERS.USERNAME, USERS.EMAIL, USERS.PASSWORD_HASH, USERS.SALT, USERS.MEMBER_SINCE)
-      .values(username, email, computeHash(salt + password), salt, OffsetDateTime.now)
-      .execute()
+    val user = new UsersRecord(username, email, computeHash(salt + password), salt, OffsetDateTime.now)
+    sql.insertInto(USERS).set(user).execute()
+    user
   }
 
   def listAll()(implicit db: DB) = db.query { sql =>

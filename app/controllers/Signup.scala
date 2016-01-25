@@ -10,11 +10,14 @@ import play.api.data.Forms._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import models.Users
+import scala.concurrent.Future
+import jp.t2v.lab.play2.auth.LoginLogout
+import scala.concurrent.Await
 
 case class SignupData(username: String, email: String, password: String)
 
 /** Just temporary container for everything while we're still hacking on the basics **/
-class Signup @Inject() (implicit db: DB) extends Controller {
+class Signup @Inject() (implicit val db: DB) extends Controller with LoginLogout with HasDB with AuthConfigImpl{
 
   val signupForm = Form(
     mapping(
@@ -28,16 +31,18 @@ class Signup @Inject() (implicit db: DB) extends Controller {
     Ok(views.html.signup(signupForm))
   }
 
-  def processSignup = Action { implicit request =>
+  def processSignup = Action.async { implicit request =>
     signupForm.bindFromRequest.fold(
       formWithErrors => {
         Logger.info("Bad request!")
-        BadRequest(views.html.signup(formWithErrors))
+        Future.successful(BadRequest(views.html.signup(formWithErrors)))
       },
 
       signupData => {
-        Users.insertUser(signupData.username, signupData.email, signupData.password)
-        Redirect(routes.Application.landingPage()) // .flashing("success" -> "Account Created!")
+        val user = Users.insertUser(signupData.username, signupData.email, signupData.password)
+        user.flatMap(u => {
+          gotoLoginSucceeded(u.getUsername)
+        })
       }
     )
   }

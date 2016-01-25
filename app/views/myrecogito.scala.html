@@ -1,0 +1,12 @@
+@(user : models.generated.tables.records.UsersRecord)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MY RECOGITO</title>
+  </head>
+  <body>
+    <h1>My Recogito</h1>
+    <p>you are logged in as: @user.getUsername</p>
+    <p><a href="@routes.Logout.logout">logout</a></p>
+  </body>
+</html>

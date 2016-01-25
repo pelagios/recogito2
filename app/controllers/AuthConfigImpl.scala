@@ -31,7 +31,7 @@ trait AuthConfigImpl extends AuthConfig { self: HasDB =>
     Users.findByUsername(id)(db)
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Results.Redirect(routes.Application.landingPage))
+    Future.successful(Results.Redirect(routes.MyRecogito.index()))
 
   def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Results.Redirect(routes.Application.landingPage))
