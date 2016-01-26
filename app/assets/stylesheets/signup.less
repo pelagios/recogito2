@@ -1,0 +1,39 @@
+@import "globals.less";
+
+body {
+  background-image: url("/assets/images/scratches.jpg");
+  background-size: 100% auto;
+}
+
+#content {
+  position:relative;
+  max-width:768px;
+  margin:30px auto;
+  background-color:#f8f8f8;
+  .rounded-corners(2px);
+}
+
+.col {
+  padding:30px;
+}
+
+#col-left {
+  .rounded-corners-left(2px);
+  background-color:#fff;
+  width:55%;
+  border-right:1px solid #f2f2f2;
+}
+
+#col-right {
+  position:absolute;
+  top:0;
+  text-align:center;
+  margin-left:55%;
+  width:45%;
+
+  form, dl, dd {
+    padding:0;
+    margin:0;
+  }
+
+}

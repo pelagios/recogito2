@@ -1,25 +1,23 @@
+@import "fonts.less";
 @import "buttons.less";
+@import "mixins.less";
 
-@font-face {
-  font-family: 'Cinzel';
-  src: url('/assets/fonts/cinzel/Cinzel-Regular.ttf');
+html, body {
+  padding:0;
+  margin:0;
+  font-size:17px;
+  font-family:PTSansNarrow;
+  line-height:150%;
+  color:#323232;
 }
 
-@font-face {
-  font-family: 'PTSansNarrow';
-  src: url('/assets/fonts/pt_sans_narrow/PT_Sans-Narrow-Web-Regular.ttf');
-}
-
-@font-face {
-  font-family: 'FontAwesome';
-  src: url('/assets/fonts/font_awesome/fontawesome-webfont.eot?v=4.5.0');
-  src: url('/assets/fonts/font_awesome/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'),
-       url('/assets/fonts/font_awesome/fontawesome-webfont.woff2?v=4.5.0') format('woff2'),
-       url('/assets/fonts/font_awesome/fontawesome-webfont.woff?v=4.5.0') format('woff'),
-       url('/assets/fonts/font_awesome/fontawesome-webfont.ttf?v=4.5.0') format('truetype'),
-       url('/assets/fonts/font_awesome/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
-  font-weight: normal;
-  font-style: normal;
+h1 {
+  font-family:PTSansNarrow;
+  letter-spacing:1px;
+  font-size:22px;
+  padding-bottom:10px;
+  margin:0;
+  padding:0;
 }
 
 .icon {

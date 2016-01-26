@@ -3,13 +3,52 @@
 <html>
   <head>
     <title>Recogito Signup</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/signup.css")"/>
   </head>
- <body>
-    @helper.form(action = routes.Signup.processSignup()) {
-      @helper.inputText(signupForm("username"))
-      @helper.inputText(signupForm("email"))
-      @helper.inputPassword(signupForm("password"))
-      <input type="submit" />
-    }
+  <body>
+    <div id="content">
+      <div class="col" id="col-left">
+        <h1>Terms and Conditions of Use</h1>
+        <p>
+          The Pelagios project has sought to ensure that the content of the materials hosted on
+          the Recogito website (the "Website") comply with UK copyright law. All third-party
+          Recogito Website content, except where otherwise noted, is to be used expressly on a
+          fair use basis, and explicitly for the purpose of annotating place references in
+          historical sources. Annotations created by each Recogito contributor are released
+          under a Creative Commons Attribution Zero license, for public use without requiring
+          attribution. All other materials should be assumed to fall under copyright unless
+          otherwise stated.
+        </p>
+
+        <p>
+          By logging in to the Recogito Website, you confirm that you accept these Terms of Use
+          and that you agree to comply with them:
+        </p>
+
+        <ul>
+          <li>You will view and use the documents hosted and licensed to the Recogito Website
+            solely for the purpose of annotating the content;</li>
+          <li>You consent to have any annotations created by you released immediately into the
+            public domain under the Creative Commons CC0 ('CC Zero') 1.0 Universal license;</li>
+          <li>You understand that the Recogito Website does not own the right to the materials nor
+            the right to license to third parties and you will not use any copyright materials from
+            this Website for purposes of your own that go beyond 'fair use' without first obtaining
+            permission from the respective copyright owner(s).</li>
+          <li>You will only upload content, documents and materials of which you own the entire
+            copyright, save that you may link to third party copyrighted materials. That you have
+            read, and accept the General Provisions and Disclaimer.</li>
+        </ul>
+      </div>
+
+      <div class="col" id="col-right">
+        <h1>Sign Up for Recogito</h1>
+        @helper.form(action = routes.Signup.processSignup()) {
+          @helper.inputText(signupForm("username"))
+          @helper.inputText(signupForm("email"))
+          @helper.inputPassword(signupForm("password"))
+          <input type="submit" />
+        }
+      </div>
+    </div>
   </body>
 </html>
