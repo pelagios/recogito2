@@ -46,9 +46,9 @@
           <!-- These are here to disable Chrome autofill -->
           <input style="display:none" type="text" name="dummyusername"/>
           <input style="display:none" type="password" name="dummypassword"/>
-          @helper.inputText(signupForm("username"), args = 'placeholder -> "Enter a Username...")
-          @helper.inputText(signupForm("email"), args = 'placeholder -> "Email")
-          @helper.inputPassword(signupForm("password"), args = 'placeholder -> "Password")
+          @helper.inputText(signupForm("username"), args = 'placeholder -> "Enter a Username...", 'autocomplete -> "off")
+          @helper.inputText(signupForm("email"), args = 'placeholder -> "Email", 'autocomplete -> "off")
+          @helper.inputPassword(signupForm("password"), args = 'placeholder -> "Password", 'autocomplete -> "off")
           <p class="disclaimer">
             Signing up signifies you have read and agree to our Terms and Conditions of Use.
           </p>

@@ -15,8 +15,8 @@
       @helper.form(action = controllers.landing.routes.LoginController.processLogin()) {
         <input style="display:none" type="text" name="dummyusername"/>
         <input style="display:none" type="password" name="dummypassword"/>
-        @helper.inputText(loginForm("username"), args = 'placeholder -> "Username")
-        @helper.inputPassword(loginForm("password"), args = 'placeholder -> "Password")
+        @helper.inputText(loginForm("username"), args = 'placeholder -> "Username", 'autocomplete -> "false")
+        @helper.inputPassword(loginForm("password"), args = 'placeholder -> "Password", 'autocomplete -> "false")
         <button type="submit" class="btn btn-blue btn-large"/>
           <span class="icon">&#xf090;</span>
           Log In
