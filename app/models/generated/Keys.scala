@@ -57,6 +57,6 @@ object Keys {
 	}
 
 	private object ForeignKeys0 extends AbstractKeys {
-		val FK_DOCUMENTS_USERS_1 : ForeignKey[DocumentsRecord, UsersRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USERS, Documents.DOCUMENTS, Documents.DOCUMENTS.USERNAME)
+		val FK_DOCUMENTS_USERS_1 : ForeignKey[DocumentsRecord, UsersRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USERS, Documents.DOCUMENTS, Documents.DOCUMENTS.OWNERID)
 	}
 }

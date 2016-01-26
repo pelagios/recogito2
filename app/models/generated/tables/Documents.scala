@@ -57,9 +57,9 @@ class Documents(alias : String, aliased : Table[DocumentsRecord], parameters : A
 	val ID : TableField[DocumentsRecord, Integer] = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), "")
 
 	/**
-	 * The column <code>documents.username</code>.
+	 * The column <code>documents.ownerid</code>.
 	 */
-	val USERNAME : TableField[DocumentsRecord, String] = createField("username", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val OWNERID : TableField[DocumentsRecord, String] = createField("ownerid", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
 
 	/**
 	 * The column <code>documents.title</code>.

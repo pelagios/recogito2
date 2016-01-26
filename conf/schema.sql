@@ -8,7 +8,7 @@ CREATE TABLE users (
 
 CREATE TABLE documents (
   id integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-  username varchar NOT NULL REFERENCES users(username),
+  ownerid varchar NOT NULL REFERENCES users(username),
   title varchar NOT NULL,
   author varchar,
   description varchar,

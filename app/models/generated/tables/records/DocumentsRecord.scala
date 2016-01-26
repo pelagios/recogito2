@@ -46,16 +46,16 @@ class DocumentsRecord extends UpdatableRecordImpl[DocumentsRecord](Documents.DOC
 	}
 
 	/**
-	 * Setter for <code>documents.username</code>.
+	 * Setter for <code>documents.ownerid</code>.
 	 */
-	def setUsername(value : String) : Unit = {
+	def setOwnerid(value : String) : Unit = {
 		setValue(1, value)
 	}
 
 	/**
-	 * Getter for <code>documents.username</code>.
+	 * Getter for <code>documents.ownerid</code>.
 	 */
-	def getUsername : String = {
+	def getOwnerid : String = {
 		val r = getValue(1)
 		if (r == null) null else r.asInstanceOf[String]
 	}
@@ -139,13 +139,13 @@ class DocumentsRecord extends UpdatableRecordImpl[DocumentsRecord](Documents.DOC
 		super.valuesRow.asInstanceOf[ Row6[Integer, String, String, String, String, String] ]
 	}
 	override def field1 : Field[Integer] = Documents.DOCUMENTS.ID
-	override def field2 : Field[String] = Documents.DOCUMENTS.USERNAME
+	override def field2 : Field[String] = Documents.DOCUMENTS.OWNERID
 	override def field3 : Field[String] = Documents.DOCUMENTS.TITLE
 	override def field4 : Field[String] = Documents.DOCUMENTS.AUTHOR
 	override def field5 : Field[String] = Documents.DOCUMENTS.DESCRIPTION
 	override def field6 : Field[String] = Documents.DOCUMENTS.LANGUAGE
 	override def value1 : Integer = getId
-	override def value2 : String = getUsername
+	override def value2 : String = getOwnerid
 	override def value3 : String = getTitle
 	override def value4 : String = getAuthor
 	override def value5 : String = getDescription
@@ -157,7 +157,7 @@ class DocumentsRecord extends UpdatableRecordImpl[DocumentsRecord](Documents.DOC
 	}
 
 	override def value2(value : String) : DocumentsRecord = {
-		setUsername(value)
+		setOwnerid(value)
 		this
 	}
 
@@ -194,11 +194,11 @@ class DocumentsRecord extends UpdatableRecordImpl[DocumentsRecord](Documents.DOC
 	/**
 	 * Create a detached, initialised DocumentsRecord
 	 */
-	def this(id : Integer, username : String, title : String, author : String, description : String, language : String) = {
+	def this(id : Integer, ownerid : String, title : String, author : String, description : String, language : String) = {
 		this()
 
 		setValue(0, id)
-		setValue(1, username)
+		setValue(1, ownerid)
 		setValue(2, title)
 		setValue(3, author)
 		setValue(4, description)

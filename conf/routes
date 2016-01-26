@@ -16,6 +16,12 @@ GET     /my-recogito					   controllers.MyRecogito.index
 GET     /logout                            controllers.Logout.logout
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document management related
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+GET     /my-recogito/document              controllers.DocumentUpload.showMetadataForm
+POST    /my-recogito/document              controllers.DocumentUpload.processMetadataUpload
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Frontpage
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
