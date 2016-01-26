@@ -1,9 +1,9 @@
-@(signupForm: Form[SignupData])(implicit messages: Messages)
+@(signupForm: Form[controllers.landing.SignupData])(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito Signup</title>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/signup.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/signup.css")"/>
   </head>
   <body>
     <div id="content">
@@ -42,7 +42,7 @@
 
       <div class="col" id="col-right">
         <h1>Sign Up for Recogito</h1>
-        @helper.form(action = routes.Signup.processSignup()) {
+        @helper.form(action = controllers.landing.routes.SignupController.processSignup()) {
           <!-- These are here to disable Chrome autofill -->
           <input style="display:none" type="text" name="dummyusername"/>
           <input style="display:none" type="password" name="dummypassword"/>

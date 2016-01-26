@@ -1,0 +1,20 @@
+@()
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to Recogito</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/index.css")"/>
+  </head>
+  <body>
+    <div id="header-section">
+      <h1>Recogito</h1>
+      <p>
+        <a href="@controllers.landing.routes.LoginController.showLoginForm" class="btn btn-large btn-blue">
+          <span class="icon">&#xf090;</span>
+          LOG IN
+        </a>
+        <a href="@controllers.landing.routes.SignupController.showSignupForm" class="btn btn-large">CREATE ACCOUNT</a>
+      </p>
+    </div>
+  </body>
+</html>

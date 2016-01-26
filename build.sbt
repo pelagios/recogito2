@@ -24,7 +24,9 @@ resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
 
-includeFilter in (Assets, LessKeys.less) := "main.less" | "signup.less"
+includeFilter in (Assets, LessKeys.less) := "*.less"
+
+excludeFilter in (Assets, LessKeys.less) := "_*.less"
 
 val generateJOOQ = taskKey[Seq[File]]("Generate JooQ classes")
 

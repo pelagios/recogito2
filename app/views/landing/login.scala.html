@@ -1,0 +1,21 @@
+@(loginForm: Form[controllers.landing.LoginData])(implicit messages: Messages, flash: Flash)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to Recogito</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/login.css")"/>
+  </head>
+  <body>
+    <div id="content">
+      @flash.get("message").map { msg =>
+        <p><strong>@msg</strong></p>
+      }
+
+      @helper.form(action = controllers.landing.routes.LoginController.processLogin()) {
+        @helper.inputText(loginForm("username"))
+        @helper.inputPassword(loginForm("password"))
+        <input type="submit" />
+      }
+    </div>
+  </body>
+</html>

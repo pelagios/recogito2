@@ -17,7 +17,7 @@ import models.Roles._
 
 case class DocMetaFormData(title: String, author: String, description: String, language: String)
 
-class DocumentUpload @Inject() (implicit val db: DB) extends Controller with AuthElement with HasDB with AuthConfigImpl{
+class DocumentUpload @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
   
   val metadataForm = Form(
     mapping(
