@@ -15,9 +15,12 @@
       @helper.form(action = controllers.landing.routes.LoginController.processLogin()) {
         <input style="display:none" type="text" name="dummyusername"/>
         <input style="display:none" type="password" name="dummypassword"/>
-        @helper.inputText(loginForm("username"))
-        @helper.inputPassword(loginForm("password"))
-        <input type="submit" value="Log In" class="btn btn-blue btn-large"/>
+        @helper.inputText(loginForm("username"), args = 'placeholder -> "Username")
+        @helper.inputPassword(loginForm("password"), args = 'placeholder -> "Password")
+        <button type="submit" class="btn btn-blue btn-large"/>
+          <span class="icon">&#xf090;</span>
+          Log In
+        </button>
       }
     </div>
   </body>
