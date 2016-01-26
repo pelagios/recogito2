@@ -43,10 +43,16 @@
       <div class="col" id="col-right">
         <h1>Sign Up for Recogito</h1>
         @helper.form(action = routes.Signup.processSignup()) {
-          @helper.inputText(signupForm("username"))
-          @helper.inputText(signupForm("email"))
-          @helper.inputPassword(signupForm("password"))
-          <input type="submit" />
+          <!-- These are here to disable Chrome autofill -->
+          <input style="display:none" type="text" name="dummyusername"/>
+          <input style="display:none" type="password" name="dummypassword"/>
+          @helper.inputText(signupForm("username"), args = 'placeholder -> "Enter a Username...")
+          @helper.inputText(signupForm("email"), args = 'placeholder -> "Email")
+          @helper.inputPassword(signupForm("password"), args = 'placeholder -> "Password")
+          <p class="disclaimer">
+            Signing up signifies you have read and agree to our Terms and Conditions of Use.
+          </p>
+          <input type="submit" value="Create Account" class="btn btn-blue btn-large"/>
         }
       </div>
     </div>
