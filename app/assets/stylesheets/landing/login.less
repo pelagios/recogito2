@@ -1,0 +1,29 @@
+@import "../_globals.less";
+@import "_credentialPage.less";
+
+#content {
+  box-sizing:border-box;
+  position:relative;
+  width:400px;
+  margin:30px auto;
+  background-color:#f8f8f8;
+  .rounded-corners(2px);
+  box-shadow:0 2px 10px 0 rgba(0,0,0,0.2),0 2px 20px 0 rgba(0,0,0,0.2);
+  padding:20px 20px 10px 20px;
+  text-align:center;
+}
+
+.login-error {
+  color:#ef4343;
+  font-size:15px;
+  padding:10px 0 0 0;
+}
+
+input[type=text], input[type=password] {
+  width:320px;
+}
+
+input[type=submit] {
+  width:360px;
+  margin:10px 0;
+}

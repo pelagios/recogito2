@@ -1,9 +1,5 @@
 @import "../_globals.less";
-
-body {
-  background-image: url("/assets/images/scratches.jpg");
-  background-size: 100% auto;
-}
+@import "_credentialPage.less";
 
 #content {
   position:relative;
@@ -40,52 +36,8 @@ body {
     width:220px;
   }
 
-  dl, dd {
-    padding:0;
-    margin:0;
-  }
+}
 
-  form {
-    padding-top:15px;
-
-    input {
-      border:0;
-    }
-
-    label, dd.info {
-      display:none;
-    }
-
-    dd.error {
-      color:#ef4343;
-      font-size:15px;
-      margin-top:-5px;
-      padding-bottom:5px;
-    }
-
-    input[type=text], input[type=password] {
-      color:#525252;
-      background-color:#fff;
-      width:180px;
-      padding:12px 20px;
-      margin:7px 0;
-      font-size:17px;
-      font-family:PTSansNarrow;
-      letter-spacing:1px;
-      outline:none;
-      border:1px solid #f2f2f2;
-    }
-
-    input[type=text]:focus, input[type=password]:focus {
-      border-color:#4f92d7;
-      box-shadow: 0 0 4px 0 rgba(79,146,215,0.5);
-    }
-
-    input[type=submit] {
-      box-shadow:none;
-      cursor:pointer;
-    }
-
-  }
-
+input[type=text], input[type=password] {
+  width:180px;
 }

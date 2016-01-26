@@ -7,14 +7,17 @@
   </head>
   <body>
     <div id="content">
+      <h1>Sign in</h1>
       @flash.get("message").map { msg =>
-        <p><strong>@msg</strong></p>
+        <p class="login-error"><strong>@msg</strong></p>
       }
 
       @helper.form(action = controllers.landing.routes.LoginController.processLogin()) {
+        <input style="display:none" type="text" name="dummyusername"/>
+        <input style="display:none" type="password" name="dummypassword"/>
         @helper.inputText(loginForm("username"))
         @helper.inputPassword(loginForm("password"))
-        <input type="submit" />
+        <input type="submit" value="Log In" class="btn btn-blue btn-large"/>
       }
     </div>
   </body>
