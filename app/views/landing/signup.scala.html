@@ -1,4 +1,4 @@
-@(signupForm: Form[controllers.landing.SignupData])(implicit messages: Messages)
+@(signupForm: Form[controllers.landing.SignupData], message: Option[String] = None)(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
   <head>
@@ -42,6 +42,10 @@
 
       <div class="col" id="col-right">
         <h1>Sign Up for Recogito</h1>
+        @message.map { msg =>
+          <p class="error-msg"><strong>@msg</strong></p>
+        }
+
         @helper.form(action = controllers.landing.routes.SignupController.processSignup()) {
           <!-- These are here to disable Chrome autofill -->
           <input style="display:none" type="text" name="dummyusername"/>

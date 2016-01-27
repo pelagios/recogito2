@@ -9,7 +9,7 @@
     <div id="content">
       <h1>Sign in</h1>
       @flash.get("message").map { msg =>
-        <p class="login-error"><strong>@msg</strong></p>
+        <p class="error-msg"><strong>@msg</strong></p>
       }
 
       @helper.form(action = controllers.landing.routes.LoginController.processLogin()) {
