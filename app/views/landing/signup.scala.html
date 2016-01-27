@@ -46,10 +46,8 @@
           <p class="error-msg"><strong>@msg</strong></p>
         }
 
-        @helper.form(action = controllers.landing.routes.SignupController.processSignup()) {
+        @helper.form(action = controllers.landing.routes.SignupController.processSignup(), args = 'autocomplete -> "off") {
           <!-- These are here to disable Chrome autofill -->
-          <input style="display:none" type="text" name="dummyusername"/>
-          <input style="display:none" type="password" name="dummypassword"/>
           @helper.inputText(signupForm("username"), args = 'placeholder -> "Enter a Username...", 'autocomplete -> "off")
           @helper.inputText(signupForm("email"), args = 'placeholder -> "Email", 'autocomplete -> "off")
           @helper.inputPassword(signupForm("password"), args = 'placeholder -> "Password", 'autocomplete -> "off")
