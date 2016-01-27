@@ -4,7 +4,7 @@ import controllers.{ AbstractController, Security }
 import database.DB
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
-import models.Users
+import models.UserService
 import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
@@ -35,7 +35,7 @@ class SignupController @Inject() (implicit val db: DB) extends AbstractControlle
         Future.successful(BadRequest(views.html.landing.signup(formWithErrors))),
 
       signupData =>
-        Users.insertUser(signupData.username, signupData.email, signupData.password).flatMap(user =>
+        UserService.insertUser(signupData.username, signupData.email, signupData.password).flatMap(user =>
           gotoLoginSucceeded(user.getUsername))
     )
   }

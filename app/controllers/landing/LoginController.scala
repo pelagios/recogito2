@@ -4,7 +4,7 @@ import controllers.{ AbstractController, Security }
 import database.DB
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
-import models.Users
+import models.UserService
 import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
@@ -39,7 +39,7 @@ class LoginController @Inject() (implicit val db: DB) extends AbstractController
       },
 
       loginData => {
-        Users.validateUser(loginData.username, loginData.password).flatMap(isValid => {
+        UserService.validateUser(loginData.username, loginData.password).flatMap(isValid => {
           if (isValid)
             gotoLoginSucceeded(loginData.username)
           else

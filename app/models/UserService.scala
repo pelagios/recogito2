@@ -13,7 +13,7 @@ import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
-object Users {
+object UserService {
   
   private val MD5 = "MD5"
 

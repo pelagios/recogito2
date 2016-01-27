@@ -11,7 +11,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import jp.t2v.lab.play2.auth.AuthElement
 import play.api.Play.current
 import scala.concurrent.Future
-import models.Documents
+import models.DocumentService
 import models.Roles._
 
 
@@ -38,7 +38,7 @@ class DocumentUpload @Inject() (implicit val db: DB) extends AbstractController 
         Future.successful(BadRequest(views.html.documentupload(formWithErrors))),
 
       docMetadata =>
-        Documents.insertMetadata(loggedIn.getUsername, docMetadata.title, docMetadata.author, docMetadata.description, docMetadata.language).flatMap(doc =>
+        DocumentService.insertMetadata(loggedIn.getUsername, docMetadata.title, docMetadata.author, docMetadata.description, docMetadata.language).flatMap(doc =>
            Future(Redirect(routes.DocumentUpload.showMetadataForm())) 
         )
     )
