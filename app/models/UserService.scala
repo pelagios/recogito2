@@ -14,8 +14,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
 object UserService {
-  
-  private val MD5 = "MD5"
+
+  private val SHA_256 = "SHA-256"
 
   def insertUser(username: String, email: String, password: String)(implicit db: DB) = db.withTransaction { sql =>
     val salt = randomSalt
@@ -32,16 +32,16 @@ object UserService {
   def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(USERS).where(USERS.USERNAME.equal(username)).fetchOne())
   }
-  
+
   def validateUser(username: String, password: String)(implicit db: DB) = {
     findByUsername(username).map(_ match {
-      case Some(user) => 
+      case Some(user) =>
         computeHash(user.getSalt+password)==user.getPasswordHash
       case None => false
     })
-    
+
   }
-  
+
   /** Utility function to create new random salt for password hashing **/
   private def randomSalt = {
     val r = new SecureRandom()
@@ -52,7 +52,7 @@ object UserService {
 
   /** Utility function to compute an MD5 password hash **/
   private def computeHash(str: String) = {
-    val md = MessageDigest.getInstance(MD5).digest(str.getBytes)
+    val md = MessageDigest.getInstance(SHA_256).digest(str.getBytes)
     new BigInteger(1, md).toString(16)
   }
 

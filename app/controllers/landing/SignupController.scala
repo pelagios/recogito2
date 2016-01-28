@@ -16,15 +16,15 @@ import scala.concurrent.Future
 case class SignupData(username: String, email: String, password: String)
 
 class SignupController @Inject() (implicit val db: DB) extends AbstractController with Login with Security {
-  
+
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
-  
-  // We're checking for occurrence of specific text snippets in exception message. 
+
+  // We're checking for occurrence of specific text snippets in exception message.
   // Quite hard-coded... but currently don't see a cleaner way.
   private val SCREEN_ERROR_MESSAGES = Map(
     "UNIQUE constraint failed" -> "This username is no longer available")
-  
-  private def screenErrorMessage(t: Throwable) = 
+
+  private def screenErrorMessage(t: Throwable) =
     SCREEN_ERROR_MESSAGES.find { case (trigger, screenMsg) => t.getMessage.contains(trigger) }
       .map(_._2).getOrElse(DEFAULT_ERROR_MESSAGE)
 
@@ -48,7 +48,7 @@ class SignupController @Inject() (implicit val db: DB) extends AbstractControlle
       signupData =>
         UserService.insertUser(signupData.username, signupData.email, signupData.password)
           .flatMap(user => gotoLoginSucceeded(user.getUsername))
-          .recover{ case t:Throwable =>
+          .recover { case t:Throwable =>
             Ok(views.html.landing.signup(signupForm.bindFromRequest, Some(screenErrorMessage(t)))) }
     )
   }
