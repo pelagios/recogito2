@@ -34,18 +34,16 @@ class LoginController @Inject() (implicit val db: DB) extends AbstractController
 
   def processLogin = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => {
-        Future(BadRequest(views.html.landing.login(formWithErrors)))
-      },
+      formWithErrors =>
+        Future(BadRequest(views.html.landing.login(formWithErrors))),
 
-      loginData => {
+      loginData =>
         UserService.validateUser(loginData.username, loginData.password).flatMap(isValid => {
           if (isValid)
             gotoLoginSucceeded(loginData.username)
           else
             Future(Redirect(routes.LoginController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
         })
-      }
     )
   }
 

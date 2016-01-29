@@ -12,7 +12,6 @@ import sun.security.provider.SecureRandom
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-
 object UserService {
 
   private val SHA_256 = "SHA-256"
@@ -33,14 +32,11 @@ object UserService {
     Option(sql.selectFrom(USERS).where(USERS.USERNAME.equal(username)).fetchOne())
   }
 
-  def validateUser(username: String, password: String)(implicit db: DB) = {
+  def validateUser(username: String, password: String)(implicit db: DB) =
     findByUsername(username).map(_ match {
-      case Some(user) =>
-        computeHash(user.getSalt+password)==user.getPasswordHash
+      case Some(user) => computeHash(user.getSalt+password) == user.getPasswordHash
       case None => false
     })
-
-  }
 
   /** Utility function to create new random salt for password hashing **/
   private def randomSalt = {

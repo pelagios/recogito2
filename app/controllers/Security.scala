@@ -9,17 +9,17 @@ import scala.reflect.{ ClassTag, classTag }
 import play.api.mvc.{ Result, Results, RequestHeader }
 
 trait Security extends AuthConfig { self: HasDatabase =>
-  
+
   private val NO_PERMISSION = "No permission"
 
   type Id = String
- 
+
   type User = UsersRecord
 
   type Authority = Role
 
   val idTag: ClassTag[Id] = classTag[Id]
-  
+
   val sessionTimeoutInSeconds: Int = 3600
 
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] =
@@ -38,8 +38,8 @@ trait Security extends AuthConfig { self: HasDatabase =>
     Future.successful(Results.Forbidden(NO_PERMISSION))
 
   def authorize(user: User, authority: Authority)(implicit ctx: ExecutionContext): Future[Boolean] = Future.successful {
+    // TODO implement
     true
   }
-  
-}
 
+}
