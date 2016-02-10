@@ -20,6 +20,7 @@ GET     /logout                            controllers.landing.LogoutController.
 
 GET     /my-recogito/document              controllers.DocumentUpload.showMetadataForm
 POST    /my-recogito/document              controllers.DocumentUpload.processMetadataUpload
+POST    /my-recogito/upload                controllers.myrecogito.upload.UploadController.processContentUpload
 GET     /my-recogito					   controllers.MyRecogito.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
