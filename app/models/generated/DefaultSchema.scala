@@ -10,9 +10,14 @@ import java.util.List
 
 import javax.annotation.Generated
 
-import models.generated.tables.Documents
+import models.generated.tables.Document
+import models.generated.tables.Folder
+import models.generated.tables.FolderAssociation
+import models.generated.tables.SharingRecord
 import models.generated.tables.SqliteSequence
-import models.generated.tables.Users
+import models.generated.tables.Team
+import models.generated.tables.TeamMembership
+import models.generated.tables.User
 
 import org.jooq.Table
 import org.jooq.impl.SchemaImpl
@@ -46,8 +51,13 @@ class DefaultSchema extends SchemaImpl("") {
 
 	private def getTables0() : List[Table[_]] = {
 		return Arrays.asList[Table[_]](
-			Documents.DOCUMENTS,
+			Document.DOCUMENT,
+			Folder.FOLDER,
+			FolderAssociation.FOLDER_ASSOCIATION,
+			SharingRecord.SHARING_RECORD,
 			SqliteSequence.SQLITE_SEQUENCE,
-			Users.USERS)
+			Team.TEAM,
+			TeamMembership.TEAM_MEMBERSHIP,
+			User.USER)
 	}
 }

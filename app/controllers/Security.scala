@@ -3,7 +3,7 @@ package controllers
 import jp.t2v.lab.play2.auth.AuthConfig
 import models.Roles._
 import models.UserService
-import models.generated.tables.records.UsersRecord
+import models.generated.tables.records.UserRecord
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.reflect.{ ClassTag, classTag }
 import play.api.mvc.{ Result, Results, RequestHeader }
@@ -14,7 +14,7 @@ trait Security extends AuthConfig { self: HasDatabase =>
 
   type Id = String
 
-  type User = UsersRecord
+  type User = UserRecord
 
   type Authority = Role
 

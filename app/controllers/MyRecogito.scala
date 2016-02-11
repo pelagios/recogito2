@@ -8,9 +8,9 @@ import play.api.mvc.{ Action, Controller }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 class MyRecogito @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
-  
+
    def index = StackAction(AuthorityKey -> Normal) { implicit request =>
      Ok(views.html.myrecogito(loggedIn))
   }
-   
+
 }
