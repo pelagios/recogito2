@@ -18,7 +18,7 @@ import models.Roles._
 case class DocMetaFormData(title: String, author: String, description: String, language: String)
 
 class DocumentUpload @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
-  
+
   val metadataForm = Form(
     mapping(
       "title" -> nonEmptyText,
@@ -27,21 +27,21 @@ class DocumentUpload @Inject() (implicit val db: DB) extends AbstractController 
       "language" -> nonEmptyText
     )(DocMetaFormData.apply)(DocMetaFormData.unapply)
   )
-  
+
   def showMetadataForm = StackAction (AuthorityKey ->Normal) { implicit request =>
     Ok(views.html.documentupload(metadataForm))
   }
-   
+
   def processMetadataUpload =  AsyncStack(AuthorityKey ->Normal) {  implicit request =>
     metadataForm.bindFromRequest.fold(
       formWithErrors =>
         Future.successful(BadRequest(views.html.documentupload(formWithErrors))),
 
       docMetadata =>
-        DocumentService.insertMetadata(loggedIn.getUsername, docMetadata.title, docMetadata.author, docMetadata.description, docMetadata.language).flatMap(doc =>
-           Future(Redirect(routes.DocumentUpload.showMetadataForm())) 
+        DocumentService.insertMetadata(loggedIn.getUsername, docMetadata.author, docMetadata.title, docMetadata.description, docMetadata.language).flatMap(doc =>
+           Future(Redirect(routes.DocumentUpload.showMetadataForm()))
         )
     )
   }
-  
+
 }

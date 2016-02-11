@@ -6,9 +6,14 @@ package models.generated
 
 import javax.annotation.Generated
 
-import models.generated.tables.Documents
+import models.generated.tables.Document
+import models.generated.tables.Folder
+import models.generated.tables.FolderAssociation
+import models.generated.tables.SharingRecord
 import models.generated.tables.SqliteSequence
-import models.generated.tables.Users
+import models.generated.tables.Team
+import models.generated.tables.TeamMembership
+import models.generated.tables.User
 
 
 /**
@@ -24,9 +29,24 @@ import models.generated.tables.Users
 object Tables {
 
 	/**
-	 * The table documents
+	 * The table document
 	 */
-	val DOCUMENTS = models.generated.tables.Documents.DOCUMENTS
+	val DOCUMENT = models.generated.tables.Document.DOCUMENT
+
+	/**
+	 * The table folder
+	 */
+	val FOLDER = models.generated.tables.Folder.FOLDER
+
+	/**
+	 * The table folder_association
+	 */
+	val FOLDER_ASSOCIATION = models.generated.tables.FolderAssociation.FOLDER_ASSOCIATION
+
+	/**
+	 * The table sharing_record
+	 */
+	val SHARING_RECORD = models.generated.tables.SharingRecord.SHARING_RECORD
 
 	/**
 	 * The table sqlite_sequence
@@ -34,7 +54,17 @@ object Tables {
 	val SQLITE_SEQUENCE = models.generated.tables.SqliteSequence.SQLITE_SEQUENCE
 
 	/**
-	 * The table users
+	 * The table team
 	 */
-	val USERS = models.generated.tables.Users.USERS
+	val TEAM = models.generated.tables.Team.TEAM
+
+	/**
+	 * The table team_membership
+	 */
+	val TEAM_MEMBERSHIP = models.generated.tables.TeamMembership.TEAM_MEMBERSHIP
+
+	/**
+	 * The table user
+	 */
+	val USER = models.generated.tables.User.USER
 }

@@ -5,7 +5,7 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.time.OffsetDateTime
 import models.generated.Tables._
-import models.generated.tables.records.UsersRecord
+import models.generated.tables.records.UserRecord
 import org.apache.commons.codec.binary.Base64
 import scala.collection.JavaConversions._
 import sun.security.provider.SecureRandom
@@ -18,18 +18,18 @@ object UserService {
 
   def insertUser(username: String, email: String, password: String)(implicit db: DB) = db.withTransaction { sql =>
     val salt = randomSalt
-    val user = new UsersRecord(username, email, computeHash(salt + password), salt, OffsetDateTime.now)
-    sql.insertInto(USERS).set(user).execute()
+    val user = new UserRecord(username, email, computeHash(salt + password), salt, OffsetDateTime.now, true)
+    sql.insertInto(USER).set(user).execute()
     user
   }
 
   def listAll()(implicit db: DB) = db.query { sql =>
-    sql.selectFrom(USERS).fetch().into(classOf[UsersRecord]).toSeq
+    sql.selectFrom(USER).fetch().into(classOf[UserRecord]).toSeq
   }
 
   /** TODO this is accessed for every request - should cache this at some point **/
   def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
-    Option(sql.selectFrom(USERS).where(USERS.USERNAME.equal(username)).fetchOne())
+    Option(sql.selectFrom(USER).where(USER.USERNAME.equal(username)).fetchOne())
   }
 
   def validateUser(username: String, password: String)(implicit db: DB) =

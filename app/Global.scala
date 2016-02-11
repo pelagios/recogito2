@@ -23,9 +23,15 @@ object Global extends GlobalSettings {
   private def initDB(connection: Connection) = {
     // Splitting by ; is not 100% robust - but should be sufficient for our own schema file
     val statement = connection.createStatement
-    Source.fromFile(SCHEMA_SQL)("UTF-8").getLines().mkString("\n").split(";").foreach(s => {
-      statement.addBatch(s + ";")
-    })
+
+    Source.fromFile(SCHEMA_SQL)("UTF-8")
+      .getLines().map(_.trim)
+      .filter(line => !(line.startsWith("--") || line.isEmpty))
+      .mkString(" ").split(";")
+      .foreach(s => {
+        statement.addBatch(s + ";")
+      })
+
     statement.executeBatch()
     statement.close()
   }
