@@ -13,6 +13,8 @@ import models.generated.tables.SharingEventLog
 import models.generated.tables.SharingPolicy
 import models.generated.tables.Team
 import models.generated.tables.TeamMembership
+import models.generated.tables.Upload
+import models.generated.tables.UploadFilepart
 import models.generated.tables.User
 import models.generated.tables.UserActivityLog
 import models.generated.tables.UserActivityPerDay
@@ -23,6 +25,8 @@ import models.generated.tables.records.SharingEventLogRecord
 import models.generated.tables.records.SharingPolicyRecord
 import models.generated.tables.records.TeamMembershipRecord
 import models.generated.tables.records.TeamRecord
+import models.generated.tables.records.UploadFilepartRecord
+import models.generated.tables.records.UploadRecord
 import models.generated.tables.records.UserActivityLogRecord
 import models.generated.tables.records.UserActivityPerDayRecord
 import models.generated.tables.records.UserRecord
@@ -59,6 +63,8 @@ object Keys {
 	val PK_SHARING_EVENT_LOG = UniqueKeys0.PK_SHARING_EVENT_LOG
 	val PK_SHARING_POLICY = UniqueKeys0.PK_SHARING_POLICY
 	val PK_TEAM = UniqueKeys0.PK_TEAM
+	val PK_UPLOAD = UniqueKeys0.PK_UPLOAD
+	val PK_UPLOAD_FILEPART = UniqueKeys0.PK_UPLOAD_FILEPART
 	val PK_USER = UniqueKeys0.PK_USER
 	val PK_USER_ACTIVITY_LOG = UniqueKeys0.PK_USER_ACTIVITY_LOG
 	val PK_USER_ACTIVITY_PER_DAY = UniqueKeys0.PK_USER_ACTIVITY_PER_DAY
@@ -81,6 +87,8 @@ object Keys {
 	val FK_TEAM_USER_1 = ForeignKeys0.FK_TEAM_USER_1
 	val FK_TEAM_MEMBERSHIP_USER_1 = ForeignKeys0.FK_TEAM_MEMBERSHIP_USER_1
 	val FK_TEAM_MEMBERSHIP_TEAM_1 = ForeignKeys0.FK_TEAM_MEMBERSHIP_TEAM_1
+	val FK_UPLOAD_USER_1 = ForeignKeys0.FK_UPLOAD_USER_1
+	val FK_UPLOAD_FILEPART_UPLOAD_1 = ForeignKeys0.FK_UPLOAD_FILEPART_UPLOAD_1
 	val FK_USER_ACTIVITY_LOG_USER_1 = ForeignKeys0.FK_USER_ACTIVITY_LOG_USER_1
 	val FK_USER_ACTIVITY_PER_DAY_USER_1 = ForeignKeys0.FK_USER_ACTIVITY_PER_DAY_USER_1
 
@@ -94,6 +102,8 @@ object Keys {
 		val PK_SHARING_EVENT_LOG : UniqueKey[SharingEventLogRecord] = AbstractKeys.createUniqueKey(SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ID)
 		val PK_SHARING_POLICY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val PK_TEAM : UniqueKey[TeamRecord] = AbstractKeys.createUniqueKey(Team.TEAM, Team.TEAM.TITLE)
+		val PK_UPLOAD : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.ID)
+		val PK_UPLOAD_FILEPART : UniqueKey[UploadFilepartRecord] = AbstractKeys.createUniqueKey(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.ID)
 		val PK_USER : UniqueKey[UserRecord] = AbstractKeys.createUniqueKey(User.USER, User.USER.USERNAME)
 		val PK_USER_ACTIVITY_LOG : UniqueKey[UserActivityLogRecord] = AbstractKeys.createUniqueKey(UserActivityLog.USER_ACTIVITY_LOG, UserActivityLog.USER_ACTIVITY_LOG.ID)
 		val PK_USER_ACTIVITY_PER_DAY : UniqueKey[UserActivityPerDayRecord] = AbstractKeys.createUniqueKey(UserActivityPerDay.USER_ACTIVITY_PER_DAY, UserActivityPerDay.USER_ACTIVITY_PER_DAY.ID)
@@ -114,6 +124,8 @@ object Keys {
 		val FK_TEAM_USER_1 : ForeignKey[TeamRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Team.TEAM, Team.TEAM.CREATED_BY)
 		val FK_TEAM_MEMBERSHIP_USER_1 : ForeignKey[TeamMembershipRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.USERNAME)
 		val FK_TEAM_MEMBERSHIP_TEAM_1 : ForeignKey[TeamMembershipRecord, TeamRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_TEAM, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.TEAM)
+		val FK_UPLOAD_USER_1 : ForeignKey[UploadRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Upload.UPLOAD, Upload.UPLOAD.OWNER)
+		val FK_UPLOAD_FILEPART_UPLOAD_1 : ForeignKey[UploadFilepartRecord, UploadRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_UPLOAD, UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.UPLOAD_ID)
 		val FK_USER_ACTIVITY_LOG_USER_1 : ForeignKey[UserActivityLogRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UserActivityLog.USER_ACTIVITY_LOG, UserActivityLog.USER_ACTIVITY_LOG.USERNAME)
 		val FK_USER_ACTIVITY_PER_DAY_USER_1 : ForeignKey[UserActivityPerDayRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UserActivityPerDay.USER_ACTIVITY_PER_DAY, UserActivityPerDay.USER_ACTIVITY_PER_DAY.USERNAME)
 	}

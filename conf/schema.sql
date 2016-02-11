@@ -23,12 +23,36 @@ CREATE TABLE user_activity_per_day (
   total_activities INTEGER NOT NULL
 );
 
+-- staging area for documents during upload workflow
+CREATE TABLE upload (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  owner VARCHAR NOT NULL REFERENCES user(username),
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  title VARCHAR NOT NULL,
+  author VARCHAR,
+  date_freeform VARCHAR,
+  description VARCHAR,
+  source VARCHAR,
+  language VARCHAR
+);
+
+CREATE TABLE upload_filepart (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  upload_id INTEGER NOT NULL REFERENCES upload(id),
+  title VARCHAR NOT NULL,
+  -- TODO filepart metadata (source, identifier,... ?)
+  content_type VARCHAR NOT NULL,
+  content BLOB NOT NULL
+);
+
 -- users own (and can share) documents
 CREATE TABLE document (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   owner VARCHAR NOT NULL REFERENCES user(username),
-  author VARCHAR,
+  uploaded_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  -- TODO total filesize of all content parts?
   title VARCHAR NOT NULL,
+  author VARCHAR,
   date_numeric TIMESTAMP,
   date_freeform VARCHAR,
   description VARCHAR,

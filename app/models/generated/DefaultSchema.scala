@@ -18,6 +18,8 @@ import models.generated.tables.SharingPolicy
 import models.generated.tables.SqliteSequence
 import models.generated.tables.Team
 import models.generated.tables.TeamMembership
+import models.generated.tables.Upload
+import models.generated.tables.UploadFilepart
 import models.generated.tables.User
 import models.generated.tables.UserActivityLog
 import models.generated.tables.UserActivityPerDay
@@ -62,6 +64,8 @@ class DefaultSchema extends SchemaImpl("") {
 			SqliteSequence.SQLITE_SEQUENCE,
 			Team.TEAM,
 			TeamMembership.TEAM_MEMBERSHIP,
+			Upload.UPLOAD,
+			UploadFilepart.UPLOAD_FILEPART,
 			User.USER,
 			UserActivityLog.USER_ACTIVITY_LOG,
 			UserActivityPerDay.USER_ACTIVITY_PER_DAY)

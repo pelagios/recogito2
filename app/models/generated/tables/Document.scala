@@ -8,6 +8,7 @@ import java.lang.Class
 import java.lang.Integer
 import java.lang.String
 import java.sql.Timestamp
+import java.time.OffsetDateTime
 import java.util.Arrays
 import java.util.List
 
@@ -63,14 +64,19 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	val OWNER : TableField[DocumentRecord, String] = createField("owner", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
 
 	/**
-	 * The column <code>document.author</code>.
+	 * The column <code>document.uploaded_at</code>.
 	 */
-	val AUTHOR : TableField[DocumentRecord, String] = createField("author", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val UPLOADED_AT : TableField[DocumentRecord, OffsetDateTime] = createField("uploaded_at", org.jooq.impl.SQLDataType.TIMESTAMPWITHTIMEZONE.nullable(false), "")
 
 	/**
 	 * The column <code>document.title</code>.
 	 */
 	val TITLE : TableField[DocumentRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+
+	/**
+	 * The column <code>document.author</code>.
+	 */
+	val AUTHOR : TableField[DocumentRecord, String] = createField("author", org.jooq.impl.SQLDataType.VARCHAR, "")
 
 	/**
 	 * The column <code>document.date_numeric</code>.

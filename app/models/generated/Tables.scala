@@ -14,6 +14,8 @@ import models.generated.tables.SharingPolicy
 import models.generated.tables.SqliteSequence
 import models.generated.tables.Team
 import models.generated.tables.TeamMembership
+import models.generated.tables.Upload
+import models.generated.tables.UploadFilepart
 import models.generated.tables.User
 import models.generated.tables.UserActivityLog
 import models.generated.tables.UserActivityPerDay
@@ -70,6 +72,16 @@ object Tables {
 	 * The table team_membership
 	 */
 	val TEAM_MEMBERSHIP = models.generated.tables.TeamMembership.TEAM_MEMBERSHIP
+
+	/**
+	 * The table upload
+	 */
+	val UPLOAD = models.generated.tables.Upload.UPLOAD
+
+	/**
+	 * The table upload_filepart
+	 */
+	val UPLOAD_FILEPART = models.generated.tables.UploadFilepart.UPLOAD_FILEPART
 
 	/**
 	 * The table user
