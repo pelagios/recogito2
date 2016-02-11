@@ -7,6 +7,22 @@ CREATE TABLE user (
   active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+CREATE TABLE user_activity_log (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+  username VARCHAR NOT NULL REFERENCES user(username),
+  -- TODO do some sort of structured recording of activity types in the future
+  activity VARCHAR NOT NULL
+);
+
+CREATE TABLE user_activity_per_day (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+  username VARCHAR NOT NULL REFERENCES user(username),
+  -- TODO split up totals per activity type, once we have them defined
+  total_activities INTEGER NOT NULL
+);
+
 -- users own (and can share) documents
 CREATE TABLE document (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -22,16 +38,16 @@ CREATE TABLE document (
 
 -- users can organize documents into folders
 CREATE TABLE folder (
-   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-   owner VARCHAR NOT NULL REFERENCES user(username),
-   title VARCHAR NOT NULL,
-   -- if parent is empty then it's a root folder
-   parent INTEGER REFERENCES folder(id)
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  owner VARCHAR NOT NULL REFERENCES user(username),
+  title VARCHAR NOT NULL,
+  -- if parent is empty then it's a root folder
+  parent INTEGER REFERENCES folder(id)
 );
 
 CREATE TABLE folder_association (
-	 folder_id INTEGER NOT NULL REFERENCES folder(id),
-	 document_id INTEGER NOT NULL REFERENCES document(id)
+  folder_id INTEGER NOT NULL REFERENCES folder(id),
+  document_id INTEGER NOT NULL REFERENCES document(id)
 );
 
 -- teams are a first level entities similar to user
@@ -48,42 +64,25 @@ CREATE TABLE team_membership (
 );
 
 -- ledger of shared documents and folders
-CREATE TABLE sharing_record (
+CREATE TABLE sharing_policy (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   -- one of the following two needs to be defined
   folder_id INTEGER REFERENCES folder(id),
   document_id INTEGER REFERENCES document(id),
   shared_by VARCHAR NOT NULL REFERENCES user(username),
   shared_with VARCHAR NOT NULL REFERENCES user(username),
-  shared_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  accepted BOOLEAN NOT NULL DEFAULT FALSE,
-  revoked BOOLEAN NOT NULL DEFAULT FALSE
-  -- active boolean NOT NULL DEFAULT 'true',
-  -- deactivation_date timestamp with time zone
+  shared_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
--- restrict available document sharing possibilities
--- create table sharing_policies_codes (
---  code varchar primary key CHECK (code in ('Folder', 'Document'))
--- );
--- insert into sharing_policies_codes values ('Folder'), ('Document');
-
--- create table sharing_event_codes (
---   code varchar primary key CHECK (code in ('added', 'deleted','moved','accepted','declined'))
--- );
--- insert into sharing_event_codes values ('added'), ('deleted'), ('moved'), ('accepted'), ('declined');
-
--- keep a log what happened for shared elements e.g. removal of documents
--- to inform the user about what happened
--- create table sharing_event_log (
--- id integer NOT NULL PRIMARY KEY AUTOINCREMENT,
---  userid varchar NOT NULL REFERENCES users(username),
---  code varchar references sharing_event_codes (code),
---  sharingid integer references sharing_policies(id),
---  folderid integer references folders(id),
---  documentid integer references documents(id),
---  event_date timestamp with time zone NOT NULL
--- );
+-- keep a log of what happened for shared elements
+-- e.g. to inform users about what happened
+CREATE TABLE sharing_event_log (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  type_of_action VARCHAR,
+  action_by VARCHAR NOT NULL REFERENCES user(username),
+  action_at TIMESTAMP WITH TIME ZONE NO NULL,
+  policy_id INTEGER NOT NULL REFERENCES sharing_policy(id)
+);
 
 -- tags are user specific and allow him/her to group documents
 -- CREATE TABLE hashtags (

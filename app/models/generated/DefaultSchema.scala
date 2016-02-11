@@ -13,11 +13,14 @@ import javax.annotation.Generated
 import models.generated.tables.Document
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
-import models.generated.tables.SharingRecord
+import models.generated.tables.SharingEventLog
+import models.generated.tables.SharingPolicy
 import models.generated.tables.SqliteSequence
 import models.generated.tables.Team
 import models.generated.tables.TeamMembership
 import models.generated.tables.User
+import models.generated.tables.UserActivityLog
+import models.generated.tables.UserActivityPerDay
 
 import org.jooq.Table
 import org.jooq.impl.SchemaImpl
@@ -54,10 +57,13 @@ class DefaultSchema extends SchemaImpl("") {
 			Document.DOCUMENT,
 			Folder.FOLDER,
 			FolderAssociation.FOLDER_ASSOCIATION,
-			SharingRecord.SHARING_RECORD,
+			SharingEventLog.SHARING_EVENT_LOG,
+			SharingPolicy.SHARING_POLICY,
 			SqliteSequence.SQLITE_SEQUENCE,
 			Team.TEAM,
 			TeamMembership.TEAM_MEMBERSHIP,
-			User.USER)
+			User.USER,
+			UserActivityLog.USER_ACTIVITY_LOG,
+			UserActivityPerDay.USER_ACTIVITY_PER_DAY)
 	}
 }

@@ -9,11 +9,14 @@ import javax.annotation.Generated
 import models.generated.tables.Document
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
-import models.generated.tables.SharingRecord
+import models.generated.tables.SharingEventLog
+import models.generated.tables.SharingPolicy
 import models.generated.tables.SqliteSequence
 import models.generated.tables.Team
 import models.generated.tables.TeamMembership
 import models.generated.tables.User
+import models.generated.tables.UserActivityLog
+import models.generated.tables.UserActivityPerDay
 
 
 /**
@@ -44,9 +47,14 @@ object Tables {
 	val FOLDER_ASSOCIATION = models.generated.tables.FolderAssociation.FOLDER_ASSOCIATION
 
 	/**
-	 * The table sharing_record
+	 * The table sharing_event_log
 	 */
-	val SHARING_RECORD = models.generated.tables.SharingRecord.SHARING_RECORD
+	val SHARING_EVENT_LOG = models.generated.tables.SharingEventLog.SHARING_EVENT_LOG
+
+	/**
+	 * The table sharing_policy
+	 */
+	val SHARING_POLICY = models.generated.tables.SharingPolicy.SHARING_POLICY
 
 	/**
 	 * The table sqlite_sequence
@@ -67,4 +75,14 @@ object Tables {
 	 * The table user
 	 */
 	val USER = models.generated.tables.User.USER
+
+	/**
+	 * The table user_activity_log
+	 */
+	val USER_ACTIVITY_LOG = models.generated.tables.UserActivityLog.USER_ACTIVITY_LOG
+
+	/**
+	 * The table user_activity_per_day
+	 */
+	val USER_ACTIVITY_PER_DAY = models.generated.tables.UserActivityPerDay.USER_ACTIVITY_PER_DAY
 }

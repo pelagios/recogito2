@@ -9,16 +9,22 @@ import javax.annotation.Generated
 import models.generated.tables.Document
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
-import models.generated.tables.SharingRecord
+import models.generated.tables.SharingEventLog
+import models.generated.tables.SharingPolicy
 import models.generated.tables.Team
 import models.generated.tables.TeamMembership
 import models.generated.tables.User
+import models.generated.tables.UserActivityLog
+import models.generated.tables.UserActivityPerDay
 import models.generated.tables.records.DocumentRecord
 import models.generated.tables.records.FolderAssociationRecord
 import models.generated.tables.records.FolderRecord
-import models.generated.tables.records.SharingRecordRecord
+import models.generated.tables.records.SharingEventLogRecord
+import models.generated.tables.records.SharingPolicyRecord
 import models.generated.tables.records.TeamMembershipRecord
 import models.generated.tables.records.TeamRecord
+import models.generated.tables.records.UserActivityLogRecord
+import models.generated.tables.records.UserActivityPerDayRecord
 import models.generated.tables.records.UserRecord
 
 import org.jooq.ForeignKey
@@ -50,9 +56,12 @@ object Keys {
 
 	val PK_DOCUMENT = UniqueKeys0.PK_DOCUMENT
 	val PK_FOLDER = UniqueKeys0.PK_FOLDER
-	val PK_SHARING_RECORD = UniqueKeys0.PK_SHARING_RECORD
+	val PK_SHARING_EVENT_LOG = UniqueKeys0.PK_SHARING_EVENT_LOG
+	val PK_SHARING_POLICY = UniqueKeys0.PK_SHARING_POLICY
 	val PK_TEAM = UniqueKeys0.PK_TEAM
 	val PK_USER = UniqueKeys0.PK_USER
+	val PK_USER_ACTIVITY_LOG = UniqueKeys0.PK_USER_ACTIVITY_LOG
+	val PK_USER_ACTIVITY_PER_DAY = UniqueKeys0.PK_USER_ACTIVITY_PER_DAY
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
@@ -63,13 +72,17 @@ object Keys {
 	val FK_FOLDER_FOLDER_1 = ForeignKeys0.FK_FOLDER_FOLDER_1
 	val FK_FOLDER_ASSOCIATION_FOLDER_1 = ForeignKeys0.FK_FOLDER_ASSOCIATION_FOLDER_1
 	val FK_FOLDER_ASSOCIATION_DOCUMENT_1 = ForeignKeys0.FK_FOLDER_ASSOCIATION_DOCUMENT_1
-	val FK_SHARING_RECORD_FOLDER_1 = ForeignKeys0.FK_SHARING_RECORD_FOLDER_1
-	val FK_SHARING_RECORD_DOCUMENT_1 = ForeignKeys0.FK_SHARING_RECORD_DOCUMENT_1
-	val FK_SHARING_RECORD_USER_2 = ForeignKeys0.FK_SHARING_RECORD_USER_2
-	val FK_SHARING_RECORD_USER_1 = ForeignKeys0.FK_SHARING_RECORD_USER_1
+	val FK_SHARING_EVENT_LOG_USER_1 = ForeignKeys0.FK_SHARING_EVENT_LOG_USER_1
+	val FK_SHARING_EVENT_LOG_SHARING_POLICY_1 = ForeignKeys0.FK_SHARING_EVENT_LOG_SHARING_POLICY_1
+	val FK_SHARING_POLICY_FOLDER_1 = ForeignKeys0.FK_SHARING_POLICY_FOLDER_1
+	val FK_SHARING_POLICY_DOCUMENT_1 = ForeignKeys0.FK_SHARING_POLICY_DOCUMENT_1
+	val FK_SHARING_POLICY_USER_2 = ForeignKeys0.FK_SHARING_POLICY_USER_2
+	val FK_SHARING_POLICY_USER_1 = ForeignKeys0.FK_SHARING_POLICY_USER_1
 	val FK_TEAM_USER_1 = ForeignKeys0.FK_TEAM_USER_1
 	val FK_TEAM_MEMBERSHIP_USER_1 = ForeignKeys0.FK_TEAM_MEMBERSHIP_USER_1
 	val FK_TEAM_MEMBERSHIP_TEAM_1 = ForeignKeys0.FK_TEAM_MEMBERSHIP_TEAM_1
+	val FK_USER_ACTIVITY_LOG_USER_1 = ForeignKeys0.FK_USER_ACTIVITY_LOG_USER_1
+	val FK_USER_ACTIVITY_PER_DAY_USER_1 = ForeignKeys0.FK_USER_ACTIVITY_PER_DAY_USER_1
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
@@ -78,9 +91,12 @@ object Keys {
 	private object UniqueKeys0 extends AbstractKeys {
 		val PK_DOCUMENT : UniqueKey[DocumentRecord] = AbstractKeys.createUniqueKey(Document.DOCUMENT, Document.DOCUMENT.ID)
 		val PK_FOLDER : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
-		val PK_SHARING_RECORD : UniqueKey[SharingRecordRecord] = AbstractKeys.createUniqueKey(SharingRecord.SHARING_RECORD, SharingRecord.SHARING_RECORD.ID)
+		val PK_SHARING_EVENT_LOG : UniqueKey[SharingEventLogRecord] = AbstractKeys.createUniqueKey(SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ID)
+		val PK_SHARING_POLICY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val PK_TEAM : UniqueKey[TeamRecord] = AbstractKeys.createUniqueKey(Team.TEAM, Team.TEAM.TITLE)
 		val PK_USER : UniqueKey[UserRecord] = AbstractKeys.createUniqueKey(User.USER, User.USER.USERNAME)
+		val PK_USER_ACTIVITY_LOG : UniqueKey[UserActivityLogRecord] = AbstractKeys.createUniqueKey(UserActivityLog.USER_ACTIVITY_LOG, UserActivityLog.USER_ACTIVITY_LOG.ID)
+		val PK_USER_ACTIVITY_PER_DAY : UniqueKey[UserActivityPerDayRecord] = AbstractKeys.createUniqueKey(UserActivityPerDay.USER_ACTIVITY_PER_DAY, UserActivityPerDay.USER_ACTIVITY_PER_DAY.ID)
 	}
 
 	private object ForeignKeys0 extends AbstractKeys {
@@ -89,12 +105,16 @@ object Keys {
 		val FK_FOLDER_FOLDER_1 : ForeignKey[FolderRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, Folder.FOLDER, Folder.FOLDER.PARENT)
 		val FK_FOLDER_ASSOCIATION_FOLDER_1 : ForeignKey[FolderAssociationRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.FOLDER_ID)
 		val FK_FOLDER_ASSOCIATION_DOCUMENT_1 : ForeignKey[FolderAssociationRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_DOCUMENT, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.DOCUMENT_ID)
-		val FK_SHARING_RECORD_FOLDER_1 : ForeignKey[SharingRecordRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, SharingRecord.SHARING_RECORD, SharingRecord.SHARING_RECORD.FOLDER_ID)
-		val FK_SHARING_RECORD_DOCUMENT_1 : ForeignKey[SharingRecordRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_DOCUMENT, SharingRecord.SHARING_RECORD, SharingRecord.SHARING_RECORD.DOCUMENT_ID)
-		val FK_SHARING_RECORD_USER_2 : ForeignKey[SharingRecordRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, SharingRecord.SHARING_RECORD, SharingRecord.SHARING_RECORD.SHARED_BY)
-		val FK_SHARING_RECORD_USER_1 : ForeignKey[SharingRecordRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, SharingRecord.SHARING_RECORD, SharingRecord.SHARING_RECORD.SHARED_WITH)
+		val FK_SHARING_EVENT_LOG_USER_1 : ForeignKey[SharingEventLogRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ACTION_BY)
+		val FK_SHARING_EVENT_LOG_SHARING_POLICY_1 : ForeignKey[SharingEventLogRecord, SharingPolicyRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_SHARING_POLICY, SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.POLICY_ID)
+		val FK_SHARING_POLICY_FOLDER_1 : ForeignKey[SharingPolicyRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.FOLDER_ID)
+		val FK_SHARING_POLICY_DOCUMENT_1 : ForeignKey[SharingPolicyRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_DOCUMENT, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.DOCUMENT_ID)
+		val FK_SHARING_POLICY_USER_2 : ForeignKey[SharingPolicyRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.SHARED_BY)
+		val FK_SHARING_POLICY_USER_1 : ForeignKey[SharingPolicyRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.SHARED_WITH)
 		val FK_TEAM_USER_1 : ForeignKey[TeamRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Team.TEAM, Team.TEAM.CREATED_BY)
 		val FK_TEAM_MEMBERSHIP_USER_1 : ForeignKey[TeamMembershipRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.USERNAME)
 		val FK_TEAM_MEMBERSHIP_TEAM_1 : ForeignKey[TeamMembershipRecord, TeamRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_TEAM, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.TEAM)
+		val FK_USER_ACTIVITY_LOG_USER_1 : ForeignKey[UserActivityLogRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UserActivityLog.USER_ACTIVITY_LOG, UserActivityLog.USER_ACTIVITY_LOG.USERNAME)
+		val FK_USER_ACTIVITY_PER_DAY_USER_1 : ForeignKey[UserActivityPerDayRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UserActivityPerDay.USER_ACTIVITY_PER_DAY, UserActivityPerDay.USER_ACTIVITY_PER_DAY.USERNAME)
 	}
 }
