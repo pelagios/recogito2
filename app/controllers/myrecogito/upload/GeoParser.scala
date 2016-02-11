@@ -1,18 +1,65 @@
 package controllers.myrecogito.upload
 
+import akka.actor.{ Actor, ActorSystem, Props }
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.{ Annotation, StanfordCoreNLP }
 import java.io.File
 import java.util.Properties
+import javax.inject.Inject
+import play.api.libs.concurrent.Execution.Implicits._
 import scala.collection.JavaConverters._
+import scala.concurrent.Future
 import scala.io.Source
 
 case class NamedEntity(term: String, category: String, offset: Int)
 
-// TODO needs cleanup
+class GeoParseActor(text: String) extends Actor {
+  
+  import GeoParseActor._
+  
+  private var totalProgress = 0.0
+  
+  private var currentPhase = "INITIALIZING"
+    
+  def receive = {
+    
+    case Start => Future { 
+      val results = GeoParser.parse(text)
+    }
+    
+    case QueryProgress => sender() ! Progress(totalProgress, currentPhase)
+    
+  }
+  
+}
+
+object GeoParseActor {
+
+  sealed abstract trait Message
+  
+  case object Start extends Message
+  case object QueryProgress extends Message
+  case class Progress(value: Double, currentPhase: String) extends Message
+
+}
+
+class GeoParser(implicit system: ActorSystem) {
+  
+  import GeoParseActor._
+  
+  def parseAsync(file: File) = {
+    val text = Source.fromFile(file).getLines().mkString("\n")
+    val props = Props(classOf[GeoParseActor], text)
+    val actor = system.actorOf(props) 
+    actor ! Start
+  }
+  
+}
+
 object GeoParser {  
   
   private val props = new Properties()
+  
   props.put("annotators", "tokenize, ssplit, pos, lemma, ner")
   
   private val pipeline = new StanfordCoreNLP(props)
@@ -36,9 +83,6 @@ object GeoParser {
       })
     }).flatten    
   }
-  
-  def parse(file: File): Seq[NamedEntity] =
-    parse(Source.fromFile(file).getLines().mkString("\n"))
   
 }
 
