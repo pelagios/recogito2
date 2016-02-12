@@ -4,6 +4,12 @@
   <head>
     <title>My Recogito - Upload Files</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
+    <script src="@routes.Assets.versioned("lib/dropzone/min/dropzone.min.js")"></script>
+    <script>
+      Dropzone.options.dropzone = {
+        clickable: 'li'
+      };
+    </script>
   </head>
   <body>
     <div id="header">
@@ -15,16 +21,16 @@
     </div>
 
     <div id="content">
-      <div id="dnd-area">
+      <form action="@controllers.myrecogito.upload.routes.UploadController.processStep2" id="dropzone" class="dropzone">
         <h2>Drag &amp; Drop a File</h2>
         <p>or select an option below</p>
 
-        <ul class="upload-options">
-          <li>Add Text <span class="hints">(Text, Markdown or TEI/XML)</span></li>
-          <li>Add Image</li>
-          <li>Add Data <span class="hints">(CSV)</span></li>
+        <ul id="upload-options">
+          <li><p class="caption">Add Text</p><p class="formats">Text, Markdown or TEI/XML</p></li>
+          <li><p class="caption">Add Image</p></li>
+          <li><p class="caption">Add Data</p><p class="formats">CSV</p></li>
         </ul>
-      </div>
+      </form>
 
       <div id="bottom-buttons">
         <a href="@controllers.myrecogito.upload.routes.UploadController.showStep1" class="btn btn-large btn-blue">Back</a>

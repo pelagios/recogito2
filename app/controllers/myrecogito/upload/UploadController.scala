@@ -63,6 +63,10 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   def showStep2 = StackAction(AuthorityKey -> Normal) { implicit request =>
     Ok(views.html.myrecogito.upload.upload_2())
   }
+  
+  def processStep2 = StackAction(AuthorityKey -> Normal) { implicit request =>
+    Ok("upload")
+  }
 
   def showStep3 = StackAction(AuthorityKey -> Normal) { implicit request =>
     Ok(views.html.myrecogito.upload.upload_3())

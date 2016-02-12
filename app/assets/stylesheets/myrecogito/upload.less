@@ -1,9 +1,12 @@
 @import "../_globals.less";
 
-ul#step-breadcrumbs {
+ul {
   list-style-type:none;
   margin:0;
   padding:0;
+}
+
+ul#step-breadcrumbs {
 
   li {
     display:inline-block;
@@ -19,6 +22,30 @@ ul#step-breadcrumbs {
     text-shadow:0 -1px 0 rgba(0,0,0,0.2);
   }
 
+}
+
+ul#upload-options {
+
+  li {
+    display:inline-block;
+    vertical-align:top;
+    padding:10px;
+    margin:10px 20px;
+    width:100px;
+    height:100px;
+    border:1px solid black;
+    text-align:center;
+  
+    .caption {
+    
+    }
+  
+    .formats {
+      font-size:15px;
+    }
+  
+  }
+  
 }
 
 form {
