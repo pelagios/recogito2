@@ -6,13 +6,58 @@ import database.DB
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import models.Roles._
+import models.UploadService
+import models.generated.tables.records.UploadRecord
+import play.api.Play.current
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.i18n.Messages.Implicits._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
-import play.api.Logger
+
+case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
 
 class UploadController @Inject() (implicit val db: DB, system: ActorSystem) extends AbstractController with AuthElement with Security {
+  
+  private val ERROR = "There was an error processing your data"
 
-  def showStep1 = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Ok(views.html.myrecogito.upload.upload_1())
+  val newDocumentForm = Form(
+    mapping(
+      "title" -> nonEmptyText,
+      "author" -> text,
+      "date_freeform" -> text,
+      "description" -> text,
+      "source" -> text,
+      "language" -> text
+    )(NewDocumentData.apply)(NewDocumentData.unapply)
+  )
+  
+  implicit def uploadRecordToNewDocumentData(r: UploadRecord) =
+    NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getSource, r.getLanguage)
+  
+  def showStep1 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService.findForUser(loggedIn.getUsername).map(_ match {
+      case Some(pendingUpload) =>
+        Ok(views.html.myrecogito.upload.upload_1(newDocumentForm.fill(pendingUpload)))
+        
+      case None =>
+        Ok(views.html.myrecogito.upload.upload_1(newDocumentForm))
+    })
+  }
+  
+  def processStep1 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    newDocumentForm.bindFromRequest.fold(
+      formWithErrors =>
+        Future.successful(BadRequest(views.html.myrecogito.upload.upload_1(formWithErrors))),
+        
+      docData =>
+        UploadService.insertOrReplaceUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
+          .flatMap(user => Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)))
+          .recover { case t:Throwable => {
+            t.printStackTrace()
+            Ok(views.html.myrecogito.upload.upload_1(newDocumentForm.bindFromRequest, Some(ERROR))) 
+          }}
+    )
   }
 
   def showStep2 = StackAction(AuthorityKey -> Normal) { implicit request =>

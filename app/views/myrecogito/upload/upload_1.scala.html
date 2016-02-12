@@ -1,4 +1,4 @@
-@()
+@(newDocumentForm: Form[controllers.myrecogito.upload.NewDocumentData], message: Option[String] = None)(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
   <head>
@@ -15,13 +15,22 @@
     </div>
 
     <div id="content">
-      <div id="metadata-form">
-        <!-- todo generate form via Play helpers -->
-      </div>
-
-      <div id="bottom-buttons">
-        <a href="@controllers.myrecogito.upload.routes.UploadController.showStep2" class="btn btn-large btn-blue">Next</a>
-      </div>
+      @helper.form(action = controllers.myrecogito.upload.routes.UploadController.processStep1(), args = 'autocomplete -> "off") {
+        <div class="recommended-fields">
+          @helper.inputText(newDocumentForm("title"), args = '_label -> "Title", '_help -> "*")
+          @helper.inputText(newDocumentForm("author"), args = '_label -> "Author")
+          @helper.inputText(newDocumentForm("date_freeform"), args = '_label -> "Date")
+        </div>
+        <p class="field-toggle"><span class="icon"></span> More Fields</p>
+        <div class="more-fields">
+          @helper.inputText(newDocumentForm("description"), args = '_label -> "Description")
+          @helper.inputText(newDocumentForm("source"), args = '_label -> "Source")
+          @helper.inputText(newDocumentForm("language"), args = '_label -> "Language")
+        </div>
+        <div id="bottom-buttons">
+          <button type="submit" class="btn btn-large btn-blue">Next</a>
+        </div>
+      }
     </div>
   </body>
 </html>

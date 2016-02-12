@@ -26,7 +26,7 @@ CREATE TABLE user_activity_per_day (
 -- staging area for documents during upload workflow
 CREATE TABLE upload (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  owner VARCHAR NOT NULL REFERENCES user(username),
+  owner VARCHAR NOT NULL UNIQUE REFERENCES user(username),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   title VARCHAR NOT NULL,
   author VARCHAR,
