@@ -3,8 +3,25 @@
 <html>
   <head>
     <title>My Recogito - New Document</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
   </head>
   <body>
+    <div id="header">
+      <ul id="step-breadcrumbs">
+        <li class="active">New Document</li>
+        <li>Upload Files</li>
+        <li>Organize Document</li>
+      </ul>
+    </div>
 
+    <div id="content">
+      <div id="metadata-form">
+        <!-- todo generate form via Play helpers -->
+      </div>
+
+      <div id="bottom-buttons">
+        <a href="@controllers.myrecogito.upload.routes.UploadController.showStep2" class="btn btn-large btn-blue">Next</a>
+      </div>
+    </div>
   </body>
 </html>

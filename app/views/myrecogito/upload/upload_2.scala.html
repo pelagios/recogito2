@@ -3,8 +3,33 @@
 <html>
   <head>
     <title>My Recogito - Upload Files</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
   </head>
   <body>
+    <div id="header">
+      <ul id="step-breadcrumbs">
+        <li>New Document</li>
+        <li class="active">Upload Files</li>
+        <li>Organize Document</li>
+      </ul>
+    </div>
 
+    <div id="content">
+      <div id="dnd-area">
+        <h2>Drag &amp; Drop a File</h2>
+        <p>or select an option below</p>
+
+        <ul class="upload-options">
+          <li>Add Text <span class="hints">(Text, Markdown or TEI/XML)</span></li>
+          <li>Add Image</li>
+          <li>Add Data <span class="hints">(CSV)</span></li>
+        </ul>
+      </div>
+
+      <div id="bottom-buttons">
+        <a href="@controllers.myrecogito.upload.routes.UploadController.showStep1" class="btn btn-large btn-blue">Back</a>
+        <a href="@controllers.myrecogito.upload.routes.UploadController.showStep3" class="btn btn-large btn-blue">Next</a>
+      </div>
+    </div>
   </body>
 </html>
