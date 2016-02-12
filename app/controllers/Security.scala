@@ -10,6 +10,8 @@ import play.api.mvc.{ Result, Results, RequestHeader }
 
 trait Security extends AuthConfig { self: HasDatabase =>
 
+  private val ACCESS_URI = "access_uri"
+  
   private val NO_PERMISSION = "No permission"
 
   type Id = String
@@ -25,14 +27,16 @@ trait Security extends AuthConfig { self: HasDatabase =>
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] =
     UserService.findByUsername(id)(db)
 
-  def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Results.Redirect(routes.MyRecogito.index()))
+  def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
+    val destination = request.session.get(ACCESS_URI).getOrElse(routes.MyRecogito.index.toString)
+    Future.successful(Results.Redirect(destination).withSession(request.session - ACCESS_URI))
+  }
 
   def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Results.Redirect(landing.routes.LandingController.index))
 
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Results.Redirect(landing.routes.LandingController.index))
+    Future.successful(Results.Redirect(landing.routes.LandingController.index).withSession(ACCESS_URI -> request.uri))
 
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit context: ExecutionContext): Future[Result] =
     Future.successful(Results.Forbidden(NO_PERMISSION))
