@@ -12,6 +12,7 @@ import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import scala.concurrent.Future
+import play.api.Logger
 
 case class SignupData(username: String, email: String, password: String)
 
@@ -48,8 +49,10 @@ class SignupController @Inject() (implicit val db: DB) extends AbstractControlle
       signupData =>
         UserService.insertUser(signupData.username, signupData.email, signupData.password)
           .flatMap(user => gotoLoginSucceeded(user.getUsername))
-          .recover { case t:Throwable =>
-            Ok(views.html.landing.signup(signupForm.bindFromRequest, Some(screenErrorMessage(t)))) }
+          .recover { case t:Throwable => {
+            t.printStackTrace()
+            Ok(views.html.landing.signup(signupForm.bindFromRequest, Some(screenErrorMessage(t)))) 
+          }}
     )
   }
 

@@ -17,7 +17,8 @@ libraryDependencies ++= Seq(
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
   "org.jooq" % "jooq-meta" % "3.7.2",
   "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
-  specs2 % Test
+  specs2 % Test,
+  "org.dbunit" % "dbunit" % "2.5.1" %Test
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
