@@ -7,10 +7,9 @@ import java.time.OffsetDateTime
 import models.generated.Tables._
 import models.generated.tables.records.UserRecord
 import org.apache.commons.codec.binary.Base64
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConversions._
 import sun.security.provider.SecureRandom
-import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 object UserService {
 
