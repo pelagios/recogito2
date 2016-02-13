@@ -7,9 +7,9 @@ body {
 }
 
 #content {
-  padding:20px 10px;
-  position:relative;
+  padding:20px;
   max-width:768px;
+  box-sizing:border-box;
   margin:30px auto;
   background-color:@login-box-background-grey;
   .rounded-corners(2px);
@@ -22,14 +22,53 @@ ul {
   padding:0;
 }
 
-ul#step-breadcrumbs {
+#header-steps {
+  overflow:hidden;
 
   li {
+    position:relative;
+    margin:0;
+    width:33.2%;
+    height:45px;
+    padding:10px 10px 10px 35px;
+    box-sizing:border-box;
     display:inline-block;
-    padding:5px 10px;
-    margin:0 2px 0 0;
-    background:#a3c2e2;
+    background-color:#a3c2e2;
     color:#fff;
+  }
+  
+  .arrow::after {
+    content:'';
+    position:absolute;
+    box-sizing:border-box;
+    top:4px;
+    right:-19px;
+    height:37px;
+    width:37px;
+    background-color:#a3c2e2;
+    transform: rotate(45deg);
+    border-width:5px 5px 0 0;
+    border-style:solid;
+    border-color:@login-box-background-grey;
+    .rounded-corners(4px);
+  }
+  
+  li:nth-child(1) { 
+    .rounded-corners-left(2px);
+    padding-left:15px;
+    z-index: 2; 
+  }
+  
+  li:nth-child(2) { 
+    z-index: 1; 
+  }
+
+  li:nth-child(3) { 
+    .rounded-corners-right(2px);
+  }
+  
+  .arrow.active::after {
+    background-color:#4483c4;
   }
 
   li.active {
@@ -65,6 +104,8 @@ ul#upload-options {
 }
 
 form {
+  padding-top:20px;
+  margin:0 auto;
 
   dl { position:relative; }
 

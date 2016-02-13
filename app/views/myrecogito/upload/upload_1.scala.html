@@ -6,15 +6,11 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
   </head>
   <body>
-    <div id="header">
-      <ul id="step-breadcrumbs">
-        <li class="active">New Document</li>
-        <li>Upload Files</li>
-        <li>Organize Document</li>
-      </ul>
-    </div>
-
     <div id="content">
+      <ul id="header-steps">
+        <li class="active arrow">New Document</li><li class="arrow">Upload Files</li><li>Organize Document</li>
+      </ul>
+
       @helper.form(action = controllers.myrecogito.upload.routes.UploadController.processStep1(), args = 'autocomplete -> "off") {
         <div class="recommended-fields">
           @helper.inputText(newDocumentForm("title"), args = '_label -> "Title", '_help -> "*")
@@ -27,7 +23,7 @@
           @helper.inputText(newDocumentForm("source"), args = '_label -> "Source")
           @helper.inputText(newDocumentForm("language"), args = '_label -> "Language")
         </div>
-        <div id="bottom-buttons">
+        <div id="buttons">
           <button type="submit" class="btn btn-large btn-blue">Next</a>
         </div>
       }
