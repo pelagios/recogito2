@@ -3,6 +3,7 @@ package controllers.myrecogito.upload
 import akka.actor.ActorSystem
 import controllers.{ AbstractController, Security }
 import database.DB
+import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import models.Roles._
@@ -65,7 +66,15 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   }
   
   def processStep2 = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Ok("upload")
+    request.body.asMultipartFormData.map(tempfile =>
+      tempfile.file("file").map { f =>
+        val filename = f.filename
+        f.ref.moveTo(new File(s"$filename"))
+        Ok("File uploaded")
+      }.getOrElse {
+        BadRequest("").flashing("error" -> "Missing file")
+      }
+    ).get
   }
 
   def showStep3 = StackAction(AuthorityKey -> Normal) { implicit request =>
