@@ -6,18 +6,14 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
   </head>
   <body>
-    <div id="header">
-      <ul id="step-breadcrumbs">
-        <li>New Document</li>
-        <li>Upload Files</li>
-        <li class="active">Organize Document</li>
-      </ul>
-    </div>
-
     <div id="content">
+      <ul id="header-steps">
+        <li class="arrow">New Document</li><li class="arrow">Upload Files</li><li class="active">Organize Document</li>
+      </ul>
+      
       <p class="info">Drag to Change Order</p>
 
-      <div id="bottom-buttons">
+      <div id="buttons">
         <a href="@controllers.myrecogito.upload.routes.UploadController.showStep2" class="btn btn-large btn-blue">Back</a>
         <a href="#" class="btn btn-large btn-blue">OK</a>
       </div>

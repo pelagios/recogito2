@@ -13,15 +13,11 @@
     </script>
   </head>
   <body>
-    <div id="header">
-      <ul id="step-breadcrumbs">
-        <li>New Document</li>
-        <li class="active">Upload Files</li>
-        <li>Organize Document</li>
-      </ul>
-    </div>
-
     <div id="content">
+      <ul id="header-steps">
+        <li class="arrow">New Document</li><li class="active arrow">Upload Files</li><li>Organize Document</li>
+      </ul>
+
       <form action="@controllers.myrecogito.upload.routes.UploadController.processStep2" id="dropzone" class="dropzone">
         <h2>Drag &amp; Drop a File</h2>
         <p>or select an option below</p>
@@ -33,7 +29,7 @@
         </ul>
       </form>
 
-      <div id="bottom-buttons">
+      <div id="buttons">
         <a href="@controllers.myrecogito.upload.routes.UploadController.showStep1" class="btn btn-large btn-blue">Back</a>
         <a href="@controllers.myrecogito.upload.routes.UploadController.showStep3" class="btn btn-large btn-blue">Next</a>
       </div>

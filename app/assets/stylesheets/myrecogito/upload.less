@@ -1,5 +1,7 @@
 @import "../_globals.less";
 @import "_dropzone.less";
+@import "_step1.less";
+@import "_step2.less";
 
 body {
   background-image: url("/assets/images/scratches.jpg");
@@ -30,7 +32,7 @@ ul {
     margin:0;
     width:33.2%;
     height:45px;
-    padding:10px 10px 10px 35px;
+    padding:10px 10px 10px 40px;
     box-sizing:border-box;
     display:inline-block;
     background-color:#a3c2e2;
@@ -46,11 +48,11 @@ ul {
     height:37px;
     width:37px;
     background-color:#a3c2e2;
-    transform: rotate(45deg);
-    border-width:5px 5px 0 0;
+    transform:rotate(45deg);
+    border-width:3px 3px 0 0;
     border-style:solid;
     border-color:@login-box-background-grey;
-    .rounded-corners(4px);
+    .rounded-corners(2px);
   }
   
   li:nth-child(1) { 
@@ -79,60 +81,7 @@ ul {
 
 }
 
-ul#upload-options {
-
-  li {
-    display:inline-block;
-    vertical-align:top;
-    padding:10px;
-    margin:10px 20px;
-    width:100px;
-    height:100px;
-    border:1px solid black;
-    text-align:center;
-  
-    .caption {
-    
-    }
-  
-    .formats {
-      font-size:15px;
-    }
-  
-  }
-  
-}
-
-form {
+#buttons {
   padding-top:20px;
-  margin:0 auto;
-
-  dl { position:relative; }
-
-  dt, dd {
-    display:inline;
-    margin:0;
-    padding:0 5px;
-  }
-
-  label {
-    display:inline-block;
-    width:100px;
-    text-align:right;
-  }
-
-  input {
-    width:220px;
-  }
-
-  .info {
-    width:20px;
-    font-size:23px;
-    position:absolute;
-    top:4px;
-    font-family: Arial, Helvetica, sans-serif;
-    color:@login-error-red;
-  }
-
+  text-align:right;
 }
-

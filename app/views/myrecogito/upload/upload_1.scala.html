@@ -11,7 +11,7 @@
         <li class="active arrow">New Document</li><li class="arrow">Upload Files</li><li>Organize Document</li>
       </ul>
 
-      @helper.form(action = controllers.myrecogito.upload.routes.UploadController.processStep1(), args = 'autocomplete -> "off") {
+      @helper.form(action = controllers.myrecogito.upload.routes.UploadController.processStep1(), args = 'autocomplete -> "off", 'class -> "step1") {
         <div class="recommended-fields">
           @helper.inputText(newDocumentForm("title"), args = '_label -> "Title", '_help -> "*")
           @helper.inputText(newDocumentForm("author"), args = '_label -> "Author")
