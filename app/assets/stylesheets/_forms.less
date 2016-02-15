@@ -1,0 +1,41 @@
+.error-msg {
+  color:@login-error-red;
+  font-size:15px;
+  padding:10px 0 0 0;
+}
+
+form {
+
+  dl, dd {
+    padding:0;
+    margin:0;
+  }
+
+  dd.error {
+    color:@login-error-red;
+    font-size:15px;
+    margin-top:-5px;
+    padding-bottom:5px;
+  }
+
+  input {
+    border:0;
+    outline:none;
+    font-size:17px;
+  }
+
+  input[type=text], input[type=password] {
+    box-sizing:border-box;
+    color:@login-form-textcolor-grey;
+    background-color:@login-form-bg-white;
+    font-family:PTSansNarrow;
+    letter-spacing:1px;
+    border:1px solid @login-form-border-grey;
+  }
+
+  input[type=text]:focus, input[type=password]:focus {
+    border-color:@login-form-border-hi-blue;
+    box-shadow:0 0 4px 0 @login-form-glow-blue;
+  }
+
+}

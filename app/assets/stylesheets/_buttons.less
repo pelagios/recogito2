@@ -1,3 +1,13 @@
+/** Button colours **/
+@btn-grey-bg:#dfdfdf;
+@btn-grey-bg-hover:#f2f2f2;
+@btn-grey-text:#555;
+
+@btn-blue-bg:#4483c4;
+@btn-blue-bg-hover:#4f92d7;
+@btn-blue-bg-disabled:#a3c2e2;
+@btn-blue-text:#fff;
+
 .btn {
   cursor:pointer;
   margin:0 5px;
@@ -5,14 +15,14 @@
   text-decoration:none;
   border-radius:2px;
   display:inline-block;
-  color:#555;
-  background-color:#dfdfdf;
+  color:@btn-grey-text;
+  background-color:@btn-grey-bg;
   outline:none;
   border:none;
 }
 
 .btn:hover {
-  background-color:#f2f2f2;
+  background-color:@btn-grey-bg-hover;
 }
 
 .btn-large {
@@ -21,11 +31,15 @@
 }
 
 .btn-blue {
-  color:#fff;
+  color:@btn-blue-text;
   text-shadow:0 -1px 0 rgba(0,0,0,0.2);
-  background-color:#4483c4;
+  background-color:@btn-blue-bg;
 }
 
 .btn-blue:hover {
-  background-color:#4f92d7;
+  background-color:@btn-blue-bg-hover;
+}
+
+.btn-blue:disabled {
+  background-color:@btn-blue-bg-disabled;
 }

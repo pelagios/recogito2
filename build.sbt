@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
   ws,
-  
+
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models",
   "jp.t2v" %% "play2-auth" % "0.14.1",
@@ -20,6 +20,7 @@ libraryDependencies ++= Seq(
   "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
 
   "org.webjars" % "dropzone" % "4.2.0",
+  "org.webjars" % "jquery" % "1.12.0",
 
   specs2 % Test
 )
