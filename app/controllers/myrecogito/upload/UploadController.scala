@@ -61,8 +61,15 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     )
   }
 
-  def showStep2 = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Ok(views.html.myrecogito.upload.upload_2())
+  /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
+  def showStep2 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService.findForUser(loggedIn.getUsername).map(_ match {
+      case Some(pendingUpload) =>
+        Ok(views.html.myrecogito.upload.upload_2())
+        
+      case None =>
+        Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1)
+    })
   }
   
   def processStep2 = StackAction(AuthorityKey -> Normal) { implicit request =>

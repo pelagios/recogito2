@@ -7,7 +7,7 @@
     <script src="@routes.Assets.versioned("lib/dropzone/min/dropzone.min.js")"></script>
     <script>
       Dropzone.options.dropzone = {
-        clickable: 'li',
+        clickable: '.choose-file',
         createImageThumbnails: false
       };
     </script>
@@ -19,19 +19,17 @@
       </ul>
 
       <form action="@controllers.myrecogito.upload.routes.UploadController.processStep2" id="dropzone" class="dropzone">
-        <h2>Drag &amp; Drop a File</h2>
-        <p>or select an option below</p>
-
-        <ul id="upload-options">
-          <li><p class="caption">Add Text</p><p class="formats">Text, Markdown or TEI/XML</p></li>
-          <li><p class="caption">Add Image</p></li>
-          <li><p class="caption">Add Data</p><p class="formats">CSV</p></li>
-        </ul>
+        <h2>Drag Files Here</h2>
+        <p>or</p>
+        <div class="choose-file btn btn-large btn-blue"><span class="icon">&#xf055;</span> Choose a File to Upload</div>
+        <p class="formats">
+          Supported formats: UTF-8 plain text, Markdown, TEI/XML, image files, CSV
+        </p>
       </form>
 
       <div id="buttons">
-        <a href="@controllers.myrecogito.upload.routes.UploadController.showStep1" class="btn btn-large btn-blue">Back</a>
-        <a href="@controllers.myrecogito.upload.routes.UploadController.showStep3" class="btn btn-large btn-blue">Next</a>
+        <a class="back btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep1">Back</a>
+        <a class="next btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep3">Next</a>
       </div>
     </div>
   </body>
