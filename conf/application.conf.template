@@ -25,6 +25,9 @@ play.i18n.langs = [ "en" ]
 # Default to Routes in the root package (and conf/routes)
 # play.http.router = my.application.Routes
 
+# Directory for storing document filepart uploads
+recogito.upload.dir = uploads
+
 # Database configuration
 # ~~~~~
 # You can declare as many datasources as you want.

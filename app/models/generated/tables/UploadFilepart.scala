@@ -23,9 +23,6 @@ import org.jooq.TableField
 import org.jooq.UniqueKey
 import org.jooq.impl.TableImpl
 
-import scala.Array
-import scala.Byte
-
 
 object UploadFilepart {
 
@@ -70,14 +67,9 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	val TITLE : TableField[UploadFilepartRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
 
 	/**
-	 * The column <code>upload_filepart.content_type</code>.
+	 * The column <code>upload_filepart.filepath</code>.
 	 */
-	val CONTENT_TYPE : TableField[UploadFilepartRecord, String] = createField("content_type", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
-
-	/**
-	 * The column <code>upload_filepart.content</code>.
-	 */
-	val CONTENT : TableField[UploadFilepartRecord, Array[Byte]] = createField("content", org.jooq.impl.SQLDataType.BLOB.nullable(false), "")
+	val FILEPATH : TableField[UploadFilepartRecord, String] = createField("filepath", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
 
 	/**
 	 * Create a <code>upload_filepart</code> table reference

@@ -15,12 +15,16 @@ import play.api.data.Forms._
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
+import play.api.Logger
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
 
 class UploadController @Inject() (implicit val db: DB, system: ActorSystem) extends AbstractController with AuthElement with Security {
   
-  private val ERROR = "There was an error processing your data"
+  private val FILE_ARG = "file"
+  
+  private val MSG_OK = "Ok."
+  private val MSG_ERROR = "There was an error processing your data"
 
   val newDocumentForm = Form(
     mapping(
@@ -46,21 +50,6 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     })
   }
   
-  def processStep1 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    newDocumentForm.bindFromRequest.fold(
-      formWithErrors =>
-        Future.successful(BadRequest(views.html.myrecogito.upload.upload_1(formWithErrors))),
-        
-      docData =>
-        UploadService.insertOrReplaceUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
-          .flatMap(user => Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)))
-          .recover { case t:Throwable => {
-            t.printStackTrace()
-            Ok(views.html.myrecogito.upload.upload_1(newDocumentForm.bindFromRequest, Some(ERROR))) 
-          }}
-    )
-  }
-
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
   def showStep2 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findForUser(loggedIn.getUsername).map(_ match {
@@ -72,40 +61,62 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     })
   }
   
-  def processStep2 = StackAction(AuthorityKey -> Normal) { implicit request =>
-    request.body.asMultipartFormData.map(tempfile =>
-      tempfile.file("file").map { f =>
-        val filename = f.filename
-        // f.ref.moveTo(new File(s"$filename"))
-        Ok("File uploaded")
-      }.getOrElse {
-        BadRequest("").flashing("error" -> "Missing file")
-      }
-    ).get
-  }
-
   def showStep3 = StackAction(AuthorityKey -> Normal) { implicit request =>
     Ok(views.html.myrecogito.upload.upload_3())
   }
-
-  def processContentUpload = AsyncStack(AuthorityKey -> Normal) {  implicit request =>
-    request.body.asMultipartFormData match {
-
-      case Some(formData) => Future.successful {
-        formData.file("file") match {
-          case Some(filePart) => {
-              new GeoParser().parseAsync(filePart.ref.file)
-              Ok("")
-            }
-          case None =>
-            BadRequest("Form data missing")
+  
+  /** Stores document metadata, during step 1 **/
+  def storeDocumentMetadata = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    newDocumentForm.bindFromRequest.fold(
+      formWithErrors =>
+        Future.successful(BadRequest(views.html.myrecogito.upload.upload_1(formWithErrors))),
+        
+      docData =>
+        UploadService.insertOrReplaceUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
+          .flatMap(user => Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)))
+          .recover { case t: Throwable => {
+            t.printStackTrace()
+            Ok(views.html.myrecogito.upload.upload_1(newDocumentForm.bindFromRequest, Some(MSG_ERROR))) 
+          }}
+    )
+  }
+  
+  /** Stores a filepart, during step 2 **/
+  def storeFilepart = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
+    // First, we need to get the pending upload this filepart belongs to
+    UploadService.findForUser(loggedIn.getUsername)
+      .flatMap(_ match {
+        case Some(pendingUpload) =>
+          request.body.asMultipartFormData.map(tempfile => {
+            tempfile.file(FILE_ARG).map(f => {
+              UploadService.storeFilepart(pendingUpload.getId, f)
+                .map(_ => Ok(MSG_OK)) 
+            }).getOrElse({
+              // POST without a file? Not possible through the UI!
+              Logger.warn("Filepart POST without file attached")
+              Future.successful(BadRequest(MSG_ERROR))
+            })
+          }).getOrElse({
+            // POST without form data? Not possible through the UI!
+            Logger.warn("Filepart POST without form data")
+            Future.successful(BadRequest(MSG_ERROR))
+          })
+         
+        case None => {
+          // No pending upload stored in database? Not possible through the UI!
+          Logger.warn("Filepart POST without pending upload")
+          Future.successful(BadRequest(MSG_ERROR))
         }
-      }
-
-      case None =>
-        Future.successful(BadRequest("Form data missing"))
-
-    }
+      })
+      .recover { case t: Throwable => {
+        t.printStackTrace()
+        BadRequest(MSG_ERROR)   
+      }}
+  }
+ 
+  /** Deletes a filepart, during step 2 **/
+  def deleteFilepart = StackAction(AuthorityKey -> Normal) { implicit request =>
+    Ok("")
   }
 
 }

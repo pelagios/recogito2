@@ -8,3 +8,4 @@
 .cache-*
 recogito.db
 /vagrant
+/uploads

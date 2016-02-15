@@ -18,15 +18,16 @@ GET     /logout                            controllers.landing.LogoutController.
 # User personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+GET     /my-recogito/upload/step-1         controllers.myrecogito.upload.UploadController.showStep1
+POST    /my-recogito/upload/step-1         controllers.myrecogito.upload.UploadController.storeDocumentMetadata
+GET     /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.showStep2
+POST    /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.storeFilepart
+DELETE  /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.deleteFilepart
+GET     /my-recogito/upload/step-3         controllers.myrecogito.upload.UploadController.showStep3
+GET     /my-recogito					   controllers.MyRecogito.index
+
 GET     /my-recogito/document              controllers.DocumentUpload.showMetadataForm
 POST    /my-recogito/document              controllers.DocumentUpload.processMetadataUpload
-GET     /my-recogito/upload/step-1         controllers.myrecogito.upload.UploadController.showStep1
-POST    /my-recogito/upload/step-1         controllers.myrecogito.upload.UploadController.processStep1
-GET     /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.showStep2
-POST    /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.processStep2
-GET     /my-recogito/upload/step-3         controllers.myrecogito.upload.UploadController.showStep3
-POST    /my-recogito/upload                controllers.myrecogito.upload.UploadController.processContentUpload
-GET     /my-recogito					   controllers.MyRecogito.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Root

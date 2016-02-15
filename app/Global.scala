@@ -5,6 +5,7 @@ import play.api.db.DB
 import play.api.Play.current
 import play.api.{ Application, GlobalSettings, Logger }
 import scala.io.Source
+import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext
 
 object Global extends GlobalSettings {
@@ -12,8 +13,9 @@ object Global extends GlobalSettings {
   private val SCHEMA_SQL = "conf/schema.sql"
 
   override def onStart(app: Application) {
+    // Crude DB initialization check - does the user table exist? Run schema generation if not.
     DB.withConnection { connection =>
-      if (DSL.using(connection, database.DB.CURRENT_SQLDIALECT).meta().getTables.isEmpty()) {
+      if (!DSL.using(connection, database.DB.CURRENT_SQLDIALECT).meta().getTables.map(_.getName.toLowerCase).contains("user")) {
         Logger.info("Empty database - initializing...")
         initDB(connection)
       }
