@@ -76,7 +76,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     request.body.asMultipartFormData.map(tempfile =>
       tempfile.file("file").map { f =>
         val filename = f.filename
-        f.ref.moveTo(new File(s"$filename"))
+        // f.ref.moveTo(new File(s"$filename"))
         Ok("File uploaded")
       }.getOrElse {
         BadRequest("").flashing("error" -> "Missing file")

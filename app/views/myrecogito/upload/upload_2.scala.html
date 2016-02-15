@@ -5,12 +5,6 @@
     <title>My Recogito - Upload Files</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
     <script src="@routes.Assets.versioned("lib/dropzone/min/dropzone.min.js")"></script>
-    <script>
-      Dropzone.options.dropzone = {
-        clickable: '.choose-file',
-        createImageThumbnails: false
-      };
-    </script>
   </head>
   <body>
     <div id="content">
@@ -22,15 +16,33 @@
         <h2>Drag Files Here</h2>
         <p>or</p>
         <div class="choose-file btn btn-large btn-blue"><span class="icon">&#xf055;</span> Choose a File to Upload</div>
-        <p class="formats">
-          Supported formats: UTF-8 plain text, Markdown, TEI/XML, image files, CSV
-        </p>
+        <p class="formats">Supported formats: UTF-8 plain text, Markdown, TEI/XML, image files, CSV</p>
       </form>
+
+      <div id="upload-progress" class="dropzone-previews"></div>
 
       <div id="buttons">
         <a class="back btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep1">Back</a>
         <a class="next btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep3">Next</a>
       </div>
     </div>
+    <script>
+      Dropzone.options.dropzone = {
+        clickable: '.choose-file',
+        createImageThumbnails: false,
+        addRemoveLinks: true,
+        dictRemoveFile: '',
+        previewsContainer: document.getElementById('upload-progress'),
+        previewTemplate:
+          '<div class="dz-preview dz-file-preview">' +
+          '  <div class="dz-details">' +
+          '    <div class="dz-size" data-dz-size=""></div>' +
+          '    <div class="dz-filename"><span data-dz-name=""></span></div>' +
+          '  </div>' +
+          '  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress=""></span></div>' +
+          '  <div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
+          '</div>'
+      };
+    </script>
   </body>
 </html>
