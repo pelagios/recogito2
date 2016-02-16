@@ -9,7 +9,7 @@
   <body>
     <div id="content">
       <ul id="header-steps">
-        <li class="arrow">Enter Metadata</li><li class="active arrow">Upload Files</li><li>Organize Document</li>
+        <li class="arrow">Enter Metadata</li><li class="active arrow">Attach Files</li><li>Import</li>
       </ul>
 
       <form action="@controllers.myrecogito.upload.routes.UploadController.storeFilepart" id="dropzone" class="dropzone">
@@ -24,15 +24,15 @@
       <form id="buttons" method="POST" action="@controllers.myrecogito.upload.routes.UploadController.showStep3">
         <div class="ner">
           <input type="checkbox" id="apply-ner" name="apply-ner"/>
-          <label for="apply-ner">Apply Named Entity Recognition</label>
+          <label for="apply-ner">Apply automatic annotation</label>
           <span class="tooltip bottom whats-this">(<u>What's this?</u>)
             <span class="hint">Select this option if you want Recogito to attempt automatic
-              annotation of mentions of places and people in your text files on import.</span>
+              identification of places and persons in your texts during import.</span>
           </span>
         </div>
 
         <a class="back btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep1">Back</a>
-        <input type="submit" class="next btn btn-large btn-blue" value="OK" />
+        <input type="submit" class="next btn btn-large btn-blue" value="Next" />
       </form>
     </div>
     <script>
