@@ -4,6 +4,8 @@ import database.DB
 import java.time.OffsetDateTime
 import models.generated.Tables._
 import models.generated.tables.records.DocumentRecord
+import models.generated.tables.records.UploadRecord
+import models.generated.tables.records.UploadFilepartRecord
 
 object DocumentService {
 

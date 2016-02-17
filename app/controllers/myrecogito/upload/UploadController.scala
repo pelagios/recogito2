@@ -41,7 +41,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getSource, r.getLanguage)
   
   def showStep1 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findForUser(loggedIn.getUsername).map(_ match {
+    UploadService.findPendingUpload(loggedIn.getUsername).map(_ match {
       case Some(pendingUpload) =>
         Ok(views.html.myrecogito.upload.upload_1(newDocumentForm.fill(pendingUpload)))
         
@@ -52,7 +52,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
   def showStep2 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findForUserWithFileparts(loggedIn.getUsername).map(_ match {
+    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).map(_ match {
       case Some((pendingUpload, fileparts)) =>
         Ok(views.html.myrecogito.upload.upload_2(fileparts))
         
@@ -63,7 +63,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   
   /** Step 2 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
   def showStep3 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findForUserWithFileparts(loggedIn.getUsername).map(_ match {
+    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).map(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
           // No fileparts - force user to step 2          
@@ -73,8 +73,9 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
           val applyNER = checkParamValue("apply-ner", "on")
           
           // TODO start NER in case applyNER is true 
+          UploadService.importPendingUpload(pendingUpload, fileparts)
           
-          Ok(views.html.myrecogito.upload.upload_3(fileparts, applyNER))
+          Ok(views.html.myrecogito.upload.upload_3(pendingUpload, fileparts, applyNER))
         }
           
       case None =>
@@ -90,7 +91,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         Future.successful(BadRequest(views.html.myrecogito.upload.upload_1(formWithErrors))),
         
       docData =>
-        UploadService.storeUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
+        UploadService.storePendingUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
           .flatMap(user => Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)))
           .recover { case t: Throwable => {
             t.printStackTrace()
@@ -102,7 +103,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   /** Stores a filepart, during step 2 **/
   def storeFilepart = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
     // First, we need to get the pending upload this filepart belongs to
-    UploadService.findForUser(loggedIn.getUsername)
+    UploadService.findPendingUpload(loggedIn.getUsername)
       .flatMap(_ match {
         case Some(pendingUpload) =>
           request.body.asMultipartFormData.map(tempfile => {
@@ -134,6 +135,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
  
   /** Deletes a filepart, during step 2 **/
   def deleteFilepart = StackAction(AuthorityKey -> Normal) { implicit request =>
+    // TODO implement
     Ok("")
   }
 

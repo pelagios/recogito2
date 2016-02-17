@@ -14,6 +14,7 @@ import play.api.libs.Files.TemporaryFile
 import models.generated.tables.records.UploadFilepartRecord
 import models.generated.tables.records.UploadFilepartRecord
 import play.api.Logger
+import models.generated.tables.records.UploadFilepartRecord
 
 object UploadService {
   
@@ -44,7 +45,7 @@ object UploadService {
   }
   
   /** Inserts a new upload, or updates an existing one if it already exists **/
-  def storeUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, source: String, language: String)(implicit db: DB) =
+  def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, source: String, language: String)(implicit db: DB) =
     db.withTransaction { sql =>
       val upload = 
         Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(owner)).fetchOne()) match {
@@ -72,11 +73,24 @@ object UploadService {
       upload
   }
   
-  def findForUser(username: String)(implicit db: DB) = db.query { sql =>
+  /** Inserts a new filepart - metadata goes to the DB, content to the pending-uploads dir **/
+  def insertFilepart(uploadId: Int, filepart: FilePart[TemporaryFile])(implicit db: DB) = db.withTransaction { sql =>
+    val title = filepart.filename
+    val extension = title.substring(title.lastIndexOf('.'))
+    val filepath = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
+    val filepartRecord = new UploadFilepartRecord(null, uploadId, title, filepath.getPath) 
+    filepart.ref.moveTo(new File(s"$filepath"))
+    sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute
+    filepartRecord
+  }
+  
+  /** Retrieves the pending upload for a user (if any) **/
+  def findPendingUpload(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).fetchOne())
   }
   
-  def findForUserWithFileparts(username: String)(implicit db: DB) = db.query { sql =>
+  /** Retrieves the pending upload for a user (if any) along with the filepart metadata records **/
+  def findPendingUploadWithFileparts(username: String)(implicit db: DB) = db.query { sql =>
     val result = 
       sql.selectFrom(UPLOAD
         .leftJoin(UPLOAD_FILEPART)
@@ -100,14 +114,17 @@ object UploadService {
       Some(result.head)
   }
   
-  def insertFilepart(uploadId: Int, filepart: FilePart[TemporaryFile])(implicit db: DB) = db.withTransaction { sql =>
-    val title = filepart.filename
-    val extension = title.substring(title.lastIndexOf('.'))
-    val filepath = new File(UPLOAD_BASE, UUID.randomUUID.toString + extension)
-    val filepartRecord = new UploadFilepartRecord(null, uploadId, title, filepath.getPath) 
-    filepart.ref.moveTo(new File(s"$filepath"))
-    sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute
-    filepartRecord
+  /** Promotes a pending upload in the staging area to actual document **/
+  def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
+    
+    // TODO create a document record in the DOCUMENT table
+    
+    // TODO how to deal with fileparts? We need a new document model!
+    
+    // TODO delete Upload and Filepart records from the staging area tables
+    
+    // TODO move files from /pending folder to /user-data
+    
   }
     
 }
