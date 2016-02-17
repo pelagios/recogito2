@@ -9,13 +9,13 @@ import jp.t2v.lab.play2.auth.AuthElement
 import models.Roles._
 import models.UploadService
 import models.generated.tables.records.UploadRecord
+import play.api.Logger
 import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
-import play.api.Logger
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
 
@@ -52,37 +52,35 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
   def showStep2 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findForUser(loggedIn.getUsername).map(_ match {
-      case Some(pendingUpload) =>
-        Ok(views.html.myrecogito.upload.upload_2())
+    UploadService.findForUserWithFileparts(loggedIn.getUsername).map(_ match {
+      case Some((pendingUpload, fileparts)) =>
+        Ok(views.html.myrecogito.upload.upload_2(fileparts))
         
       case None =>
         Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1)
     })
   }
   
-  /** Step 2 requires that a pending request and at least one filepart exists - otherwise, redirect **/
-  def showStep3 = StackAction(AuthorityKey -> Normal) { implicit request =>
-    /*
-    val result = UploadService.findUploadForUser(loggedIn.getUsername).flatMap(_ match {
-      case Some(pendingUpload) =>
-        UploadService.findFilepartsByUpload(pendingUpload.getId).map(fileparts => {
-          if (fileparts.isEmpty) {
-            // No filepart - force user to step 2
-            Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)
-          } else {
-            // Pending upload + at least one filepart available - proceed
-            Ok("") // TODO
-          }
-        })
-      
+  /** Step 2 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
+  def showStep3 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService.findForUserWithFileparts(loggedIn.getUsername).map(_ match {
+      case Some((pendingUpload, fileparts)) =>
+        if (fileparts.isEmpty) {
+          // No fileparts - force user to step 2          
+          Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)
+        } else {
+          // Pending upload + fileparts available - proceed
+          val applyNER = checkParamValue("apply-ner", "on")
+          
+          // TODO start NER in case applyNER is true 
+          
+          Ok(views.html.myrecogito.upload.upload_3(fileparts, applyNER))
+        }
+          
       case None =>
         // No pending upload - force user to step 1
-        Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1))
+        Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1)
     })
-    */
-    
-    Ok(views.html.myrecogito.upload.upload_3())
   }
   
   /** Stores document metadata, during step 1 **/
