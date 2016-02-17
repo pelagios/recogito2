@@ -7,7 +7,6 @@ import java.time.OffsetDateTime
 import java.util.UUID
 import models.generated.Tables._
 import models.generated.tables.records.UploadRecord
-import play.api.Play
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
@@ -16,33 +15,7 @@ import models.generated.tables.records.UploadFilepartRecord
 import play.api.Logger
 import models.generated.tables.records.UploadFilepartRecord
 
-object UploadService {
-  
-  /** Init upload dir base folders **/
-  private lazy val UPLOAD_BASE = {
-    val dir = Play.current.configuration.getString("recogito.upload.dir") match {
-      case Some(filename) => new File(filename)   
-      case None => new File("uploads") // Default
-    }
-    
-    if (!dir.exists)
-      dir.mkdir()
-    dir
-  }
-  
-  private lazy val USER_DATA_DIR = {
-    val dir = new File(UPLOAD_BASE, "user_data")
-    if (!dir.exists)
-      dir.mkdir()
-    dir
-  }
-    
-  private lazy val PENDING_UPLOADS_DIR = {
-    val dir = new File(UPLOAD_BASE, "pending")
-    if (!dir.exists)
-      dir.mkdir()
-    dir
-  }
+object UploadService extends AbstractFileService {
   
   /** Inserts a new upload, or updates an existing one if it already exists **/
   def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, source: String, language: String)(implicit db: DB) =

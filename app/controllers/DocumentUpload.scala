@@ -38,7 +38,7 @@ class DocumentUpload @Inject() (implicit val db: DB) extends AbstractController 
         Future.successful(BadRequest(views.html.documentupload(formWithErrors))),
 
       docMetadata =>
-        DocumentService.insertMetadata(loggedIn.getUsername, docMetadata.author, docMetadata.title, docMetadata.description, docMetadata.language).flatMap(doc =>
+        DocumentService.insertDocument(loggedIn.getUsername, docMetadata.author, docMetadata.title, docMetadata.description, docMetadata.language).flatMap(doc =>
            Future(Redirect(routes.DocumentUpload.showMetadataForm()))
         )
     )

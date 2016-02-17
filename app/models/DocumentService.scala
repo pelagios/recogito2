@@ -9,9 +9,10 @@ import models.generated.tables.records.UploadFilepartRecord
 
 object DocumentService {
 
-  def insertMetadata(owner: String, author: String, title: String, description: String, language: String)(implicit db: DB) = db.withTransaction { sql =>
-    val docMetadata = new DocumentRecord(null, owner, OffsetDateTime.now, author, title, null, null, description, null, language)
-    sql.insertInto(DOCUMENT).set(docMetadata).execute()
+  def insertDocument(owner: String, author: String, title: String, description: String, language: String)(implicit db: DB) = db.query { sql =>
+    val document = new DocumentRecord(null, owner, OffsetDateTime.now, author, title, null, null, description, null, language)
+    sql.insertInto(DOCUMENT).set(document).execute()
+    document
   }
 
 }
