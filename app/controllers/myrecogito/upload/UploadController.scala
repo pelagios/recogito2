@@ -61,7 +61,27 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     })
   }
   
+  /** Step 2 requires that a pending request and at least one filepart exists - otherwise, redirect **/
   def showStep3 = StackAction(AuthorityKey -> Normal) { implicit request =>
+    /*
+    val result = UploadService.findUploadForUser(loggedIn.getUsername).flatMap(_ match {
+      case Some(pendingUpload) =>
+        UploadService.findFilepartsByUpload(pendingUpload.getId).map(fileparts => {
+          if (fileparts.isEmpty) {
+            // No filepart - force user to step 2
+            Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)
+          } else {
+            // Pending upload + at least one filepart available - proceed
+            Ok("") // TODO
+          }
+        })
+      
+      case None =>
+        // No pending upload - force user to step 1
+        Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1))
+    })
+    */
+    
     Ok(views.html.myrecogito.upload.upload_3())
   }
   
@@ -72,7 +92,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         Future.successful(BadRequest(views.html.myrecogito.upload.upload_1(formWithErrors))),
         
       docData =>
-        UploadService.insertOrReplaceUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
+        UploadService.storeUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
           .flatMap(user => Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)))
           .recover { case t: Throwable => {
             t.printStackTrace()
@@ -89,7 +109,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         case Some(pendingUpload) =>
           request.body.asMultipartFormData.map(tempfile => {
             tempfile.file(FILE_ARG).map(f => {
-              UploadService.storeFilepart(pendingUpload.getId, f)
+              UploadService.insertFilepart(pendingUpload.getId, f)
                 .map(_ => Ok(MSG_OK)) 
             }).getOrElse({
               // POST without a file? Not possible through the UI!

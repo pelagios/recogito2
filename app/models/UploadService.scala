@@ -27,11 +27,32 @@ object UploadService {
     dir
   }
   
-  def insertOrReplaceUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, source: String, language: String)(implicit db: DB) =
+  /** Inserts a new upload, or updates an existing one if it already exists **/
+  def storeUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, source: String, language: String)(implicit db: DB) =
     db.withTransaction { sql =>
-      sql.delete(UPLOAD).where(UPLOAD.OWNER.equal(owner)).execute() // Make sure there's only one pending upload per user max
-      val upload = new UploadRecord(null, owner, OffsetDateTime.now, title, author, dateFreeform, description, source, language)
-      sql.insertInto(UPLOAD).set(upload).execute()
+      val upload = 
+        Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(owner)).fetchOne()) match {
+          case Some(upload) => {
+            // Pending upload - update
+            upload.setCreatedAt(OffsetDateTime.now)
+            upload.setTitle(title)
+            upload.setAuthor(author)
+            upload.setDateFreeform(dateFreeform)
+            upload.setDescription(description)
+            upload.setSource(source)
+            upload.setLanguage(language)
+            upload
+          }
+          
+          case None => {
+            // No pending upload - create new
+            val upload = new UploadRecord(null, owner, OffsetDateTime.now, title, author, dateFreeform, description, source, language)
+            sql.attach(upload)
+            upload
+          }
+        }
+      
+      upload.store()
       upload
   }
   
@@ -39,7 +60,15 @@ object UploadService {
     Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).fetchOne())
   }
   
-  def storeFilepart(uploadId: Int, filepart: FilePart[TemporaryFile])(implicit db: DB) = db.withTransaction { sql =>
+  def findForUserWithFileparts(username: String)(implicit db: DB) = db.query { sql =>
+    sql.selectFrom(UPLOAD
+        .leftJoin(UPLOAD_FILEPART)
+        .on(UPLOAD.ID.equal(UPLOAD_FILEPART.UPLOAD_ID)))
+      .where(UPLOAD.OWNER.equal(username))
+      .fetchArray().toSeq
+  }
+  
+  def insertFilepart(uploadId: Int, filepart: FilePart[TemporaryFile])(implicit db: DB) = db.withTransaction { sql =>
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filepath = new File(UPLOAD_DIR, UUID.randomUUID.toString + extension)
@@ -48,5 +77,5 @@ object UploadService {
     sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute
     filepartRecord
   }
-
+    
 }

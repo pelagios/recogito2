@@ -8,7 +8,6 @@ import models.generated.Tables._
 import models.generated.tables.records.UserRecord
 import org.apache.commons.codec.binary.Base64
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.collection.JavaConversions._
 import sun.security.provider.SecureRandom
 
 object UserService {
@@ -23,12 +22,16 @@ object UserService {
   }
 
   def listAll()(implicit db: DB) = db.query { sql =>
-    sql.selectFrom(USER).fetch().into(classOf[UserRecord]).toSeq
+    sql.selectFrom(USER).fetchArray.toSeq
   }
 
   /** TODO this is accessed for every request - should cache this at some point **/
   def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(USER).where(USER.USERNAME.equal(username)).fetchOne())
+  }
+  
+  def findByUsernameIgnoreCase(username: String)(implicit db: DB) = db.query { sql =>
+    Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
 
   def validateUser(username: String, password: String)(implicit db: DB) =
