@@ -7,6 +7,7 @@ package models.generated
 import javax.annotation.Generated
 
 import models.generated.tables.Document
+import models.generated.tables.DocumentFilepart
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
 import models.generated.tables.SharingEventLog
@@ -37,6 +38,11 @@ object Tables {
 	 * The table document
 	 */
 	val DOCUMENT = models.generated.tables.Document.DOCUMENT
+
+	/**
+	 * The table document_filepart
+	 */
+	val DOCUMENT_FILEPART = models.generated.tables.DocumentFilepart.DOCUMENT_FILEPART
 
 	/**
 	 * The table folder

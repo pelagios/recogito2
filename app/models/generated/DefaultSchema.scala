@@ -11,6 +11,7 @@ import java.util.List
 import javax.annotation.Generated
 
 import models.generated.tables.Document
+import models.generated.tables.DocumentFilepart
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
 import models.generated.tables.SharingEventLog
@@ -57,6 +58,7 @@ class DefaultSchema extends SchemaImpl("") {
 	private def getTables0() : List[Table[_]] = {
 		return Arrays.asList[Table[_]](
 			Document.DOCUMENT,
+			DocumentFilepart.DOCUMENT_FILEPART,
 			Folder.FOLDER,
 			FolderAssociation.FOLDER_ASSOCIATION,
 			SharingEventLog.SHARING_EVENT_LOG,

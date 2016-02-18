@@ -4,9 +4,12 @@
 package models.generated
 
 
+import java.lang.Integer
+
 import javax.annotation.Generated
 
 import models.generated.tables.Document
+import models.generated.tables.DocumentFilepart
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
 import models.generated.tables.SharingEventLog
@@ -18,6 +21,7 @@ import models.generated.tables.UploadFilepart
 import models.generated.tables.User
 import models.generated.tables.UserActivityLog
 import models.generated.tables.UserActivityPerDay
+import models.generated.tables.records.DocumentFilepartRecord
 import models.generated.tables.records.DocumentRecord
 import models.generated.tables.records.FolderAssociationRecord
 import models.generated.tables.records.FolderRecord
@@ -32,6 +36,7 @@ import models.generated.tables.records.UserActivityPerDayRecord
 import models.generated.tables.records.UserRecord
 
 import org.jooq.ForeignKey
+import org.jooq.Identity
 import org.jooq.UniqueKey
 import org.jooq.impl.AbstractKeys
 
@@ -53,12 +58,14 @@ object Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
+	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
 	val PK_DOCUMENT = UniqueKeys0.PK_DOCUMENT
+	val PK_DOCUMENT_FILEPART = UniqueKeys0.PK_DOCUMENT_FILEPART
 	val PK_FOLDER = UniqueKeys0.PK_FOLDER
 	val PK_SHARING_EVENT_LOG = UniqueKeys0.PK_SHARING_EVENT_LOG
 	val PK_SHARING_POLICY = UniqueKeys0.PK_SHARING_POLICY
@@ -74,6 +81,7 @@ object Keys {
 	// -------------------------------------------------------------------------
 
 	val FK_DOCUMENT_USER_1 = ForeignKeys0.FK_DOCUMENT_USER_1
+	val FK_DOCUMENT_FILEPART_DOCUMENT_1 = ForeignKeys0.FK_DOCUMENT_FILEPART_DOCUMENT_1
 	val FK_FOLDER_USER_1 = ForeignKeys0.FK_FOLDER_USER_1
 	val FK_FOLDER_FOLDER_1 = ForeignKeys0.FK_FOLDER_FOLDER_1
 	val FK_FOLDER_ASSOCIATION_FOLDER_1 = ForeignKeys0.FK_FOLDER_ASSOCIATION_FOLDER_1
@@ -96,8 +104,13 @@ object Keys {
 	// [#1459] distribute members to avoid static initialisers > 64kb
 	// -------------------------------------------------------------------------
 
+	private object Identities0 extends AbstractKeys {
+		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
+	}
+
 	private object UniqueKeys0 extends AbstractKeys {
 		val PK_DOCUMENT : UniqueKey[DocumentRecord] = AbstractKeys.createUniqueKey(Document.DOCUMENT, Document.DOCUMENT.ID)
+		val PK_DOCUMENT_FILEPART : UniqueKey[DocumentFilepartRecord] = AbstractKeys.createUniqueKey(DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.ID)
 		val PK_FOLDER : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
 		val PK_SHARING_EVENT_LOG : UniqueKey[SharingEventLogRecord] = AbstractKeys.createUniqueKey(SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ID)
 		val PK_SHARING_POLICY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
@@ -111,6 +124,7 @@ object Keys {
 
 	private object ForeignKeys0 extends AbstractKeys {
 		val FK_DOCUMENT_USER_1 : ForeignKey[DocumentRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Document.DOCUMENT, Document.DOCUMENT.OWNER)
+		val FK_DOCUMENT_FILEPART_DOCUMENT_1 : ForeignKey[DocumentFilepartRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_DOCUMENT, DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.DOCUMENT_ID)
 		val FK_FOLDER_USER_1 : ForeignKey[FolderRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Folder.FOLDER, Folder.FOLDER.OWNER)
 		val FK_FOLDER_FOLDER_1 : ForeignKey[FolderRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, Folder.FOLDER, Folder.FOLDER.PARENT)
 		val FK_FOLDER_ASSOCIATION_FOLDER_1 : ForeignKey[FolderAssociationRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.FOLDER_ID)

@@ -40,8 +40,8 @@ CREATE TABLE upload_filepart (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   upload_id INTEGER NOT NULL REFERENCES upload(id) ON DELETE CASCADE,
   title VARCHAR NOT NULL,
+  content_type VARCHAR NOT NULL,
   filename VARCHAR NOT NULL
-  -- TODO content_type VARCHAR NOT NULL,
   -- TODO filepart metadata (source, identifier,... ?),
   -- TODO sequence_no INTEGER NOT NULL
 );
@@ -51,7 +51,6 @@ CREATE TABLE document (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   owner VARCHAR NOT NULL REFERENCES user(username),
   uploaded_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  -- TODO total filesize of all content parts?
   title VARCHAR NOT NULL,
   author VARCHAR,
   date_numeric TIMESTAMP,
@@ -59,6 +58,16 @@ CREATE TABLE document (
   description VARCHAR,
   source VARCHAR,
   language VARCHAR
+);
+
+CREATE TABLE document_filepart (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  document_id INTEGER NOT NULL REFERENCES document(id) ON DELETE CASCADE,
+  title VARCHAR NOT NULL,
+  content_type VARCHAR NOT NULL,
+  filename VARCHAR NOT NULL
+  -- TODO filepart metadata (source, identifier,... ?),
+  -- TODO sequence_no INTEGER NOT NULL
 );
 
 -- users can organize documents into folders

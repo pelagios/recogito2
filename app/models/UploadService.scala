@@ -7,13 +7,16 @@ import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.time.OffsetDateTime
 import java.util.UUID
 import models.generated.Tables._
-import models.generated.tables.records.{ UploadRecord, UploadFilepartRecord }
+import models.generated.tables.records.{ DocumentRecord, UploadRecord, UploadFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
 import play.api.Logger
 
 object UploadService extends FileUsingService {
+  
+  /** Ugly helper that turns empty strings to null, so they are properly to the DB **/
+  private def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
   
   /** Inserts a new upload, or updates an existing one if it already exists **/
   def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, source: String, language: String)(implicit db: DB) =
@@ -24,17 +27,26 @@ object UploadService extends FileUsingService {
             // Pending upload - update
             upload.setCreatedAt(OffsetDateTime.now)
             upload.setTitle(title)
-            upload.setAuthor(author)
-            upload.setDateFreeform(dateFreeform)
-            upload.setDescription(description)
-            upload.setSource(source)
-            upload.setLanguage(language)
+            upload.setAuthor(nullIfEmpty(author))
+            upload.setDateFreeform(nullIfEmpty(dateFreeform))
+            upload.setDescription(nullIfEmpty(description))
+            upload.setSource(nullIfEmpty(source))
+            upload.setLanguage(nullIfEmpty(language))
             upload
           }
           
           case None => {
             // No pending upload - create new
-            val upload = new UploadRecord(null, owner, OffsetDateTime.now, title, author, dateFreeform, description, source, language)
+            val upload = new UploadRecord(null, 
+                owner, 
+                OffsetDateTime.now, 
+                nullIfEmpty(title), 
+                nullIfEmpty(author), 
+                nullIfEmpty(dateFreeform), 
+                nullIfEmpty(description),
+                nullIfEmpty(source),
+                nullIfEmpty(language))
+            
             sql.attach(upload)
             upload
           }
@@ -49,9 +61,9 @@ object UploadService extends FileUsingService {
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filepath = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
-    val filepartRecord = new UploadFilepartRecord(null, uploadId, title, filepath.getName) 
+    val filepartRecord = new UploadFilepartRecord(null, uploadId, title, ContentTypes.TEXT_PLAIN.toString, filepath.getName) 
     filepart.ref.moveTo(new File(s"$filepath"))
-    sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute
+    sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     filepartRecord
   }
   
@@ -87,19 +99,34 @@ object UploadService extends FileUsingService {
   
   /** Promotes a pending upload in the staging area to actual document **/
   def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
+    // Create a document record from the metadata properties of the upload
+    val document = new DocumentRecord(null,
+          upload.getOwner,
+          upload.getCreatedAt,
+          upload.getTitle,
+          upload.getAuthor,
+          null, // TODO timestamp_numeric
+          upload.getDateFreeform,
+          upload.getDescription,
+          upload.getSource,
+          upload.getLanguage)
     
-    // TODO create a document record in the DOCUMENT table
+    sql.insertInto(DOCUMENT).set(document).execute()
     
     // TODO how to deal with fileparts? We need a new document model!
     
-    // TODO delete Upload and Filepart records from the staging area tables
+    // Delete Upload and Filepart records from the staging area tables
+    sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.UPLOAD_ID.equal(upload.getId)).execute()
+    sql.deleteFrom(UPLOAD).where(UPLOAD.ID.equal(upload.getId)).execute()    
     
-    // Move files from /pending folder to /user-data
+    // Move files from 'pending' to 'user-data' folder 
     fileparts.foreach(filepart => {
       val source = new File(PENDING_UPLOADS_DIR, filepart.getFilename).toPath
       val destination = new File(getUserDir(upload.getOwner, true).get, filepart.getFilename).toPath
       Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
     })    
+    
+    document
   }
     
 }
