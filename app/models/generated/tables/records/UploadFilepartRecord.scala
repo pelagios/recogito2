@@ -76,16 +76,16 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 	}
 
 	/**
-	 * Setter for <code>upload_filepart.filepath</code>.
+	 * Setter for <code>upload_filepart.filename</code>.
 	 */
-	def setFilepath(value : String) : Unit = {
+	def setFilename(value : String) : Unit = {
 		setValue(3, value)
 	}
 
 	/**
-	 * Getter for <code>upload_filepart.filepath</code>.
+	 * Getter for <code>upload_filepart.filename</code>.
 	 */
-	def getFilepath : String = {
+	def getFilename : String = {
 		val r = getValue(3)
 		if (r == null) null else r.asInstanceOf[String]
 	}
@@ -111,11 +111,11 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 	override def field1 : Field[Integer] = UploadFilepart.UPLOAD_FILEPART.ID
 	override def field2 : Field[Integer] = UploadFilepart.UPLOAD_FILEPART.UPLOAD_ID
 	override def field3 : Field[String] = UploadFilepart.UPLOAD_FILEPART.TITLE
-	override def field4 : Field[String] = UploadFilepart.UPLOAD_FILEPART.FILEPATH
+	override def field4 : Field[String] = UploadFilepart.UPLOAD_FILEPART.FILENAME
 	override def value1 : Integer = getId
 	override def value2 : Integer = getUploadId
 	override def value3 : String = getTitle
-	override def value4 : String = getFilepath
+	override def value4 : String = getFilename
 
 	override def value1(value : Integer) : UploadFilepartRecord = {
 		setId(value)
@@ -133,7 +133,7 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 	}
 
 	override def value4(value : String) : UploadFilepartRecord = {
-		setFilepath(value)
+		setFilename(value)
 		this
 	}
 
@@ -148,12 +148,12 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 	/**
 	 * Create a detached, initialised UploadFilepartRecord
 	 */
-	def this(id : Integer, uploadId : Integer, title : String, filepath : String) = {
+	def this(id : Integer, uploadId : Integer, title : String, filename : String) = {
 		this()
 
 		setValue(0, id)
 		setValue(1, uploadId)
 		setValue(2, title)
-		setValue(3, filepath)
+		setValue(3, filename)
 	}
 }

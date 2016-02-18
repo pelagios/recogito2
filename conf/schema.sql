@@ -40,7 +40,7 @@ CREATE TABLE upload_filepart (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   upload_id INTEGER NOT NULL REFERENCES upload(id) ON DELETE CASCADE,
   title VARCHAR NOT NULL,
-  filepath VARCHAR NOT NULL
+  filename VARCHAR NOT NULL
   -- TODO content_type VARCHAR NOT NULL,
   -- TODO filepart metadata (source, identifier,... ?),
   -- TODO sequence_no INTEGER NOT NULL

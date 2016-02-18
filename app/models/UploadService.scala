@@ -3,19 +3,17 @@ package models
 import collection.JavaConverters._
 import database.DB
 import java.io.File
+import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.time.OffsetDateTime
 import java.util.UUID
 import models.generated.Tables._
-import models.generated.tables.records.UploadRecord
+import models.generated.tables.records.{ UploadRecord, UploadFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
-import models.generated.tables.records.UploadFilepartRecord
-import models.generated.tables.records.UploadFilepartRecord
 import play.api.Logger
-import models.generated.tables.records.UploadFilepartRecord
 
-object UploadService extends AbstractFileService {
+object UploadService extends FileUsingService {
   
   /** Inserts a new upload, or updates an existing one if it already exists **/
   def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, source: String, language: String)(implicit db: DB) =
@@ -51,7 +49,7 @@ object UploadService extends AbstractFileService {
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filepath = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
-    val filepartRecord = new UploadFilepartRecord(null, uploadId, title, filepath.getPath) 
+    val filepartRecord = new UploadFilepartRecord(null, uploadId, title, filepath.getName) 
     filepart.ref.moveTo(new File(s"$filepath"))
     sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute
     filepartRecord
@@ -96,8 +94,12 @@ object UploadService extends AbstractFileService {
     
     // TODO delete Upload and Filepart records from the staging area tables
     
-    // TODO move files from /pending folder to /user-data
-    
+    // Move files from /pending folder to /user-data
+    fileparts.foreach(filepart => {
+      val source = new File(PENDING_UPLOADS_DIR, filepart.getFilename).toPath
+      val destination = new File(getUserDir(upload.getOwner, true).get, filepart.getFilename).toPath
+      Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
+    })    
   }
     
 }
