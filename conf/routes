@@ -25,10 +25,7 @@ POST    /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadC
 DELETE  /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.deleteFilepart
 GET     /my-recogito/upload/step-3         controllers.myrecogito.upload.UploadController.showStep3
 POST    /my-recogito/upload/step-3         controllers.myrecogito.upload.UploadController.showStep3
-GET     /my-recogito					   controllers.MyRecogito.index
-
-GET     /my-recogito/document              controllers.DocumentUpload.showMetadataForm
-POST    /my-recogito/document              controllers.DocumentUpload.processMetadataUpload
+GET     /my-recogito					             controllers.myrecogito.MyRecogitoController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Root

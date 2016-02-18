@@ -26,7 +26,7 @@ trait Security extends AuthConfig { self: HasDatabase =>
     UserService.findByUsername(id)(db)
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
-    val destination = request.session.get("access_uri").getOrElse(routes.MyRecogito.index.toString)
+    val destination = request.session.get("access_uri").getOrElse(myrecogito.routes.MyRecogitoController.index.toString)
     Future.successful(Results.Redirect(destination).withSession(request.session - "access_uri"))
   }
 

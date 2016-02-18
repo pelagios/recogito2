@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   cache,
   ws,
 
+  "commons-io" % "commons-io" % "2.4",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models",
   "jp.t2v" %% "play2-auth" % "0.14.1",
