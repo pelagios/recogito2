@@ -9,8 +9,8 @@
 # * 'Bodies' can be very different in nature (commentary vs. semantic tag vs. combinations). The
 #   ElasticSearch mapping has to be a superset to all of those. No way around that though (and
 #   probably not a big deal anyway)
-# * What are the possible types of bodies? - COMMENT, TRANSCRIPTION, TAG, NAMED_ENTITY (place,
-#   person, ...),
+# * What are the possible types of bodies? - COMMENT, TRANSCRIPTION, TAG, PLACE, PERSON (we want
+#   specific types, not just 'NAMED_ENTITY')
 # * Do we have all possible properties of the 'body' covered?
 # * Which ones do we allow to be multi-valued? (transcription and comment only?)
 # * Which ones are (can?) be the result of a user intervention, i.e. need their provenance
@@ -35,10 +35,11 @@
         "type": "nested",
         "properties": {
           "type": { "type": "string", "index": "not_analyzed" },
-          "chars": { "type": "string" },
-          "uri": { "type": "string", "index": "not_analyzed" },
           "created_by": { "type": "string", "index": "not_analyzed" },
-          "created_at": {  "type": "date", "format": "yyyy-MM-dd'T'HHmmssZ" }
+          "created_at": {  "type": "date", "format": "yyyy-MM-dd'T'HHmmssZ" },
+          "quote": { "type": "string" },
+          "uri": { "type": "string", "index": "not_analyzed" },
+          "text": { "type": "string" }
         }
       }
     }
