@@ -1,4 +1,4 @@
-package database
+package storage
 
 import akka.actor.ActorSystem
 import javax.inject.Inject
@@ -29,7 +29,7 @@ class DB @Inject() (db: Database, system: ActorSystem) {
 }
 
 object DB {
-  
+
   val CURRENT_SQLDIALECT = SQLDialect.SQLITE
-  
+
 }

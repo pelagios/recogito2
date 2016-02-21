@@ -15,7 +15,7 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
     // Crude DB initialization check - does the user table exist? Run schema generation if not.
     DB.withConnection { connection =>
-      if (!DSL.using(connection, database.DB.CURRENT_SQLDIALECT).meta().getTables.map(_.getName.toLowerCase).contains("user")) {
+      if (!DSL.using(connection, storage.DB.CURRENT_SQLDIALECT).meta().getTables.map(_.getName.toLowerCase).contains("user")) {
         Logger.info("Empty database - initializing...")
         initDB(connection)
       }

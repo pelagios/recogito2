@@ -1,7 +1,6 @@
 package controllers.landing
 
 import controllers.{ AbstractController, Security }
-import database.DB
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
 import models.UserService
@@ -17,14 +16,15 @@ import scala.concurrent.duration._
 import play.api.Logger
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import storage.DB
 
 case class SignupData(username: String, email: String, password: String)
 
 class SignupController @Inject() (implicit val db: DB) extends AbstractController with Login with Security {
 
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
-  
-  private val VALID_CHARACTERS = 
+
+  private val VALID_CHARACTERS =
     (('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9') ++ Seq('_', '-', '.')).toSet
 
   /** Username must be unique and may not contain special characters **/
@@ -45,7 +45,7 @@ class SignupController @Inject() (implicit val db: DB) extends AbstractControlle
           t.printStackTrace()
           Invalid(DEFAULT_ERROR_MESSAGE)
         }
-      } 
+      }
     } else {
       Invalid("Please don't use special characters - " + invalidChars.mkString(", "))
     }
@@ -73,7 +73,7 @@ class SignupController @Inject() (implicit val db: DB) extends AbstractControlle
           .flatMap(user => gotoLoginSucceeded(user.getUsername))
           .recover { case t:Throwable => {
             t.printStackTrace()
-            Ok(views.html.landing.signup(signupForm.bindFromRequest, Some(DEFAULT_ERROR_MESSAGE))) 
+            Ok(views.html.landing.signup(signupForm.bindFromRequest, Some(DEFAULT_ERROR_MESSAGE)))
           }}
     )
   }

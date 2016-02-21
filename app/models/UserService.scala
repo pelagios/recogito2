@@ -1,6 +1,5 @@
 package models
 
-import database.DB
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.time.OffsetDateTime
@@ -9,9 +8,10 @@ import models.generated.tables.records.UserRecord
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import storage.{ DB, FileStore }
 import sun.security.provider.SecureRandom
 
-object UserService extends FileUsingService {
+object UserService extends FileStore {
 
   private val SHA_256 = "SHA-256"
 
@@ -26,7 +26,7 @@ object UserService extends FileUsingService {
   def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(USER).where(USER.USERNAME.equal(username)).fetchOne())
   }
-  
+
   def findByUsernameIgnoreCase(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
@@ -36,7 +36,7 @@ object UserService extends FileUsingService {
       case Some(user) => computeHash(user.getSalt+password) == user.getPasswordHash
       case None => false
     })
-    
+
   def getUsedDiskspaceKB(username: String) =
     getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l)
 

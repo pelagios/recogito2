@@ -1,7 +1,6 @@
 package controllers.landing
 
 import controllers.{ AbstractController, Security }
-import database.DB
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
 import models.UserService
@@ -12,6 +11,7 @@ import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import scala.concurrent.Future
+import storage.DB
 
 case class LoginData(username: String, password: String)
 

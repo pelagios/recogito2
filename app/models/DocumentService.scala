@@ -1,7 +1,7 @@
 package models
 
-import database.DB
 import models.generated.Tables._
+import storage.DB
 
 object DocumentService {
 
@@ -12,5 +12,5 @@ object DocumentService {
        .offset(offset)
        .fetchArray().toSeq
   }
-  
+
 }

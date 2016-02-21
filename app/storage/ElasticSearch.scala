@@ -1,0 +1,5 @@
+package storage
+
+object ElasticSearch {
+  
+}
