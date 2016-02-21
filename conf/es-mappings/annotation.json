@@ -41,6 +41,14 @@
           "uri": { "type": "string", "index": "not_analyzed" },
           "text": { "type": "string" }
         }
+      },
+      "status": {
+        "type": "nested",
+        "properties": {
+          "value": { "type": "string", "index": "not_analyzed" },
+          "set_by": { "type": "string", "index": "not_analyzed" },
+          "set_at": {  "type": "date", "format": "yyyy-MM-dd'T'HHmmssZ" }
+        }
       }
     }
   }
