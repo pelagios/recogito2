@@ -22,13 +22,17 @@ class AnnotationStorageSpec extends Specification {
   private def getClient() = {
     val settings = ImmutableSettings.settingsBuilder()
           .put("http.enabled", false)
+          // .put("path.home", "es-root/")
 
     val client = ElasticClient.local(settings.build)
+    
     val response = client.execute { indexExists("recogito") }.await
-    if (!response.isExists) {
-      Logger.info("Creating index 'recogito'")
-      client.execute { create index "recogito" }.await      
+    if (response.isExists) {
+      Logger.info("Index 'recogito' exists - dropping")
+      client.execute { delete index "recogito" }.await
+      Logger.info("done.")
     }
+ 
     client
   }
                     
@@ -37,12 +41,19 @@ class AnnotationStorageSpec extends Specification {
      "properly initialize mappings from config file" in {       
        val client = getClient()
        
+       Logger.info("Creating annotation mapping")
+       
        // client.execute { create index "recogito" mappings JsonDocumentSource(annotationMapping) }.await      
+       val foo = client.admin.indices().prepareCreate("recogito")
+       foo.addMapping("annotation", annotationMapping)
+       foo.execute().actionGet()
+       
+       Logger.info("OK - checking if its there")
        
        val response = client.execute { getMapping("recogito" / "annotation") }.await
        Logger.info(response.getMappings.toString)
        
-       response.getMappings.keys.contains("annotation") must equalTo(true)       
+       response.getMappings.get("recogito").keys.contains("annotation") must equalTo(true)       
      }
     
   }
