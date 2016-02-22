@@ -1,6 +1,3 @@
-# Basically just keeps a record of all versions on an annotation. The modified annotation
-# is stored as a serialized, non-indexed JSON string. For search/restore, all we need to
-# know is who created each version, and when 
 {
   "annotation": {
     "properties": {
