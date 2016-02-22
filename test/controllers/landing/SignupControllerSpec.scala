@@ -1,4 +1,4 @@
-package landing
+package controllers.landing
 
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -8,7 +8,7 @@ import play.api.test.Helpers._
 import play.api.Logger
 
 @RunWith(classOf[JUnitRunner])
-class SignupSpec extends Specification {
+class SignupControllerSpec extends Specification {
   
   val testDatabase = Map(
     "db.default.driver" -> "org.sqlite.JDBC",

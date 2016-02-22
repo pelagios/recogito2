@@ -9,7 +9,7 @@ import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext
 
 object Global extends GlobalSettings {
-
+  
   private val SCHEMA_SQL = "conf/schema.sql"
 
   override def onStart(app: Application) {

@@ -1,4 +1,4 @@
-package database
+package storage
 
 import org.specs2.mutable._
 import org.specs2.runner._
