@@ -10,11 +10,14 @@ case class AnnotationBody (
 
   createdAt: Date,
 
-  quote: String,
+  lastModifiedBy: String,
 
-  uri: String,
+  lastModifiedAt: Date,
 
-  text: String
+  value: String,
+
+  uri: String
+
 )
 
 object AnnotationBody extends Enumeration {
@@ -23,9 +26,11 @@ object AnnotationBody extends Enumeration {
 
   val COMMENT = Value("COMMENT")
 
-  val PERSON = Value("ENTITY_PERSON")
+  val PERSON = Value("PERSON")
 
-  val PLACE = Value("ENTITY_PLACE")
+  val PLACE = Value("PLACE")
+
+  val QUOTE = Value("QUOTE")
 
   val TAG = Value("TAG")
 

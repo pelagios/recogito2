@@ -1,0 +1,38 @@
+{
+  "annotation_id": "2fabe353-d517-4f18-b6a9-c9ec368b160a",
+  "version_id": "74de3052-7087-41b3-84cd-cb8f4a1caa79",
+  "annotates": {
+    "document": 2,
+    "filepart": 1
+  },
+  "has_previous_versions": 1,
+  "contributors": [ "rainer" ],
+  "anchor": "{ \"x\": 25, \"y\": 120 }",
+  "created_by": "rainer",
+  "created_at": "2016-02-23'T'181000Z",
+  "last_modified_by": "rainer",
+  "last_modified_at": "2016-02-23'T'182400Z",
+  "bodies": [
+    {
+      "type": "TRANSCRIPTION",
+      "created_by": "rainer",
+      "created_at": {  "type": "date", "format": "2016-02-23'T'181000Z" },
+      "value": "Stansted"
+    },{
+      "type": "COMMENT",
+      "created_by": "rainer",
+      "created_at": {  "type": "date", "format": "2016-02-23'T'181200Z" },
+      "value": "I was there when I created this test file."
+    },{
+      "type": "PLACE",
+      "created_by": "rainer",
+      "created_at": {  "type": "date", "format": "2016-02-23'T'182400Z" },
+      "uri": "https://www.wikidata.org/wiki/Q8709"
+    }
+  ],
+  "status": {
+    "value": "VERIFIED",
+    "set_by": "rainer",
+    "set_at": "2016-02-23'T'182400Z"
+  }
+}

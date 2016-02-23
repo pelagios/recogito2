@@ -10,6 +10,10 @@ case class Annotation(
 
   annotates: AnnotatedObject,
 
+  hasPreviousVersions: Int,
+
+  contributors: Seq[String],
+
   anchor: String,
 
   createdBy: String,
