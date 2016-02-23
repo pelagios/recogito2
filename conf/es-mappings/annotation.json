@@ -14,7 +14,7 @@
       "created_by": { "type": "string", "index": "not_analyzed" },
       "created_at": {  "type": "date", "format": "yyyy-MM-dd'T'HHmmssZ" },
       "last_modified_by": { "type": "string", "index": "not_analyzed" },
-      "last_modified": { "type": "date", "format": "yyyy-MM-dd'T'HHmmssZ" },
+      "last_modified_at": { "type": "date", "format": "yyyy-MM-dd'T'HHmmssZ" },
       "bodies": {
         "type": "nested",
         "properties": {
