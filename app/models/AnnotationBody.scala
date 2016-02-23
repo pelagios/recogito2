@@ -1,6 +1,9 @@
 package models
 
 import java.util.Date
+import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._
 
 case class AnnotationBody (
 
@@ -10,13 +13,13 @@ case class AnnotationBody (
 
   createdAt: Date,
 
-  lastModifiedBy: String,
+  lastModifiedBy: Option[String],
 
-  lastModifiedAt: Date,
+  lastModifiedAt: Option[Date],
 
-  value: String,
+  value: Option[String],
 
-  uri: String
+  uri: Option[String]
 
 )
 
@@ -35,5 +38,25 @@ object AnnotationBody extends Enumeration {
   val TAG = Value("TAG")
 
   val TRANSCRIPTION = Value("TRANSCRIPTION")
+  
+  /** JSON serialization **/
+  implicit val annotationBodyWrites: Writes[AnnotationBody] = (
+    (JsPath \ "type").write[String] ~
+    (JsPath \ "created_by").write[String] ~
+    (JsPath \ "created_at").write[Date] ~
+    (JsPath \ "last_modified_by").writeNullable[String] ~
+    (JsPath \ "last_modified_at").writeNullable[Date] ~
+    (JsPath \ "value").writeNullable[String] ~
+    (JsPath \ "uri").writeNullable[String]
+  )(body => (
+      body.hasType.toString,
+      body.createdBy,
+      body.createdAt,
+      body.lastModifiedBy,
+      body.lastModifiedAt,
+      body.value,
+      body.uri))
 
 }
+
+
