@@ -9,10 +9,6 @@ case class AnnotationBody (
 
   hasType: AnnotationBody.Type,
 
-  createdBy: Option[String],
-
-  createdAt: DateTime,
-
   lastModifiedBy: Option[String],
 
   lastModifiedAt: Option[DateTime],
@@ -48,8 +44,6 @@ object AnnotationBody extends Enumeration with JsonDate {
 
   implicit val annotationBodyFormat: Format[AnnotationBody] = (
     (JsPath \ "type").format[AnnotationBody.Value] and
-    (JsPath \ "created_by").formatNullable[String] and 
-    (JsPath \ "created_at").format[DateTime] and
     (JsPath \ "last_modified_by").formatNullable[String] and
     (JsPath \ "last_modified_at").formatNullable[DateTime] and
     (JsPath \ "value").formatNullable[String] and

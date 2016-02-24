@@ -8,25 +8,23 @@
   "has_previous_versions": 1,
   "contributors": [ "rainer" ],
   "anchor": "{ \"x\": 25, \"y\": 120 }",
-  "created_by": "rainer",
-  "created_at": "2016-02-23'T'181000Z",
   "last_modified_by": "rainer",
   "last_modified_at": "2016-02-23'T'182400Z",
   "bodies": [
     {
       "type": "TRANSCRIPTION",
-      "created_by": "rainer",
-      "created_at": {  "type": "date", "format": "2016-02-23'T'181000Z" },
+      "last_modified_by": "rainer",
+      "last_modified_at": {  "type": "date", "format": "2016-02-23'T'181000Z" },
       "value": "Stansted"
     },{
       "type": "COMMENT",
-      "created_by": "rainer",
-      "created_at": {  "type": "date", "format": "2016-02-23'T'181200Z" },
+      "last_modified_by": "rainer",
+      "last_modified_at": {  "type": "date", "format": "2016-02-23'T'181200Z" },
       "value": "I was there when I created this test file."
     },{
       "type": "PLACE",
-      "created_by": "rainer",
-      "created_at": {  "type": "date", "format": "2016-02-23'T'182400Z" },
+      "last_modified_by": "rainer",
+      "last_modified_at": {  "type": "date", "format": "2016-02-23'T'182400Z" },
       "uri": "https://www.wikidata.org/wiki/Q8709"
     }
   ],

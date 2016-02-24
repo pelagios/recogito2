@@ -21,10 +21,6 @@ case class Annotation(
 
   anchor: String,
 
-  createdBy: Option[String],
-
-  createdAt: DateTime,
-
   lastModifiedBy: Option[String],
 
   lastModifiedAt: DateTime,
@@ -52,8 +48,6 @@ object Annotation extends JsonDate {
     (JsPath \ "has_previous_versions").formatNullable[Int] and 
     (JsPath \ "contributors").format[Seq[String]] and
     (JsPath \ "anchor").format[String] and
-    (JsPath \ "created_by").formatNullable[String] and
-    (JsPath \ "created_at").format[DateTime] and
     (JsPath \ "last_modified_by").formatNullable[String] and
     (JsPath \ "last_modified_at").format[DateTime] and
     (JsPath \ "bodies").format[Seq[AnnotationBody]] and
