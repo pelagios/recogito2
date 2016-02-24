@@ -21,14 +21,17 @@ object AnnotationStatus extends Enumeration {
 
   val VERIFIED = Value("VERIFIED")
 
-  /** JSON serialization **/ 
-  implicit val annotationStatusWrites: Writes[AnnotationStatus] = (
-    (JsPath \ "value").write[String] ~
-    (JsPath \ "set_by").writeNullable[String] ~
-    (JsPath \ "set_at").writeNullable[Date]
-  )(status => (
-      status.value.toString,
-      status.setBy,
-      status.setAt))
+  /** JSON conversion **/
+  implicit val annotationStatusValueFormat: Format[AnnotationStatus.Value] = 
+    Format(
+      (JsPath).read[String].map(AnnotationStatus.withName(_)),
+      (JsPath).write[String].contramap((_.toString))
+    ) 
+
+  implicit val annotationStatusFormat: Format[AnnotationStatus] = (
+    (JsPath \ "value").format[AnnotationStatus.Value] and
+    (JsPath \ "set_by").formatNullable[String] and 
+    (JsPath \ "set_at").formatNullable[Date]
+  )(AnnotationStatus.apply, unlift(AnnotationStatus.unapply))
   
 }

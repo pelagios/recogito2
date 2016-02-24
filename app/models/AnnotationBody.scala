@@ -9,7 +9,7 @@ case class AnnotationBody (
 
   hasType: AnnotationBody.Type,
 
-  createdBy: String,
+  createdBy: Option[String],
 
   createdAt: Date,
 
@@ -37,25 +37,24 @@ object AnnotationBody extends Enumeration {
 
   val TAG = Value("TAG")
 
-  val TRANSCRIPTION = Value("TRANSCRIPTION")
-  
-  /** JSON serialization **/
-  implicit val annotationBodyWrites: Writes[AnnotationBody] = (
-    (JsPath \ "type").write[String] ~
-    (JsPath \ "created_by").write[String] ~
-    (JsPath \ "created_at").write[Date] ~
-    (JsPath \ "last_modified_by").writeNullable[String] ~
-    (JsPath \ "last_modified_at").writeNullable[Date] ~
-    (JsPath \ "value").writeNullable[String] ~
-    (JsPath \ "uri").writeNullable[String]
-  )(body => (
-      body.hasType.toString,
-      body.createdBy,
-      body.createdAt,
-      body.lastModifiedBy,
-      body.lastModifiedAt,
-      body.value,
-      body.uri))
+  val TRANSCRIPTION = Value("TRANSCRIPTION")      
+      
+  /** JSON conversion **/
+  implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] = 
+    Format(
+      (JsPath).read[String].map(AnnotationBody.withName(_)),
+      (JsPath).write[String].contramap((_.toString))
+    ) 
+
+  implicit val annotationBodyFormat: Format[AnnotationBody] = (
+    (JsPath \ "type").format[AnnotationBody.Value] and
+    (JsPath \ "created_by").formatNullable[String] and 
+    (JsPath \ "created_at").format[Date] and
+    (JsPath \ "last_modified_by").formatNullable[String] and
+    (JsPath \ "last_modified_at").formatNullable[Date] and
+    (JsPath \ "value").formatNullable[String] and
+    (JsPath \ "uri").formatNullable[String]
+  )(AnnotationBody.apply, unlift(AnnotationBody.unapply))
 
 }
 

@@ -37,33 +37,26 @@ case class Annotation(
 case class AnnotatedObject(document: Int, filepart: Int)
 
 object Annotation {
-  
-  /** JSON serialization **/ 
-  implicit val annotationWrites: Writes[Annotation] = (
-    (JsPath \ "annotation_id").write[String] ~
-    (JsPath \ "version_id").write[String] ~
-    (JsPath \ "annotates").write[JsValue] ~
-    (JsPath \ "has_previous_versions").writeNullable[Int] ~
-    (JsPath \ "contributors").write[Seq[String]] ~
-    (JsPath \ "anchor").write[String] ~
-    (JsPath \ "created_by").writeNullable[String] ~
-    (JsPath \ "created_at").write[Date] ~
-    (JsPath \ "last_modified_by").writeNullable[String] ~
-    (JsPath \ "last_modified_at").write[Date] ~
-    (JsPath \ "bodies").write[Seq[AnnotationBody]] ~
-    (JsPath \ "status").write[AnnotationStatus]
-  )(a => (
-      a.annotationId.toString,
-      a.versionId.toString,
-      Json.obj("document" -> a.annotates.document, "filepart" -> a.annotates.filepart),
-      a.hasPreviousVersions,
-      a.contributors,
-      a.anchor,
-      a.createdBy,
-      a.createdAt,
-      a.lastModifiedBy,
-      a.lastModifiedAt,
-      a.bodies,
-      a.status))
+
+  /** JSON conversion **/
+  implicit val annotatedObjectFormat: Format[AnnotatedObject] = (
+    (JsPath \ "document").format[Int] and
+    (JsPath \ "filepart").format[Int]
+  )(AnnotatedObject.apply, unlift(AnnotatedObject.unapply))
+
+  implicit val annotationFormat: Format[Annotation] = (
+    (JsPath \ "annotation_id").format[UUID] and
+    (JsPath \ "version_id").format[UUID] and
+    (JsPath \ "annotates").format[AnnotatedObject] and
+    (JsPath \ "has_previous_versions").formatNullable[Int] and 
+    (JsPath \ "contributors").format[Seq[String]] and
+    (JsPath \ "anchor").format[String] and
+    (JsPath \ "created_by").formatNullable[String] and
+    (JsPath \ "created_at").format[Date] and
+    (JsPath \ "last_modified_by").formatNullable[String] and
+    (JsPath \ "last_modified_at").format[Date] and
+    (JsPath \ "bodies").format[Seq[AnnotationBody]] and
+    (JsPath \ "status").format[AnnotationStatus]  
+  )(Annotation.apply, unlift(Annotation.unapply))
   
 }
