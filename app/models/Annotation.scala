@@ -1,6 +1,7 @@
 package models
 
-import java.util.{ Date, UUID }
+import java.util.UUID
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -22,11 +23,11 @@ case class Annotation(
 
   createdBy: Option[String],
 
-  createdAt: Date,
+  createdAt: DateTime,
 
   lastModifiedBy: Option[String],
 
-  lastModifiedAt: Date,
+  lastModifiedAt: DateTime,
 
   bodies: Seq[AnnotationBody],
 
@@ -36,8 +37,8 @@ case class Annotation(
 
 case class AnnotatedObject(document: Int, filepart: Int)
 
-object Annotation {
-
+object Annotation extends JsonDate {
+    
   /** JSON conversion **/
   implicit val annotatedObjectFormat: Format[AnnotatedObject] = (
     (JsPath \ "document").format[Int] and
@@ -52,9 +53,9 @@ object Annotation {
     (JsPath \ "contributors").format[Seq[String]] and
     (JsPath \ "anchor").format[String] and
     (JsPath \ "created_by").formatNullable[String] and
-    (JsPath \ "created_at").format[Date] and
+    (JsPath \ "created_at").format[DateTime] and
     (JsPath \ "last_modified_by").formatNullable[String] and
-    (JsPath \ "last_modified_at").format[Date] and
+    (JsPath \ "last_modified_at").format[DateTime] and
     (JsPath \ "bodies").format[Seq[AnnotationBody]] and
     (JsPath \ "status").format[AnnotationStatus]  
   )(Annotation.apply, unlift(Annotation.unapply))

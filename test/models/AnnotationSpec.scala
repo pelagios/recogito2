@@ -19,8 +19,14 @@ class SignupControllerSpec extends Specification {
   "annotation" should {
     
     "be properly created from JSON" in {
-      // val textAnnotation = Json.fromJson(TEXT_ANNOTATION_JSON)
-      1 must equalTo(1)
+      val result = Json.fromJson[Annotation](Json.parse(TEXT_ANNOTATION_JSON))
+      result.isSuccess must equalTo(true)
+      
+      val textAnnotation = result.get
+      textAnnotation.hasPreviousVersions must equalTo(Some(1))
+      textAnnotation.contributors.size must equalTo(1)
+      textAnnotation.contributors.head must equalTo("rainer")
+      textAnnotation.status.value must equalTo(AnnotationStatus.VERIFIED)
     }
     
   }

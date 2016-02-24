@@ -9,32 +9,32 @@
   "contributors": [ "rainer" ],
   "anchor": "char-offset:231",
   "created_by": "rainer",
-  "created_at": "2016-02-23'T'181000Z",
+  "created_at": "2016-02-23T18:10:00Z",
   "last_modified_by": "rainer",
-  "last_modified_at": "2016-02-23'T'182400Z",
+  "last_modified_at": "2016-02-23T18:24:00Z",
   "bodies": [
     {
       "type": "QUOTE",
       "created_by": "rainer",
-      "created_at": {  "type": "date", "format": "2016-02-23'T'181000Z" },
+      "created_at": "2016-02-23T18:10:00Z",
       "value": "London Stansted"
     },{
       "type": "COMMENT",
       "created_by": "rainer",
-      "created_at": {  "type": "date", "format": "2016-02-23'T'181200Z" },
+      "created_at": "2016-02-23T18:12:00Z",
       "value": "I was there when I created this test file."
     },{
       "type": "PLACE",
       "created_by": "rainer",
-      "created_at": {  "type": "date", "format": "2016-02-23'T'181000Z" },
+      "created_at": "2016-02-23T18:10:00Z",
       "last_modified_by": "rainer",
-      "last_modified_at": "2016-02-23'T'182400Z",
+      "last_modified_at": "2016-02-23T18:24:00Z",
       "uri": "https://www.wikidata.org/wiki/Q8709"
     }
   ],
   "status": {
     "value": "VERIFIED",
     "set_by": "rainer",
-    "set_at": "2016-02-23'T'182400Z"
+    "set_at": "2016-02-23T18:24:00Z"
   }
 }

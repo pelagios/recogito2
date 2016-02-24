@@ -1,6 +1,6 @@
 package models
 
-import java.util.Date
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -11,11 +11,11 @@ case class AnnotationBody (
 
   createdBy: Option[String],
 
-  createdAt: Date,
+  createdAt: DateTime,
 
   lastModifiedBy: Option[String],
 
-  lastModifiedAt: Option[Date],
+  lastModifiedAt: Option[DateTime],
 
   value: Option[String],
 
@@ -23,7 +23,7 @@ case class AnnotationBody (
 
 )
 
-object AnnotationBody extends Enumeration {
+object AnnotationBody extends Enumeration with JsonDate {
 
   type Type = Value
 
@@ -43,15 +43,15 @@ object AnnotationBody extends Enumeration {
   implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] = 
     Format(
       (JsPath).read[String].map(AnnotationBody.withName(_)),
-      (JsPath).write[String].contramap((_.toString))
+      (JsPath).write[String].contramap(_.toString)
     ) 
 
   implicit val annotationBodyFormat: Format[AnnotationBody] = (
     (JsPath \ "type").format[AnnotationBody.Value] and
     (JsPath \ "created_by").formatNullable[String] and 
-    (JsPath \ "created_at").format[Date] and
+    (JsPath \ "created_at").format[DateTime] and
     (JsPath \ "last_modified_by").formatNullable[String] and
-    (JsPath \ "last_modified_at").formatNullable[Date] and
+    (JsPath \ "last_modified_at").formatNullable[DateTime] and
     (JsPath \ "value").formatNullable[String] and
     (JsPath \ "uri").formatNullable[String]
   )(AnnotationBody.apply, unlift(AnnotationBody.unapply))
