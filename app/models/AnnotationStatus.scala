@@ -11,7 +11,7 @@ case class AnnotationStatus(
 
   setBy: Option[String],
 
-  setAt: Option[DateTime]
+  setAt: DateTime
 
 )
 
@@ -24,14 +24,14 @@ object AnnotationStatus extends Enumeration with JsonDate {
   /** JSON conversion **/
   implicit val annotationStatusValueFormat: Format[AnnotationStatus.Value] = 
     Format(
-      (JsPath).read[String].map(AnnotationStatus.withName(_)),
-      (JsPath).write[String].contramap(_.toString)
+      JsPath.read[String].map(AnnotationStatus.withName(_)),
+      Writes[AnnotationStatus.Value](s => JsString(s.toString))
     ) 
 
   implicit val annotationStatusFormat: Format[AnnotationStatus] = (
     (JsPath \ "value").format[AnnotationStatus.Value] and
     (JsPath \ "set_by").formatNullable[String] and 
-    (JsPath \ "set_at").formatNullable[DateTime]
+    (JsPath \ "set_at").format[DateTime]
   )(AnnotationStatus.apply, unlift(AnnotationStatus.unapply))
   
 }

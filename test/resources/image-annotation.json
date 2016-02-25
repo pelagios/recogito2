@@ -9,28 +9,28 @@
   "contributors": [ "rainer" ],
   "anchor": "{ \"x\": 25, \"y\": 120 }",
   "last_modified_by": "rainer",
-  "last_modified_at": "2016-02-23'T'182400Z",
+  "last_modified_at": "2016-02-23T18:24:00Z",
   "bodies": [
     {
       "type": "TRANSCRIPTION",
       "last_modified_by": "rainer",
-      "last_modified_at": {  "type": "date", "format": "2016-02-23'T'181000Z" },
+      "last_modified_at": "2016-02-23T18:10:00Z",
       "value": "Stansted"
     },{
       "type": "COMMENT",
       "last_modified_by": "rainer",
-      "last_modified_at": {  "type": "date", "format": "2016-02-23'T'181200Z" },
+      "last_modified_at": "2016-02-23T18:12:00Z",
       "value": "I was there when I created this test file."
     },{
       "type": "PLACE",
       "last_modified_by": "rainer",
-      "last_modified_at": {  "type": "date", "format": "2016-02-23'T'182400Z" },
+      "last_modified_at": "2016-02-23T18:24:00Z",
       "uri": "https://www.wikidata.org/wiki/Q8709"
     }
   ],
   "status": {
     "value": "VERIFIED",
     "set_by": "rainer",
-    "set_at": "2016-02-23'T'182400Z"
+    "set_at": "2016-02-23T18:24:00Z"
   }
 }

@@ -11,7 +11,7 @@ case class AnnotationBody (
 
   lastModifiedBy: Option[String],
 
-  lastModifiedAt: Option[DateTime],
+  lastModifiedAt: DateTime,
 
   value: Option[String],
 
@@ -38,14 +38,14 @@ object AnnotationBody extends Enumeration with JsonDate {
   /** JSON conversion **/
   implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] = 
     Format(
-      (JsPath).read[String].map(AnnotationBody.withName(_)),
-      (JsPath).write[String].contramap(_.toString)
+      JsPath.read[String].map(AnnotationBody.withName(_)),
+      Writes[AnnotationBody.Type](t => JsString(t.toString))
     ) 
 
   implicit val annotationBodyFormat: Format[AnnotationBody] = (
     (JsPath \ "type").format[AnnotationBody.Value] and
     (JsPath \ "last_modified_by").formatNullable[String] and
-    (JsPath \ "last_modified_at").formatNullable[DateTime] and
+    (JsPath \ "last_modified_at").format[DateTime] and
     (JsPath \ "value").formatNullable[String] and
     (JsPath \ "uri").formatNullable[String]
   )(AnnotationBody.apply, unlift(AnnotationBody.unapply))
