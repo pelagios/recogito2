@@ -9,6 +9,9 @@
 * Which bodies are allowed to be multi-valued? Which ones unique? (QUOTE only?)
 * What about comments on the annotation (current solution) vs. comments on a specific body ("This
   transcription is a transliteration", "This transcription is according to Parsons")?
+  * Damien seems to need both versions comments on bodies
+  * Most common use case seems to be "doubt" (Cat - on image transcriptions; but might be on
+    georesolutions, too?)
 * ~~How do we deal with status? Specical property of the annotation, or regular part?
   (Note that we'll want to track *who* set the status can be != creator!)~~
 * ~~The annotation 'top level' represents just the 'anchored selection'. Everything that's

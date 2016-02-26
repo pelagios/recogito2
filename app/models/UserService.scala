@@ -8,10 +8,10 @@ import models.generated.tables.records.UserRecord
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import storage.{ DB, FileStore }
+import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
-object UserService extends FileStore {
+object UserService extends FileAccess {
 
   private val SHA_256 = "SHA-256"
 

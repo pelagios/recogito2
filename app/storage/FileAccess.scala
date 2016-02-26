@@ -4,7 +4,7 @@ import java.io.File
 import play.api.Play
 
 /** Base functionality for using files uploaded by users **/
-trait FileStore {
+trait FileAccess {
 
   private val A_TO_Z =
     (('a' to 'z') ++ ('A' to 'Z')).toSet

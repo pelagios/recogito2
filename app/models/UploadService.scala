@@ -11,9 +11,9 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
 import play.api.Logger
-import storage.{ DB, FileStore }
+import storage.{ DB, FileAccess }
 
-object UploadService extends FileStore {
+object UploadService extends FileAccess {
 
   /** Ugly helper that turns empty strings to null, so they are properly to the DB **/
   private def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
