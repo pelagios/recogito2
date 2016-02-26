@@ -58,7 +58,7 @@ object NERService extends FileAccess {
   
   private val pipeline = new StanfordCoreNLP(props)
   
-  private def parse(text: String) = {
+  private[ner] def parse(text: String) = {
     val document = new NLPAnnotation(text)
     pipeline.annotate(document)
 
@@ -83,7 +83,7 @@ object NERService extends FileAccess {
       })
     })
     
-    Logger.info(phrases.toString)
+    phrases.filter(_.entityTag != "O")
   }
   
 }
