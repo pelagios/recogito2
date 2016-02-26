@@ -73,12 +73,12 @@ object NERService extends FileAccess {
     */
   def spawnParseProcess(doc: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem) = {
     val userDir = getUserDir(doc.getOwner).get
-    val partsWithFiles = parts.map(part => (part, new File(userDir, part.getFilename)))   
+    val partsWithFiles = parts.map(part => PartWithFile(part, new File(userDir, part.getFilename)))   
     spawnParseProcessForFiles(doc, partsWithFiles)
   }
   
   /** Separated file retrieval from actor spawning, so we can test more easily **/
-  private[ner] def spawnParseProcessForFiles(doc: DocumentRecord, partsWithFiles: Seq[(DocumentFilepartRecord, File)])(implicit system: ActorSystem) = {
+  private[ner] def spawnParseProcessForFiles(doc: DocumentRecord, partsWithFiles: Seq[PartWithFile])(implicit system: ActorSystem) = {
     val actorId = generateRandomActorId()
     val actor = system.actorOf(Props(classOf[NERActor], doc, partsWithFiles), name = actorId)
     actors.put(actorId, actor)

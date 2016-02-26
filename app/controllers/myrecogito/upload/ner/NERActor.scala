@@ -7,46 +7,38 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import play.api.Logger
 import scala.io.Source
 
-private[ner] class NERActor(document: DocumentRecord, parts: Seq[(DocumentFilepartRecord, File)]) extends Actor {
-  
-  Logger.info("yay")
+private[ner] case class PartWithFile(part: DocumentFilepartRecord, file: File)
+
+private[ner] class NERActor(document: DocumentRecord, parts: Seq[PartWithFile]) extends Actor {
   
   import NERActor._
   
   def receive = {
     
     case StartNER => {
-      Logger.info("Starting")
-      parseFileparts(document, parts)
-      Logger.info("NER completed")
-      sender ! NERComplete
+      val result = parseFileparts(document, parts)
+      sender ! NERComplete(result)
     }
       
   }
 
-  private def parseFileparts(document: DocumentRecord, parts: Seq[(DocumentFilepartRecord, File)]) = {
-    parts.map { tuple => {
-      Logger.info(tuple._2.getName)
-    }}
-
-        
-        
-        /*_ match {
-      case (part, file) if part.getContentType == ContentTypes.TEXT_PLAIN.toString => 
-        parsePlaintext(document, part, file)
-        
-      case (part, file) =>
-        Logger.info("Skipping NER for file of unsupported type " + part.getContentType + ": " + file.getAbsolutePath) 
-    })*/
+  private def parseFileparts(document: DocumentRecord, parts: Seq[PartWithFile]): Map[Int, Seq[Phrase]] = {
+    parts.map(partWithFile => {
+      partWithFile match {
+        case p if p.part.getContentType == ContentTypes.TEXT_PLAIN.toString =>
+          (p.part.getId.toInt, parsePlaintext(document, p.part, p.file))
+          
+        case p => {
+          Logger.info("Skipping NER for file of unsupported type " + p.part.getContentType + ": " + p.file.getAbsolutePath) 
+          (p.part.getId.toInt, Seq.empty[Phrase])          
+        }
+      }
+    }).toMap    
   }
   
   private def parsePlaintext(document: DocumentRecord, part: DocumentFilepartRecord, file: File) = {
-    Logger.info("Staring NER")
-    
     val text = Source.fromFile(file).getLines.mkString("\n")
-    val entities = NERService.parse(text)
-    
-    // TODO implement
+    NERService.parse(text)
   }
   
 }
@@ -58,6 +50,6 @@ object NERActor {
   case object StartNER extends Message
   case object QueryNERProgress extends Message
   case class NERProgress(value: Double, currentPhase: String) extends Message
-  case object NERComplete extends Message
+  case class NERComplete(result: Map[Int, Seq[Phrase]]) extends Message
 
 }
