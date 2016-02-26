@@ -1,62 +1,25 @@
 package controllers.myrecogito.upload.ner
 
-import akka.actor.Actor
+import akka.actor.{ ActorRef, ActorSystem, Props }
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.StanfordCoreNLP
 import edu.stanford.nlp.pipeline.{ Annotation => NLPAnnotation }
-import java.io.File
 import java.util.Properties
-import models.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConverters._
-import scala.concurrent.Future
-import scala.io.Source
-import storage.FileAccess
-
-private[ner] class NERActor(document: DocumentRecord, fileparts: Seq[DocumentFilepartRecord]) extends Actor with FileAccess {
-  
-  def receive = {
-    
-    case "SomeMessage" => // TODO implement
-      
-  }
-
-  private def parseFileparts() = {
-    // This will throw an exception if user data dir does not exist - can only
-    // happen in case DB integrity is broken!
-    val userDir = getUserDir(document.getOwner).get
-    
-    val files = fileparts.map(part => (part, new File(userDir, part.getFilename)))
-    
-    // Process files in parallel
-    files.par.map(_ match {
-      case (part, file) if part.getContentType == ContentTypes.TEXT_PLAIN => 
-        parsePlaintext(document, part, file)
-        
-      case (part, file) =>
-        Logger.info("Skipping NER for file of unsupported type " + part.getContentType + ": " + file.getAbsolutePath) 
-    })
-  }
-  
-  private def parsePlaintext(document: DocumentRecord, part: DocumentFilepartRecord, file: File) = {
-    val text = Source.fromFile(file).getLines.mkString("\n")
-    
-    // TODO implement
-    
-  }
-  
-}
+import org.apache.commons.lang3.RandomStringUtils
 
 private[ner] case class Phrase(chars: String, entityTag: String, charOffset: Int)
 
-object NERService extends FileAccess {
+object NERService {
   
   private val props = new Properties()
   props.put("annotators", "tokenize, ssplit, pos, lemma, ner")
   
   private val pipeline = new StanfordCoreNLP(props)
+  
+  // A mutable hashmap for tracking ActorRefs by their ID
+  private val actors = scala.collection.mutable.HashMap.empty[String, ActorRef]
   
   private[ner] def parse(text: String) = {
     val document = new NLPAnnotation(text)
@@ -84,6 +47,33 @@ object NERService extends FileAccess {
     })
     
     phrases.filter(_.entityTag != "O")
+  }
+  
+  private def generateRandomActorId(triesLeft: Int = 100): String = {
+    val id = RandomStringUtils.randomAlphanumeric(20)
+    if (actors.contains(id)) {
+      // Collision! Try again, or throw exception if max number of tries reached
+      if (triesLeft > 0)
+        generateRandomActorId(triesLeft - 1)      
+      else
+        throw new RuntimeException("Could not generate unique actor ID")
+    } else {
+      // Unique ID
+      id
+    }
+  }
+  
+  /** Spawns a new background parse process **/
+  def spawnParseProcess(document: DocumentRecord, fileparts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem) = {
+    val actorId = generateRandomActorId()
+    val actor = system.actorOf(Props(classOf[NERActor], document, fileparts), name = actorId) 
+    actor ! NERActor.StartNER
+    actorId
+  }
+  
+  /** Queries the progress for a specific process **/ 
+  def queryProgress(processId: String)(implicit system: ActorSystem) = {
+    
   }
   
 }
