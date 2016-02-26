@@ -1,16 +1,11 @@
 package controllers.myrecogito.upload.ner
 
-import akka.actor.ActorSystem
-import com.typesafe.config.ConfigFactory
-import java.time.OffsetDateTime
-import models.ContentTypes
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
+import play.api.Logger
 import play.api.test._
 import play.api.test.Helpers._
-import play.api.Logger
 import scala.io.Source
 
 @RunWith(classOf[JUnitRunner])
@@ -57,22 +52,18 @@ class NERServiceSpec extends Specification {
   }
   
   "The NER service" should {
-
-    implicit val actorSystem = ActorSystem("testActorSystem", ConfigFactory.load())
     
-    // TODO need to find a way to make the NER actors more testable (with absolute filepaths!)
-    
-    // TODO revisit the filepart DB schema (title vs. name vs. path etc.)
-    
-    val document = new DocumentRecord(0, "rainer", OffsetDateTime.now, "The Odyssey", null, null, null, null, null, null)
-    val filepart = new DocumentFilepartRecord(0, 0, "text-for-ner.txt", ContentTypes.TEXT_PLAIN.toString, "test/resources/text-for-ner.txt")
-    
-    "spawn 100 actors without ID collisions" in {
-      (1 to 100).map(_ => {
-        val actorId = NERService.spawnParseProcess(document, Seq(filepart))
-        Logger.info(actorId)
-        1 must equalTo(1)
+    "generate 100.000 unique IDs without collision" in {
+      val numberOfIdsToGenerate = 100000
+      
+      val mockActorMap = scala.collection.mutable.HashMap.empty[String, Any]
+      
+      (1 to numberOfIdsToGenerate).foreach(_ =>{
+        val id = NERService.generateRandomActorId(actorMap = mockActorMap)
+        mockActorMap.put(id, None)
       })
+      
+      mockActorMap.size must equalTo(numberOfIdsToGenerate)
     }
     
   }

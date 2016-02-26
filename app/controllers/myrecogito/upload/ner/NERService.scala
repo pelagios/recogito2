@@ -4,14 +4,16 @@ import akka.actor.{ ActorRef, ActorSystem, Props }
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.StanfordCoreNLP
 import edu.stanford.nlp.pipeline.{ Annotation => NLPAnnotation }
+import java.io.File
 import java.util.Properties
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import scala.collection.JavaConverters._
 import org.apache.commons.lang3.RandomStringUtils
+import scala.collection.JavaConverters._
+import storage.FileAccess
 
 private[ner] case class Phrase(chars: String, entityTag: String, charOffset: Int)
 
-object NERService {
+object NERService extends FileAccess {
   
   private val props = new Properties()
   props.put("annotators", "tokenize, ssplit, pos, lemma, ner")
@@ -49,12 +51,12 @@ object NERService {
     phrases.filter(_.entityTag != "O")
   }
   
-  private def generateRandomActorId(triesLeft: Int = 100): String = {
-    val id = RandomStringUtils.randomAlphanumeric(20)
-    if (actors.contains(id)) {
-      // Collision! Try again, or throw exception if max number of tries reached
+  private[ner] def generateRandomActorId(triesLeft: Int = 100, actorMap: scala.collection.mutable.Map[String, _] = actors): String = {
+    val id = RandomStringUtils.randomAlphanumeric(14)
+    if (actorMap.contains(id)) {
+      // Collision! Try again, or throw exception if max number of tries reached (chances for this are low in practice)
       if (triesLeft > 0)
-        generateRandomActorId(triesLeft - 1)      
+        generateRandomActorId(triesLeft - 1, actorMap)      
       else
         throw new RuntimeException("Could not generate unique actor ID")
     } else {
@@ -63,10 +65,23 @@ object NERService {
     }
   }
   
-  /** Spawns a new background parse process **/
-  def spawnParseProcess(document: DocumentRecord, fileparts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem) = {
+  /** Spawns a new background parse process. 
+    * 
+    * The function will throw an exception in case the user data directory
+    * for any of the fileparts does not exist. This should, however, never
+    * happen. If it does, something is seriously broken with the DB integrity.
+    */
+  def spawnParseProcess(doc: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem) = {
+    val userDir = getUserDir(doc.getOwner).get
+    val partsWithFiles = parts.map(part => (part, new File(userDir, part.getFilename)))   
+    spawnParseProcessForFiles(doc, partsWithFiles)
+  }
+  
+  /** Separated file retrieval from actor spawning, so we can test more easily **/
+  private[ner] def spawnParseProcessForFiles(doc: DocumentRecord, partsWithFiles: Seq[(DocumentFilepartRecord, File)])(implicit system: ActorSystem) = {
     val actorId = generateRandomActorId()
-    val actor = system.actorOf(Props(classOf[NERActor], document, fileparts), name = actorId) 
+    val actor = system.actorOf(Props(classOf[NERActor], doc, partsWithFiles), name = actorId)
+    actors.put(actorId, actor)
     actor ! NERActor.StartNER
     actorId
   }
