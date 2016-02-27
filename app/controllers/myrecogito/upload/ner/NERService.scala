@@ -20,9 +20,6 @@ object NERService extends FileAccess {
   
   private val pipeline = new StanfordCoreNLP(props)
   
-  // A mutable hashmap for tracking ActorRefs by their ID
-  private val actors = scala.collection.mutable.HashMap.empty[String, ActorRef]
-  
   private[ner] def parse(text: String) = {
     val document = new NLPAnnotation(text)
     pipeline.annotate(document)
@@ -50,44 +47,22 @@ object NERService extends FileAccess {
     
     phrases.filter(_.entityTag != "O")
   }
-  
-  private[ner] def generateRandomActorId(triesLeft: Int = 100, actorMap: scala.collection.mutable.Map[String, _] = actors): String = {
-    val id = RandomStringUtils.randomAlphanumeric(14)
-    if (actorMap.contains(id)) {
-      // Collision! Try again, or throw exception if max number of tries reached (chances for this are low in practice)
-      if (triesLeft > 0)
-        generateRandomActorId(triesLeft - 1, actorMap)      
-      else
-        throw new RuntimeException("Could not generate unique actor ID")
-    } else {
-      // Unique ID
-      id
-    }
-  }
-  
+    
   /** Spawns a new background parse process. 
     * 
     * The function will throw an exception in case the user data directory
     * for any of the fileparts does not exist. This should, however, never
     * happen. If it does, something is seriously broken with the DB integrity.
     */
-  def spawnParseProcess(doc: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem) = {
-    val userDir = getUserDir(doc.getOwner).get
-    val partsWithFiles = parts.map(part => PartWithFile(part, new File(userDir, part.getFilename)))   
-    spawnParseProcessForFiles(doc, partsWithFiles)
-  }
+  def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
+    spawnNERProcess(document, parts, getUserDir(document.getOwner).get)
   
-  /** Separated file retrieval from actor spawning, so we can test more easily **/
-  private[ner] def spawnParseProcessForFiles(doc: DocumentRecord, partsWithFiles: Seq[PartWithFile])(implicit system: ActorSystem) = {
-    val actorId = generateRandomActorId()
-    val actor = system.actorOf(Props(classOf[NERActor], doc, partsWithFiles), name = actorId)
-    actors.put(actorId, actor)
-    actor ! NERActor.StartNER
-    actorId
-  }
-  
+  /** We're splitting this function, so we can inject alternative folders for testing **/
+  private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File)(implicit system: ActorSystem): Unit =
+    system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder), name = document.getId.toString) 
+
   /** Queries the progress for a specific process **/ 
-  def queryProgress(processId: String)(implicit system: ActorSystem) = {
+  def queryProgress(documentId: String)(implicit system: ActorSystem) = {
     
   }
   

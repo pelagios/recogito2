@@ -3,7 +3,6 @@ package controllers.myrecogito.upload.ner
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
-import play.api.Logger
 import play.api.test._
 import play.api.test.Helpers._
 import scala.io.Source
@@ -47,23 +46,6 @@ class NERServiceSpec extends Specification {
         val snippetFromSourceFile = TEST_TEXT.substring(e.charOffset, e.charOffset + e.chars.size)
         snippetFromSourceFile must equalTo(e.chars)
       })
-    }
-    
-  }
-  
-  "The NER service" should {
-    
-    "generate 100.000 unique IDs without collision" in {
-      val numberOfIdsToGenerate = 100000
-      
-      val mockActorMap = scala.collection.mutable.HashMap.empty[String, Any]
-      
-      (1 to numberOfIdsToGenerate).foreach(_ =>{
-        val id = NERService.generateRandomActorId(actorMap = mockActorMap)
-        mockActorMap.put(id, None)
-      })
-      
-      mockActorMap.size must equalTo(numberOfIdsToGenerate)
     }
     
   }
