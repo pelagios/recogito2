@@ -41,26 +41,28 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
       val duration = System.currentTimeMillis - startTime
       Logger.info("NER service accepted in " + duration + " ms")
       (System.currentTimeMillis - startTime).toInt must be <(500)
+      
+      "report progress until completion" in {
+      
+        (1 to 10).foreach(_ => {
+          Logger.info("Querying progress")
+          val result = Await.result(NERService.queryProgress(0), 10 seconds)
+          Logger.info(result.progress.headOption.map(_.progress).toString)
+        })
+        
+        success
+      }
+      
     }
-    
-    "report progress until completion" in {
       
-      (1 to 10).foreach(_ => {
-        val result = Await.result(NERService.queryProgress(0), 10 seconds)
-        Logger.info(result.progress.headOption.map(_.progress).toString)
-      })
-      
-      "progress responses should arrive in less than 500 ms" in {
-        success
-      }
-      
-      "progress must be at 100% for all fileparts after completion" in {
-        success
-      }
-      
+    "progress responses should arrive in less than 500 ms" in {
       success
     }
-    
+      
+    "progress must be at 100% for all fileparts after completion" in {
+      success
+    }
+          
     "accept progress queries after completion, until the KEEPALIVE time expires" in {
       success 
     }

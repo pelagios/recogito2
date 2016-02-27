@@ -11,6 +11,7 @@ import java.util.Properties
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConverters._
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import storage.FileAccess
 
