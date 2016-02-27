@@ -19,6 +19,8 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     
     case Start => Future {
       val result = parseFilepart(document, part, dir)
+      Logger.info("Done.")
+      result.foreach(phrase => Logger.info(phrase.toString))
       
       // TODO convert result to annotations
       
@@ -41,8 +43,10 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       case t if t == ContentTypes.TEXT_PLAIN.toString =>
         parsePlaintext(document, part, new File(dir, part.getFilename))
           
-      case t =>
+      case t => {
         Logger.info("Skipping NER for file of unsupported type " + t + ": " + dir.getName + File.separator + part.getFilename) 
+        Seq.empty[Phrase]
+      }
     }
   
   private def parsePlaintext(document: DocumentRecord, part: DocumentFilepartRecord, file: File) = {

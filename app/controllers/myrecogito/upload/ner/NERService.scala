@@ -18,10 +18,10 @@ private[ner] case class Phrase(chars: String, entityTag: String, charOffset: Int
 
 object NERService extends FileAccess {
   
-  private val props = new Properties()
+  private lazy val props = new Properties()
   props.put("annotators", "tokenize, ssplit, pos, lemma, ner")
   
-  private val pipeline = new StanfordCoreNLP(props)
+  private lazy val pipeline = new StanfordCoreNLP(props)
   
   private[ner] def parse(text: String) = {
     val document = new NLPAnnotation(text)
@@ -61,13 +61,13 @@ object NERService extends FileAccess {
     spawnNERProcess(document, parts, getUserDir(document.getOwner).get)
   
   /** We're splitting this function, so we can inject alternative folders for testing **/
-  private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder), name = "doc_" + document.getId.toString) 
+  private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
+    val actor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder, keepalive), name = "doc_" + document.getId.toString) 
     actor ! NERMessages.Start
   }
   
   /** Queries the progress for a specific process **/ 
-  def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
+  def queryProgress(documentId: Int, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
     implicit val t = Timeout(timeout)
     system.actorSelection("user/doc_" + documentId).resolveOne()
       .flatMap(actor => (actor ? NERMessages.QueryProgress).mapTo[NERMessages.DocumentProgress])

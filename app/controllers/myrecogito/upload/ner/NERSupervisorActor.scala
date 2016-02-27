@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.util.{ Success, Failure }
 
-private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: Duration = 10 minutes) extends Actor {
+private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: Duration) extends Actor {
     
   import NERMessages._
   
