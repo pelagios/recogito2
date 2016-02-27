@@ -29,12 +29,12 @@ class NERSupervisorActorSpec extends TestKit(ActorSystem()) with ImplicitSender 
     val supervisor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, dir, KEEPALIVE))
     
     "run NER on the 5 test files without error" in {  
-      supervisor ! NERMessages.StartNER
+      supervisor ! NERMessages.Start
       // expectMsg(1 minutes, NERMessages.NERComplete)
       
       (1 to 10).foreach(_ => {
         Thread.sleep(2000)
-        supervisor ! NERMessages.QueryNERProgress
+        supervisor ! NERMessages.QueryProgress
       })
       
       success

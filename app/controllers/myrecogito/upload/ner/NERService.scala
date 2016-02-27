@@ -1,14 +1,17 @@
 package controllers.myrecogito.upload.ner
 
 import akka.actor.{ ActorRef, ActorSystem, Props }
+import akka.pattern.ask
+import akka.util.Timeout
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.StanfordCoreNLP
 import edu.stanford.nlp.pipeline.{ Annotation => NLPAnnotation }
 import java.io.File
 import java.util.Properties
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import org.apache.commons.lang3.RandomStringUtils
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConverters._
+import scala.concurrent.duration._
 import storage.FileAccess
 
 private[ner] case class Phrase(chars: String, entityTag: String, charOffset: Int)
@@ -58,12 +61,16 @@ object NERService extends FileAccess {
     spawnNERProcess(document, parts, getUserDir(document.getOwner).get)
   
   /** We're splitting this function, so we can inject alternative folders for testing **/
-  private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File)(implicit system: ActorSystem): Unit =
-    system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder), name = document.getId.toString) 
-
+  private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File)(implicit system: ActorSystem): Unit = {
+    val actor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder), name = "doc_" + document.getId.toString) 
+    actor ! NERMessages.Start
+  }
+  
   /** Queries the progress for a specific process **/ 
-  def queryProgress(documentId: String)(implicit system: ActorSystem) = {
-    
+  def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
+    implicit val t = Timeout(timeout)
+    system.actorSelection("user/doc_" + documentId).resolveOne()
+      .flatMap(actor => (actor ? NERMessages.QueryProgress).mapTo[NERMessages.DocumentProgress])
   }
   
 }

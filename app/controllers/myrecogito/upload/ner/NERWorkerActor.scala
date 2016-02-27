@@ -5,24 +5,33 @@ import java.io.File
 import models.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.Logger
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.Future
 import scala.io.Source
 
 private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) extends Actor {
   
   import NERMessages._
   
+  var progress = 0.0
+  
   def receive = {
     
-    case StartNER => {
+    case Start => Future {
       val result = parseFilepart(document, part, dir)
       
       // TODO convert result to annotations
       
       // TODO import to DB
       
-      sender ! NERComplete
+      progress = 1.0
+      
+      sender ! Completed
       context.stop(self) 
     }
+    
+    case QueryProgress => 
+      sender ! WorkerProgress(part.getId, progress)
       
   }
 

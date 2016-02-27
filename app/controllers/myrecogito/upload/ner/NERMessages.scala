@@ -4,12 +4,16 @@ object NERMessages{
 
   sealed abstract trait Message
   
-  case object StartNER extends Message
+  case object Start extends Message
   
-  case object QueryNERProgress extends Message
+  case object QueryProgress extends Message
+  
+  case class WorkerProgress(filepartId: Int, progress: Double)
 
-  case class NERProgress(value: Double, currentPhase: String) extends Message
+  case class DocumentProgress(documentId: Int, progress: Seq[WorkerProgress]) extends Message
+  
+  case object Failed extends Message
 
-  case object NERComplete extends Message
+  case object Completed extends Message
 
 }
