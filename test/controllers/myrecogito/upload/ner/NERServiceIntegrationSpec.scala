@@ -28,8 +28,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
     val parts = (1 to 5).map(n => 
       new DocumentFilepartRecord(n, { if (n < 4) 0 else 1 }, "text-for-ner-0" + n + ".txt", ContentTypes.TEXT_PLAIN.toString, "text-for-ner-0" + n + ".txt"))
       
-    val parts1 = parts.take(3)
-    val parts2 = parts.drop(3)
+    val parts1 = parts // .take(3)
+    // val parts2 = parts.drop(3)
       
     val dir = new File("test/resources")
     
@@ -37,7 +37,7 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
       Logger.info("Submitting 2 documents to NER service")
       val startTime = System.currentTimeMillis
       NERService.spawnNERProcess(document1, parts1, dir)
-      NERService.spawnNERProcess(document2, parts2, dir)
+      // NERService.spawnNERProcess(document2, parts2, dir)
       val duration = System.currentTimeMillis - startTime
       Logger.info("NER service accepted in " + duration + " ms")
       (System.currentTimeMillis - startTime).toInt must be <(500)
@@ -45,9 +45,10 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
       "report progress until completion" in {
       
         (1 to 10).foreach(_ => {
-          Logger.info("Querying progress")
+          Logger.info("[Test ] Sending progress query...")
           val result = Await.result(NERService.queryProgress(0), 10 seconds)
-          Logger.info(result.progress.headOption.map(_.progress).toString)
+          Logger.info("[Test] Progress response is here: " + result.progress.headOption.map(_.progress).toString)
+          Thread.sleep(1000)
         })
         
         success

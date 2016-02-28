@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   ws,
 
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.4",
+  "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "commons-io" % "commons-io" % "2.4",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models",
@@ -26,6 +27,8 @@ libraryDependencies ++= Seq(
 
   specs2 % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"
+  
+  
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

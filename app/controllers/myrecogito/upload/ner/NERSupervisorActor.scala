@@ -1,8 +1,7 @@
 package controllers.myrecogito.upload.ner
 
 import akka.actor.{ Actor, ActorRef, Props }
-import akka.pattern.ask
-import akka.util.Timeout
+import akka.contrib.pattern.Aggregator
 import java.io.File
 import models.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
@@ -12,15 +11,15 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.util.{ Success, Failure }
 
-private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: Duration) extends Actor {
+private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: Duration) extends Actor with Aggregator {
     
   import NERMessages._
   
   private val workers = spawnWorkers(document, parts, dir)
   
   private var remainingWorkers = workers.size
-  
-  def receive = {
+    
+  expect {
     
     /** Spawns and starts child actors **/
     case Start => {
@@ -32,27 +31,37 @@ private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[Docum
     
     /** Collects progress info from child actors and aggregates the results **/
     case QueryProgress => {
-      implicit val timeout = Timeout(10 seconds)
-
-      val queries = workers.map(w => (w ? QueryProgress).mapTo[WorkerProgress])
-      Future.sequence(queries).onComplete {
-        
-        case Success(results) =>
-          sender ! DocumentProgress(document.getId, results)
-          
-        case Failure(t) => {
-          Logger.error("Error querying NER progress")
-          t.printStackTrace()
-        }
-        
-      }
+      aggregateProgressReports(document.getId, workers, sender)      
     }
     
     /** Waits 10 more minutes for late-arriving progress queries, than stops **/
     case Completed => {
+      Logger.info("[Supervisor] Workers completed")
       remainingWorkers -= 1
       if (remainingWorkers < 1)
         shutdown()
+    }
+    
+  }
+  
+  private def aggregateProgressReports(documentId: Int, workers: Seq[ActorRef], origSender: ActorRef) {
+    var responses = Seq.empty[WorkerProgress]
+    
+    // TODO timeout
+    workers.foreach { w =>
+      w ! QueryProgress
+      expectOnce {
+        case p: WorkerProgress =>
+          responses = responses :+ p 
+          respondIfDone()
+      }
+    }
+    
+    def respondIfDone() = {
+      if (responses.size == workers.size) {
+        Logger.info("[Supervisor] Sending aggregate progress response")
+        origSender ! DocumentProgress(documentId, responses.toSeq)
+      }      
     }
     
   }
