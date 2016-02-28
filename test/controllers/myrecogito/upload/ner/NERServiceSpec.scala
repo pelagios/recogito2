@@ -15,8 +15,6 @@ class NERServiceSpec extends Specification {
   
   "The NER parse function" should {
     
-    "do nothing" in { success }
-    /*
     val entities = NERService.parse(TEST_TEXT)
     
     "detect 11 Named Entites in the test text" in {
@@ -49,7 +47,7 @@ class NERServiceSpec extends Specification {
         snippetFromSourceFile must equalTo(e.chars)
       })
     }
-    */
+ 
   }
   
 }

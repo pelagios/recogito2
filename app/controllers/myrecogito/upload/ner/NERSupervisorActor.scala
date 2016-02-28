@@ -37,6 +37,7 @@ private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[Docum
     /** Waits 10 more minutes for late-arriving progress queries, than stops **/
     case Completed => {
       Logger.info("[Supervisor] Workers completed")
+      // TODO stop the workers from here, don't let them stop themselves
       remainingWorkers -= 1
       if (remainingWorkers < 1)
         shutdown()
@@ -47,21 +48,20 @@ private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[Docum
   private def aggregateProgressReports(documentId: Int, workers: Seq[ActorRef], origSender: ActorRef) {
     var responses = Seq.empty[WorkerProgress]
     
-    // TODO timeout
-    workers.foreach { w =>
+    workers.foreach(w => {
       w ! QueryProgress
+      
       expectOnce {
-        case p: WorkerProgress =>
+        case p: WorkerProgress => {
           responses = responses :+ p 
           respondIfDone()
+        }
       }
-    }
+    })
     
     def respondIfDone() = {
-      if (responses.size == workers.size) {
-        Logger.info("[Supervisor] Sending aggregate progress response")
-        origSender ! DocumentProgress(documentId, responses.toSeq)
-      }      
+      if (responses.size == workers.size)
+        origSender ! DocumentProgress(documentId, responses.toSeq)      
     }
     
   }

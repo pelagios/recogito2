@@ -27,6 +27,8 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       Future {
         val result = parseFilepart(document, part, dir)
         Logger.info("Done.")
+        
+        // TODO what about failed parses -> send Failed message
       
         // TODO convert result to annotations
       
@@ -35,6 +37,8 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
         progress = 1.0
       
         origSender ! Completed
+        
+        // TODO workers should be stopped by the supervisor
         context.stop(self)
       }
     }
@@ -61,41 +65,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     val text = Source.fromFile(file).getLines.mkString("\n")
     NERService.parse(text)
   }
-  
-  /*
-  private[ner] def parse(text: String) = {
-    val props = new Properties()
-    props.put("annotators", "tokenize, ssplit, pos, lemma, ner")
-  
-    val document = new Annotation(text)
-    // pipeline.annotate(document)
-    new StanfordCoreNLP(props).annotate(document)
     
-    val phrases = document.get(classOf[CoreAnnotations.SentencesAnnotation]).asScala.toSeq.flatMap(sentence => {
-      val tokens = sentence.get(classOf[CoreAnnotations.TokensAnnotation]).asScala.toSeq
-      tokens.foldLeft(Seq.empty[Phrase])((result, token) => {
-        val entityTag = token.get(classOf[CoreAnnotations.NamedEntityTagAnnotation])
-        val chars = token.get(classOf[CoreAnnotations.TextAnnotation])
-        val charOffset = token.beginPosition
-
-        result.headOption match {
-          
-          case Some(previousPhrase) if previousPhrase.entityTag == entityTag =>
-            // Append to previous phrase if entity tag is the same
-            Phrase(previousPhrase.chars + " " + chars, entityTag, previousPhrase.charOffset) +: result.tail
-            
-          case _ =>
-            // Either this is the first token (result.headOption == None), or a new phrase
-            Phrase(chars, entityTag, charOffset) +: result  
-  
-        }
-      })
-    })
-    
-    phrases.filter(_.entityTag != "O")
-  }
-  */
-  
 }
 
 private[ner] object NERWorkerActor {

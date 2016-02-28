@@ -12,6 +12,8 @@ object NERMessages{
 
   case class DocumentProgress(documentId: Int, progress: Seq[WorkerProgress]) extends Message
   
+  case object TimedOut extends Message
+  
   case object Failed extends Message
 
   case object Completed extends Message

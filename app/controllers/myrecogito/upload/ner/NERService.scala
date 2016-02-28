@@ -73,6 +73,7 @@ object NERService extends FileAccess {
   def queryProgress(documentId: Int, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
     implicit val t = Timeout(timeout)
     
+    // TODO still having trouble finding actors by name - figure out how this works!
     
     // system.actorSelection("user/doc_" + documentId).resolveOne()
     //  .flatMap(actor => {
