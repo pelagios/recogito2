@@ -2,33 +2,34 @@
 # Static resources
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                              controllers.Assets.versioned(path="/public", file: Asset)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /signup                            controllers.landing.SignupController.showSignupForm
-POST    /signup                            controllers.landing.SignupController.processSignup
-GET     /login                             controllers.landing.LoginController.showLoginForm
-POST    /login                             controllers.landing.LoginController.processLogin
-GET     /logout                            controllers.landing.LogoutController.logout
+GET     /signup                                    controllers.landing.SignupController.showSignupForm
+POST    /signup                                    controllers.landing.SignupController.processSignup
+GET     /login                                     controllers.landing.LoginController.showLoginForm
+POST    /login                                     controllers.landing.LoginController.processLogin
+GET     /logout                                    controllers.landing.LogoutController.logout
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # User personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my-recogito/upload/step-1         controllers.myrecogito.upload.UploadController.showStep1
-POST    /my-recogito/upload/step-1         controllers.myrecogito.upload.UploadController.storeDocumentMetadata
-GET     /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.showStep2
-POST    /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.storeFilepart
-DELETE  /my-recogito/upload/step-2         controllers.myrecogito.upload.UploadController.deleteFilepart
-GET     /my-recogito/upload/step-3         controllers.myrecogito.upload.UploadController.showStep3
-POST    /my-recogito/upload/step-3         controllers.myrecogito.upload.UploadController.showStep3
-GET     /my-recogito					             controllers.myrecogito.MyRecogitoController.index
+GET     /my-recogito/upload/step-1                 controllers.myrecogito.upload.UploadController.showStep1
+POST    /my-recogito/upload/step-1                 controllers.myrecogito.upload.UploadController.storeDocumentMetadata
+GET     /my-recogito/upload/step-2                 controllers.myrecogito.upload.UploadController.showStep2
+POST    /my-recogito/upload/step-2                 controllers.myrecogito.upload.UploadController.storeFilepart
+DELETE  /my-recogito/upload/step-2                 controllers.myrecogito.upload.UploadController.deleteFilepart
+GET     /my-recogito/upload/step-3                 controllers.myrecogito.upload.UploadController.showStep3
+POST    /my-recogito/upload/step-3                 controllers.myrecogito.upload.UploadController.showStep3
+GET     /my-recogito/upload/ner-progress/:docId    controllers.myrecogito.upload.UploadController.queryNERProgress(docId: Int)
+GET     /my-recogito					                     controllers.myrecogito.MyRecogitoController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /                                  controllers.landing.LandingController.index
+GET     /                                          controllers.landing.LandingController.index

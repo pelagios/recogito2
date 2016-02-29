@@ -16,6 +16,6 @@ object NERMessages{
   
   case class Failed(msg: String) extends Message
 
-  case object Completed extends Message
+  case object Completed extends Message  
 
 }

@@ -45,8 +45,8 @@ private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[Docum
     var responses = Seq.empty[WorkerProgress]
     var responseSent = false
     
-    // After 3 seconds, we'll reply with what we have, even if not all responses are in
-    context.system.scheduler.scheduleOnce(3 seconds, self, TimedOut)
+    // After 5 seconds, we'll reply with what we have, even if not all responses are in
+    context.system.scheduler.scheduleOnce(5 seconds, self, TimedOut)
     expect {
       case TimedOut => {
         if (responses.size < workers.size)

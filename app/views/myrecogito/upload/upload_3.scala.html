@@ -1,9 +1,10 @@
-@(upload: models.generated.tables.records.DocumentRecord, fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord], applyNER: Boolean)
+@(document: models.generated.tables.records.DocumentRecord, fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord], applyNER: Boolean)
 <!DOCTYPE html>
 <html>
   <head>
     <title>My Recogito - Organize Document</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
+    <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
   </head>
   <body>
     <div id="content">
@@ -11,12 +12,55 @@
         <li class="arrow">Enter Metadata</li><li class="arrow">Attach Files</li><li class="active">Import</li>
       </ul>
 
-      <p style="height:70px"></p>
+      <ul class="fileparts">
+        @for(part <- fileparts) {
+          <li class="filepart-preview" data-id="@part.getId">
+            <p class="filepart-title">@part.getTitle</p>
+            <p class="filepart-ner-progress">?</p>
+          </li>
+        }
+      </ul>
 
       <div id="buttons">
         <a href="@controllers.myrecogito.upload.routes.UploadController.showStep2" class="back btn btn-large btn-blue">Back</a>
         <a href="#" class="next btn btn-large btn-blue">OK</a>
       </div>
     </div>
+    <script>
+      jQuery(document).ready(function() {
+            // Document ID
+        var docId = @document.getId,
+
+            // Number of fileparts in this document
+            hasParts = @fileparts.size,
+
+            NER_PROGRESS_SERVICE_URL = '@controllers.myrecogito.upload.routes.UploadController.queryNERProgress(document.getId)',
+
+            pollNERProgress = function() {
+              jQuery.getJSON(NER_PROGRESS_SERVICE_URL, function(data) {
+                var workerProgress = data.progress,
+
+                    completedWorkers = jQuery.grep(workerProgress, function(p) {
+                      return p.progress == 1.0;
+                    }),
+
+                    isComplete = completedWorkers.length === hasParts;
+
+                jQuery.each(workerProgress, function(idx, p) {
+                  var div = jQuery('li[data-id="' + p.filepart_id + '"] .filepart-ner-progress');
+                  div.html(p.progress);
+                });
+
+                if (isComplete)
+                  console.log('NER complete.')
+                else
+                  setTimeout(pollNERProgress, 1000);
+
+              });
+            };
+
+        pollNERProgress();
+      });
+    </script>
   </body>
 </html>

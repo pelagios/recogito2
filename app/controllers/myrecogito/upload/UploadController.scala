@@ -3,17 +3,21 @@ package controllers.myrecogito.upload
 import akka.actor.ActorSystem
 import controllers.{ AbstractController, Security }
 import controllers.myrecogito.upload.ner.NERService
+import controllers.myrecogito.upload.ner.NERMessages._
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import models.Roles._
-import models.UploadService
+import models.{ DocumentService, UploadService }
 import models.generated.tables.records.UploadRecord
 import play.api.Logger
 import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages.Implicits._
+import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import storage.DB
@@ -73,10 +77,10 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
           // Pending upload + fileparts available - proceed
           UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
             val applyNER = checkParamValue("apply-ner", "on")
-            
+
             if (applyNER)
               NERService.spawnNERProcess(doc, docParts)
-              
+
             Ok(views.html.myrecogito.upload.upload_3(doc, docParts, applyNER))
           }}
         }
@@ -136,10 +140,55 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
       }}
   }
 
+  /** Queries the NER service for progress on the document with the specified ID
+   	*
+   	* The method returns NotFound when the document does not exist, and returns
+   	* Forbidden when the document owner is not equal to the currently logged in user. 
+   	*/
+  def queryNERProgress(id: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    import UploadController._
+        
+    DocumentService.findById(id).flatMap(_ match {
+      case Some(document) if document.getOwner == loggedIn.getUsername => {    
+        NERService.queryProgress(id).map(_ match {
+          case Some(result) =>
+            Ok(Json.toJson(result))
+            
+          case None =>
+            // Document exists, but there's no NER process for it
+            NotFound
+        })
+      }
+      
+      case Some(document) =>
+        // Document exists, but belongs to another user
+        Future.successful(Forbidden)
+        
+      case None =>
+        // Document not in database
+        Future.successful(NotFound)
+    })
+  }
+
   /** Deletes a filepart, during step 2 **/
   def deleteFilepart = StackAction(AuthorityKey -> Normal) { implicit request =>
     // TODO implement
     Ok("")
   }
 
+}
+
+/** Defines JSON serialization for NER progress messages **/
+object UploadController {
+
+  implicit val workerProgressWrites: Writes[WorkerProgress] = (
+    (JsPath \ "filepart_id").write[Int] and
+    (JsPath \ "progress").write[Double]
+  )(unlift(WorkerProgress.unapply))
+  
+  implicit val documentProgressWrites: Writes[DocumentProgress] = (
+    (JsPath \ "document_id").write[Int] and
+    (JsPath \ "progress").write[Seq[WorkerProgress]]
+  )(unlift(DocumentProgress.unapply))
+  
 }
