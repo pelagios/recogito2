@@ -13,6 +13,7 @@ libraryDependencies ++= Seq(
 
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.4",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
   "commons-io" % "commons-io" % "2.4",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models",

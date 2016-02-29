@@ -2,17 +2,14 @@ package controllers.myrecogito.upload.ner
 
 import akka.actor.Actor
 import java.io.File
-import models.ContentTypes
+import java.util.UUID
+import models._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import scala.io.Source
-//
-import java.util.Properties
-import edu.stanford.nlp.ling.CoreAnnotations
-import edu.stanford.nlp.pipeline.{ Annotation, StanfordCoreNLP }
-import scala.collection.JavaConverters._
 
 private[ner] object NERWorkerActor {
   
@@ -31,15 +28,9 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     case Start => {
       val origSender = sender
       parseFilepart(document, part, dir).map { result =>
-        
-        // TODO what about failed parses -> send Failed message
-      
-        // TODO convert result to annotations
-      
-        // TODO import to DB
-      
+        val annotations = phrasesToAnnotations(result, document, part)
+        AnnotationService.insertAnnotations(annotations)
         progress = 1.0
-      
         origSender ! Completed
       }.recover { case t => {
         t.printStackTrace
@@ -68,5 +59,46 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     val text = Source.fromFile(file).getLines.mkString("\n")
     NERService.parse(text)
   }
-    
+  
+  private def phrasesToAnnotations(phrases: Seq[Phrase], document: DocumentRecord, part: DocumentFilepartRecord) =
+    phrases
+      .filter(p => (p.entityTag == "LOCATION" || p.entityTag == "PERSON"))
+      .map(p => {
+        val now = DateTime.now
+        val annotationType = 
+          p.entityTag match {
+            case "LOCATION" => AnnotationBody.PLACE
+            case "PERSON" => AnnotationBody.PERSON
+          }
+        
+        Annotation(
+          UUID.randomUUID,
+          UUID.randomUUID,
+          AnnotatedObject(document.getId, part.getId),
+          None, // no previous versions
+          Seq.empty[String], // No contributing users
+          "char-offset:" + p.charOffset,
+          None, // no last modifying user
+          now,
+          Seq(
+            AnnotationBody(
+              AnnotationBody.QUOTE,
+              None, // no last modifying user
+              now,
+              Some(p.chars),
+              None), // uri
+            AnnotationBody(
+              annotationType,
+              None,
+              now,
+              None,
+              None)
+          ),
+          AnnotationStatus(
+            AnnotationStatus.UNVERIFIED,
+            None,
+            now)
+        )
+      })
+
 }
