@@ -25,11 +25,12 @@ libraryDependencies ++= Seq(
 
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
+  "org.webjars" % "jquery-ui" % "1.11.4",
 
   specs2 % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"
-  
-  
+
+
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

@@ -1,3 +1,39 @@
+h2 {
+  text-align:center;
+  padding:30px 0 30px 0;
+}
+
 ul.fileparts {
-  padding-bottom:70px;
+  padding-bottom:80px;
+
+  li {
+    position:relative;
+    cursor:pointer;
+    padding:10px;
+    margin:6px 5px;
+    background-color:@login-form-bg-white;
+    border:1px solid @login-form-border-grey;
+  }
+
+  li:before {
+    content:'\f0dc';
+    color:@dz-text;
+    font-size:14.5px;
+    font-family:FontAwesome;
+    padding-right:5px;
+  }
+
+  .filepart-ner-progress {
+    display:inline-block;
+    width:145px;
+    position:absolute;
+    text-align:center;
+    padding:10px;
+    top:0;
+    bottom:0;
+    right:0;
+    font-size:15px;
+    background-color:lighten(@login-form-border-grey, 6%);
+  }
+
 }

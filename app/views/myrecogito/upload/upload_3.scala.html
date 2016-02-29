@@ -1,10 +1,11 @@
-@(document: models.generated.tables.records.DocumentRecord, fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord], applyNER: Boolean)
+@() @*document: models.generated.tables.records.DocumentRecord, fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord], applyNER: Boolean)*@
 <!DOCTYPE html>
 <html>
   <head>
     <title>My Recogito - Organize Document</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
+    <script src="@routes.Assets.versioned("lib/jquery-ui/jquery-ui.min.js")"></script>
   </head>
   <body>
     <div id="content">
@@ -12,13 +13,47 @@
         <li class="arrow">Enter Metadata</li><li class="arrow">Attach Files</li><li class="active">Import</li>
       </ul>
 
+      <h2>Grab &amp; Drag to Change Order</h2>
+
       <ul class="fileparts">
-        @for(part <- fileparts) {
+        <li class="filepart-preview">
+          the-odyssey-1.txt
+          <span class="filepart-ner-progress">
+            Annotation
+            <span class="filepart-ner-progress-current">In Progress...</span>
+          </span>
+        </li>
+
+        <li class="filepart-preview">
+          the-odyssey-3.txt
+          <span class="filepart-ner-progress">
+            Annotation
+            <span class="filepart-ner-progress-current">In Progress...</span>
+          </span>
+        </li>
+
+        <li class="filepart-preview">
+          the-odyssey-4.txt
+          <span class="filepart-ner-progress">
+            Annotation
+            <span class="filepart-ner-progress-current">In Progress...</span>
+          </span>
+        </li>
+
+        <li class="filepart-preview">
+          the-odyssey-2.txt
+          <span class="filepart-ner-progress">
+            Annotation
+            <span class="filepart-ner-progress-current">In Progress...</span>
+          </span>
+        </li>
+
+        @* for(part <- fileparts) {
           <li class="filepart-preview" data-id="@part.getId">
             <p class="filepart-title">@part.getTitle</p>
-            <p class="filepart-ner-progress">?</p>
+            <p class="filepart-ner-progress"></p>
           </li>
-        }
+        } *@
       </ul>
 
       <div id="buttons">
@@ -26,6 +61,15 @@
         <a href="#" class="next btn btn-large btn-blue">OK</a>
       </div>
     </div>
+
+    <script>
+      jQuery(document).ready(function() {
+        jQuery('ul.fileparts').sortable();
+        jQuery('ul.fileparts').disableSelection();
+      });
+    </script>
+
+    @*
     <script>
       jQuery(document).ready(function() {
             // Document ID
@@ -59,8 +103,10 @@
               });
             };
 
+        jQuery('ul.fileparts').sortable();
+        jQuery('ul.fileparts').disableSelection();
         pollNERProgress();
       });
-    </script>
+    </script>*@
   </body>
 </html>

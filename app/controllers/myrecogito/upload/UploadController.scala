@@ -67,7 +67,9 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   }
 
   /** Step 2 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
-  def showStep3 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showStep3 = StackAction(AuthorityKey -> Normal) { implicit request =>
+    Ok(views.html.myrecogito.upload.upload_3())
+    /*
     UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).flatMap(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
@@ -89,6 +91,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         // No pending upload - force user to step 1
         Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1))
     })
+    */
   }
 
   /** Stores document metadata, during step 1 **/
@@ -144,27 +147,27 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   /** Queries the NER service for progress on the document with the specified ID
    	*
    	* The method returns NotFound when the document does not exist, and returns
-   	* Forbidden when the document owner is not equal to the currently logged in user. 
+   	* Forbidden when the document owner is not equal to the currently logged in user.
    	*/
   def queryNERProgress(id: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     import UploadController._
-        
+
     DocumentService.findById(id).flatMap(_ match {
-      case Some(document) if document.getOwner == loggedIn.getUsername => {    
+      case Some(document) if document.getOwner == loggedIn.getUsername => {
         NERService.queryProgress(id).map(_ match {
           case Some(result) =>
             Ok(Json.toJson(result))
-            
+
           case None =>
             // Document exists, but there's no NER process for it
             NotFound
         })
       }
-      
+
       case Some(document) =>
         // Document exists, but belongs to another user
         Future.successful(Forbidden)
-        
+
       case None =>
         // Document not in database
         Future.successful(NotFound)
@@ -186,10 +189,10 @@ object UploadController {
     (JsPath \ "filepart_id").write[Int] and
     (JsPath \ "progress").write[Double]
   )(unlift(WorkerProgress.unapply))
-  
+
   implicit val documentProgressWrites: Writes[DocumentProgress] = (
     (JsPath \ "document_id").write[Int] and
     (JsPath \ "progress").write[Seq[WorkerProgress]]
   )(unlift(DocumentProgress.unapply))
-  
+
 }
