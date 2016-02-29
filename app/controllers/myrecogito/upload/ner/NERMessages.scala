@@ -14,7 +14,7 @@ object NERMessages{
   
   case object TimedOut extends Message
   
-  case object Failed extends Message
+  case class Failed(msg: String) extends Message
 
   case object Completed extends Message
 

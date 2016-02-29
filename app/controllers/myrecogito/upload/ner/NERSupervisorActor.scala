@@ -5,15 +5,14 @@ import akka.contrib.pattern.Aggregator
 import java.io.File
 import models.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
-import scala.concurrent.Future
-import scala.util.{ Success, Failure }
 
-private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: Duration) extends Actor with Aggregator {
+private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: FiniteDuration) extends Actor with Aggregator {
     
   import NERMessages._
+  
+  NERSupervisor.registerActor(document.getId, self)
   
   private val workers = spawnWorkers(document, parts, dir)
   
@@ -21,32 +20,39 @@ private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[Docum
     
   expect {
     
-    /** Spawns and starts child actors **/
-    case Start => {
+    /** Starts child worker actors **/
+    case Start =>
       if (workers.isEmpty)
         shutdown()
       else
-        workers.foreach(_ ! Start)   
-    }
+        workers.foreach(_ ! Start)
     
-    /** Collects progress info from child actors and aggregates the results **/
-    case QueryProgress => {
-      aggregateProgressReports(document.getId, workers, sender)      
-    }
+    /** Collects progress info from child workers and aggregates the results **/
+    case QueryProgress =>
+      aggregateProgressReports(document.getId, workers, sender)    
     
-    /** Waits 10 more minutes for late-arriving progress queries, than stops **/
-    case Completed => {
-      Logger.info("[Supervisor] Workers completed")
-      // TODO stop the workers from here, don't let them stop themselves
+    /** Once all workers are done, waits KEEPALIVE time for late-arriving progress queries then stops **/
+    case Completed | Failed => {
       remainingWorkers -= 1
-      if (remainingWorkers < 1)
-        shutdown()
+      if (remainingWorkers == 0)
+        shutdown(keepalive)
     }
     
   }
   
+  /** Sends out progress queries to child workers and collects the responses **/
   private def aggregateProgressReports(documentId: Int, workers: Seq[ActorRef], origSender: ActorRef) {
     var responses = Seq.empty[WorkerProgress]
+    var responseSent = false
+    
+    // After 3 seconds, we'll reply with what we have, even if not all responses are in
+    context.system.scheduler.scheduleOnce(3 seconds, self, TimedOut)
+    expect {
+      case TimedOut => {
+        if (responses.size < workers.size)
+          respondIfDone(force = true)
+      }
+    }
     
     workers.foreach(w => {
       w ! QueryProgress
@@ -59,23 +65,42 @@ private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[Docum
       }
     })
     
-    def respondIfDone() = {
-      if (responses.size == workers.size)
-        origSender ! DocumentProgress(documentId, responses.toSeq)      
+    def respondIfDone(force: Boolean = false) =
+      if (!responseSent)
+        if (force || responses.size == workers.size) {
+          origSender ! DocumentProgress(documentId, responses.toSeq)
+          responseSent = true
+        }
+  }
+  
+  /** Waits for KEEPALIVE time and then shuts down **/
+  private def shutdown(keepalive: FiniteDuration = 0 seconds) = {
+    context.system.scheduler.scheduleOnce(keepalive) {
+      NERSupervisor.deregisterActor(document.getId)
+      workers.foreach(context.stop(_))
+      context.stop(self)
     }
-    
   }
   
-  private def shutdown() = {
-    // TODO clean up - we want to keep the supervisor alive for 10 more minutes
-    // so we can react to late-arriving progress queries, and then stop it
-    Logger.info("Shutting down")
-    context.stop(self)
-  }
-  
+  /** Creates workers for ever content type indicated as 'supported' by the Worker class **/
   private def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
     parts
       .filter(part => NERWorkerActor.SUPPORTED_CONTENT_TYPES.contains(part.getContentType))
-      .map(p => context.actorOf(Props(classOf[NERWorkerActor], document, p, dir)))
+      .map(p => context.actorOf(Props(classOf[NERWorkerActor], document, p, dir), name="doc_" + document.getId + "_part" + p.getId))
+  
+}
+
+private[ner] object NERSupervisor {
+  
+  private val supervisors = scala.collection.mutable.Map.empty[Int, ActorRef]
+  
+  def registerActor(id: Int, actor: ActorRef) =
+    supervisors.put(id, actor)
+  
+  def deregisterActor(id: Int) =
+    supervisors.remove(id)
+    
+  def getActor(id: Int) =
+    supervisors.get(id)
   
 }

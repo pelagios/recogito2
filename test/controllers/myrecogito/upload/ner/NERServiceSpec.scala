@@ -5,6 +5,8 @@ import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import scala.io.Source
 
 @RunWith(classOf[JUnitRunner])
@@ -15,7 +17,7 @@ class NERServiceSpec extends Specification {
   
   "The NER parse function" should {
     
-    val entities = NERService.parse(TEST_TEXT)
+    val entities =  Await.result(NERService.parse(TEST_TEXT), 10 seconds)
     
     "detect 11 Named Entites in the test text" in {
       entities.size must equalTo (11)

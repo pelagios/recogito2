@@ -14,6 +14,12 @@ import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.{ Annotation, StanfordCoreNLP }
 import scala.collection.JavaConverters._
 
+private[ner] object NERWorkerActor {
+  
+  val SUPPORTED_CONTENT_TYPES = Set(ContentTypes.TEXT_PLAIN).map(_.toString)
+  
+}
+
 private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) extends Actor {
   
   import NERMessages._
@@ -24,9 +30,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     
     case Start => {
       val origSender = sender
-      Future {
-        val result = parseFilepart(document, part, dir)
-        Logger.info("Done.")
+      parseFilepart(document, part, dir).map { result =>
         
         // TODO what about failed parses -> send Failed message
       
@@ -37,15 +41,14 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
         progress = 1.0
       
         origSender ! Completed
-        
-        // TODO workers should be stopped by the supervisor
-        context.stop(self)
-      }
+      }.recover { case t => {
+        t.printStackTrace
+        origSender ! Failed(t.getMessage)
+      }}
     }
     
-    case QueryProgress => {
+    case QueryProgress =>
       sender ! WorkerProgress(part.getId, progress)
-    }
       
   }
 
@@ -57,7 +60,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
           
       case t => {
         Logger.info("Skipping NER for file of unsupported type " + t + ": " + dir.getName + File.separator + part.getFilename) 
-        Seq.empty[Phrase]
+        Future { Seq.empty[Phrase] }
       }
     }
   
@@ -66,10 +69,4 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     NERService.parse(text)
   }
     
-}
-
-private[ner] object NERWorkerActor {
-  
-  val SUPPORTED_CONTENT_TYPES = Set(ContentTypes.TEXT_PLAIN).map(_.toString)
-  
 }
