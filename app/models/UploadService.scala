@@ -6,11 +6,12 @@ import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.time.OffsetDateTime
 import java.util.UUID
 import models.generated.Tables._
-import models.generated.tables.records.{ DocumentRecord, UploadRecord, UploadFilepartRecord }
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
 import play.api.Logger
+import scala.collection.JavaConversions._
 import storage.{ DB, FileAccess }
 
 object UploadService extends FileAccess {
@@ -99,7 +100,6 @@ object UploadService extends FileAccess {
 
   /** Promotes a pending upload in the staging area to actual document **/
   def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
-    // Create a document record from the metadata properties of the upload
     val document = new DocumentRecord(null,
           upload.getOwner,
           upload.getCreatedAt,
@@ -110,23 +110,39 @@ object UploadService extends FileAccess {
           upload.getDescription,
           upload.getSource,
           upload.getLanguage)
+    
+    // Insert document, retrieving the auto-generated ID
+    val docId = 
+      sql.insertInto(DOCUMENT).set(document).returning(DOCUMENT.ID).fetchOne()
+    document.setId(docId.getId)
 
-    sql.insertInto(DOCUMENT).set(document).execute()
+    // Insert filepart records - I couldn't find a way to do a batch-insert that also returns
+    // the auto-generated ID. Any hints on how this could be achieved appreciated! 
+    val docFileparts = fileparts.map(part => {
+      val docFilepart = new DocumentFilepartRecord(null,
+            docId.getId,
+            part.getTitle, 
+            part.getContentType, 
+            part.getFilename)
 
-    // TODO how to deal with fileparts? We need a new document model!
-
-    // Delete Upload and Filepart records from the staging area tables
-    sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.UPLOAD_ID.equal(upload.getId)).execute()
-    sql.deleteFrom(UPLOAD).where(UPLOAD.ID.equal(upload.getId)).execute()
+      val docFilepartId =
+        sql.insertInto(DOCUMENT_FILEPART).set(docFilepart).returning(DOCUMENT_FILEPART.ID).fetchOne()
+      docFilepart.setId(docFilepartId.getId)
+      docFilepart
+    })
 
     // Move files from 'pending' to 'user-data' folder
-    fileparts.foreach(filepart => {
+    val filePaths = fileparts.map(filepart => {
       val source = new File(PENDING_UPLOADS_DIR, filepart.getFilename).toPath
       val destination = new File(getUserDir(upload.getOwner, true).get, filepart.getFilename).toPath
       Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
     })
+    
+    // Delete Upload and Filepart records from the staging area tables
+    sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.UPLOAD_ID.equal(upload.getId)).execute()
+    sql.deleteFrom(UPLOAD).where(UPLOAD.ID.equal(upload.getId)).execute()
 
-    document
+    (document, docFileparts)
   }
 
 }

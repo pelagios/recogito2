@@ -34,7 +34,7 @@ trait FileAccess {
     dir
   }
 
-  def getUserDir(username: String, createIfNotExists: Boolean = false): Option[File] = {
+  protected def getUserDir(username: String, createIfNotExists: Boolean = false): Option[File] = {
     val alphabeticCharsOnly = username.filter(A_TO_Z.contains(_))
 
     // User folders are contained in common parent folder. The name of that folder is

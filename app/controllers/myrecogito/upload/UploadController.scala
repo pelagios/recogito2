@@ -2,6 +2,7 @@ package controllers.myrecogito.upload
 
 import akka.actor.ActorSystem
 import controllers.{ AbstractController, Security }
+import controllers.myrecogito.upload.ner.NERService
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
@@ -63,24 +64,26 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
 
   /** Step 2 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
   def showStep3 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).map(_ match {
+    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).flatMap(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
           // No fileparts - force user to step 2
-          Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)
+          Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2))
         } else {
           // Pending upload + fileparts available - proceed
-          val applyNER = checkParamValue("apply-ner", "on")
-
-          // TODO start NER in case applyNER is true
-          UploadService.importPendingUpload(pendingUpload, fileparts)
-
-          Ok(views.html.myrecogito.upload.upload_3(pendingUpload, fileparts, applyNER))
+          UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
+            val applyNER = checkParamValue("apply-ner", "on")
+            
+            if (applyNER)
+              NERService.spawnNERProcess(doc, docParts)
+              
+            Ok(views.html.myrecogito.upload.upload_3(doc, docParts, applyNER))
+          }}
         }
 
       case None =>
         // No pending upload - force user to step 1
-        Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1)
+        Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1))
     })
   }
 
