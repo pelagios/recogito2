@@ -39,11 +39,13 @@ CREATE TABLE upload (
 CREATE TABLE upload_filepart (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   upload_id INTEGER NOT NULL REFERENCES upload(id) ON DELETE CASCADE,
+  owner VARCHAR NOT NULL REFERENCES user(username),
   title VARCHAR NOT NULL,
   content_type VARCHAR NOT NULL,
-  filename VARCHAR NOT NULL
+  filename VARCHAR NOT NULL,
   -- TODO filepart metadata (source, identifier,... ?),
   -- TODO sequence_no INTEGER NOT NULL
+  UNIQUE (owner, title)
 );
 
 -- users own (and can share) documents

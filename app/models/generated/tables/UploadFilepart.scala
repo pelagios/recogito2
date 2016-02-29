@@ -62,6 +62,11 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	val UPLOAD_ID : TableField[UploadFilepartRecord, Integer] = createField("upload_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), "")
 
 	/**
+	 * The column <code>upload_filepart.owner</code>.
+	 */
+	val OWNER : TableField[UploadFilepartRecord, String] = createField("owner", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+
+	/**
 	 * The column <code>upload_filepart.title</code>.
 	 */
 	val TITLE : TableField[UploadFilepartRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
@@ -103,7 +108,7 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	}
 
 	override def getReferences : List[ ForeignKey[UploadFilepartRecord, _] ] = {
-		return Arrays.asList[ ForeignKey[UploadFilepartRecord, _] ](Keys.FK_UPLOAD_FILEPART_UPLOAD_1)
+		return Arrays.asList[ ForeignKey[UploadFilepartRecord, _] ](Keys.FK_UPLOAD_FILEPART_UPLOAD_1, Keys.FK_UPLOAD_FILEPART_USER_1)
 	}
 
 	override def as(alias : String) : UploadFilepart = {

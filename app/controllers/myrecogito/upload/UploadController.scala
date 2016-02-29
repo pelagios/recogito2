@@ -110,12 +110,13 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   /** Stores a filepart, during step 2 **/
   def storeFilepart = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     // First, we need to get the pending upload this filepart belongs to
-    UploadService.findPendingUpload(loggedIn.getUsername)
+    val username = loggedIn.getUsername
+    UploadService.findPendingUpload(username)
       .flatMap(_ match {
         case Some(pendingUpload) =>
           request.body.asMultipartFormData.map(tempfile => {
             tempfile.file(FILE_ARG).map(f => {
-              UploadService.insertFilepart(pendingUpload.getId, f)
+              UploadService.insertFilepart(pendingUpload.getId, username, f)
                 .map(_ => Ok(MSG_OK))
             }).getOrElse({
               // POST without a file? Not possible through the UI!

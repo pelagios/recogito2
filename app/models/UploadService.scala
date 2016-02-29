@@ -58,21 +58,40 @@ object UploadService extends FileAccess {
   }
 
   /** Inserts a new filepart - metadata goes to the DB, content to the pending-uploads dir **/
-  def insertFilepart(uploadId: Int, filepart: FilePart[TemporaryFile])(implicit db: DB) = db.withTransaction { sql =>
+  def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile])(implicit db: DB) = db.withTransaction { sql =>
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filepath = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
-    val filepartRecord = new UploadFilepartRecord(null, uploadId, title, ContentTypes.TEXT_PLAIN.toString, filepath.getName)
+    val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, ContentTypes.TEXT_PLAIN.toString, filepath.getName)
     filepart.ref.moveTo(new File(s"$filepath"))
     sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     filepartRecord
+  }
+  
+  /** Deletes a filepart - record is removed from the DB, file from the data directory **/
+  def deleteFilepartByTitleAndOwner(title: String, owner: String)(implicit db: DB) = db.withTransaction { sql =>
+    Option(sql.selectFrom(UPLOAD_FILEPART)
+              .where(UPLOAD_FILEPART.TITLE.equal(title))
+              .and(UPLOAD_FILEPART.OWNER.equal(owner))
+              .fetchOne()) match {
+      
+      case Some(filepartRecord) => {
+        val file = new File(PENDING_UPLOADS_DIR, filepartRecord.getFilename)
+        file.delete()
+        filepartRecord.delete() 
+      }
+      
+      case None =>
+        // Not possible from the UI!
+        Logger.warn("Somebody trying to remove a non-existing upload filepart")
+    }                 
   }
 
   /** Retrieves the pending upload for a user (if any) **/
   def findPendingUpload(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).fetchOne())
   }
-
+  
   /** Retrieves the pending upload for a user (if any) along with the filepart metadata records **/
   def findPendingUploadWithFileparts(username: String)(implicit db: DB) = db.query { sql =>
     val result =

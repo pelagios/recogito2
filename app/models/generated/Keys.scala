@@ -4,8 +4,6 @@
 package models.generated
 
 
-import java.lang.Integer
-
 import javax.annotation.Generated
 
 import models.generated.tables.Document
@@ -36,7 +34,6 @@ import models.generated.tables.records.UserActivityPerDayRecord
 import models.generated.tables.records.UserRecord
 
 import org.jooq.ForeignKey
-import org.jooq.Identity
 import org.jooq.UniqueKey
 import org.jooq.impl.AbstractKeys
 
@@ -58,7 +55,6 @@ object Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
-	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
@@ -97,16 +93,13 @@ object Keys {
 	val FK_TEAM_MEMBERSHIP_TEAM_1 = ForeignKeys0.FK_TEAM_MEMBERSHIP_TEAM_1
 	val FK_UPLOAD_USER_1 = ForeignKeys0.FK_UPLOAD_USER_1
 	val FK_UPLOAD_FILEPART_UPLOAD_1 = ForeignKeys0.FK_UPLOAD_FILEPART_UPLOAD_1
+	val FK_UPLOAD_FILEPART_USER_1 = ForeignKeys0.FK_UPLOAD_FILEPART_USER_1
 	val FK_USER_ACTIVITY_LOG_USER_1 = ForeignKeys0.FK_USER_ACTIVITY_LOG_USER_1
 	val FK_USER_ACTIVITY_PER_DAY_USER_1 = ForeignKeys0.FK_USER_ACTIVITY_PER_DAY_USER_1
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
 	// -------------------------------------------------------------------------
-
-	private object Identities0 extends AbstractKeys {
-		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
-	}
 
 	private object UniqueKeys0 extends AbstractKeys {
 		val PK_DOCUMENT : UniqueKey[DocumentRecord] = AbstractKeys.createUniqueKey(Document.DOCUMENT, Document.DOCUMENT.ID)
@@ -140,6 +133,7 @@ object Keys {
 		val FK_TEAM_MEMBERSHIP_TEAM_1 : ForeignKey[TeamMembershipRecord, TeamRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_TEAM, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.TEAM)
 		val FK_UPLOAD_USER_1 : ForeignKey[UploadRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Upload.UPLOAD, Upload.UPLOAD.OWNER)
 		val FK_UPLOAD_FILEPART_UPLOAD_1 : ForeignKey[UploadFilepartRecord, UploadRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_UPLOAD, UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.UPLOAD_ID)
+		val FK_UPLOAD_FILEPART_USER_1 : ForeignKey[UploadFilepartRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.OWNER)
 		val FK_USER_ACTIVITY_LOG_USER_1 : ForeignKey[UserActivityLogRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UserActivityLog.USER_ACTIVITY_LOG, UserActivityLog.USER_ACTIVITY_LOG.USERNAME)
 		val FK_USER_ACTIVITY_PER_DAY_USER_1 : ForeignKey[UserActivityPerDayRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UserActivityPerDay.USER_ACTIVITY_PER_DAY, UserActivityPerDay.USER_ACTIVITY_PER_DAY.USERNAME)
 	}
