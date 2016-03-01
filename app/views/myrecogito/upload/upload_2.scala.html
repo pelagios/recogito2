@@ -45,6 +45,10 @@
       <div id="upload-progress" class="dropzone-previews"></div>
 
       <form id="buttons" method="POST" action="@controllers.myrecogito.upload.routes.UploadController.showStep3">
+        <div class="buttons-left">
+          <a class="back btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep1">Back</a>
+        </div>
+        
         <div class="ner">
           <input type="checkbox" id="apply-ner" checked="true" name="apply-ner"/>
           <label for="apply-ner">Apply automatic annotation</label>
@@ -54,8 +58,9 @@
           </span>
         </div>
 
-        <a class="back btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep1">Back</a>
-        <input type="submit" class="next btn btn-large btn-blue" value="Next" />
+        <div class="buttons-right">
+          <input type="submit" class="next btn btn-large btn-blue" disabled="true" value="Next" />
+        </div>
       </form>
     </div>
     <script>

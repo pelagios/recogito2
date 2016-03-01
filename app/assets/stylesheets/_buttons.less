@@ -10,10 +10,10 @@
 
 .btn {
   cursor:pointer;
-  margin:0 5px;
+  margin:0 2px;
   font-family:PTSansNarrow;
   text-decoration:none;
-  border-radius:2px;
+  .rounded-corners(2px);
   display:inline-block;
   color:@btn-grey-text;
   background-color:@btn-grey-bg;
@@ -34,6 +34,22 @@
   color:@btn-blue-text;
   text-shadow:0 -1px 0 rgba(0,0,0,0.2);
   background-color:@btn-blue-bg;
+}
+
+.btn-blue-outline {
+  box-sizing:border-box;
+  .rounded-corners(2px);
+  border:1px solid lighten(@btn-blue-bg, 15%);
+  color:@btn-blue-bg;
+  background-color:lighten(@btn-blue-bg, 60%);
+}
+
+.btn-blue-outline.btn-large {
+  padding:8px 39px 7px 39px;
+}
+
+.btn-blue-outline:hover {
+  background-color:lighten(@btn-blue-bg, 45%);
 }
 
 .btn-blue:hover {

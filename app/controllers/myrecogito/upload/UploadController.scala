@@ -141,6 +141,19 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
       }}
   }
 
+  def cancelPendingUpload() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService
+      .deletePendingUpload(loggedIn.getUsername)
+      .map(success => {
+        // TODO add error message if succeess == false
+        Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
+      })
+      .recover{ case t =>
+        // TODO add error message
+        Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
+      }
+  }
+  
   /** Queries the NER service for progress on the document with the specified ID
    	*
    	* The method returns NotFound when the document does not exist, and returns

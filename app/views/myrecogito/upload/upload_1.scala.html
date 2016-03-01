@@ -13,22 +13,28 @@
       </ul>
 
       @helper.form(action = controllers.myrecogito.upload.routes.UploadController.storeDocumentMetadata(), args = 'autocomplete -> "off", 'class -> "step1") {
-        <div class="recommended-fields">
-          @helper.inputText(newDocumentForm("title"), args = '_label -> "Title", '_help -> "*")
-          @helper.inputText(newDocumentForm("author"), args = '_label -> "Author")
-          @helper.inputText(newDocumentForm("date_freeform"), args = '_label -> "Date")
+        <div class="center-column">
+          <div class="recommended-fields">
+            @helper.inputText(newDocumentForm("title"), args = '_label -> "Title", '_help -> "*")
+            @helper.inputText(newDocumentForm("author"), args = '_label -> "Author")
+            @helper.inputText(newDocumentForm("date_freeform"), args = '_label -> "Date")
+          </div>
+          <p class="field-toggle">
+            <span class="icon">&#xf078;</span>
+            <span class="toggle-label">More Fields</span>
+          </p>
+          <div class="more-fields">
+            @helper.inputText(newDocumentForm("description"), args = '_label -> "Description")
+            @helper.inputText(newDocumentForm("source"), args = '_label -> "Source")
+            @helper.inputText(newDocumentForm("language"), args = '_label -> "Language")
+          </div>
         </div>
-        <p class="field-toggle">
-          <span class="icon">&#xf078;</span>
-          <span class="toggle-label">More Fields</span>
-        </p>
-        <div class="more-fields">
-          @helper.inputText(newDocumentForm("description"), args = '_label -> "Description")
-          @helper.inputText(newDocumentForm("source"), args = '_label -> "Source")
-          @helper.inputText(newDocumentForm("language"), args = '_label -> "Language")
-        </div>
+        
         <div id="buttons">
-          <button type="submit" disabled="true" class="next btn btn-large btn-blue">Next</a>
+          <div class="buttons-right">
+            <a href="@controllers.myrecogito.upload.routes.UploadController.cancelPendingUpload()" class="cancel btn btn-large btn-blue-outline">Cancel</a>
+            <button type="submit" disabled="true" class="next btn btn-large btn-blue">Next</a>
+          </div>
         </div>
       }
     </div>
