@@ -1,4 +1,4 @@
-@() @*document: models.generated.tables.records.DocumentRecord, fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord], applyNER: Boolean)*@
+@(document: models.generated.tables.records.DocumentRecord, fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord], applyNER: Boolean)
 <!DOCTYPE html>
 <html>
   <head>
@@ -16,7 +16,7 @@
       <h2>Grab &amp; Drag to Change Order</h2>
 
       <ul class="fileparts">
-        <li class="filepart-preview">
+        <!-- li class="filepart-preview">
           the-odyssey-1.txt
           <span class="filepart-ner-progress">
             Annotation
@@ -25,88 +25,84 @@
         </li>
 
         <li class="filepart-preview">
-          the-odyssey-3.txt
-          <span class="filepart-ner-progress">
-            Annotation
-            <span class="filepart-ner-progress-current">In Progress...</span>
-          </span>
-        </li>
-
-        <li class="filepart-preview">
           the-odyssey-4.txt
-          <span class="filepart-ner-progress">
+          <span class="filepart-ner-progress failed">
             Annotation
-            <span class="filepart-ner-progress-current">In Progress...</span>
+            <span class="filepart-ner-progress-current">Failed</span>
           </span>
         </li>
 
         <li class="filepart-preview">
           the-odyssey-2.txt
-          <span class="filepart-ner-progress">
+          <span class="filepart-ner-progress completed">
             Annotation
-            <span class="filepart-ner-progress-current">In Progress...</span>
+            <span class="filepart-ner-progress-current">Completed</span>
           </span>
-        </li>
+        </li -->
 
-        @* for(part <- fileparts) {
+        @for(part <- fileparts) {
           <li class="filepart-preview" data-id="@part.getId">
-            <p class="filepart-title">@part.getTitle</p>
-            <p class="filepart-ner-progress"></p>
+            @part.getTitle
+
+            @if(applyNER) {
+              <span class="filepart-ner-progress">
+                Annotation
+                <span class="filepart-ner-progress-current">...</span>
+              </span>
+            }
           </li>
-        } *@
+        }
       </ul>
 
       <div id="buttons">
         <a href="@controllers.myrecogito.upload.routes.UploadController.showStep2" class="back btn btn-large btn-blue">Back</a>
-        <a href="#" class="next btn btn-large btn-blue">OK</a>
+        <a href="#" class="next btn btn-large btn-blue">DONE</a>
       </div>
     </div>
-
     <script>
       jQuery(document).ready(function() {
+        @if(applyNER) {
+          var docId = @document.getId,
+
+              hasParts = @fileparts.size,
+
+              NER_PROGRESS_SERVICE_URL = '@controllers.myrecogito.upload.routes.UploadController.queryNERProgress(document.getId)',
+
+              pollNERProgress = function() {
+                jQuery.getJSON(NER_PROGRESS_SERVICE_URL, function(data) {
+                  var workerProgress = data.progress,
+
+                      completedWorkers = jQuery.grep(workerProgress, function(p) {
+                        return p.progress == 1.0;
+                      }),
+
+                      isComplete = completedWorkers.length === hasParts;
+
+                  jQuery.each(workerProgress, function(idx, p) {
+                    var progressSpan =
+                          jQuery('li[data-id="' + p.filepart_id + '"] .filepart-ner-progress'),
+                        statusSpan =
+                          progressSpan.find('.filepart-ner-progress-current');
+
+                    if (p.progress == 1.0) {
+                      progressSpan.addClass('completed');
+                      statusSpan.html('Completed');
+                    } else {
+                      statusSpan.html('In Progress...');
+                    }
+                  });
+
+                  if (!isComplete)
+                    setTimeout(pollNERProgress, 1000);
+                });
+              };
+
+          pollNERProgress();
+        }
+
         jQuery('ul.fileparts').sortable();
         jQuery('ul.fileparts').disableSelection();
       });
     </script>
-
-    @*
-    <script>
-      jQuery(document).ready(function() {
-            // Document ID
-        var docId = @document.getId,
-
-            // Number of fileparts in this document
-            hasParts = @fileparts.size,
-
-            NER_PROGRESS_SERVICE_URL = '@controllers.myrecogito.upload.routes.UploadController.queryNERProgress(document.getId)',
-
-            pollNERProgress = function() {
-              jQuery.getJSON(NER_PROGRESS_SERVICE_URL, function(data) {
-                var workerProgress = data.progress,
-
-                    completedWorkers = jQuery.grep(workerProgress, function(p) {
-                      return p.progress == 1.0;
-                    }),
-
-                    isComplete = completedWorkers.length === hasParts;
-
-                jQuery.each(workerProgress, function(idx, p) {
-                  var div = jQuery('li[data-id="' + p.filepart_id + '"] .filepart-ner-progress');
-                  div.html(p.progress);
-                });
-
-                if (isComplete)
-                  console.log('NER complete.')
-                else
-                  setTimeout(pollNERProgress, 1000);
-
-              });
-            };
-
-        jQuery('ul.fileparts').sortable();
-        jQuery('ul.fileparts').disableSelection();
-        pollNERProgress();
-      });
-    </script>*@
   </body>
 </html>

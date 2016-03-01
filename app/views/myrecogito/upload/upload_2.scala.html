@@ -19,6 +19,19 @@
         <p class="formats">Supported formats: UTF-8 plain text, Markdown, TEI/XML, image files, CSV</p>
       </form>
 
+      <div id="already-uploaded">
+        @for(filepart <- fileparts) {
+          <div class="dz-preview dz-file-preview">
+            <div class="dz-details">
+              <div class="dz-size"></div>
+              <div class="dz-filename"><span>@filepart.getTitle</span></div>
+            </div>
+            <div class="dz-progress"><span class="dz-upload" style="width:100%"></span></div>
+            <a class="dz-remove" href="javascript:undefined;"></a>
+          </div>
+        }
+      </div>
+
       <div id="upload-progress" class="dropzone-previews"></div>
 
       <form id="buttons" method="POST" action="@controllers.myrecogito.upload.routes.UploadController.showStep3">

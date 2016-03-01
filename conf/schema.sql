@@ -43,6 +43,7 @@ CREATE TABLE upload_filepart (
   title VARCHAR NOT NULL,
   content_type VARCHAR NOT NULL,
   filename VARCHAR NOT NULL,
+  filesize_kb DOUBLE NOT NULL,
   -- TODO filepart metadata (source, identifier,... ?),
   -- TODO sequence_no INTEGER NOT NULL
   UNIQUE (owner, title)

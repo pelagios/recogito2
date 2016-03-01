@@ -67,9 +67,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   }
 
   /** Step 2 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
-  def showStep3 = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Ok(views.html.myrecogito.upload.upload_3())
-    /*
+  def showStep3 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).flatMap(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
@@ -91,7 +89,6 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         // No pending upload - force user to step 1
         Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1))
     })
-    */
   }
 
   /** Stores document metadata, during step 1 **/
