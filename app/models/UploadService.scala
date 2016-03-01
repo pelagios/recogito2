@@ -62,7 +62,8 @@ object UploadService extends FileAccess {
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filepath = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
-    val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, ContentTypes.TEXT_PLAIN.toString, filepath.getName)
+    val filesize = filepart.ref.file.length.toDouble / 1024
+    val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, ContentTypes.TEXT_PLAIN.toString, filepath.getName, filesize)
     filepart.ref.moveTo(new File(s"$filepath"))
     sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     filepartRecord

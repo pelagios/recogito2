@@ -1,4 +1,13 @@
 @(fileparts: Seq[models.generated.tables.records.UploadFilepartRecord])
+
+@formatSize(sizeKb: Double) = @{
+  val fmt = new java.text.DecimalFormat("#.#")
+  if (sizeKb < 100)
+    fmt.format(sizeKb) + " KB"
+  else
+    fmt.format(sizeKb / 1000) + " MB"
+}
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -23,7 +32,7 @@
         @for(filepart <- fileparts) {
           <div class="dz-preview dz-file-preview">
             <div class="dz-details">
-              <div class="dz-size"></div>
+              <div class="dz-size">@formatSize(filepart.getFilesizeKb)</div>
               <div class="dz-filename"><span>@filepart.getTitle</span></div>
             </div>
             <div class="dz-progress"><span class="dz-upload" style="width:100%"></span></div>
