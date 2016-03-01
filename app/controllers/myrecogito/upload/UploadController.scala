@@ -145,7 +145,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     UploadService
       .deletePendingUpload(loggedIn.getUsername)
       .map(success => {
-        // TODO add error message if succeess == false
+        // TODO add error message if success == false
         Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
       })
       .recover{ case t =>

@@ -29,26 +29,26 @@
         <p class="formats">Supported formats: UTF-8 plain text, Markdown, TEI/XML, image files, CSV</p>
       </form>
 
-      <div id="already-uploaded">
-        @for(filepart <- fileparts) {
-          <div class="dz-preview dz-file-preview" data-id="@filepart.getId">
-            <div class="dz-details">
-              <div class="dz-size">@formatSize(filepart.getFilesizeKb)</div>
-              <div class="dz-filename"><span>@filepart.getTitle</span></div>
+      <div id="uploaded">
+        <div id="uploaded-before">@for(filepart <- fileparts) {
+            <div class="dz-preview dz-file-preview" data-id="@filepart.getId">
+              <div class="dz-details">
+                <div class="dz-size">@formatSize(filepart.getFilesizeKb)</div>
+                <div class="dz-filename"><span>@filepart.getTitle</span></div>
+              </div>
+              <div class="dz-progress"><span class="dz-upload" style="width:100%"></span></div>
+              <a class="dz-remove" title="Click to remove the file" href="javascript:undefined;"></a>
             </div>
-            <div class="dz-progress"><span class="dz-upload" style="width:100%"></span></div>
-            <a class="dz-remove" href="javascript:undefined;"></a>
-          </div>
-        }
-      </div>
+          }</div>
 
-      <div id="upload-progress" class="dropzone-previews"></div>
+        <div id="uploaded-now" class="dropzone-previews"></div>
+      </div>
 
       <form id="buttons" method="POST" action="@controllers.myrecogito.upload.routes.UploadController.showStep3">
         <div class="buttons-left">
           <a class="back btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep1">Back</a>
         </div>
-        
+
         <div class="ner">
           <input type="checkbox" id="apply-ner" checked="true" name="apply-ner"/>
           <label for="apply-ner">Apply automatic annotation</label>
@@ -59,7 +59,8 @@
         </div>
 
         <div class="buttons-right">
-          <input type="submit" class="next btn btn-large btn-blue" disabled="true" value="Next" />
+          <a href="@controllers.myrecogito.upload.routes.UploadController.cancelPendingUpload()" class="cancel btn btn-large btn-blue-outline">Cancel</a>
+          <input type="submit" class="next btn btn-large btn-blue" disabled="true" value="Import!" />
         </div>
       </form>
     </div>
@@ -71,16 +72,40 @@
             jQuery.ajax({
               url: '@controllers.myrecogito.upload.routes.UploadController.showStep2/' + encodeURIComponent(name),
               type: 'DELETE',
-              success: function(result) { div.remove(); }
+              success: function(result) {
+                div.remove();
+                refreshView();
+              }
             });
+
+            refreshView();
+          },
+
+          onUploadError = function(e) {
+            jQuery(e.previewElement).addClass('upload-failed');
+            refreshView();
+          },
+
+          refreshView = function() {
+            var previewElements = jQuery('.dz-preview'),
+                uploadContainer = jQuery('#uploaded');
+
+            if (previewElements.length === 0)
+              uploadContainer.hide();
+            else
+              uploadContainer.show();
+
+            if (previewElements.not('.upload-failed').length > 0)
+              jQuery('input.next').prop('disabled', false);
+            else
+              jQuery('input.next').prop('disabled', true);
           };
 
       Dropzone.options.dropzone = {
         clickable: '.choose-file',
         createImageThumbnails: false,
-        addRemoveLinks: true,
         dictRemoveFile: '',
-        previewsContainer: document.getElementById('upload-progress'),
+        previewsContainer: document.getElementById('uploaded-now'),
         previewTemplate:
           '<div class="dz-preview dz-file-preview">' +
           '  <div class="dz-details">' +
@@ -88,15 +113,19 @@
           '    <div class="dz-filename"><span data-dz-name=""></span></div>' +
           '  </div>' +
           '  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress=""></span></div>' +
+          '  <a class="dz-remove" title="Click to remove the file" data-dz-remove></a>' +
           '  <div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
           '</div>',
         init: function() {
-          this.on('removedfile', onDelete)
+          this.on('removedfile', onDelete);
+          this.on('success', refreshView);
+          this.on('error', onUploadError);
         }
       };
 
       jQuery(document).ready(function() {
-        jQuery('#already-uploaded').on('click', '.dz-remove', onDelete);
+        jQuery('#uploaded').on('click', '.dz-remove', onDelete);
+        refreshView();
       });
     </script>
   </body>

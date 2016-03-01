@@ -2,8 +2,8 @@
 
 #dropzone {
   box-sizing:border-box;
-  margin:20px 0.4% 10px 0;
-  padding:30px 20px 20px 20px;
+  margin:20px 0.4% 20px 2px;
+  padding:20px;
   border:3px dashed @dz-text;
   text-align:center;
   color:@dz-text;
@@ -15,20 +15,31 @@
 
   .formats {
     font-size:15px;
+    margin-top:20px;
+    margin-bottom:0;
+  }
+
+  h2 {
+    padding:0;
+  }
+
+  p {
+    margin:15px 0;
   }
 
 }
 
 .dz-message { display:none; }
 
-#upload-progress, #already-uploaded {
-  margin:0 0 57px 0;
+#uploaded {
+  margin:20px 1px;
+  border:1px solid darken(@login-box-background-grey, 4%);
+  background-color:lighten(@login-box-background-grey, 3%);
+  padding:10px 0;
+  display:none;
 
   .dz-preview {
-    padding:15px 60px 20px 30px;
-    margin-top:10px;
-    background-color:lighten(@login-box-background-grey, 3%);
-    border:1px solid darken(@login-box-background-grey, 4%);
+    padding:5px 60px 10px 30px;
     position:relative;
 
     .dz-details {
@@ -36,7 +47,7 @@
 
       div {
         display:inline-block;
-        padding-bottom:10px;
+        padding-bottom:3px;
       }
 
       .dz-size {
@@ -49,7 +60,7 @@
     .dz-progress {
       width:100%;
       position:relative;
-      height:5px;
+      height:4px;
       background-color:darken(@login-box-background-grey, 8%);
       .rounded-corners(2px);
 
@@ -67,16 +78,27 @@
       font-family:FontAwesome;
       position:absolute;
       right:25px;
-      top:38px;
+      top:26px;
       text-decoration:none;
-      font-size:19.5px;
+      font-size:17px;
       color:lighten(@page-textcolor-lightgrey, 30%);
+      cursor:pointer;
+    }
+
+    .dz-error-message {
+      font-size:15px;
+      color:@login-error-red;
+      padding-top:3px;
     }
 
     .dz-success-mark, .dz-error-mark {
       display:none;
     }
 
+  }
+
+  .dz-preview.upload-failed .dz-upload {
+    background-color:lighten(@login-error-red, 10%);
   }
 
 }

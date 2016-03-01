@@ -13,7 +13,7 @@
         <li class="arrow">Enter Metadata</li><li class="arrow">Attach Files</li><li class="active">Import</li>
       </ul>
 
-      <h2>Grab &amp; Drag to Change Order</h2>
+      <h2>Drag to Change Order</h2>
 
       <ul class="fileparts">
         @for(part <- fileparts) {
@@ -31,7 +31,9 @@
       </ul>
 
       <div id="buttons">
-        <a href="#" class="next btn btn-large btn-blue">DONE</a>
+        <div class="buttons-right">
+          <a href="@controllers.myrecogito.routes.MyRecogitoController.index" class="next btn btn-large btn-blue">Done</a>
+        </div>
       </div>
     </div>
     <script>
