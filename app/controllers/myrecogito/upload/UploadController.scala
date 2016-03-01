@@ -172,12 +172,10 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   }
 
   /** Deletes a filepart, during step 2 **/
-  def deleteFilepart(name: String) = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Logger.info("Deleting filepart " + name)
-
-    // TODO verify whether the part is owned by the logged in user
-
-    Ok("ok.")
+  def deleteFilepart(name: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService.deleteFilepartByTitleAndOwner(name, loggedIn.getUsername).map(success => {
+      if (success) Ok("ok.") else NotFound
+    })
   }
 
 }

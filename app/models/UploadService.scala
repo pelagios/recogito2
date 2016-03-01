@@ -79,12 +79,13 @@ object UploadService extends FileAccess {
       case Some(filepartRecord) => {
         val file = new File(PENDING_UPLOADS_DIR, filepartRecord.getFilename)
         file.delete()
-        filepartRecord.delete() 
+        filepartRecord.delete() == 1 
       }
       
       case None =>
         // Not possible from the UI!
         Logger.warn("Somebody trying to remove a non-existing upload filepart")
+        false
     }                 
   }
 
