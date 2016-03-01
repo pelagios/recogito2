@@ -14,6 +14,7 @@
     <title>My Recogito - Upload Files</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/myrecogito/upload.css")"/>
     <script src="@routes.Assets.versioned("lib/dropzone/min/dropzone.min.js")"></script>
+    <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
   </head>
   <body>
     <div id="content">
@@ -30,7 +31,7 @@
 
       <div id="already-uploaded">
         @for(filepart <- fileparts) {
-          <div class="dz-preview dz-file-preview">
+          <div class="dz-preview dz-file-preview" data-id="@filepart.getId">
             <div class="dz-details">
               <div class="dz-size">@formatSize(filepart.getFilesizeKb)</div>
               <div class="dz-filename"><span>@filepart.getTitle</span></div>
@@ -58,6 +59,17 @@
       </form>
     </div>
     <script>
+      var onDelete = function(e) {
+            var div = jQuery(e.target).closest('.dz-preview'),
+                name = (e.name) ? e.name : div.find('.dz-filename').text();
+
+            jQuery.ajax({
+              url: '@controllers.myrecogito.upload.routes.UploadController.showStep2/' + encodeURIComponent(name),
+              type: 'DELETE',
+              success: function(result) { div.remove(); }
+            });
+          };
+
       Dropzone.options.dropzone = {
         clickable: '.choose-file',
         createImageThumbnails: false,
@@ -72,8 +84,15 @@
           '  </div>' +
           '  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress=""></span></div>' +
           '  <div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
-          '</div>'
+          '</div>',
+        init: function() {
+          this.on('removedfile', onDelete)
+        }
       };
+
+      jQuery(document).ready(function() {
+        jQuery('#already-uploaded').on('click', '.dz-remove', onDelete);
+      });
     </script>
   </body>
 </html>

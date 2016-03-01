@@ -16,30 +16,6 @@
       <h2>Grab &amp; Drag to Change Order</h2>
 
       <ul class="fileparts">
-        <!-- li class="filepart-preview">
-          the-odyssey-1.txt
-          <span class="filepart-ner-progress">
-            Annotation
-            <span class="filepart-ner-progress-current">In Progress...</span>
-          </span>
-        </li>
-
-        <li class="filepart-preview">
-          the-odyssey-4.txt
-          <span class="filepart-ner-progress failed">
-            Annotation
-            <span class="filepart-ner-progress-current">Failed</span>
-          </span>
-        </li>
-
-        <li class="filepart-preview">
-          the-odyssey-2.txt
-          <span class="filepart-ner-progress completed">
-            Annotation
-            <span class="filepart-ner-progress-current">Completed</span>
-          </span>
-        </li -->
-
         @for(part <- fileparts) {
           <li class="filepart-preview" data-id="@part.getId">
             @part.getTitle

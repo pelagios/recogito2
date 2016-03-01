@@ -22,7 +22,7 @@ GET     /my-recogito/upload/step-1                 controllers.myrecogito.upload
 POST    /my-recogito/upload/step-1                 controllers.myrecogito.upload.UploadController.storeDocumentMetadata
 GET     /my-recogito/upload/step-2                 controllers.myrecogito.upload.UploadController.showStep2
 POST    /my-recogito/upload/step-2                 controllers.myrecogito.upload.UploadController.storeFilepart
-DELETE  /my-recogito/upload/step-2                 controllers.myrecogito.upload.UploadController.deleteFilepart
+DELETE  /my-recogito/upload/step-2/:name       controllers.myrecogito.upload.UploadController.deleteFilepart(name: String)
 GET     /my-recogito/upload/step-3                 controllers.myrecogito.upload.UploadController.showStep3
 POST    /my-recogito/upload/step-3                 controllers.myrecogito.upload.UploadController.showStep3
 GET     /my-recogito/upload/ner-progress/:docId    controllers.myrecogito.upload.UploadController.queryNERProgress(docId: Int)
