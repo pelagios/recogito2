@@ -7,6 +7,7 @@ import play.api.{ Application, GlobalSettings, Logger }
 import scala.io.Source
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext
+import models.UserService
 
 object Global extends GlobalSettings {
   
@@ -35,7 +36,7 @@ object Global extends GlobalSettings {
       })
 
     statement.executeBatch()
-    statement.close()
+    statement.close()    
   }
 
 }

@@ -68,9 +68,9 @@ CREATE TABLE document_filepart (
   document_id INTEGER NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   title VARCHAR NOT NULL,
   content_type VARCHAR NOT NULL,
-  filename VARCHAR NOT NULL
+  filename VARCHAR NOT NULL,
+  sequence_no INTEGER NOT NULL
   -- TODO filepart metadata (source, identifier,... ?),
-  -- TODO sequence_no INTEGER NOT NULL
 );
 
 -- users can organize documents into folders
