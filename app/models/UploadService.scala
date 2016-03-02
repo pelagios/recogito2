@@ -150,7 +150,8 @@ object UploadService extends FileAccess {
             docId.getId,
             part.getTitle, 
             part.getContentType, 
-            part.getFilename)
+            part.getFilename,
+            0)
 
       val docFilepartId =
         sql.insertInto(DOCUMENT_FILEPART).set(docFilepart).returning(DOCUMENT_FILEPART.ID).fetchOne()

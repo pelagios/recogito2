@@ -9,21 +9,23 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.io.Source
 
 object ES {
+  
+  val IDX_RECOGITO = "recogito"
 
   val client = {
     // Initialize the client
     val settings =
       ImmutableSettings.settingsBuilder()
-        .put("http.enabled", false)
+        .put("http.enabled", true)
         .put("path.home", "index")
 
     val client = ElasticClient.local(settings.build)
 
     // Check if index 'recogito' exists, create (with mappoings) if not
-    val response = client.execute { indexExists("recogito") }.await
+    val response = client.execute { indexExists(IDX_RECOGITO) }.await
     if (!response.isExists) {
       Logger.info("No ES index - initializing...")
-      val create = client.admin.indices().prepareCreate("recogito")
+      val create = client.admin.indices().prepareCreate(IDX_RECOGITO)
       loadMappings.foreach { case (name, json) =>  { 
         Logger.info("Create mapping - " + name)
         create.addMapping(name, json) 
