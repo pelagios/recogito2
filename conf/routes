@@ -30,6 +30,16 @@ GET     /my-recogito/upload/cancel                 controllers.myrecogito.upload
 GET     /my-recogito					           controllers.myrecogito.MyRecogitoController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document annotation views
+# 
+# TODO temporary hack!
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /documents/:docId                          controllers.annotation.TextAnnotationController.showTextAnnotationView(docId: Int)
+GET     /fileparts/:partId/annotations             controllers.annotation.TextAnnotationController.getAnnotationsFor(partId: Int)
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

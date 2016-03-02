@@ -2,6 +2,7 @@ package storage
 
 import java.io.File
 import play.api.Play
+import scala.io.Source
 
 /** Base functionality for using files uploaded by users **/
 trait FileAccess {
@@ -64,5 +65,15 @@ trait FileAccess {
       None
     }
   }
+  
+  protected def loadTextfile(username: String, filename: String): Option[String] =
+    getUserDir(username).flatMap(dir => {
+      val file = new File(dir, filename)
+      if (file.exists) { 
+        Some(Source.fromFile(file).getLines.mkString("\n")) 
+      } else {
+        None
+      }
+    })
 
 }

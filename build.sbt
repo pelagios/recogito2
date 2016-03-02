@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
+  "org.webjars.bower" % "rangy" % "1.3.0",
 
   specs2 % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"

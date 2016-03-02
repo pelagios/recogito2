@@ -13,7 +13,7 @@
 
     <ul>
       @for(document <- documents) {
-        <li>@document.getTitle</li>
+        <li><a href="@controllers.annotation.routes.TextAnnotationController.showTextAnnotationView(document.getId)">@document.getTitle</a></li>
       }
     </ul>
 
