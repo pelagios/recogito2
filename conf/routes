@@ -27,7 +27,7 @@ GET     /my-recogito/upload/step-3                 controllers.myrecogito.upload
 POST    /my-recogito/upload/step-3                 controllers.myrecogito.upload.UploadController.showStep3
 GET     /my-recogito/upload/ner-progress/:docId    controllers.myrecogito.upload.UploadController.queryNERProgress(docId: Int)
 GET     /my-recogito/upload/cancel                 controllers.myrecogito.upload.UploadController.cancelPendingUpload
-GET     /my-recogito					                     controllers.myrecogito.MyRecogitoController.index
+GET     /my-recogito					           controllers.myrecogito.MyRecogitoController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Root

@@ -96,6 +96,7 @@ object UploadService extends FileAccess {
   
   /** Deletes a user's pending upload **/
   def deletePendingUpload(username: String)(implicit db: DB) = db.query { sql =>
+    sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.OWNER.equal(username)).execute
     sql.deleteFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).execute() == 1
   }
   
