@@ -1,11 +1,13 @@
 package models
 
+import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
 import storage.ES
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
+import play.api.Logger
 
 object AnnotationService {
 
@@ -21,14 +23,14 @@ object AnnotationService {
   }
   
   def insertAnnotations(annotations: Seq[Annotation]) = {
-    ES.client execute {
-      bulk ( annotations.map(a =>  index into ES.IDX_RECOGITO / ANNOTATION source a) )
-    }
-  }
+    annotations.foreach(a => {
+      ES.client execute { index into ES.IDX_RECOGITO / ANNOTATION source a }
+    })
+   }
   
   def findByFilepartId(id: Int)(implicit context: ExecutionContext) = {
     val foo = ES.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart" -> id))
+      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart" -> id)) limit 1000
     }
     
     val bar = foo.map(response => {

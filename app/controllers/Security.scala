@@ -1,6 +1,6 @@
 package controllers
 
-import jp.t2v.lab.play2.auth.AuthConfig
+import jp.t2v.lab.play2.auth.{ AuthConfig, CookieTokenAccessor }
 import models.Roles._
 import models.UserService
 import models.generated.tables.records.UserRecord
@@ -9,9 +9,9 @@ import scala.reflect.{ ClassTag, classTag }
 import play.api.mvc.{ Result, Results, RequestHeader }
 
 trait Security extends AuthConfig { self: HasDatabase =>
-  
+
   private val NO_PERMISSION = "No permission"
-  
+
   type Id = String
 
   type User = UserRecord
@@ -21,7 +21,7 @@ trait Security extends AuthConfig { self: HasDatabase =>
   val idTag: ClassTag[Id] = classTag[Id]
 
   val sessionTimeoutInSeconds: Int = 3600
-  
+
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] =
     UserService.findByUsername(id)(db)
 
@@ -43,5 +43,12 @@ trait Security extends AuthConfig { self: HasDatabase =>
     // TODO implement
     true
   }
+
+  override lazy val tokenAccessor = new CookieTokenAccessor(
+    // Note: ideally we should use HTTPS and set this to true in proction like so
+    // cookieSecureOption = play.api.Play.isProd(play.api.Play.current)
+    cookieSecureOption = false,
+    cookieMaxAge       = Some(sessionTimeoutInSeconds)
+  )
 
 }

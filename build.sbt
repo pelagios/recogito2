@@ -6,6 +6,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.7"
 
+resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
 libraryDependencies ++= Seq(
   jdbc,
   cache,
@@ -27,14 +29,11 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
   "org.webjars.bower" % "rangy" % "1.3.0",
+  "org.webjars" % "requirejs" % "2.1.22",
 
   specs2 % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"
-
-
 )
-
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 // Play provides two styles of routers, one expects its actions to be injected, the
 // other, legacy style, accesses its actions statically.

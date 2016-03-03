@@ -16,6 +16,12 @@ Future home of Recogito v2.0
 If you stick with the default settings, Recogito will automatically create an SQLite database, so there's
 nothing you need to do. However, we recommend a PostgreSQL DB for production use.
 
+## Running in production
+
+* Type `activator start` to run Recogito in production mode.
+* Be sure to set a random application secret in `conf/application.conf`. Play includes a utility
+  to generate one for you - type `activator playGenerateSecret`.
+
 ## Current TODOs
 
 * In UserService, we should use Play's cache to buffer user lookups to the DB.

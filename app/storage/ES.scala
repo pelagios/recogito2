@@ -7,6 +7,7 @@ import org.elasticsearch.common.settings.ImmutableSettings
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.io.Source
+import scala.concurrent.duration._
 
 object ES {
   
@@ -16,14 +17,17 @@ object ES {
     // Initialize the client
     val settings =
       ImmutableSettings.settingsBuilder()
-        .put("http.enabled", true)
+        .put("http.enabled", false)
         .put("path.home", "index")
 
     val client = ElasticClient.local(settings.build)
 
     // Check if index 'recogito' exists, create (with mappoings) if not
-    val response = client.execute { indexExists(IDX_RECOGITO) }.await
-    if (!response.isExists) {
+    implicit val duration = 60 seconds
+    val response = client.execute { index exists(IDX_RECOGITO) }.await
+    Logger.info("ES exists: " + response.isExists())
+    
+    if (!response.isExists()) {
       Logger.info("No ES index - initializing...")
       val create = client.admin.indices().prepareCreate(IDX_RECOGITO)
       loadMappings.foreach { case (name, json) =>  { 

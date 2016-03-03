@@ -8,6 +8,7 @@ import scala.io.Source
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext
 import models.UserService
+import storage.ES
 
 object Global extends GlobalSettings {
   
