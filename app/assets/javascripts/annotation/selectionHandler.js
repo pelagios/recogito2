@@ -1,4 +1,4 @@
-define([], function() {
+define(['storage'], function(Storage) {
 
   var selectionHandler = function(rootNode) {
 
@@ -58,10 +58,19 @@ define([], function() {
 
             var selectedRange = trimRange(selection.getRangeAt(0)),
                 stub = rangeToAnnotationStub(selectedRange),
-                highlight = document.createElement('SPAN');
 
-            highlight.className = 'entity PLACE';
-            selectedRange.surroundContents(highlight);
+                onStoreSuccess = function() {
+                  var highlight = document.createElement('SPAN');
+                  highlight.className = 'entity PLACE';
+                  selectedRange.surroundContents(highlight);
+                },
+
+                onStoreError = function(error) {
+                  console.log('Error creating annotation');
+                  console.log(error);
+                };
+
+            Storage.createAnnotation(stub, onStoreSuccess, onStoreError);
           }
         };
 

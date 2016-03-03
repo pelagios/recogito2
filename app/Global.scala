@@ -23,6 +23,10 @@ object Global extends GlobalSettings {
       }
     }
   }
+  
+  override def onStop(app: Application) {
+    ES.client.close()
+  }
 
   private def initDB(connection: Connection) = {
     // Splitting by ; is not 100% robust - but should be sufficient for our own schema file

@@ -17,7 +17,7 @@ object ES {
     // Initialize the client
     val settings =
       ImmutableSettings.settingsBuilder()
-        .put("http.enabled", false)
+        .put("http.enabled", true)
         .put("path.home", "index")
 
     val client = ElasticClient.local(settings.build)

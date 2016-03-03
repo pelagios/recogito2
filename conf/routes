@@ -38,6 +38,7 @@ GET     /my-recogito					           controllers.myrecogito.MyRecogitoController.
 
 GET     /documents/:docId                          controllers.annotation.TextAnnotationController.showTextAnnotationView(docId: Int)
 GET     /fileparts/:partId/annotations             controllers.annotation.TextAnnotationController.getAnnotationsFor(partId: Int)
+POST    /annotations                               controllers.annotation.TextAnnotationController.createAnnotation
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Root

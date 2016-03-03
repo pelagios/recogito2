@@ -33,14 +33,19 @@ case class Annotation(
 
 case class AnnotatedObject(document: Int, filepart: Int)
 
-object Annotation extends JsonDate {
-    
+object AnnotatedObject {
+
   /** JSON conversion **/
   implicit val annotatedObjectFormat: Format[AnnotatedObject] = (
     (JsPath \ "document").format[Int] and
     (JsPath \ "filepart").format[Int]
   )(AnnotatedObject.apply, unlift(AnnotatedObject.unapply))
+  
+}
 
+object Annotation extends JsonDate {
+    
+  /** JSON conversion **/
   implicit val annotationFormat: Format[Annotation] = (
     (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "version_id").format[UUID] and
