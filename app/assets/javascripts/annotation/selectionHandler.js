@@ -1,6 +1,6 @@
 define(['storage'], function(Storage) {
 
-  var selectionHandler = function(rootNode) {
+  var selectionHandler = function(rootNode, highlighter) {
 
         /** Trims a range by removing leading and trailing spaces **/
     var trimRange = function(range) {
@@ -48,6 +48,19 @@ define(['storage'], function(Storage) {
           };
         },
 
+        /** cf. http://stackoverflow.com/questions/3169786/clear-text-selection-with-javascript **/
+        clearSelection = function() {
+          if (window.getSelection) {
+            if (window.getSelection().empty) {
+              window.getSelection().empty();
+            } else if (window.getSelection().removeAllRanges) {
+              window.getSelection().removeAllRanges();
+            }
+          } else if (document.selection) {
+            document.selection.empty();
+          }
+        },
+
         onSelect = function(e) {
           var selection = rangy.getSelection(),
               annotation;
@@ -60,9 +73,8 @@ define(['storage'], function(Storage) {
                 stub = rangeToAnnotationStub(selectedRange),
 
                 onStoreSuccess = function() {
-                  var highlight = document.createElement('SPAN');
-                  highlight.className = 'entity PLACE';
-                  selectedRange.surroundContents(highlight);
+                  highlighter.wrapRange(selectedRange, 'entity ' + window.config.className, rootNode);
+                  clearSelection();
                 },
 
                 onStoreError = function(error) {
@@ -74,7 +86,7 @@ define(['storage'], function(Storage) {
           }
         };
 
-    rangy.init();
+
     jQuery(rootNode).mouseup(onSelect);
   };
 
