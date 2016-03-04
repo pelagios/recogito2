@@ -4,7 +4,16 @@ define(['../common/annotationUtils'], function(AnnotationUtils) {
 
     var contentNode = rootNode.childNodes[0],
 
-        ranges = jQuery.map(annotations, function(annotation) {
+        sortByOffsetDesc= function(annotations) {
+          return annotations.sort(function(a, b) {
+            var offsetA = a.anchor.substr(12),
+                offsetB = b.anchor.substr(12);
+
+            return offsetB - offsetA;
+          });
+        },
+
+        ranges = jQuery.map(sortByOffsetDesc(annotations), function(annotation) {
           var anchor = annotation.anchor.substr(12),
           quote = AnnotationUtils.getQuote(annotation),
           entityType = AnnotationUtils.getEntityType(annotation),
