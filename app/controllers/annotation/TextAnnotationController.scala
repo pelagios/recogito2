@@ -56,7 +56,7 @@ class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractC
         if (document.getOwner == username) {
           loadTextfile(username, fileparts.head.getFilename) match {
             case Some(content) =>
-              Ok(views.html.annotation.text_annotation(document.getId, fileparts.head.getId, content))
+              Ok(views.html.annotation.text_annotation(document, fileparts, fileparts.head, content))
             
             case None => {
               // Filepart found in DB, but no file on filesystem

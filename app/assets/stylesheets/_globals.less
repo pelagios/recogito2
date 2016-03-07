@@ -24,7 +24,8 @@ h1 {
   font-family:FontAwesome;
 }
 
-.tooltip span {
+.tooltip .hint {
+  font-family:PTSansNarrow;
   z-index:999;
   background-color:#000;
   color:#fff;
@@ -51,6 +52,11 @@ h1 {
   height:0;
   border-left:solid 10px transparent;
   border-right:solid 10px transparent;
+}
+
+.tooltip.left .hint:after {
+  left:85%;
+  margin-left:-80%;
 }
 
 .tooltip.top .hint:after {

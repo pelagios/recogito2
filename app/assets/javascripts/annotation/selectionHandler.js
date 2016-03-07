@@ -73,7 +73,8 @@ define(['storage'], function(Storage) {
                 stub = rangeToAnnotationStub(selectedRange),
 
                 onStoreSuccess = function() {
-                  highlighter.wrapRange(selectedRange, 'entity ' + window.config.className, rootNode);
+                  // TODO 'PLACE' currently hardwired - this is just temporary
+                  highlighter.wrapRange(selectedRange, 'entity PLACE', rootNode);
                   clearSelection();
                 },
 

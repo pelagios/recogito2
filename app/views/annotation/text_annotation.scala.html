@@ -1,4 +1,7 @@
-@(docId: Int, filepartId: Int, content: String)(implicit request: RequestHeader)
+@(document: models.generated.tables.records.DocumentRecord,
+  allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
+  currentPart: models.generated.tables.records.DocumentFilepartRecord,
+  content: String)(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
@@ -9,17 +12,70 @@
     <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/annotation/app.js")"></script>
     <script>
       window.config = {
-        documentId: @docId,
-        filepartId: @filepartId,
-        className: 'PLACE'
+        documentId: @document.getId,
+        filepartId: @currentPart.getId
       }
     </script>
   </head>
   <body>
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <span class="icon">&#xE86F;</span>
+      </div>
+    </div>
+
+    <div class="header-menu">
+      <ul>
+        <li class="icon tooltip bottom left">&#xE82B;
+          <span class="icon">
+            <span class="hint">Switch to Map View</span>
+          </span>
+        </li>
+
+        <li class="icon tooltip bottom left">&#xE8AE;
+          <span class="icon">
+            <span class="hint">Switch to Document Stats</span>
+          </span>
+        </li>
+
+        <li class="icon tooltip bottom left">&#xE85F;
+          <span class="icon">
+            <span class="hint">Invite other users to view or work with you on this
+              document</span>
+          </span>
+        </li>
+
+        <li class="icon tooltip bottom left">&#xE875;
+          <span class="icon">
+            <span class="hint">Download this document as TEI/XML</span>
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="header">
+      <h1>
+        @Option(document.getAuthor).map(_ + ": ")
+        @document.getTitle
+        @Option(document.getDateFreeform).map("(" + _ + ")")
+      </h1>
+
+      <a class="icon home">&#xf015;</a>
+
+      <!-- div class="toolbar">
+        <ul>
+          <li class="has-sub-options active">
+            ANNOTATION: STANDARD
+          </li>
+        </ul>
+      </div -->
+
+    </div>
+
     <pre id="content">@content</pre>
+
     @helper.javascriptRouter("jsRoutes")(
       controllers.annotation.routes.javascript.TextAnnotationController.getAnnotationsFor
     )
-    <button onclick="window.config.className = 'COMMENT'" style="padding-top:40px;">COMMENT</button>;
   </body>
 </html>
