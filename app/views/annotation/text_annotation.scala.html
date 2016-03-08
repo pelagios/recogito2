@@ -22,39 +22,27 @@
       <div class="header-iconbar">
         <ul>
           <li class="icon tooltip bottom">&#xe82b;
-            <span class="icon">
-              <span class="hint">Switch to Map View</span>
-            </span>
+            <span class="hint">Switch to Map View</span>
           </li>
 
           <li class="icon tooltip bottom">&#xe8ae;
-            <span class="icon">
-              <span class="hint">Show Document Stats</span>
-            </span>
+            <span class="hint">Detailed document and annotation stats</span>
           </li>
 
           <li class="icon tooltip bottom">&#xe85f;
-            <span class="icon">
-              <span class="hint">Invite other users to view or work with you on this document</span>
-            </span>
+            <span class="hint">Invite other users to view or work with you on this document</span>
           </li>
 
           <li class="icon tooltip bottom">&#xe8c9;
-            <span class="icon">
-              <span class="hint">Edit document metadata and settings</span>
-            </span>
+            <span class="hint">Change document settings and metadata</span>
           </li>
 
           <li class="icon tooltip bottom">&#xe875;
-            <span class="icon">
-              <span class="hint">See available download options for this document</span>
-            </span>
+            <span class="hint">See available download options for this document</span>
           </li>
 
           <li class="icon home tooltip bottom">&#xe8bf;
-            <span class="icon">
-              <span class="hint">Return to your document index</span>
-            </span>
+            <span class="hint">Go back to your home page</span>
           </li>
         </ul>
       </div>
@@ -70,7 +58,7 @@
           <span class="annotations">0</span> Annotations
           &nbsp; &centerdot; &nbsp;
           <span class="icon">&#xf0c0;</span>
-          <span class="contributors">1 Contributor</span>
+          <span class="contributors">No Other Contributors</span>
         </p>
       </div>
 
@@ -92,8 +80,18 @@
     </div> <!-- header -->
 
     <div class="sidebar">
-      <div class="sidebar-header">
+      <div class="sidebar-header tooltip bottom">
         <span class="icon">&#xE86F;</span>
+        <span class="hint">You are in the Text Annotation View</span>
+      </div>
+      <div class="sidebar-parts">
+        <ul>
+          @for(part <- allParts) {
+            @if(part == currentPart) { <li class="active"> } else { <li> }
+              <a href="#">@part.getTitle</a>
+            </li>
+          }
+        </ul>
       </div>
     </div>
 
