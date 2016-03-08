@@ -6,6 +6,7 @@ import models.UserService
 import models.generated.tables.records.UserRecord
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.reflect.{ ClassTag, classTag }
+import play.api.Play
 import play.api.mvc.{ Result, Results, RequestHeader }
 
 trait Security extends AuthConfig { self: HasDatabase =>
@@ -45,9 +46,7 @@ trait Security extends AuthConfig { self: HasDatabase =>
   }
 
   override lazy val tokenAccessor = new CookieTokenAccessor(
-    // Note: ideally we should use HTTPS and set this to true in proction like so
-    // cookieSecureOption = play.api.Play.isProd(play.api.Play.current)
-    cookieSecureOption = false,
+    cookieSecureOption = Play.current.configuration.getBoolean("auth.cookie.secure").getOrElse(false),
     cookieMaxAge       = Some(sessionTimeoutInSeconds)
   )
 
