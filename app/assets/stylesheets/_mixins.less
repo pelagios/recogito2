@@ -29,7 +29,7 @@
 
 .outline(@fill, @stroke) {
   color: @fill;
-  text-shadow:-1px -1px 0 @stroke, 1px -1px 0 @stroke, -1px 1px 0 @stroke, 1px 1px 0 @stroke;    
+  text-shadow:-1px -1px 0 @stroke, 1px -1px 0 @stroke, -1px 1px 0 @stroke, 1px 1px 0 @stroke;
 }
 
 .noselect() {
@@ -39,4 +39,10 @@
   -moz-user-select:none;
   -ms-user-select:none;
   user-select:none;
+}
+
+.box-shadow(@x, @y, @r, @color) {
+  -moz-box-shadow: @x @y @r @color;
+	-webkit-box-shadow: @x @y @r @color;
+	box-shadow: @x @y @r @color;
 }

@@ -130,20 +130,6 @@
     cursor:pointer;
   }
 
-  li.has-sub-options {
-    margin-right:15px;
-  }
-
-  li.has-sub-options:after {
-    content:'\f0dd';
-    color:lighten(#34495e, 5%);
-    font-size:10.5px;
-    font-family:FontAwesome;
-    position:absolute;
-    top:-1px;
-    right:-10px;
-  }
-
   ul.annotation-mode {
 
     li.active, li.active:hover {
@@ -164,6 +150,60 @@
 
     li:hover {
       border-color:#beb22c;
+    }
+
+  }
+
+  li.has-sub-options {
+    margin-right:15px;
+  }
+
+  li.has-sub-options:after {
+    content:'\f0dd';
+    color:lighten(#34495e, 5%);
+    font-size:10.5px;
+    font-family:FontAwesome;
+    position:absolute;
+    top:-1px;
+    right:-10px;
+  }
+
+  li.has-sub-options:hover {
+    border-color:transparent !important;
+  }
+
+  li.has-sub-options:hover .dropdown {
+    display:block;
+  }
+
+  .dropdown {
+    position:absolute;
+    top:29px;
+    left:-30px;
+    padding:0 20px 20px 20px;
+    overflow:hidden;
+    display:none;
+
+    ul {
+      background-color:#fff;
+      width:100px;
+      padding:5px 3px;
+      border-style:solid;
+      border-color:#d6d7d9;
+      border-width:0 1px 1px 1px;
+      .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.15));
+    }
+
+    li {
+      display:block;
+      border:none;
+    }
+
+    .icon {
+      display:inline-block;
+      text-align:center;
+      width:8px;
+      padding-right:10px;
     }
 
   }
