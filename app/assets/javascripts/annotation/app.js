@@ -11,6 +11,8 @@ require(['annotationRenderer', 'highlighter', 'selectionHandler'], function(Anno
         var rootNode = document.getElementById('content'),
             renderer = new AnnotationRenderer(rootNode, data, highlighter),
             selectionHandler = new SelectionHandler(rootNode, highlighter);
+
+        jQuery('.annotations').html(data.length);
       },
 
       error: function(error) {

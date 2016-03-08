@@ -18,58 +18,83 @@
     </script>
   </head>
   <body>
+    <div class="header">
+      <div class="header-iconbar">
+        <ul>
+          <li class="icon tooltip bottom">&#xe82b;
+            <span class="icon">
+              <span class="hint">Switch to Map View</span>
+            </span>
+          </li>
+
+          <li class="icon tooltip bottom">&#xe8ae;
+            <span class="icon">
+              <span class="hint">Show Document Stats</span>
+            </span>
+          </li>
+
+          <li class="icon tooltip bottom">&#xe85f;
+            <span class="icon">
+              <span class="hint">Invite other users to view or work with you on this document</span>
+            </span>
+          </li>
+
+          <li class="icon tooltip bottom">&#xe8c9;
+            <span class="icon">
+              <span class="hint">Edit document metadata and settings</span>
+            </span>
+          </li>
+
+          <li class="icon tooltip bottom">&#xe875;
+            <span class="icon">
+              <span class="hint">See available download options for this document</span>
+            </span>
+          </li>
+
+          <li class="icon home tooltip bottom">&#xe8bf;
+            <span class="icon">
+              <span class="hint">Return to your document index</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="header-infobox">
+        <h1>
+          @Option(document.getAuthor).map(_ + ": ")
+          @document.getTitle
+        </h1>
+        <h2 class="date">@Option(document.getDateFreeform)</h2>
+        <p class="quick-stats">
+          <span class="icon comment">&#xf0e5;</span>
+          <span class="annotations">0</span> Annotations
+          &nbsp; &centerdot; &nbsp;
+          <span class="icon">&#xf0c0;</span>
+          <span class="contributors">1 Contributor</span>
+        </p>
+      </div>
+
+      <div class="header-toolbar">
+        <h3>ANNOTATION MODE:</h3>
+        <ul class="annotation-mode">
+          <li class="active">NORMAL</li>
+          <li class="has-sub-options">QUICK</li>
+          <li>BULK</li>
+        </ul>
+
+        <h3>COLOR:</h3>
+        <ul class="color-scheme">
+          <li class="active">BY TYPE</li>
+          <li>BY STATUS</li>
+        </ul>
+      </div>
+
+    </div> <!-- header -->
+
     <div class="sidebar">
       <div class="sidebar-header">
         <span class="icon">&#xE86F;</span>
       </div>
-    </div>
-
-    <div class="header-menu">
-      <ul>
-        <li class="icon tooltip bottom left">&#xE82B;
-          <span class="icon">
-            <span class="hint">Switch to Map View</span>
-          </span>
-        </li>
-
-        <li class="icon tooltip bottom left">&#xE8AE;
-          <span class="icon">
-            <span class="hint">Switch to Document Stats</span>
-          </span>
-        </li>
-
-        <li class="icon tooltip bottom left">&#xE85F;
-          <span class="icon">
-            <span class="hint">Invite other users to view or work with you on this
-              document</span>
-          </span>
-        </li>
-
-        <li class="icon tooltip bottom left">&#xE875;
-          <span class="icon">
-            <span class="hint">Download this document as TEI/XML</span>
-          </span>
-        </li>
-      </ul>
-    </div>
-
-    <div class="header">
-      <h1>
-        @Option(document.getAuthor).map(_ + ": ")
-        @document.getTitle
-        @Option(document.getDateFreeform).map("(" + _ + ")")
-      </h1>
-
-      <a class="icon home">&#xf015;</a>
-
-      <!-- div class="toolbar">
-        <ul>
-          <li class="has-sub-options active">
-            ANNOTATION: STANDARD
-          </li>
-        </ul>
-      </div -->
-
     </div>
 
     <pre id="content">@content</pre>
