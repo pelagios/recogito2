@@ -44,8 +44,7 @@ CREATE TABLE upload_filepart (
   content_type VARCHAR NOT NULL,
   filename VARCHAR NOT NULL,
   filesize_kb DOUBLE NOT NULL,
-  -- TODO filepart metadata (source, identifier,... ?),
-  -- TODO sequence_no INTEGER NOT NULL
+  -- TODO filepart metadata (source, identifier,... ?)
   UNIQUE (owner, title)
 );
 
@@ -69,8 +68,9 @@ CREATE TABLE document_filepart (
   title VARCHAR NOT NULL,
   content_type VARCHAR NOT NULL,
   filename VARCHAR NOT NULL,
-  sequence_no INTEGER NOT NULL
-  -- TODO filepart metadata (source, identifier,... ?),
+  sequence_no INTEGER NOT NULL,
+  -- TODO filepart metadata (source, identifier,... ?)
+  UNIQUE (document_id, sequence_no)
 );
 
 -- users can organize documents into folders

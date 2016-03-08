@@ -26,7 +26,7 @@
           </li>
 
           <li class="icon tooltip bottom">&#xe8ae;
-            <span class="hint">Detailed document and annotation stats</span>
+            <span class="hint">Detailed annotation stats for this document</span>
           </li>
 
           <li class="icon tooltip bottom">&#xe85f;
@@ -34,7 +34,7 @@
           </li>
 
           <li class="icon tooltip bottom">&#xe8c9;
-            <span class="hint">Change document settings and metadata</span>
+            <span class="hint">Edit document settings and metadata</span>
           </li>
 
           <li class="icon tooltip bottom">&#xe875;
@@ -95,9 +95,15 @@
       <div class="sidebar-parts">
         <ul>
           @for(part <- allParts) {
-            @if(part == currentPart) { <li class="active"> } else { <li> }
-              <a href="#">@part.getTitle</a>
-            </li>
+            @if(part == currentPart) {
+              <li class="active">
+                <a href="#" onclick="return false;">@part.getTitle</a>
+              </li>
+            } else {
+              <li>
+                <a href="@controllers.annotation.routes.TextAnnotationController.showTextAnnotationView(document.getId, part.getSequenceNo)">@part.getTitle</a>
+              </li>
+            }
           }
         </ul>
       </div>

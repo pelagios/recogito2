@@ -145,19 +145,19 @@ object UploadService extends FileAccess {
 
     // Insert filepart records - I couldn't find a way to do a batch-insert that also returns
     // the auto-generated ID. Any hints on how this could be achieved appreciated! 
-    val docFileparts = fileparts.map(part => {
+    val docFileparts = fileparts.zipWithIndex.map { case (part, idx) => {
       val docFilepart = new DocumentFilepartRecord(null,
             docId.getId,
             part.getTitle, 
             part.getContentType, 
             part.getFilename,
-            0)
+            idx)
 
       val docFilepartId =
         sql.insertInto(DOCUMENT_FILEPART).set(docFilepart).returning(DOCUMENT_FILEPART.ID).fetchOne()
       docFilepart.setId(docFilepartId.getId)
       docFilepart
-    })
+    }}
 
     // Move files from 'pending' to 'user-data' folder
     val filePaths = fileparts.map(filepart => {
