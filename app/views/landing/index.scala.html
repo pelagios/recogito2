@@ -6,18 +6,18 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/index.css")"/>
   </head>
   <body>
-    <div id="header-section">
+    <div id="landing-header">
       <h1>Recogito</h1>
       <p>
-        <a href="@controllers.landing.routes.LoginController.showLoginForm" class="btn btn-large btn-blue">
+        <a href="@controllers.landing.routes.LoginController.showLoginForm" class="btn">
           <span class="icon">&#xf090;</span>
           LOG IN
         </a>
-        <a href="@controllers.landing.routes.SignupController.showSignupForm" class="btn btn-large">CREATE ACCOUNT</a>
+        <a href="@controllers.landing.routes.SignupController.showSignupForm" class="btn grey">CREATE ACCOUNT</a>
       </p>
     </div>
 
-    <div class="content-section three-columns">
+    <div class="landing-content three-columns">
 
       <div class="column">
         <!-- placeholder -->

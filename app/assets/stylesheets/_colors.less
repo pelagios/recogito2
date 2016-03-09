@@ -1,46 +1,58 @@
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ **/
-/** Base layout colours            **/
+/** Base layout colors             **/
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ **/
 
-/** Recogito's light blue signature colour **/
+// Recogito's light blue signature colour
 @ocean:#4483c4;
 
-/** Dark blue used in sidebar and for header type **/
+// Slightly lighter version for hover effects on ocean-coloured buttons
+@ocean-hover:#4f92d7;
+
+// 'Pale' version of ocean for disabled buttons
+@ocean-disabled:#a3c2e2;
+
+// Pale blue used as standard background colour in text annotation view
+@blueish-white:#ecf0f1;
+
+// Dark blue used in sidebar and for header type
 @nightsky:#34495e;
 
-/** Darker version for 'highlighted' selections on Nightsky background **/
+// Darker version for 'highlighted' selections on Nightsky background
 @nightsky-dark:#233342;
 
-/** Font colors to use on nightsky background **/
-@nightsky-type:#fff;
-@nightsky-type-disabled:#92a4a4;
+// 'Complementary' highlight colour used for selection in annotation area header
+@shore:#beb22c;
 
-/** Used for accent borders on white background - e.g. annotation area header **/
+// Used for accent borders on white background - e.g. annotation area header
 @lightgrey-border:#e5e5e5;
 @lightgrey-border-darker:#d6d7d9;
 
-/** Used for header icons and type - e.g. in annotation area header **/
+
+
+/** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ **/
+/** Type colors                    **/
+/** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ **/
+
+// Standard 'black' (well, not quite) type
+@standard-type: #323232;
+
+// Used for header icons and type - e.g. in annotation area header
 @lightblue-type:#9ca4b1;
 
-/** 'Complementary' highlight colour used for selection in annotation area header **/
-@shore:#beb22c;
+// Red for error message text
+@red-type:#ef4343;
+
+// Font on nightsky background
+@nightsky-type:#fff;
+@nightsky-type-disabled:#92a4a4;
+
 
 
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ **/
-/** Deprecated!!!                  **/
+/** Form colors                    **/
 /** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ **/
 
-
-
-/** General page colours **/
-@page-textcolor-lightgrey:  #323232;
-@page-headline-blue:         #5B83AD;
-
-/** Login & signup **/
-@login-box-background-grey:  #f2f2f2;
-@login-error-red:            #ef4343;
-@login-form-textcolor-grey:  #525252;
-@login-form-bg-white:        #fff;
-@login-form-border-grey:     #e7e7e7;
-@login-form-border-hi-blue:  #4f92d7;
-@login-form-glow-blue:       rgba(79,146,215,0.5);
+@form-type:#525252;
+@form-blue-glow:rgba(79,146,215,0.5);
+@form-grey-border:#e7e7e7;
+@form-blue-border:#4f92d7;

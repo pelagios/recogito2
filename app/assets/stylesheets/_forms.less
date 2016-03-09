@@ -1,5 +1,5 @@
 .error-msg {
-  color:@login-error-red;
+  color:@red-type;
   font-size:15px;
   padding:10px 0 0 0;
 }
@@ -11,7 +11,7 @@ dl, dd {
 }
 
 dd.error {
-  color:@login-error-red;
+  color:@red-type;
   font-size:15px;
   margin-top:-5px;
   padding-bottom:5px;
@@ -25,16 +25,16 @@ input {
 
 input[type=text], input[type=password] {
   box-sizing:border-box;
-  color:@login-form-textcolor-grey;
-  background-color:@login-form-bg-white;
+  color:@form-type;
+  background-color:#fff;
   font-family:PTSansNarrow;
   letter-spacing:1px;
-  border:1px solid @login-form-border-grey;
+  border:1px solid @form-grey-border;
 }
 
 input[type=text]:focus, input[type=password]:focus {
-  border-color:@login-form-border-hi-blue;
-  box-shadow:0 0 4px 0 @login-form-glow-blue;
+  border-color:@form-blue-border;
+  box-shadow:0 0 4px 0 @form-blue-glow;
 }
 
 input[type=checkbox] { display:none; }
