@@ -8,24 +8,26 @@ import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.io.Source
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object ES {
   
   val IDX_RECOGITO = "recogito"
 
-  val client = {
-    // Initialize the client
+  lazy val client = {
     val settings =
       ImmutableSettings.settingsBuilder()
         .put("http.enabled", true)
         .put("path.home", "index")
 
-    val client = ElasticClient.local(settings.build)
-
-    // Check if index 'recogito' exists, create (with mappoings) if not
-    implicit val duration = 60 seconds
+    ElasticClient.local(settings.build)
+  }
+  
+  def start() = {
+    Logger.info("Starting ElasticSearch local node")
+    
+    implicit val timeout = 60 seconds
     val response = client.execute { index exists(IDX_RECOGITO) }.await
-    Logger.info("ES exists: " + response.isExists())
     
     if (!response.isExists()) {
       Logger.info("No ES index - initializing...")
@@ -36,8 +38,11 @@ object ES {
       }}
       create.execute().actionGet()
     }
-
-    client
+  }
+  
+  def stop() = {
+    Logger.info("Stopping ElasticSearch local node")
+    client.close()
   }
 
   /** Loads all JSON files from the mappings directory **/

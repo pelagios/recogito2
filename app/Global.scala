@@ -22,10 +22,12 @@ object Global extends GlobalSettings {
         initDB(connection)
       }
     }
+    
+    ES.start()
   }
   
   override def onStop(app: Application) {
-    ES.client.close()
+    ES.stop()
   }
 
   private def initDB(connection: Connection) = {
