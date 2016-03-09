@@ -3,13 +3,13 @@
   top:0;
   width:@sidebar-width;
   height:100%;
-  background-color:#34495e;
+  background-color:@nightsky;
   font-family:OpenSans;
 
   .sidebar-header {
     position:relative;
     box-sizing:border-box;
-    background-color:#4483c4;
+    background-color:@ocean;
     height:70px;
     text-align:center;
     color:#fff;
@@ -40,7 +40,7 @@
 
     a {
       display:block;
-      color:#92a4a4;
+      color:@nightsky-type-disabled;
       font-size:16px;
       padding:10px 15px;
       font-weight:bold;
@@ -54,12 +54,12 @@
     }
 
     li.active a {
-      color:#fff;
-      background-color:#233342;
+      color:@nightsky-type;
+      background-color:@nightsky-dark;
     }
 
     li:hover {
-      background-color:rgba(35, 51, 66, 0.5);
+      background-color:fadeout(@nightsky-dark, 50%);
     }
 
   }

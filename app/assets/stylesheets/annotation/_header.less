@@ -9,7 +9,7 @@
   width:100%;
   margin-left:@sidebar-width;
   height:70px;
-  border-bottom:1px solid #e5e5e5;
+  border-bottom:1px solid @lightgrey-border;
 
   ul {
     box-sizing:border-box;
@@ -23,7 +23,7 @@
     cursor:pointer;
     font-family:Tonicons;
     display:inline-block;
-    color:#98a3a5;
+    color:@lightblue-type;
     font-size:32px;
     margin:0 60px 0 0;
     padding:25px 0;
@@ -31,16 +31,8 @@
 
   li.home {
     position:absolute;
-    top:14px;
+    top:0;
     right:200px;
-    padding:0;
-    width:40px;
-    height:40px;
-    border:2px solid lighten(#98a3a5, 15%);
-    line-height:39px;
-    font-size:27px;
-    border-radius:50%;
-    text-align:center;
   }
 
   .tooltip .hint {
@@ -63,8 +55,8 @@
   position:relative;
   padding-top:70px;
   margin-left:@sidebar-width;
-  border-bottom:1px solid #e5e5e5;
-  color:#34495e;
+  border-bottom:1px solid @lightgrey-border;
+  color:@nightsky;
 
   h1 {
     font-weight:normal;
@@ -77,7 +69,7 @@
   }
 
   p {
-    color:#9ca4b1;
+    color:@lightblue-type;
     padding:3px 32px 40px 32px;
     margin:0;
     font-size:15px;
@@ -99,11 +91,11 @@
 .header-toolbar {
   position:relative;
   margin-left:@sidebar-width;
-  border-bottom:1px solid #d6d7d9;
+  border-bottom:1px solid @lightgrey-border-darker;
   font-family:OpenSans;
   font-size:12px;
   padding:0 30px;
-  color:#34495e;
+  color:@nightsky;
 
   h3 {
     display:inline-block;
@@ -132,24 +124,16 @@
 
   ul.annotation-mode {
 
-    li.active, li.active:hover {
-      border-color:#3987d7;
-    }
-
-    li:hover {
-      border-color:#3987d7;
+    li.active, li:hover {
+      border-color:@ocean;
     }
 
   }
 
   ul.color-scheme {
 
-    li.active, li.active:hover {
-      border-color:#beb22c;
-    }
-
-    li:hover {
-      border-color:#beb22c;
+    li.active, li:hover {
+      border-color:@shore;
     }
 
   }
@@ -160,7 +144,7 @@
 
   li.has-sub-options:after {
     content:'\f0dd';
-    color:lighten(#34495e, 5%);
+    color:lighten(@nightsky, 5%);
     font-size:10.5px;
     font-family:FontAwesome;
     position:absolute;
