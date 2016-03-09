@@ -30,6 +30,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   private val FILE_ARG = "file"
 
   private val MSG_OK = "Ok."
+  
   private val MSG_ERROR = "There was an error processing your data"
 
   val newDocumentForm = Form(
@@ -46,6 +47,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   implicit def uploadRecordToNewDocumentData(r: UploadRecord) =
     NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getSource, r.getLanguage)
 
+    
   def showStep1 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUpload(loggedIn.getUsername).map(_ match {
       case Some(pendingUpload) =>
@@ -55,44 +57,9 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         Ok(views.html.upload.upload_1(newDocumentForm))
     })
   }
-
-  /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
-  def showStep2 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).map(_ match {
-      case Some((pendingUpload, fileparts)) =>
-        Ok(views.html.upload.upload_2(fileparts))
-
-      case None =>
-        Redirect(controllers.upload.routes.UploadController.showStep1)
-    })
-  }
-
-  /** Step 2 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
-  def showStep3 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).flatMap(_ match {
-      case Some((pendingUpload, fileparts)) =>
-        if (fileparts.isEmpty) {
-          // No fileparts - force user to step 2
-          Future.successful(Redirect(controllers.upload.routes.UploadController.showStep2))
-        } else {
-          // Pending upload + fileparts available - proceed
-          UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
-            val applyNER = checkParamValue("apply-ner", "on")
-
-            if (applyNER)
-              NERService.spawnNERProcess(doc, docParts)
-
-            Ok(views.html.upload.upload_3(doc, docParts, applyNER))
-          }}
-        }
-
-      case None =>
-        // No pending upload - force user to step 1
-        Future.successful(Redirect(controllers.upload.routes.UploadController.showStep1))
-    })
-  }
-
-  /** Stores document metadata, during step 1 **/
+  
+  
+  /** Stores document metadata following step 1 **/
   def storeDocumentMetadata = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     newDocumentForm.bindFromRequest.fold(
       formWithErrors =>
@@ -107,8 +74,21 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
           }}
     )
   }
+  
 
-  /** Stores a filepart, during step 2 **/
+  /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
+  def showStep2 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).map(_ match {
+      case Some((pendingUpload, fileparts)) =>
+        Ok(views.html.upload.upload_2(fileparts))
+
+      case None =>
+        Redirect(controllers.upload.routes.UploadController.showStep1)
+    })
+  }
+  
+  
+  /** Stores a filepart during step 2 **/
   def storeFilepart = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     // First, we need to get the pending upload this filepart belongs to
     val username = loggedIn.getUsername
@@ -141,27 +121,46 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         BadRequest(MSG_ERROR)
       }}
   }
-
-  def cancelPendingUpload() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService
-      .deletePendingUpload(loggedIn.getUsername)
-      .map(success => {
-        // TODO add error message if success == false
-        Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
-      })
-      .recover{ case t =>
-        // TODO add error message
-        Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
-      }
+  
+  
+  /** Deletes a filepart during step 2 **/ 
+  def deleteFilepart(name: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService.deleteFilepartByTitleAndOwner(name, loggedIn.getUsername).map(success => {
+      if (success) Ok("ok.") else NotFound
+    })
   }
   
-  /** Queries the NER service for progress on the document with the specified ID
-   	*
-   	* The method returns NotFound when the document does not exist, and returns
-   	* Forbidden when the document owner is not equal to the currently logged in user.
-   	*/
+
+  /** Step 3 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
+  def showStep3 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).flatMap(_ match {
+      case Some((pendingUpload, fileparts)) =>
+        if (fileparts.isEmpty) {
+          // No fileparts - force user to step 2
+          Future.successful(Redirect(controllers.upload.routes.UploadController.showStep2))
+        } else {
+          // Pending upload + fileparts available - proceed
+          UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
+            val applyNER = checkParamValue("apply-ner", "on")
+
+            if (applyNER)
+              NERService.spawnNERProcess(doc, docParts)
+
+            Ok(views.html.upload.upload_3(doc, docParts, applyNER))
+          }}
+        }
+
+      case None =>
+        // No pending upload - force user to step 1
+        Future.successful(Redirect(controllers.upload.routes.UploadController.showStep1))
+    })
+  }
+
+  
+  /** Queries the NER for progress on a document (user needs to be logged in and own the document) **/
   def queryNERProgress(id: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    import UploadController._
+    
+    import UploadController._  // Message (de)serialization
 
     DocumentService.findById(id).flatMap(_ match {
       case Some(document) if document.getOwner == loggedIn.getUsername => {
@@ -185,11 +184,18 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     })
   }
 
-  /** Deletes a filepart, during step 2 **/
-  def deleteFilepart(name: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.deleteFilepartByTitleAndOwner(name, loggedIn.getUsername).map(success => {
-      if (success) Ok("ok.") else NotFound
-    })
+
+  def cancelUploadWizard() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService
+      .deletePendingUpload(loggedIn.getUsername)
+      .map(success => {
+        // TODO add error message if success == false
+        Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
+      })
+      .recover{ case t =>
+        // TODO add error message
+        Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
+      }
   }
 
 }

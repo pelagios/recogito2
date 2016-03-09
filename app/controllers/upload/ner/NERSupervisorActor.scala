@@ -95,13 +95,10 @@ private[ner] object NERSupervisor {
   
   private val supervisors = scala.collection.mutable.Map.empty[Int, ActorRef]
   
-  def registerActor(id: Int, actor: ActorRef) =
-    supervisors.put(id, actor)
+  def registerActor(id: Int, actor: ActorRef) = supervisors.put(id, actor)
   
-  def deregisterActor(id: Int) =
-    supervisors.remove(id)
+  def deregisterActor(id: Int) = supervisors.remove(id)
     
-  def getActor(id: Int) =
-    supervisors.get(id)
+  def getActor(id: Int) = supervisors.get(id)
   
 }

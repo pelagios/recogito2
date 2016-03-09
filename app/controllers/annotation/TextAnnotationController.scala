@@ -16,7 +16,6 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import org.joda.time.DateTime
 
-
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationBodyStub(hasType: AnnotationBody.Type, value: Option[String], uri: Option[String])
 
@@ -41,8 +40,6 @@ object AnnotationStub {
   )(AnnotationStub.apply _)
 
 }
-
-
 
 class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security with FileAccess {
 

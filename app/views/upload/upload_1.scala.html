@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Recogito - Enter Metadata</title>
+    <title>Upload Document - Enter Metadata</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/upload/wizard.css")"/>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
   </head>
@@ -32,7 +32,7 @@
 
         <div id="buttons">
           <div class="buttons-right">
-            <a href="@controllers.upload.routes.UploadController.cancelPendingUpload()" class="cancel btn outline">Cancel</a>
+            <a href="@controllers.upload.routes.UploadController.cancelUploadWizard()" class="cancel btn outline">Cancel</a>
             <button type="submit" disabled="true" class="btn">Next</a>
           </div>
         </div>

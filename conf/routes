@@ -32,7 +32,7 @@ DELETE  /upload/step-2/:name                       controllers.upload.UploadCont
 GET     /upload/step-3                             controllers.upload.UploadController.showStep3
 POST    /upload/step-3                             controllers.upload.UploadController.showStep3
 GET     /upload/ner-progress/:docId                controllers.upload.UploadController.queryNERProgress(docId: Int)
-GET     /upload/cancel                             controllers.upload.UploadController.cancelPendingUpload
+GET     /upload/cancel                             controllers.upload.UploadController.cancelUploadWizard
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document annotation views
