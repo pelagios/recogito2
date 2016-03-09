@@ -1,4 +1,4 @@
-package models
+package models.annotation
 
 import java.util.{ Date, UUID }
 

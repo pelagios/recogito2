@@ -1,5 +1,6 @@
-package models
+package models.annotation
 
+import models.HasDate
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -19,7 +20,7 @@ case class AnnotationBody (
 
 )
 
-object AnnotationBody extends Enumeration with JsonDate {
+object AnnotationBody extends Enumeration with HasDate {
 
   type Type = Value
 
@@ -33,14 +34,14 @@ object AnnotationBody extends Enumeration with JsonDate {
 
   val TAG = Value("TAG")
 
-  val TRANSCRIPTION = Value("TRANSCRIPTION")      
-      
+  val TRANSCRIPTION = Value("TRANSCRIPTION")
+
   /** JSON conversion **/
-  implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] = 
+  implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] =
     Format(
       JsPath.read[String].map(AnnotationBody.withName(_)),
       Writes[AnnotationBody.Type](t => JsString(t.toString))
-    ) 
+    )
 
   implicit val annotationBodyFormat: Format[AnnotationBody] = (
     (JsPath \ "type").format[AnnotationBody.Value] and
@@ -51,5 +52,3 @@ object AnnotationBody extends Enumeration with JsonDate {
   )(AnnotationBody.apply, unlift(AnnotationBody.unapply))
 
 }
-
-

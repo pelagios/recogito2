@@ -1,26 +1,18 @@
-package models
+package models.content
 
+import models.BaseService
 import models.generated.Tables._
-import org.jooq.Record
-import storage.DB
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import org.jooq.Record
 import scala.reflect.ClassTag
-import play.api.Logger
+import storage.DB
 
-object DocumentService {
-  
-  /** TODO move this into a general "Service" superclass or trait **/
-  def groupJoin2Result[T <: Record, V <: Record](records: Seq[Record], t: Class[T], v: Class[V]) = {
-    records
-      .map(r => (r.into(t), r.into(v)))
-      .groupBy(_._1)
-      .mapValues(_.map(_._2))
-  }
+object DocumentService extends BaseService {
 
   def findById(id: Int)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne())
   }
-  
+
   def findByUser(username: String, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
     sql.selectFrom(DOCUMENT)
        .where(DOCUMENT.OWNER.equal(username))
@@ -28,21 +20,28 @@ object DocumentService {
        .offset(offset)
        .fetchArray().toSeq
   }
-  
+
   def findByIdWithFileparts(id: Int)(implicit db: DB) = db.query { sql =>
-    val records = 
+    val records =
       sql.selectFrom(DOCUMENT
         .join(DOCUMENT_FILEPART)
         .on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID)))
       .where(DOCUMENT.ID.equal(id))
       .fetchArray()
-      
+
     // Convert to (DocumentRecord, Seq[DocumentFilepartRecord) tuple
-    val grouped = groupJoin2Result(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
+    val grouped = groupJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
     if (grouped.size > 1)
       throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
-    
+
     grouped.headOption
+  }
+  
+  def findPartByDocAndSeqNo(docId: Int, seqNo: Int)(implicit db: DB) = db.query { sql =>
+    Option(sql.selectFrom(DOCUMENT_FILEPART)
+              .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId))
+              .and(DOCUMENT_FILEPART.SEQUENCE_NO.equal(seqNo))
+              .fetchOne())
   }
 
 }

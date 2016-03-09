@@ -65,12 +65,12 @@ trait FileAccess {
       None
     }
   }
-  
+
   protected def loadTextfile(username: String, filename: String): Option[String] =
     getUserDir(username).flatMap(dir => {
       val file = new File(dir, filename)
-      if (file.exists) { 
-        Some(Source.fromFile(file).getLines.mkString("\n")) 
+      if (file.exists) {
+        Some(Source.fromFile(file).getLines.mkString("\n"))
       } else {
         None
       }

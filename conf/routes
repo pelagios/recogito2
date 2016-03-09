@@ -8,46 +8,48 @@ GET     /assets/*file                              controllers.Assets.versioned(
 # Landing area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /signup                                    controllers.landing.SignupController.showSignupForm
-POST    /signup                                    controllers.landing.SignupController.processSignup
-GET     /login                                     controllers.landing.LoginController.showLoginForm
-POST    /login                                     controllers.landing.LoginController.processLogin
-GET     /logout                                    controllers.landing.LogoutController.logout
+GET     /signup                                     controllers.landing.SignupController.showSignupForm
+POST    /signup                                     controllers.landing.SignupController.processSignup
+GET     /login                                      controllers.landing.LoginController.showLoginForm
+POST    /login                                      controllers.landing.LoginController.processLogin
+GET     /logout                                     controllers.landing.LogoutController.logout
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # User personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my-recogito					                     controllers.myrecogito.MyRecogitoController.index
+GET     /my-recogito                                controllers.myrecogito.MyRecogitoController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document upload
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /upload/step-1                             controllers.upload.UploadController.showStep1
-POST    /upload/step-1                             controllers.upload.UploadController.storeDocumentMetadata
-GET     /upload/step-2                             controllers.upload.UploadController.showStep2
-POST    /upload/step-2                             controllers.upload.UploadController.storeFilepart
-DELETE  /upload/step-2/:name                       controllers.upload.UploadController.deleteFilepart(name: String)
-GET     /upload/step-3                             controllers.upload.UploadController.showStep3
-POST    /upload/step-3                             controllers.upload.UploadController.showStep3
-GET     /upload/ner-progress/:docId                controllers.upload.UploadController.queryNERProgress(docId: Int)
-GET     /upload/cancel                             controllers.upload.UploadController.cancelUploadWizard
+GET     /upload/step-1                              controllers.upload.UploadController.showStep1
+POST    /upload/step-1                              controllers.upload.UploadController.storeDocumentMetadata
+GET     /upload/step-2                              controllers.upload.UploadController.showStep2
+POST    /upload/step-2                              controllers.upload.UploadController.storeFilepart
+DELETE  /upload/step-2/:name                        controllers.upload.UploadController.deleteFilepart(name: String)
+GET     /upload/step-3                              controllers.upload.UploadController.showStep3
+POST    /upload/step-3                              controllers.upload.UploadController.showStep3
+GET     /upload/ner-progress/:docId                 controllers.upload.UploadController.queryNERProgress(docId: Int)
+GET     /upload/cancel                              controllers.upload.UploadController.cancelUploadWizard
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Annotation API
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /annotations                                controllers.annotation.AnnotationController.loadAnnotations
+POST    /annotation                                 controllers.annotation.AnnotationController.createAnnotation
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document annotation views
-#
-# TODO temporary hack!
-#
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:docId/part/:partNo              controllers.annotation.TextAnnotationController.showTextAnnotationView(docId: Int, partNo: Int)
-GET     /document/:docId                           controllers.annotation.TextAnnotationController.showTextAnnotationViewForFirstPart(docId: Int)
-GET     /fileparts/:partId/annotations             controllers.annotation.TextAnnotationController.getAnnotationsFor(partId: Int)
-POST    /annotations                               controllers.annotation.TextAnnotationController.createAnnotation
+GET     /document/:docId/part/:partNo               controllers.annotation.ui.TextViewController.showAnnotationViewForDocPart(docId: Int, partNo: Int)
+GET     /document/:docId                            controllers.annotation.ui.TextViewController.showAnnotationViewForDoc(docId: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /                                          controllers.landing.LandingController.index
+GET     /                                           controllers.landing.LandingController.index

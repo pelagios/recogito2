@@ -1,4 +1,4 @@
-package models
+package models.content
 
 import collection.JavaConverters._
 import java.io.File
@@ -68,38 +68,38 @@ object UploadService extends FileAccess {
     sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     filepartRecord
   }
-  
+
   /** Deletes a filepart - record is removed from the DB, file from the data directory **/
   def deleteFilepartByTitleAndOwner(title: String, owner: String)(implicit db: DB) = db.withTransaction { sql =>
     Option(sql.selectFrom(UPLOAD_FILEPART)
               .where(UPLOAD_FILEPART.TITLE.equal(title))
               .and(UPLOAD_FILEPART.OWNER.equal(owner))
               .fetchOne()) match {
-      
+
       case Some(filepartRecord) => {
         val file = new File(PENDING_UPLOADS_DIR, filepartRecord.getFilename)
         file.delete()
-        filepartRecord.delete() == 1 
+        filepartRecord.delete() == 1
       }
-      
+
       case None =>
         // Not possible from the UI!
         Logger.warn("Somebody trying to remove a non-existing upload filepart")
         false
-    }                 
+    }
   }
 
   /** Retrieves the pending upload for a user (if any) **/
   def findPendingUpload(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).fetchOne())
-  } 
-  
+  }
+
   /** Deletes a user's pending upload **/
   def deletePendingUpload(username: String)(implicit db: DB) = db.query { sql =>
     sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.OWNER.equal(username)).execute
     sql.deleteFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).execute() == 1
   }
-  
+
   /** Retrieves the pending upload for a user (if any) along with the filepart metadata records **/
   def findPendingUploadWithFileparts(username: String)(implicit db: DB) = db.query { sql =>
     val result =
@@ -137,19 +137,19 @@ object UploadService extends FileAccess {
           upload.getDescription,
           upload.getSource,
           upload.getLanguage)
-    
+
     // Insert document, retrieving the auto-generated ID
-    val docId = 
+    val docId =
       sql.insertInto(DOCUMENT).set(document).returning(DOCUMENT.ID).fetchOne()
     document.setId(docId.getId)
 
     // Insert filepart records - I couldn't find a way to do a batch-insert that also returns
-    // the auto-generated ID. Any hints on how this could be achieved appreciated! 
+    // the auto-generated ID. Any hints on how this could be achieved appreciated!
     val docFileparts = fileparts.zipWithIndex.map { case (part, idx) => {
       val docFilepart = new DocumentFilepartRecord(null,
             docId.getId,
-            part.getTitle, 
-            part.getContentType, 
+            part.getTitle,
+            part.getContentType,
             part.getFilename,
             idx)
 
@@ -165,7 +165,7 @@ object UploadService extends FileAccess {
       val destination = new File(getUserDir(upload.getOwner, true).get, filepart.getFilename).toPath
       Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
     })
-    
+
     // Delete Upload and Filepart records from the staging area tables
     sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.UPLOAD_ID.equal(upload.getId)).execute()
     sql.deleteFrom(UPLOAD).where(UPLOAD.ID.equal(upload.getId)).execute()

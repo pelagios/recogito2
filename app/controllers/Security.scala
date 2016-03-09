@@ -1,8 +1,8 @@
 package controllers
 
+import controllers.Roles._
 import jp.t2v.lab.play2.auth.{ AuthConfig, CookieTokenAccessor }
-import models.Roles._
-import models.UserService
+import models.user.UserService
 import models.generated.tables.records.UserRecord
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.reflect.{ ClassTag, classTag }

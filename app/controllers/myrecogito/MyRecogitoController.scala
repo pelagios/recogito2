@@ -1,11 +1,11 @@
 package controllers.myrecogito
 
 import controllers.{ AbstractController, Security }
+import controllers.Roles._
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
-import models.Roles._
-import models.UserService
-import models.DocumentService
+import models.user.UserService
+import models.content.DocumentService
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.DB
 

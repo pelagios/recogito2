@@ -1,20 +1,20 @@
 package controllers.annotation
 
+import controllers.Roles._
 import controllers.{ AbstractController, Security }
 import java.util.UUID
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
-import models.Roles._
-import models.{ Annotation, AnnotationService, AnnotationStatus, AnnotationBody, AnnotatedObject, DocumentService }
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import storage.{ DB, FileAccess }
-import scala.concurrent.Future
+import models.annotation._
+import models.content.DocumentService
+import org.joda.time.DateTime
 import play.api.Logger
-import play.api.mvc.Action
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import org.joda.time.DateTime
+import scala.concurrent.Future
+import storage.DB
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationBodyStub(hasType: AnnotationBody.Type, value: Option[String], uri: Option[String])
@@ -41,53 +41,44 @@ object AnnotationStub {
 
 }
 
-class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security with FileAccess {
+class AnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
 
-  /** TODO temporary dummy implementation **/
-  def showTextAnnotationViewForFirstPart(documentId: Int) = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Redirect(routes.TextAnnotationController.showTextAnnotationView(documentId, 0))
+  private val PARAM_DOC = "doc"
+  
+  private val PARAM_PART = "part"
+  
+  /** TODO currently annotation read access is unlimited to any logged in user - do we want that? **/
+  def loadAnnotations() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    val docId = getQueryParam(PARAM_DOC).map(_.toInt)
+    val partNo = getQueryParam(PARAM_PART).map(_.toInt)
+    
+    (docId, partNo) match {
+      
+      case (Some(id), Some(seqNo)) =>
+        // Load annotations for specific doc part
+        DocumentService.findPartByDocAndSeqNo(id, seqNo).flatMap(_ match {
+          case Some(filepart) =>
+            AnnotationService.findByFilepartId(filepart.getId)
+              .map(annotations => Ok(Json.toJson(annotations)))
+            
+          case None =>
+            Future.successful(NotFound)
+        })
+        
+      case (Some(id), None) =>
+        // Load annotations for entire doc
+        AnnotationService.findByDocId(id).map(annotations => Ok(Json.toJson(annotations)))
+        
+      case _ =>
+        // No doc ID
+        Future.successful(BadRequest)
+      
+    }
+    
+
   }
-
-  def showTextAnnotationView(documentId: Int, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val username = loggedIn.getUsername
-
-    DocumentService.findByIdWithFileparts(documentId).map(_ match {
-      case Some((document, fileparts)) => {
-        // Verify if the user is allowed to access this document - TODO what about shared content?
-        if (document.getOwner == username) {
-          fileparts.find(_.getSequenceNo == partNo) match {
-            case Some(filepart) => {
-              loadTextfile(username, filepart.getFilename) match {
-                case Some(content) =>
-                  Ok(views.html.annotation.text(document, fileparts, filepart, content))
-
-                case None => {
-                  // Filepart found in DB, but no file on filesystem
-                  InternalServerError
-                }
-              }
-            }
-
-            case None =>
-              // No filepart with the specified sequence no
-              NotFound
-          }
-        } else {
-          Forbidden
-        }
-      }
-
-      case None =>
-        // No document with that ID found in DB
-        NotFound
-    })
-  }
-
-  def getAnnotationsFor(filepartId: Int) = Action.async { request =>
-    AnnotationService.findByFilepartId(filepartId)
-      .map(annotations => Ok(Json.toJson(annotations)))
-  }
-
+  
+  /** TODO currently annotation creation is unlimited to any logged in user - need to check access rights! **/
   def createAnnotation() = StackAction(AuthorityKey -> Normal) { implicit request =>
     request.body.asJson match {
 
@@ -106,13 +97,12 @@ class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractC
                 s.get.anchor,
                 Some(user),
                 now,
-                s.get.bodies.map(b =>
-                  AnnotationBody(b.hasType, Some(user), now, b.value, b.uri)),
+                s.get.bodies.map(b => AnnotationBody(b.hasType, Some(user), now, b.value, b.uri)),
                 AnnotationStatus(AnnotationStatus.UNVERIFIED, Some(user), now))
 
             // TODO error reporting?
             AnnotationService.insertAnnotations(Seq(annotation))
-            Ok("ok.")
+            Status(OK)
           }
 
           case e: JsError => {
@@ -129,5 +119,5 @@ class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractC
 
     }
   }
-
+  
 }

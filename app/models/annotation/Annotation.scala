@@ -1,11 +1,11 @@
-package models
+package models.annotation
 
 import java.util.UUID
+import models.HasDate
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import javax.json.JsonNumber
 
 case class Annotation(
 
@@ -40,23 +40,23 @@ object AnnotatedObject {
     (JsPath \ "document").format[Int] and
     (JsPath \ "filepart").format[Int]
   )(AnnotatedObject.apply, unlift(AnnotatedObject.unapply))
-  
+
 }
 
-object Annotation extends JsonDate {
-    
+object Annotation extends HasDate {
+
   /** JSON conversion **/
   implicit val annotationFormat: Format[Annotation] = (
     (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "version_id").format[UUID] and
     (JsPath \ "annotates").format[AnnotatedObject] and
-    (JsPath \ "has_previous_versions").formatNullable[Int] and 
+    (JsPath \ "has_previous_versions").formatNullable[Int] and
     (JsPath \ "contributors").format[Seq[String]] and
     (JsPath \ "anchor").format[String] and
     (JsPath \ "last_modified_by").formatNullable[String] and
     (JsPath \ "last_modified_at").format[DateTime] and
     (JsPath \ "bodies").format[Seq[AnnotationBody]] and
-    (JsPath \ "status").format[AnnotationStatus]  
+    (JsPath \ "status").format[AnnotationStatus]
   )(Annotation.apply, unlift(Annotation.unapply))
-  
+
 }

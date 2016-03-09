@@ -3,7 +3,8 @@ package controllers.upload.ner
 import akka.actor.Actor
 import java.io.File
 import java.util.UUID
-import models._
+import models.annotation._
+import models.content.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.Logger

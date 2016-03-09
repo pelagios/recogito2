@@ -3,7 +3,7 @@ package controllers.landing
 import controllers.{ AbstractController, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
-import models.UserService
+import models.user.UserService
 import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._

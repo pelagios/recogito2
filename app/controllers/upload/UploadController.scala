@@ -2,13 +2,13 @@ package controllers.upload
 
 import akka.actor.ActorSystem
 import controllers.{ AbstractController, Security }
+import controllers.Roles._
 import controllers.upload.ner._
 import controllers.upload.ner.NERMessages._
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
-import models.Roles._
-import models.{ DocumentService, UploadService }
+import models.content.{ DocumentService, UploadService }
 import models.generated.tables.records.UploadRecord
 import play.api.Logger
 import play.api.Play.current
@@ -28,8 +28,6 @@ case class NewDocumentData(title: String, author: String, dateFreeform: String, 
 class UploadController @Inject() (implicit val db: DB, system: ActorSystem) extends AbstractController with AuthElement with Security {
 
   private val FILE_ARG = "file"
-
-  private val MSG_OK = "Ok."
   
   private val MSG_ERROR = "There was an error processing your data"
 
@@ -98,7 +96,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
           request.body.asMultipartFormData.map(tempfile => {
             tempfile.file(FILE_ARG).map(f => {
               UploadService.insertFilepart(pendingUpload.getId, username, f)
-                .map(_ => Ok(MSG_OK))
+                .map(_ => Status(OK))
             }).getOrElse({
               // POST without a file? Not possible through the UI!
               Logger.warn("Filepart POST without file attached")

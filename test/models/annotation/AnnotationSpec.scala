@@ -1,4 +1,4 @@
-package models
+package models.annotation
 
 import java.util.UUID
 import org.specs2.mutable._

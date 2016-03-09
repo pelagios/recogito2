@@ -7,7 +7,7 @@ import play.api.{ Application, GlobalSettings, Logger }
 import scala.io.Source
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext
-import models.UserService
+import models.user.UserService
 import storage.ES
 
 object Global extends GlobalSettings {

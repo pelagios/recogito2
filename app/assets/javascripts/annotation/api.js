@@ -2,6 +2,10 @@ define([], function() {
 
   return {
 
+    loadAnnotations : function() {
+
+    },
+
     createAnnotation : function(annotationStub, onSuccess, onError) {
       jQuery.ajax({
         url: '/annotations',

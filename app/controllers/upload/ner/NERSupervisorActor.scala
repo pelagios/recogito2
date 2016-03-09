@@ -3,7 +3,7 @@ package controllers.upload.ner
 import akka.actor.{ Actor, ActorRef, Props }
 import akka.contrib.pattern.Aggregator
 import java.io.File
-import models.ContentTypes
+import models.content.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._

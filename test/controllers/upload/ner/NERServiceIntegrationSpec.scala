@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.testkit.{ TestKit, ImplicitSender }
 import java.io.File
 import java.time.OffsetDateTime
-import models.ContentTypes
+import models.content.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.specs2.mutable._
 import org.specs2.runner._

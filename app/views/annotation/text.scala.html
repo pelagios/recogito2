@@ -71,8 +71,8 @@
             QUICK
             <div class="dropdown">
               <ul>
-                <li><span class="icon">&#xf041;</span> Places</li>
-                <li><span class="icon">&#xf007;</span> Persons</li>
+                <li data-mode="PLACE"><span class="icon">&#xf041;</span> Places</li>
+                <li data-mode="PERSON"><span class="icon">&#xf007;</span> Persons</li>
                 <li><span class="icon">&#xf02c;</span> Tags</li>
               </ul>
             </div>
@@ -102,7 +102,7 @@
               </li>
             } else {
               <li>
-                <a href="@controllers.annotation.routes.TextAnnotationController.showTextAnnotationView(document.getId, part.getSequenceNo)">@part.getTitle</a>
+                <a href="@controllers.annotation.ui.routes.TextViewController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
               </li>
             }
           }
@@ -113,7 +113,7 @@
     <pre id="content">@content</pre>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.annotation.routes.javascript.TextAnnotationController.getAnnotationsFor
+      controllers.annotation.routes.javascript.AnnotationController.loadAnnotations
     )
   </body>
 </html>
