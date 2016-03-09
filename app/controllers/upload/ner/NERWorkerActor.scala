@@ -1,4 +1,4 @@
-package controllers.myrecogito.upload.ner
+package controllers.upload.ner
 
 import akka.actor.Actor
 import java.io.File

@@ -1,4 +1,4 @@
-package controllers.myrecogito.upload.ner
+package controllers.upload.ner
 
 import akka.actor.{ Actor, ActorRef, Props }
 import akka.contrib.pattern.Aggregator
@@ -7,6 +7,7 @@ import models.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: FiniteDuration) extends Actor with Aggregator {
     

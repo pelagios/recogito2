@@ -1,4 +1,4 @@
-package controllers.myrecogito.upload.ner
+package controllers.upload.ner
 
 import akka.actor.{ ActorRef, ActorSystem, Props }
 import akka.pattern.ask
@@ -13,6 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.language.postfixOps
 import storage.FileAccess
 
 private[ner] case class Phrase(chars: String, entityTag: String, charOffset: Int)

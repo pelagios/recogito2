@@ -1,4 +1,4 @@
-package controllers.myrecogito.upload.ner
+package controllers.upload.ner
 
 object NERMessages{
 

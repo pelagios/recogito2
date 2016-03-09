@@ -1,4 +1,4 @@
-package controllers.myrecogito.upload.ner
+package controllers.upload.ner
 
 import akka.actor.ActorSystem
 import akka.testkit.{ TestKit, ImplicitSender }

@@ -18,20 +18,25 @@ GET     /logout                                    controllers.landing.LogoutCon
 # User personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my-recogito/upload/step-1                 controllers.myrecogito.upload.UploadController.showStep1
-POST    /my-recogito/upload/step-1                 controllers.myrecogito.upload.UploadController.storeDocumentMetadata
-GET     /my-recogito/upload/step-2                 controllers.myrecogito.upload.UploadController.showStep2
-POST    /my-recogito/upload/step-2                 controllers.myrecogito.upload.UploadController.storeFilepart
-DELETE  /my-recogito/upload/step-2/:name           controllers.myrecogito.upload.UploadController.deleteFilepart(name: String)
-GET     /my-recogito/upload/step-3                 controllers.myrecogito.upload.UploadController.showStep3
-POST    /my-recogito/upload/step-3                 controllers.myrecogito.upload.UploadController.showStep3
-GET     /my-recogito/upload/ner-progress/:docId    controllers.myrecogito.upload.UploadController.queryNERProgress(docId: Int)
-GET     /my-recogito/upload/cancel                 controllers.myrecogito.upload.UploadController.cancelPendingUpload
-GET     /my-recogito					           controllers.myrecogito.MyRecogitoController.index
+GET     /my-recogito					                     controllers.myrecogito.MyRecogitoController.index
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document upload
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /upload/step-1                             controllers.upload.UploadController.showStep1
+POST    /upload/step-1                             controllers.upload.UploadController.storeDocumentMetadata
+GET     /upload/step-2                             controllers.upload.UploadController.showStep2
+POST    /upload/step-2                             controllers.upload.UploadController.storeFilepart
+DELETE  /upload/step-2/:name                       controllers.upload.UploadController.deleteFilepart(name: String)
+GET     /upload/step-3                             controllers.upload.UploadController.showStep3
+POST    /upload/step-3                             controllers.upload.UploadController.showStep3
+GET     /upload/ner-progress/:docId                controllers.upload.UploadController.queryNERProgress(docId: Int)
+GET     /upload/cancel                             controllers.upload.UploadController.cancelPendingUpload
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document annotation views
-# 
+#
 # TODO temporary hack!
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
