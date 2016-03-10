@@ -1,5 +1,5 @@
 .header {
-  white-space: nowrap;
+  white-space:nowrap;
   background-color:#fff;
 }
 
@@ -21,6 +21,7 @@
   }
 
   li {
+    position:relative;
     cursor:pointer;
     font-family:Tonicons;
     display:inline-block;
@@ -48,16 +49,22 @@
   }
 
   .tooltip .hint {
-    box-sizing:border-box;
+    position:absolute;
+    top:67px;
+    left:-73px;
     padding:8px;
-    margin-top:17px;
-    margin-left:-66px;
     width:160px;
+    white-space:normal;
+  }
+
+  .tooltip.active .hint {
+    top:73px;
+    left:-65px;
   }
 
   li.home .hint {
-     margin-top:19px;
-     margin-left:-81px;
+    width:100px;
+    left:-45px;
   }
 
 } /** .header-iconbar **/
