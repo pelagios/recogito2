@@ -8,7 +8,7 @@
     <div class="header-iconbar">
       <ul>
         <li class="tooltip bottom">
-          <a href="@controllers.my.annotation.routes.TextViewController.showAnnotationViewForDocPart(document.getId, 0)">
+          <a href="@controllers.my.annotation.routes.TextAnnotationController.showAnnotationViewForDocPart(document.getId, 0)">
             <span class="icon">&#xe86f;</span>
             <span class="hint">You are now in the Text Annotation View</span>
           </a>
@@ -22,7 +22,7 @@
         </li>
 
         <li class="tooltip bottom">
-          <a href="@controllers.my.stats.routes.DocumentStatsController.showDocumentStats(document.getId)">
+          <a href="@controllers.my.stats.routes.StatsController.showDocumentStats(document.getId)">
             <span class="icon">&#xe8ae;</span>
             <span class="hint">Detailed annotation stats for this document</span>
           </a>
@@ -34,7 +34,7 @@
         </li>
 
         <li class="tooltip bottom">
-          <a href="@controllers.my.sharing.routes.SharingController.showShareSettings(document.getId)">
+          <a href="@controllers.my.sharing.routes.SharingController.showSharingSettings(document.getId)">
             <span class="icon">&#xe85f;</span>
             <span class="hint">Invite other users to view or work with you on this document</span>
           </a>

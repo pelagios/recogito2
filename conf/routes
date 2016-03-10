@@ -16,15 +16,13 @@ GET     /logout                                     controllers.landing.LogoutCo
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# My Recogito root
+# My Recogito
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my-recogito                                controllers.my.MyRecogitoController.index
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My document upload
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my/upload/step-1                           controllers.my.upload.UploadController.showStep1
 POST    /my/upload/step-1                           controllers.my.upload.UploadController.storeDocumentMetadata
@@ -37,44 +35,33 @@ GET     /my/upload/ner-progress/:docId              controllers.my.upload.Upload
 GET     /my/upload/cancel                           controllers.my.upload.UploadController.cancelUploadWizard
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My annotation views
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my/doc/:docId/part/:partNo/edit            controllers.my.annotation.TextViewController.showAnnotationViewForDocPart(docId: Int, partNo: Int)
-GET     /my/doc/:docId/edit                         controllers.my.annotation.TextViewController.showAnnotationViewForDoc(docId: Int)
+GET     /my/doc/:docId/part/:partNo/edit            controllers.my.annotation.TextAnnotationController.showAnnotationViewForDocPart(docId: Int, partNo: Int)
+GET     /my/doc/:docId/edit                         controllers.my.annotation.TextAnnotationController.showAnnotationViewForDoc(docId: Int)
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# My map view
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# My map
 
 GET     /my/doc/:docId/map                          controllers.my.map.MapController.showMap(docId: Int)
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# My document stats
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# My stats
 
-GET     /my/doc/:docId/stats                        controllers.my.stats.DocumentStatsController.showDocumentStats(docId: Int)
+GET     /my/doc/:docId/stats                        controllers.my.stats.StatsController.showDocumentStats(docId: Int)
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My document downloads
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my/doc/:docId/downloads                    controllers.my.downloads.DownloadsController.showDownloadOptions(docId: Int)
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 # My sharing settings
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my/doc/:docId/share                        controllers.my.sharing.SharingController.showShareSettings(docId: Int)
+GET     /my/doc/:docId/share                        controllers.my.sharing.SharingController.showSharingSettings(docId: Int)
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # My document settings
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my/doc/:docId/settings                     controllers.my.settings.SettingsController.showDocumentSettings(docId: Int)
 

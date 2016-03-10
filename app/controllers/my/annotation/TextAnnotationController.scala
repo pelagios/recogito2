@@ -8,11 +8,11 @@ import models.user.Roles._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.{ DB, FileAccess }
 
-class TextViewController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security with FileAccess {
+class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security with FileAccess {
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: Int) = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Redirect(routes.TextViewController.showAnnotationViewForDocPart(documentId, 0))
+    Redirect(routes.TextAnnotationController.showAnnotationViewForDocPart(documentId, 0))
   }
 
   def showAnnotationViewForDocPart(documentId: Int, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
