@@ -3,7 +3,7 @@
 <html>
   <head>
     <title>My Recogito - Organize Document</title>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/upload/wizard.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/upload/wizard.css")"/>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/jquery-ui/jquery-ui.min.js")"></script>
   </head>
@@ -32,7 +32,7 @@
 
       <div id="buttons">
         <div class="buttons-right">
-          <a href="@controllers.myrecogito.routes.MyRecogitoController.index" class="next btn btn-large btn-blue">Done</a>
+          <a href="@controllers.my.routes.MyRecogitoController.index" class="next btn btn-large btn-blue">Done</a>
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
 
               hasParts = @fileparts.size,
 
-              NER_PROGRESS_SERVICE_URL = '@controllers.myrecogito.upload.routes.UploadController.queryNERProgress(document.getId)',
+              NER_PROGRESS_SERVICE_URL = '@controllers.my.upload.routes.UploadController.queryNERProgress(document.getId)',
 
               pollNERProgress = function() {
                 jQuery.getJSON(NER_PROGRESS_SERVICE_URL, function(data) {

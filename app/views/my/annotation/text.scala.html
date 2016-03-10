@@ -6,7 +6,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/annotation/text.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/annotation/text.css")"/>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/rangy/rangy-core.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/rangy/rangy-textrange.min.js")"></script>
@@ -109,7 +109,7 @@
               </li>
             } else {
               <li>
-                <a href="@controllers.myrecogito.annotation.routes.TextViewController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
+                <a href="@controllers.my.annotation.routes.TextViewController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
               </li>
             }
           }

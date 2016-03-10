@@ -1,9 +1,9 @@
-package controllers.myrecogito.upload
+package controllers.my.upload
 
 import akka.actor.ActorSystem
 import controllers.{ AbstractController, Security }
-import controllers.myrecogito.upload.ner._
-import controllers.myrecogito.upload.ner.NERMessages._
+import controllers.my.upload.ner._
+import controllers.my.upload.ner.NERMessages._
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
@@ -49,10 +49,10 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   def showStep1 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUpload(loggedIn.getUsername).map(_ match {
       case Some(pendingUpload) =>
-        Ok(views.html.myrecogito.upload.upload_1(newDocumentForm.fill(pendingUpload)))
+        Ok(views.html.my.upload.upload_1(newDocumentForm.fill(pendingUpload)))
 
       case None =>
-        Ok(views.html.myrecogito.upload.upload_1(newDocumentForm))
+        Ok(views.html.my.upload.upload_1(newDocumentForm))
     })
   }
 
@@ -61,14 +61,14 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   def storeDocumentMetadata = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     newDocumentForm.bindFromRequest.fold(
       formWithErrors =>
-        Future.successful(BadRequest(views.html.myrecogito.upload.upload_1(formWithErrors))),
+        Future.successful(BadRequest(views.html.my.upload.upload_1(formWithErrors))),
 
       docData =>
         UploadService.storePendingUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
-          .flatMap(user => Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2)))
+          .flatMap(user => Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2)))
           .recover { case t: Throwable => {
             t.printStackTrace()
-            Ok(views.html.myrecogito.upload.upload_1(newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
+            Ok(views.html.my.upload.upload_1(newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
           }}
     )
   }
@@ -78,10 +78,10 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   def showStep2 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).map(_ match {
       case Some((pendingUpload, fileparts)) =>
-        Ok(views.html.myrecogito.upload.upload_2(fileparts))
+        Ok(views.html.my.upload.upload_2(fileparts))
 
       case None =>
-        Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1)
+        Redirect(controllers.my.upload.routes.UploadController.showStep1)
     })
   }
 
@@ -135,7 +135,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
           // No fileparts - force user to step 2
-          Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep2))
+          Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2))
         } else {
           // Pending upload + fileparts available - proceed
           UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
@@ -144,13 +144,13 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
             if (applyNER)
               NERService.spawnNERProcess(doc, docParts)
 
-            Ok(views.html.myrecogito.upload.upload_3(doc, docParts, applyNER))
+            Ok(views.html.my.upload.upload_3(doc, docParts, applyNER))
           }}
         }
 
       case None =>
         // No pending upload - force user to step 1
-        Future.successful(Redirect(controllers.myrecogito.upload.routes.UploadController.showStep1))
+        Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep1))
     })
   }
 
@@ -188,11 +188,11 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
       .deletePendingUpload(loggedIn.getUsername)
       .map(success => {
         // TODO add error message if success == false
-        Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
+        Redirect(controllers.my.routes.MyRecogitoController.index)
       })
       .recover{ case t =>
         // TODO add error message
-        Redirect(controllers.myrecogito.routes.MyRecogitoController.index)
+        Redirect(controllers.my.routes.MyRecogitoController.index)
       }
   }
 

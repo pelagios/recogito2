@@ -1,4 +1,4 @@
-package controllers.myrecogito
+package controllers.my
 
 import controllers.{ AbstractController, Security }
 import javax.inject.Inject
@@ -14,7 +14,7 @@ class MyRecogitoController @Inject() (implicit val db: DB) extends AbstractContr
   def index = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     val username = loggedIn.getUsername
     DocumentService.findByUser(username).map(documents => {
-      Ok(views.html.myrecogito.index(loggedIn, UserService.getUsedDiskspaceKB(username), documents))
+      Ok(views.html.my.index(loggedIn, UserService.getUsedDiskspaceKB(username), documents))
     })
   }
 
