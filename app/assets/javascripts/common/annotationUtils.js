@@ -18,6 +18,15 @@ define(function() {
         if (t === 'PLACE' || t === 'PERSON')
           return t;
       }
+    },
+
+    sortByOffset: function(annotations) {
+      return annotations.sort(function(a, b) {
+        var offsetA = a.anchor.substr(12),
+            offsetB = b.anchor.substr(12);
+
+        return offsetA - offsetB;
+      });
     }
 
   };

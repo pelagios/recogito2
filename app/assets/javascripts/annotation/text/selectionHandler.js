@@ -1,9 +1,10 @@
-define(['storage'], function(Storage) {
+define(['../../common/hasEvents', 'events', '../../common/config'], function(HasEvents, Events, Config) {
 
-  var selectionHandler = function(rootNode, highlighter) {
+  var SelectionHandler = function(rootNode) {
 
-        /** Trims a range by removing leading and trailing spaces **/
-    var trimRange = function(range) {
+    var self = this,
+
+        trimRange = function(range) {
           var quote = range.toString(),
               leadingSpaces = 0,
               trailingSpaces = 0;
@@ -37,8 +38,8 @@ define(['storage'], function(Storage) {
 
           return {
             annotates: {
-              document: window.config.documentId,
-              filepart: window.config.filepartId
+              document: Config.documentId,
+              filepart: Config.partId
             },
             anchor: 'char-offset:' + rangeBefore.toString().length,
             bodies: [
@@ -51,11 +52,10 @@ define(['storage'], function(Storage) {
         /** cf. http://stackoverflow.com/questions/3169786/clear-text-selection-with-javascript **/
         clearSelection = function() {
           if (window.getSelection) {
-            if (window.getSelection().empty) {
+            if (window.getSelection().empty)
               window.getSelection().empty();
-            } else if (window.getSelection().removeAllRanges) {
+            else if (window.getSelection().removeAllRanges)
               window.getSelection().removeAllRanges();
-            }
           } else if (document.selection) {
             document.selection.empty();
           }
@@ -63,34 +63,27 @@ define(['storage'], function(Storage) {
 
         onSelect = function(e) {
           var selection = rangy.getSelection(),
-              annotation;
+              selectedRange, annotationStub;
 
           if (!selection.isCollapsed &&
                selection.rangeCount == 1 &&
                selection.getRangeAt(0).toString().trim().length > 0) {
 
-            var selectedRange = trimRange(selection.getRangeAt(0)),
-                stub = rangeToAnnotationStub(selectedRange),
+            selectedRange = trimRange(selection.getRangeAt(0));
+            annotationStub = rangeToAnnotationStub(selectedRange);
 
-                onStoreSuccess = function() {
-                  // TODO 'PLACE' currently hardwired - this is just temporary
-                  highlighter.wrapRange(selectedRange, 'entity PLACE', rootNode);
-                  clearSelection();
-                },
+            clearSelection();
 
-                onStoreError = function(error) {
-                  console.log('Error creating annotation');
-                  console.log(error);
-                };
-
-            Storage.createAnnotation(stub, onStoreSuccess, onStoreError);
+            self.fireEvent(Events.ANNOTATION_CREATED, annotationStub);
           }
         };
 
 
     jQuery(rootNode).mouseup(onSelect);
+    HasEvents.apply(this);
   };
+  SelectionHandler.prototype = Object.create(HasEvents.prototype);
 
-  return selectionHandler;
+  return SelectionHandler;
 
 });

@@ -2,7 +2,8 @@ define([], function() {
 
   var TEXT = 3; // HTML DOM node type for text nodes
 
-  var Highlighter = function() {
+  var Highlighter = function(rootNode) {
+
     var walkTextNodes = function(node, nodeArray) {
           var nodes = (nodeArray) ? nodeArray : [];
 
@@ -50,7 +51,7 @@ define([], function() {
           range.surroundContents(wrapper);
         },
 
-        wrapRange = function(range, cssClass, rootNode) {
+        wrapRange = function(range, cssClass) {
           if (range.startContainer === range.endContainer) {
             surround(range, cssClass);
           } else {

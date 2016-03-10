@@ -10,11 +10,12 @@
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/rangy/rangy-core.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/rangy/rangy-textrange.min.js")"></script>
-    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/annotation/app.js")"></script>
+    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/annotation/text/app.js")"></script>
     <script>
       window.config = {
         documentId: @document.getId,
-        filepartId: @currentPart.getId
+        partId: @currentPart.getId,
+        partSequenceNo: @currentPart.getSequenceNo
       }
     </script>
   </head>
@@ -67,7 +68,7 @@
         <h2 class="date">@Option(document.getDateFreeform)</h2>
         <p class="quick-stats">
           <span class="icon comment">&#xf0e5;</span>
-          <span class="annotations">0</span> Annotations
+          <span class="annotations">-</span> Annotations
           &nbsp; &centerdot; &nbsp;
           <span class="icon">&#xf0c0;</span>
           <span class="contributors">No Other Contributors</span>
@@ -123,7 +124,8 @@
     <pre id="content">@content</pre>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.annotation.routes.javascript.AnnotationController.loadAnnotations
+      controllers.annotation.routes.javascript.AnnotationController.loadAnnotations,
+      controllers.annotation.routes.javascript.AnnotationController.createAnnotation
     )
   </body>
 </html>

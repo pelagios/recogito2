@@ -51,7 +51,7 @@ class AnnotationController @Inject() (implicit val db: DB) extends AbstractContr
   def loadAnnotations() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     val docId = getQueryParam(PARAM_DOC).map(_.toInt)
     val partNo = getQueryParam(PARAM_PART).map(_.toInt)
-    
+
     (docId, partNo) match {
       
       case (Some(id), Some(seqNo)) =>
@@ -102,7 +102,7 @@ class AnnotationController @Inject() (implicit val db: DB) extends AbstractContr
 
             // TODO error reporting?
             AnnotationService.insertAnnotations(Seq(annotation))
-            Status(OK)
+            Ok(Json.toJson(annotation))
           }
 
           case e: JsError => {
