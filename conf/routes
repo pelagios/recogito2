@@ -15,7 +15,7 @@ POST    /login                                      controllers.landing.LoginCon
 GET     /logout                                     controllers.landing.LogoutController.logout
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# User personal space
+# MyRecogito root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my-recogito                                controllers.myrecogito.MyRecogitoController.index
@@ -24,29 +24,31 @@ GET     /my-recogito                                controllers.myrecogito.MyRec
 # Document upload
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /upload/step-1                              controllers.upload.UploadController.showStep1
-POST    /upload/step-1                              controllers.upload.UploadController.storeDocumentMetadata
-GET     /upload/step-2                              controllers.upload.UploadController.showStep2
-POST    /upload/step-2                              controllers.upload.UploadController.storeFilepart
-DELETE  /upload/step-2/:name                        controllers.upload.UploadController.deleteFilepart(name: String)
-GET     /upload/step-3                              controllers.upload.UploadController.showStep3
-POST    /upload/step-3                              controllers.upload.UploadController.showStep3
-GET     /upload/ner-progress/:docId                 controllers.upload.UploadController.queryNERProgress(docId: Int)
-GET     /upload/cancel                              controllers.upload.UploadController.cancelUploadWizard
+GET     /my/upload/step-1                           controllers.myrecogito.upload.UploadController.showStep1
+POST    /my/upload/step-1                           controllers.myrecogito.upload.UploadController.storeDocumentMetadata
+GET     /my/upload/step-2                           controllers.myrecogito.upload.UploadController.showStep2
+POST    /my/upload/step-2                           controllers.myrecogito.upload.UploadController.storeFilepart
+DELETE  /my/upload/step-2/:name                     controllers.myrecogito.upload.UploadController.deleteFilepart(name: String)
+GET     /my/upload/step-3                           controllers.myrecogito.upload.UploadController.showStep3
+POST    /my/upload/step-3                           controllers.myrecogito.upload.UploadController.showStep3
+GET     /my/upload/ner-progress/:docId              controllers.myrecogito.upload.UploadController.queryNERProgress(docId: Int)
+GET     /my/upload/cancel                           controllers.myrecogito.upload.UploadController.cancelUploadWizard
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Annotation API
+# Annotation views
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /annotations                                controllers.annotation.AnnotationController.loadAnnotations
-POST    /annotation                                 controllers.annotation.AnnotationController.createAnnotation
+GET     /my/document/:docId/part/:partNo            controllers.myrecogito.annotation.TextViewController.showAnnotationViewForDocPart(docId: Int, partNo: Int)
+GET     /my/document/:docId                         controllers.myrecogito.annotation.TextViewController.showAnnotationViewForDoc(docId: Int)
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Document annotation views
+# JSON API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:docId/part/:partNo               controllers.annotation.ui.TextViewController.showAnnotationViewForDocPart(docId: Int, partNo: Int)
-GET     /document/:docId                            controllers.annotation.ui.TextViewController.showAnnotationViewForDoc(docId: Int)
+GET     /annotations                                controllers.api.AnnotationController.loadAnnotations
+POST    /annotation                                 controllers.api.AnnotationController.createAnnotation
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Root

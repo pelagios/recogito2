@@ -109,7 +109,7 @@
               </li>
             } else {
               <li>
-                <a href="@controllers.annotation.ui.routes.TextViewController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
+                <a href="@controllers.myrecogito.annotation.routes.TextViewController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
               </li>
             }
           }
@@ -120,8 +120,8 @@
     <pre id="content">@content</pre>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.annotation.routes.javascript.AnnotationController.loadAnnotations,
-      controllers.annotation.routes.javascript.AnnotationController.createAnnotation
+      controllers.api.routes.javascript.AnnotationController.loadAnnotations,
+      controllers.api.routes.javascript.AnnotationController.createAnnotation
     )
   </body>
 </html>

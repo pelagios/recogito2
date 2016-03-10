@@ -1,4 +1,4 @@
-package controllers.annotation.ui
+package controllers.myrecogito.annotation
 
 import controllers.{ AbstractController, Security }
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class TextViewController @Inject() (implicit val db: DB) extends AbstractControl
             case Some(filepart) => {
               loadTextfile(username, filepart.getFilename) match {
                 case Some(content) =>
-                  Ok(views.html.annotation.text(document, fileparts, filepart, content))
+                  Ok(views.html.myrecogito.annotation.text(document, fileparts, filepart, content))
 
                 case None => {
                   // Filepart found in DB, but no file on filesystem

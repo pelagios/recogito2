@@ -43,7 +43,7 @@
 
               hasParts = @fileparts.size,
 
-              NER_PROGRESS_SERVICE_URL = '@controllers.upload.routes.UploadController.queryNERProgress(document.getId)',
+              NER_PROGRESS_SERVICE_URL = '@controllers.myrecogito.upload.routes.UploadController.queryNERProgress(document.getId)',
 
               pollNERProgress = function() {
                 jQuery.getJSON(NER_PROGRESS_SERVICE_URL, function(data) {

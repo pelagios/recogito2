@@ -1,4 +1,4 @@
-package controllers.upload.ner
+package controllers.myrecogito.upload.ner
 
 import org.specs2.mutable._
 import org.specs2.runner._

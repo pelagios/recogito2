@@ -7,7 +7,7 @@ define(['../common/hasEvents', './apiEvents'], function(HasEvents, Events) {
 
   APIConnector.prototype.loadAnnotations = function(documentId, partNumber) {
     var self = this;
-    jsRoutes.controllers.annotation.AnnotationController.loadAnnotations().ajax({
+    jsRoutes.controllers.api.AnnotationController.loadAnnotations().ajax({
       data: {
         doc: documentId,
         part: partNumber
@@ -25,7 +25,7 @@ define(['../common/hasEvents', './apiEvents'], function(HasEvents, Events) {
 
   APIConnector.prototype.storeAnnotation = function(annotationStub) {
     var self = this;
-    jsRoutes.controllers.annotation.AnnotationController.createAnnotation().ajax({
+    jsRoutes.controllers.api.AnnotationController.createAnnotation().ajax({
       type: 'POST',
       data: JSON.stringify(annotationStub),
       contentType: 'application/json',

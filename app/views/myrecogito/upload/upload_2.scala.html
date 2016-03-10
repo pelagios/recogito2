@@ -22,7 +22,7 @@
         <li class="arrow">Enter Metadata</li><li class="active arrow">Attach Files</li><li>Import</li>
       </ul>
 
-      <form action="@controllers.upload.routes.UploadController.storeFilepart" id="dropzone" class="dropzone">
+      <form action="@controllers.myrecogito.upload.routes.UploadController.storeFilepart" id="dropzone" class="dropzone">
         <h2>Drag Files Here</h2>
         <p>or</p>
         <div class="choose-file btn btn-large btn-blue"><span class="icon">&#xf055;</span> Choose a File to Attach</div>
@@ -44,9 +44,9 @@
         <div id="uploaded-now" class="dropzone-previews"></div>
       </div>
 
-      <form id="buttons" method="POST" action="@controllers.upload.routes.UploadController.showStep3">
+      <form id="buttons" method="POST" action="@controllers.myrecogito.upload.routes.UploadController.showStep3">
         <div class="buttons-left">
-          <a class="back btn btn-large btn-blue" href="@controllers.upload.routes.UploadController.showStep1">Back</a>
+          <a class="back btn btn-large btn-blue" href="@controllers.myrecogito.upload.routes.UploadController.showStep1">Back</a>
         </div>
 
         <div class="ner">
@@ -59,7 +59,7 @@
         </div>
 
         <div class="buttons-right">
-          <a href="@controllers.upload.routes.UploadController.cancelUploadWizard()" class="cancel btn outline">Cancel</a>
+          <a href="@controllers.myrecogito.upload.routes.UploadController.cancelUploadWizard()" class="cancel btn outline">Cancel</a>
           <input type="submit" class="next btn" disabled="true" value="Import!" />
         </div>
       </form>
@@ -70,7 +70,7 @@
                 name = (e.name) ? e.name : div.find('.dz-filename').text();
 
             jQuery.ajax({
-              url: '@controllers.upload.routes.UploadController.showStep2/' + encodeURIComponent(name),
+              url: '@controllers.myrecogito.upload.routes.UploadController.showStep2/' + encodeURIComponent(name),
               type: 'DELETE',
               success: function(result) {
                 div.remove();

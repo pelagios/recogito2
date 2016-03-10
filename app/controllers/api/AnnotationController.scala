@@ -1,4 +1,4 @@
-package controllers.annotation
+package controllers.api
 
 import controllers.{ AbstractController, Security }
 import java.util.UUID
@@ -44,40 +44,40 @@ object AnnotationStub {
 class AnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
 
   private val PARAM_DOC = "doc"
-  
+
   private val PARAM_PART = "part"
-  
+
   /** TODO currently annotation read access is unlimited to any logged in user - do we want that? **/
   def loadAnnotations() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     val docId = getQueryParam(PARAM_DOC).map(_.toInt)
     val partNo = getQueryParam(PARAM_PART).map(_.toInt)
 
     (docId, partNo) match {
-      
+
       case (Some(id), Some(seqNo)) =>
         // Load annotations for specific doc part
         DocumentService.findPartByDocAndSeqNo(id, seqNo).flatMap(_ match {
           case Some(filepart) =>
             AnnotationService.findByFilepartId(filepart.getId)
               .map(annotations => Ok(Json.toJson(annotations)))
-            
+
           case None =>
             Future.successful(NotFound)
         })
-        
+
       case (Some(id), None) =>
         // Load annotations for entire doc
         AnnotationService.findByDocId(id).map(annotations => Ok(Json.toJson(annotations)))
-        
+
       case _ =>
         // No doc ID
         Future.successful(BadRequest)
-      
+
     }
-    
+
 
   }
-  
+
   /** TODO currently annotation creation is unlimited to any logged in user - need to check access rights! **/
   def createAnnotation() = StackAction(AuthorityKey -> Normal) { implicit request =>
     request.body.asJson match {
@@ -119,5 +119,5 @@ class AnnotationController @Inject() (implicit val db: DB) extends AbstractContr
 
     }
   }
-  
+
 }
