@@ -23,7 +23,6 @@
   li {
     position:relative;
     cursor:pointer;
-    font-family:Tonicons;
     display:inline-block;
     color:@lightblue-type;
     font-size:32px;
@@ -31,7 +30,11 @@
     padding:25px 0;
   }
 
-  li.active span.icon {
+  li .icon {
+    font-family:Tonicons;
+  }
+
+  li.active .icon {
     position:relative;
     top:-6px;
     padding:12px 11px 10px 11px;
