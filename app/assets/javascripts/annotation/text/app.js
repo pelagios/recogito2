@@ -23,7 +23,7 @@ require([
         makeToolbarSticky = function() {
           var onScroll = function() {
             var scrollTop = jQuery(window).scrollTop();
-            if (scrollTop > 167)
+            if (scrollTop > 147)
               toolbar.addClass('fixed');
             else
               toolbar.removeClass('fixed');
