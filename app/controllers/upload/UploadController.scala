@@ -2,7 +2,6 @@ package controllers.upload
 
 import akka.actor.ActorSystem
 import controllers.{ AbstractController, Security }
-import controllers.Roles._
 import controllers.upload.ner._
 import controllers.upload.ner.NERMessages._
 import java.io.File
@@ -10,6 +9,7 @@ import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import models.content.{ DocumentService, UploadService }
 import models.generated.tables.records.UploadRecord
+import models.user.Roles._
 import play.api.Logger
 import play.api.Play.current
 import play.api.data.Form

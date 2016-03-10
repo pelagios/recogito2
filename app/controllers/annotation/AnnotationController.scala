@@ -1,12 +1,12 @@
 package controllers.annotation
 
-import controllers.Roles._
 import controllers.{ AbstractController, Security }
 import java.util.UUID
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import models.annotation._
 import models.content.DocumentService
+import models.user.Roles._
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext

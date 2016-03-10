@@ -1,10 +1,10 @@
 package controllers.annotation.ui
 
-import controllers.Roles._
 import controllers.{ AbstractController, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import models.content.DocumentService
+import models.user.Roles._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.{ DB, FileAccess }
 

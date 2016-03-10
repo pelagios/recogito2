@@ -1,4 +1,4 @@
-package controllers
+package models.user
 
 object Roles {
   
