@@ -8,6 +8,7 @@
   margin-left:@sidebar-width;
   height:70px;
   border-bottom:1px solid @lightgrey-border;
+  .noselect();
 
   ul {
     box-sizing:border-box;
@@ -21,10 +22,14 @@
     position:relative;
     cursor:pointer;
     display:inline-block;
-    color:@lightblue-type;
     font-size:32px;
     margin:0 50px 0 0;
     padding:25px 0;
+  }
+
+  a {
+    color:@lightblue-type;
+    text-decoration:none;
   }
 
   li .icon {

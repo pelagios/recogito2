@@ -1,0 +1,59 @@
+@(document: models.generated.tables.records.DocumentRecord)
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/downloads/index.css")"/>
+  </head>
+  <body>
+    <div class="header-iconbar">
+      <ul>
+        <li class="tooltip bottom">
+          <a href="@controllers.my.annotation.routes.TextViewController.showAnnotationViewForDocPart(document.getId, 0)">
+            <span class="icon">&#xe86f;</span>
+            <span class="hint">You are now in the Text Annotation View</span>
+          </a>
+        </li>
+
+        <li class="tooltip bottom">
+          <a href="@controllers.my.map.routes.MapController.showMap(document.getId)">
+            <span class="icon">&#xe846;</span>
+            <span class="hint">Switch to Map View</span>
+          </a>
+        </li>
+
+        <li class="tooltip bottom">
+          <a href="@controllers.my.stats.routes.DocumentStatsController.showDocumentStats(document.getId)">
+            <span class="icon">&#xe8ae;</span>
+            <span class="hint">Detailed annotation stats for this document</span>
+          </a>
+        </li>
+
+        <li class="active tooltip bottom">
+          <span class="icon">&#xe875;</span>
+          <span class="hint">See available download options for this document</span>
+        </li>
+
+        <li class="tooltip bottom">
+          <a href="@controllers.my.sharing.routes.SharingController.showShareSettings(document.getId)">
+            <span class="icon">&#xe85f;</span>
+            <span class="hint">Invite other users to view or work with you on this document</span>
+          </a>
+        </li>
+
+        <li class="tooltip bottom">
+          <a href="@controllers.my.settings.routes.SettingsController.showDocumentSettings(document.getId)">
+            <span class="icon">&#xe8c9;</span>
+            <span class="hint">Edit document settings and metadata</span>
+          </a>
+        </li>
+
+        <li class="home tooltip bottom">
+          <a href="@controllers.my.routes.MyRecogitoController.index">
+            <span class="icon">&#xe8bf;</span>
+            <span class="hint">Back to your home page</span>
+          </a>
+        </li>
+      </ul>
+    </div> <!-- .header-iconbar -->
+  </body>
+</html>

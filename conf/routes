@@ -14,14 +14,16 @@ GET     /login                                      controllers.landing.LoginCon
 POST    /login                                      controllers.landing.LoginController.processLogin
 GET     /logout                                     controllers.landing.LogoutController.logout
 
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# MyRecogito root
+# My Recogito root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my-recogito                                controllers.my.MyRecogitoController.index
 
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Document upload
+# My document upload
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my/upload/step-1                           controllers.my.upload.UploadController.showStep1
@@ -34,20 +36,55 @@ POST    /my/upload/step-3                           controllers.my.upload.Upload
 GET     /my/upload/ner-progress/:docId              controllers.my.upload.UploadController.queryNERProgress(docId: Int)
 GET     /my/upload/cancel                           controllers.my.upload.UploadController.cancelUploadWizard
 
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Annotation views
+# My annotation views
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my/document/:docId/part/:partNo            controllers.my.annotation.TextViewController.showAnnotationViewForDocPart(docId: Int, partNo: Int)
-GET     /my/document/:docId                         controllers.my.annotation.TextViewController.showAnnotationViewForDoc(docId: Int)
+GET     /my/doc/:docId/part/:partNo/edit            controllers.my.annotation.TextViewController.showAnnotationViewForDocPart(docId: Int, partNo: Int)
+GET     /my/doc/:docId/edit                         controllers.my.annotation.TextViewController.showAnnotationViewForDoc(docId: Int)
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# My map view
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /my/doc/:docId/map                          controllers.my.map.MapController.showMap(docId: Int)
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# My document stats
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /my/doc/:docId/stats                        controllers.my.stats.DocumentStatsController.showDocumentStats(docId: Int)
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# My document downloads
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /my/doc/:docId/downloads                    controllers.my.downloads.DownloadsController.showDownloadOptions(docId: Int)
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# My sharing settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /my/doc/:docId/share                        controllers.my.sharing.SharingController.showShareSettings(docId: Int)
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# My document settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /my/doc/:docId/settings                     controllers.my.settings.SettingsController.showDocumentSettings(docId: Int)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /annotations                                controllers.api.AnnotationController.loadAnnotations
-POST    /annotation                                 controllers.api.AnnotationController.createAnnotation
+GET     /api/annotations                            controllers.api.AnnotationController.loadAnnotations
+POST    /api/annotation                             controllers.api.AnnotationController.createAnnotation
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

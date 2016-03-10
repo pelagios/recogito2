@@ -28,33 +28,45 @@
         </li>
 
         <li class="tooltip bottom">
-          <span class="icon">&#xe846;</span>
-          <span class="hint">Switch to Map View</span>
+          <a href="@controllers.my.map.routes.MapController.showMap(document.getId)">
+            <span class="icon">&#xe846;</span>
+            <span class="hint">Switch to Map View</span>
+          </a>
         </li>
 
         <li class="tooltip bottom">
-          <span class="icon">&#xe8ae;</span>
-          <span class="hint">Detailed annotation stats for this document</span>
+          <a href="@controllers.my.stats.routes.DocumentStatsController.showDocumentStats(document.getId)">
+            <span class="icon">&#xe8ae;</span>
+            <span class="hint">Detailed annotation stats for this document</span>
+          </a>
         </li>
 
         <li class="tooltip bottom">
-          <span class="icon">&#xe875;</span>
-          <span class="hint">See available download options for this document</span>
+          <a href="@controllers.my.downloads.routes.DownloadsController.showDownloadOptions(document.getId)">
+            <span class="icon">&#xe875;</span>
+            <span class="hint">See available download options for this document</span>
+          </a>
         </li>
 
         <li class="tooltip bottom">
-          <span class="icon">&#xe85f;</span>
-          <span class="hint">Invite other users to view or work with you on this document</span>
+          <a href="@controllers.my.sharing.routes.SharingController.showShareSettings(document.getId)">
+            <span class="icon">&#xe85f;</span>
+            <span class="hint">Invite other users to view or work with you on this document</span>
+          </a>
         </li>
 
         <li class="tooltip bottom">
-          <span class="icon">&#xe8c9;</span>
-          <span class="hint">Edit document settings and metadata</span>
+          <a href="@controllers.my.settings.routes.SettingsController.showDocumentSettings(document.getId)">
+            <span class="icon">&#xe8c9;</span>
+            <span class="hint">Edit document settings and metadata</span>
+          </a>
         </li>
 
         <li class="home tooltip bottom">
-          <span class="icon">&#xe8bf;</span>
-          <span class="hint">Back to your home page</span>
+          <a href="@controllers.my.routes.MyRecogitoController.index">
+            <span class="icon">&#xe8bf;</span>
+            <span class="hint">Back to your home page</span>
+          </a>
         </li>
       </ul>
     </div> <!-- .header-iconbar -->
