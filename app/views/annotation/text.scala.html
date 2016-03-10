@@ -20,90 +20,86 @@
     </script>
   </head>
   <body>
-    <div class="header">
-      <div class="header-iconbar">
-        <ul>
-          <li class="active tooltip bottom">
-            <span class="icon">&#xe86f;</span>
-            <span class="hint">You are now in the Text Annotation View</span>
-          </li>
+    <div class="header-iconbar">
+      <ul>
+        <li class="active tooltip bottom">
+          <span class="icon">&#xe86f;</span>
+          <span class="hint">You are now in the Text Annotation View</span>
+        </li>
 
-          <li class="tooltip bottom">
-            <span class="icon">&#xe846;</span>
-            <span class="hint">Switch to Map View</span>
-          </li>
+        <li class="tooltip bottom">
+          <span class="icon">&#xe846;</span>
+          <span class="hint">Switch to Map View</span>
+        </li>
 
-          <li class="tooltip bottom">
-            <span class="icon">&#xe8ae;</span>
-            <span class="hint">Detailed annotation stats for this document</span>
-          </li>
+        <li class="tooltip bottom">
+          <span class="icon">&#xe8ae;</span>
+          <span class="hint">Detailed annotation stats for this document</span>
+        </li>
 
-          <li class="tooltip bottom">
-            <span class="icon">&#xe875;</span>
-            <span class="hint">See available download options for this document</span>
-          </li>
+        <li class="tooltip bottom">
+          <span class="icon">&#xe875;</span>
+          <span class="hint">See available download options for this document</span>
+        </li>
 
-          <li class="tooltip bottom">
-            <span class="icon">&#xe85f;</span>
-            <span class="hint">Invite other users to view or work with you on this document</span>
-          </li>
+        <li class="tooltip bottom">
+          <span class="icon">&#xe85f;</span>
+          <span class="hint">Invite other users to view or work with you on this document</span>
+        </li>
 
-          <li class="tooltip bottom">
-            <span class="icon">&#xe8c9;</span>
-            <span class="hint">Edit document settings and metadata</span>
-          </li>
+        <li class="tooltip bottom">
+          <span class="icon">&#xe8c9;</span>
+          <span class="hint">Edit document settings and metadata</span>
+        </li>
 
-          <li class="home tooltip bottom">
-            <span class="icon">&#xe8bf;</span>
-            <span class="hint">Back to your home page</span>
-          </li>
-        </ul>
-      </div>
+        <li class="home tooltip bottom">
+          <span class="icon">&#xe8bf;</span>
+          <span class="hint">Back to your home page</span>
+        </li>
+      </ul>
+    </div> <!-- .header-iconbar -->
 
-      <div class="header-infobox">
-        <h1>
-          @Option(document.getAuthor).map(_ + ": ")
-          @document.getTitle
-        </h1>
-        <h2 class="date">@Option(document.getDateFreeform)</h2>
-        <p class="quick-stats">
-          <span class="icon comment">&#xf0e5;</span>
-          <span class="annotations">-</span> Annotations
-          &nbsp; &centerdot; &nbsp;
-          <span class="icon">&#xf0c0;</span>
-          <span class="contributors">No Other Contributors</span>
-        </p>
-      </div>
+    <div class="header-infobox">
+      <h1>
+        @Option(document.getAuthor).map(_ + ": ")
+        @document.getTitle
+      </h1>
+      <h2 class="date">@Option(document.getDateFreeform)</h2>
+      <p class="quick-stats">
+        <span class="icon comment">&#xf0e5;</span>
+        <span class="annotations">-</span> Annotations
+        &nbsp; &centerdot; &nbsp;
+        <span class="icon">&#xf0c0;</span>
+        <span class="contributors">No Other Contributors</span>
+      </p>
+    </div> <!-- .header-infobox -->
 
-      <div class="header-toolbar">
-        <h3>ANNOTATION MODE:</h3>
-        <ul class="annotation-mode">
-          <li class="active">NORMAL</li>
-          <li class="has-sub-options">
-            QUICK
-            <div class="dropdown">
-              <ul>
-                <li data-mode="PLACE"><span class="icon">&#xf041;</span> Places</li>
-                <li data-mode="PERSON"><span class="icon">&#xf007;</span> Persons</li>
-                <li><span class="icon">&#xf02c;</span> Tags</li>
-              </ul>
-            </div>
-          </li>
-          <li>BULK</li>
-        </ul>
+    <div class="header-toolbar">
+      <h3>ANNOTATION MODE:</h3>
+      <ul class="annotation-mode">
+        <li class="active">NORMAL</li>
+        <li class="has-sub-options">
+          QUICK
+          <div class="dropdown">
+            <ul>
+              <li data-mode="PLACE"><span class="icon">&#xf041;</span> Places</li>
+              <li data-mode="PERSON"><span class="icon">&#xf007;</span> Persons</li>
+              <li><span class="icon">&#xf02c;</span> Tags</li>
+            </ul>
+          </div>
+        </li>
+        <li>BULK</li>
+      </ul>
 
-        <h3>COLOR:</h3>
-        <ul class="color-scheme">
-          <li class="active">BY TYPE</li>
-          <li>BY STATUS</li>
-        </ul>
-      </div>
-    </div> <!-- header -->
+      <h3>COLOR:</h3>
+      <ul class="color-scheme">
+        <li class="active">BY TYPE</li>
+        <li>BY STATUS</li>
+      </ul>
+    </div> <!-- .header-toolbar -->
 
     <div class="sidebar">
-      <div class="sidebar-header tooltip bottom">
-        <!-- TODO -->
-      </div>
+      <div class="sidebar-header tooltip bottom"></div>
       <div class="sidebar-parts">
         <ul>
           @for(part <- allParts) {
@@ -119,7 +115,7 @@
           }
         </ul>
       </div>
-    </div>
+    </div> <!-- .sidebar -->
 
     <pre id="content">@content</pre>
 
