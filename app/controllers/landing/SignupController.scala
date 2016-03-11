@@ -24,11 +24,23 @@ class SignupController @Inject() (implicit val db: DB) extends AbstractControlle
 
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
 
+  // Only alphanumeric + a small set of special characters are valid in usernames
   private val VALID_CHARACTERS =
     (('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9') ++ Seq('_', '-', '.')).toSet
+    
+  // We use usernames as first-level URL elements, therefore some are prohibited (cf. routes file)
+  private val RESERVED_NAMES =  
+    Set("assets", "signup", "login", "logout", "admin", "document", "api")
 
-  /** Username must be unique and may not contain special characters **/
-  val isValidUsername: Constraint[String] = Constraint("constraints.username")({ username =>
+  private val isNotReserved: Constraint[String] = Constraint("constraints.notreserved")({username =>
+    if (RESERVED_NAMES.contains(username.toLowerCase))
+      Invalid(username + " is a reserved word")
+    else
+      Valid
+  })
+    
+  /** Username must be unique in DB, and may not contain special characters **/
+  private val validAndAvailable: Constraint[String] = Constraint("constraints.valid")({ username =>
     // Check if username contains only valid characters
     val invalidChars = username.filter(!VALID_CHARACTERS.contains(_)).toSeq
     if (invalidChars.size == 0) {
@@ -53,7 +65,7 @@ class SignupController @Inject() (implicit val db: DB) extends AbstractControlle
 
   val signupForm = Form(
     mapping(
-      "username" -> nonEmptyText(minLength=3).verifying(isValidUsername),
+      "username" -> nonEmptyText(minLength=3).verifying(isNotReserved).verifying(validAndAvailable),
       "email" -> email,
       "password" -> nonEmptyText
     )(SignupData.apply)(SignupData.unapply)

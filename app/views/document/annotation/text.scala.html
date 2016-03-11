@@ -1,4 +1,5 @@
-@(document: models.generated.tables.records.DocumentRecord,
+@(username:String,
+  document: models.generated.tables.records.DocumentRecord,
   allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
   content: String)(implicit request: RequestHeader)
@@ -6,7 +7,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/annotation/text.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text.css")"/>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/rangy/rangy-core.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/rangy/rangy-textrange.min.js")"></script>
@@ -28,42 +29,42 @@
         </li>
 
         <li class="tooltip bottom">
-          <a href="@controllers.my.map.routes.MapController.showMap(document.getId)">
+          <a href="@controllers.document.map.routes.MapController.showMap(document.getId)">
             <span class="icon">&#xe846;</span>
             <span class="hint">Switch to Map View</span>
           </a>
         </li>
 
         <li class="tooltip bottom">
-          <a href="@controllers.my.stats.routes.StatsController.showDocumentStats(document.getId)">
+          <a href="@controllers.document.stats.routes.StatsController.showDocumentStats(document.getId)">
             <span class="icon">&#xe8ae;</span>
             <span class="hint">Detailed annotation stats for this document</span>
           </a>
         </li>
 
         <li class="tooltip bottom">
-          <a href="@controllers.my.downloads.routes.DownloadsController.showDownloadOptions(document.getId)">
+          <a href="@controllers.document.downloads.routes.DownloadsController.showDownloadOptions(document.getId)">
             <span class="icon">&#xe875;</span>
             <span class="hint">See available download options for this document</span>
           </a>
         </li>
 
         <li class="tooltip bottom">
-          <a href="@controllers.my.sharing.routes.SharingController.showSharingSettings(document.getId)">
+          <a href="@controllers.document.share.routes.ShareController.showShareSettings(document.getId)">
             <span class="icon">&#xe85f;</span>
             <span class="hint">Invite other users to view or work with you on this document</span>
           </a>
         </li>
 
         <li class="tooltip bottom">
-          <a href="@controllers.my.settings.routes.SettingsController.showDocumentSettings(document.getId)">
+          <a href="@controllers.document.settings.routes.SettingsController.showDocumentSettings(document.getId)">
             <span class="icon">&#xe8c9;</span>
             <span class="hint">Edit document settings and metadata</span>
           </a>
         </li>
 
         <li class="home tooltip bottom">
-          <a href="@controllers.my.routes.MyRecogitoController.index">
+          <a href="@controllers.my.routes.MyRecogitoController.index(username.toLowerCase)">
             <span class="icon">&#xe8bf;</span>
             <span class="hint">Back to your home page</span>
           </a>
@@ -121,7 +122,7 @@
               </li>
             } else {
               <li>
-                <a href="@controllers.my.annotation.routes.TextAnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
+                <a href="@controllers.document.annotation.routes.TextAnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
               </li>
             }
           }

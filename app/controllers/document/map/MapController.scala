@@ -1,4 +1,4 @@
-package controllers.my.map
+package controllers.document.map
 
 import controllers.{ AbstractController, Security }
 import javax.inject.Inject
@@ -9,8 +9,8 @@ import storage.DB
 class MapController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
 
   def showMap(documentId: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderDocumentResponse(documentId, loggedIn.getUsername, 
-        { case (document, fileparts) =>  Ok(views.html.my.map.index(document)) })
+    renderDocumentResponse(documentId, loggedIn.getUsername,
+        { case (document, fileparts) =>  Ok(views.html.document.map.index(loggedIn.getUsername, document)) })
   }
 
 }

@@ -1,13 +1,13 @@
 package models.content
 
-import models.BaseService
+import models.AbstractService
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.jooq.Record
 import scala.reflect.ClassTag
 import storage.DB
 
-object DocumentService extends BaseService {
+object DocumentService extends AbstractService {
 
   def findById(id: Int)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne())
@@ -36,7 +36,7 @@ object DocumentService extends BaseService {
 
     grouped.headOption
   }
-  
+
   def findPartByDocAndSeqNo(docId: Int, seqNo: Int)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(DOCUMENT_FILEPART)
               .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId))

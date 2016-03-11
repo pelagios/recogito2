@@ -2,7 +2,7 @@ package models
 
 import org.jooq.Record
 
-trait BaseService {
+trait AbstractService {
 
   def groupJoinResult[T <: Record, V <: Record](records: Seq[Record], t: Class[T], v: Class[V]) = {
     records

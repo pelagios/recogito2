@@ -46,48 +46,48 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
     NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getSource, r.getLanguage)
 
 
-  def showStep1 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showStep1(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUpload(loggedIn.getUsername).map(_ match {
       case Some(pendingUpload) =>
-        Ok(views.html.my.upload.upload_1(newDocumentForm.fill(pendingUpload)))
+        Ok(views.html.my.upload.upload_1(usernameInPath, newDocumentForm.fill(pendingUpload)))
 
       case None =>
-        Ok(views.html.my.upload.upload_1(newDocumentForm))
+        Ok(views.html.my.upload.upload_1(usernameInPath, newDocumentForm))
     })
   }
 
 
   /** Stores document metadata following step 1 **/
-  def storeDocumentMetadata = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def storeDocumentMetadata(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     newDocumentForm.bindFromRequest.fold(
       formWithErrors =>
-        Future.successful(BadRequest(views.html.my.upload.upload_1(formWithErrors))),
+        Future.successful(BadRequest(views.html.my.upload.upload_1(usernameInPath, formWithErrors))),
 
       docData =>
         UploadService.storePendingUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
-          .flatMap(user => Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2)))
+          .flatMap(user => Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath))))
           .recover { case t: Throwable => {
             t.printStackTrace()
-            Ok(views.html.my.upload.upload_1(newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
+            Ok(views.html.my.upload.upload_1(usernameInPath, newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
           }}
     )
   }
 
 
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
-  def showStep2 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showStep2(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).map(_ match {
       case Some((pendingUpload, fileparts)) =>
-        Ok(views.html.my.upload.upload_2(fileparts))
+        Ok(views.html.my.upload.upload_2(usernameInPath, fileparts))
 
       case None =>
-        Redirect(controllers.my.upload.routes.UploadController.showStep1)
+        Redirect(controllers.my.upload.routes.UploadController.showStep1(usernameInPath))
     })
   }
 
 
   /** Stores a filepart during step 2 **/
-  def storeFilepart = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def storeFilepart(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     // First, we need to get the pending upload this filepart belongs to
     val username = loggedIn.getUsername
     UploadService.findPendingUpload(username)
@@ -122,20 +122,20 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
 
 
   /** Deletes a filepart during step 2 **/
-  def deleteFilepart(name: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.deleteFilepartByTitleAndOwner(name, loggedIn.getUsername).map(success => {
+  def deleteFilepart(usernameInPath: String, filename: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    UploadService.deleteFilepartByTitleAndOwner(filename, loggedIn.getUsername).map(success => {
       if (success) Ok("ok.") else NotFound
     })
   }
 
 
   /** Step 3 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
-  def showStep3 = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showStep3(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).flatMap(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
           // No fileparts - force user to step 2
-          Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2))
+          Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath)))
         } else {
           // Pending upload + fileparts available - proceed
           UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
@@ -144,19 +144,19 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
             if (applyNER)
               NERService.spawnNERProcess(doc, docParts)
 
-            Ok(views.html.my.upload.upload_3(doc, docParts, applyNER))
+            Ok(views.html.my.upload.upload_3(usernameInPath, doc, docParts, applyNER))
           }}
         }
 
       case None =>
         // No pending upload - force user to step 1
-        Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep1))
+        Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep1(usernameInPath)))
     })
   }
 
 
   /** Queries the NER for progress on a document (user needs to be logged in and own the document) **/
-  def queryNERProgress(id: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def queryNERProgress(usernameInPath: String, id: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
     import UploadController._  // Message (de)serialization
 
@@ -183,16 +183,16 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
   }
 
 
-  def cancelUploadWizard() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def cancelUploadWizard(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService
       .deletePendingUpload(loggedIn.getUsername)
       .map(success => {
         // TODO add error message if success == false
-        Redirect(controllers.my.routes.MyRecogitoController.index)
+        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
       })
       .recover{ case t =>
         // TODO add error message
-        Redirect(controllers.my.routes.MyRecogitoController.index)
+        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
       }
   }
 

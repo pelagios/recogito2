@@ -13,10 +13,10 @@
 
     <ul>
       @for(document <- documents) {
-        <li><a href="@controllers.my.annotation.routes.TextAnnotationController.showAnnotationViewForDocPart(document.getId, 0)">@document.getTitle</a></li>
+        <li><a href="@controllers.document.annotation.routes.TextAnnotationController.showAnnotationViewForDocPart(document.getId, 0)">@document.getTitle</a></li>
       }
     </ul>
 
-    <a href="@controllers.my.upload.routes.UploadController.showStep1()">Upload New Document</a>
+    <a href="@controllers.my.upload.routes.UploadController.showStep1(user.getUsername.toLowerCase)">Upload New Document</a>
   </body>
 </html>

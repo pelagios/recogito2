@@ -1,4 +1,4 @@
-@(newDocumentForm: Form[controllers.my.upload.NewDocumentData], message: Option[String] = None)(implicit messages: Messages)
+@(username: String, newDocumentForm: Form[controllers.my.upload.NewDocumentData], message: Option[String] = None)(implicit messages: Messages)
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,7 +12,7 @@
         <li class="active arrow">Enter Metadata</li><li class="arrow">Attach Files</li><li>Import</li>
       </ul>
 
-      @helper.form(action = controllers.my.upload.routes.UploadController.storeDocumentMetadata(), args = 'autocomplete -> "off", 'class -> "step1") {
+      @helper.form(action = controllers.my.upload.routes.UploadController.storeDocumentMetadata(username.toLowerCase), args = 'autocomplete -> "off", 'class -> "step1") {
         <div class="center-column">
           <div class="recommended-fields">
             @helper.inputText(newDocumentForm("title"), args = '_label -> "Title", '_help -> "*")
@@ -32,7 +32,7 @@
 
         <div id="buttons">
           <div class="buttons-right">
-            <a href="@controllers.my.upload.routes.UploadController.cancelUploadWizard()" class="cancel btn outline">Cancel</a>
+            <a href="@controllers.my.upload.routes.UploadController.cancelUploadWizard(username.toLowerCase)" class="cancel btn outline">Cancel</a>
             <button type="submit" disabled="true" class="btn">Next</a>
           </div>
         </div>

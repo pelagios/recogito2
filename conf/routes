@@ -8,74 +8,65 @@ GET     /assets/*file                              controllers.Assets.versioned(
 # Landing area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /signup                                     controllers.landing.SignupController.showSignupForm
-POST    /signup                                     controllers.landing.SignupController.processSignup
-GET     /login                                      controllers.landing.LoginController.showLoginForm
-POST    /login                                      controllers.landing.LoginController.processLogin
-GET     /logout                                     controllers.landing.LogoutController.logout
-
+GET     /signup                                    controllers.landing.SignupController.showSignupForm
+POST    /signup                                    controllers.landing.SignupController.processSignup
+GET     /login                                     controllers.landing.LoginController.showLoginForm
+POST    /login                                     controllers.landing.LoginController.processLogin
+GET     /logout                                    controllers.landing.LogoutController.logout
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# My Recogito
+# Admin area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my-recogito                                controllers.my.MyRecogitoController.index
+GET     /admin                                     controllers.admin.AdminController.index
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document views
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# My document upload
+GET     /document/:id/part/:partNo/edit            controllers.document.annotation.TextAnnotationController.showAnnotationViewForDocPart(id: Int, partNo: Int)
+GET     /document/:id/edit                         controllers.document.annotation.TextAnnotationController.showAnnotationViewForDoc(id: Int)
 
-GET     /my/upload/step-1                           controllers.my.upload.UploadController.showStep1
-POST    /my/upload/step-1                           controllers.my.upload.UploadController.storeDocumentMetadata
-GET     /my/upload/step-2                           controllers.my.upload.UploadController.showStep2
-POST    /my/upload/step-2                           controllers.my.upload.UploadController.storeFilepart
-DELETE  /my/upload/step-2/:name                     controllers.my.upload.UploadController.deleteFilepart(name: String)
-GET     /my/upload/step-3                           controllers.my.upload.UploadController.showStep3
-POST    /my/upload/step-3                           controllers.my.upload.UploadController.showStep3
-GET     /my/upload/ner-progress/:docId              controllers.my.upload.UploadController.queryNERProgress(docId: Int)
-GET     /my/upload/cancel                           controllers.my.upload.UploadController.cancelUploadWizard
+GET     /document/:id/map                          controllers.document.map.MapController.showMap(id: Int)
 
+GET     /document/:id/stats                        controllers.document.stats.StatsController.showDocumentStats(id: Int)
 
-# My annotation views
+GET     /document/:id/downloads                    controllers.document.downloads.DownloadsController.showDownloadOptions(id: Int)
 
-GET     /my/doc/:docId/part/:partNo/edit            controllers.my.annotation.TextAnnotationController.showAnnotationViewForDocPart(docId: Int, partNo: Int)
-GET     /my/doc/:docId/edit                         controllers.my.annotation.TextAnnotationController.showAnnotationViewForDoc(docId: Int)
+GET     /document/:id/share                        controllers.document.share.ShareController.showShareSettings(id: Int)
 
-
-# My map
-
-GET     /my/doc/:docId/map                          controllers.my.map.MapController.showMap(docId: Int)
-
-
-# My stats
-
-GET     /my/doc/:docId/stats                        controllers.my.stats.StatsController.showDocumentStats(docId: Int)
-
-
-# My document downloads
-
-GET     /my/doc/:docId/downloads                    controllers.my.downloads.DownloadsController.showDownloadOptions(docId: Int)
-
-
-# My sharing settings
-
-GET     /my/doc/:docId/share                        controllers.my.sharing.SharingController.showSharingSettings(docId: Int)
-
-
-# My document settings
-
-GET     /my/doc/:docId/settings                     controllers.my.settings.SettingsController.showDocumentSettings(docId: Int)
-
+GET     /document/:id/settings                     controllers.document.settings.SettingsController.showDocumentSettings(id: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /api/annotations                            controllers.api.AnnotationController.loadAnnotations
-POST    /api/annotation                             controllers.api.AnnotationController.createAnnotation
-
+GET     /api/annotations                           controllers.api.AnnotationController.loadAnnotations
+POST    /api/annotation                            controllers.api.AnnotationController.createAnnotation
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Root
+# User/team personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /                                           controllers.landing.LandingController.index
+GET     /:username/upload/step-1                   controllers.my.upload.UploadController.showStep1(username: String)
+POST    /:username/upload/step-1                   controllers.my.upload.UploadController.storeDocumentMetadata(username: String)
+GET     /:username/upload/step-2                   controllers.my.upload.UploadController.showStep2(username: String)
+POST    /:username/upload/step-2                   controllers.my.upload.UploadController.storeFilepart(username: String)
+DELETE  /:username/upload/step-2/:filename         controllers.my.upload.UploadController.deleteFilepart(username: String, filename: String)
+GET     /:username/upload/step-3                   controllers.my.upload.UploadController.showStep3(username: String)
+POST    /:username/upload/step-3                   controllers.my.upload.UploadController.showStep3(username: String)
+GET     /:username/upload/ner-progress/:docId      controllers.my.upload.UploadController.queryNERProgress(username: String, docId: Int)
+GET     /:username/upload/cancel                   controllers.my.upload.UploadController.cancelUploadWizard(username: String)
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal space root
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /my                                        controllers.my.MyRecogitoController.my
+GET     /:username                                 controllers.my.MyRecogitoController.index(username: String)
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Application root
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /                                          controllers.landing.LandingController.index

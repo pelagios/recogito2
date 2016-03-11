@@ -1,4 +1,4 @@
-package controllers.my.stats
+package controllers.document.stats
 
 import controllers.{ AbstractController, Security }
 import javax.inject.Inject
@@ -10,7 +10,7 @@ class StatsController @Inject() (implicit val db: DB) extends AbstractController
 
   def showDocumentStats(documentId: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.getUsername,
-        { case (document, fileparts) =>  Ok(views.html.my.stats.index(document)) })
+        { case (document, fileparts) =>  Ok(views.html.document.stats.index(loggedIn.getUsername, document)) })
   }
 
 }
