@@ -49,7 +49,7 @@ class AnnotationController @Inject() (implicit val db: DB) extends AbstractContr
 
   /** TODO currently annotation read access is unlimited to any logged in user - do we want that? **/
   def loadAnnotations() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val docId = getQueryParam(PARAM_DOC).map(_.toInt)
+    val docId = getQueryParam(PARAM_DOC)
     val partNo = getQueryParam(PARAM_PART).map(_.toInt)
 
     (docId, partNo) match {

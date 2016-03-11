@@ -156,7 +156,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
 
 
   /** Queries the NER for progress on a document (user needs to be logged in and own the document) **/
-  def queryNERProgress(usernameInPath: String, id: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def queryNERProgress(usernameInPath: String, id: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
     import UploadController._  // Message (de)serialization
 
@@ -207,7 +207,7 @@ object UploadController {
   )(unlift(WorkerProgress.unapply))
 
   implicit val documentProgressWrites: Writes[DocumentProgress] = (
-    (JsPath \ "document_id").write[Int] and
+    (JsPath \ "document_id").write[String] and
     (JsPath \ "progress").write[Seq[WorkerProgress]]
   )(unlift(DocumentProgress.unapply))
 

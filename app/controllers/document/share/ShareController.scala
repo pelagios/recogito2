@@ -8,7 +8,7 @@ import storage.DB
 
 class ShareController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
 
-  def showShareSettings(documentId: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showShareSettings(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.getUsername,
         { case (document, fileparts) =>  Ok(views.html.document.share.index(loggedIn.getUsername, document)) })
   }

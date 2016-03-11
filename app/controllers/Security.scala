@@ -34,13 +34,8 @@ trait Security extends AuthConfig { self: HasDatabase =>
   def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Results.Redirect(landing.routes.LandingController.index))
 
-  def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
-    val redirect = Results.Redirect(landing.routes.LoginController.showLoginForm)
-    if (request.uri.endsWith("favicon.ico")) // Prevent the browser window being redirected to the favicon
-      Future.successful(redirect)
-    else
-      Future.successful(redirect.withSession("access_uri" -> request.uri))
-  }
+  def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
+    Future.successful(Results.Redirect(landing.routes.LoginController.showLoginForm))
 
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit context: ExecutionContext): Future[Result] =
     Future.successful(Results.Forbidden(NO_PERMISSION))

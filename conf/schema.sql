@@ -50,7 +50,7 @@ CREATE TABLE upload_filepart (
 
 -- users own (and can share) documents
 CREATE TABLE document (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  id VARCHAR NOT NULL PRIMARY KEY,
   owner VARCHAR NOT NULL REFERENCES user(username),
   uploaded_at TIMESTAMP WITH TIME ZONE NOT NULL,
   title VARCHAR NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE document (
 
 CREATE TABLE document_filepart (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  document_id INTEGER NOT NULL REFERENCES document(id) ON DELETE CASCADE,
+  document_id VARCHAR NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   title VARCHAR NOT NULL,
   content_type VARCHAR NOT NULL,
   filename VARCHAR NOT NULL,

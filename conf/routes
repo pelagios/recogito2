@@ -3,6 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /assets/*file                              controllers.Assets.versioned(path="/public", file: Asset)
+GET     /favicon.ico                               controllers.Assets.at(path="/public", file="/images/favicon.png")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing area
@@ -24,18 +25,18 @@ GET     /admin                                     controllers.admin.AdminContro
 # Document views
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id/part/:partNo/edit            controllers.document.annotation.TextAnnotationController.showAnnotationViewForDocPart(id: Int, partNo: Int)
-GET     /document/:id/edit                         controllers.document.annotation.TextAnnotationController.showAnnotationViewForDoc(id: Int)
+GET     /document/:id/part/:partNo/edit            controllers.document.annotation.TextAnnotationController.showAnnotationViewForDocPart(id: String, partNo: Int)
+GET     /document/:id/edit                         controllers.document.annotation.TextAnnotationController.showAnnotationViewForDoc(id: String)
 
-GET     /document/:id/map                          controllers.document.map.MapController.showMap(id: Int)
+GET     /document/:id/map                          controllers.document.map.MapController.showMap(id: String)
 
-GET     /document/:id/stats                        controllers.document.stats.StatsController.showDocumentStats(id: Int)
+GET     /document/:id/stats                        controllers.document.stats.StatsController.showDocumentStats(id: String)
 
-GET     /document/:id/downloads                    controllers.document.downloads.DownloadsController.showDownloadOptions(id: Int)
+GET     /document/:id/downloads                    controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
 
-GET     /document/:id/share                        controllers.document.share.ShareController.showShareSettings(id: Int)
+GET     /document/:id/share                        controllers.document.share.ShareController.showShareSettings(id: String)
 
-GET     /document/:id/settings                     controllers.document.settings.SettingsController.showDocumentSettings(id: Int)
+GET     /document/:id/settings                     controllers.document.settings.SettingsController.showDocumentSettings(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API
@@ -55,8 +56,8 @@ POST    /:username/upload/step-2                   controllers.my.upload.UploadC
 DELETE  /:username/upload/step-2/:filename         controllers.my.upload.UploadController.deleteFilepart(username: String, filename: String)
 GET     /:username/upload/step-3                   controllers.my.upload.UploadController.showStep3(username: String)
 POST    /:username/upload/step-3                   controllers.my.upload.UploadController.showStep3(username: String)
-GET     /:username/upload/ner-progress/:docId      controllers.my.upload.UploadController.queryNERProgress(username: String, docId: Int)
 GET     /:username/upload/cancel                   controllers.my.upload.UploadController.cancelUploadWizard(username: String)
+GET     /:username/upload/ner-progress/:docId      controllers.my.upload.UploadController.queryNERProgress(username: String, docId: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

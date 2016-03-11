@@ -40,7 +40,7 @@ abstract class AbstractController extends Controller with HasDatabase {
     * Just hand this method a function that produces an HTTP OK result for a document, while
     * the method handles Forbidden/Not Found error cases.
     */
-  protected def renderDocumentResponse(docId: Int, user: String, response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Result)(implicit db: DB) = {
+  protected def renderDocumentResponse(docId: String, user: String, response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Result)(implicit db: DB) = {
     DocumentService.findByIdWithFileparts(docId).map(_ match {
       case Some((document, fileparts)) => {
         // Verify if the user is allowed to access this document - TODO what about shared content?

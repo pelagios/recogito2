@@ -30,7 +30,7 @@ class SignupController @Inject() (implicit val db: DB) extends AbstractControlle
     
   // We use usernames as first-level URL elements, therefore some are prohibited (cf. routes file)
   private val RESERVED_NAMES =  
-    Set("assets", "signup", "login", "logout", "admin", "document", "api")
+    Set("assets", "signup", "login", "logout", "admin", "document", "api", "favicon.ico")
 
   private val isNotReserved: Constraint[String] = Constraint("constraints.notreserved")({username =>
     if (RESERVED_NAMES.contains(username.toLowerCase))

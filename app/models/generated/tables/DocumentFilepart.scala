@@ -59,7 +59,7 @@ class DocumentFilepart(alias : String, aliased : Table[DocumentFilepartRecord], 
 	/**
 	 * The column <code>document_filepart.document_id</code>.
 	 */
-	val DOCUMENT_ID : TableField[DocumentFilepartRecord, Integer] = createField("document_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), "")
+	val DOCUMENT_ID : TableField[DocumentFilepartRecord, String] = createField("document_id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
 
 	/**
 	 * The column <code>document_filepart.title</code>.

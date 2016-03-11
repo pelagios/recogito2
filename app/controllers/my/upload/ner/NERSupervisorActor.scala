@@ -42,7 +42,7 @@ private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[Docum
   }
 
   /** Sends out progress queries to child workers and collects the responses **/
-  private def aggregateProgressReports(documentId: Int, workers: Seq[ActorRef], origSender: ActorRef) {
+  private def aggregateProgressReports(documentId: String, workers: Seq[ActorRef], origSender: ActorRef) {
     var responses = Seq.empty[WorkerProgress]
     var responseSent = false
 
@@ -93,12 +93,12 @@ private[ner] class NERSupervisorActor(document: DocumentRecord, parts: Seq[Docum
 
 private[ner] object NERSupervisor {
 
-  private val supervisors = scala.collection.mutable.Map.empty[Int, ActorRef]
+  private val supervisors = scala.collection.mutable.Map.empty[String, ActorRef]
 
-  def registerActor(id: Int, actor: ActorRef) = supervisors.put(id, actor)
+  def registerActor(id: String, actor: ActorRef) = supervisors.put(id, actor)
 
-  def deregisterActor(id: Int) = supervisors.remove(id)
+  def deregisterActor(id: String) = supervisors.remove(id)
 
-  def getActor(id: Int) = supervisors.get(id)
+  def getActor(id: String) = supervisors.get(id)
 
 }

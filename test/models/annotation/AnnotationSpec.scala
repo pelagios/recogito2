@@ -30,7 +30,7 @@ class AnnotationSpec extends Specification {
       val annotation = result.get
       annotation.annotationId must equalTo(UUID.fromString("7cfa1504-26de-45ef-a590-8b60ea8a60e8"))
       annotation.versionId must equalTo(UUID.fromString("e868423f-5ea9-42ed-bb7d-5e1fac9195a0"))
-      annotation.annotates.document must equalTo(1)
+      annotation.annotates.document must equalTo("98muze1cl3saib")
       annotation.hasPreviousVersions must equalTo(Some(1))
       annotation.contributors.size must equalTo(1)
       annotation.contributors.head must equalTo("rainer")
@@ -87,7 +87,7 @@ class AnnotationSpec extends Specification {
         Annotation(
           annotationId,
           versionId,
-          AnnotatedObject(1, 1),
+          AnnotatedObject("98muze1cl3saib", 1),
           None,
           Seq.empty[String],
           "char-offset:25",

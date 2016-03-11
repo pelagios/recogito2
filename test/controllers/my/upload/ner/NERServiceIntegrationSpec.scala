@@ -25,12 +25,12 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
     val KEEP_ALIVE = 10 seconds
     
     // Two test documents
-    val document1 = new DocumentRecord(0, "rainer", OffsetDateTime.now, "A short test doc", null, null, null, null, null, null)
-    val document2 = new DocumentRecord(1, "rainer", OffsetDateTime.now, "A long test doc", null, null, null, null, null, null)
+    val document1 = new DocumentRecord("hcylkmacy4xgkb", "rainer", OffsetDateTime.now, "A short test doc", null, null, null, null, null, null)
+    val document2 = new DocumentRecord("98muze1cl3saib", "rainer", OffsetDateTime.now, "A long test doc", null, null, null, null, null, null)
     
     // Five fileparts - parts 1-3 on document 0, 4-5 on document 1
-    val parts1 = (1 to 5).map(n => new DocumentFilepartRecord(n, 0, "text-for-ner-0" + n + ".txt", ContentTypes.TEXT_PLAIN.toString, "text-for-ner-0" + n + ".txt", 0))
-    val parts2 = Seq(new DocumentFilepartRecord(6, 0, "text-for-ner-06.txt", ContentTypes.TEXT_PLAIN.toString, "text-for-ner-06.txt", 0))
+    val parts1 = (1 to 5).map(n => new DocumentFilepartRecord(n, "hcylkmacy4xgkb", "text-for-ner-0" + n + ".txt", ContentTypes.TEXT_PLAIN.toString, "text-for-ner-0" + n + ".txt", 0))
+    val parts2 = Seq(new DocumentFilepartRecord(6, "98muze1cl3saib", "text-for-ner-06.txt", ContentTypes.TEXT_PLAIN.toString, "text-for-ner-06.txt", 0))
       
     val dir = new File("test/resources")
     
@@ -53,8 +53,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
         
         val queryStartTime = System.currentTimeMillis
         
-        val result1 = Await.result(NERService.queryProgress(0), 10 seconds)
-        val result2 = Await.result(NERService.queryProgress(1), 10 seconds)
+        val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
+        val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
         
         (System.currentTimeMillis - queryStartTime).toInt must be <(500)
         
@@ -79,8 +79,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
     "accept progress queries after completion" in {
       val queryStartTime = System.currentTimeMillis
       
-      val result1 = Await.result(NERService.queryProgress(0), 10 seconds)
-      val result2 = Await.result(NERService.queryProgress(1), 10 seconds)
+      val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
+      val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
       
       (System.currentTimeMillis - queryStartTime).toInt must be <(500)
       
@@ -100,8 +100,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
     "reject progress queries after the KEEPALIVE time has expired" in {
       Thread.sleep(KEEP_ALIVE.toMillis)
       
-      val result1 = Await.result(NERService.queryProgress(0), 10 seconds)
-      val result2 = Await.result(NERService.queryProgress(1), 10 seconds)
+      val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
+      val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
     
       Logger.info("[NERServiceIntegrationSpec] KEEPALIVE expired")
       

@@ -127,7 +127,8 @@ object UploadService extends FileAccess {
 
   /** Promotes a pending upload in the staging area to actual document **/
   def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
-    val document = new DocumentRecord(null,
+    val document = new DocumentRecord(
+          DocumentService.generateRandomID(),
           upload.getOwner,
           upload.getCreatedAt,
           upload.getTitle,
@@ -138,16 +139,14 @@ object UploadService extends FileAccess {
           upload.getSource,
           upload.getLanguage)
 
-    // Insert document, retrieving the auto-generated ID
-    val docId =
-      sql.insertInto(DOCUMENT).set(document).returning(DOCUMENT.ID).fetchOne()
-    document.setId(docId.getId)
+    // Insert document
+    sql.insertInto(DOCUMENT).set(document).execute()
 
     // Insert filepart records - I couldn't find a way to do a batch-insert that also returns
     // the auto-generated ID. Any hints on how this could be achieved appreciated!
     val docFileparts = fileparts.zipWithIndex.map { case (part, idx) => {
       val docFilepart = new DocumentFilepartRecord(null,
-            docId.getId,
+            document.getId,
             part.getTitle,
             part.getContentType,
             part.getFilename,

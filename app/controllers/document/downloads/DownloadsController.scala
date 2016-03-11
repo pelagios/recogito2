@@ -8,7 +8,7 @@ import storage.DB
 
 class DownloadsController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
 
-  def showDownloadOptions(documentId: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showDownloadOptions(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.getUsername,
         { case (document, fileparts) =>  Ok(views.html.document.downloads.index(loggedIn.getUsername, document)) })
   }

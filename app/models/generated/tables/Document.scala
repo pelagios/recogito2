@@ -5,7 +5,6 @@ package models.generated.tables
 
 
 import java.lang.Class
-import java.lang.Integer
 import java.lang.String
 import java.sql.Timestamp
 import java.time.OffsetDateTime
@@ -56,7 +55,7 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	/**
 	 * The column <code>document.id</code>.
 	 */
-	val ID : TableField[DocumentRecord, Integer] = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), "")
+	val ID : TableField[DocumentRecord, String] = createField("id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
 
 	/**
 	 * The column <code>document.owner</code>.

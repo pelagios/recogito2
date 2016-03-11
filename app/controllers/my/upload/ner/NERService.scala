@@ -78,12 +78,12 @@ object NERService extends FileAccess {
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder, keepalive), name = "doc_" + document.getId.toString)
+    val actor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder, keepalive), name = "doc_" + document.getId)
     actor ! NERMessages.Start
   }
 
   /** Queries the progress for a specific process **/
-  def queryProgress(documentId: Int, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
+  def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
     NERSupervisor.getActor(documentId) match {
       case Some(actor) => {
         implicit val t = Timeout(timeout)

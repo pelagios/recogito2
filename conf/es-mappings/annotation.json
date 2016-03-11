@@ -6,7 +6,7 @@
       "annotates": {
         "type": "nested",
         "properties": {
-          "document": { "type": "integer" },
+          "document": { "type": "string", "index": "not_analyzed" },
           "filepart": { "type": "integer" }
         }
       },

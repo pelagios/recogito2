@@ -11,11 +11,11 @@ import storage.{ DB, FileAccess }
 class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security with FileAccess {
 
   /** Just a redirect for convenience **/
-  def showAnnotationViewForDoc(documentId: Int) = StackAction(AuthorityKey -> Normal) { implicit request =>
+  def showAnnotationViewForDoc(documentId: String) = StackAction(AuthorityKey -> Normal) { implicit request =>
     Redirect(routes.TextAnnotationController.showAnnotationViewForDocPart(documentId, 0))
   }
 
-  def showAnnotationViewForDocPart(documentId: Int, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     val username = loggedIn.getUsername
 
     DocumentService.findByIdWithFileparts(documentId).map(_ match {

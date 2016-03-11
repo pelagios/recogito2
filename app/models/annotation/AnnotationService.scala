@@ -28,7 +28,7 @@ object AnnotationService {
     })
    }
   
-  def findByDocId(id: Int)(implicit context: ExecutionContext) = {
+  def findByDocId(id: String)(implicit context: ExecutionContext) = {
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document" -> id)) limit 1000
     } map(_.as[Annotation].toSeq)

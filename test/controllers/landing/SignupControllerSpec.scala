@@ -25,14 +25,17 @@ class SignupControllerSpec extends Specification {
   "The signup page" should {
 
     "create a user in the DB" in new WithBrowser(app = FakeApplication(additionalConfiguration = testDatabase)) {
-      val redirect = route(createUserRequest).get
+      val firstRedirect = route(createUserRequest).get
+      status(firstRedirect) must equalTo(SEE_OTHER)
+      redirectLocation(firstRedirect) must equalTo (Some("/my"))
       
-      status(redirect) must equalTo(SEE_OTHER)
-      redirectLocation(redirect) must equalTo (Some("/my-recogito"))
+      val secondRedirect = route(FakeRequest(GET, "/my").withCookies(cookies(firstRedirect).head)).get
+      status(secondRedirect) must equalTo(SEE_OTHER)
+      redirectLocation(secondRedirect) must equalTo (Some("/testuser"))
       
-      val myRecogito = route(FakeRequest(GET,"/my-recogito").withCookies(cookies(redirect).head)).get
-      status(myRecogito) must equalTo(OK)
-      contentAsString(myRecogito) must contain ("you are logged in")
+      val profilePage = route(FakeRequest(GET, "/testuser").withCookies(cookies(firstRedirect).head)).get
+      status(profilePage) must equalTo(OK)
+      contentAsString(profilePage) must contain ("you are logged in")
     }
     
   }

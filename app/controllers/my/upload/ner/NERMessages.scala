@@ -10,7 +10,7 @@ object NERMessages{
 
   case class WorkerProgress(filepartId: Int, progress: Double)
 
-  case class DocumentProgress(documentId: Int, progress: Seq[WorkerProgress]) extends Message
+  case class DocumentProgress(documentId: String, progress: Seq[WorkerProgress]) extends Message
 
   case object TimedOut extends Message
 

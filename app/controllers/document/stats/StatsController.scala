@@ -8,7 +8,7 @@ import storage.DB
 
 class StatsController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
 
-  def showDocumentStats(documentId: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showDocumentStats(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.getUsername,
         { case (document, fileparts) =>  Ok(views.html.document.stats.index(loggedIn.getUsername, document)) })
   }
