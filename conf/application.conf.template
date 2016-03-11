@@ -28,7 +28,10 @@ play.i18n.langs = [ "en" ]
 # Default to Routes in the root package (and conf/routes)
 # play.http.router = my.application.Routes
 
-# Directory for storing document filepart uploads
+# Index location
+recogito.index.dir = index
+
+# Uploads location
 recogito.upload.dir = uploads
 
 # Database configuration

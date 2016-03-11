@@ -1,7 +1,7 @@
 package storage
 
 import java.io.File
-import play.api.Play
+import play.api.{ Logger, Play }
 import scala.io.Source
 
 /** Base functionality for using files uploaded by users **/
@@ -15,6 +15,8 @@ trait FileAccess {
       case Some(filename) => new File(filename)
       case None => new File("uploads") // Default
     }
+    
+    Logger.info("Using " + dir.getAbsolutePath + " as upload location")
 
     if (!dir.exists)
       dir.mkdir()

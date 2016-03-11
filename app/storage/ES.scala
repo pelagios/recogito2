@@ -4,7 +4,7 @@ import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
 import org.elasticsearch.common.settings.ImmutableSettings
-import play.api.Logger
+import play.api.{ Logger, Play }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.io.Source
 import scala.concurrent.duration._
@@ -15,11 +15,17 @@ object ES {
   val IDX_RECOGITO = "recogito"
 
   lazy val client = {
+    val home = Play.current.configuration.getString("recogito.index.dir") match {
+      case Some(dir) => new File(dir)
+      case None => new File("index")
+    }
+    
     val settings =
       ImmutableSettings.settingsBuilder()
         .put("http.enabled", true)
-        .put("path.home", "index")
-
+        .put("path.home", home.getAbsolutePath)
+        
+    Logger.info("Using " + home.getAbsolutePath + " as index location")
     ElasticClient.local(settings.build)
   }
   
