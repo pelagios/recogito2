@@ -13,13 +13,15 @@ Future home of Recogito v2.0
 
 ## Database Configuration
 
-If you stick with the default settings, Recogito will automatically create an SQLite database, so there's
-nothing you need to do. However, we recommend a PostgreSQL DB for production use.
+If you stick with the default settings, Recogito will automatically create an SQLite database and
+an embedded ElasticSearch index, so there's nothing you need to do. However, for prodcution use
+we recommend a PostgreSQL DB and a separate ElasticSearch installation.
 
 ## Running in production
 
-* Type `activator start` to run Recogito in production mode. (Note: things have changed in the
-  current play version - expect updated instructions!)
+* To test production mode before deploying, type `activator testProd`
+* For full production deployment, refer to the current [Play Framework
+  docs](https://www.playframework.com/documentation/2.5.x/Production)
 * Be sure to set a random application secret in `conf/application.conf`. Play includes a utility
   to generate one for you - type `activator playGenerateSecret`.
 
