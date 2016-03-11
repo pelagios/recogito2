@@ -90,24 +90,24 @@
     <div class="header-toolbar">
       <h3>ANNOTATION MODE:</h3>
       <ul class="annotation-mode">
-        <li class="active">NORMAL</li>
-        <li class="has-sub-options">
+        <li data-mode="NORMAL" class="active">NORMAL</li>
+        <li class="quick has-sub-options">
           QUICK
-          <div class="dropdown">
+          <div class="dropdown" style="display:none;">
             <ul>
-              <li data-mode="PLACE"><span class="icon">&#xf041;</span> Places</li>
-              <li data-mode="PERSON"><span class="icon">&#xf007;</span> Persons</li>
-              <li><span class="icon">&#xf02c;</span> Tags</li>
+              <li data-mode="QUICK" data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
+              <li data-mode="QUICK" data-type="PERSON"><span class="icon">&#xf007;</span> Persons</li>
+              <li data-mode="QUICK" data-type="TAGS"><span class="icon">&#xf02c;</span> Tags</li>
             </ul>
           </div>
         </li>
-        <li>BULK</li>
+        <li data-mode="BULK">BULK</li>
       </ul>
 
       <h3>COLOR:</h3>
       <ul class="color-scheme">
-        <li class="active">BY TYPE</li>
-        <li>BY STATUS</li>
+        <li data-scheme="BY_TYPE" class="active">BY TYPE</li>
+        <li data-scheme="BY_STATUS">BY STATUS</li>
       </ul>
     </div> <!-- .header-toolbar -->
 

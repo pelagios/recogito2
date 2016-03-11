@@ -1,14 +1,15 @@
 require([
-  '../apiConnector',
   'events',
   'highlighter',
   'selectionHandler',
+  'toolbar',
+  '../apiConnector',
   '../../common/config',
-  '../../common/annotationUtils'], function(APIConnector, Events, Highlighter, SelectionHandler, Config, Utils) {
+  '../../common/annotationUtils'], function(Events, Highlighter, SelectionHandler, Toolbar, APIConnector, Config, Utils) {
 
   jQuery(document).ready(function() {
 
-    var toolbar = jQuery('.header-toolbar'),
+    var toolbar = new Toolbar(jQuery('.header-toolbar')),
 
         contentNode = document.getElementById('content'),
 
@@ -19,19 +20,6 @@ require([
         selectionHandler = new SelectionHandler(contentNode),
 
         API = new APIConnector(),
-
-        makeToolbarSticky = function() {
-          if (Config.IS_TOUCH)
-            toolbar.addClass('sticky');
-          else
-            jQuery(window).scroll(function() {
-              var scrollTop = jQuery(window).scrollTop();
-              if (scrollTop > 147)
-                toolbar.addClass('fixed');
-              else
-                toolbar.removeClass('fixed');
-            });
-        },
 
         renderAnnotation = function(annotation) {
           var anchor = annotation.anchor.substr(12),
@@ -59,10 +47,6 @@ require([
           // TODO visual notification
         },
 
-        onAnnotationCreated = function(annotationStub) {
-          API.storeAnnotation(annotationStub);
-        },
-
         onAnnotationStored = function(annotation) {
           renderAnnotation(annotation);
         },
@@ -70,19 +54,25 @@ require([
         onAnnotationStoreError = function(error) {
           // TODO visual notification
           console.log(error);
+        },
+
+        onAnnotationCreated = function(annotationStub) {
+          // TODO just a dummy for now
+          annotationStub.bodies.push({ type: toolbar.getCurrentMode().type });
+          API.storeAnnotation(annotationStub);
         };
 
-    makeToolbarSticky();
-
+    // API event handling
     API.on(Events.API_ANNOTATIONS_LOADED, onAnnotationsLoaded);
     API.on(Events.API_ANNOTATIONS_LOAD_ERROR, onAnnotationsLoadError);
     API.on(Events.API_CREATE_SUCCESS, onAnnotationStored);
     API.on(Events.API_CREATE_ERROR, onAnnotationStoreError);
 
+    // Annotation event handling
     selectionHandler.on(Events.ANNOTATION_CREATED, onAnnotationCreated);
 
+    // Init
     rangy.init();
-
     API.loadAnnotations(Config.documentId, Config.partSequenceNo);
   });
 

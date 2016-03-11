@@ -6,6 +6,155 @@ body {
   background-color:#ecf0f1;
 }
 
+.header-toolbar {
+  margin-left:@sidebar-width;
+  border-bottom:1px solid @lightgrey-border-darker;
+  font-family:OpenSans;
+  font-size:12px;
+  padding:0 30px;
+  color:@nightsky;
+  background-color:#fff;
+  white-space:nowrap;
+
+  h3 {
+    display:inline-block;
+    margin:0;
+    padding:0 0 0 0;
+    font-size:12px;
+    font-weight:bold;
+  }
+
+  ul {
+    display:inline-block;
+    list-style-type:none;
+    margin:0;
+    padding:4px 90px 0 0;
+  }
+
+  li {
+    position:relative;
+    margin:0 10px;
+    padding:0;
+    display:inline-block;
+    font-weight:normal;
+    border-bottom:4px solid transparent;
+    cursor:pointer;
+  }
+
+  ul.annotation-mode {
+
+    li.active, li:hover {
+      border-color:@ocean;
+    }
+
+  }
+
+  ul.color-scheme {
+
+    li.active, li:hover {
+      border-color:@shore;
+    }
+
+  }
+
+  li.has-sub-options {
+    padding:0 15px;
+    margin:0 7px;
+  }
+
+  li.has-sub-options:after {
+    content:'\f0dd';
+    color:lighten(@nightsky, 5%);
+    font-size:10.5px;
+    font-family:FontAwesome;
+    position:absolute;
+    top:-1px;
+    right:0;
+  }
+
+  li.has-sub-options:hover {
+    border-color:transparent !important;
+  }
+
+  li.quick:before {
+    display:inline-block;
+    width:7px;
+    content:'';
+    position:absolute;
+    top:1px;
+    font-family:FontAwesome;
+  }
+
+  li.quick.PLACE:before {
+    content:'\f041';
+    left:3px;
+  }
+
+  li.quick.PERSON:before {
+    content:'\f007';
+    left:2px;
+  }
+
+  li.quick.TAGS:before {
+    content:'\f02c';
+    left:0;
+  }
+
+  .dropdown {
+    position:absolute;
+    top:29px;
+    left:-30px;
+    padding:0 20px 20px 20px;
+    overflow:hidden;
+
+    ul {
+      background-color:#fff;
+      width:100px;
+      padding:5px 0;
+      border-style:solid;
+      border-color:#d6d7d9;
+      border-width:0 1px 1px 1px;
+      .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.15));
+    }
+
+    li {
+      display:block;
+      margin:0;
+      padding:0 20px 0 15px;
+      border:none;
+    }
+
+    li:hover {
+      background-color:@blueish-white;
+    }
+
+    .icon {
+      display:inline-block;
+      text-align:center;
+      width:8px;
+      padding-right:10px;
+    }
+
+  }
+
+} /** .header-toolbar **/
+
+.header-toolbar.fixed {
+  position:fixed;
+  background-color:#fff;
+  top:70px;
+  width:100%;
+}
+
+.header-toolbar.sticky {
+  position:-webkit-sticky;
+  position:-moz-sticky;
+  position:-ms-sticky;
+  position:-o-sticky;
+  position:sticky;
+  top:70px;
+}
+
 pre {
   margin:40px 50px 50px 230px;
   line-height:170%;

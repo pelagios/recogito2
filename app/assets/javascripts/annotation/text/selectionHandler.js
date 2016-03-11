@@ -43,8 +43,7 @@ define(['../../common/hasEvents', 'events', '../../common/config'], function(Has
             },
             anchor: 'char-offset:' + rangeBefore.toString().length,
             bodies: [
-              { type: 'QUOTE', value: selectedRange.toString() },
-              { type: 'PLACE' } // TODO this is just a dummy for now
+              { type: 'QUOTE', value: selectedRange.toString() }
             ]
           };
         },
