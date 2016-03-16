@@ -6,6 +6,7 @@ import akka.util.Timeout
 import controllers.my.upload.{ Messages, Supervisor }
 import java.io.File
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -37,12 +38,14 @@ object TilingService extends FileAccess {
     
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[tiling] def spawnTilingProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
+    Logger.info("Starting image tiling process")
     val actor = system.actorOf(Props(classOf[TilingSupervisorActor], document, parts, sourceFolder, keepalive), name = "doc_" + document.getId)
     actor ! Messages.Start
   }
   
   /** Queries the progress for a specific process **/
   def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
+    Logger.info("Reporting tiling progress")
     Supervisor.getSupervisorActor(documentId) match {
       case Some(actor) => {
         implicit val t = Timeout(timeout)

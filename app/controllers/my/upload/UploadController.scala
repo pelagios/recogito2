@@ -3,11 +3,12 @@ package controllers.my.upload
 import akka.actor.ActorSystem
 import controllers.{ AbstractController, Security }
 import controllers.my.upload.Messages._
-import controllers.my.upload.ner._
+import controllers.my.upload.ner.NERService
+import controllers.my.upload.tiling.TilingService
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
-import models.content.{ DocumentService, UploadService }
+import models.content.{ ContentTypes, DocumentService, UploadService }
 import models.generated.tables.records.UploadRecord
 import models.user.Roles._
 import play.api.Logger
@@ -139,10 +140,16 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         } else {
           // Pending upload + fileparts available - proceed
           UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
+            
+            // Apply NER if requested
             val applyNER = checkParamValue("apply-ner", "on")
-
             if (applyNER)
               NERService.spawnNERProcess(doc, docParts)
+              
+            // Tile images
+            val imageParts = docParts.filter(_.getContentType.equals(ContentTypes.IMAGE_UPLOAD.toString))
+            if (imageParts.size > 0)
+              TilingService.spawnTilingProcess(doc, imageParts)
 
             Ok(views.html.my.upload.upload_3(usernameInPath, doc, docParts, applyNER))
           }}
@@ -202,7 +209,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
 object UploadController {
   
   implicit val progressStatusValueWrites: Writes[ProgressStatus.Value] =
-    JsPath.write[String].contramap[ProgressStatus.Value](_.toString)
+    Writes[ProgressStatus.Value](status => JsString(status.toString))
   
   implicit val workerProgressWrites: Writes[WorkerProgress] = (
     (JsPath \ "filepart_id").write[Int] and

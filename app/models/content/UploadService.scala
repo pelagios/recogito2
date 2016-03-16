@@ -61,10 +61,15 @@ object UploadService extends FileAccess {
   def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile])(implicit db: DB) = db.withTransaction { sql =>
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
-    val filepath = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
     val filesize = filepart.ref.file.length.toDouble / 1024
-    val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, ContentTypes.TEXT_PLAIN.toString, filepath.getName, filesize)
-    filepart.ref.moveTo(new File(s"$filepath"))
+    val file = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
+    val contentType = ContentTypes.fromFile(file)
+    if (contentType.isEmpty)
+      throw new Exception("Unsupported filetype")
+      
+    filepart.ref.moveTo(file)    
+    val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.get.toString, file.getName, filesize)
+    
     sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     filepartRecord
   }
@@ -83,8 +88,7 @@ object UploadService extends FileAccess {
       }
 
       case None =>
-        // Not possible from the UI!
-        Logger.warn("Somebody trying to remove a non-existing upload filepart")
+        // Happens when someone clicks 'delete' on a failed upload - never mind
         false
     }
   }
