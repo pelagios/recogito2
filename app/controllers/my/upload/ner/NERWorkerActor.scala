@@ -20,7 +20,7 @@ private[ner] object NERWorkerActor {
 
 private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) extends Actor {
 
-  import NERMessages._
+  import controllers.my.upload.Messages._
 
   var progress = 0.0
 

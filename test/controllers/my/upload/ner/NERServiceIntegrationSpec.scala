@@ -6,8 +6,10 @@ import java.io.File
 import java.time.OffsetDateTime
 import models.content.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import org.apache.commons.io.FileUtils
 import org.specs2.mutable._
 import org.specs2.runner._
+import org.specs2.specification.AfterAll
 import org.junit.runner._
 import play.api.Logger
 import play.api.test._
@@ -16,9 +18,14 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
     
 @RunWith(classOf[JUnitRunner])
-class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSender with SpecificationLike {
+class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSender with SpecificationLike with AfterAll {
   
   sequential // Force Specs2 to execute tests in sequential order
+  
+  private val TMP_IDX_DIR = "test/resources/tmp-idx"
+  
+  override def afterAll =
+    FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
   
   "The NER service" should {
     
@@ -44,36 +51,36 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
       (System.currentTimeMillis - processStartTime).toInt must be <(1000)
     }
       
-    "report progress until complete, with progress response time <500ms" in {
-      var ctr = 50
-      var isComplete = false
-      
-      while (ctr > 0 && !isComplete) {
-        ctr -= 1
+    "report progress until complete" in {
+      running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
+        var ctr = 50
+        var isComplete = false
         
-        val queryStartTime = System.currentTimeMillis
+        while (ctr > 0 && !isComplete) {
+          ctr -= 1
+          
+          val queryStartTime = System.currentTimeMillis
+          
+          val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
+          val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
+          
+          result1.isDefined must equalTo(true) 
+          result2.isDefined must equalTo(true) 
+          
+          val totalProgress1 = result1.get.progress.map(_.progress).sum / result1.get.progress.size
+          val totalProgress2 = result2.get.progress.map(_.progress).sum / result2.get.progress.size
+              
+          Logger.info("[NERServiceIntegrationSpec] Progress for doc 1 is " + totalProgress1)
+          Logger.info("[NERServiceIntegrationSpec] Progress for doc 2 is " + totalProgress2)
+          
+          if (totalProgress1 + totalProgress2 == 2.0)
+            isComplete = true
+          
+          Thread.sleep(2000)
+        }
         
-        val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
-        val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
-        
-        (System.currentTimeMillis - queryStartTime).toInt must be <(500)
-        
-        result1.isDefined must equalTo(true) 
-        result2.isDefined must equalTo(true) 
-        
-        val totalProgress1 = result1.get.progress.map(_.progress).sum / result1.get.progress.size
-        val totalProgress2 = result2.get.progress.map(_.progress).sum / result2.get.progress.size
-            
-        Logger.info("[NERServiceIntegrationSpec] Progress for doc 1 is " + totalProgress1)
-        Logger.info("[NERServiceIntegrationSpec] Progress for doc 2 is " + totalProgress2)
-        
-        if (totalProgress1 + totalProgress2 == 2.0)
-          isComplete = true
-        
-        Thread.sleep(2000)
+        success
       }
-      
-      success
     }
           
     "accept progress queries after completion" in {
@@ -107,14 +114,6 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
       
       result1.isDefined must equalTo(false)
       result2.isDefined must equalTo(false)
-    }
-    
-  }
-  
-  "The database" should {
-    
-    "contain the annotations after NER" in {
-      success
     }
     
   }

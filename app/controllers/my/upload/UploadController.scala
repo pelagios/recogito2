@@ -2,8 +2,8 @@ package controllers.my.upload
 
 import akka.actor.ActorSystem
 import controllers.{ AbstractController, Security }
+import controllers.my.upload.Messages._
 import controllers.my.upload.ner._
-import controllers.my.upload.ner.NERMessages._
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement

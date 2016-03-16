@@ -1,6 +1,6 @@
-package controllers.my.upload.ner
+package controllers.my.upload
 
-object NERMessages{
+object Messages{
 
   sealed abstract trait Message
 
