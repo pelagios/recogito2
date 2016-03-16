@@ -122,7 +122,7 @@
               </li>
             } else {
               <li>
-                <a href="@controllers.document.annotation.routes.TextAnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
+                <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
               </li>
             }
           }
@@ -133,8 +133,8 @@
     <pre id="content">@content</pre>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.api.routes.javascript.AnnotationController.loadAnnotations,
-      controllers.api.routes.javascript.AnnotationController.createAnnotation
+      controllers.api.routes.javascript.AnnotationAPIController.loadAnnotations,
+      controllers.api.routes.javascript.AnnotationAPIController.createAnnotation
     )
   </body>
 </html>

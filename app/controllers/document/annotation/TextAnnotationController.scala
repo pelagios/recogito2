@@ -10,11 +10,6 @@ import storage.{ DB, FileAccess }
 
 class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security with FileAccess {
 
-  /** Just a redirect for convenience **/
-  def showAnnotationViewForDoc(documentId: String) = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Redirect(routes.TextAnnotationController.showAnnotationViewForDocPart(documentId, 0))
-  }
-
   def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     val username = loggedIn.getUsername
 
@@ -29,7 +24,7 @@ class TextAnnotationController @Inject() (implicit val db: DB) extends AbstractC
                   Ok(views.html.document.annotation.text(username, document, fileparts, filepart, content))
 
                 case None => {
-                  // Filepart found in DB, but no file on filesystem
+                  // Filepart found in DB, but not file on filesystem
                   InternalServerError
                 }
               }

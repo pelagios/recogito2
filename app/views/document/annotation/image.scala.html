@@ -1,17 +1,19 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord)
+@(username:String,
+  document: models.generated.tables.records.DocumentRecord,
+  allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
+  currentPart: models.generated.tables.records.DocumentFilepartRecord)(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/stats/index.css")"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image.css")"/>
   </head>
   <body>
     <div class="header-iconbar">
       <ul>
-        <li class="tooltip bottom">
-          <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 0)">
-            <span class="icon">&#xe86f;</span>
-            <span class="hint">You are now in the Text Annotation View</span>
-          </a>
+        <li class="active tooltip bottom">
+          <span class="icon">&#xe86f;</span>
+          <span class="hint">You are now in the Text Annotation View</span>
         </li>
 
         <li class="tooltip bottom">
@@ -21,9 +23,11 @@
           </a>
         </li>
 
-        <li class="active tooltip bottom">
-          <span class="icon">&#xe8ae;</span>
-          <span class="hint">Detailed annotation stats for this document</span>
+        <li class="tooltip bottom">
+          <a href="@controllers.document.stats.routes.StatsController.showDocumentStats(document.getId)">
+            <span class="icon">&#xe8ae;</span>
+            <span class="hint">Detailed annotation stats for this document</span>
+          </a>
         </li>
 
         <li class="tooltip bottom">

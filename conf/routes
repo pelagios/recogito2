@@ -25,8 +25,8 @@ GET     /admin                                     controllers.admin.AdminContro
 # Document views
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id/part/:partNo/edit            controllers.document.annotation.TextAnnotationController.showAnnotationViewForDocPart(id: String, partNo: Int)
-GET     /document/:id/edit                         controllers.document.annotation.TextAnnotationController.showAnnotationViewForDoc(id: String)
+GET     /document/:id/part/:partNo/edit            controllers.document.annotation.AnnotationController.showAnnotationViewForDocPart(id: String, partNo: Int)
+GET     /document/:id/edit                         controllers.document.annotation.AnnotationController.showAnnotationViewForDoc(id: String)
 
 GET     /document/:id/map                          controllers.document.map.MapController.showMap(id: String)
 
@@ -42,8 +42,8 @@ GET     /document/:id/settings                     controllers.document.settings
 # JSON API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /api/annotations                           controllers.api.AnnotationController.loadAnnotations
-POST    /api/annotation                            controllers.api.AnnotationController.createAnnotation
+GET     /api/annotations                           controllers.api.AnnotationAPIController.loadAnnotations
+POST    /api/annotation                            controllers.api.AnnotationAPIController.createAnnotation
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # User/team personal space

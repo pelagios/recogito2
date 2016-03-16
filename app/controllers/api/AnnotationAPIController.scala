@@ -41,7 +41,7 @@ object AnnotationStub {
 
 }
 
-class AnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
+class AnnotationAPIController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
 
   private val PARAM_DOC = "doc"
 
