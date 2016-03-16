@@ -200,9 +200,13 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
 
 /** Defines JSON serialization for NER progress messages **/
 object UploadController {
-
+  
+  implicit val progressStatusValueWrites: Writes[ProgressStatus.Value] =
+    JsPath.write[String].contramap[ProgressStatus.Value](_.toString)
+  
   implicit val workerProgressWrites: Writes[WorkerProgress] = (
     (JsPath \ "filepart_id").write[Int] and
+    (JsPath \ "status").write[ProgressStatus.Value] and
     (JsPath \ "progress").write[Double]
   )(unlift(WorkerProgress.unapply))
 

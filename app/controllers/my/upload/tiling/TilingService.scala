@@ -1,6 +1,9 @@
 package controllers.my.upload.tiling
 
-import akka.actor.ActorSystem
+import akka.actor.{ ActorSystem, Props }
+import akka.pattern.ask
+import akka.util.Timeout
+import controllers.my.upload.{ Messages, Supervisor }
 import java.io.File
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -34,8 +37,21 @@ object TilingService extends FileAccess {
     
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[tiling] def spawnTilingProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
-    // val actor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder, keepalive), name = "doc_" + document.getId)
-    // actor ! NERMessages.Start
+    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], document, parts, sourceFolder, keepalive), name = "doc_" + document.getId)
+    actor ! Messages.Start
+  }
+  
+  /** Queries the progress for a specific process **/
+  def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
+    Supervisor.getSupervisorActor(documentId) match {
+      case Some(actor) => {
+        implicit val t = Timeout(timeout)
+        (actor ? Messages.QueryProgress).mapTo[Messages.DocumentProgress].map(Some(_))
+      }
+
+      case None =>
+        Future.successful(None)
+    }
   }
   
 }

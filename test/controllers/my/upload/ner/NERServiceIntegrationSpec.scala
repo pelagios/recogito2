@@ -20,7 +20,8 @@ import scala.concurrent.duration._
 @RunWith(classOf[JUnitRunner])
 class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSender with SpecificationLike with AfterAll {
   
-  sequential // Force Specs2 to execute tests in sequential order
+  // Force Specs2 to execute tests in sequential order
+  sequential 
   
   private val TMP_IDX_DIR = "test/resources/tmp-idx"
   
@@ -106,11 +107,10 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
     
     "reject progress queries after the KEEPALIVE time has expired" in {
       Thread.sleep(KEEP_ALIVE.toMillis)
+      Logger.info("[NERServiceIntegrationSpec] KEEPALIVE expired")
       
       val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
       val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
-    
-      Logger.info("[NERServiceIntegrationSpec] KEEPALIVE expired")
       
       result1.isDefined must equalTo(false)
       result2.isDefined must equalTo(false)

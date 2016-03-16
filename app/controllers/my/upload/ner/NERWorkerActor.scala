@@ -1,6 +1,7 @@
 package controllers.my.upload.ner
 
 import akka.actor.Actor
+import controllers.my.upload.ProgressStatus
 import java.io.File
 import java.util.UUID
 import models.annotation._
@@ -23,24 +24,29 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
   import controllers.my.upload.Messages._
 
   var progress = 0.0
+  var status = ProgressStatus.PENDING
 
   def receive = {
 
     case Start => {
+      status = ProgressStatus.IN_PROGRESS
       val origSender = sender
+      
       parseFilepart(document, part, dir).map { result =>
         val annotations = phrasesToAnnotations(result, document, part)
         AnnotationService.insertAnnotations(annotations)
         progress = 1.0
+        status = ProgressStatus.COMPLETED
         origSender ! Completed
       }.recover { case t => {
         t.printStackTrace
+        status = ProgressStatus.FAILED
         origSender ! Failed(t.getMessage)
       }}
     }
 
     case QueryProgress =>
-      sender ! WorkerProgress(part.getId, progress)
+      sender ! WorkerProgress(part.getId, status, progress)
 
   }
 
