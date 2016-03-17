@@ -35,7 +35,7 @@ trait Security extends AuthConfig { self: HasDatabase =>
     Future.successful(Results.Redirect(landing.routes.LandingController.index))
 
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Results.Redirect(landing.routes.LoginController.showLoginForm))
+    Future.successful(Results.Redirect(landing.routes.LoginController.showLoginForm).withSession("access_uri" -> request.uri))
 
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit context: ExecutionContext): Future[Result] =
     Future.successful(Results.Forbidden(NO_PERMISSION))
