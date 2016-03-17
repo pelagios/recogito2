@@ -5,6 +5,7 @@ import java.io.File
 import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.time.OffsetDateTime
 import java.util.UUID
+import models.content.ContentIdentificationFailures._
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -12,6 +13,7 @@ import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
 import play.api.Logger
 import scala.collection.JavaConversions._
+import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 
 object UploadService extends FileAccess {
@@ -58,20 +60,26 @@ object UploadService extends FileAccess {
   }
 
   /** Inserts a new filepart - metadata goes to the DB, content to the pending-uploads dir **/
-  def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile])(implicit db: DB) = db.withTransaction { sql =>
+  def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile])(implicit db: DB): 
+    Future[Either[ContentIdentificationFailure, UploadFilepartRecord]] = db.withTransaction { sql =>
+      
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filesize = filepart.ref.file.length.toDouble / 1024
     val file = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
-    val contentType = ContentTypes.fromFile(file)
-    if (contentType.isEmpty)
-      throw new Exception("Unsupported filetype")
-      
-    filepart.ref.moveTo(file)    
-    val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.get.toString, file.getName, filesize)
     
-    sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
-    filepartRecord
+    ContentType.fromFile(file) match {
+      case Right(contentType) => {      
+        filepart.ref.moveTo(file)    
+        val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize)
+    
+        sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
+        Right(filepartRecord)
+      }
+        
+      case Left(identificationFailure) =>
+        Left(identificationFailure)
+    }
   }
 
   /** Deletes a filepart - record is removed from the DB, file from the data directory **/

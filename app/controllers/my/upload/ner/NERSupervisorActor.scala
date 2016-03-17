@@ -3,7 +3,6 @@ package controllers.my.upload.ner
 import akka.actor.Props
 import controllers.my.upload.SupervisorActor
 import java.io.File
-import models.content.ContentTypes
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.duration.FiniteDuration
 

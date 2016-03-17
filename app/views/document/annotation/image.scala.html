@@ -7,6 +7,17 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("lib/openlayers/ol.css")"/>
+    <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
+    <script src="@routes.Assets.versioned("lib/openlayers/ol.js")"></script>
+    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/annotation/image/app.js")"></script>
+    <script>
+      window.config = {
+        documentId: '@document.getId',
+        partId: @currentPart.getId,
+        partSequenceNo: @currentPart.getSequenceNo
+      }
+    </script>
   </head>
   <body>
     <div class="header-iconbar">
@@ -59,5 +70,41 @@
         </li>
       </ul>
     </div> <!-- .header-iconbar -->
+
+    <div class="header-infobox">
+      <h1>
+        @Option(document.getAuthor).map(_ + ": ")
+        @document.getTitle
+      </h1>
+      <h2 class="date">@Option(document.getDateFreeform)</h2>
+      <p class="quick-stats">
+        <span class="icon comment">&#xf0e5;</span>
+        <span class="annotations">-</span> Annotations
+        &nbsp; &centerdot; &nbsp;
+        <span class="icon">&#xf0c0;</span>
+        <span class="contributors">No Other Contributors</span>
+      </p>
+    </div> <!-- .header-infobox -->
+
+    <div id="image-pane"></div>
+
+    <div class="sidebar">
+      <div class="sidebar-header tooltip bottom"></div>
+      <div class="sidebar-parts">
+        <ul>
+          @for(part <- allParts) {
+            @if(part == currentPart) {
+              <li class="active">
+                <a href="#" onclick="return false;">@part.getTitle</a>
+              </li>
+            } else {
+              <li>
+                <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
+              </li>
+            }
+          }
+        </ul>
+      </div>
+    </div> <!-- .sidebar -->
   </body>
 </html>

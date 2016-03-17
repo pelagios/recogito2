@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.testkit.{ TestKit, ImplicitSender }
 import java.io.File
 import java.time.OffsetDateTime
-import models.content.ContentTypes
+import models.content.ContentType
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.apache.commons.io.FileUtils
 import org.specs2.mutable._
@@ -37,8 +37,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
     val document2 = new DocumentRecord("98muze1cl3saib", "rainer", OffsetDateTime.now, "A long test doc", null, null, null, null, null, null)
     
     // Five fileparts - parts 1-3 on document 0, 4-5 on document 1
-    val parts1 = (1 to 5).map(n => new DocumentFilepartRecord(n, "hcylkmacy4xgkb", "text-for-ner-0" + n + ".txt", ContentTypes.TEXT_PLAIN.toString, "text-for-ner-0" + n + ".txt", 0))
-    val parts2 = Seq(new DocumentFilepartRecord(6, "98muze1cl3saib", "text-for-ner-06.txt", ContentTypes.TEXT_PLAIN.toString, "text-for-ner-06.txt", 0))
+    val parts1 = (1 to 5).map(n => new DocumentFilepartRecord(n, "hcylkmacy4xgkb", "text-for-ner-0" + n + ".txt", ContentType.TEXT_PLAIN.toString, "text-for-ner-0" + n + ".txt", 0))
+    val parts2 = Seq(new DocumentFilepartRecord(6, "98muze1cl3saib", "text-for-ner-06.txt", ContentType.TEXT_PLAIN.toString, "text-for-ner-06.txt", 0))
       
     val dir = new File("test/resources")
     

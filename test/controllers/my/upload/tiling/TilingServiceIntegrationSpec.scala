@@ -5,7 +5,7 @@ import akka.testkit.{ TestKit, ImplicitSender }
 import controllers.my.upload.ProgressStatus
 import java.io.File
 import java.time.OffsetDateTime
-import models.content.ContentTypes
+import models.content.ContentType
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.apache.commons.io.FileUtils
 import org.specs2.mutable._
@@ -35,7 +35,7 @@ class TilingServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitS
     val KEEP_ALIVE = 10 seconds
     
     val document = new DocumentRecord("hcylkmacy4xgkb", "rainer", OffsetDateTime.now, "A test image", null, null, null, null, null, null)
-    val parts = Seq(new DocumentFilepartRecord(1, "hcylkmacy4xgkb", "Ptolemy_map_15th_century.jpg", ContentTypes.IMAGE_UPLOAD.toString, "Ptolemy_map_15th_century.jpg", 0))
+    val parts = Seq(new DocumentFilepartRecord(1, "hcylkmacy4xgkb", "Ptolemy_map_15th_century.jpg", ContentType.IMAGE_UPLOAD.toString, "Ptolemy_map_15th_century.jpg", 0))
     val dir = new File("test/resources")
     
     

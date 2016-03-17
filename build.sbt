@@ -30,6 +30,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
+  "org.webjars" % "openlayers" % "3.13.0",
   "org.webjars.bower" % "rangy" % "1.3.0",
   "org.webjars" % "requirejs" % "2.1.22",
 

@@ -5,7 +5,7 @@ import controllers.my.upload.ProgressStatus
 import java.io.File
 import java.util.UUID
 import models.annotation._
-import models.content.ContentTypes
+import models.content.ContentType
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.Logger
@@ -15,7 +15,7 @@ import scala.io.Source
 
 private[ner] object NERWorkerActor {
 
-  val SUPPORTED_CONTENT_TYPES = Set(ContentTypes.TEXT_PLAIN).map(_.toString)
+  val SUPPORTED_CONTENT_TYPES = Set(ContentType.TEXT_PLAIN).map(_.toString)
 
 }
 
@@ -53,7 +53,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
   /** Select appropriate parser for part content type **/
   private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) =
     part.getContentType match {
-      case t if t == ContentTypes.TEXT_PLAIN.toString =>
+      case t if t == ContentType.TEXT_PLAIN.toString =>
         parsePlaintext(document, part, new File(dir, part.getFilename))
 
       case t => {

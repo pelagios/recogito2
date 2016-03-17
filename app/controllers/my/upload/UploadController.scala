@@ -8,7 +8,8 @@ import controllers.my.upload.tiling.TilingService
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
-import models.content.{ ContentTypes, DocumentService, UploadService }
+import models.content.ContentIdentificationFailures._
+import models.content.{ ContentType, DocumentService, UploadService }
 import models.generated.tables.records.UploadRecord
 import models.user.Roles._
 import play.api.Logger
@@ -96,8 +97,18 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
         case Some(pendingUpload) =>
           request.body.asMultipartFormData.map(tempfile => {
             tempfile.file(FILE_ARG).map(f => {
-              UploadService.insertFilepart(pendingUpload.getId, username, f)
-                .map(_ => Status(OK))
+              UploadService.insertFilepart(pendingUpload.getId, username, f).map(_ match {
+                case Right(filepart) =>
+                  // Upload was properly identified and stored
+                  Status(OK)
+                  
+                case Left(UnsupportedContentType) =>
+                  BadRequest("Unknown or unsupported file format")
+                  
+                case Left(otherFailure) =>
+                  // For future use
+                  BadRequest(MSG_ERROR)
+              })
             }).getOrElse({
               // POST without a file? Not possible through the UI!
               Logger.warn("Filepart POST without file attached")
@@ -147,7 +158,7 @@ class UploadController @Inject() (implicit val db: DB, system: ActorSystem) exte
               NERService.spawnNERProcess(doc, docParts)
               
             // Tile images
-            val imageParts = docParts.filter(_.getContentType.equals(ContentTypes.IMAGE_UPLOAD.toString))
+            val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
             if (imageParts.size > 0)
               TilingService.spawnTilingProcess(doc, imageParts)
 

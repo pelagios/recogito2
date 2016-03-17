@@ -3,7 +3,7 @@ package controllers.document.annotation
 import controllers.{ AbstractController, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
-import models.content.{ ContentTypes, DocumentService }
+import models.content.{ ContentType, DocumentService }
 import models.user.Roles._
 import play.api.mvc.Controller
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -24,12 +24,12 @@ class AnnotationController @Inject() (implicit val db: DB) extends AbstractContr
         // Verify if the user is allowed to access this document - TODO what about shared content?
         if (document.getOwner == username) {
           fileparts.find(_.getSequenceNo == partNo) match {
-            case Some(filepart) => ContentTypes.withName(filepart.getContentType) match {
+            case Some(filepart) => ContentType.withName(filepart.getContentType) match {
               
-              case ContentTypes.IMAGE_UPLOAD => 
+              case ContentType.IMAGE_UPLOAD => 
                 Ok(views.html.document.annotation.image(username, document, fileparts, filepart))
                 
-              case ContentTypes.TEXT_PLAIN => {
+              case ContentType.TEXT_PLAIN => {
                 loadTextfile(username, filepart.getFilename) match {
                   case Some(content) =>
                     Ok(views.html.document.annotation.text(username, document, fileparts, filepart, content))

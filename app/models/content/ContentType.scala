@@ -1,9 +1,9 @@
 package models.content
 
 import java.io.File
-import play.api.Logger
+import models.content.ContentIdentificationFailures._
 
-object ContentTypes extends Enumeration {
+object ContentType extends Enumeration {
 
   val TEXT_PLAIN =    Value("TEXT_PLAIN")
 
@@ -21,17 +21,16 @@ object ContentTypes extends Enumeration {
     *
     * TODO identify from the actual file, not just from the extension
     */
-  def fromFile(file: File): Option[ContentTypes.Value] = {
-    val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
+  def fromFile(file: File): Either[ContentIdentificationFailure, ContentType.Value] = {
+    val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase 
     extension match {
-      
-      case "txt" => Some(TEXT_PLAIN)
-      
-      case "jpg" | "tif" | "png" => Some(IMAGE_UPLOAD)
-
-      case _ => None
-      
+      case "txt" =>
+        Right(TEXT_PLAIN)
+      case "jpg" | "tif" | "png" => 
+        Right(IMAGE_UPLOAD)
+      case _ => 
+        Left(UnsupportedContentType)
     }
   }
-
+  
 }
