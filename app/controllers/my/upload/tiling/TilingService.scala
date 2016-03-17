@@ -15,7 +15,7 @@ import storage.FileAccess
 import sys.process._
 
 object TilingService extends FileAccess {
-  
+
   private[tiling] def createZoomify(file: File, destFolder: File): Future[Unit] = {
     Future {
       s"vips dzsave $file $destFolder --layout zoomify" !
@@ -26,7 +26,7 @@ object TilingService extends FileAccess {
         throw new Exception("Image tiling failed for " + file.getAbsolutePath + " to " + destFolder.getAbsolutePath)
     }
   }
-  
+
   /** Spawns a new background tiling process.
     *
     * The function will throw an exception in case the user data directory
@@ -35,13 +35,13 @@ object TilingService extends FileAccess {
     */
   def spawnTilingProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
     spawnTilingProcess(document, parts, getUserDir(document.getOwner).get)
-    
+
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[tiling] def spawnTilingProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
     val actor = system.actorOf(Props(classOf[TilingSupervisorActor], document, parts, sourceFolder, keepalive), name = "tile_doc_" + document.getId)
     actor ! Messages.Start
   }
-  
+
   /** Queries the progress for a specific process **/
   def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
     Logger.info("Reporting tiling progress")
@@ -55,5 +55,5 @@ object TilingService extends FileAccess {
         Future.successful(None)
     }
   }
-  
+
 }

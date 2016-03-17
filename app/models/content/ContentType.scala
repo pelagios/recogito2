@@ -1,9 +1,20 @@
 package models.content
 
 import java.io.File
+import scala.language.postfixOps
+import scala.util.Try
+import sys.process._
 
 object ContentType extends Enumeration {
-  
+
+  // Images are only supported if VIPS is installed on the system
+  private val VIPS_INSTALLED =
+    Try(
+
+        "vips help" !
+
+    ).isSuccess
+
   import ContentIdentificationFailures._
 
   val TEXT_PLAIN =    Value("TEXT_PLAIN")
@@ -17,22 +28,22 @@ object ContentType extends Enumeration {
   val IMAGE_IIIF =    Value("IMAGE_IIIF")
 
   val DATA_CSV =      Value("DATA_CSV")
-  
+
   /** TODO analyze based on the actual file, not just the extension! **/
   def fromFile(file: File): Either[ContentIdentificationFailure, ContentType.Value] = {
-    val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase 
-    
+    val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
+
     extension match {
       case "txt" =>
         Right(TEXT_PLAIN)
-        
-      case "jpg" | "tif" | "png" => 
-          Right(IMAGE_UPLOAD)
-        
-      case _ => 
+
+      case "jpg" | "tif" | "png" =>
+        if (VIPS_INSTALLED) Right(IMAGE_UPLOAD) else Left(UnsupportedContentType)
+
+      case _ =>
         Left(UnsupportedContentType)
     }
-    
+
   }
-  
+
 }

@@ -2,9 +2,17 @@
 
 Future home of Recogito v2.0
 
+## Prerequisites
+
+* Java 8 JDK
+* [Play Framework v2.5.0](https://www.playframework.com/download) installed on your machine
+* Image upload requires that the [vips](http://www.vips.ecs.soton.ac.uk/) image processing system
+  is installed and available through the command-line. If vips is not available on your system,
+  Recogito will reject uploaded images as 'unsupported content'.
+
 ## Installation
 
-* Prerequisites: Java 8 JDK and [Play Framework v2.5.0](https://www.playframework.com/download)
+
 * Create a copy of the file `conf/application.conf.template` named `conf/application.conf` and
   make any environment-specific changes there. (Normally, the defaults should be fine.)
 * Type `activator run` to start the application in development mode.
@@ -14,7 +22,7 @@ Future home of Recogito v2.0
 ## Database Configuration
 
 If you stick with the default settings, Recogito will automatically create an SQLite database and
-an embedded ElasticSearch index, so there's nothing you need to do. However, for prodcution use
+an embedded ElasticSearch index, so there's nothing you need to do. However, for production use
 we recommend a PostgreSQL DB and a separate ElasticSearch installation.
 
 ## Running in production
