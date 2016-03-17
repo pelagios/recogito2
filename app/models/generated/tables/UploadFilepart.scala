@@ -80,12 +80,17 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	/**
 	 * The column <code>upload_filepart.filename</code>.
 	 */
-	val FILENAME : TableField[UploadFilepartRecord, String] = createField("filename", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val FILENAME : TableField[UploadFilepartRecord, String] = createField("filename", org.jooq.impl.SQLDataType.VARCHAR, "")
 
 	/**
 	 * The column <code>upload_filepart.filesize_kb</code>.
 	 */
-	val FILESIZE_KB : TableField[UploadFilepartRecord, Double] = createField("filesize_kb", org.jooq.impl.SQLDataType.DOUBLE.nullable(false), "")
+	val FILESIZE_KB : TableField[UploadFilepartRecord, Double] = createField("filesize_kb", org.jooq.impl.SQLDataType.DOUBLE, "")
+
+	/**
+	 * The column <code>upload_filepart.extra_metadata</code>.
+	 */
+	val EXTRA_METADATA : TableField[UploadFilepartRecord, String] = createField("extra_metadata", org.jooq.impl.SQLDataType.VARCHAR, "")
 
 	/**
 	 * Create a <code>upload_filepart</code> table reference
