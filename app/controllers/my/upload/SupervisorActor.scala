@@ -25,7 +25,7 @@ abstract class SupervisorActor(document: DocumentRecord, parts: Seq[DocumentFile
     /** Starts child worker actors **/
     case Start =>
       if (workers.isEmpty)
-        shutdown(keepalive)
+        shutdown(0 seconds)
       else
         workers.foreach(_ ! Start)
 

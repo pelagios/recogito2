@@ -42,9 +42,8 @@ CREATE TABLE upload_filepart (
   owner VARCHAR NOT NULL REFERENCES user(username),
   title VARCHAR NOT NULL,
   content_type VARCHAR NOT NULL,
-  filename VARCHAR,
+  filename VARCHAR NOT NULL,
   filesize_kb DOUBLE,
-  extra_metadata VARCHAR,
   -- TODO filepart metadata (source, identifier,... ?)
   UNIQUE (owner, title)
 );
@@ -68,9 +67,8 @@ CREATE TABLE document_filepart (
   document_id VARCHAR NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   title VARCHAR NOT NULL,
   content_type VARCHAR NOT NULL,
-  filename VARCHAR,
+  filename VARCHAR NOT NULL,
   sequence_no INTEGER NOT NULL,
-  extra_metadata VARCHAR,
   -- TODO filepart metadata (source, identifier,... ?)
   UNIQUE (document_id, sequence_no)
 );

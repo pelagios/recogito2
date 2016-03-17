@@ -35,7 +35,7 @@ class TilingServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitS
     val KEEP_ALIVE = 10 seconds
     
     val document = new DocumentRecord("hcylkmacy4xgkb", "rainer", OffsetDateTime.now, "A test image", null, null, null, null, null, null)
-    val parts = Seq(new DocumentFilepartRecord(1, "hcylkmacy4xgkb", "Ptolemy_map_15th_century.jpg", ContentType.IMAGE_UPLOAD.toString, "Ptolemy_map_15th_century.jpg", 0, null))
+    val parts = Seq(new DocumentFilepartRecord(1, "hcylkmacy4xgkb", "Ptolemy_map_15th_century.jpg", ContentType.IMAGE_UPLOAD.toString, "Ptolemy_map_15th_century.jpg", 0))
     val dir = new File("test/resources")
     
     
