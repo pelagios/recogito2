@@ -3,15 +3,18 @@ package models.user
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.time.OffsetDateTime
+import models.AbstractService
 import models.generated.Tables._
 import models.generated.tables.records.UserRecord
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
+import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
-object UserService extends FileAccess {
+object UserService extends AbstractService with FileAccess {
 
   private val SHA_256 = "SHA-256"
 
@@ -22,8 +25,11 @@ object UserService extends FileAccess {
     user
   }
 
-  /** TODO this is accessed for every request - should cache this at some point **/
-  def findByUsername(username: String)(implicit db: DB) = db.query { sql =>
+  /** This method is cached, since it's basically called on every request **/
+  def findByUsername(username: String)(implicit db: DB, cache: CacheApi) =
+    cachedLookup("user", username, findByUsernameNoCache)
+  
+  def findByUsernameNoCache(username: String)(implicit db: DB, cache: CacheApi) = db.query { sql =>
     Option(sql.selectFrom(USER).where(USER.USERNAME.equal(username)).fetchOne())
   }
 
@@ -31,9 +37,9 @@ object UserService extends FileAccess {
     Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
 
-  def validateUser(username: String, password: String)(implicit db: DB) =
+  def validateUser(username: String, password: String)(implicit db: DB, cache: CacheApi) =
     findByUsername(username).map(_ match {
-      case Some(user) => computeHash(user.getSalt+password) == user.getPasswordHash
+      case Some(user) => computeHash(user.getSalt + password) == user.getPasswordHash
       case None => false
     })
 

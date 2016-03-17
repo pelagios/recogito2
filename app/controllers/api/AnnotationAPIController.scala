@@ -9,6 +9,7 @@ import models.content.DocumentService
 import models.user.Roles._
 import org.joda.time.DateTime
 import play.api.Logger
+import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -41,7 +42,7 @@ object AnnotationStub {
 
 }
 
-class AnnotationAPIController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
+class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController with AuthElement with Security {
 
   private val PARAM_DOC = "doc"
 

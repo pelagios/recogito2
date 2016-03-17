@@ -1,19 +1,19 @@
 package controllers.my.upload
 
 import akka.actor.ActorSystem
-import controllers.{ AbstractController, Security }
+import controllers.AbstractController
 import controllers.my.upload.Messages._
 import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
 import java.io.File
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
 import models.content.ContentIdentificationFailures._
 import models.content.{ ContentType, DocumentService, UploadService }
 import models.generated.tables.records.UploadRecord
 import models.user.Roles._
 import play.api.Logger
 import play.api.Play.current
+import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages.Implicits._
@@ -27,7 +27,7 @@ import storage.DB
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
 
-class UploadController @Inject() (implicit val db: DB, system: ActorSystem) extends AbstractController with AuthElement with Security {
+class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem) extends AbstractController {
 
   private val FILE_ARG = "file"
 

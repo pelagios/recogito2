@@ -7,9 +7,10 @@ import models.generated.tables.records.UserRecord
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.reflect.{ ClassTag, classTag }
 import play.api.Play
+import play.api.cache.CacheApi
 import play.api.mvc.{ Result, Results, RequestHeader }
 
-trait Security extends AuthConfig { self: HasDatabase =>
+trait Security extends AuthConfig { self: HasCacheAndDatabase =>
 
   private val NO_PERMISSION = "No permission"
 
@@ -24,7 +25,7 @@ trait Security extends AuthConfig { self: HasDatabase =>
   val sessionTimeoutInSeconds: Int = 3600
 
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] =
-    UserService.findByUsername(id)(db)
+    UserService.findByUsername(id)(db, cache)
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
     val destination = request.session.get("access_uri").getOrElse(my.routes.MyRecogitoController.my.toString)

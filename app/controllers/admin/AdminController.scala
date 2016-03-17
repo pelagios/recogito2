@@ -1,12 +1,12 @@
 package controllers.admin
 
-import controllers.{ AbstractController, Security }
+import controllers.AbstractController
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
 import models.user.Roles._
+import play.api.cache.CacheApi
 import storage.DB
 
-class AdminController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
+class AdminController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController {
   
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.index())

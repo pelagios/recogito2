@@ -1,17 +1,25 @@
 package controllers
 
+import jp.t2v.lab.play2.auth.AuthElement
 import models.content.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.Logger
+import play.api.cache.CacheApi
 import play.api.mvc.{ Request, Result, Controller, AnyContent }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.DB
 
-/** Helper trait so we can hand the injected DB down to the Security trait **/
-trait HasDatabase { def db: DB }
+/** Helper trait so we can hand the injected Cache and DB down to the Security trait **/
+trait HasCacheAndDatabase {
+ 
+  def cache: CacheApi
+  
+  def db: DB
+  
+} 
 
 /** Currently (mostly) a placeholder for future common Controller functionality **/
-abstract class AbstractController extends Controller with HasDatabase {
+abstract class AbstractController extends Controller with HasCacheAndDatabase with AuthElement with Security {
 
   /** Returns the value of the specified query string parameter **/
   protected def getQueryParam(key: String)(implicit request: Request[AnyContent]): Option[String] =
@@ -41,7 +49,7 @@ abstract class AbstractController extends Controller with HasDatabase {
     * the method handles Forbidden/Not Found error cases.
     */
   protected def renderDocumentResponse(docId: String, user: String, 
-      response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Result)(implicit db: DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Result)(implicit cache: CacheApi, db: DB) = {
     
     DocumentService.findByIdWithFileparts(docId).map(_ match {
       case Some((document, fileparts)) => {
@@ -65,7 +73,7 @@ abstract class AbstractController extends Controller with HasDatabase {
   
   /** Helper that covers the boilerplate for all document part views **/
   protected def renderDocumentPartResponse(docId: String, partNo: Int, user: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord) => Result)(implicit db:DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord) => Result)(implicit cache: CacheApi, db:DB) = {
     
     DocumentService.findByIdWithFileparts(docId).map(_ match {
       case Some((document, fileparts)) => {

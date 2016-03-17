@@ -1,12 +1,12 @@
 package controllers.document.downloads
 
-import controllers.{ AbstractController, Security }
+import controllers.AbstractController
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
 import models.user.Roles._
+import play.api.cache.CacheApi
 import storage.DB
 
-class DownloadsController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
+class DownloadsController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController {
 
   def showDownloadOptions(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.getUsername,

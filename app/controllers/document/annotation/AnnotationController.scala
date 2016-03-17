@@ -1,15 +1,15 @@
 package controllers.document.annotation
 
-import controllers.{ AbstractController, Security }
+import controllers.AbstractController
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
 import models.content.{ ContentType, DocumentService }
 import models.user.Roles._
+import play.api.cache.CacheApi
 import play.api.mvc.Controller
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.{ DB, FileAccess }
 
-class AnnotationController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security with FileAccess {
+class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController with FileAccess {
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: String) = StackAction(AuthorityKey -> Normal) { implicit request =>

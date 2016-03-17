@@ -1,16 +1,16 @@
 package controllers.my
 
-import controllers.{ AbstractController, Security }
+import controllers.AbstractController
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
 import models.user.Roles._
 import models.user.UserService
 import models.content.DocumentService
+import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import storage.DB
 
-class MyRecogitoController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security {
+class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController {
 
   def my = StackAction(AuthorityKey -> Normal) { implicit request =>
     Redirect(routes.MyRecogitoController.index(loggedIn.getUsername))

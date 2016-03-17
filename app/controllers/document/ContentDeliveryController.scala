@@ -1,15 +1,15 @@
 package controllers.document
 
-import controllers.{ AbstractController, Security }
+import controllers.AbstractController
 import java.io.File
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
 import models.user.Roles._
+import play.api.cache.CacheApi
 import storage.{ DB, FileAccess }
 
 import play.api.Logger
 
-class ContentDeliveryController @Inject() (implicit val db: DB) extends AbstractController with AuthElement with Security with FileAccess {
+class ContentDeliveryController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController with FileAccess {
   
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentPartResponse(docId, partNo, loggedIn.getUsername, { case (document, fileparts, filepart) =>

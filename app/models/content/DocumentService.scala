@@ -7,6 +7,7 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import org.apache.commons.lang3.RandomStringUtils
 import org.jooq.Record
 import play.api.Logger
+import play.api.cache.CacheApi
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -56,7 +57,11 @@ object DocumentService extends AbstractService {
        .fetchArray().toSeq
   }
 
-  def findByIdWithFileparts(id: String)(implicit db: DB) = db.query { sql =>
+  /** This method is cached as it gets accessed a lot **/
+  def findByIdWithFileparts(id: String)(implicit db: DB, cache: CacheApi) =
+    cachedLookup("doc", id, findByIdWithFilepartsNoCache)
+  
+  private def findByIdWithFilepartsNoCache(id: String)(implicit db: DB) = db.query { sql =>
     val records =
       sql.selectFrom(DOCUMENT
         .join(DOCUMENT_FILEPART)

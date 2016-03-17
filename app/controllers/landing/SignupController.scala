@@ -1,10 +1,11 @@
 package controllers.landing
 
-import controllers.{ AbstractController, Security }
+import controllers.AbstractController
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
 import models.user.UserService
 import play.api.Play.current
+import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation._
@@ -20,7 +21,7 @@ import storage.DB
 
 case class SignupData(username: String, email: String, password: String)
 
-class SignupController @Inject() (implicit val db: DB) extends AbstractController with Login with Security {
+class SignupController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController with Login {
 
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
 
