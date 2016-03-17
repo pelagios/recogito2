@@ -4,30 +4,53 @@ require(['../../common/config'], function(Config) {
 
     var contentDiv = jQuery('#image-pane'),
 
-        projection = new ol.proj.Projection({
-          code: 'ZOOMIFY',
-          units: 'pixels',
-          extent: [0, 0, 8275, 6514]
-        }),
+        BASE_URL = '/document/' + Config.documentId + '/part/' + Config.partSequenceNo + '/tiles/',
 
-        tileSource = new ol.source.Zoomify({
-          url: '/document/' + Config.documentId + '/part/' + Config.partSequenceNo + '/tiles/',
-          size: [ 8275, 6514 ]
-        }),
+        init = function(width, height) {
+          var projection = new ol.proj.Projection({
+                code: 'ZOOMIFY',
+                units: 'pixels',
+                extent: [0, 0, width, height]
+              }),
 
-        tileLayer = new ol.layer.Tile({ source: tileSource }),
+              tileSource = new ol.source.Zoomify({
+                url: BASE_URL,
+                size: [ width, height ]
+              }),
 
-        olMap = new ol.Map({
-          target: 'image-pane',
-          layers: [ tileLayer ],
-          view: new ol.View({
-            projection: projection,
-            center: [4137, -3257],
-            zoom: 0,
-            minResolution: 0.125
-          })
-        });
+              tileLayer = new ol.layer.Tile({ source: tileSource }),
 
+              olMap = new ol.Map({
+                target: 'image-pane',
+                layers: [ tileLayer ],
+                view: new ol.View({
+                  projection: projection,
+                  center: [width / 2, - (height / 2)],
+                  zoom: 0,
+                  minResolution: 0.125
+                })
+              });
+        },
+
+        loadManifest = function() {
+          jQuery.ajax({
+            type: 'GET',
+            url: BASE_URL + 'ImageProperties.xml',
+            success: function(response) {
+              // jQuery handles XML parsing for us automagically
+              var props = jQuery(response).find('IMAGE_PROPERTIES'),
+                  width = parseInt(props.attr('WIDTH')),
+                  height = parseInt(props.attr('HEIGHT'));
+
+              init(width, height);
+            },
+            error: function(error) {
+              console.log(error);
+            }
+          });
+        };
+
+    loadManifest();
   });
 
 });
