@@ -1,4 +1,4 @@
-require([], function() {
+require(['../../common/config'], function(Config) {
 
   jQuery(document).ready(function() {
 
@@ -11,7 +11,7 @@ require([], function() {
         }),
 
         tileSource = new ol.source.Zoomify({
-          url: 'http://localhost:9000/assets/images/41911630-a1ce-4ce1-adf8-4cb961301ec9/',
+          url: '/document/' + Config.documentId + '/part/' + Config.partSequenceNo + '/tiles/',
           size: [ 8275, 6514 ]
         }),
 

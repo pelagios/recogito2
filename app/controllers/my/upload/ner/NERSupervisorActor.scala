@@ -14,7 +14,7 @@ private[ner]
   override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
     parts
       .filter(part => NERWorkerActor.SUPPORTED_CONTENT_TYPES.contains(part.getContentType))
-      .map(p => context.actorOf(Props(classOf[NERWorkerActor], document, p, dir), name="doc_" + document.getId + "_part" + p.getId))
+      .map(p => context.actorOf(Props(classOf[NERWorkerActor], document, p, dir), name="ner_doc_" + document.getId + "_part" + p.getId))
 
 }
 

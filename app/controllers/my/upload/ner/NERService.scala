@@ -79,7 +79,7 @@ object NERService extends FileAccess {
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder, keepalive), name = "doc_" + document.getId)
+    val actor = system.actorOf(Props(classOf[NERSupervisorActor], document, parts, sourceFolder, keepalive), name = "ner_doc_" + document.getId)
     actor ! Messages.Start
   }
 

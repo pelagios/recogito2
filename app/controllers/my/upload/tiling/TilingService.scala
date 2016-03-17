@@ -38,8 +38,7 @@ object TilingService extends FileAccess {
     
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[tiling] def spawnTilingProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
-    Logger.info("Starting image tiling process")
-    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], document, parts, sourceFolder, keepalive), name = "doc_" + document.getId)
+    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], document, parts, sourceFolder, keepalive), name = "tile_doc_" + document.getId)
     actor ! Messages.Start
   }
   

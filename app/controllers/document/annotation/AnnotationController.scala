@@ -13,7 +13,7 @@ class AnnotationController @Inject() (implicit val db: DB) extends AbstractContr
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: String) = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Redirect(routes.AnnotationController.showAnnotationViewForDocPart(documentId, 0))
+    Redirect(routes.AnnotationController.showAnnotationViewForDocPart(documentId, 1))
   }
 
   def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>

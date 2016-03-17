@@ -15,6 +15,6 @@ private[tiling]
   override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
     parts
       .filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
-      .map(p => context.actorOf(Props(classOf[TilingWorkerActor], document, p, dir), name="doc_" + document.getId + "_part" + p.getId))
+      .map(p => context.actorOf(Props(classOf[TilingWorkerActor], document, p, dir), name="tile_doc_" + document.getId + "_part" + p.getId))
   
 }

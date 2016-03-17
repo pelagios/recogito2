@@ -40,12 +40,16 @@ abstract class AbstractController extends Controller with HasDatabase {
     * Just hand this method a function that produces an HTTP OK result for a document, while
     * the method handles Forbidden/Not Found error cases.
     */
-  protected def renderDocumentResponse(docId: String, user: String, response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Result)(implicit db: DB) = {
+  protected def renderDocumentResponse(docId: String, user: String, 
+      response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Result)(implicit db: DB) = {
+    
     DocumentService.findByIdWithFileparts(docId).map(_ match {
       case Some((document, fileparts)) => {
         // Verify if the user is allowed to access this document - TODO what about shared content?
         if (document.getOwner == user)
+          
           response(document, fileparts)
+          
         else
           Forbidden
       }
@@ -53,7 +57,41 @@ abstract class AbstractController extends Controller with HasDatabase {
       case None =>
         // No document with that ID found in DB
         NotFound
-    })
+    }).recover { case t =>
+      t.printStackTrace()
+      InternalServerError(t.getMessage)
+    }
+  }
+  
+  /** Helper that covers the boilerplate for all document part views **/
+  protected def renderDocumentPartResponse(docId: String, partNo: Int, user: String,
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord) => Result)(implicit db:DB) = {
+    
+    DocumentService.findByIdWithFileparts(docId).map(_ match {
+      case Some((document, fileparts)) => {
+        if (document.getOwner == user) {
+          val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
+          if (selectedPart.isEmpty) {
+            NotFound
+          } else if (selectedPart.size == 1) {
+            
+            response(document, fileparts, selectedPart.head)
+            
+          } else {
+            // More than one part with this sequence number - DB integrity broken!
+            throw new Exception("Invalid ocument part")
+          }
+        } else {
+          Forbidden
+        }
+      }
+      
+      case None =>
+        NotFound
+    }).recover { case t =>
+      t.printStackTrace()
+      InternalServerError(t.getMessage)
+    }
   }
 
 }

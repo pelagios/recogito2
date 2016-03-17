@@ -8,7 +8,7 @@ import controllers.my.upload.tiling.TilingService
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
-import models.content.ContentIdentificationFailures._
+import models.content.ContentAnalysisFailures._
 import models.content.{ ContentType, DocumentService, UploadService }
 import models.generated.tables.records.UploadRecord
 import models.user.Roles._
