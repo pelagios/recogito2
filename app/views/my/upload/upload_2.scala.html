@@ -105,6 +105,7 @@
         clickable: '.choose-file',
         createImageThumbnails: false,
         dictRemoveFile: '',
+        maxFilesize:200,
         previewsContainer: document.getElementById('uploaded-now'),
         previewTemplate:
           '<div class="dz-preview dz-file-preview">' +
@@ -118,7 +119,7 @@
           '</div>',
         init: function() {
           this.on('removedfile', onDelete);
-          this.on('success', refreshView);
+          this.on('addedfile', refreshView);
           this.on('error', onUploadError);
         }
       };
