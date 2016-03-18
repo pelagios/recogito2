@@ -7,8 +7,45 @@ html, body {
   height:100%;
 }
 
-.header-infobox {
+.header-toolbar {
   .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.15));
+  padding-top:2px;
+  height:30px;
+
+  .active {
+    border-bottom:4px solid @ocean;
+  }
+
+  .search {
+    position:relative;
+    float:right;
+
+    input {
+      width:200px;
+      box-sizing:border-box;
+      font-size:12px;
+      height:23px;
+      padding:0 16px 0 3px;
+      margin:2px 0;
+      font-family:OpenSans;
+      letter-spacing:0.5px;
+      background-color:@blueish-white;
+    }
+
+    input:focus {
+      border-color:@form-grey-border;
+      box-shadow:none;
+    }
+
+    .icon {
+      position:absolute;
+      color:@lightgrey-type;
+      top:1px;
+      right:5px;
+    }
+
+  }
+
 }
 
 #image-pane {
@@ -17,6 +54,7 @@ html, body {
   right:0;
   bottom:0;
   left:@sidebar-width;
+  cursor:move;
 
   .ol-zoom {
     right:48px;
