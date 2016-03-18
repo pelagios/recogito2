@@ -1,6 +1,6 @@
 package controllers.my
 
-import controllers.AbstractController
+import controllers.BaseController
 import javax.inject.Inject
 import models.user.Roles._
 import models.user.UserService
@@ -10,7 +10,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import storage.DB
 
-class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController {
+class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
   def my = StackAction(AuthorityKey -> Normal) { implicit request =>
     Redirect(routes.MyRecogitoController.index(loggedIn.getUsername))

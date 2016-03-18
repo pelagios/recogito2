@@ -11,7 +11,7 @@ import storage.DB
 
 import play.api.Logger
 
-trait AbstractService {
+trait BaseService {
 
   protected def groupJoinResult[T <: Record, V <: Record](records: Seq[Record], t: Class[T], v: Class[V]) = {
     records

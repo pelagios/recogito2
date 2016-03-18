@@ -10,7 +10,7 @@ import play.api.Play
 import play.api.cache.CacheApi
 import play.api.mvc.{ Result, Results, RequestHeader }
 
-trait Security extends AuthConfig { self: HasCacheAndDatabase =>
+trait Security extends AuthConfig { self: HasDatabase with HasCache =>
 
   private val NO_PERMISSION = "No permission"
 

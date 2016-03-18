@@ -1,9 +1,8 @@
 package controllers.api
 
-import controllers.{ AbstractController, Security }
+import controllers.BaseController
 import java.util.UUID
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
 import models.annotation._
 import models.content.DocumentService
 import models.user.Roles._
@@ -42,7 +41,7 @@ object AnnotationStub {
 
 }
 
-class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController with AuthElement with Security {
+class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
   private val PARAM_DOC = "doc"
 

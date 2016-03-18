@@ -1,6 +1,6 @@
 package controllers.landing
 
-import controllers.AbstractController
+import controllers.BaseController
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
 import models.user.UserService
@@ -16,7 +16,7 @@ import storage.DB
 
 case class LoginData(username: String, password: String)
 
-class LoginController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController with Login {
+class LoginController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with Login {
 
   private val MESSAGE = "message"
 

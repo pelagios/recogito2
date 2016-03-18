@@ -1,7 +1,7 @@
 package models.content
 
 import collection.JavaConversions._
-import models.AbstractService
+import models.BaseService
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.apache.commons.lang3.RandomStringUtils
@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.DB
 
-object DocumentService extends AbstractService {
+object DocumentService extends BaseService {
   
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14

@@ -1,12 +1,12 @@
 package controllers.document.settings
 
-import controllers.AbstractController
+import controllers.BaseController
 import javax.inject.Inject
 import models.user.Roles._
 import play.api.cache.CacheApi
 import storage.DB
 
-class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends AbstractController {
+class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
   def showDocumentSettings(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.getUsername,

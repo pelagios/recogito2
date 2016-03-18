@@ -9,17 +9,14 @@ import play.api.mvc.{ Request, Result, Controller, AnyContent }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.DB
 
-/** Helper trait so we can hand the injected Cache and DB down to the Security trait **/
-trait HasCacheAndDatabase {
- 
-  def cache: CacheApi
-  
-  def db: DB
-  
-} 
+/** Helper trait so we can hand the injected DB to the Security trait **/
+trait HasDatabase { def db: DB } 
+
+/** Helper trait so we can hand the injected Cache to the Security trait **/
+trait HasCache { def cache: CacheApi }
 
 /** Currently (mostly) a placeholder for future common Controller functionality **/
-abstract class AbstractController extends Controller with HasCacheAndDatabase with AuthElement with Security {
+abstract class BaseController extends Controller with HasCache with HasDatabase with AuthElement with Security {
 
   /** Returns the value of the specified query string parameter **/
   protected def getQueryParam(key: String)(implicit request: Request[AnyContent]): Option[String] =

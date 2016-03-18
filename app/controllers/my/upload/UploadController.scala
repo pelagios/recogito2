@@ -1,7 +1,7 @@
 package controllers.my.upload
 
 import akka.actor.ActorSystem
-import controllers.AbstractController
+import controllers.BaseController
 import controllers.my.upload.Messages._
 import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
@@ -27,7 +27,7 @@ import storage.DB
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
 
-class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem) extends AbstractController {
+class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem) extends BaseController {
 
   private val FILE_ARG = "file"
 

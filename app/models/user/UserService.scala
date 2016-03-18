@@ -3,7 +3,7 @@ package models.user
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.time.OffsetDateTime
-import models.AbstractService
+import models.BaseService
 import models.generated.Tables._
 import models.generated.tables.records.UserRecord
 import org.apache.commons.codec.binary.Base64
@@ -14,7 +14,7 @@ import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
-object UserService extends AbstractService with FileAccess {
+object UserService extends BaseService with FileAccess {
 
   private val SHA_256 = "SHA-256"
 
