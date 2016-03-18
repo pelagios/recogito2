@@ -6,7 +6,14 @@ require(['../../common/config'], function(Config) {
 
         BASE_URL = '/document/' + Config.documentId + '/part/' + Config.partSequenceNo + '/tiles/',
 
-        init = function(width, height) {
+        initDropdown = function(element) {
+          element.hide();
+          element.parent().hover(
+            function() { element.show(); },
+            function() { element.hide(); });
+        },
+
+        initImage = function(width, height) {
           var projection = new ol.proj.Projection({
                 code: 'ZOOMIFY',
                 units: 'pixels',
@@ -42,7 +49,7 @@ require(['../../common/config'], function(Config) {
                   width = parseInt(props.attr('WIDTH')),
                   height = parseInt(props.attr('HEIGHT'));
 
-              init(width, height);
+              initImage(width, height);
             },
             error: function(error) {
               console.log(error);
@@ -50,6 +57,7 @@ require(['../../common/config'], function(Config) {
           });
         };
 
+    initDropdown(jQuery('.dropdown'));
     loadManifest();
   });
 

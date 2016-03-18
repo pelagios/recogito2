@@ -8,17 +8,15 @@ body {
 
 .header-iconbar {
   position:fixed;
-  z-index:3;
+  width:100%;
 }
 
 .header-infobox {
   padding-top:70px;
-  z-index:2;
 }
 
 .header-toolbar {
   position:relative;
-  z-index:1;
 
   ul {
     display:inline-block;
@@ -35,6 +33,10 @@ body {
     font-weight:normal;
     border-bottom:4px solid transparent;
     cursor:pointer;
+  }
+
+  .has-sub-options:hover {
+    border-color:transparent !important;
   }
 
   ul.annotation-mode {
