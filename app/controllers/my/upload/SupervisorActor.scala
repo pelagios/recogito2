@@ -8,11 +8,13 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-abstract class SupervisorActor(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
+case class TaskType(name: String)
+
+abstract class SupervisorActor(taskType: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
   
   import Messages._
-
-  Supervisor.registerSupervisorActor(document.getId, self)
+  
+  Supervisor.registerSupervisorActor(taskType, document.getId, self)
   
   private val workers = spawnWorkers(document, parts, dir)
 
@@ -70,7 +72,7 @@ abstract class SupervisorActor(document: DocumentRecord, parts: Seq[DocumentFile
     def respondIfDone(force: Boolean = false) =
       if (!responseSent)
         if (force || responses.size == workers.size) {
-          origSender ! DocumentProgress(documentId, responses.toSeq)
+          origSender ! DocumentProgress(documentId, taskType, responses.toSeq)
           responseSent = true
         }
   }
@@ -78,7 +80,7 @@ abstract class SupervisorActor(document: DocumentRecord, parts: Seq[DocumentFile
   /** Waits for KEEPALIVE time, and then shuts down **/
   private def shutdown(keepalive: FiniteDuration) = {
     context.system.scheduler.scheduleOnce(keepalive) {
-      Supervisor.deregisterSupervisorActor(document.getId)
+      Supervisor.deregisterSupervisorActor(taskType, document.getId)
       workers.foreach(context.stop(_))
       context.stop(self)
     }
@@ -89,12 +91,12 @@ abstract class SupervisorActor(document: DocumentRecord, parts: Seq[DocumentFile
 object Supervisor {
 
   // Keeps track of all currently active supervisors
-  private val supervisors = scala.collection.mutable.Map.empty[String, ActorRef]
+  private val supervisors = scala.collection.mutable.Map.empty[(TaskType, String), ActorRef]
 
-  def registerSupervisorActor(id: String, actor: ActorRef) = supervisors.put(id, actor)
+  def registerSupervisorActor(task: TaskType, id: String, actor: ActorRef) = supervisors.put((task, id), actor)
 
-  def deregisterSupervisorActor(id: String) = supervisors.remove(id)
+  def deregisterSupervisorActor(task: TaskType, id: String) = supervisors.remove((task, id))
 
-  def getSupervisorActor(id: String) = supervisors.get(id)
+  def getSupervisorActor(task: TaskType, id: String) = supervisors.get((task, id))
 
 }

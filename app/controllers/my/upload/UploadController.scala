@@ -221,6 +221,9 @@ object UploadController {
   
   implicit val progressStatusValueWrites: Writes[ProgressStatus.Value] =
     Writes[ProgressStatus.Value](status => JsString(status.toString))
+    
+  implicit val taskTypeWrites: Writes[TaskType] =
+    Writes[TaskType](t => JsString(t.name))
   
   implicit val workerProgressWrites: Writes[WorkerProgress] = (
     (JsPath \ "filepart_id").write[Int] and
@@ -230,6 +233,7 @@ object UploadController {
 
   implicit val documentProgressWrites: Writes[DocumentProgress] = (
     (JsPath \ "document_id").write[String] and
+    (JsPath \ "task_name").write[TaskType] and
     (JsPath \ "progress").write[Seq[WorkerProgress]]
   )(unlift(DocumentProgress.unapply))
 

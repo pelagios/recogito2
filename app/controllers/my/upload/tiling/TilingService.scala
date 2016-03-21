@@ -3,7 +3,7 @@ package controllers.my.upload.tiling
 import akka.actor.{ ActorSystem, Props }
 import akka.pattern.ask
 import akka.util.Timeout
-import controllers.my.upload.{ Messages, Supervisor }
+import controllers.my.upload.{ Messages, Supervisor, TaskType }
 import java.io.File
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.Logger
@@ -15,6 +15,8 @@ import storage.FileAccess
 import sys.process._
 
 object TilingService extends FileAccess {
+  
+  private val TASK_TILING = TaskType("IMAGE_TILING")
 
   private[tiling] def createZoomify(file: File, destFolder: File): Future[Unit] = {
     Future {
@@ -38,14 +40,14 @@ object TilingService extends FileAccess {
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[tiling] def spawnTilingProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], document, parts, sourceFolder, keepalive), name = "tile_doc_" + document.getId)
+    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], TASK_TILING, document, parts, sourceFolder, keepalive), name = "tile_doc_" + document.getId)
     actor ! Messages.Start
   }
 
   /** Queries the progress for a specific process **/
   def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
     Logger.info("Reporting tiling progress")
-    Supervisor.getSupervisorActor(documentId) match {
+    Supervisor.getSupervisorActor(TASK_TILING, documentId) match {
       case Some(actor) => {
         implicit val t = Timeout(timeout)
         (actor ? Messages.QueryProgress).mapTo[Messages.DocumentProgress].map(Some(_))

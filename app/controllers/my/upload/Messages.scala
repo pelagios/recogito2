@@ -10,7 +10,7 @@ object Messages {
 
   case class WorkerProgress(filepartId: Int, status: ProgressStatus.Value, progress: Double)
 
-  case class DocumentProgress(documentId: String, progress: Seq[WorkerProgress]) extends Message
+  case class DocumentProgress(documentId: String, task: TaskType, progress: Seq[WorkerProgress]) extends Message
 
   case object TimedOut extends Message
 
