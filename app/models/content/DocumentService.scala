@@ -11,9 +11,9 @@ import play.api.cache.CacheApi
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import storage.DB
+import storage.{ DB, FileAccess }
 
-object DocumentService extends BaseService {
+object DocumentService extends BaseService with FileAccess {
   
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
@@ -47,6 +47,31 @@ object DocumentService extends BaseService {
   
   def findById(id: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne())
+  }
+  
+  def delete(document: DocumentRecord)(implicit db: DB) = db.withTransaction { sql =>
+    val ownerDir = getUserDir(document.getOwner).get // Document but no owner dir? Only possible if integrity broken! 
+    
+    val fileparts = 
+      sql.selectFrom(DOCUMENT_FILEPART)
+         .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
+         .fetchArray
+         
+    sql.deleteFrom(DOCUMENT_FILEPART)
+       .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
+       .execute()
+       
+    fileparts.foreach(part => {
+      
+      // TODO remove file
+      
+      // TODO remove tileset (if any)
+      
+    })
+    
+    sql.deleteFrom(DOCUMENT)
+       .where(DOCUMENT.ID.equal(document.getId))
+       .execute()
   }
 
   def findByUser(username: String, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>

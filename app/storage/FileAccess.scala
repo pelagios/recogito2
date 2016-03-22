@@ -68,6 +68,7 @@ trait FileAccess {
     }
   }
 
+  /** Helper **/
   protected def loadTextfile(username: String, filename: String): Option[String] =
     getUserDir(username).flatMap(dir => {
       val file = new File(dir, filename)
@@ -78,6 +79,7 @@ trait FileAccess {
       }
     })
     
+  /** Helper **/
   protected def loadThumbnail(username: String, docId: String, filename: String): Option[File] = 
     getUserDir(username).flatMap(dir => {
       val tilesetDir = new File(dir, filename.substring(0, filename.lastIndexOf('.')))

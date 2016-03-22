@@ -39,11 +39,12 @@ GET     /document/:id/share                        controllers.document.share.Sh
 GET     /document/:id/settings                     controllers.document.settings.SettingsController.showDocumentSettings(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Document content delivery
+# Document content
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id/part/:partNo/tiles/*path     controllers.document.ContentDeliveryController.getImageTile(id: String, partNo: Int, path: String)
-GET     /document/:id/part/:partNo/thumb.jpg       controllers.document.ContentDeliveryController.getThumbnail(id: String, partNo: Int)
+GET     /document/:id/part/:partNo/tiles/*path     controllers.document.DocumentController.getImageTile(id: String, partNo: Int, path: String)
+GET     /document/:id/part/:partNo/thumb.jpg       controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
+DELETE  /document/:id                              controllers.document.DocumentController.deleteDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API
