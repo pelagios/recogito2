@@ -36,7 +36,7 @@ object TilingService extends FileAccess {
     * happen. If it does, something is seriously broken with the DB integrity.
     */
   def spawnTilingProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
-    spawnTilingProcess(document, parts, getUserDir(document.getOwner).get)
+    spawnTilingProcess(document, parts, getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[tiling] def spawnTilingProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {

@@ -77,7 +77,7 @@ object NERService extends FileAccess {
     * happen. If it does, something is seriously broken with the DB integrity.
     */
   def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
-    spawnNERProcess(document, parts, getUserDir(document.getOwner).get)
+    spawnNERProcess(document, parts, getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {

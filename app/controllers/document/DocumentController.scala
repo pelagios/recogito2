@@ -15,11 +15,11 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentPartResponse(docId, partNo, loggedIn.getUsername, { case (document, fileparts, filepart) =>
       // ownerDataDir must exist, unless DB integrity is broken - renderDocumentResponse will handle the exception if .get fails
-      val ownerDataDir = getUserDir(document.getOwner).get
+      val documentDir = getDocumentDir(document.getOwner, document.getId).get
       
       // Tileset foldername is, by convention, equal to filename minus extension
       val foldername = filepart.getFilename.substring(0, filepart.getFilename.lastIndexOf('.'))
-      val tileFolder = new File(ownerDataDir, foldername)
+      val tileFolder = new File(documentDir, foldername)
       
       val file = new File(tileFolder, tilepath)
       if (file.exists)
@@ -31,7 +31,7 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
   
   def getThumbnail(docId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentPartResponse(docId, partNo, loggedIn.getUsername, { case (document, fileparts, filepart) =>
-      loadThumbnail(loggedIn.getUsername, docId, filepart.getFilename) match {
+      openThumbnail(loggedIn.getUsername, docId, filepart.getFilename) match {
         case Some(file) => Ok.sendFile(file)
         case None => NotFound
       }

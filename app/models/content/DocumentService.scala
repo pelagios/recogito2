@@ -21,7 +21,7 @@ object DocumentService extends BaseService with FileAccess {
   private[content] def generateRandomID(retries: Int = 10)(implicit db: DB): String = {
     // Generate 10 random IDs
     val randomIds = 
-      (1 to 10).map(_ => RandomStringUtils.randomAlphanumeric(ID_LENGTH)).toSet
+      (1 to 10).map(_ => RandomStringUtils.randomAlphanumeric(ID_LENGTH).toLowerCase).toSet
 
     // Match them all against the database and remove those that already exist
     val idsAlreadyInDB = Await.result(findIDs(randomIds), 10 seconds)    

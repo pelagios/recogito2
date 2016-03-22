@@ -19,7 +19,7 @@ private[ner] object NERWorkerActor {
 
 }
 
-private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) extends Actor {
+private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File) extends Actor {
 
   import controllers.my.upload.Messages._
 
@@ -32,7 +32,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       status = ProgressStatus.IN_PROGRESS
       val origSender = sender
       
-      parseFilepart(document, part, dir).map { result =>
+      parseFilepart(document, part, documentDir).map { result =>
         val annotations = phrasesToAnnotations(result, document, part)
         AnnotationService.insertAnnotations(annotations)
         progress = 1.0
@@ -51,13 +51,13 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
   }
 
   /** Select appropriate parser for part content type **/
-  private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) =
+  private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File) =
     part.getContentType match {
       case t if t == ContentType.TEXT_PLAIN.toString =>
-        parsePlaintext(document, part, new File(dir, part.getFilename))
+        parsePlaintext(document, part, new File(documentDir, part.getFilename))
 
       case t => {
-        Logger.info("Skipping NER for file of unsupported type " + t + ": " + dir.getName + File.separator + part.getFilename)
+        Logger.info("Skipping NER for file of unsupported type " + t + ": " + documentDir.getName + File.separator + part.getFilename)
         Future { Seq.empty[Phrase] }
       }
     }

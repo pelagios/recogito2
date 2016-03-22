@@ -174,7 +174,7 @@ object UploadService extends FileAccess {
     // Move files from 'pending' to 'user-data' folder
     val filePaths = fileparts.map(filepart => {
       val source = new File(PENDING_UPLOADS_DIR, filepart.getFilename).toPath
-      val destination = new File(getUserDir(upload.getOwner, true).get, filepart.getFilename).toPath
+      val destination = new File(getDocumentDir(upload.getOwner, document.getId, true).get, filepart.getFilename).toPath
       Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
     })
 

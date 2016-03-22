@@ -7,7 +7,7 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 
-class TilingWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) extends Actor{
+class TilingWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File) extends Actor{
 
   import controllers.my.upload.Messages._
 
@@ -21,10 +21,10 @@ class TilingWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, 
       
       val origSender = sender
       val filename = part.getFilename
-      val destFolder = new File(dir, filename.substring(0, filename.lastIndexOf('.')))
+      val tilesetDir= new File(documentDir, filename.substring(0, filename.lastIndexOf('.')))
       
       TilingService
-        .createZoomify(new File(dir, filename), destFolder).map(_ => {
+        .createZoomify(new File(documentDir, filename), tilesetDir).map(_ => {
           progress = 1.0
           status = ProgressStatus.COMPLETED
           origSender ! Completed

@@ -1,6 +1,7 @@
 package storage
 
 import java.io.File
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.{ Logger, Play }
 import scala.io.Source
 
@@ -68,9 +69,23 @@ trait FileAccess {
     }
   }
 
-  /** Helper **/
-  protected def loadTextfile(username: String, filename: String): Option[String] =
-    getUserDir(username).flatMap(dir => {
+  protected def getDocumentDir(owner: String, docId: String, createIfNotExists: Boolean = false): Option[File] =
+    getUserDir(owner, createIfNotExists).flatMap(userDir => {
+      val documentDir = new File(userDir, docId)
+      if (createIfNotExists) {
+        if (!documentDir.exists)
+          documentDir.mkdir()
+        Some(documentDir)
+      } else if (documentDir.exists) {
+        Some(documentDir)
+      } else {
+        None
+      }
+    })
+    
+  /** Helper to read the contents of a text filepart **/
+  protected def readTextfile(owner: String, docId: String, filename: String): Option[String] =
+    getDocumentDir(owner, docId).flatMap(dir => {
       val file = new File(dir, filename)
       if (file.exists) {
         Some(Source.fromFile(file).getLines.mkString("\n"))
@@ -80,8 +95,8 @@ trait FileAccess {
     })
     
   /** Helper **/
-  protected def loadThumbnail(username: String, docId: String, filename: String): Option[File] = 
-    getUserDir(username).flatMap(dir => {
+  protected def openThumbnail(owner: String, docId: String, filename: String): Option[File] = 
+    getDocumentDir(owner, docId).flatMap(dir => {
       val tilesetDir = new File(dir, filename.substring(0, filename.lastIndexOf('.')))
       if (tilesetDir.exists) { 
         val thumbnail = new File(tilesetDir, "TileGroup0/0-0-0.jpg")

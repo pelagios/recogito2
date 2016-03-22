@@ -10,13 +10,13 @@ import scala.language.postfixOps
 
 case class TaskType(name: String)
 
-abstract class SupervisorActor(taskType: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
+abstract class SupervisorActor(taskType: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord], documentDir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
   
   import Messages._
   
   Supervisor.registerSupervisorActor(taskType, document.getId, self)
   
-  private val workers = spawnWorkers(document, parts, dir)
+  private val workers = spawnWorkers(document, parts, documentDir)
 
   private var remainingWorkers = workers.size
   
