@@ -117,9 +117,7 @@
         <ul>
           @for(part <- allParts) {
             @if(part == currentPart) {
-              <li class="active">
-                <a href="#" onclick="return false;">@part.getTitle</a>
-              </li>
+              <li class="active">@part.getTitle</li>
             } else {
               <li>
                 <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
