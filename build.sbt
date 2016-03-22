@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.4",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
+  "com.vividsolutions" % "jts" % "1.13",
   "commons-io" % "commons-io" % "2.4",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models",
@@ -31,8 +32,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
   "org.webjars" % "openlayers" % "3.13.0",
-  "org.webjars.bower" % "rangy" % "1.3.0",
   "org.webjars" % "requirejs" % "2.1.22",
+  "org.webjars.bower" % "rangy" % "1.3.0",
 
   specs2 % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"

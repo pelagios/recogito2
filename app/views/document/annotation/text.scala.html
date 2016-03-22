@@ -117,10 +117,10 @@
         <ul>
           @for(part <- allParts) {
             @if(part == currentPart) {
-              <li class="active">@part.getTitle</li>
+              <li class="active part-title">@part.getTitle</li>
             } else {
               <li>
-                <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
+                <a class="part-title" href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
               </li>
             }
           }
