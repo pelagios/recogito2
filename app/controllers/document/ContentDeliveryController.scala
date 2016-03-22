@@ -28,4 +28,13 @@ class ContentDeliveryController @Inject() (implicit val cache: CacheApi, val db:
     })
   }
   
+  def getThumbnail(docId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    renderDocumentPartResponse(docId, partNo, loggedIn.getUsername, { case (document, fileparts, filepart) =>
+      loadThumbnail(loggedIn.getUsername, docId, filepart.getFilename) match {
+        case Some(file) => Ok.sendFile(file)
+        case None => NotFound
+      }
+    })
+  }
+  
 }

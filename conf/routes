@@ -43,6 +43,7 @@ GET     /document/:id/settings                     controllers.document.settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /document/:id/part/:partNo/tiles/*path     controllers.document.ContentDeliveryController.getImageTile(id: String, partNo: Int, path: String)
+GET     /document/:id/part/:partNo/thumb.jpg       controllers.document.ContentDeliveryController.getThumbnail(id: String, partNo: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API

@@ -38,27 +38,17 @@
       padding:10px 0 0 0;
     }
 
-    a {
-      display:block;
-      color:@nightsky-type-disabled;
-      font-size:16px;
-      padding:10px 15px;
-      font-weight:bold;
-      letter-spacing:0.7px;
-      text-decoration:none;
-    }
-
     li {
       margin:10px 0;
-      padding:0;
+      padding:15px;
     }
 
-    li.active a {
+    li.active {
       color:@nightsky-type;
       background-color:@nightsky-dark;
     }
 
-    li:hover {
+    li:hover:not(.active) {
       background-color:fadeout(@nightsky-dark, 50%);
     }
 

@@ -1,5 +1,6 @@
 package controllers
 
+import java.io.File
 import jp.t2v.lab.play2.auth.AuthElement
 import models.content.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
@@ -70,33 +71,21 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
   
   /** Helper that covers the boilerplate for all document part views **/
   protected def renderDocumentPartResponse(docId: String, partNo: Int, user: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord) => Result)(implicit cache: CacheApi, db:DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord) => Result)(implicit cache: CacheApi, db: DB) = {
     
-    DocumentService.findByIdWithFileparts(docId).map(_ match {
-      case Some((document, fileparts)) => {
-        if (document.getOwner == user) {
-          val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
-          if (selectedPart.isEmpty) {
-            NotFound
-          } else if (selectedPart.size == 1) {
-            
-            response(document, fileparts, selectedPart.head)
-            
-          } else {
-            // More than one part with this sequence number - DB integrity broken!
-            throw new Exception("Invalid ocument part")
-          }
-        } else {
-          Forbidden
-        }
-      }
-      
-      case None =>
+    renderDocumentResponse(docId, user, { case (document, fileparts) => 
+      val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
+      if (selectedPart.isEmpty) {
         NotFound
-    }).recover { case t =>
-      t.printStackTrace()
-      InternalServerError(t.getMessage)
-    }
+      } else if (selectedPart.size == 1) {
+            
+        response(document, fileparts, selectedPart.head)
+            
+      } else {
+        // More than one part with this sequence number - DB integrity broken!
+        throw new Exception("Invalid ocument part")
+      }
+    })
   }
 
 }

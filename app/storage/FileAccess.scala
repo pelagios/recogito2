@@ -77,5 +77,19 @@ trait FileAccess {
         None
       }
     })
+    
+  protected def loadThumbnail(username: String, docId: String, filename: String): Option[File] = 
+    getUserDir(username).flatMap(dir => {
+      val tilesetDir = new File(dir, filename.substring(0, filename.lastIndexOf('.')))
+      if (tilesetDir.exists) { 
+        val thumbnail = new File(tilesetDir, "TileGroup0/0-0-0.jpg")
+        if (thumbnail.exists)
+          Some(thumbnail)
+        else
+          None
+      } else {
+        None        
+      }
+    })
 
 }
