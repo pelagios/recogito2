@@ -30,16 +30,17 @@ define(['events', '../../common/config', '../../common/hasEvents'], function(Eve
 
         attachButtonHandlers = function() {
           annotationModes.on('click', '>li', function(e) {
-            var t = jQuery(e.target),
+            var menuItemQuick = annotationModes.find('.quick'),
+                t = jQuery(e.target),
                 mode = t.data('mode'),
                 type = t.data('type');
 
             if (isModeChanged(mode, type)) {
               annotationModes.find('.active').removeClass('active');
-              quickModeMenu.parent().removeClass(currentMode.type);
+              menuItemQuick.removeClass(currentMode.type);
               if (type) {
                 // Sub-menu selection
-                quickModeMenu.parent().addClass('active ' + type);
+                menuItemQuick.addClass('active ' + type);
                 quickModeMenu.hide();
               } else {
                 t.addClass('active');
