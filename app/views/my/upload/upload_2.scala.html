@@ -31,7 +31,7 @@
 
       <div id="uploaded">
         <div id="uploaded-before">@for(filepart <- fileparts) {
-            <div class="dz-preview dz-file-preview" data-id="@filepart.getId">
+            <div class="dz-preview dz-file-preview" data-id="@filepart.getId" data-type="@filepart.getContentType">
               <div class="dz-details">
                 <div class="dz-size">@formatSize(filepart.getFilesizeKb)</div>
                 <div class="dz-filename"><span>@filepart.getTitle</span></div>
@@ -50,7 +50,7 @@
         </div>
 
         <div class="ner">
-          <input type="checkbox" id="apply-ner" checked="true" name="apply-ner"/>
+          <input type="checkbox" id="apply-ner" name="apply-ner"/>
           <label for="apply-ner">Apply automatic annotation</label>
           <span class="tooltip bottom whats-this">(<u>What's this?</u>)
             <span class="hint">Select this option to perform Named Entity Recognition (automatic
@@ -60,35 +60,24 @@
 
         <div class="buttons-right">
           <a href="@controllers.my.upload.routes.UploadController.cancelUploadWizard(username)" class="cancel btn outline">Cancel</a>
-          <input type="submit" class="next btn" disabled="true" value="Import!" />
+          <input type="submit" class="next btn" disabled="true" value="Next" />
         </div>
       </form>
     </div>
     <script>
-      var onDelete = function(e) {
-            var div = jQuery(e.target).closest('.dz-preview'),
-                name = (e.name) ? e.name : div.find('.dz-filename').text();
+      var dropzone,
 
-            jQuery.ajax({
-              url: '@controllers.my.upload.routes.UploadController.showStep2(username)/' + encodeURIComponent(name),
-              type: 'DELETE',
-              success: function(result) {
-                div.remove();
-                refreshView();
-              }
+          uploadsIncludeText = function() {
+            var textUploads = jQuery.grep(jQuery('.dz-preview'), function(el) {
+              return jQuery(el).data('type') === 'TEXT_PLAIN';
             });
-
-            refreshView();
-          },
-
-          onUploadError = function(e) {
-            jQuery(e.previewElement).addClass('upload-failed');
-            refreshView();
+            return textUploads.length > 0;
           },
 
           refreshView = function() {
             var previewElements = jQuery('.dz-preview'),
-                uploadContainer = jQuery('#uploaded');
+                uploadContainer = jQuery('#uploaded'),
+                ner = jQuery('.ner');
 
             if (previewElements.length === 0)
               uploadContainer.hide();
@@ -99,6 +88,43 @@
               jQuery('input.next').prop('disabled', false);
             else
               jQuery('input.next').prop('disabled', true);
+
+            if (uploadsIncludeText())
+              ner.show();
+            else
+              ner.hide();
+          },
+
+          onAddedFile = function(e) {
+            refreshView();
+            jQuery('input.next').prop('disabled', true);
+          },
+
+          onDelete = function(e) {
+            var div = jQuery(e.target).closest('.dz-preview'),
+                name = (e.name) ? e.name : div.find('.dz-filename').text();
+
+            jQuery.ajax({
+              url: '@controllers.my.upload.routes.UploadController.showStep2(username)/' + encodeURIComponent(name),
+              type: 'DELETE',
+              success: function(result) {
+                div.remove();
+                refreshView();
+              }
+            });uploadedBefore
+
+            refreshView();
+          },
+
+          onUploadSuccess = function(e, response) {
+            e.previewElement.dataset.type = response.content_type;
+            if (dropzone.getQueuedFiles().length + dropzone.getUploadingFiles().length == 0)
+              refreshView();
+          },
+
+          onUploadError = function(e, response) {
+            jQuery(e.previewElement).addClass('upload-failed');
+            refreshView();
           };
 
       Dropzone.options.dropzone = {
@@ -118,8 +144,10 @@
           '  <div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
           '</div>',
         init: function() {
+          dropzone = this;
+          this.on('addedfile', onAddedFile);
           this.on('removedfile', onDelete);
-          this.on('addedfile', refreshView);
+          this.on('success', onUploadSuccess);
           this.on('error', onUploadError);
         }
       };

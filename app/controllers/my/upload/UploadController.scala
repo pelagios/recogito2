@@ -25,6 +25,8 @@ import scala.concurrent.Future
 import scala.language.implicitConversions
 import storage.DB
 
+case class UploadSuccess(contentType: String)
+
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
 
 class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem) extends BaseController {
@@ -90,6 +92,9 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
 
   /** Stores a filepart during step 2 **/
   def storeFilepart(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    
+    import UploadController._ 
+    
     // First, we need to get the pending upload this filepart belongs to
     val username = loggedIn.getUsername
     UploadService.findPendingUpload(username)
@@ -100,7 +105,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
               UploadService.insertFilepart(pendingUpload.getId, username, f).map(_ match {
                 case Right(filepart) =>
                   // Upload was properly identified and stored
-                  Status(OK)
+                  Ok(Json.toJson(UploadSuccess(filepart.getContentType)))
                   
                 case Left(UnsupportedContentType) =>
                   BadRequest("Unknown or unsupported file format")
@@ -219,6 +224,9 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
 /** Defines JSON serialization for NER progress messages **/
 object UploadController {
   
+  implicit val uploadSuccessWrites: Writes[UploadSuccess] =
+    (JsPath \ "content_type").write[String].contramap(_.contentType)
+
   implicit val progressStatusValueWrites: Writes[ProgressStatus.Value] =
     Writes[ProgressStatus.Value](status => JsString(status.toString))
     
