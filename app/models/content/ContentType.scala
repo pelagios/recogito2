@@ -1,6 +1,7 @@
 package models.content
 
 import java.io.File
+import play.api.Logger
 import scala.language.postfixOps
 import scala.util.Try
 import sys.process._
@@ -8,12 +9,13 @@ import sys.process._
 object ContentType extends Enumeration {
 
   // Images are only supported if VIPS is installed on the system
-  private val VIPS_INSTALLED =
-    Try(
-
-        "vips help" !
-
-    ).isSuccess
+  private val VIPS_INSTALLED = {
+    val testVips = Try("vips help" !)
+    if (testVips.isFailure)
+      Logger.warn("VIPS not installed - image support disabled")
+      
+    testVips.isSuccess
+  }
 
   import ContentIdentificationFailures._
 
