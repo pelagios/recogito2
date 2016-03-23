@@ -8,7 +8,8 @@ Future home of Recogito v2.0.
 * [Play Framework v2.5.0](https://www.playframework.com/download)
 * To use image annotation, you need to have the [vips](http://www.vips.ecs.soton.ac.uk/) image
   processing system installed. If vips is not available on the command line, Recogito is set to
-  reject uploaded images as 'unsupported content'.
+  reject uploaded images as 'unsupported content'. (Note: on Ubuntu, 'libvips-tools' is the
+  package you need.)
 
 ## Installation
 
