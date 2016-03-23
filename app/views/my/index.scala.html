@@ -1,8 +1,9 @@
-@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, documents: Seq[models.generated.tables.records.DocumentRecord])
+@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, documents: Seq[models.generated.tables.records.DocumentRecord])(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
     <title>MY RECOGITO</title>
+    <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
   </head>
   <body>
     <h1>My Recogito</h1>
@@ -13,10 +14,32 @@
 
     <ul>
       @for(document <- documents) {
-        <li><a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a></li>
+        <li>
+          <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a>
+          <button onclick="deleteDocument('@document.getId');">Delete</button>
+        </li>
       }
     </ul>
 
     <a href="@controllers.my.upload.routes.UploadController.showStep1(user.getUsername.toLowerCase)">Upload New Document</a>
+
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.document.routes.javascript.DocumentController.deleteDocument
+    )
+
+    <script>
+      function deleteDocument(id) {
+        console.log('Deleting document ' + id);
+        jsRoutes.controllers.document.DocumentController.deleteDocument(id).ajax({
+          success: function(result) {
+            window.location.reload(true); 
+          },
+
+          error: function(error) {
+            console.log(error);
+          }
+        });
+      }
+    </script>
   </body>
 </html>

@@ -12,6 +12,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.{ DB, FileAccess }
+import org.apache.commons.io.FileUtils
 
 object DocumentService extends BaseService with FileAccess {
   
@@ -50,24 +51,14 @@ object DocumentService extends BaseService with FileAccess {
   }
   
   def delete(document: DocumentRecord)(implicit db: DB) = db.withTransaction { sql =>
-    val ownerDir = getUserDir(document.getOwner).get // Document but no owner dir? Only possible if integrity broken! 
-    
-    val fileparts = 
-      sql.selectFrom(DOCUMENT_FILEPART)
-         .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
-         .fetchArray
-         
     sql.deleteFrom(DOCUMENT_FILEPART)
        .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
        .execute()
-       
-    fileparts.foreach(part => {
-      
-      // TODO remove file
-      
-      // TODO remove tileset (if any)
-      
-    })
+
+    // Some document may not have local files - e.g. IIIF  
+    val maybeDocumentDir = getDocumentDir(document.getOwner, document.getId)
+    if (maybeDocumentDir.isDefined)
+      FileUtils.deleteDirectory(maybeDocumentDir.get)
     
     sql.deleteFrom(DOCUMENT)
        .where(DOCUMENT.ID.equal(document.getId))

@@ -10,6 +10,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 
+import play.api.Logger
+
 class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with FileAccess {
   
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
@@ -39,6 +41,7 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
   }
   
   def deleteDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    Logger.info("foo")
     DocumentService.findById(docId).flatMap(_ match {
       case Some(document) => {
         // Only the owner can delete a document
