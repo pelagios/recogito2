@@ -55,7 +55,7 @@ object DocumentService extends BaseService with FileAccess {
        .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
        .execute()
 
-    // Some document may not have local files - e.g. IIIF  
+    // Note: some documents may not have local files - e.g. IIIF  
     val maybeDocumentDir = getDocumentDir(document.getOwner, document.getId)
     if (maybeDocumentDir.isDefined)
       FileUtils.deleteDirectory(maybeDocumentDir.get)
