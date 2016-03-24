@@ -1,4 +1,4 @@
-@(username: String, fileparts: Seq[models.generated.tables.records.UploadFilepartRecord])
+@(username: String, fileparts: Seq[models.generated.tables.records.UploadFilepartRecord])(implicit request: RequestHeader)
 
 @formatSize(sizeKb: Double) = @{
   val fmt = new java.text.DecimalFormat("#.#")
@@ -15,6 +15,10 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/upload/wizard.css")"/>
     <script src="@routes.Assets.versioned("lib/dropzone/min/dropzone.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
+    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/my/upload/step2.js")"></script>
+    <script>
+      window.config = { owner: '@username' }
+    </script>
   </head>
   <body>
     <div id="content">
@@ -22,10 +26,10 @@
         <li class="arrow">Enter Metadata</li><li class="active arrow">Attach Files</li><li>Import</li>
       </ul>
 
-      <form action="@controllers.my.upload.routes.UploadController.storeFilepart(username)" id="dropzone" class="dropzone">
+      <form action="@controllers.my.upload.routes.UploadController.storeFilepart(username)" id="dropzone">
         <h2>Drag Files Here</h2>
         <p>or</p>
-        <div class="choose-file btn btn-large btn-blue"><span class="icon">&#xf055;</span> Choose a File to Attach</div>
+        <div id="choose-file" class="choose-file btn btn-large btn-blue"><span class="icon">&#xf055;</span> Choose a File to Attach</div>
         <p class="formats">Supported formats: UTF-8 plain text, Markdown, TEI/XML, image files, CSV</p>
       </form>
 
@@ -64,98 +68,10 @@
         </div>
       </form>
     </div>
-    <script>
-      var dropzone,
 
-          uploadsIncludeText = function() {
-            var textUploads = jQuery.grep(jQuery('.dz-preview'), function(el) {
-              return jQuery(el).data('type') === 'TEXT_PLAIN';
-            });
-            return textUploads.length > 0;
-          },
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.my.upload.routes.javascript.UploadController.deleteFilepart
+    )
 
-          refreshView = function() {
-            var previewElements = jQuery('.dz-preview'),
-                uploadContainer = jQuery('#uploaded'),
-                ner = jQuery('.ner');
-
-            if (previewElements.length === 0)
-              uploadContainer.hide();
-            else
-              uploadContainer.show();
-
-            if (previewElements.not('.upload-failed').length > 0)
-              jQuery('input.next').prop('disabled', false);
-            else
-              jQuery('input.next').prop('disabled', true);
-
-            if (uploadsIncludeText())
-              ner.show();
-            else
-              ner.hide();
-          },
-
-          onAddedFile = function(e) {
-            refreshView();
-            jQuery('input.next').prop('disabled', true);
-          },
-
-          onDelete = function(e) {
-            var div = jQuery(e.target).closest('.dz-preview'),
-                name = (e.name) ? e.name : div.find('.dz-filename').text();
-
-            jQuery.ajax({
-              url: '@controllers.my.upload.routes.UploadController.showStep2(username)/' + encodeURIComponent(name),
-              type: 'DELETE',
-              success: function(result) {
-                div.remove();
-                refreshView();
-              }
-            });uploadedBefore
-
-            refreshView();
-          },
-
-          onUploadSuccess = function(e, response) {
-            e.previewElement.dataset.type = response.content_type;
-            if (dropzone.getQueuedFiles().length + dropzone.getUploadingFiles().length == 0)
-              refreshView();
-          },
-
-          onUploadError = function(e, response) {
-            jQuery(e.previewElement).addClass('upload-failed');
-            refreshView();
-          };
-
-      Dropzone.options.dropzone = {
-        clickable: '.choose-file',
-        createImageThumbnails: false,
-        dictRemoveFile: '',
-        maxFilesize:200,
-        previewsContainer: document.getElementById('uploaded-now'),
-        previewTemplate:
-          '<div class="dz-preview dz-file-preview">' +
-          '  <div class="dz-details">' +
-          '    <div class="dz-size" data-dz-size=""></div>' +
-          '    <div class="dz-filename"><span data-dz-name=""></span></div>' +
-          '  </div>' +
-          '  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress=""></span></div>' +
-          '  <a class="dz-remove" title="Click to remove the file" data-dz-remove></a>' +
-          '  <div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
-          '</div>',
-        init: function() {
-          dropzone = this;
-          this.on('addedfile', onAddedFile);
-          this.on('removedfile', onDelete);
-          this.on('success', onUploadSuccess);
-          this.on('error', onUploadError);
-        }
-      };
-
-      jQuery(document).ready(function() {
-        jQuery('#uploaded').on('click', '.dz-remove', onDelete);
-        refreshView();
-      });
-    </script>
   </body>
 </html>
