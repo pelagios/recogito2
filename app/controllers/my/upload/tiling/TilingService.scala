@@ -3,7 +3,7 @@ package controllers.my.upload.tiling
 import akka.actor.{ ActorSystem, Props }
 import akka.pattern.ask
 import akka.util.Timeout
-import controllers.my.upload.{ Messages, Supervisor, TaskType }
+import controllers.my.upload._
 import java.io.File
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.Logger
@@ -14,9 +14,9 @@ import scala.language.postfixOps
 import storage.FileAccess
 import sys.process._
 
-object TilingService extends FileAccess {
+object TilingService extends ProcessingService with FileAccess {
   
-  private val TASK_TILING = TaskType("IMAGE_TILING")
+  val TASK_TILING = TaskType("IMAGE_TILING")
 
   private[tiling] def createZoomify(file: File, destFolder: File): Future[Unit] = {
     Future {
@@ -45,7 +45,7 @@ object TilingService extends FileAccess {
   }
 
   /** Queries the progress for a specific process **/
-  def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
+  override def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
     Logger.info("Reporting tiling progress")
     Supervisor.getSupervisorActor(TASK_TILING, documentId) match {
       case Some(actor) => {

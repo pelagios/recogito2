@@ -8,8 +8,6 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-case class TaskType(name: String)
-
 abstract class SupervisorActor(taskType: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord], documentDir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
   
   import Messages._
@@ -86,17 +84,4 @@ abstract class SupervisorActor(taskType: TaskType, document: DocumentRecord, par
     }
   }
   
-}
-
-object Supervisor {
-
-  // Keeps track of all currently active supervisors
-  private val supervisors = scala.collection.mutable.Map.empty[(TaskType, String), ActorRef]
-
-  def registerSupervisorActor(task: TaskType, id: String, actor: ActorRef) = supervisors.put((task, id), actor)
-
-  def deregisterSupervisorActor(task: TaskType, id: String) = supervisors.remove((task, id))
-
-  def getSupervisorActor(task: TaskType, id: String) = supervisors.get((task, id))
-
 }

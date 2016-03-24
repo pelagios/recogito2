@@ -3,7 +3,7 @@ package controllers.my.upload.ner
 import akka.actor.{ ActorRef, ActorSystem, Props }
 import akka.pattern.ask
 import akka.util.Timeout
-import controllers.my.upload.{ Messages, Supervisor, TaskType }
+import controllers.my.upload._
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.{ Annotation, StanfordCoreNLP }
 import java.io.File
@@ -19,9 +19,9 @@ import storage.FileAccess
 
 private[ner] case class Phrase(chars: String, entityTag: String, charOffset: Int)
 
-object NERService extends FileAccess {
+object NERService extends ProcessingService with FileAccess {
   
-  private val TASK_NER = TaskType("NER")
+  val TASK_NER = TaskType("NER")
 
   private lazy val props = new Properties()
   props.put("annotators", "tokenize, ssplit, pos, lemma, ner")
@@ -86,7 +86,7 @@ object NERService extends FileAccess {
   }
 
   /** Queries the progress for a specific process **/
-  def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
+  override def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
     Supervisor.getSupervisorActor(TASK_NER, documentId) match {
       case Some(actor) => {
         implicit val t = Timeout(timeout)

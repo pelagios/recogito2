@@ -156,18 +156,24 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
         } else {
           // Pending upload + fileparts available - proceed
           UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
+            // We'll forward a list of the running processing tasks to the view, so it can show progress
+            val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]
             
             // Apply NER if requested
             val applyNER = checkParamValue("apply-ner", "on")
-            if (applyNER)
+            if (applyNER) {
               NERService.spawnNERProcess(doc, docParts)
+              runningTasks.append(NERService.TASK_NER)
+            }
               
             // Tile images
             val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
-            if (imageParts.size > 0)
+            if (imageParts.size > 0) {
               TilingService.spawnTilingProcess(doc, imageParts)
+              runningTasks.append(TilingService.TASK_TILING)
+            }
 
-            Ok(views.html.my.upload.upload_3(usernameInPath, doc, docParts, applyNER))
+            Ok(views.html.my.upload.upload_3(usernameInPath, doc, docParts, runningTasks))
           }}
         }
 
@@ -176,36 +182,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
         Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep1(usernameInPath)))
     })
   }
-
-
-  /** Queries the NER for progress on a document (user needs to be logged in and own the document) **/
-  def queryNERProgress(usernameInPath: String, id: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-
-    import UploadController._  // Message (de)serialization
-
-    DocumentService.findById(id).flatMap(_ match {
-      case Some(document) if document.getOwner == loggedIn.getUsername => {
-        NERService.queryProgress(id).map(_ match {
-          case Some(result) =>
-            Ok(Json.toJson(result))
-
-          case None =>
-            // Document exists, but there's no NER process for it
-            NotFound
-        })
-      }
-
-      case Some(document) =>
-        // Document exists, but belongs to another userimport controllers.AbstractController
-        Future.successful(Forbidden)
-
-      case None =>
-        // Document not in database
-        Future.successful(NotFound)
-    })
-  }
-
-
+  
   def cancelUploadWizard(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService
       .deletePendingUpload(loggedIn.getUsername)
@@ -218,6 +195,35 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
         Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
       }
   }
+  
+  /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
+  private def queryTaskProgress(username: String, docId: String, service: ProcessingService) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    
+    import UploadController._  // Message (de)serialization
+    
+    DocumentService.findById(docId).flatMap(_ match {
+      case Some(document) if document.getOwner == loggedIn.getUsername => {
+        service.queryProgress(docId).map(_ match {
+          case Some(result) =>
+            Ok(Json.toJson(result))
+          case None =>
+            NotFound
+        })
+      }
+      
+      case Some(document) =>
+        // Document exists, but belongs to another user
+        Future.successful(Forbidden)
+        
+      case None =>
+        Future.successful(NotFound)
+    })
+  }
+
+  
+  def queryNERProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, NERService)
+  
+  def queryTilingProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, TilingService)
 
 }
 
