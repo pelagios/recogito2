@@ -3,25 +3,25 @@
   "uris": [
     "http://pleiades.stoa.org/places/118543",
     "http://dare.ht.lu.se/places/10778",
-    "http://www.trismegistos.org/place/35191",
-    "http://vici.org/vici/13408"
+    "http://www.trismegistos.org/place/35191"
   ],
   "title": "Ad Mauros",
   "place_types": [
-    { "label": "fort" , "in_gazetteer": "DARE" },
-    { "label": "fort" , "in_gazetteer": "Pleiades" },
-    { "label": "tower", "in_gazetteer": "Pleiades" }
+    { "type": "fort" , "in_gazetteer": "DARE" },
+    { "type": "fort" , "in_gazetteer": "Pleiades" },
+    { "type": "tower", "in_gazetteer": "Pleiades" }
   ],
   "descriptions": [
-    { "label": "An ancient place, cited: BAtlas 12 H4 Ad Mauros", "in_gazetteer": "Pleiades" }
+    { "description": "An ancient place, cited: BAtlas 12 H4 Ad Mauros", "in_gazetteer": "Pleiades" }
   ],
   "names": [
-    { "label": "Ad Mauros", "in_gazetteer": "Pleiades" },
-    { "label": "Ad Mauros", "in_gazetteer": "Trismegistos" },
-    { "label": "Eferding", "in_gazetteer": "Trismegistos" },
-    { "label": "Marianianio", "language": "la", "in_gazetteer": "Trismegistos" }
+    { "name": "Ad Mauros", "in_gazetteer": "Pleiades" },
+    { "name": "Ad Mauros/Marinianio, Eferding", "in_gazetteer": "DARE" },
+    { "name": "Ad Mauros", "in_gazetteer": "Trismegistos" },
+    { "name": "Eferding", "in_gazetteer": "Trismegistos" },
+    { "name": "Marianianio", "language": "la", "in_gazetteer": "Trismegistos" }
   ],
-  "representative_geometry": {
+  "geometry": {
      "type": "point",
      "coordinates": [ 14.02358, 48.31058 ]
    },
@@ -33,6 +33,44 @@
     "http://de.wikipedia.org/wiki/Kastell_Eferding",
     "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html"
   ],
-  "exact_matches": [],
-  "is_conflation_of": []
+  "is_conflation_of": [
+    {
+      "gazetteer": "Pleiades",
+      "uri": "http://pleiades.stoa.org/places/118543",
+      "title": "Ad Mauros",
+      "place_types": [ "fort" , "tower" ],
+      "descriptions": [
+        { "description": "An ancient place, cited: BAtlas 12 H4 Ad Mauros" }
+      ],
+      "names": [
+        { "name": "Ad Mauros" }
+      ],
+      "geometry": {
+         "type": "point",
+         "coordinates": [ 14.02358, 48.31058 ]
+       },
+      "representative_point": [ 14.02358, 48.31058 ],
+      "temporal_bounds": { "from": -30, "to": 640 }
+    }, {
+      "gazetteer": "DARE",
+      "uri": "http://dare.ht.lu.se/places/10778",
+      "title": "Ad Mauros/Marinianio, Eferding",
+      "place_types": [ "fort" ],
+      "geometry": {
+         "type": "point",
+         "coordinates": [ 14.02358, 48.31058 ]
+       },
+      "representative_point": [ 14.02358, 48.31058 ],
+      "temporal_bounds": { "from": -30, "to": 640 }
+    },{
+      "gazetteer": "Trismegistos",
+      "uri": "http://www.trismegistos.org/place/35191",
+      "title": "Ad Mauros",
+      "names": [
+        { "name": "Ad Mauros" },
+        { "name": "Eferding" },
+        { "name": "Marianianio", "language": "la" }
+      ]
+    }
+  ]
 }
