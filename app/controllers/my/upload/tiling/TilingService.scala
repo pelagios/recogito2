@@ -6,7 +6,6 @@ import akka.util.Timeout
 import controllers.my.upload._
 import java.io.File
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -15,7 +14,7 @@ import storage.FileAccess
 import sys.process._
 
 object TilingService extends ProcessingService with FileAccess {
-  
+
   val TASK_TILING = TaskType("IMAGE_TILING")
 
   private[tiling] def createZoomify(file: File, destFolder: File): Future[Unit] = {
@@ -46,7 +45,6 @@ object TilingService extends ProcessingService with FileAccess {
 
   /** Queries the progress for a specific process **/
   override def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
-    Logger.info("Reporting tiling progress")
     Supervisor.getSupervisorActor(TASK_TILING, documentId) match {
       case Some(actor) => {
         implicit val t = Timeout(timeout)
