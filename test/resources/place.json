@@ -1,0 +1,38 @@
+{
+  "_id": "http://pleiades.stoa.org/places/118543",
+  "uris": [
+    "http://pleiades.stoa.org/places/118543",
+    "http://dare.ht.lu.se/places/10778",
+    "http://www.trismegistos.org/place/35191",
+    "http://vici.org/vici/13408"
+  ],
+  "title": "Ad Mauros",
+  "place_types": [
+    { "label": "fort" , "in_gazetteer": "DARE" },
+    { "label": "fort" , "in_gazetteer": "Pleiades" },
+    { "label": "tower", "in_gazetteer": "Pleiades" }
+  ],
+  "descriptions": [
+    { "label": "An ancient place, cited: BAtlas 12 H4 Ad Mauros", "in_gazetteer": "Pleiades" }
+  ],
+  "names": [
+    { "label": "Ad Mauros", "in_gazetteer": "Pleiades" },
+    { "label": "Ad Mauros", "in_gazetteer": "Trismegistos" },
+    { "label": "Eferding", "in_gazetteer": "Trismegistos" },
+    { "label": "Marianianio", "language": "la", "in_gazetteer": "Trismegistos" }
+  ],
+  "representative_geometry": {
+     "type": "point",
+     "coordinates": [ 14.02358, 48.31058 ]
+   },
+  "representative_point": [ 14.02358, 48.31058 ],
+  "temporal_bounds": { "from": -30, "to": 640 },
+  "close_matches": [
+    "http://sws.geonames.org/2780394",
+    "http://www.wikidata.org/entity/Q2739862",
+    "http://de.wikipedia.org/wiki/Kastell_Eferding",
+    "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html"
+  ],
+  "exact_matches": [],
+  "is_conflation_of": []
+}

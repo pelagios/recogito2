@@ -8,7 +8,10 @@ scalaVersion := "2.11.7"
 
 scalacOptions ++= Seq("-feature")
 
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+resolvers ++= Seq(
+  "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
+  "Open Source Geospatial Foundation Repository" at "http://download.osgeo.org/webdav/geotools/"
+)
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -23,6 +26,7 @@ libraryDependencies ++= Seq(
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models",
   "jp.t2v" %% "play2-auth" % "0.14.1",
+  "org.geotools" % "gt-geojson" % "14.0",
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
   "org.jooq" % "jooq-meta" % "3.7.2",
