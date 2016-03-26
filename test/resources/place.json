@@ -7,19 +7,17 @@
   ],
   "title": "Ad Mauros",
   "place_types": [
-    { "type": "fort" , "in_gazetteer": "DARE" },
-    { "type": "fort" , "in_gazetteer": "Pleiades" },
-    { "type": "tower", "in_gazetteer": "Pleiades" }
+    { "type": "fort" , "in_gazetteer": [ "DARE", "Pleiades" ] },
+    { "type": "tower", "in_gazetteer": [ "Pleiades" ] }
   ],
   "descriptions": [
     { "description": "An ancient place, cited: BAtlas 12 H4 Ad Mauros", "in_gazetteer": "Pleiades" }
   ],
   "names": [
-    { "name": "Ad Mauros", "in_gazetteer": "Pleiades" },
-    { "name": "Ad Mauros/Marinianio, Eferding", "in_gazetteer": "DARE" },
-    { "name": "Ad Mauros", "in_gazetteer": "Trismegistos" },
-    { "name": "Eferding", "in_gazetteer": "Trismegistos" },
-    { "name": "Marianianio", "language": "la", "in_gazetteer": "Trismegistos" }
+    { "name": "Ad Mauros", "in_gazetteer": [ "Pleiades", "Trismegistos" ] },
+    { "name": "Ad Mauros/Marinianio, Eferding", "in_gazetteer": [ "DARE" ] },
+    { "name": "Eferding", "in_gazetteer": [ "Trismegistos" ] },
+    { "name": "Marianianio", "language": "la", "in_gazetteer": [ "Trismegistos" ] }
   ],
   "geometry": {
      "type": "point",

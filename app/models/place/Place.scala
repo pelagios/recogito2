@@ -107,25 +107,25 @@ object Gazetteer {
     
 }
 
-case class PlaceType(label: String, inGazetteer: Gazetteer)
+case class PlaceType(label: String, inGazetteer: Seq[Gazetteer])
 
 object PlaceType {
   
   implicit val placeTypeFormat: Format[PlaceType] = (
     (JsPath \ "label").format[String] and
-    (JsPath \ "in_gazetteer").format[Gazetteer]
+    (JsPath \ "in_gazetteer").format[Seq[Gazetteer]]
   )(PlaceType.apply, unlift(PlaceType.unapply))
     
 }
     
-case class Literal(label: String, language: Option[String], inGazetteer: Gazetteer)
+case class Literal(label: String, language: Option[String], inGazetteer: Seq[Gazetteer])
 
 object Literal {
   
   implicit val literalFormat: Format[Literal] = (
     (JsPath \ "label").format[String] and
     (JsPath \ "language").formatNullable[String] and
-    (JsPath \ "in_gazetteer").format[Gazetteer]
+    (JsPath \ "in_gazetteer").format[Seq[Gazetteer]]
   )(Literal.apply, unlift(Literal.unapply))
   
 }
