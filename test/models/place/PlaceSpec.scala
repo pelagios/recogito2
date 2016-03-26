@@ -23,7 +23,7 @@ class PlaceSpec extends Specification {
       
       Logger.info(place.toString)
       
-      success
+      place.isSuccess must equalTo(true)
     }
     
   }

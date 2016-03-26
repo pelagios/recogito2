@@ -24,10 +24,10 @@ case class Place(
   placeTypes: Seq[PlaceType],
     
   /** Descriptions from all gazetteers (with source information) **/
-  descriptions: Seq[Literal],
+  descriptions: Seq[Description],
     
   /** Names from all gazetteers (with source information) **/
-  names: Seq[Literal],
+  names: Seq[Name],
     
   /** One representative geometry - usually that of a 'preferred geometry provider' **/ 
   representativeGeometry: Option[Geometry],
@@ -50,6 +50,18 @@ case class Place(
   val allMatches = closeMatches ++ exactMatches 
   
 }
+
+case class Gazetteer(name: String)
+
+case class PlaceType(placeType: String, inGazetteer: Seq[Gazetteer])
+
+case class Description(description: String, language: Option[String], inGazetteer: Gazetteer)
+
+case class Name(name: String, language: Option[String], inGazetteer: Seq[Gazetteer])
+
+case class TemporalBounds(from: DateTime, to: DateTime)
+
+/** JSON (de)serialization **/
 
 object Place {
   
@@ -84,18 +96,22 @@ object Place {
     (JsPath \ "uris").format[Seq[String]] and
     (JsPath \ "title").format[String] and
     (JsPath \ "place_types").format[Seq[PlaceType]] and
-    (JsPath \ "descriptions").format[Seq[Literal]] and
-    (JsPath \ "names").format[Seq[Literal]] and
+    (JsPath \ "descriptions").format[Seq[Description]] and
+    (JsPath \ "names").format[Seq[Name]] and
     (JsPath \ "representative_geometry").formatNullable[Geometry] and
     (JsPath \ "representative_point").formatNullable[Coordinate] and
     (JsPath \ "temporal_bounds").formatNullable[TemporalBounds] and
-    (JsPath \ "close_matches").format[Seq[String]] and
-    (JsPath \ "exact_matches").format[Seq[String]]
+    (JsPath \ "close_matches").formatNullable[Seq[String]].inmap[Seq[String]](
+        o => o.getOrElse(Seq.empty[String]),
+        s => if (s.isEmpty) None else Some(s)
+      ) and
+    (JsPath \ "exact_matches").formatNullable[Seq[String]].inmap[Seq[String]](
+        o => o.getOrElse(Seq.empty[String]),
+        s => if (s.isEmpty) None else Some(s)
+      )
   )(Place.apply, unlift(Place.unapply))
   
 }
-
-case class Gazetteer(name: String)
 
 object Gazetteer {
   
@@ -107,36 +123,41 @@ object Gazetteer {
     
 }
 
-case class PlaceType(label: String, inGazetteer: Seq[Gazetteer])
-
 object PlaceType {
   
   implicit val placeTypeFormat: Format[PlaceType] = (
-    (JsPath \ "label").format[String] and
+    (JsPath \ "type").format[String] and
     (JsPath \ "in_gazetteer").format[Seq[Gazetteer]]
   )(PlaceType.apply, unlift(PlaceType.unapply))
     
 }
     
-case class Literal(label: String, language: Option[String], inGazetteer: Seq[Gazetteer])
-
-object Literal {
+object Description {
   
-  implicit val literalFormat: Format[Literal] = (
-    (JsPath \ "label").format[String] and
+  implicit val descriptionFormat: Format[Description] = (
+    (JsPath \ "description").format[String] and
     (JsPath \ "language").formatNullable[String] and
-    (JsPath \ "in_gazetteer").format[Seq[Gazetteer]]
-  )(Literal.apply, unlift(Literal.unapply))
+    (JsPath \ "in_gazetteer").format[Gazetteer]
+  )(Description.apply, unlift(Description.unapply))
   
 }
 
-case class TemporalBounds(from: DateTime, to: DateTime)
+object Name {
+  
+  implicit val literalFormat: Format[Name] = (
+    (JsPath \ "name").format[String] and
+    (JsPath \ "language").formatNullable[String] and
+    (JsPath \ "in_gazetteer").format[Seq[Gazetteer]]
+  )(Name.apply, unlift(Name.unapply))
+  
+}
+
 
 object TemporalBounds extends HasDate {
   
   implicit val temporalBoundsFormat: Format[TemporalBounds] = (
     (JsPath \ "from").format[DateTime] and
-    (JsPath \ "language").format[DateTime]
+    (JsPath \ "to").format[DateTime]
   )(TemporalBounds.apply, unlift(TemporalBounds.unapply))
   
 }
