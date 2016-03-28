@@ -1,22 +1,18 @@
 package models.place
 
-import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.joda.time.format.DateTimeFormat
+import org.joda.time.{ DateTime, DateTimeZone }
 import org.junit.runner._
 import play.api.Logger
 import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json.Json
 import scala.io.Source
-import org.joda.time.DateTime
-import com.vividsolutions.jts.geom.GeometryFactory
 
 @RunWith(classOf[JUnitRunner])
 class PlaceSpec extends Specification {
-
-  private val DATE_TIME_PATTERN = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
   
   "sample place" should {
     
@@ -56,8 +52,8 @@ class PlaceSpec extends Specification {
       place.representativePoint must equalTo(Some(location))
       place.geometry must equalTo(Some(new GeometryFactory().createPoint(location)))
       
-      val from = new DateTime(-30, 1, 1, 0, 0)
-      val to = new DateTime(640, 1, 1, 0, 0)
+      val from = new DateTime(DateTimeZone.UTC).withDate(-30, 1, 1).withTime(0, 0, 0, 0)
+      val to = new DateTime(DateTimeZone.UTC).withDate(640, 1, 1).withTime(0, 0, 0, 0)
       place.temporalBounds must equalTo(Some(TemporalBounds(from, to)))
 
       val expectedCloseMatches = Seq(
@@ -72,7 +68,35 @@ class PlaceSpec extends Specification {
     
   }
   
-  // TODO test flex date parse/serialize
+  "the flex date parser" should {
+    
+    "parse integer- and datestring-formatted years as equal DateTimes" in {
+      
+      val jsonTempBoundsInt = Json.parse("{ \"from\": -30, \"to\": 640 }")      
+      val jsonTempBoundsStr = Json.parse("{ \"from\": \"-30-01-01T00:00:00Z\", \"to\": \"640-01-01T00:00:00Z\" }") 
+
+      val boundsFromInt = Json.fromJson[TemporalBounds](jsonTempBoundsInt)
+      val boundsFromStr = Json.fromJson[TemporalBounds](jsonTempBoundsStr)
+
+      boundsFromInt.isSuccess must equalTo(true)
+      boundsFromStr.isSuccess must equalTo(true)
+      
+      boundsFromStr.get.from.getYear must equalTo(-30)
+      boundsFromStr.get.to.getYear must equalTo(640)
+      
+      boundsFromInt.get.from.getMillis must equalTo(boundsFromStr.get.from.getMillis)
+      boundsFromInt.get.to.getMillis must equalTo(boundsFromStr.get.to.getMillis)
+    }
+    
+  }
+  
+  "the date serializer" should {
+    
+    "serialize dates in UTC" in  {
+      failure
+    }
+    
+  }
   
   "JSON serialization/parsing roundtrip" should {
     

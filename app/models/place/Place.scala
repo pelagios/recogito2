@@ -3,7 +3,7 @@ package models.place
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
 import java.io.StringWriter
 import models.HasDate
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, DateTimeZone }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -156,13 +156,15 @@ object Name {
 
 
 object TemporalBounds extends HasDate {
-  
-  import play.api.libs.json.{ Json, JsString }
-  
+ 
   /** Helper to produce a DateTime from a JsValue that's either an Int or a date string **/
   private def flexDateRead(json: JsValue): DateTime =
     json.asOpt[Int] match {
-      case Some(year) => new DateTime(year, 1, 1, 0, 0)
+      case Some(year) => {
+        new DateTime(DateTimeZone.UTC)
+          .withDate(year, 1, 1)
+          .withTime(0, 0, 0, 0)
+      }
       case None => Json.fromJson[DateTime](json).get
     }
   
