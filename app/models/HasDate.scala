@@ -1,17 +1,30 @@
 package models
 
+import org.joda.time.{ DateTime, DateTimeZone }
+import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
 trait HasDate {
 
-  private val dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+  private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").withZone(DateTimeZone.UTC)
 
   implicit val dateTimeFormat =
+    /*
     Format(
       Reads.jodaDateReads(dateFormat),
       Writes.jodaDateWrites(dateFormat)
+    )
+    */
+    Format(
+      JsPath.read[JsString].map { json =>
+        formatter.parseDateTime(json.value)
+      },
+      
+      Writes[DateTime] { dt =>
+        Json.toJson(formatter.print(dt))
+      }
     )
 
 }

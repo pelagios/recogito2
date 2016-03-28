@@ -90,10 +90,27 @@ class PlaceSpec extends Specification {
     
   }
   
-  "the date serializer" should {
+  "temp bounds (de)serialization" should {
     
-    "serialize dates in UTC" in  {
-      failure
+    "yield dates serialized in UTC" in  {
+      val tempBounds = TemporalBounds(
+          new DateTime(DateTimeZone.UTC).withDate(1492, 1, 1).withTime(0, 0, 0, 0),
+          new DateTime(DateTimeZone.UTC).withDate(1493, 1, 1).withTime(0, 0, 0, 0))
+      
+      val asJson = Json.toJson(tempBounds)
+      
+      (asJson \ "from").as[String] must equalTo ("1492-01-01T00:00:00+00:00")
+      (asJson \ "to").as[String] must equalTo ("1493-01-01T00:00:00+00:00")
+    }
+    
+    "maintain UTC in a parse/serialize roundtrip" in {
+      val json = "{\"from\":\"1492-01-01T00:00:00+00:00\",\"to\":\"1493-01-01T00:00:00+00:00\"}"
+      
+      val asDateTime = Json.fromJson[TemporalBounds](Json.parse(json))
+      asDateTime.isSuccess must equalTo(true)
+      
+      val serialized = Json.toJson(asDateTime.get)
+      Json.stringify(serialized) must equalTo(json)
     }
     
   }
