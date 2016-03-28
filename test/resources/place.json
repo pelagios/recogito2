@@ -20,7 +20,7 @@
     { "name": "Marianianio", "language": "la", "in_gazetteer": [ "Trismegistos" ] }
   ],
   "geometry": {
-     "type": "point",
+     "type": "Point",
      "coordinates": [ 14.02358, 48.31058 ]
    },
   "representative_point": [ 14.02358, 48.31058 ],

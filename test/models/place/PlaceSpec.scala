@@ -58,7 +58,7 @@ class PlaceSpec extends Specification {
       
       val from = new DateTime(-30, 1, 1, 0, 0)
       val to = new DateTime(640, 1, 1, 0, 0)
-      place.temporalBounds must equalTo(TemporalBounds(from, to))
+      place.temporalBounds must equalTo(Some(TemporalBounds(from, to)))
 
       val expectedCloseMatches = Seq(
         "http://sws.geonames.org/2780394",
@@ -71,5 +71,26 @@ class PlaceSpec extends Specification {
     }
     
   }
+  
+  // TODO test flex date parse/serialize
+  
+  "JSON serialization/parsing roundtrip" should {
+    
+    "yield an equal Place" in {
+      // TODO create Place programmatically
+      
+      // TODO serialize place to JSON
+      
+      // TODO parse JSON
+      
+      // TODO compare parsed Place with original place - must be equal
+      success
+    }
+    
+  }
+  
+  // TODO test index insertion (i.e. does the ES mapping definition fit the test JSON? 
+  
+  // TODO what do we do with 'isConflationOf'? We should introduce an extra 'GazetteerRecord' case class for this!
   
 }

@@ -157,9 +157,25 @@ object Name {
 
 object TemporalBounds extends HasDate {
   
+  import play.api.libs.json.{ Json, JsString }
+  
+  /** Helper to produce a DateTime from a JsValue that's either an Int or a date string **/
+  private def flexDateRead(json: JsValue): DateTime =
+    json.asOpt[Int] match {
+      case Some(year) => new DateTime(year, 1, 1, 0, 0)
+      case None => Json.fromJson[DateTime](json).get
+    }
+  
+  /** Vice versa, generates an Int if the date is a year **/
+  private def flexDateWrite(dt: DateTime): JsValue =
+    if (dt.monthOfYear == 1 && dt.dayOfMonth == 1 && dt.minuteOfDay == 0)
+      Json.toJson(dt.year.get)
+    else
+      Json.toJson(dt)
+          
   implicit val temporalBoundsFormat: Format[TemporalBounds] = (
-    (JsPath \ "from").format[DateTime] and
-    (JsPath \ "to").format[DateTime]
+    (JsPath \ "from").format[JsValue].inmap[DateTime](flexDateRead, flexDateWrite) and
+    (JsPath \ "to").format[JsValue].inmap[DateTime](flexDateRead, flexDateWrite)
   )(TemporalBounds.apply, unlift(TemporalBounds.unapply))
   
 }
