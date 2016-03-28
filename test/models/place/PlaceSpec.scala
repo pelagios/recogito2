@@ -10,8 +10,8 @@ import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json.Json
 import scala.io.Source
-
 import org.joda.time.DateTime
+import com.vividsolutions.jts.geom.GeometryFactory
 
 @RunWith(classOf[JUnitRunner])
 class PlaceSpec extends Specification {
@@ -51,28 +51,23 @@ class PlaceSpec extends Specification {
           Name("Marianianio", Some("la"), Seq(Gazetteer("Trismegistos"))))
           
       place.names must containAllOf(expectedNames)
-      
-      place.representativePoint must equalTo(Some(new Coordinate(14.02358, 48.31058)))
 
-      /*
-      "geometry": {
-        "type": "point",
-        "coordinates": [ 14.02358, 48.31058 ]
-      }
-      */
+      val location = new Coordinate(14.02358, 48.31058)
+      place.representativePoint must equalTo(Some(location))
+      place.geometry must equalTo(Some(new GeometryFactory().createPoint(location)))
       
       val from = new DateTime(-30, 1, 1, 0, 0)
       val to = new DateTime(640, 1, 1, 0, 0)
       place.temporalBounds must equalTo(TemporalBounds(from, to))
 
-      /*
-      "close_matches": [
+      val expectedCloseMatches = Seq(
         "http://sws.geonames.org/2780394",
         "http://www.wikidata.org/entity/Q2739862",
         "http://de.wikipedia.org/wiki/Kastell_Eferding",
-        "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html"
-      ]
-      */
+        "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html")
+        
+      place.closeMatches must containAllOf(expectedCloseMatches)
+      place.exactMatches.size must equalTo(0)
     }
     
   }

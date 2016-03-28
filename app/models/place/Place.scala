@@ -30,7 +30,7 @@ case class Place(
   names: Seq[Name],
     
   /** One representative geometry - usually that of a 'preferred geometry provider' **/ 
-  representativeGeometry: Option[Geometry],
+  geometry: Option[Geometry],
     
   /** One representative geometry **/
   representativePoint: Option[Coordinate],
@@ -65,6 +65,8 @@ case class TemporalBounds(from: DateTime, to: DateTime)
 
 object Place {
   
+  import play.api.Logger
+  
   implicit val geometryWrites: Format[Geometry] =
     Format(
       JsPath.read[JsValue].map { json =>
@@ -98,7 +100,7 @@ object Place {
     (JsPath \ "place_types").format[Seq[PlaceType]] and
     (JsPath \ "descriptions").format[Seq[Description]] and
     (JsPath \ "names").format[Seq[Name]] and
-    (JsPath \ "representative_geometry").formatNullable[Geometry] and
+    (JsPath \ "geometry").formatNullable[Geometry] and
     (JsPath \ "representative_point").formatNullable[Coordinate] and
     (JsPath \ "temporal_bounds").formatNullable[TemporalBounds] and
     (JsPath \ "close_matches").formatNullable[Seq[String]].inmap[Seq[String]](
