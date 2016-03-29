@@ -1,0 +1,54 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix geosparql: <http://www.opengis.net/ont/geosparql#> .
+@prefix lawd: <http://lawd.info/ontology/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<http://pleiades.stoa.org/places/246343#this> a lawd:Place;
+  rdfs:label "Col. Barcino" ;
+  dcterms:description "An ancient place, cited: BAtlas 25 H4 Col. Barcino" ;
+  dcterms:type <http://pelagios.github.io/vocab/placeTypes#settlement> ;
+  lawd:hasName [ lawd:primaryForm "Barcelona" ] ;
+  lawd:hasName [ lawd:primaryForm "Col. Barcino" ] ;
+  lawd:hasName [ lawd:primaryForm "Col. Iulia Augusta" ] ;
+  lawd:hasName [ lawd:primaryForm "Paterna Faventia" ] ;
+  lawd:hasName [ lawd:primaryForm "Barcelona" ] ;
+  geosparql:hasGeometry [ geosparql:asWKT "POINT (2.169911 41.387911)" ] ;
+  .
+  
+<http://pleiades.stoa.org/places/128460#this> a lawd:Place;
+  rdfs:label "Mun. Vindobona" ;
+  dcterms:description "An ancient place, cited: BAtlas 13 B4 Mun. Vindobona" ;
+  dcterms:type <http://pelagios.github.io/vocab/placeTypes#settlement> ;
+  lawd:hasName [ lawd:primaryForm "Mun. Vindobona" ] ;
+  lawd:hasName [ lawd:primaryForm "Wien" ] ;
+  lawd:hasName [ lawd:primaryForm "Wien/Vienna AUS" ] ;
+  geosparql:hasGeometry [ geosparql:asWKT "POINT (16.373064 48.208982)" ] ;
+  .
+
+<http://pleiades.stoa.org/places/128537#this> a lawd:Place;
+  rdfs:label "Vindobona" ;
+  dcterms:description "An ancient place, cited: BAtlas 13 B4 Vindobona" ;
+  dcterms:type <http://pelagios.github.io/vocab/placeTypes#settlement> ;
+  lawd:hasName [ lawd:primaryForm "Vindobona" ] ;
+  lawd:hasName [ lawd:primaryForm "Vienna AUS" ] ;
+  geosparql:hasGeometry [ geosparql:asWKT "POINT (16.373946 48.211345)" ] ;
+  .
+  
+<http://pleiades.stoa.org/places/491741#this> a lawd:Place;
+  rdfs:label "Thessalonica" ;
+  dcterms:description "An ancient place, cited: BAtlas 50 C3 Thessalonica" ;
+  dcterms:type <http://pelagios.github.io/vocab/placeTypes#settlement> ;
+  lawd:hasName [ lawd:primaryForm "Thessalonica" ] ;
+  lawd:hasName [ lawd:primaryForm "Thessalonike/Salonica" ] ;
+  geosparql:hasGeometry [ geosparql:asWKT "POINT (22.956201 40.626402)" ] ;
+  .
+  
+<http://pleiades.stoa.org/places/89222#this> a lawd:Place;
+  rdfs:label "Lancaster" ;
+  dcterms:description "An ancient place, cited: BAtlas 9 E6 Lancaster" ;
+  dcterms:type <http://pelagios.github.io/vocab/placeTypes#settlement> ;
+  lawd:hasName [ lawd:primaryForm "Lancaster" ] ;
+  lawd:hasName [ lawd:primaryForm "Lancaster" ] ;
+  geosparql:hasGeometry [ geosparql:asWKT "POINT (-2.805657 54.049839)" ] ;
+  .

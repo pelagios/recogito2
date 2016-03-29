@@ -1,0 +1,74 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix lawd: <http://lawd.info/ontology/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix gn: <http://www.geonames.org/ontology#> .
+
+<http://dare.ht.lu.se/places/6534> a lawd:Place ;
+rdfs:label "Col. Barcino, Barcelona" ;
+dcterms:description "Ancient city Col. Barcino, modern Barcelona. municipia Barcelona, provincia Barcelona, ES" ;
+dcterms:subject "city" ;
+gn:countryCode "ES" ;
+dcterms:temporal "-30/640" ;
+skos:exactMatch <http://pleiades.stoa.org/places/246343/> ;
+skos:exactMatch <http://www.trismegistos.org/place/26261> ;
+skos:closeMatch <http://www.wikidata.org/entity/Q17587742> ;
+skos:closeMatch <http://www.wikidata.org/entity/Q1492> ;
+skos:closeMatch <http://www.wikidata.org/entity/Q3819019> ;
+lawd:hasName [ lawd:primaryForm "Barcelona" ] ;
+lawd:hasName [ lawd:primaryForm "Col. Barcino"@la ] ;
+lawd:hasName [ lawd:primaryForm "Barcelone"@fr ] ;
+foaf:primaryTopicOf <http://dare.ht.lu.se/places/6534.html> ;
+geo:location [ geo:lat 41.384106 ; geo:long 2.175422 ] ;
+.
+
+<http://dare.ht.lu.se/places/10783> a lawd:Place ;
+rdfs:label "Mun. Vindobona, Wien" ;
+dcterms:description "Ancient city Mun. Vindobona, modern Wien. Gemeinde Wien, Bezirk Wien, AT" ;
+dcterms:subject "city" ;
+gn:countryCode "AT" ;
+dcterms:temporal "-30/640" ;
+skos:exactMatch <http://pleiades.stoa.org/places/128460/> ;
+skos:exactMatch <http://www.trismegistos.org/place/28821> ;
+skos:closeMatch <http://www.wikidata.org/entity/Q871525> ;
+lawd:hasName [ lawd:primaryForm "Wien" ] ;
+lawd:hasName [ lawd:primaryForm "Mun. Vindobona"@la ] ;
+lawd:hasName [ lawd:primaryForm "Vienne"@fr ] ;
+lawd:hasName [ lawd:primaryForm "Vienna"@en ] ;
+foaf:primaryTopicOf <http://dare.ht.lu.se/places/10783.html> ;
+geo:location [ geo:lat 48.193161 ; geo:long 16.391128 ] ;
+.
+
+<http://dare.ht.lu.se/places/17068> a lawd:Place ;
+rdfs:label "Thessalonica, Thessaloniki" ;
+dcterms:description "Ancient city Thessalonica, modern Thessaloniki. Thessaloniki, GR" ;
+dcterms:subject "city" ;
+gn:countryCode "GR" ;
+dcterms:temporal "-750/640" ;
+skos:exactMatch <http://pleiades.stoa.org/places/491741/> ;
+skos:exactMatch <http://www.trismegistos.org/place/2394> ;
+skos:closeMatch <http://www.wikidata.org/entity/Q2246013> ;
+skos:closeMatch <http://www.wikidata.org/entity/Q17151> ;
+lawd:hasName [ lawd:primaryForm "Thessaloniki" ] ;
+lawd:hasName [ lawd:primaryForm "Thessalonica"@la ] ;
+lawd:hasName [ lawd:primaryForm "Thessalonique"@fr ] ;
+lawd:hasName [ lawd:primaryForm "Θεσσαλονίκη"@el ] ;
+foaf:primaryTopicOf <http://dare.ht.lu.se/places/17068.html> ;
+geo:location [ geo:lat 40.630282 ; geo:long 22.949569 ] ;
+.
+
+<http://dare.ht.lu.se/places/23712> a lawd:Place ;
+rdfs:label "Calunium?, Lancaster" ;
+dcterms:description "Ancient fort Calunium?, modern Lancaster. Lancaster, GB" ;
+dcterms:subject "fort" ;
+gn:countryCode "GB" ;
+dcterms:temporal "-30/640" ;
+skos:exactMatch <http://pleiades.stoa.org/places/89222/> ;
+skos:exactMatch <http://www.trismegistos.org/place/15045> ;
+lawd:hasName [ lawd:primaryForm "Lancaster" ] ;
+lawd:hasName [ lawd:primaryForm "Calunium"@la ] ;
+foaf:primaryTopicOf <http://dare.ht.lu.se/places/23712.html> ;
+geo:location [ geo:lat 54.051435 ; geo:long -2.805983 ] ;
+.

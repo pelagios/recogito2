@@ -87,6 +87,11 @@ class GazetteerRecordSpec extends Specification {
       gazetteerRecords must containAllOf(Seq(pleiadesRecord, dareRecord, trismegistosRecord))
     }
     
+    "be properly created from RDF" in {
+      // TODO implement
+      failure
+    }
+    
   }
   
   "the flex date parser" should {

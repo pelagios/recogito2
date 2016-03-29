@@ -32,6 +32,8 @@ libraryDependencies ++= Seq(
   "org.jooq" % "jooq-meta" % "3.7.2",
   "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
 
+  "org.pelagios" % "scalagios-core" % "2.0.0" from "https://github.com/pelagios/scalagios/releases/download/v2.0/scalagios-core.jar",
+
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
