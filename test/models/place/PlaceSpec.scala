@@ -20,12 +20,23 @@ class PlaceSpec extends Specification {
       val json = Source.fromFile("test/resources/place.json").getLines().mkString("\n")
       val parseResult = Json.fromJson[Place](Json.parse(json))
       
+      Logger.info(parseResult.toString)
+      
       parseResult.isSuccess must equalTo(true)
       
       val place = parseResult.get
       
       place.id must equalTo ("http://pleiades.stoa.org/places/118543")
-      
+      place.title must equalTo("Ad Mauros")
+
+      val location = new Coordinate(14.02358, 48.31058)
+      place.representativePoint must equalTo(Some(location))
+      place.geometry must equalTo(Some(new GeometryFactory().createPoint(location)))
+
+      val from = new DateTime(DateTimeZone.UTC).withDate(-30, 1, 1).withTime(0, 0, 0, 0)
+      val to = new DateTime(DateTimeZone.UTC).withDate(640, 1, 1).withTime(0, 0, 0, 0)
+      place.temporalBounds must equalTo(Some(TemporalBounds(from, to)))
+
       /*
       val expectedURIs = Seq(
           "http://pleiades.stoa.org/places/118543",
@@ -33,7 +44,7 @@ class PlaceSpec extends Specification {
           "http://www.trismegistos.org/place/35191")          
       place.uris must containAllOf(expectedURIs)
 
-      place.title must equalTo("Ad Mauros")
+
 
       place.placeTypes.size must equalTo(2)
       place.placeTypes.map(_.placeType) must containAllOf(Seq("fort", "tower"))
@@ -48,14 +59,6 @@ class PlaceSpec extends Specification {
           Name("Marianianio", Some("la"), Seq(Gazetteer("Trismegistos"))))
           
       place.names must containAllOf(expectedNames)
-
-      val location = new Coordinate(14.02358, 48.31058)
-      place.representativePoint must equalTo(Some(location))
-      place.geometry must equalTo(Some(new GeometryFactory().createPoint(location)))
-      
-      val from = new DateTime(DateTimeZone.UTC).withDate(-30, 1, 1).withTime(0, 0, 0, 0)
-      val to = new DateTime(DateTimeZone.UTC).withDate(640, 1, 1).withTime(0, 0, 0, 0)
-      place.temporalBounds must equalTo(Some(TemporalBounds(from, to)))
 
       val expectedCloseMatches = Seq(
         "http://sws.geonames.org/2780394",

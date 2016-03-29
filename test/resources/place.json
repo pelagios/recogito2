@@ -10,7 +10,7 @@
   "is_conflation_of": [
     {
       "uri": "http://pleiades.stoa.org/places/118543",
-      "gazetteer": "Pleiades",
+      "source_gazetteer": "Pleiades",
       "title": "Ad Mauros",
       "place_types": [ "fort" , "tower" ],
       "descriptions": [
@@ -20,21 +20,21 @@
         { "name": "Ad Mauros" }
       ],
       "geometry": {
-         "type": "point",
+         "type": "Point",
          "coordinates": [ 14.02358, 48.31058 ]
        },
       "representative_point": [ 14.02358, 48.31058 ],
       "temporal_bounds": { "from": -30, "to": 640 }
     }, {
       "uri": "http://dare.ht.lu.se/places/10778",
-      "gazetteer": "DARE",
+      "source_gazetteer": "DARE",
       "title": "Ad Mauros/Marinianio, Eferding",
       "place_types": [ "fort" ],
       "names": [
         { "name": "Ad Mauros/Marinianio, Eferding" }
       ],
       "geometry": {
-         "type": "point",
+         "type": "Point",
          "coordinates": [ 14.02358, 48.31058 ]
        },
       "representative_point": [ 14.02358, 48.31058 ],
@@ -47,7 +47,7 @@
       ]
     },{
       "uri": "http://www.trismegistos.org/place/35191",
-      "gazetteer": "Trismegistos",
+      "source_gazetteer": "Trismegistos",
       "title": "Ad Mauros",
       "names": [
         { "name": "Ad Mauros" },

@@ -51,25 +51,30 @@ case class TemporalBounds(from: DateTime, to: DateTime)
 object GazetteerRecord {
   
   import Place._
-
+  
+  private def fromOptSeq[T](o: Option[Seq[T]]) =
+    o.getOrElse(Seq.empty[T])
+  
+  private def toOptSeq[T](s: Seq[T]) =
+    if (s.isEmpty) None else Some(s)
+  
   implicit val gazetteerRecordFormat: Format[GazetteerRecord] = (
     (JsPath \ "uri").format[String] and
     (JsPath \ "source_gazetteer").format[Gazetteer] and
     (JsPath \ "title").format[String] and
-    (JsPath \ "place_types").format[Seq[String]] and
-    (JsPath \ "descriptions").format[Seq[Description]] and
-    (JsPath \ "names").format[Seq[Name]] and
+    (JsPath \ "place_types").formatNullable[Seq[String]]
+      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
+    (JsPath \ "descriptions").formatNullable[Seq[Description]]
+      .inmap[Seq[Description]](fromOptSeq[Description], toOptSeq[Description]) and
+    (JsPath \ "names").formatNullable[Seq[Name]]
+      .inmap[Seq[Name]](fromOptSeq[Name], toOptSeq[Name]) and
     (JsPath \ "geometry").formatNullable[Geometry] and
     (JsPath \ "representative_point").formatNullable[Coordinate] and
     (JsPath \ "temporal_bounds").formatNullable[TemporalBounds] and
-    (JsPath \ "close_matches").formatNullable[Seq[String]].inmap[Seq[String]](
-        o => o.getOrElse(Seq.empty[String]),
-        s => if (s.isEmpty) None else Some(s)
-      ) and
-    (JsPath \ "exact_matches").formatNullable[Seq[String]].inmap[Seq[String]](
-        o => o.getOrElse(Seq.empty[String]),
-        s => if (s.isEmpty) None else Some(s)
-      )
+    (JsPath \ "close_matches").formatNullable[Seq[String]]
+      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
+    (JsPath \ "exact_matches").formatNullable[Seq[String]]
+      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String])
   )(GazetteerRecord.apply, unlift(GazetteerRecord.unapply))
   
 }
