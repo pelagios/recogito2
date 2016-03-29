@@ -6,7 +6,6 @@ import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
-import play.api.Logger
 import scala.io.Source
 import play.api.libs.json.Json
 import org.joda.time.DateTime
@@ -75,7 +74,7 @@ class AnnotationSpec extends Specification {
       val (annotationId, versionId) = (UUID.randomUUID(), UUID.randomUUID())
       
       // Current time (we force millis to 0 because serialization will drop them!) 
-      val now = DateTime.now.withMillis(0)
+      val now = DateTime.now().withMillisOfSecond(0)
       
       // Two bodies, representing result of NER, without georesolution
       val bodies = 
