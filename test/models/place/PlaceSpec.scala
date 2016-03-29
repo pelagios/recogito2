@@ -14,7 +14,7 @@ import scala.io.Source
 @RunWith(classOf[JUnitRunner])
 class PlaceSpec extends Specification {
   
-  "sample place" should {
+  "The sample place" should {
 
     val json = Source.fromFile("test/resources/place.json").getLines().mkString("\n")
     val parseResult = Json.fromJson[Place](Json.parse(json))
@@ -39,7 +39,7 @@ class PlaceSpec extends Specification {
       place.temporalBounds must equalTo(Some(TemporalBounds(from, to)))
     }
     
-    "should report the expected gazetteer record URIs" in {
+    "report the expected gazetteer record URIs" in {
       val place = parseResult.get
       val expectedURIs = Seq(
           "http://pleiades.stoa.org/places/118543",
@@ -50,7 +50,7 @@ class PlaceSpec extends Specification {
       place.uris must containAllOf(expectedURIs)
     }
     
-    "should report the expected source gazetteers" in {
+    "report the expected source gazetteers" in {
       val place = parseResult.get
       val expectedGazetteers = 
         Seq("Pleiades", "Trismegistos", "DARE").map(Gazetteer(_))
@@ -59,7 +59,7 @@ class PlaceSpec extends Specification {
       place.isInGazetteers must containAllOf(expectedGazetteers)
     }
     
-    "should list the expected place types per gazetteer" in {
+    "list the expected place types per gazetteer" in {
       val place = parseResult.get      
       
       place.placeTypes.size must equalTo(2)
@@ -67,7 +67,7 @@ class PlaceSpec extends Specification {
       place.placeTypes.get("tower").get must equalTo(Seq(Gazetteer("Pleiades")))
     }
     
-    "should list the expected descriptions by gazetteer" in {
+    "list the expected descriptions by gazetteer" in {
       val place = parseResult.get
 
       place.descriptions.size must equalTo(1)
@@ -75,7 +75,7 @@ class PlaceSpec extends Specification {
       place.descriptions.head._2 must equalTo(Seq(Gazetteer("Pleiades")))
     }
     
-    "should list the expected names per gazetteer" in {
+    "list the expected names per gazetteer" in {
       val place = parseResult.get
       
       place.names.size must equalTo(4)
@@ -85,7 +85,7 @@ class PlaceSpec extends Specification {
       place.names.get(Name("Marianianio", Some("la"))).get must equalTo(Seq(Gazetteer("Trismegistos")))      
     }
     
-    "should list the expected close- and exactMatches" in {
+    "list the expected close- and exactMatches" in {
       val place = parseResult.get
       val expectedCloseMatches = Seq(
         "http://sws.geonames.org/2780394",
@@ -104,9 +104,9 @@ class PlaceSpec extends Specification {
     
   }
     
-  "JSON serialization/parsing roundtrip" should {
+  "A JSON serialization/parsing roundtrip" should {
     
-    "yield an equal Place" in {
+    "yield an equal Place before and after" in {
       
       import GazetteerRecordSpec._
       
@@ -128,7 +128,5 @@ class PlaceSpec extends Specification {
     }
     
   }
-  
-  // TODO test index insertion (i.e. does the ES mapping definition fit the test JSON? 
-    
+       
 }

@@ -4,10 +4,9 @@ import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
-import storage.ES
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
-import play.api.Logger
+import storage.ES
 
 object AnnotationService {
 
