@@ -29,7 +29,45 @@ case class Place(
   /** The gazetteer records that define that place **/
   isConflationOf: Seq[GazetteerRecord]
   
-)
+) {
+  
+  /** URIs of all gazetteer records that define that place **/
+  def uris: Seq[String] = isConflationOf.map(_.uri)
+
+  /** List of the gazetteers that define that place **/
+  def isInGazetteers: Seq[Gazetteer] = isConflationOf.map(_.sourceGazetteer)
+  
+  /** Place types assigned to this place as Map[placeType -> list of gazetteers including the type] **/
+  lazy val placeTypes =
+    isConflationOf
+      .flatMap(g => g.placeTypes.map((_, g.sourceGazetteer)))
+      .groupBy(_._1)
+      .map { case (placeType, s) => (placeType -> s.map(_._2)) }.toMap
+      
+  /** Descriptions assigned to this place as Map[description -> list of gazetteers including the description] **/
+  lazy val descriptions =
+    isConflationOf
+      .flatMap(g => g.descriptions.map((_, g.sourceGazetteer)))
+      .groupBy(_._1)
+      .map { case (description, s) => (description -> s.map(_._2)) }.toMap
+    
+  /** Names assigned to this place as Map[name -> list of gazetteers including the name] **/
+  lazy val names =
+    isConflationOf
+      .flatMap(g => g.names.map((_, g.sourceGazetteer)))
+      .groupBy(_._1)
+      .map { case (name, s) => (name -> s.map(_._2)) }.toMap
+
+  /** All close matches assigned to this place by source gazetteers **/
+  def closeMatches = isConflationOf.flatMap(_.closeMatches)
+  
+  /** All exact matches assigned to this place by source gazetteers **/
+  def exactMatches = isConflationOf.flatMap(_.exactMatches)
+  
+  /** For covenience **/
+  def allMatches: Seq[String] = closeMatches ++ exactMatches
+  
+}
 
 /** JSON (de)serialization **/
 
