@@ -38,8 +38,6 @@ case class GazetteerRecord(
 
 }
 
-case class Gazetteer(name: String)
-
 case class Description(description: String, language: Option[String] = None)
 
 case class Name(name: String, language: Option[String] = None)
@@ -79,16 +77,6 @@ object GazetteerRecord {
   
 }
 
-object Gazetteer {
-  
-  implicit val gazetteerFormat: Format[Gazetteer] =
-    Format(
-      JsPath.read[String].map(Gazetteer(_)),
-      Writes[Gazetteer](t => JsString(t.name))
-    )
-    
-}
-    
 object Description {
   
   implicit val descriptionFormat: Format[Description] = (
