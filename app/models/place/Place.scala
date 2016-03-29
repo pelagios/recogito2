@@ -73,15 +73,17 @@ case class Place(
 
 object Place {
   
+  private val DECIMAL_PRECISION = 12
+  
   implicit val geometryFormat: Format[Geometry] =
     Format(
       JsPath.read[JsValue].map { json =>
-        new GeometryJSON().read(Json.stringify(json))
+        new GeometryJSON(DECIMAL_PRECISION).read(Json.stringify(json))
       },
       
       Writes[Geometry] { geom =>
         val writer = new StringWriter()
-        new GeometryJSON().write(geom, writer)
+        new GeometryJSON(DECIMAL_PRECISION).write(geom, writer)
         Json.parse(writer.toString)
       }
     )

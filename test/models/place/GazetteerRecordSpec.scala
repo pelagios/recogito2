@@ -10,9 +10,69 @@ import play.api.test.Helpers._
 import play.api.libs.json.Json
 import scala.io.Source
 
+object GazetteerRecordSpec {
+  
+  private val coord = new Coordinate(14.02358, 48.31058)
+  private val point = new GeometryFactory().createPoint(coord)
+      
+  private val from = new DateTime(DateTimeZone.UTC).withDate(-30, 1, 1).withTime(0, 0, 0, 0)
+  private val to = new DateTime(DateTimeZone.UTC).withDate(640, 1, 1).withTime(0, 0, 0, 0)
+  
+  val pleiadesRecord = GazetteerRecord(
+    "http://pleiades.stoa.org/places/118543",
+    Gazetteer("Pleiades"),
+    "Ad Mauros",
+    Seq("fort" , "tower"),
+    Seq(Description("An ancient place, cited: BAtlas 12 H4 Ad Mauros")),
+    Seq(Name("Ad Mauros")),
+    Some(point),
+    Some(coord),
+    Some(TemporalBounds(from, to)),
+    Seq.empty[String],
+    Seq.empty[String])
+    
+  val dareRecord = GazetteerRecord(
+    "http://dare.ht.lu.se/places/10778",
+    Gazetteer("DARE"),
+    "Ad Mauros/Marinianio, Eferding",
+    Seq("fort"),
+    Seq.empty[Description],
+    Seq(Name("Ad Mauros/Marinianio, Eferding")),
+    Some(point),
+    Some(coord),
+    Some(TemporalBounds(from, to)),
+    Seq(
+      "http://sws.geonames.org/2780394",
+      "http://www.wikidata.org/entity/Q2739862",
+      "http://de.wikipedia.org/wiki/Kastell_Eferding",
+      "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html"
+    ),
+    Seq.empty[String]) 
+    
+  val trismegistosRecord = GazetteerRecord(
+    "http://www.trismegistos.org/place/35191",
+    Gazetteer("Trismegistos"),
+    "Ad Mauros",
+    Seq.empty[String],
+    Seq.empty[Description],
+    Seq(
+      Name("Ad Mauros"),
+      Name("Eferding"),
+      Name("Marianianio", Some("la"))
+    ),
+    None,
+    None,
+    None,
+    Seq.empty[String],
+    Seq.empty[String])
+  
+}
+
 @RunWith(classOf[JUnitRunner])
 class GazetteerRecordSpec extends Specification {
 
+  import GazetteerRecordSpec._
+  
   "sample gazetteer records" should {
     
     "be properly created from place JSON" in {
@@ -23,62 +83,7 @@ class GazetteerRecordSpec extends Specification {
       
       val gazetteerRecords = parseResult.get.isConflationOf
       
-      gazetteerRecords.size must equalTo(3)
-      
-      val coord = new Coordinate(14.02358, 48.31058)
-      val point = new GeometryFactory().createPoint(coord)
-      
-      val from = new DateTime(DateTimeZone.UTC).withDate(-30, 1, 1).withTime(0, 0, 0, 0)
-      val to = new DateTime(DateTimeZone.UTC).withDate(640, 1, 1).withTime(0, 0, 0, 0)
-
-      val pleiadesRecord = GazetteerRecord(
-        "http://pleiades.stoa.org/places/118543",
-        Gazetteer("Pleiades"),
-        "Ad Mauros",
-        Seq("fort" , "tower"),
-        Seq(Description("An ancient place, cited: BAtlas 12 H4 Ad Mauros")),
-        Seq(Name("Ad Mauros")),
-        Some(point),
-        Some(coord),
-        Some(TemporalBounds(from, to)),
-        Seq.empty[String],
-        Seq.empty[String])
-        
-      val dareRecord = GazetteerRecord(
-        "http://dare.ht.lu.se/places/10778",
-        Gazetteer("DARE"),
-        "Ad Mauros/Marinianio, Eferding",
-        Seq("fort"),
-        Seq.empty[Description],
-        Seq(Name("Ad Mauros/Marinianio, Eferding")),
-        Some(point),
-        Some(coord),
-        Some(TemporalBounds(from, to)),
-        Seq(
-          "http://sws.geonames.org/2780394",
-          "http://www.wikidata.org/entity/Q2739862",
-          "http://de.wikipedia.org/wiki/Kastell_Eferding",
-          "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html"
-        ),
-        Seq.empty[String]) 
-        
-      val trismegistosRecord = GazetteerRecord(
-        "http://www.trismegistos.org/place/35191",
-        Gazetteer("Trismegistos"),
-        "Ad Mauros",
-        Seq.empty[String],
-        Seq.empty[Description],
-        Seq(
-          Name("Ad Mauros"),
-          Name("Eferding"),
-          Name("Marianianio", Some("la"))
-        ),
-        None,
-        None,
-        None,
-        Seq.empty[String],
-        Seq.empty[String])
-        
+      gazetteerRecords.size must equalTo(3)        
       gazetteerRecords must containAllOf(Seq(pleiadesRecord, dareRecord, trismegistosRecord))
     }
     

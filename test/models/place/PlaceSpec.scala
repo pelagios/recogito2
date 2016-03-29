@@ -107,14 +107,24 @@ class PlaceSpec extends Specification {
   "JSON serialization/parsing roundtrip" should {
     
     "yield an equal Place" in {
-      // TODO create Place programmatically
       
-      // TODO serialize place to JSON
+      import GazetteerRecordSpec._
       
-      // TODO parse JSON
+      val before = Place(
+        "http://pleiades.stoa.org/places/118543",
+        "Ad Mauros",
+        dareRecord.geometry,
+        dareRecord.representativePoint,
+        dareRecord.temporalBounds,
+        Seq(pleiadesRecord, dareRecord, trismegistosRecord)
+      )
+                  
+      val serializedToJson = Json.stringify(Json.toJson(before))
+      val parsedFromJson = Json.fromJson[Place](Json.parse(serializedToJson))
+      parsedFromJson.isSuccess must equalTo(true)
       
-      // TODO compare parsed Place with original place - must be equal
-      success
+      val after = parsedFromJson.get
+      after must equalTo(before)
     }
     
   }
