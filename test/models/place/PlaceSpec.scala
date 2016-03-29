@@ -26,6 +26,7 @@ class PlaceSpec extends Specification {
       
       place.id must equalTo ("http://pleiades.stoa.org/places/118543")
       
+      /*
       val expectedURIs = Seq(
           "http://pleiades.stoa.org/places/118543",
           "http://dare.ht.lu.se/places/10778",
@@ -64,57 +65,11 @@ class PlaceSpec extends Specification {
         
       place.closeMatches must containAllOf(expectedCloseMatches)
       place.exactMatches.size must equalTo(0)
+      */
     }
     
   }
-  
-  "the flex date parser" should {
     
-    "parse integer- and datestring-formatted years as equal DateTimes" in {
-      
-      val jsonTempBoundsInt = Json.parse("{ \"from\": -30, \"to\": 640 }")      
-      val jsonTempBoundsStr = Json.parse("{ \"from\": \"-30-01-01T00:00:00Z\", \"to\": \"640-01-01T00:00:00Z\" }") 
-
-      val boundsFromInt = Json.fromJson[TemporalBounds](jsonTempBoundsInt)
-      val boundsFromStr = Json.fromJson[TemporalBounds](jsonTempBoundsStr)
-
-      boundsFromInt.isSuccess must equalTo(true)
-      boundsFromStr.isSuccess must equalTo(true)
-      
-      boundsFromStr.get.from.getYear must equalTo(-30)
-      boundsFromStr.get.to.getYear must equalTo(640)
-      
-      boundsFromInt.get.from.getMillis must equalTo(boundsFromStr.get.from.getMillis)
-      boundsFromInt.get.to.getMillis must equalTo(boundsFromStr.get.to.getMillis)
-    }
-    
-  }
-  
-  "temp bounds (de)serialization" should {
-    
-    "yield dates serialized in UTC" in  {
-      val tempBounds = TemporalBounds(
-          new DateTime(DateTimeZone.UTC).withDate(1492, 1, 1).withTime(0, 0, 0, 0),
-          new DateTime(DateTimeZone.UTC).withDate(1493, 1, 1).withTime(0, 0, 0, 0))
-      
-      val asJson = Json.toJson(tempBounds)
-      
-      (asJson \ "from").as[String] must equalTo ("1492-01-01T00:00:00+00:00")
-      (asJson \ "to").as[String] must equalTo ("1493-01-01T00:00:00+00:00")
-    }
-    
-    "maintain UTC in a parse/serialize roundtrip" in {
-      val json = "{\"from\":\"1492-01-01T00:00:00+00:00\",\"to\":\"1493-01-01T00:00:00+00:00\"}"
-      
-      val asDateTime = Json.fromJson[TemporalBounds](Json.parse(json))
-      asDateTime.isSuccess must equalTo(true)
-      
-      val serialized = Json.toJson(asDateTime.get)
-      Json.stringify(serialized) must equalTo(json)
-    }
-    
-  }
-  
   "JSON serialization/parsing roundtrip" should {
     
     "yield an equal Place" in {
@@ -131,7 +86,5 @@ class PlaceSpec extends Specification {
   }
   
   // TODO test index insertion (i.e. does the ES mapping definition fit the test JSON? 
-  
-  // TODO what do we do with 'isConflationOf'? We should introduce an extra 'GazetteerRecord' case class for this!
-  
+    
 }
