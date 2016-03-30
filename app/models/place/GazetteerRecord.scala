@@ -121,4 +121,16 @@ object TemporalBounds extends HasDate {
     (JsPath \ "to").format[JsValue].inmap[DateTime](flexDateRead, flexDateWrite)
   )(TemporalBounds.apply, unlift(TemporalBounds.unapply))
   
+  def computeUnion(bounds: Seq[TemporalBounds]): TemporalBounds = {
+    val from = bounds.map(_.from.getMillis).min
+    val to = bounds.map(_.to.getMillis).max
+    TemporalBounds(new DateTime(from), new DateTime(to))
+  }
+  
+  def fromYears(from: Int, to: Int): TemporalBounds = {
+    val f = new DateTime(DateTimeZone.UTC).withDate(from, 1, 1).withTime(0, 0, 0, 0)
+    val t = new DateTime(DateTimeZone.UTC).withDate(to, 1, 1).withTime(0, 0, 0, 0)
+    TemporalBounds(f, t)
+  }
+  
 }

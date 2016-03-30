@@ -33,10 +33,7 @@ class PlaceSpec extends Specification {
       val location = new Coordinate(14.02358, 48.31058)
       place.representativePoint must equalTo(Some(location))
       place.geometry must equalTo(Some(new GeometryFactory().createPoint(location)))
-
-      val from = new DateTime(DateTimeZone.UTC).withDate(-30, 1, 1).withTime(0, 0, 0, 0)
-      val to = new DateTime(DateTimeZone.UTC).withDate(640, 1, 1).withTime(0, 0, 0, 0)
-      place.temporalBounds must equalTo(Some(TemporalBounds(from, to)))
+      place.temporalBounds must equalTo(Some(TemporalBounds.fromYears(-30, 640)))
     }
     
     "report the expected gazetteer record URIs" in {

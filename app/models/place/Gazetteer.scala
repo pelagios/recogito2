@@ -9,26 +9,17 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
+import play.api.Logger
+
 case class Gazetteer(name: String)
 
 object Gazetteer {
-  
+
   implicit val gazetteerFormat: Format[Gazetteer] =
     Format(
       JsPath.read[String].map(Gazetteer(_)),
       Writes[Gazetteer](t => JsString(t.name))
     )
-
-  def normalizeURI(uri: String) = {
-    // We remove '#this' suffixes
-    val noThis = if (uri.indexOf("#this") > -1) uri.substring(0, uri.indexOf("#this")) else uri
-      
-    // By convention, we remove trailing slash
-    if (noThis.endsWith("/"))
-      noThis.substring(0, noThis.size - 1)
-    else 
-      noThis
-  }
     
   def loadFromRDF(file: File, gazetteerName: String): Seq[GazetteerRecord] = {
     val (is, filename) = if (file.getName.endsWith(".gz"))
@@ -38,7 +29,7 @@ object Gazetteer {
         
     Scalagios.readPlaces(is, filename).map(p =>
       GazetteerRecord(
-        normalizeURI(p.uri),
+        GazetteerUtils.normalizeURI(p.uri),
         Gazetteer(gazetteerName),
         p.label,
         p.category.map(category => Seq(category.toString)).getOrElse(Seq.empty[String]),
@@ -51,4 +42,36 @@ object Gazetteer {
         p.exactMatches)).toSeq
   }
     
+}
+
+object GazetteerUtils {
+  
+  /** Normalizes a URI to a standard format
+    * 
+    * Removes '#this' suffixes (used by Pleiades) and, by convention, trailing slashes. 
+    */
+  def normalizeURI(uri: String) = {
+    val noThis = if (uri.indexOf("#this") > -1) uri.substring(0, uri.indexOf("#this")) else uri
+      
+    if (noThis.endsWith("/"))
+      noThis.substring(0, noThis.size - 1)
+    else 
+      noThis
+  }
+  
+  /** Returns a clone of the gazetteer record, with all URIs normalized **/
+  def normalizeRecord(r: GazetteerRecord) = 
+    GazetteerRecord(
+      normalizeURI(r.uri),
+      r.sourceGazetteer,
+      r.title,
+      r.placeTypes,
+      r.descriptions,
+      r.names,
+      r.geometry,
+      r.representativePoint,
+      r.temporalBounds,
+      r.closeMatches.map(normalizeURI(_)),
+      r.exactMatches.map(normalizeURI(_)))
+      
 }

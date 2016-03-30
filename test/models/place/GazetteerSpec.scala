@@ -64,7 +64,7 @@ class GazetteerSpec extends Specification {
       testRecord.geometry must equalTo(Some(point))
       testRecord.representativePoint must equalTo(Some(coord))
 
-      testRecord.temporalBounds must equalTo(None)
+      testRecord.temporalBounds must equalTo(TemporalBounds.fromYears(-20, 630))
       testRecord.closeMatches.size must equalTo(0)
       testRecord.exactMatches.size must equalTo(0)
       testRecord.allMatches.size must equalTo(0)
