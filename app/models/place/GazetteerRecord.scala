@@ -34,7 +34,19 @@ case class GazetteerRecord(
 ) {
   
   // For convenience
-  lazy val allMatches = closeMatches ++ exactMatches 
+  lazy val allMatches = closeMatches ++ exactMatches
+  
+  /** Returns true if there is a connection between the two records.
+    *   
+    * A connection can result from one of the following three causes:
+    * - this record lists the other record's URI as a close- or exactMatch
+    * - the other record lists this record's URI as a close- or exactMatch
+    * - both records share at least one close/exactMatch URI
+    */
+  def isConnectedWith(other: GazetteerRecord): Boolean =
+    allMatches.contains(other.uri) ||
+    other.allMatches.contains(uri) ||
+    allMatches.exists(matchURI => other.allMatches.contains(matchURI))
 
 }
 

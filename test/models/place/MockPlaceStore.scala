@@ -10,8 +10,9 @@ class MockPlaceStore extends PlaceStore {
     mockIndex.size
   }
 
-  def insertOrUpdatePlace(place: Place) =
+  def insertOrUpdatePlace(place: Place) = {
     mockIndex.put(place.id, place)
+  }
     
   def deletePlace(id: String) =
     mockIndex.remove(id)

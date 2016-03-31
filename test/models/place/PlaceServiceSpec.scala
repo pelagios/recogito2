@@ -21,13 +21,80 @@ class PlaceServiceSpec extends Specification {
   
   val mockStore = new MockPlaceStore()
   
+  "The conflate method" should {
+    
+    "properly merge 3 test records that should be joined" in {
+      val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), "Record A",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq("http://www.example.com/place/b"),
+        Seq.empty[String])
+        
+      val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), "Record B",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq.empty[String], Seq.empty[String])
+
+      val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), "Record C",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq("http://www.example.com/place/a"),
+        Seq("http://www.example.com/place/b"))
+        
+      val conflated = PlaceService.conflate(Seq(recordA, recordB, recordC))
+      conflated.size must equalTo(1)
+      conflated.head.id must equalTo(recordA.uri)
+      conflated.head.isConflationOf.size must equalTo(3)
+    }
+    
+    "properly separate 3 records that should remain speparate" in {
+      val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), "Record A",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq("http://www.example.com/place/d"),
+        Seq.empty[String])
+        
+      val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), "Record B",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq.empty[String], Seq.empty[String])
+
+      val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), "Record C",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq("http://www.example.com/place/e"),
+        Seq("http://www.example.com/place/f"))
+        
+      val conflated = PlaceService.conflate(Seq(recordA, recordB, recordC))
+      conflated.size must equalTo(3)
+      conflated.map(_.id) must containAllOf(Seq(recordA.uri, recordB.uri, recordC.uri))
+      conflated.map(_.isConflationOf.size) must equalTo(Seq(1, 1, 1))
+    }
+    
+    "properly conflate 3 records into 2 groups of 1 and 2 places" in {
+      val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), "Record A",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq("http://www.example.com/place/d"),
+        Seq.empty[String])
+        
+      val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), "Record B",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq.empty[String], Seq.empty[String])
+
+      val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), "Record C",
+        Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        Seq("http://www.example.com/place/e"),
+        Seq("http://www.example.com/place/a"))
+        
+      val conflated = PlaceService.conflate(Seq(recordA, recordB, recordC))
+      
+      conflated.size must equalTo(2)
+      conflated.map(_.id) must containAllOf(Seq(recordA.uri, recordB.uri))
+    }
+    
+  }
+  
   "After importing the DARE sample, the PlaceService" should {
     
      val dareRecords = Gazetteer.loadFromRDF(new File(DARE_RDF), "DARE")
     
     "contain 4 places" in {
       // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec
-      PlaceService.importGazetteerRecords(dareRecords, mockStore)
+      PlaceService.importRecords(dareRecords, mockStore)
       PlaceService.totalPlaces(mockStore) must equalTo(4)
     }
     
@@ -52,7 +119,7 @@ class PlaceServiceSpec extends Specification {
     
     "return Vindobona, Thessalonica and Calunium" in {
       val fakeVindobona = GazetteerRecord(
-        "http://www.wikidata.org/entity/Q871525", // This will cause DARE's Vindobona to match
+        "http://www.wikidata.org/entity/Q871525/", // This will cause DARE's Vindobona to match
         Gazetteer("DummyGazetteer"),
         "A fake place",
         Seq.empty[String],
@@ -61,8 +128,8 @@ class PlaceServiceSpec extends Specification {
         None,
         None,
         None,
-        Seq("http://dare.ht.lu.se/places/17068"), // This will match DARE's Thessalonica
-        Seq("http://www.trismegistos.org/place/15045")) // This is a common match with DARE's Calunium
+        Seq("http://dare.ht.lu.se/places/17068/"), // This will match DARE's Thessalonica
+        Seq("http://www.trismegistos.org/place/15045/")) // This is a common match with DARE's Calunium
       
       val expectedPlaceURIs = Seq(
         "http://dare.ht.lu.se/places/10783",
@@ -81,7 +148,7 @@ class PlaceServiceSpec extends Specification {
     val pleiadesRecords = Gazetteer.loadFromRDF(new File(PLEIADES_RDF), "Pleiades")
       
     "contain 5 places" in {
-      PlaceService.importGazetteerRecords(pleiadesRecords, mockStore)
+      PlaceService.importRecords(pleiadesRecords, mockStore)
       PlaceService.totalPlaces(mockStore) must equalTo(5)
     }
     
@@ -186,7 +253,7 @@ class PlaceServiceSpec extends Specification {
         Seq("http://pleiades.stoa.org/places/128460"), // Mun. Vindobona
         Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
       
-      PlaceService.importGazetteerRecords(Seq(fakeMeidling), mockStore)
+      PlaceService.importRecords(Seq(fakeMeidling), mockStore)
       PlaceService.totalPlaces(mockStore) must equalTo(4)
     }
     
@@ -205,16 +272,41 @@ class PlaceServiceSpec extends Specification {
     
   }
   
-  "After removing the bridging record, the PlaceService" should {
+  "After updating the bridge record, the PlaceService" should {
     
-    "contain one place more" in {
-      // TODO implement
-      failure
+    "contain two places more" in {
+      // Update our fictitious record, so that it no longer connects the two Vindobonas
+      val fakeMeidling = GazetteerRecord(
+        "http://de.wikipedia.org/wiki/Meidling",
+        Gazetteer("DummyGazetteer"),
+        "A fake briding place",
+        Seq.empty[String],
+        Seq.empty[Description],
+        Seq.empty[Name],
+        None,
+        None,
+        None,
+        Seq.empty[String], // Mun. Vindobona
+        Seq.empty[String]) // Vindobona
+       
+      PlaceService.importRecords(Seq(fakeMeidling), mockStore)
+      PlaceService.totalPlaces(mockStore) must equalTo(6)
     }
     
-    "should contain two 'successor places' consisting of properly conflated records" in {
-      // TODO implement
-      failure
+    "should contain 3 properly conflated successor places (2 original Vindobonas and dummy Meidling record)" in {
+      val munVindobona = PlaceService.findByURI("http://dare.ht.lu.se/places/10783", mockStore)
+      munVindobona.isDefined must equalTo(true)
+      munVindobona.get.id must equalTo("http://dare.ht.lu.se/places/10783")
+      munVindobona.get.isConflationOf.size must equalTo(2)
+      munVindobona.get.uris must containAllOf(Seq("http://dare.ht.lu.se/places/10783", "http://pleiades.stoa.org/places/128460"))
+      
+      val vindobona = PlaceService.findByURI("http://pleiades.stoa.org/places/128537", mockStore)
+      vindobona.isDefined must equalTo(true)
+      vindobona.get.isConflationOf.map(_.uri) must equalTo(Seq("http://pleiades.stoa.org/places/128537"))
+      
+      val fakeMeidling = PlaceService.findByURI("http://de.wikipedia.org/wiki/Meidling", mockStore)
+      fakeMeidling.isDefined must equalTo(true)
+      fakeMeidling.get.isConflationOf.map(_.uri) must equalTo(Seq("http://de.wikipedia.org/wiki/Meidling"))
     }
     
   }
