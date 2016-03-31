@@ -1,9 +1,6 @@
 package models.place
 
 import GazetteerUtils._
-import play.api.Logger
-
-case class ConflationResult(toUpdateOrInsert: Seq[Place], toDelete: Seq[Place])
 
 object PlaceService {
   
