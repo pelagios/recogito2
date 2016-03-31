@@ -46,23 +46,32 @@ class PlaceServiceSpec extends Specification {
       lancaster.get.title must equalTo("Calunium?, Lancaster")      
     }
     
-    "return DARE places based on a search by close- or exactMatch URI" in {
-      // Except for URI normalization this mostly tests the mock impl - but see above
-      val expectedBarcelona = PlaceService.findByMatchURI("http://pleiades.stoa.org/places/246343", mockStore)
-      expectedBarcelona.size must equalTo(1)
-      expectedBarcelona.head.title must equalTo("Col. Barcino, Barcelona")
-     
-      val expectedVindobona = PlaceService.findByMatchURI("http://pleiades.stoa.org/places/128460", mockStore)
-      expectedVindobona.size must equalTo(1)
-      expectedVindobona.head.title must equalTo("Mun. Vindobona, Wien")
+  }
+  
+  "Based on the fictitious sample record, getAffectedPlaces" should {
+    
+    "return Vindobona, Thessalonica and Calunium" in {
+      val fakeVindobona = GazetteerRecord(
+        "http://www.wikidata.org/entity/Q871525", // This will cause DARE's Vindobona to match
+        Gazetteer("DummyGazetteer"),
+        "A fake place",
+        Seq.empty[String],
+        Seq.empty[Description],
+        Seq.empty[Name],
+        None,
+        None,
+        None,
+        Seq("http://dare.ht.lu.se/places/17068"), // This will match DARE's Thessalonica
+        Seq("http://www.trismegistos.org/place/15045")) // This is a common match with DARE's Calunium
       
-      val expectedThessaloniki = PlaceService.findByMatchURI("http://pleiades.stoa.org/places/491741", mockStore)
-      expectedThessaloniki.size must equalTo(1)
-      expectedThessaloniki.head.title must equalTo("Thessalonica, Thessaloniki")
-          
-      val expectedLancaster = PlaceService.findByMatchURI("http://pleiades.stoa.org/places/89222", mockStore)
-      expectedLancaster.size must equalTo(1)
-      expectedLancaster.head.title must equalTo("Calunium?, Lancaster")     
+      val expectedPlaceURIs = Seq(
+        "http://dare.ht.lu.se/places/10783",
+        "http://dare.ht.lu.se/places/17068",
+        "http://dare.ht.lu.se/places/23712")
+        
+      val affectedPlaces = PlaceService.getAffectedPlaces(fakeVindobona, mockStore)
+      affectedPlaces.size must equalTo(3)
+      affectedPlaces.map(_.id) must containAllOf(expectedPlaceURIs)
     }
     
   }
@@ -132,16 +141,17 @@ class PlaceServiceSpec extends Specification {
       vindobona.temporalBounds must equalTo(Some(TemporalBounds.fromYears(-30, 640)))
       
       vindobona.names.size must equalTo(6)
+            
       vindobona.names.get(Name("Mun. Vindobona")).get must equalTo(Seq(Gazetteer("Pleiades")))
       vindobona.names.get(Name("Mun. Vindobona", Some("la"))).get must equalTo(Seq(Gazetteer("DARE")))
-      vindobona.names.get(Name("Wien")).get must equalTo(Seq(Gazetteer("Pleiades"), Gazetteer("DARE")))
+      vindobona.names.get(Name("Wien")).get must containAllOf(Seq(Gazetteer("Pleiades"), Gazetteer("DARE")))
       vindobona.names.get(Name("Wien/Vienna AUS")).get must equalTo(Seq(Gazetteer("Pleiades")))
-      vindobona.names.get(Name("Vienna", Some("fr"))).get must equalTo(Seq(Gazetteer("DARE")))
+      vindobona.names.get(Name("Vienne", Some("fr"))).get must equalTo(Seq(Gazetteer("DARE")))
       vindobona.names.get(Name("Vienna", Some("en"))).get must equalTo(Seq(Gazetteer("DARE")))
 
       val expectedCloseMatches = Seq("http://www.wikidata.org/entity/Q871525")
       val expectedExactMatches = Seq(
-          "http://pleiades.stoa.org/places/128460/",
+          "http://pleiades.stoa.org/places/128460",
           "http://www.trismegistos.org/place/28821")
 
       vindobona.closeMatches must equalTo(expectedCloseMatches)
@@ -162,8 +172,22 @@ class PlaceServiceSpec extends Specification {
   "After adding a 'bridiging' record that connects two places, the PlaceService" should {
     
     "contain one place less" in {
-      // TODO implement
-      failure
+      // A fictitious record connecting the two Vindobonas
+      val fakeMeidling = GazetteerRecord(
+        "https://de.wikipedia.org/wiki/Meidling",
+        Gazetteer("DummyGazetteer"),
+        "A fake briding place",
+        Seq.empty[String],
+        Seq.empty[Description],
+        Seq.empty[Name],
+        None,
+        None,
+        None,
+        Seq("http://pleiades.stoa.org/places/128460"), // Mun. Vindobona
+        Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
+      
+      PlaceService.importGazetteerRecords(Seq(fakeMeidling), mockStore)
+      PlaceService.totalPlaces(mockStore) must equalTo(4)
     }
     
     "should contain a 'successor place' consisting of the properly conflated records" in {

@@ -124,7 +124,9 @@ object TemporalBounds extends HasDate {
   def computeUnion(bounds: Seq[TemporalBounds]): TemporalBounds = {
     val from = bounds.map(_.from.getMillis).min
     val to = bounds.map(_.to.getMillis).max
-    TemporalBounds(new DateTime(from), new DateTime(to))
+    TemporalBounds(
+      new DateTime(from, DateTimeZone.UTC), 
+      new DateTime(to, DateTimeZone.UTC))
   }
   
   def fromYears(from: Int, to: Int): TemporalBounds = {

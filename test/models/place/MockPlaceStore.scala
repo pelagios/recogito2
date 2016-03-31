@@ -1,17 +1,19 @@
 package models.place
 
+import play.api.Logger
+
 class MockPlaceStore extends PlaceStore {
   
   val mockIndex = scala.collection.mutable.HashMap.empty[String, Place]
   
-  def totalPlaces() = mockIndex.size
+  def totalPlaces() = {
+    Logger.info(mockIndex.keys.mkString("\n"))
+    mockIndex.size
+  }
 
-  def insertPlace(place: Place) =
+  def insertOrUpdatePlace(place: Place) =
     mockIndex.put(place.id, place)
     
-  def deletePlace(id: String) =
-    mockIndex.remove(id)
-  
   def findByURI(uri: String): Option[Place] = {
     val normalizedURI = GazetteerUtils.normalizeURI(uri)
     
@@ -27,8 +29,11 @@ class MockPlaceStore extends PlaceStore {
     
   }
   
-  def findByMatchURI(uri: String): Seq[Place] =
-    mockIndex.values.filter(place => place.allMatches.contains(GazetteerUtils.normalizeURI(uri))).toSeq
+  def findByPlaceOrMatchURIs(uris: Seq[String]) = {
+    val normalized = uris.map(uri => GazetteerUtils.normalizeURI(uri)).toSet
+    mockIndex.values.filter(place =>
+      (place.uris ++ place.allMatches).exists(uri => normalized.contains(uri))).toSeq
+  }
   
   def searchByName(name: String): Seq[Place] =
     mockIndex.values.toSeq

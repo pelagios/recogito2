@@ -6,16 +6,19 @@ import play.api.libs.json.Json
 
 trait PlaceStore {
 
+  /** Returns the total number of places in the store **/
   def totalPlaces(): Int
   
-  def insertPlace(place: Place)
+  /** Inserts a place **/
+  def insertOrUpdatePlace(place: Place)
   
-  def deletePlace(id: String)
-  
+  /** Retrieves a place by one of its gazetteer record URIs **/
   def findByURI(uri: String): Option[Place]
   
-  def findByMatchURI(uri: String): Seq[Place] 
+  /** Finds all places with a record URI or close/exactMatch URI that matches any of the supplied URIs **/
+  def findByPlaceOrMatchURIs(uris: Seq[String]): Seq[Place]
   
+  /** Searches places by name **/
   def searchByName(query: String): Seq[Place]
   
 }
@@ -29,13 +32,9 @@ private[place] class ESPlaceStore extends PlaceStore {
     0
   }
 
-  def insertPlace(place: Place) = {
+  def insertOrUpdatePlace(place: Place) = {
     // TODO implement
     // ES.client execute { index into ES.IDX_RECOGITO / PLACE source place }
-  }
-  
-  def deletePlace(id: String) = {
-    
   }
 
   def findByURI(uri: String): Option[Place] = {
@@ -46,11 +45,7 @@ private[place] class ESPlaceStore extends PlaceStore {
     Option.empty[Place]
   }
 
-  def findByMatchURI(uri: String): Seq[Place] = {
-    // TODO implement - make sure exactmatches are queried as well
-    // ES.client execute {
-    //  search in ES.IDX_RECOGITO / PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.close_matches" -> uri)) limit 1
-    // } map(_.as[Place].toSeq)
+  def findByPlaceOrMatchURIs(uris: Seq[String]): Seq[Place] = {
     Seq.empty[Place]
   }
 
