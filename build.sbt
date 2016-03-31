@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
 
   // Scalagios core + transient dependencies
-  "org.pelagios" % "scalagios-core" % "2.0.0" from "https://github.com/pelagios/scalagios/releases/download/v2.0/scalagios-core.jar",
+  "org.pelagios" % "scalagios-core" % "2.0.1" from "https://github.com/pelagios/scalagios/releases/download/v2.0.1/scalagios-core.jar",
   "org.openrdf.sesame" % "sesame-rio-n3" % "2.7.5",
   "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.7.5",
 

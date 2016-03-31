@@ -2,13 +2,12 @@ package models.place
 
 import java.io.{ File, FileInputStream, InputStream }
 import java.util.zip.GZIPInputStream
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, DateTimeZone }
 import org.pelagios.Scalagios
 import org.pelagios.api.gazetteer.{ Place => PelagiosPlace }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-
 import play.api.Logger
 
 case class Gazetteer(name: String)
@@ -27,6 +26,18 @@ object Gazetteer {
       else
         (new FileInputStream(file), file.getName)
         
+    import org.pelagios.api.PeriodOfTime
+    
+    // Helper to convert between Scalagios and Recogito time format
+    def convertPeriodOfTime(period: PeriodOfTime): TemporalBounds = {
+        val startDate = period.start
+        val endDate = period.end.getOrElse(startDate)
+        
+        TemporalBounds(
+          new DateTime(startDate).withZone(DateTimeZone.UTC), 
+          new DateTime(endDate).withZone(DateTimeZone.UTC))          
+    }
+        
     Scalagios.readPlaces(is, filename).map(p =>
       GazetteerRecord(
         GazetteerUtils.normalizeURI(p.uri),
@@ -37,7 +48,7 @@ object Gazetteer {
         p.names.map(l => Name(l.chars, l.lang)),
         p.location.map(_.geometry),
         p.location.map(_.pointLocation),
-        p.temporalCoverage.map(t => TemporalBounds(new DateTime(t.start), t.end.map(end => new DateTime(end)).getOrElse(new DateTime(t.start)))),
+        p.temporalCoverage.map(convertPeriodOfTime(_)),
         p.closeMatches,
         p.exactMatches)).toSeq
   }
