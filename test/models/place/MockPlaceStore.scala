@@ -7,12 +7,14 @@ class MockPlaceStore extends PlaceStore {
   val mockIndex = scala.collection.mutable.HashMap.empty[String, Place]
   
   def totalPlaces() = {
-    Logger.info(mockIndex.keys.mkString("\n"))
     mockIndex.size
   }
 
   def insertOrUpdatePlace(place: Place) =
     mockIndex.put(place.id, place)
+    
+  def deletePlace(id: String) =
+    mockIndex.remove(id)
     
   def findByURI(uri: String): Option[Place] = {
     val normalizedURI = GazetteerUtils.normalizeURI(uri)

@@ -174,7 +174,7 @@ class PlaceServiceSpec extends Specification {
     "contain one place less" in {
       // A fictitious record connecting the two Vindobonas
       val fakeMeidling = GazetteerRecord(
-        "https://de.wikipedia.org/wiki/Meidling",
+        "http://de.wikipedia.org/wiki/Meidling",
         Gazetteer("DummyGazetteer"),
         "A fake briding place",
         Seq.empty[String],
@@ -190,9 +190,17 @@ class PlaceServiceSpec extends Specification {
       PlaceService.totalPlaces(mockStore) must equalTo(4)
     }
     
-    "should contain a 'successor place' consisting of the properly conflated records" in {
-      // TODO implement
-      failure
+    "have properly conflated the successor place" in {
+      val conflated = PlaceService.findByURI("http://dare.ht.lu.se/places/10783", mockStore).get
+      conflated.id must equalTo("http://dare.ht.lu.se/places/10783")
+      
+      val expectedURIs = Seq(
+        "http://de.wikipedia.org/wiki/Meidling",
+        "http://dare.ht.lu.se/places/10783",
+        "http://pleiades.stoa.org/places/128460", // Mun. Vindobona
+        "http://pleiades.stoa.org/places/128537") // Vindobona
+      conflated.isConflationOf.size must equalTo(4)   
+      conflated.uris must containAllOf(expectedURIs)
     }
     
   }

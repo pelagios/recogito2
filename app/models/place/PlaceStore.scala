@@ -12,6 +12,9 @@ trait PlaceStore {
   /** Inserts a place **/
   def insertOrUpdatePlace(place: Place)
   
+  /** Deletes the place with the specified ID **/
+  def deletePlace(id: String)
+  
   /** Retrieves a place by one of its gazetteer record URIs **/
   def findByURI(uri: String): Option[Place]
   
@@ -35,6 +38,10 @@ private[place] class ESPlaceStore extends PlaceStore {
   def insertOrUpdatePlace(place: Place) = {
     // TODO implement
     // ES.client execute { index into ES.IDX_RECOGITO / PLACE source place }
+  }
+  
+  def deletePlace(id: String) = {
+    
   }
 
   def findByURI(uri: String): Option[Place] = {

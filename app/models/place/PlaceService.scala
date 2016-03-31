@@ -3,6 +3,8 @@ package models.place
 import GazetteerUtils._
 import play.api.Logger
 
+case class ConflationResult(toUpdateOrInsert: Seq[Place], toDelete: Seq[Place])
+
 object PlaceService {
   
   // Maximum number of URIs we will concatenate to an OR query
@@ -22,10 +24,11 @@ object PlaceService {
     store.findByPlaceOrMatchURIs(uris)
   }
   
-  private[place] def conflatePlaces(normalizedRecord: GazetteerRecord, places: Seq[Place]): Seq[Place] = {
+  private[place] def conflatePlaces(normalizedRecord: GazetteerRecord, affectedPlaces: Seq[Place]): ConflationResult = {
     // The general rule is that the "biggest place" (with highest number of gazetteer records) determines
     // ID and title of the conflated places
-    val definingPlace = places.sortBy(_.isConflationOf.size).headOption
+    val affectedPlacesSorted = affectedPlaces.sortBy(- _.isConflationOf.size)
+    val definingPlace = affectedPlacesSorted.headOption
     
     // Temporal bounds are computed as the union of all gazetteer records
     def temporalBoundsUnion(bounds: Seq[TemporalBounds]): Option[TemporalBounds] =
@@ -36,16 +39,26 @@ object PlaceService {
       
     // TODO in case we're conflating more than one places, we will need to update PlaceReferences in the store accordingly
         
-    val place = Place(
+    // Work in progress - we're still assuming the result will be only one place.
+    // But there could be more than one affected places, so all except the defining place
+    // need to be removed from the store
+        
+    val toUpdateOrInsert = Seq(Place(
       definingPlace.map(_.id).getOrElse(normalizedRecord.uri),
       definingPlace.map(_.title).getOrElse(normalizedRecord.title),
       definingPlace.map(_.geometry).getOrElse(normalizedRecord.geometry), // TODO implement rules for preferred geometry
       definingPlace.map(_.representativePoint).getOrElse(normalizedRecord.representativePoint), // TODO implement rules for preferred point
-      temporalBoundsUnion((places.map(_.temporalBounds) :+ normalizedRecord.temporalBounds).flatten),
-      places.toSeq.flatMap(_.isConflationOf) :+ normalizedRecord
-    )
+      temporalBoundsUnion((affectedPlaces.map(_.temporalBounds) :+ normalizedRecord.temporalBounds).flatten),
+      affectedPlaces.toSeq.flatMap(_.isConflationOf) :+ normalizedRecord
+    ))
     
-    Seq(place)
+    val toDelete =
+      if (affectedPlacesSorted.size > 1)
+        affectedPlacesSorted.tail
+      else
+        Seq.empty[Place]
+      
+    ConflationResult(toUpdateOrInsert, toDelete)
   }
   
   private[place] def addGazetteerRecord(record: GazetteerRecord, store: PlaceStore) = {
@@ -56,7 +69,8 @@ object PlaceService {
       
     // "Re-conflated" places after adding the record 
     val conflated = conflatePlaces(normalizedRecord, affectedPlaces)
-    conflated.foreach(place => store.insertOrUpdatePlace(place))
+    conflated.toUpdateOrInsert.foreach(place => store.insertOrUpdatePlace(place))
+    conflated.toDelete.foreach(place => store.deletePlace(place.id))
   }
   
   def importGazetteerRecords(records: Seq[GazetteerRecord], store: PlaceStore = esStore) = {
