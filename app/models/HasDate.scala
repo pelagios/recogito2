@@ -8,7 +8,7 @@ import play.api.libs.functional.syntax._
 
 trait HasDate {
 
-  private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ")
+  private val formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").withZone(DateTimeZone.UTC)
 
   implicit val dateTimeFormat =
     Format(
@@ -17,7 +17,7 @@ trait HasDate {
       },
       
       Writes[DateTime] { dt =>
-        Json.toJson(formatter.withZone(DateTimeZone.UTC).print(dt))
+        Json.toJson(formatter.print(dt))
       }
     )
 

@@ -5,7 +5,6 @@ import org.specs2.mutable._
 import org.specs2.runner._
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.junit.runner._
-import play.api.Logger
 import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json.Json
@@ -13,7 +12,7 @@ import scala.io.Source
 
 @RunWith(classOf[JUnitRunner])
 class PlaceSpec extends Specification {
-  
+
   "The sample place" should {
 
     val json = Source.fromFile("test/resources/place.json").getLines().mkString("\n")
@@ -117,6 +116,7 @@ class PlaceSpec extends Specification {
       )
                   
       val serializedToJson = Json.stringify(Json.toJson(before))
+      
       val parsedFromJson = Json.fromJson[Place](Json.parse(serializedToJson))
       parsedFromJson.isSuccess must equalTo(true)
       
