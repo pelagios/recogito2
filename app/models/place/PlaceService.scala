@@ -71,47 +71,62 @@ object PlaceService {
   }
   
   private def importRecord(record: GazetteerRecord, store: PlaceStore)(implicit context: ExecutionContext): Future[Boolean] = {    
-    val normalizedRecord = normalizeRecord(record)
     
-    getAffectedPlaces(normalizedRecord, store).map(p => {
-      
-      // All places that will be affected by the import, sorted by no. of gazetteer records
-      val affectedPlaces = p.sortBy(- _._1.isConflationOf.size)
-  
-      val affectedRecords = 
-        affectedPlaces
-          .flatMap(_._1.isConflationOf) // all gazetteer records contained in the affected places
-          .filter(_.uri != record.uri) // This record might update to an existing record!
-          
-      val conflated = conflate(affectedRecords :+ normalizedRecord)
-      
-      // Add (or update) the newly conflated places
-      conflated.foreach(p => store.insertOrUpdatePlace(p))
-      
-      // List of associations (Record URI, Parent PlaceID) before conflation
-      val recordToParentMappingBefore = affectedPlaces.flatMap(t =>
-        t._1.isConflationOf.map(record => (record.uri, t._1.id)))
+    // Fetches affected places from the store and computes the new conflation
+    def conflateAffectedPlaces(normalizedRecord: GazetteerRecord): Future[(Seq[(Place, Long)], Seq[Place])] = {
+      getAffectedPlaces(normalizedRecord, store).map(p => {
+        // Sorted affected places by no. of gazetteer records
+        val affectedPlaces = p.sortBy(- _._1.isConflationOf.size)
+    
+        val affectedRecords = 
+          affectedPlaces
+            .flatMap(_._1.isConflationOf) // all gazetteer records contained in the affected places
+            .filter(_.uri != record.uri) // This record might update to an existing record!
+            
+        val conflated = conflate(affectedRecords :+ normalizedRecord)
         
-      // List of associations (Record URI, Parent PlaceID) after conflation
-      val recordToParentMappingAfter = conflated.flatMap(place =>
-        place.isConflationOf.map(record => (record.uri, place.id)))
+        // Pass back places before and after conflation
+        (affectedPlaces, conflated)
+      })
+    }
+    
+    // Stores the newly conflated places to the store
+    def storeUpdatedPlaces(placesAfter: Seq[Place]): Future[Seq[Place]] =
+      Future.sequence {
+        placesAfter.map(place => store.insertOrUpdatePlace(place).map((place, _)))
+      } map { _.filter(!_._2).map(_._1) }
       
-      // We need to delete places that appear before, but not after the conflation
-      val placeIdsBefore = recordToParentMappingBefore.map(_._2).distinct
-      val placeIdsAfter = recordToParentMappingAfter.map(_._2).distinct
-      
-      val toDelete = placeIdsBefore diff placeIdsAfter
-      toDelete.foreach(id => store.deletePlace(id))
-      
-      // TODO Now we need to re-write the PlaceLinks
-      // TODO - identify which record-to-place-mappings have changed
-      // TODO - fetch those from the store
-      // TODO - update them to the new value
-      // TODO Note: this is a running system, users may have changed the
-      // TODO the link - use optimistic locking, re-run failures
-      
-      true // set to false in case of failure
-    })
+    // Deletes the places that no longer exist after the conflation from the store
+    def deleteMergedPlaces(placesBefore: Seq[(Place, Long)], placesAfter: Seq[Place]): Future[Seq[String]] =
+      Future.sequence {
+        // List of associations (Record URI, Parent PlaceID) before conflation
+        val recordToParentMappingBefore = placesBefore.flatMap(t =>
+          t._1.isConflationOf.map(record => (record.uri, t._1.id)))
+            
+        // List of associations (Record URI, Parent PlaceID) after conflation
+        val recordToParentMappingAfter = placesAfter.flatMap(place =>
+          place.isConflationOf.map(record => (record.uri, place.id)))
+          
+        // We need to delete all places that appear before, but not after the conflation
+        val placeIdsBefore = recordToParentMappingBefore.map(_._2).distinct
+        val placeIdsAfter = recordToParentMappingAfter.map(_._2).distinct  
+  
+        val toDelete = placeIdsBefore diff placeIdsAfter
+        toDelete.map(id => store.deletePlace(id).map((id, _)))
+      } map { _.filter(!_._2).map(_._1) }
+       
+    for {
+      (placesBefore, placesAfter) <- conflateAffectedPlaces(normalizeRecord(record))
+      failedUpdates <- storeUpdatedPlaces(placesAfter)
+      failedDeletes <- deleteMergedPlaces(placesBefore, placesAfter)
+    } yield failedUpdates.isEmpty && failedDeletes.isEmpty
+    
+    // TODO Now we need to re-write the PlaceLinks
+    // TODO - identify which record-to-place-mappings have changed
+    // TODO - fetch those from the store
+    // TODO - update them to the new value
+    // TODO Note: this is a running system, users may have changed the
+    // TODO the link - use optimistic locking, re-run failures
   }
   
   def importRecords(records: Seq[GazetteerRecord], store: PlaceStore = esStore, retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[GazetteerRecord]] =
