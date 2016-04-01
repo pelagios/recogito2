@@ -66,7 +66,11 @@ private[place] class ESPlaceStore extends PlaceStore {
     } map { r =>
       (true, r.getVersion)
     } recover { 
-      case t: Throwable => (false, -1l)
+      case t: Throwable => {
+        Logger.error("Error indexing place " + place.id + ": " + t.getMessage)
+        t.printStackTrace
+        (false, -1l)
+      }
     }
     
   def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =

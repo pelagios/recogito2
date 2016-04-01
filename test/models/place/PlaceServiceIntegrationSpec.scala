@@ -80,6 +80,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
       "contain 5 places" in {
         val failedRecords = importRecords(pleiadesRecords)
         failedRecords.size must equalTo(0)
+        flush()
         getTotalPlaces() must equalTo(5)
       }
       

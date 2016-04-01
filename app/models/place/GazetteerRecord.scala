@@ -2,6 +2,7 @@ package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
 import org.joda.time.{ DateTime, DateTimeZone }
+import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -108,7 +109,20 @@ object Name {
 }
 
 
-object TemporalBounds extends HasDate {
+object TemporalBounds {
+  
+  private val dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd").withZone(DateTimeZone.UTC)
+
+  implicit val dateFormat =
+    Format(
+      JsPath.read[JsString].map { json =>
+        dateFormatter.parseDateTime(json.value)
+      },
+      
+      Writes[DateTime] { dt =>
+        Json.toJson(dateFormatter.print(dt))
+      }
+    )
  
   /** Helper to produce a DateTime from a JsValue that's either an Int or a date string **/
   private def flexDateRead(json: JsValue): DateTime =
