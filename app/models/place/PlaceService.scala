@@ -94,7 +94,7 @@ object PlaceService {
     def storeUpdatedPlaces(placesAfter: Seq[Place]): Future[Seq[Place]] =
       Future.sequence {
         placesAfter.map(place => store.insertOrUpdatePlace(place).map((place, _)))
-      } map { _.filter(!_._2).map(_._1) }
+      } map { _.filter(!_._2._1).map(_._1) }
       
     // Deletes the places that no longer exist after the conflation from the store
     def deleteMergedPlaces(placesBefore: Seq[(Place, Long)], placesAfter: Seq[Place]): Future[Seq[String]] =
@@ -118,7 +118,8 @@ object PlaceService {
     for {
       (placesBefore, placesAfter) <- conflateAffectedPlaces(normalizeRecord(record))
       failedUpdates <- storeUpdatedPlaces(placesAfter)
-      failedDeletes <- deleteMergedPlaces(placesBefore, placesAfter)
+      // Only do deletes if we know updates were stored first!
+      failedDeletes <- if (failedUpdates.isEmpty) deleteMergedPlaces(placesBefore, placesAfter) else Future.successful(Seq.empty[String])
     } yield failedUpdates.isEmpty && failedDeletes.isEmpty
     
     // TODO Now we need to re-write the PlaceLinks

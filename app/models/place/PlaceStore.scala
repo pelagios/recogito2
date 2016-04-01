@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.source.Indexable
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ Future, ExecutionContext }
+import scala.language.postfixOps
 import storage.ES
 
 trait PlaceStore {
@@ -17,7 +18,7 @@ trait PlaceStore {
     *
     * Returns true if insert was successful  
     */
-  def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[Boolean]
+  def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)]
   
   /** Deletes the place with the specified ID
     *
@@ -59,11 +60,13 @@ private[place] class ESPlaceStore extends PlaceStore {
       response.getHits.getTotalHits
     }
     
-  def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[Boolean] =
+  def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
     ES.client execute { 
-      index into ES.IDX_RECOGITO / PLACE source place 
-    } map { response =>
-      response.isCreated  
+      update id place.id in ES.IDX_RECOGITO / PLACE source place docAsUpsert 
+    } map { r =>
+      (true, r.getVersion)
+    } recover { 
+      case t: Throwable => (false, -1l)
     }
     
   def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =
@@ -89,18 +92,28 @@ private[place] class ESPlaceStore extends PlaceStore {
       }
     }
 
-  def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =
+  def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] = {
     ES.client execute {
-      search in ES.IDX_RECOGITO -> PLACE query nestedQuery("is_conflation_of") query bool {
-        should (uris.map(uri => termQuery("is_conflation_of.uri" -> uri)))
+      search in ES.IDX_RECOGITO / PLACE query { 
+        nestedQuery("is_conflation_of").query {
+          bool {
+            should { 
+              uris.map(uri => termQuery("is_conflation_of.close_matches" -> uri)) ++
+              uris.map(uri => termQuery("is_conflation_of.uri" -> uri))
+            }
+          }
+        } 
       } limit 100
     } map { _.as[(Place, Long)].toSeq } 
+  }
 
   def searchByName(query: String)(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =
     ES.client execute {
-      search in ES.IDX_RECOGITO -> PLACE query 
-        nestedQuery("is_conflation_of") query 
-          nestedQuery("is_conflation_of.names") query termQuery("is_conflation_of.names.name" -> query) limit 100
+      search in ES.IDX_RECOGITO / PLACE query {
+        nestedQuery("is_conflation_of.names").query {
+          matchQuery("is_conflation_of.names.name" -> query) 
+        }
+      } limit 100
     } map { _.as[(Place, Long)].toSeq } 
 
 }

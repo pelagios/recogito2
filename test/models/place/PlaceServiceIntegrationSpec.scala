@@ -13,6 +13,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import storage.ES
 
 @RunWith(classOf[JUnitRunner])
 class PlaceServiceIntegrationSpec extends Specification with AfterAll {
@@ -27,6 +28,9 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
   private val TMP_IDX_DIR = "test/resources/tmp-idx"
   
   /** Async Await shorthands **/
+  private def flush() = 
+    Await.result(ES.flushIndex, 10 seconds)
+    
   private def importRecords(records: Seq[GazetteerRecord]): Seq[GazetteerRecord] =
     Await.result(PlaceService.importRecords(records), 10 seconds)
   
@@ -43,12 +47,12 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
     
     "After importing the DARE sample, the PlaceService" should {
       
-       val dareRecords = Gazetteer.loadFromRDF(new File(DARE_RDF), "DARE")
+      val dareRecords = Gazetteer.loadFromRDF(new File(DARE_RDF), "DARE")
       
       "contain 4 places" in {
-        // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec
         val failedRecords = importRecords(dareRecords)
         failedRecords.size must equalTo(0)
+        flush()
         getTotalPlaces() must equalTo(4)
       }
       

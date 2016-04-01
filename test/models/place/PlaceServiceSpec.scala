@@ -103,7 +103,7 @@ class PlaceServiceSpec extends Specification {
   
   "After importing the DARE sample, the PlaceService" should {
     
-     val dareRecords = Gazetteer.loadFromRDF(new File(DARE_RDF), "DARE")
+    val dareRecords = Gazetteer.loadFromRDF(new File(DARE_RDF), "DARE")
     
     "contain 4 places" in {
       // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec

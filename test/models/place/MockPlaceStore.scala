@@ -17,7 +17,7 @@ class MockPlaceStore extends PlaceStore {
   def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext) = 
     Future {
       mockIndex.put(place.id, place)
-      true
+      (true, 0l)
     }
     
   def deletePlace(id: String)(implicit context: ExecutionContext) =

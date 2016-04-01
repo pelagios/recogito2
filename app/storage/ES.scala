@@ -46,6 +46,11 @@ object ES {
     }
   }
   
+  def flushIndex =
+    client execute {
+      flush index ES.IDX_RECOGITO
+    }
+  
   def stop() = {
     Logger.info("Stopping ElasticSearch local node")
     client.close()
