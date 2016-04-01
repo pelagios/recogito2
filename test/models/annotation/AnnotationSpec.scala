@@ -8,7 +8,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import scala.io.Source
 import play.api.libs.json.Json
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
 
 @RunWith(classOf[JUnitRunner])
@@ -33,15 +33,15 @@ class AnnotationSpec extends Specification {
       annotation.hasPreviousVersions must equalTo(Some(1))
       annotation.contributors.size must equalTo(1)
       annotation.contributors.head must equalTo("rainer")
-      annotation.lastModifiedAt must equalTo(DateTime.parse("2016-02-23T18:24:00Z", DATE_TIME_PATTERN))
+      annotation.lastModifiedAt must equalTo(DateTime.parse("2016-02-23T18:24:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC))
       annotation.status.value must equalTo(AnnotationStatus.VERIFIED)
-      annotation.status.setAt must equalTo(DateTime.parse("2016-02-23T18:24:00Z", DATE_TIME_PATTERN))
+      annotation.status.setAt must equalTo(DateTime.parse("2016-02-23T18:24:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC))
       
       // Bodies
       annotation.bodies.size must equalTo(3)
       annotation.bodies(0).hasType must equalTo(AnnotationBody.QUOTE)
       annotation.bodies(1).hasType must equalTo(AnnotationBody.COMMENT)
-      annotation.bodies(1).lastModifiedAt must equalTo(DateTime.parse("2016-02-23T18:12:00Z", DATE_TIME_PATTERN))
+      annotation.bodies(1).lastModifiedAt must equalTo(DateTime.parse("2016-02-23T18:12:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC))
       annotation.bodies(2).lastModifiedBy must equalTo(Some("rainer"))
       annotation.bodies(2).uri must equalTo(Some("https://www.wikidata.org/wiki/Q8709"))
     }
@@ -74,7 +74,7 @@ class AnnotationSpec extends Specification {
       val (annotationId, versionId) = (UUID.randomUUID(), UUID.randomUUID())
       
       // Current time (we force millis to 0 because serialization will drop them!) 
-      val now = DateTime.now().withMillisOfSecond(0)
+      val now = DateTime.now().withZone(DateTimeZone.UTC).withMillisOfSecond(0)
       
       // Two bodies, representing result of NER, without georesolution
       val bodies = 
@@ -100,7 +100,6 @@ class AnnotationSpec extends Specification {
       
       val parseResult = Json.fromJson[Annotation](Json.parse(serialized))
       parseResult.isSuccess must equalTo(true)
-      
       parseResult.get must equalTo(source)
     }
     
