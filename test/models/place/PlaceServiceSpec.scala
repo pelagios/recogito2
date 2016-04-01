@@ -23,8 +23,12 @@ class PlaceServiceSpec extends Specification {
   
   val mockStore = new MockPlaceStore()
   
+  /** Async Await shorthands **/
   private def findByURI(uri: String): Place =
     Await.result(PlaceService.findByURI(uri, mockStore), 10 seconds).get._1
+    
+  private def getTotalPlaces(): Long =
+    Await.result(PlaceService.totalPlaces(mockStore), 10 seconds)
   
   "The conflate method" should {
     
@@ -100,7 +104,7 @@ class PlaceServiceSpec extends Specification {
     "contain 4 places" in {
       // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec
       PlaceService.importRecords(dareRecords, mockStore)
-      PlaceService.totalPlaces(mockStore) must equalTo(4)
+      getTotalPlaces() must equalTo(4)
     }
     
     "return DARE places based on their URI" in {
@@ -154,7 +158,7 @@ class PlaceServiceSpec extends Specification {
       
     "contain 5 places" in {
       PlaceService.importRecords(pleiadesRecords, mockStore)
-      PlaceService.totalPlaces(mockStore) must equalTo(5)
+      getTotalPlaces() must equalTo(5)
     }
     
     "return the places by any URI - DARE or Pleiades" in { 
@@ -264,7 +268,7 @@ class PlaceServiceSpec extends Specification {
         Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
       
       PlaceService.importRecords(Seq(fakeMeidling), mockStore)
-      PlaceService.totalPlaces(mockStore) must equalTo(4)
+      getTotalPlaces() must equalTo(4)
     }
     
     "have properly conflated the successor place" in {
@@ -302,7 +306,7 @@ class PlaceServiceSpec extends Specification {
         Seq.empty[String]) // Vindobona
        
       PlaceService.importRecords(Seq(fakeMeidling), mockStore)
-      PlaceService.totalPlaces(mockStore) must equalTo(6)
+      getTotalPlaces() must equalTo(6)
     }
     
     "should contain 3 properly conflated successor places (2 original Vindobonas and dummy Meidling record)" in {

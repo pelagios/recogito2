@@ -7,9 +7,8 @@ class MockPlaceStore extends PlaceStore {
   
   val mockIndex = scala.collection.mutable.HashMap.empty[String, Place]
   
-  def totalPlaces() = {
-    mockIndex.size
-  }
+  def totalPlaces(): Future[Long] =
+    Future.successful(mockIndex.size.toLong)
 
   def insertOrUpdatePlace(place: Place) = {
     mockIndex.put(place.id, place)

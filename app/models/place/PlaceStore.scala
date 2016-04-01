@@ -12,7 +12,7 @@ import storage.ES
 trait PlaceStore {
 
   /** Returns the total number of places in the store **/
-  def totalPlaces(): Int
+  def totalPlaces(): Future[Long]
   
   /** Inserts a place **/
   def insertOrUpdatePlace(place: Place)
@@ -47,10 +47,12 @@ private[place] class ESPlaceStore extends PlaceStore {
       (Json.fromJson[Place](Json.parse(hit.sourceAsString)).get, hit.version)
   }
   
-  def totalPlaces() = {
-    // TODO implement
-    0
-  }
+  def totalPlaces(): Future[Long] =
+    ES.client execute {
+      search in ES.IDX_RECOGITO -> PLACE limit 0
+    } map { response =>
+      response.getHits.getTotalHits
+    }
 
   def insertOrUpdatePlace(place: Place) = {
     ES.client execute { index into ES.IDX_RECOGITO / PLACE source place }
@@ -62,7 +64,7 @@ private[place] class ESPlaceStore extends PlaceStore {
 
   def findByURI(uri: String): Future[Option[(Place, Long)]] =
     ES.client execute {
-      search in ES.IDX_RECOGITO / PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.uri" -> uri)) limit 10
+      search in ES.IDX_RECOGITO -> PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.uri" -> uri)) limit 10
     } map { response =>
       val placesAndVersions = response.as[(Place, Long)].toSeq 
       if (placesAndVersions.isEmpty) {
