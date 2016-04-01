@@ -8,6 +8,8 @@ import org.junit.runner._
 import play.api.Logger
 import play.api.test._
 import play.api.test.Helpers._
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
 class PlaceServiceSpec extends Specification {
@@ -20,6 +22,9 @@ class PlaceServiceSpec extends Specification {
   private val PLEIADES_RDF = "test/resources/gazetteer_sample_pleiades.ttl"
   
   val mockStore = new MockPlaceStore()
+  
+  private def findByURI(uri: String): Place =
+    Await.result(PlaceService.findByURI(uri, mockStore), 10 seconds).get._1
   
   "The conflate method" should {
     
@@ -100,17 +105,17 @@ class PlaceServiceSpec extends Specification {
     
     "return DARE places based on their URI" in {
       // Except for URI normalization this mostly tests the mock impl - but see above
-      val barcelona = PlaceService.findByURI("http://dare.ht.lu.se/places/6534", mockStore)
-      barcelona.get.title must equalTo("Col. Barcino, Barcelona")
+      val barcelona = findByURI("http://dare.ht.lu.se/places/6534")
+      barcelona.title must equalTo("Col. Barcino, Barcelona")
       
-      val vindobona = PlaceService.findByURI("http://dare.ht.lu.se/places/10783", mockStore)
-      vindobona.get.title must equalTo("Mun. Vindobona, Wien")
+      val vindobona = findByURI("http://dare.ht.lu.se/places/10783")
+      vindobona.title must equalTo("Mun. Vindobona, Wien")
       
-      val thessaloniki = PlaceService.findByURI("http://dare.ht.lu.se/places/17068", mockStore)
-      thessaloniki.get.title must equalTo("Thessalonica, Thessaloniki")
+      val thessaloniki = findByURI("http://dare.ht.lu.se/places/17068")
+      thessaloniki.title must equalTo("Thessalonica, Thessaloniki")
           
-      val lancaster = PlaceService.findByURI("http://dare.ht.lu.se/places/23712", mockStore)
-      lancaster.get.title must equalTo("Calunium?, Lancaster")      
+      val lancaster = findByURI("http://dare.ht.lu.se/places/23712")
+      lancaster.title must equalTo("Calunium?, Lancaster")      
     }
     
   }
@@ -153,43 +158,48 @@ class PlaceServiceSpec extends Specification {
     }
     
     "return the places by any URI - DARE or Pleiades" in { 
-      val barcelonaDARE = PlaceService.findByURI("http://dare.ht.lu.se/places/6534", mockStore)
-      val barcelonaPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/246343", mockStore)
-      barcelonaDARE.get must equalTo(barcelonaPleiades.get)
+      val barcelonaDARE = findByURI("http://dare.ht.lu.se/places/6534")
+      val barcelonaPleiades = findByURI("http://pleiades.stoa.org/places/246343")
+      barcelonaDARE must equalTo(barcelonaPleiades)
       
-      val vindobonaDARE = PlaceService.findByURI("http://dare.ht.lu.se/places/10783", mockStore)
-      val vindobonaPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/128460", mockStore)
-      vindobonaDARE.get must equalTo(vindobonaPleiades.get)
+      val vindobonaDARE = findByURI("http://dare.ht.lu.se/places/10783")
+      val vindobonaPleiades = findByURI("http://pleiades.stoa.org/places/128460")
+      vindobonaDARE must equalTo(vindobonaPleiades)
       
-      val thessalonikiDARE = PlaceService.findByURI("http://dare.ht.lu.se/places/17068", mockStore)
-      val thessalonikiPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/491741", mockStore)
-      thessalonikiDARE.get must equalTo(thessalonikiPleiades.get)
+      val thessalonikiDARE = findByURI("http://dare.ht.lu.se/places/17068")
+      val thessalonikiPleiades = findByURI("http://pleiades.stoa.org/places/491741")
+      thessalonikiDARE must equalTo(thessalonikiPleiades)
           
-      val lancasterDARE = PlaceService.findByURI("http://dare.ht.lu.se/places/23712", mockStore)
-      val lancasterPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/89222", mockStore)
-      lancasterDARE.get must equalTo(lancasterPleiades.get)
+      val lancasterDARE = findByURI("http://dare.ht.lu.se/places/23712")
+      val lancasterPleiades = findByURI("http://pleiades.stoa.org/places/89222")
+      lancasterDARE must equalTo(lancasterPleiades)
       
-      // This record only exists in the Pleiades sample, not the DARE one
-      val vindobonaFortPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/128537", mockStore)
-      vindobonaFortPleiades.isDefined must equalTo(true)
+      // This record only exists in the Pleiades sample, not the DARE one - just check if it's there
+      try {
+        findByURI("http://pleiades.stoa.org/places/128537")
+        success
+      } catch {
+        case t: Throwable => 
+          failure
+      }
     }
     
     "retain the original title from DARE" in { 
-      val barcelonaPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/246343", mockStore)
-      barcelonaPleiades.get.title must equalTo("Col. Barcino, Barcelona")
+      val barcelonaPleiades = findByURI("http://pleiades.stoa.org/places/246343")
+      barcelonaPleiades.title must equalTo("Col. Barcino, Barcelona")
       
-      val vindobonaPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/128460", mockStore)
-      vindobonaPleiades.get.title must equalTo("Mun. Vindobona, Wien")
+      val vindobonaPleiades = findByURI("http://pleiades.stoa.org/places/128460")
+      vindobonaPleiades.title must equalTo("Mun. Vindobona, Wien")
       
-      val thessalonikiPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/491741", mockStore)
-      thessalonikiPleiades.get.title must equalTo("Thessalonica, Thessaloniki")
+      val thessalonikiPleiades = findByURI("http://pleiades.stoa.org/places/491741")
+      thessalonikiPleiades.title must equalTo("Thessalonica, Thessaloniki")
           
-      val lancasterPleiades = PlaceService.findByURI("http://pleiades.stoa.org/places/89222", mockStore)
-      lancasterPleiades.get.title must equalTo("Calunium?, Lancaster")
+      val lancasterPleiades = findByURI("http://pleiades.stoa.org/places/89222")
+      lancasterPleiades.title must equalTo("Calunium?, Lancaster")
     }
     
     "have properly conflated the sample place Vindobona (pleiades:128460)" in {
-      val vindobona = PlaceService.findByURI("http://pleiades.stoa.org/places/128460", mockStore).get
+      val vindobona = findByURI("http://pleiades.stoa.org/places/128460")
      
       val coordDARE = new Coordinate(16.391128, 48.193161)
       val pointDARE = new GeometryFactory().createPoint(coordDARE)
@@ -258,7 +268,7 @@ class PlaceServiceSpec extends Specification {
     }
     
     "have properly conflated the successor place" in {
-      val conflated = PlaceService.findByURI("http://dare.ht.lu.se/places/10783", mockStore).get
+      val conflated = findByURI("http://dare.ht.lu.se/places/10783")
       conflated.id must equalTo("http://dare.ht.lu.se/places/10783")
       
       val expectedURIs = Seq(
@@ -275,6 +285,8 @@ class PlaceServiceSpec extends Specification {
   "After updating the bridge record, the PlaceService" should {
     
     "contain two places more" in {
+      Logger.info("Updating the bridge")
+      
       // Update our fictitious record, so that it no longer connects the two Vindobonas
       val fakeMeidling = GazetteerRecord(
         "http://de.wikipedia.org/wiki/Meidling",
@@ -294,19 +306,16 @@ class PlaceServiceSpec extends Specification {
     }
     
     "should contain 3 properly conflated successor places (2 original Vindobonas and dummy Meidling record)" in {
-      val munVindobona = PlaceService.findByURI("http://dare.ht.lu.se/places/10783", mockStore)
-      munVindobona.isDefined must equalTo(true)
-      munVindobona.get.id must equalTo("http://dare.ht.lu.se/places/10783")
-      munVindobona.get.isConflationOf.size must equalTo(2)
-      munVindobona.get.uris must containAllOf(Seq("http://dare.ht.lu.se/places/10783", "http://pleiades.stoa.org/places/128460"))
+      val munVindobona = findByURI("http://dare.ht.lu.se/places/10783")
+      munVindobona.id must equalTo("http://dare.ht.lu.se/places/10783")
+      munVindobona.isConflationOf.size must equalTo(2)
+      munVindobona.uris must containAllOf(Seq("http://dare.ht.lu.se/places/10783", "http://pleiades.stoa.org/places/128460"))
       
-      val vindobona = PlaceService.findByURI("http://pleiades.stoa.org/places/128537", mockStore)
-      vindobona.isDefined must equalTo(true)
-      vindobona.get.isConflationOf.map(_.uri) must equalTo(Seq("http://pleiades.stoa.org/places/128537"))
+      val vindobona = findByURI("http://pleiades.stoa.org/places/128537")
+      vindobona.isConflationOf.map(_.uri) must equalTo(Seq("http://pleiades.stoa.org/places/128537"))
       
-      val fakeMeidling = PlaceService.findByURI("http://de.wikipedia.org/wiki/Meidling", mockStore)
-      fakeMeidling.isDefined must equalTo(true)
-      fakeMeidling.get.isConflationOf.map(_.uri) must equalTo(Seq("http://de.wikipedia.org/wiki/Meidling"))
+      val fakeMeidling = findByURI("http://de.wikipedia.org/wiki/Meidling")
+      fakeMeidling.isConflationOf.map(_.uri) must equalTo(Seq("http://de.wikipedia.org/wiki/Meidling"))
     }
     
   }

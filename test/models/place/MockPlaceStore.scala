@@ -1,6 +1,7 @@
 package models.place
 
 import play.api.Logger
+import scala.concurrent.Future
 
 class MockPlaceStore extends PlaceStore {
   
@@ -17,17 +18,18 @@ class MockPlaceStore extends PlaceStore {
   def deletePlace(id: String) =
     mockIndex.remove(id)
     
-  def findByURI(uri: String): Option[Place] = {
+  def findByURI(uri: String): Future[Option[(Place, Long)]] = {
     val normalizedURI = GazetteerUtils.normalizeURI(uri)
     
     mockIndex.get(normalizedURI) match {
       case Some(hit) => 
-        Some(hit)
+        Future.successful(Some(hit, 0l))
         
       case None => // Might still be listed under alternative record URI
-        mockIndex.values.find { place =>
-          place.uris.contains(normalizedURI)
-        }
+        Future.successful(
+          mockIndex.values.find { place =>
+            place.uris.contains(normalizedURI)
+          }.map((_, 0l)))
     }
     
   }
