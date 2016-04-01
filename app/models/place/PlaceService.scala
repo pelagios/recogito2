@@ -1,6 +1,8 @@
 package models.place
 
 import GazetteerUtils._
+import scala.concurrent.{ ExecutionContext, Future }
+
 import play.api.Logger
 
 object PlaceService {
@@ -14,7 +16,7 @@ object PlaceService {
   private lazy val esStore = new ESPlaceStore()
   
   /** Retrieves all places in the store that will be affected from adding the record **/
-  private[place] def getAffectedPlaces(normalizedRecord: GazetteerRecord, store: PlaceStore): Seq[Place] = {
+  private[place] def getAffectedPlaces(normalizedRecord: GazetteerRecord, store: PlaceStore)(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] = {
     // We need to query for this record's URI as well as all close/exactMatchURIs
     val uris = normalizedRecord.uri +: normalizedRecord.allMatches
     
@@ -68,64 +70,64 @@ object PlaceService {
     }
   }
   
-  private def importRecord(record: GazetteerRecord, store: PlaceStore): Boolean = {    
+  private def importRecord(record: GazetteerRecord, store: PlaceStore)(implicit context: ExecutionContext): Future[Boolean] = {    
     val normalizedRecord = normalizeRecord(record)
     
-    // All places that will be affected by the import, sorted by no. of gazetteer records
-    val affectedPlaces = getAffectedPlaces(normalizedRecord, store).sortBy(- _.isConflationOf.size)
-
-    val affectedRecords = 
-      affectedPlaces
-        .flatMap(_.isConflationOf) // all gazetteer records contained in the affected places
-        .filter(_.uri != record.uri) // This record might update to an existing record!
-        
-    val conflated = conflate(affectedRecords :+ normalizedRecord)
-    
-    // Add (or update) the newly conflated places
-    conflated.foreach(p => store.insertOrUpdatePlace(p))
-    
-    // List of associations (Record URI, Parent PlaceID) before conflation
-    val recordToParentMappingBefore = affectedPlaces.flatMap(place =>
-      place.isConflationOf.map(record => (record.uri, place.id)))
+    getAffectedPlaces(normalizedRecord, store).map(p => {
       
-    // List of associations (Record URI, Parent PlaceID) after conflation
-    val recordToParentMappingAfter = conflated.flatMap(place =>
-      place.isConflationOf.map(record => (record.uri, place.id)))
-    
-    // We need to delete places that appear before, but not after the conflation
-    val placeIdsBefore = recordToParentMappingBefore.map(_._2).distinct
-    val placeIdsAfter = recordToParentMappingAfter.map(_._2).distinct
-    
-    val toDelete = placeIdsBefore diff placeIdsAfter
-    toDelete.foreach(id => store.deletePlace(id))
-    
-    // TODO Now we need to re-write the PlaceLinks
-    // TODO - identify which record-to-place-mappings have changed
-    // TODO - fetch those from the store
-    // TODO - update them to the new value
-    // TODO Note: this is a running system, users may have changed the
-    // TODO the link - use optimistic locking, re-run failures
-    
-    true // set to false in case of failure
+      // All places that will be affected by the import, sorted by no. of gazetteer records
+      val affectedPlaces = p.sortBy(- _._1.isConflationOf.size)
+  
+      val affectedRecords = 
+        affectedPlaces
+          .flatMap(_._1.isConflationOf) // all gazetteer records contained in the affected places
+          .filter(_.uri != record.uri) // This record might update to an existing record!
+          
+      val conflated = conflate(affectedRecords :+ normalizedRecord)
+      
+      // Add (or update) the newly conflated places
+      conflated.foreach(p => store.insertOrUpdatePlace(p))
+      
+      // List of associations (Record URI, Parent PlaceID) before conflation
+      val recordToParentMappingBefore = affectedPlaces.flatMap(t =>
+        t._1.isConflationOf.map(record => (record.uri, t._1.id)))
+        
+      // List of associations (Record URI, Parent PlaceID) after conflation
+      val recordToParentMappingAfter = conflated.flatMap(place =>
+        place.isConflationOf.map(record => (record.uri, place.id)))
+      
+      // We need to delete places that appear before, but not after the conflation
+      val placeIdsBefore = recordToParentMappingBefore.map(_._2).distinct
+      val placeIdsAfter = recordToParentMappingAfter.map(_._2).distinct
+      
+      val toDelete = placeIdsBefore diff placeIdsAfter
+      toDelete.foreach(id => store.deletePlace(id))
+      
+      // TODO Now we need to re-write the PlaceLinks
+      // TODO - identify which record-to-place-mappings have changed
+      // TODO - fetch those from the store
+      // TODO - update them to the new value
+      // TODO Note: this is a running system, users may have changed the
+      // TODO the link - use optimistic locking, re-run failures
+      
+      true // set to false in case of failure
+    })
   }
   
-  def importRecords(records: Seq[GazetteerRecord], store: PlaceStore = esStore, retries: Int = MAX_RETRIES): Unit = {
-    val failedRecords = records.foldLeft(Seq.empty[GazetteerRecord]) { (failed, record) =>  
-      val success = importRecord(record, store)
-      if (success)
-        failed
+  def importRecords(records: Seq[GazetteerRecord], store: PlaceStore = esStore, retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[GazetteerRecord]] =
+    Future.sequence(records.map(record => importRecord(record, store).map((record, _)))).map { results =>
+      results.filter(!_._2).map(_._1)
+    }.flatMap { failedRecords =>
+      if (failedRecords.size > 0 && retries > 0)
+        importRecords(failedRecords, store, retries - 1)
       else
-        failed :+ record
+        Future.successful(Seq.empty[GazetteerRecord])
     }
-    
-    if (failedRecords.size > 0 && retries > 0)
-      importRecords(failedRecords, store, retries - 1)
-  }
   
-  def totalPlaces(store: PlaceStore = esStore) = store.totalPlaces
+  def totalPlaces(store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.totalPlaces
   
-  def findByURI(uri: String, store: PlaceStore = esStore) = store.findByURI(uri)
+  def findByURI(uri: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.findByURI(uri)
   
-  def searchByName(query: String, store: PlaceStore = esStore) = store.searchByName(query)
+  def searchByName(query: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.searchByName(query)
 
 }

@@ -6,6 +6,7 @@ import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
 import play.api.Logger
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.test._
 import play.api.test.Helpers._
 import scala.concurrent.Await
@@ -24,6 +25,9 @@ class PlaceServiceSpec extends Specification {
   val mockStore = new MockPlaceStore()
   
   /** Async Await shorthands **/
+  private def importRecords(records: Seq[GazetteerRecord]): Seq[GazetteerRecord] =
+    Await.result(PlaceService.importRecords(records, mockStore), 10 seconds)
+  
   private def findByURI(uri: String): Place =
     Await.result(PlaceService.findByURI(uri, mockStore), 10 seconds).get._1
     
@@ -103,7 +107,8 @@ class PlaceServiceSpec extends Specification {
     
     "contain 4 places" in {
       // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec
-      PlaceService.importRecords(dareRecords, mockStore)
+      val failedRecords = importRecords(dareRecords)
+      failedRecords.size must equalTo(0)
       getTotalPlaces() must equalTo(4)
     }
     
@@ -144,10 +149,10 @@ class PlaceServiceSpec extends Specification {
         "http://dare.ht.lu.se/places/10783",
         "http://dare.ht.lu.se/places/17068",
         "http://dare.ht.lu.se/places/23712")
-        
-      val affectedPlaces = PlaceService.getAffectedPlaces(fakeVindobona, mockStore)
+                
+      val affectedPlaces = Await.result(PlaceService.getAffectedPlaces(fakeVindobona, mockStore), 10 seconds)
       affectedPlaces.size must equalTo(3)
-      affectedPlaces.map(_.id) must containAllOf(expectedPlaceURIs)
+      affectedPlaces.map(_._1.id) must containAllOf(expectedPlaceURIs)
     }
     
   }
@@ -157,7 +162,8 @@ class PlaceServiceSpec extends Specification {
     val pleiadesRecords = Gazetteer.loadFromRDF(new File(PLEIADES_RDF), "Pleiades")
       
     "contain 5 places" in {
-      PlaceService.importRecords(pleiadesRecords, mockStore)
+      val failedRecords = importRecords(pleiadesRecords)
+      failedRecords.size must equalTo(0)
       getTotalPlaces() must equalTo(5)
     }
     
@@ -267,7 +273,7 @@ class PlaceServiceSpec extends Specification {
         Seq("http://pleiades.stoa.org/places/128460"), // Mun. Vindobona
         Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
       
-      PlaceService.importRecords(Seq(fakeMeidling), mockStore)
+      importRecords(Seq(fakeMeidling))
       getTotalPlaces() must equalTo(4)
     }
     
@@ -289,8 +295,6 @@ class PlaceServiceSpec extends Specification {
   "After updating the bridge record, the PlaceService" should {
     
     "contain two places more" in {
-      Logger.info("Updating the bridge")
-      
       // Update our fictitious record, so that it no longer connects the two Vindobonas
       val fakeMeidling = GazetteerRecord(
         "http://de.wikipedia.org/wiki/Meidling",
@@ -305,7 +309,7 @@ class PlaceServiceSpec extends Specification {
         Seq.empty[String], // Mun. Vindobona
         Seq.empty[String]) // Vindobona
        
-      PlaceService.importRecords(Seq(fakeMeidling), mockStore)
+      importRecords(Seq(fakeMeidling))
       getTotalPlaces() must equalTo(6)
     }
     
