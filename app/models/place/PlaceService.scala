@@ -134,10 +134,14 @@ object PlaceService {
     Future.sequence(records.map(record => importRecord(record, store).map((record, _)))).map { results =>
       results.filter(!_._2).map(_._1)
     }.flatMap { failedRecords =>
-      if (failedRecords.size > 0 && retries > 0)
+      if (failedRecords.size > 0 && retries > 0) {
+        Logger.warn(failedRecords.size + " gazetteer records failed to import - retrying")
         importRecords(failedRecords, store, retries - 1)
-      else
-        Future.successful(Seq.empty[GazetteerRecord])
+      } else {
+        if (failedRecords.size > 0)
+          Logger.error(failedRecords.size + " gazetteer records failed without recovery")
+        Future.successful(failedRecords)
+      }
     }
   
   def totalPlaces(store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.totalPlaces
