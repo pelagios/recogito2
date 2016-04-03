@@ -3,6 +3,7 @@ package models.place
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import java.io.File
 import org.apache.commons.io.FileUtils
+import org.joda.time.DateTime
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.specification.AfterAll
@@ -180,6 +181,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
         val fakeMeidling = GazetteerRecord(
           "http://de.wikipedia.org/wiki/Meidling",
           Gazetteer("DummyGazetteer"),
+          DateTime.now(),
           "A fake briding place",
           Seq.empty[String],
           Seq.empty[Description],
@@ -216,6 +218,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
         val fakeMeidling = GazetteerRecord(
           "http://de.wikipedia.org/wiki/Meidling",
           Gazetteer("DummyGazetteer"),
+          DateTime.now(),
           "A fake briding place",
           Seq.empty[String],
           Seq.empty[Description],

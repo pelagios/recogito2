@@ -16,6 +16,7 @@
         "properties": {
           "uri": { "type": "string", "index": "not_analyzed" },
           "source_gazetteer": { "type": "string", "index": "not_analyzed" },
+          "last_changed_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
           "title": { "type": "string" },
           "place_types": { "type": "string", "index": "not_analyzed" },
           "descriptions": {

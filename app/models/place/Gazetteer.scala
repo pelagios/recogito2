@@ -42,6 +42,7 @@ object Gazetteer {
       GazetteerRecord(
         GazetteerUtils.normalizeURI(p.uri),
         Gazetteer(gazetteerName),
+        DateTime.now().withZone(DateTimeZone.UTC),
         p.label,
         p.category.map(category => Seq(category.toString)).getOrElse(Seq.empty[String]),
         p.descriptions.map(l => Description(l.chars, l.lang)),
@@ -75,6 +76,7 @@ object GazetteerUtils {
     GazetteerRecord(
       normalizeURI(r.uri),
       r.sourceGazetteer,
+      r.lastChangedAt,
       r.title,
       r.placeTypes,
       r.descriptions,

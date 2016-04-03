@@ -11,6 +11,7 @@
     {
       "uri": "http://pleiades.stoa.org/places/118543",
       "source_gazetteer": "Pleiades",
+      "last_changed_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros",
       "place_types": [ "fort" , "tower" ],
       "descriptions": [
@@ -28,6 +29,7 @@
     }, {
       "uri": "http://dare.ht.lu.se/places/10778",
       "source_gazetteer": "DARE",
+      "last_changed_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros/Marinianio, Eferding",
       "place_types": [ "fort" ],
       "names": [
@@ -48,6 +50,7 @@
     },{
       "uri": "http://www.trismegistos.org/place/35191",
       "source_gazetteer": "Trismegistos",
+      "last_changed_at": "2016-04-03T11:23:00Z", 
       "title": "Ad Mauros",
       "names": [
         { "name": "Ad Mauros" },

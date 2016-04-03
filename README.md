@@ -43,7 +43,5 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
     related conflicts during parallel import are possible. But should normally be either
     recognizable by failed clean-up deletes; or wouldn't matter since the later update will
     clean everything up. Scenario is different for PlaceLinks however!
-  * Places currently don't include added_at and last_updated timestamps
-  * Gazetteer records currently don't include added_at and last_updated timestamps
   * The place schema doesn't yet include hierarchical relations. Q: how do we deal with
     incoherent hierarchy relations reported by different gazetteers?

@@ -1,18 +1,20 @@
 package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
+import models.HasDate
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import models.HasDate
 
 case class GazetteerRecord(  
 
   uri: String,
 
   sourceGazetteer: Gazetteer,
+  
+  lastChangedAt: DateTime,
 
   title: String,
     
@@ -48,6 +50,10 @@ case class GazetteerRecord(
     allMatches.contains(other.uri) ||
     other.allMatches.contains(uri) ||
     allMatches.exists(matchURI => other.allMatches.contains(matchURI))
+    
+  /** An 'equals' method that ignores the lastChangedAt property **/
+  def equalsIgnoreLastChanged(other: GazetteerRecord): Boolean =
+    throw new Exception("Implement me!")
 
 }
 
@@ -59,7 +65,7 @@ case class TemporalBounds(from: DateTime, to: DateTime)
 
 /** JSON (de)serialization **/
 
-object GazetteerRecord {
+object GazetteerRecord extends HasDate {
   
   import Place._
   
@@ -72,6 +78,7 @@ object GazetteerRecord {
   implicit val gazetteerRecordFormat: Format[GazetteerRecord] = (
     (JsPath \ "uri").format[String] and
     (JsPath \ "source_gazetteer").format[Gazetteer] and
+    (JsPath \ "last_changed_at").format[DateTime] and
     (JsPath \ "title").format[String] and
     (JsPath \ "place_types").formatNullable[Seq[String]]
       .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and

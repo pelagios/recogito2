@@ -21,6 +21,7 @@ object GazetteerRecordSpec {
   val pleiadesRecord = GazetteerRecord(
     "http://pleiades.stoa.org/places/118543",
     Gazetteer("Pleiades"),
+    DateTime.now(),
     "Ad Mauros",
     Seq("fort" , "tower"),
     Seq(Description("An ancient place, cited: BAtlas 12 H4 Ad Mauros")),
@@ -34,6 +35,7 @@ object GazetteerRecordSpec {
   val dareRecord = GazetteerRecord(
     "http://dare.ht.lu.se/places/10778",
     Gazetteer("DARE"),
+    DateTime.now(),
     "Ad Mauros/Marinianio, Eferding",
     Seq("fort"),
     Seq.empty[Description],
@@ -52,6 +54,7 @@ object GazetteerRecordSpec {
   val trismegistosRecord = GazetteerRecord(
     "http://www.trismegistos.org/place/35191",
     Gazetteer("Trismegistos"),
+    DateTime.now(),
     "Ad Mauros",
     Seq.empty[String],
     Seq.empty[Description],
