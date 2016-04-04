@@ -39,9 +39,9 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
 * ElasticSearch gazetteer framework
   * While updating, even unchanged places are re-written to the index. Might not have such a
     huge performance impact, but investigate.
-  * Place updates currently don't make use of optimistic locking. Do we need that? Concurrency-
-    related conflicts during parallel import are possible. But should normally be either
-    recognizable by failed clean-up deletes; or wouldn't matter since the later update will
-    clean everything up. Scenario is different for PlaceLinks however!
+  * Max number of SHOULD clauses is currently not checked - we should do this in the PlaceStore
+    class to be sure weird gazetteer records don't break the import
+  * Implement PlaceLink records! (And rewriting of PlaceLinks after gazetteer updates)
+  * PlaceLinks updates also need to make use of optimistic locking
   * The place schema doesn't yet include hierarchical relations. Q: how do we deal with
     incoherent hierarchy relations reported by different gazetteers?
