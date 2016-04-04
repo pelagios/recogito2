@@ -2,7 +2,7 @@ package models.place
 
 import java.io.File
 import org.apache.commons.io.FileUtils
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, DateTimeZone }
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.specification.AfterAll
@@ -31,7 +31,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
     val record = GazetteerRecord(
       "http://www.example.com/record",
       Gazetteer("DummyGazetteer"),
-      DateTime.now(),
+      DateTime.now().withMonthOfYear(1).withDayOfMonth(1).withTime(0, 0, 0, 0).withZone(DateTimeZone.UTC),
       "Record " + Random.nextInt(),
       Seq.empty[String],
       Seq.empty[Description],

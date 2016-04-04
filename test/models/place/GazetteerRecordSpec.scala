@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.joda.time.{ DateTime, DateTimeZone }
+import org.joda.time.format.DateTimeFormat
 import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
@@ -11,6 +12,8 @@ import play.api.libs.json.Json
 import scala.io.Source
 
 object GazetteerRecordSpec {
+  
+  private val DATE_TIME_PATTERN = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
   
   private val coord = new Coordinate(14.02358, 48.31058)
   private val point = new GeometryFactory().createPoint(coord)
@@ -21,7 +24,7 @@ object GazetteerRecordSpec {
   val pleiadesRecord = GazetteerRecord(
     "http://pleiades.stoa.org/places/118543",
     Gazetteer("Pleiades"),
-    DateTime.now(),
+    DateTime.parse("2016-04-03T11:23:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC),
     "Ad Mauros",
     Seq("fort" , "tower"),
     Seq(Description("An ancient place, cited: BAtlas 12 H4 Ad Mauros")),
@@ -35,7 +38,7 @@ object GazetteerRecordSpec {
   val dareRecord = GazetteerRecord(
     "http://dare.ht.lu.se/places/10778",
     Gazetteer("DARE"),
-    DateTime.now(),
+    DateTime.parse("2016-04-03T11:23:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC),
     "Ad Mauros/Marinianio, Eferding",
     Seq("fort"),
     Seq.empty[Description],
@@ -54,7 +57,7 @@ object GazetteerRecordSpec {
   val trismegistosRecord = GazetteerRecord(
     "http://www.trismegistos.org/place/35191",
     Gazetteer("Trismegistos"),
-    DateTime.now(),
+    DateTime.parse("2016-04-03T11:23:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC),
     "Ad Mauros",
     Seq.empty[String],
     Seq.empty[Description],
@@ -97,7 +100,7 @@ class GazetteerRecordSpec extends Specification {
     "parse integer- and datestring-formatted years as equal DateTimes" in {
       
       val jsonTempBoundsInt = Json.parse("{ \"from\": -30, \"to\": 640 }")      
-      val jsonTempBoundsStr = Json.parse("{ \"from\": \"-30-01-01T00:00:00Z\", \"to\": \"640-01-01T00:00:00Z\" }") 
+      val jsonTempBoundsStr = Json.parse("{ \"from\": \"-30-01-01\", \"to\": \"640-01-01\" }") 
 
       val boundsFromInt = Json.fromJson[TemporalBounds](jsonTempBoundsInt)
       val boundsFromStr = Json.fromJson[TemporalBounds](jsonTempBoundsStr)
@@ -114,7 +117,7 @@ class GazetteerRecordSpec extends Specification {
     
   }
   
-  "temp bounds (de)serialization" should {
+  "temp bounds de/serialization" should {
     
     "yield dates serialized in UTC" in  {
       val tempBounds = TemporalBounds(
@@ -123,12 +126,12 @@ class GazetteerRecordSpec extends Specification {
       
       val asJson = Json.toJson(tempBounds)
       
-      (asJson \ "from").as[String] must equalTo ("1492-01-01T00:00:00+00:00")
-      (asJson \ "to").as[String] must equalTo ("1493-01-01T00:00:00+00:00")
+      (asJson \ "from").as[String] must equalTo ("1492-01-01")
+      (asJson \ "to").as[String] must equalTo ("1493-01-01")
     }
     
     "maintain UTC in a parse/serialize roundtrip" in {
-      val json = "{\"from\":\"1492-01-01T00:00:00+00:00\",\"to\":\"1493-01-01T00:00:00+00:00\"}"
+      val json = "{\"from\":\"1492-01-01\",\"to\":\"1493-01-01\"}"
       
       val asDateTime = Json.fromJson[TemporalBounds](Json.parse(json))
       asDateTime.isSuccess must equalTo(true)
