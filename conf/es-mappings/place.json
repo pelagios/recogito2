@@ -18,6 +18,7 @@
           "source_gazetteer": { "type": "string", "index": "not_analyzed" },
           "last_changed_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
           "title": { "type": "string" },
+          "is_part_of": { "type": "string", "index": "not_analyzed" },
           "place_types": { "type": "string", "index": "not_analyzed" },
           "descriptions": {
             "type": "nested",

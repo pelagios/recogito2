@@ -1,7 +1,7 @@
 package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
-import models.HasDate
+import models.{ HasDate, HasNullableSeq }
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
@@ -65,15 +65,9 @@ case class TemporalBounds(from: DateTime, to: DateTime)
 
 /** JSON (de)serialization **/
 
-object GazetteerRecord extends HasDate {
+object GazetteerRecord extends HasDate with HasNullableSeq {
   
   import Place._
-  
-  private def fromOptSeq[T](o: Option[Seq[T]]) =
-    o.getOrElse(Seq.empty[T])
-  
-  private def toOptSeq[T](s: Seq[T]) =
-    if (s.isEmpty) None else Some(s)
   
   implicit val gazetteerRecordFormat: Format[GazetteerRecord] = (
     (JsPath \ "uri").format[String] and
