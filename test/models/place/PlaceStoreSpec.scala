@@ -57,7 +57,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
     
   def findByURI(uri: String) = Await.result(store.findByURI(uri), 10 seconds)
   
-  def findByPlaceOrMatchURIs(uri: String) = Await.result(store.findByPlaceOrMatchURIs(Seq(uri)), 10 seconds)
+  def findByPlaceOrMatchURIs(uris: Seq[String]) = Await.result(store.findByPlaceOrMatchURIs(uris), 10 seconds)
   
   def findByName(name: String) = Await.result(store.searchByName(name), 10 seconds)
   
@@ -84,8 +84,22 @@ class PlaceStoreSpec extends Specification with AfterAll {
         tuple.get._1 must equalTo(initialPlace)
       }
       
-      "return the test place by closeMatch URI" in {
-        val result = findByPlaceOrMatchURIs("http://www.example.com/match")
+      "return the test place by a closeMatch URI" in {
+        val result = findByPlaceOrMatchURIs(
+            Seq("http://www.example.com/match",
+                "http://www.example.com/noMatch1", 
+                "http://www.example.com/noMatch2"))
+                
+        result.size must equalTo(1)
+        result.head._1 must equalTo(initialPlace)
+      }
+      
+      "return the test place by its URI using the findByPlaceOrMatchURIs method" in {
+        val result = findByPlaceOrMatchURIs(
+            Seq("http://www.example.com/noMatch1",
+                "http://www.example.com/noMatch2", 
+                "http://www.example.com/record"))
+                
         result.size must equalTo(1)
         result.head._1 must equalTo(initialPlace)
       }

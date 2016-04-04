@@ -102,13 +102,15 @@ private[place] class ESPlaceStore extends PlaceStore {
         nestedQuery("is_conflation_of").query {
           bool {
             should { 
+              uris.map(uri => termQuery("is_conflation_of.uri" -> uri)) ++
               uris.map(uri => termQuery("is_conflation_of.close_matches" -> uri)) ++
-              uris.map(uri => termQuery("is_conflation_of.uri" -> uri))
+              uris.map(uri => termQuery("is_conflation_of.exact_matches" -> uri))
             }
           }
         } 
       } limit 100
-    } map { _.as[(Place, Long)].toSeq } 
+    } map { _.as[(Place, Long)].toSeq 
+    }
   }
 
   def searchByName(query: String)(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =

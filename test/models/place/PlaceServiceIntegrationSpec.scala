@@ -81,7 +81,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
       "contain 5 places" in {
         val failedRecords = importRecords(pleiadesRecords)
         failedRecords.size must equalTo(0)
-        flush()
+        flush()   
         getTotalPlaces() must equalTo(5)
       }
       
@@ -193,6 +193,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
           Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
         
         importRecords(Seq(fakeMeidling))
+        flush()
         getTotalPlaces() must equalTo(4)
       }
       
@@ -230,6 +231,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
           Seq.empty[String]) // Vindobona
          
         importRecords(Seq(fakeMeidling))
+        flush()
         getTotalPlaces() must equalTo(6)
       }
       
