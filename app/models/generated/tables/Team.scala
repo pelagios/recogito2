@@ -54,12 +54,12 @@ class Team(alias : String, aliased : Table[TeamRecord], parameters : Array[ Fiel
 	/**
 	 * The column <code>team.title</code>.
 	 */
-	val TITLE : TableField[TeamRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val TITLE : TableField[TeamRecord, String] = createField("title", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>team.created_by</code>.
 	 */
-	val CREATED_BY : TableField[TeamRecord, String] = createField("created_by", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val CREATED_BY : TableField[TeamRecord, String] = createField("created_by", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>team.created_at</code>.

@@ -86,7 +86,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
         Json.fromJson[AnnotationStub](json) match {
           case s: JsSuccess[AnnotationStub] => {
             val now = DateTime.now()
-            val user = loggedIn.getUsername
+            val user = loggedIn.user.getUsername
             val annotation =
               Annotation(
                 UUID.randomUUID,

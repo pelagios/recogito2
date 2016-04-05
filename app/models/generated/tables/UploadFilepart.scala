@@ -65,22 +65,22 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	/**
 	 * The column <code>upload_filepart.owner</code>.
 	 */
-	val OWNER : TableField[UploadFilepartRecord, String] = createField("owner", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val OWNER : TableField[UploadFilepartRecord, String] = createField("owner", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>upload_filepart.title</code>.
 	 */
-	val TITLE : TableField[UploadFilepartRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val TITLE : TableField[UploadFilepartRecord, String] = createField("title", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>upload_filepart.content_type</code>.
 	 */
-	val CONTENT_TYPE : TableField[UploadFilepartRecord, String] = createField("content_type", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val CONTENT_TYPE : TableField[UploadFilepartRecord, String] = createField("content_type", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>upload_filepart.filename</code>.
 	 */
-	val FILENAME : TableField[UploadFilepartRecord, String] = createField("filename", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val FILENAME : TableField[UploadFilepartRecord, String] = createField("filename", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>upload_filepart.filesize_kb</code>.

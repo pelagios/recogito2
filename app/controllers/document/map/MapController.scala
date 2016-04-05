@@ -9,8 +9,8 @@ import storage.DB
 class MapController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
   def showMap(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderDocumentResponse(documentId, loggedIn.getUsername,
-        { case (document, fileparts) =>  Ok(views.html.document.map.index(loggedIn.getUsername, document)) })
+    renderDocumentResponse(documentId, loggedIn.user.getUsername,
+        { case (document, fileparts) =>  Ok(views.html.document.map.index(loggedIn.user.getUsername, document)) })
   }
 
 }

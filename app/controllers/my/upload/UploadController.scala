@@ -51,7 +51,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
 
 
   def showStep1(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUpload(loggedIn.getUsername).map(_ match {
+    UploadService.findPendingUpload(loggedIn.user.getUsername).map(_ match {
       case Some(pendingUpload) =>
         Ok(views.html.my.upload.upload_1(usernameInPath, newDocumentForm.fill(pendingUpload)))
 
@@ -68,7 +68,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
         Future.successful(BadRequest(views.html.my.upload.upload_1(usernameInPath, formWithErrors))),
 
       docData =>
-        UploadService.storePendingUpload(loggedIn.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
+        UploadService.storePendingUpload(loggedIn.user.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
           .flatMap(user => Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath))))
           .recover { case t: Throwable => {
             t.printStackTrace()
@@ -80,7 +80,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
 
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
   def showStep2(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).map(_ match {
+    UploadService.findPendingUploadWithFileparts(loggedIn.user.getUsername).map(_ match {
       case Some((pendingUpload, fileparts)) =>
         Ok(views.html.my.upload.upload_2(usernameInPath, fileparts))
 
@@ -96,7 +96,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
     import UploadController._ 
     
     // First, we need to get the pending upload this filepart belongs to
-    val username = loggedIn.getUsername
+    val username = loggedIn.user.getUsername
     UploadService.findPendingUpload(username)
       .flatMap(_ match {
         case Some(pendingUpload) =>
@@ -140,7 +140,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
 
   /** Deletes a filepart during step 2 **/
   def deleteFilepart(usernameInPath: String, filename: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.deleteFilepartByTitleAndOwner(filename, loggedIn.getUsername).map(success => {
+    UploadService.deleteFilepartByTitleAndOwner(filename, loggedIn.user.getUsername).map(success => {
       if (success) Ok("ok.") else NotFound
     })
   }
@@ -148,7 +148,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
 
   /** Step 3 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
   def showStep3(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUploadWithFileparts(loggedIn.getUsername).flatMap(_ match {
+    UploadService.findPendingUploadWithFileparts(loggedIn.user.getUsername).flatMap(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
           // No fileparts - force user to step 2
@@ -185,7 +185,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
   
   def cancelUploadWizard(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService
-      .deletePendingUpload(loggedIn.getUsername)
+      .deletePendingUpload(loggedIn.user.getUsername)
       .map(success => {
         // TODO add error message if success == false
         Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
@@ -202,7 +202,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
     import UploadController._  // Message (de)serialization
     
     DocumentService.findById(docId).flatMap(_ match {
-      case Some(document) if document.getOwner == loggedIn.getUsername => {
+      case Some(document) if document.getOwner == loggedIn.user.getUsername => {
         service.queryProgress(docId).map(_ match {
           case Some(result) =>
             Ok(Json.toJson(result))

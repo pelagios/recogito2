@@ -9,8 +9,8 @@ import storage.DB
 class ShareController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
   def showShareSettings(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderDocumentResponse(documentId, loggedIn.getUsername,
-        { case (document, fileparts) =>  Ok(views.html.document.share.index(loggedIn.getUsername, document)) })
+    renderDocumentResponse(documentId, loggedIn.user.getUsername,
+        { case (document, fileparts) =>  Ok(views.html.document.share.index(loggedIn.user.getUsername, document)) })
   }
 
 }

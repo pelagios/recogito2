@@ -18,8 +18,7 @@ import models.generated.tables.TeamMembership
 import models.generated.tables.Upload
 import models.generated.tables.UploadFilepart
 import models.generated.tables.User
-import models.generated.tables.UserActivityLog
-import models.generated.tables.UserActivityPerDay
+import models.generated.tables.UserRole
 
 
 /**
@@ -95,12 +94,7 @@ object Tables {
 	val USER = models.generated.tables.User.USER
 
 	/**
-	 * The table user_activity_log
+	 * The table user_role
 	 */
-	val USER_ACTIVITY_LOG = models.generated.tables.UserActivityLog.USER_ACTIVITY_LOG
-
-	/**
-	 * The table user_activity_per_day
-	 */
-	val USER_ACTIVITY_PER_DAY = models.generated.tables.UserActivityPerDay.USER_ACTIVITY_PER_DAY
+	val USER_ROLE = models.generated.tables.UserRole.USER_ROLE
 }

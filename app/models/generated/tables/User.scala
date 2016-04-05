@@ -54,22 +54,22 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	/**
 	 * The column <code>user.username</code>.
 	 */
-	val USERNAME : TableField[UserRecord, String] = createField("username", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val USERNAME : TableField[UserRecord, String] = createField("username", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>user.email</code>.
 	 */
-	val EMAIL : TableField[UserRecord, String] = createField("email", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val EMAIL : TableField[UserRecord, String] = createField("email", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>user.password_hash</code>.
 	 */
-	val PASSWORD_HASH : TableField[UserRecord, String] = createField("password_hash", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val PASSWORD_HASH : TableField[UserRecord, String] = createField("password_hash", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>user.salt</code>.
 	 */
-	val SALT : TableField[UserRecord, String] = createField("salt", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val SALT : TableField[UserRecord, String] = createField("salt", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>user.member_since</code>.

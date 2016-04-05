@@ -59,22 +59,22 @@ class DocumentFilepart(alias : String, aliased : Table[DocumentFilepartRecord], 
 	/**
 	 * The column <code>document_filepart.document_id</code>.
 	 */
-	val DOCUMENT_ID : TableField[DocumentFilepartRecord, String] = createField("document_id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val DOCUMENT_ID : TableField[DocumentFilepartRecord, String] = createField("document_id", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>document_filepart.title</code>.
 	 */
-	val TITLE : TableField[DocumentFilepartRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val TITLE : TableField[DocumentFilepartRecord, String] = createField("title", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>document_filepart.content_type</code>.
 	 */
-	val CONTENT_TYPE : TableField[DocumentFilepartRecord, String] = createField("content_type", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val CONTENT_TYPE : TableField[DocumentFilepartRecord, String] = createField("content_type", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>document_filepart.filename</code>.
 	 */
-	val FILENAME : TableField[DocumentFilepartRecord, String] = createField("filename", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val FILENAME : TableField[DocumentFilepartRecord, String] = createField("filename", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>document_filepart.sequence_no</code>.

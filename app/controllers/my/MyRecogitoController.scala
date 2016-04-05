@@ -13,15 +13,15 @@ import storage.DB
 class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
   def my = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Redirect(routes.MyRecogitoController.index(loggedIn.getUsername))
+    Redirect(routes.MyRecogitoController.index(loggedIn.user.getUsername))
   }
   
   def index(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val loggedInUser = loggedIn.getUsername
+    val loggedInUser = loggedIn.user.getUsername
     if (loggedInUser == usernameInPath) {
       // Personal space
       DocumentService.findByUser(loggedInUser).map(documents => {
-        Ok(views.html.my.index(loggedIn, UserService.getUsedDiskspaceKB(loggedInUser), documents))
+        Ok(views.html.my.index(loggedIn.user, UserService.getUsedDiskspaceKB(loggedInUser), documents))
       })
     } else {
       // TODO show public profile instead

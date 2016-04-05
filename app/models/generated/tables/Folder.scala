@@ -59,12 +59,12 @@ class Folder(alias : String, aliased : Table[FolderRecord], parameters : Array[ 
 	/**
 	 * The column <code>folder.owner</code>.
 	 */
-	val OWNER : TableField[FolderRecord, String] = createField("owner", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val OWNER : TableField[FolderRecord, String] = createField("owner", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>folder.title</code>.
 	 */
-	val TITLE : TableField[FolderRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val TITLE : TableField[FolderRecord, String] = createField("title", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>folder.parent</code>.

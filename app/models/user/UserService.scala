@@ -5,7 +5,7 @@ import java.security.MessageDigest
 import java.time.OffsetDateTime
 import models.BaseService
 import models.generated.Tables._
-import models.generated.tables.records.UserRecord
+import models.generated.tables.records.{ UserRecord, UserRoleRecord }
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import play.api.cache.CacheApi
@@ -14,8 +14,10 @@ import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
-object UserService extends BaseService with FileAccess {
+case class UserWithRoles(user: UserRecord, roles: Seq[UserRoleRecord])
 
+object UserService extends BaseService with FileAccess {
+  
   private val SHA_256 = "SHA-256"
 
   def insertUser(username: String, email: String, password: String)(implicit db: DB) = db.withTransaction { sql =>
@@ -29,17 +31,24 @@ object UserService extends BaseService with FileAccess {
   def findByUsername(username: String)(implicit db: DB, cache: CacheApi) =
     cachedLookup("user", username, findByUsernameNoCache)
   
-  def findByUsernameNoCache(username: String)(implicit db: DB, cache: CacheApi) = db.query { sql =>
-    Option(sql.selectFrom(USER).where(USER.USERNAME.equal(username)).fetchOne())
+  def findByUsernameNoCache(username: String)(implicit db: DB) = db.query { sql =>
+    val records = 
+      sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
+         .where(USER.USERNAME.equal(username))
+         .fetchArray()
+         
+    groupJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord]).headOption
+      .map { case (user, roles) => UserWithRoles(user, roles) }
   }
-
+  
   def findByUsernameIgnoreCase(username: String)(implicit db: DB) = db.query { sql =>
+    play.api.Logger("grouping2")
     Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
 
   def validateUser(username: String, password: String)(implicit db: DB, cache: CacheApi) =
     findByUsername(username).map(_ match {
-      case Some(user) => computeHash(user.getSalt + password) == user.getPasswordHash
+      case Some(userWithRoles) => computeHash(userWithRoles.user.getSalt + password) == userWithRoles.user.getPasswordHash
       case None => false
     })
 

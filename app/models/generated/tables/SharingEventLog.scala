@@ -60,12 +60,12 @@ class SharingEventLog(alias : String, aliased : Table[SharingEventLogRecord], pa
 	/**
 	 * The column <code>sharing_event_log.type_of_action</code>.
 	 */
-	val TYPE_OF_ACTION : TableField[SharingEventLogRecord, String] = createField("type_of_action", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val TYPE_OF_ACTION : TableField[SharingEventLogRecord, String] = createField("type_of_action", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>sharing_event_log.action_by</code>.
 	 */
-	val ACTION_BY : TableField[SharingEventLogRecord, String] = createField("action_by", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val ACTION_BY : TableField[SharingEventLogRecord, String] = createField("action_by", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>sharing_event_log.action_at</code>.

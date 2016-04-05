@@ -22,8 +22,7 @@ import models.generated.tables.TeamMembership
 import models.generated.tables.Upload
 import models.generated.tables.UploadFilepart
 import models.generated.tables.User
-import models.generated.tables.UserActivityLog
-import models.generated.tables.UserActivityPerDay
+import models.generated.tables.UserRole
 
 import org.jooq.Table
 import org.jooq.impl.SchemaImpl
@@ -69,7 +68,6 @@ class DefaultSchema extends SchemaImpl("") {
 			Upload.UPLOAD,
 			UploadFilepart.UPLOAD_FILEPART,
 			User.USER,
-			UserActivityLog.USER_ACTIVITY_LOG,
-			UserActivityPerDay.USER_ACTIVITY_PER_DAY)
+			UserRole.USER_ROLE)
 	}
 }

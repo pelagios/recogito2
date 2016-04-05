@@ -55,12 +55,12 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	/**
 	 * The column <code>document.id</code>.
 	 */
-	val ID : TableField[DocumentRecord, String] = createField("id", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val ID : TableField[DocumentRecord, String] = createField("id", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>document.owner</code>.
 	 */
-	val OWNER : TableField[DocumentRecord, String] = createField("owner", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val OWNER : TableField[DocumentRecord, String] = createField("owner", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>document.uploaded_at</code>.
@@ -70,12 +70,12 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	/**
 	 * The column <code>document.title</code>.
 	 */
-	val TITLE : TableField[DocumentRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val TITLE : TableField[DocumentRecord, String] = createField("title", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>document.author</code>.
 	 */
-	val AUTHOR : TableField[DocumentRecord, String] = createField("author", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val AUTHOR : TableField[DocumentRecord, String] = createField("author", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>document.date_numeric</code>.
@@ -85,22 +85,22 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	/**
 	 * The column <code>document.date_freeform</code>.
 	 */
-	val DATE_FREEFORM : TableField[DocumentRecord, String] = createField("date_freeform", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val DATE_FREEFORM : TableField[DocumentRecord, String] = createField("date_freeform", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>document.description</code>.
 	 */
-	val DESCRIPTION : TableField[DocumentRecord, String] = createField("description", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val DESCRIPTION : TableField[DocumentRecord, String] = createField("description", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>document.source</code>.
 	 */
-	val SOURCE : TableField[DocumentRecord, String] = createField("source", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val SOURCE : TableField[DocumentRecord, String] = createField("source", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>document.language</code>.
 	 */
-	val LANGUAGE : TableField[DocumentRecord, String] = createField("language", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val LANGUAGE : TableField[DocumentRecord, String] = createField("language", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * Create a <code>document</code> table reference

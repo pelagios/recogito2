@@ -2,8 +2,8 @@ package controllers
 
 import jp.t2v.lab.play2.auth.{ AuthConfig, CookieTokenAccessor }
 import models.user.Roles._
-import models.user.UserService
-import models.generated.tables.records.UserRecord
+import models.user.{ UserService, UserWithRoles }
+import models.generated.tables.records.{ UserRecord, UserRoleRecord }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.reflect.{ ClassTag, classTag }
 import play.api.Play
@@ -16,7 +16,7 @@ trait Security extends AuthConfig { self: HasDatabase with HasCache =>
 
   type Id = String
 
-  type User = UserRecord
+  type User = UserWithRoles
 
   type Authority = Role
 

@@ -53,12 +53,12 @@ class TeamMembership(alias : String, aliased : Table[TeamMembershipRecord], para
 	/**
 	 * The column <code>team_membership.username</code>.
 	 */
-	val USERNAME : TableField[TeamMembershipRecord, String] = createField("username", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val USERNAME : TableField[TeamMembershipRecord, String] = createField("username", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>team_membership.team</code>.
 	 */
-	val TEAM : TableField[TeamMembershipRecord, String] = createField("team", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val TEAM : TableField[TeamMembershipRecord, String] = createField("team", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>team_membership.member_since</code>.

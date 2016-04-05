@@ -70,12 +70,12 @@ class SharingPolicy(alias : String, aliased : Table[SharingPolicyRecord], parame
 	/**
 	 * The column <code>sharing_policy.shared_by</code>.
 	 */
-	val SHARED_BY : TableField[SharingPolicyRecord, String] = createField("shared_by", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val SHARED_BY : TableField[SharingPolicyRecord, String] = createField("shared_by", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>sharing_policy.shared_with</code>.
 	 */
-	val SHARED_WITH : TableField[SharingPolicyRecord, String] = createField("shared_with", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val SHARED_WITH : TableField[SharingPolicyRecord, String] = createField("shared_with", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>sharing_policy.shared_at</code>.

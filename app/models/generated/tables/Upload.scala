@@ -60,7 +60,7 @@ class Upload(alias : String, aliased : Table[UploadRecord], parameters : Array[ 
 	/**
 	 * The column <code>upload.owner</code>.
 	 */
-	val OWNER : TableField[UploadRecord, String] = createField("owner", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val OWNER : TableField[UploadRecord, String] = createField("owner", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>upload.created_at</code>.
@@ -70,32 +70,32 @@ class Upload(alias : String, aliased : Table[UploadRecord], parameters : Array[ 
 	/**
 	 * The column <code>upload.title</code>.
 	 */
-	val TITLE : TableField[UploadRecord, String] = createField("title", org.jooq.impl.SQLDataType.VARCHAR.nullable(false), "")
+	val TITLE : TableField[UploadRecord, String] = createField("title", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>upload.author</code>.
 	 */
-	val AUTHOR : TableField[UploadRecord, String] = createField("author", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val AUTHOR : TableField[UploadRecord, String] = createField("author", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>upload.date_freeform</code>.
 	 */
-	val DATE_FREEFORM : TableField[UploadRecord, String] = createField("date_freeform", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val DATE_FREEFORM : TableField[UploadRecord, String] = createField("date_freeform", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>upload.description</code>.
 	 */
-	val DESCRIPTION : TableField[UploadRecord, String] = createField("description", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val DESCRIPTION : TableField[UploadRecord, String] = createField("description", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>upload.source</code>.
 	 */
-	val SOURCE : TableField[UploadRecord, String] = createField("source", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val SOURCE : TableField[UploadRecord, String] = createField("source", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>upload.language</code>.
 	 */
-	val LANGUAGE : TableField[UploadRecord, String] = createField("language", org.jooq.impl.SQLDataType.VARCHAR, "")
+	val LANGUAGE : TableField[UploadRecord, String] = createField("language", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * Create a <code>upload</code> table reference

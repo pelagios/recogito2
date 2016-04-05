@@ -17,7 +17,7 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) 
   }
 
   def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val username = loggedIn.getUsername
+    val username = loggedIn.user.getUsername
 
     DocumentService.findByIdWithFileparts(documentId).map(_ match {
       case Some((document, fileparts)) => {
