@@ -42,8 +42,10 @@ trait Security extends AuthConfig { self: HasDatabase with HasCache =>
     Future.successful(Results.Forbidden(NO_PERMISSION))
 
   def authorize(user: User, authority: Authority)(implicit ctx: ExecutionContext): Future[Boolean] = Future.successful {
-    // TODO implement
-    true
+    authority match {
+      case Normal => true
+      case role: Role => user.hasRole(role)
+    }
   }
 
   override lazy val tokenAccessor = new CookieTokenAccessor(
