@@ -60,7 +60,6 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
     })
   }
 
-
   /** Stores document metadata following step 1 **/
   def storeDocumentMetadata(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     newDocumentForm.bindFromRequest.fold(
@@ -77,7 +76,6 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
     )
   }
 
-
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
   def showStep2(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUploadWithFileparts(loggedIn.user.getUsername).map(_ match {
@@ -89,12 +87,11 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
     })
   }
 
-
   /** Stores a filepart during step 2 **/
   def storeFilepart(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    
-    import UploadController._ 
-    
+
+    import UploadController._
+
     // First, we need to get the pending upload this filepart belongs to
     val username = loggedIn.user.getUsername
     UploadService.findPendingUpload(username)
@@ -106,10 +103,10 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
                 case Right(filepart) =>
                   // Upload was properly identified and stored
                   Ok(Json.toJson(UploadSuccess(filepart.getContentType)))
-                  
+
                 case Left(UnsupportedContentType) =>
                   BadRequest("Unknown or unsupported file format")
-                  
+
                 case Left(otherFailure) =>
                   // For future use
                   BadRequest(MSG_ERROR)
@@ -137,14 +134,12 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
       }
   }
 
-
   /** Deletes a filepart during step 2 **/
   def deleteFilepart(usernameInPath: String, filename: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.deleteFilepartByTitleAndOwner(filename, loggedIn.user.getUsername).map(success => {
       if (success) Ok("ok.") else NotFound
     })
   }
-
 
   /** Step 3 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
   def showStep3(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
@@ -158,14 +153,14 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
           UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
             // We'll forward a list of the running processing tasks to the view, so it can show progress
             val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]
-            
+
             // Apply NER if requested
             val applyNER = checkParamValue("apply-ner", "on")
             if (applyNER) {
               NERService.spawnNERProcess(doc, docParts)
               runningTasks.append(NERService.TASK_NER)
             }
-              
+
             // Tile images
             val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
             if (imageParts.size > 0) {
@@ -182,7 +177,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
         Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep1(usernameInPath)))
     })
   }
-  
+
   def cancelUploadWizard(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService
       .deletePendingUpload(loggedIn.user.getUsername)
@@ -195,12 +190,12 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
         Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
       }
   }
-  
+
   /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
   private def queryTaskProgress(username: String, docId: String, service: ProcessingService) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    
+
     import UploadController._  // Message (de)serialization
-    
+
     DocumentService.findById(docId).flatMap(_ match {
       case Some(document) if document.getOwner == loggedIn.user.getUsername => {
         service.queryProgress(docId).map(_ match {
@@ -210,35 +205,34 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
             NotFound
         })
       }
-      
+
       case Some(document) =>
         // Document exists, but belongs to another user
         Future.successful(Forbidden)
-        
+
       case None =>
         Future.successful(NotFound)
     })
   }
 
-  
   def queryNERProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, NERService)
-  
+
   def queryTilingProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, TilingService)
 
 }
 
 /** Defines JSON serialization for NER progress messages **/
 object UploadController {
-  
+
   implicit val uploadSuccessWrites: Writes[UploadSuccess] =
     (JsPath \ "content_type").write[String].contramap(_.contentType)
 
   implicit val progressStatusValueWrites: Writes[ProgressStatus.Value] =
     Writes[ProgressStatus.Value](status => JsString(status.toString))
-    
+
   implicit val taskTypeWrites: Writes[TaskType] =
     Writes[TaskType](t => JsString(t.name))
-  
+
   implicit val workerProgressWrites: Writes[WorkerProgress] = (
     (JsPath \ "filepart_id").write[Int] and
     (JsPath \ "status").write[ProgressStatus.Value] and

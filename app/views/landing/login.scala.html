@@ -12,7 +12,7 @@
         <p class="error-msg"><strong>@msg</strong></p>
       }
 
-      @helper.form(action = controllers.landing.routes.LoginController.processLogin(), args = 'autocomplete -> "off") {
+      @helper.form(action = controllers.landing.routes.LoginLogoutController.processLogin(), args = 'autocomplete -> "off") {
         @helper.inputText(loginForm("username"), args = 'placeholder -> "Username", 'autocomplete -> "false")
         @helper.inputPassword(loginForm("password"), args = 'placeholder -> "Password", 'autocomplete -> "false")
         <button type="submit" class="btn btn-blue btn-large"/>

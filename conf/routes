@@ -11,9 +11,9 @@ GET     /favicon.ico                               controllers.Assets.at(path="/
 
 GET     /signup                                    controllers.landing.SignupController.showSignupForm
 POST    /signup                                    controllers.landing.SignupController.processSignup
-GET     /login                                     controllers.landing.LoginController.showLoginForm
-POST    /login                                     controllers.landing.LoginController.processLogin
-GET     /logout                                    controllers.landing.LogoutController.logout
+GET     /login                                     controllers.landing.LoginLogoutController.showLoginForm
+POST    /login                                     controllers.landing.LoginLogoutController.processLogin
+GET     /logout                                    controllers.landing.LoginLogoutController.logout
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Admin area

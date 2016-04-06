@@ -2,7 +2,7 @@ package controllers.landing
 
 import controllers.BaseController
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.Login
+import jp.t2v.lab.play2.auth.LoginLogout
 import models.user.UserService
 import play.api.Play.current
 import play.api.cache.CacheApi
@@ -16,7 +16,7 @@ import storage.DB
 
 case class LoginData(username: String, password: String)
 
-class LoginController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with Login {
+class LoginLogoutController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with LoginLogout {
 
   private val MESSAGE = "message"
 
@@ -43,9 +43,13 @@ class LoginController @Inject() (implicit val cache: CacheApi, val db: DB) exten
           if (isValid)
             gotoLoginSucceeded(loginData.username)
           else
-            Future(Redirect(routes.LoginController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
+            Future(Redirect(routes.LoginLogoutController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
         })
     )
+  }
+
+  def logout = Action.async { implicit request =>
+    gotoLogoutSucceeded
   }
 
 }

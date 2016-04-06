@@ -15,91 +15,91 @@ require(['../../common/config'], function(Config) {
       },
 
       Filepart = function(containerElement, runningTasks) {
-                   var element = jQuery(containerElement).find('.filepart-processing-progress'),
+        var element = jQuery(containerElement).find('.filepart-processing-progress'),
 
-                       contentType = jQuery(containerElement).data('type'),
+            contentType = jQuery(containerElement).data('type'),
 
-                       id = jQuery(containerElement).data('id'),
+            id = jQuery(containerElement).data('id'),
 
-                       // The running tasks that apply to this particular contentType
-                       applicableRunningTasks = (function() {
-                         var applicableTasks = APPLICABLE_TASKS[contentType];
+            // The running tasks that apply to this particular contentType
+            applicableRunningTasks = (function() {
+              var applicableTasks = APPLICABLE_TASKS[contentType];
 
-                         return jQuery.grep(runningTasks, function(runningTask) {
-                           return applicableTasks.indexOf(runningTask) > -1;
-                         });
-                       })(),
+              return jQuery.grep(runningTasks, function(runningTask) {
+                return applicableTasks.indexOf(runningTask) > -1;
+              });
+            })(),
 
-                       progressPerTask = (function() {
-                         var progressPerTask = {};
+            progressPerTask = (function() {
+              var progressPerTask = {};
 
-                         jQuery.each(applicableRunningTasks, function(idx, t) {
-                           progressPerTask[t] = 'PENDING';
-                         });
+              jQuery.each(applicableRunningTasks, function(idx, t) {
+                progressPerTask[t] = 'PENDING';
+              });
 
-                         return progressPerTask;
-                       })(),
+              return progressPerTask;
+            })(),
 
-                       updateElement = function(progress) {
-                         if (isSuccess()) {
-                           element.addClass('completed');
-                           element.html('&#xf00c');
-                         } else  if (isFailed()) {
-                           element.addClass('failed');
-                           element.html('&#xf00d');
-                         }
-                       },
+            updateElement = function(progress) {
+              if (isSuccess()) {
+                element.addClass('completed');
+                element.html('&#xf00c');
+              } else  if (isFailed()) {
+                element.addClass('failed');
+                element.html('&#xf00d');
+              }
+            },
 
-                       isPending = function() {
-                         var completedTasks = [];
+            isPending = function() {
+              var completedTasks = [];
 
-                         jQuery.each(progressPerTask, function(task, status) {
-                           if (status === 'COMPLETED' || status === 'FAILED')
-                             completedTasks.push(task);
-                         });
+              jQuery.each(progressPerTask, function(task, status) {
+                if (status === 'COMPLETED' || status === 'FAILED')
+                  completedTasks.push(task);
+              });
 
-                         return completedTasks.length !== applicableRunningTasks.length;
-                       },
+              return completedTasks.length !== applicableRunningTasks.length;
+            },
 
-                       /** Returns true if ALL tasks on this part are COMPLETED **/
-                       isSuccess = function() {
-                         var succeededTasks = [];
+            /** Returns true if ALL tasks on this part are COMPLETED **/
+            isSuccess = function() {
+              var succeededTasks = [];
 
-                         jQuery.each(progressPerTask, function(task, status) {
-                           if (status === 'COMPLETED')
-                             succeededTasks.push(task);
-                         });
+              jQuery.each(progressPerTask, function(task, status) {
+                if (status === 'COMPLETED')
+                  succeededTasks.push(task);
+              });
 
-                         return succeededTasks.length === applicableRunningTasks.length;
-                       },
+              return succeededTasks.length === applicableRunningTasks.length;
+            },
 
-                       /** Returns true if ANY task on this part is FAILED **/
-                       isFailed = function() {
-                         var failedTasks = [];
+            /** Returns true if ANY task on this part is FAILED **/
+            isFailed = function() {
+              var failedTasks = [];
 
-                         jQuery.each(progressPerTask, function(task, status) {
-                           if (status === 'FAILED')
-                             failedTasks.push(task);
-                         });
+              jQuery.each(progressPerTask, function(task, status) {
+                if (status === 'FAILED')
+                  failedTasks.push(task);
+              });
 
-                         return failedTasks.length > 0;
-                       };
+              return failedTasks.length > 0;
+            };
 
-                   // Updates the filepart element with the given progress information
-                   this.update = function(progress) {
-                     if (applicableRunningTasks.indexOf(progress.task_name) > -1) {
-                       var progressOnThisPart = jQuery.grep(progress.progress, function(p) {
-                                                  return p.filepart_id === id;
-                                                })[0];
+            // Updates the filepart element with the given progress information
+            this.update = function(progress) {
+              if (applicableRunningTasks.indexOf(progress.task_name) > -1) {
+                var progressOnThisPart = jQuery.grep(progress.progress, function(p) {
+                                           return p.filepart_id === id;
+                                         })[0];
 
-                       progressPerTask[progress.task_name] = progressOnThisPart.status;
-                       updateElement(progress);
-                     }
-                   };
+                progressPerTask[progress.task_name] = progressOnThisPart.status;
+                updateElement(progress);
+              }
+            };
 
-                   // Returns true if this filepart is still being processed
-                   this.isPending = isPending;
-                 };
+            // Returns true if this filepart is still being processed
+            this.isPending = isPending;
+      };
 
   jQuery(document).ready(function() {
 
