@@ -1,7 +1,7 @@
 package models.place
 
 import java.util.UUID
-import models.HasNullableSeq
+import models.{ HasNullableSeq, HasDate }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -35,7 +35,7 @@ case class PlaceLink(
 
 /** JSON (de)serialization **/
 
-object PlaceLink extends HasNullableSeq {
+object PlaceLink extends HasNullableSeq with HasDate {
   
   implicit val placeLinkFormat: Format[PlaceLink] = (
     (JsPath \ "_parent").format[String] and

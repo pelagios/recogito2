@@ -16,7 +16,7 @@ class AnnotationSpec extends Specification {
   
   private val DATE_TIME_PATTERN = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
   
-  "sample text annotation" should {
+  "The sample text annotation" should {
     
     "be properly created from JSON" in {
       val json = Source.fromFile("test/resources/text-annotation.json").getLines().mkString("\n")
@@ -48,7 +48,7 @@ class AnnotationSpec extends Specification {
     
   }
   
-  "sample image annotation" should {
+  "The sample image annotation" should {
     
     "be properly created from JSON" in {
       val json = Source.fromFile("test/resources/image-annotation.json").getLines().mkString("\n")
