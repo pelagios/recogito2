@@ -31,7 +31,7 @@ case class PlaceLink(
 object PlaceLink {
   
   implicit val placeLinkFormat: Format[PlaceLink] = (
-    (JsPath \ "_parent").format[String] and
+    (JsPath \ "place_id").format[String] and
     (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "document_id").format[String] and
     (JsPath \ "filepart_id").format[Int] and

@@ -43,7 +43,7 @@ trait PlaceStore {
 
 private[place] class ESPlaceStore extends PlaceStore {
 
-  private val PLACE = "place"
+  private[place] val PLACE = "place"
   
   implicit object PlaceIndexable extends Indexable[Place] {
     override def json(p: Place): String = Json.stringify(Json.toJson(p))
@@ -57,9 +57,7 @@ private[place] class ESPlaceStore extends PlaceStore {
   def totalPlaces()(implicit context: ExecutionContext): Future[Long] =
     ES.client execute {
       search in ES.IDX_RECOGITO -> PLACE limit 0
-    } map { response =>
-      response.getHits.getTotalHits
-    }
+    } map { _.getHits.getTotalHits }
     
   def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
     ES.client execute { 
@@ -117,25 +115,25 @@ private[place] class ESPlaceStore extends PlaceStore {
       search in ES.IDX_RECOGITO / PLACE query {
         nestedQuery("is_conflation_of").query {
           bool {
-           should (
-             // Search inside record titles...
-             matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
-             matchPhraseQuery("is_conflation_of.title", q),
+            should (
+              // Search inside record titles...
+              matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
+              matchPhraseQuery("is_conflation_of.title", q),
              
-             // ...names...
-             nestedQuery("is_conflation_of.names").query {
-               matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
-             },
+              // ...names...
+              nestedQuery("is_conflation_of.names").query {
+                matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
+              },
              
-             nestedQuery("is_conflation_of.names").query {
-               matchQuery("is_conflation_of.names.name", q)
-             },
+              nestedQuery("is_conflation_of.names").query {
+                matchQuery("is_conflation_of.names.name", q)
+              },
              
-             // ...and descriptions (with lower boost)
-             nestedQuery("is_conflation_of.descriptions").query {
-               matchQuery("is_conflation_of.descriptions.description", q)
-             }.boost(0.2)
-           )
+              // ...and descriptions (with lower boost)
+              nestedQuery("is_conflation_of.descriptions").query {
+                matchQuery("is_conflation_of.descriptions.description", q)
+              }.boost(0.2)
+            )
           }
         }
       } limit l

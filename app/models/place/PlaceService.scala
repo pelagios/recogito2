@@ -136,8 +136,9 @@ object PlaceService {
       records.map { record =>
         try {
           (record, Await.result(importRecord(record, store), 5 seconds))
-        } catch {
-          case t: Throwable => (record, false)
+        } catch { case t: Throwable =>
+          t.printStackTrace()
+          (record, false)
         }
       }.filter(!_._2).map(_._1)
     }.flatMap { failedRecords =>

@@ -70,22 +70,34 @@ object PlaceLinkService {
     */
   def deleteByAnnotationId(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
     findByAnnotationIdWith_Id(annotationId.toString).flatMap { idsAndLinks => 
-      ES.client execute {
-        bulk {
-          idsAndLinks.map { case (linkId, _) => delete id linkId from ES.IDX_RECOGITO / PLACE_LINK }
+      if (idsAndLinks.size > 0) {
+        ES.client execute {
+          bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.IDX_RECOGITO / PLACE_LINK } )
+        } map { 
+          !_.hasFailures() 
+        } recover { case t: Throwable =>
+          t.printStackTrace()
+          false
         }
+      } else {
+        // Nothing to delete
+        Future.successful(true)
       }
-    } map { _.hasFailures() }
+    }
   
   /** Inserts or updates place links for an annotation **/
-  def insertOrUpdatePlaceLinksForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean] = {  
+  def insertOrUpdatePlaceLinksForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean] = {
     
-    def insertPlaceLinks(links: Seq[PlaceLink]): Future[Boolean] =
+    def insertPlaceLinks(links: Seq[PlaceLink]): Future[Boolean] = {      
       ES.client execute {
-        bulk {
-          links.map(link => index into ES.IDX_RECOGITO / PLACE_LINK source link) 
-        }
-      } map { _.hasFailures }
+        bulk ( links.map(link => index into ES.IDX_RECOGITO / PLACE_LINK source link parent link.placeId) )
+      } map {
+        !_.hasFailures
+      } recover { case t: Throwable => 
+        t.printStackTrace()
+        false
+      }
+    }
     
     // Since checking for changes would require an extra request cycle (and application-side comparison) anyway,
     // we just delete existing links and create the new ones
@@ -95,5 +107,49 @@ object PlaceLinkService {
       insertSuccess <- if (deleteSuccess) insertPlaceLinks(linksToInsert) else Future.successful(false) 
     } yield insertSuccess
   }
+  
+  def searchPlacesInDocument(q: String, documentId: String)(implicit context: ExecutionContext) =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / "place" query {
+        bool {
+          
+          must(
+            nestedQuery("is_conflation_of").query {
+              bool {
+                should (
+                  // Search inside record titles...
+                  matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
+                  matchPhraseQuery("is_conflation_of.title", q),
+                 
+                  // ...names...
+                  nestedQuery("is_conflation_of.names").query {
+                    matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
+                  },
+                 
+                  nestedQuery("is_conflation_of.names").query {
+                    matchQuery("is_conflation_of.names.name", q)
+                  },
+                 
+                  // ...and descriptions (with lower boost)
+                  nestedQuery("is_conflation_of.descriptions").query {
+                    matchQuery("is_conflation_of.descriptions.description", q)
+                  }.boost(0.2)
+                )
+              }
+            },  
+            
+            hasChildQuery("place_link").query {
+              termQuery("document_id", documentId)
+            }
+          )
+        }
+
+      }
+    }  
+    
+  def totalPlaceLinks()(implicit context: ExecutionContext): Future[Long] =
+    ES.client execute {
+      search in ES.IDX_RECOGITO -> PLACE_LINK limit 0
+    } map { _.getHits.getTotalHits }
   
 }

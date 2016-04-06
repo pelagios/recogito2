@@ -25,7 +25,6 @@ object AnnotationService {
   }
   
   def insertOrUpdateAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[(Boolean, Long)] = {
-    
     def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] = {
       ES.client execute {
         update id a.annotationId in ES.IDX_RECOGITO / ANNOTATION source a docAsUpsert
