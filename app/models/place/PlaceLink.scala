@@ -1,8 +1,6 @@
 package models.place
 
 import java.util.UUID
-import models.{ HasNullableSeq, HasDate }
-import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
