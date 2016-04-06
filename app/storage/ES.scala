@@ -62,6 +62,6 @@ object ES {
       val name = f.getName.substring(0, f.getName.lastIndexOf('.'))
       val json = Source.fromFile(f).getLines.mkString("\n")
       (name, json)
-    })
+    }).sortBy(_._1)
     
 }

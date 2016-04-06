@@ -6,12 +6,6 @@
     <url>jdbc:sqlite:recogito.db</url>
     <user></user>
     <password></password>
-
-    <!-- You can also pass user/password and other JDBC properties in the optional properties tag: -->
-    <!-- properties>
-      <property><key>user</key><value>[db-user]</value></property>
-      <property><key>password</key><value>[db-password]</value></property>
-    </properties -->
   </jdbc>
 
   <generator>
@@ -38,35 +32,8 @@
            here, if your database is currently not supported or if you wish to
            read the database schema from a file, such as a Hibernate .hbm.xml file -->
       <name>org.jooq.util.sqlite.SQLiteDatabase</name>
-
-      <!-- All elements that are generated from your schema (A Java regular expression.
-           Use the pipe to separate several expressions) Watch out for
-           case-sensitivity. Depending on your database, this might be
-           important!
-
-           You can create case-insensitive regular expressions using this syntax: (?i:expr)
-
-           Whitespace is ignored and comments are possible.
-           -->
       <includes>.*</includes>
-
-      <!-- All elements that are excluded from your schema (A Java regular expression.
-           Use the pipe to separate several expressions). Excludes match before
-           includes -->
-      <excludes><!--
-           UNUSED_TABLE                # This table (unqualified name) should not be generated
-         | PREFIX_.*                   # Objects with a given prefix should not be generated
-         | SECRET_SCHEMA\.SECRET_TABLE # This table (qualified name) should not be generated
-         | SECRET_ROUTINE              # This routine (unqualified name) ... -->
-      </excludes>
-
-      <!-- The schema that is used locally as a source for meta information.
-           This could be your development schema or the production schema, etc
-           This cannot be combined with the schemata element.
-
-           If left empty, jOOQ will generate all available schemata. See the
-           manual's next section to learn how to generate several schemata -->
-      <!-- inputSchema>[your database schema / owner / name]</inputSchema -->
+      <excludes></excludes>
     </database>
 
     <generate>
@@ -74,15 +41,7 @@
     </generate>
 
     <target>
-      <!-- The destination package of your generated classes (within the
-           destination directory)
-
-           jOOQ may append the schema name to this package if generating multiple schemas,
-           e.g. org.jooq.your.packagename.schema1
-                org.jooq.your.packagename.schema2 -->
       <packageName>models.generated</packageName>
-
-      <!-- The destination directory of your generated classes -->
       <directory>app</directory>
     </target>
   </generator>

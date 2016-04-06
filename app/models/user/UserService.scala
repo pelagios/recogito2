@@ -41,7 +41,7 @@ object UserService extends BaseService with FileAccess {
          .where(USER.USERNAME.equal(username))
          .fetchArray()
          
-    groupJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord]).headOption
+    groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord]).headOption
       .map { case (user, roles) => UserWithRoles(user, roles) }
   }
   

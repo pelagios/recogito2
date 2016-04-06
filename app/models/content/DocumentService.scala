@@ -86,7 +86,7 @@ object DocumentService extends BaseService with FileAccess {
       .fetchArray()
 
     // Convert to (DocumentRecord, Seq[DocumentFilepartRecord) tuple
-    val grouped = groupJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
+    val grouped = groupLeftJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
     if (grouped.size > 1)
       throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
 
