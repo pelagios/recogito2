@@ -26,6 +26,11 @@ object Gazetteer {
       else
         (new FileInputStream(file), file.getName)
         
+    loadFromRDF(is, filename, gazetteerName)
+  }
+    
+  def loadFromRDF(is: InputStream, filename: String, gazetteerName: String): Seq[GazetteerRecord] = {
+
     import org.pelagios.api.PeriodOfTime
     
     // Helper to convert between Scalagios and Recogito time format

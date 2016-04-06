@@ -7,8 +7,12 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import play.api.Logger
 import play.api.cache.CacheApi
 import play.api.mvc.{ Request, Result, Controller, AnyContent }
+import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.Files.TemporaryFile
 import storage.DB
+import jp.t2v.lab.play2.stackc.RequestWithAttributes
+
 
 /** Helper trait so we can hand the injected DB to the Security trait **/
 trait HasDatabase { def db: DB } 

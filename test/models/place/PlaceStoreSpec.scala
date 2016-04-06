@@ -59,7 +59,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
   
   def findByPlaceOrMatchURIs(uris: Seq[String]) = Await.result(store.findByPlaceOrMatchURIs(uris), 10 seconds)
   
-  def findByName(name: String) = Await.result(store.searchByName(name), 10 seconds)
+  def findByName(name: String) = Await.result(store.searchPlaces(name), 10 seconds)
   
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     

@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   ws,
 
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.4",
+  "org.codehaus.groovy" % "groovy-all"  % "2.4.6",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
   "com.vividsolutions" % "jts" % "1.13",
@@ -26,6 +27,7 @@ libraryDependencies ++= Seq(
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models",
   "jp.t2v" %% "play2-auth" % "0.14.1",
+
   "org.geotools" % "gt-geojson" % "14.3",
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",

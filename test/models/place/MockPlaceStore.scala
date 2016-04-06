@@ -50,14 +50,14 @@ class MockPlaceStore extends PlaceStore {
         .map((_, 0l))
     }
   
-  def searchByName(name: String)(implicit context: ExecutionContext) =
+  def searchPlaces(name: String, limit: Int)(implicit context: ExecutionContext) =
     Future {
       mockIndex.asScala.values.toSeq
         .filter(place => {
           val names = place.names.keys.toSeq.map(_.name.toLowerCase)
           names.contains(name.toLowerCase)
         })
-        .map((_, 0l))
+        .map((_, 0l)).take(limit)
     }
       
 }

@@ -1,0 +1,31 @@
+@()
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito Administration - Gazetteers</title>
+  </head>
+  <body>
+    <div class="side-navbar">
+      <ul>
+        <li><a href="#">Users</a></li>
+        <li><a href="#">Gazetteers</a></li>
+        <li><a href="#">Backup &amp; Restore</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <div class="gazetteer-search">
+        <form method="GET">
+          <input type="text" />
+        </form>
+      </div>
+
+      <div class="upload-datadump">
+        @helper.form(action = controllers.admin.gazetteer.routes.GazetteerAdminController.importGazetteer(), 'enctype -> "multipart/form-data") {
+          <input type="file" id="gazetteer-file" name="gazetteer-file">
+          <input type="submit">
+        }
+      </div>
+    </div>
+  </body>
+</html>

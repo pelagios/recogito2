@@ -1,9 +1,10 @@
 package models.place
 
 import GazetteerUtils._
-import scala.concurrent.{ ExecutionContext, Future }
-
 import play.api.Logger
+import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object PlaceService {
   
@@ -59,7 +60,7 @@ object PlaceService {
     def conflateOneRecord(r: GazetteerRecord, p: Seq[Place]): Seq[Place] = {
       val connectedPlaces = p.filter(_.isConflationOf.exists(_.isConnectedWith(r)))    
       val unconnectedPlaces = places.diff(connectedPlaces)
-      join(r, connectedPlaces) +: unconnectedPlaces 
+      join(r, connectedPlaces) +: unconnectedPlaces
     }
     
     if (normalizedRecords.isEmpty) {
@@ -131,23 +132,32 @@ object PlaceService {
   }
   
   def importRecords(records: Seq[GazetteerRecord], store: PlaceStore = esStore, retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[GazetteerRecord]] =
-    Future.sequence(records.map(record => importRecord(record, store).map((record, _)))).map { results =>
-      results.filter(!_._2).map(_._1)
+    Future {
+      records.map { record =>
+        try {
+          (record, Await.result(importRecord(record, store), 5 seconds))
+        } catch {
+          case t: Throwable => (record, false)
+        }
+      }.filter(!_._2).map(_._1)
     }.flatMap { failedRecords =>
       if (failedRecords.size > 0 && retries > 0) {
         Logger.warn(failedRecords.size + " gazetteer records failed to import - retrying")
         importRecords(failedRecords, store, retries - 1)
       } else {
+        Logger.info("Successfully imported " + (records.size - failedRecords.size) + " records")  
         if (failedRecords.size > 0)
           Logger.error(failedRecords.size + " gazetteer records failed without recovery")
+        else
+          Logger.info("No failed imports")
         Future.successful(failedRecords)
       }
     }
-  
+ 
   def totalPlaces(store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.totalPlaces
   
   def findByURI(uri: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.findByURI(uri)
   
-  def searchByName(query: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.searchByName(query)
+  def searchPlaces(query: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.searchPlaces(query)
 
 }

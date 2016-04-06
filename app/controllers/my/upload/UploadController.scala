@@ -131,10 +131,10 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
           Future.successful(BadRequest(MSG_ERROR))
         }
       })
-      .recover { case t: Throwable => {
+      .recover { case t: Throwable =>
         t.printStackTrace()
         BadRequest(MSG_ERROR)
-      }}
+      }
   }
 
 

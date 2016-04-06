@@ -1,0 +1,9 @@
+script.engine.groovy.inline.search: on
+
+index:
+  analysis :
+    analyzer :
+      lowercase_keyword :
+        type : custom
+        tokenizer : keyword
+        filter : [lowercase]
