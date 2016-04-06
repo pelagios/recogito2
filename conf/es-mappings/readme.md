@@ -2,13 +2,13 @@
 
 ## Annotations
 
-* Which bodies are allowed to be multi-valued? Which ones unique? (Note: QUOTE unique? Everything else - PLACE, PERSON, TAG,
-  TRANSCRIPTION - multivalued?)
 * What about comments on the annotation (current solution) vs. comments on a specific body ("This
   transcription is a transliteration", "This transcription is according to Parsons")?
   * Damien seems to need both versions comments on bodies
   * Most common use case seems to be "doubt" (Cat - on image transcriptions; but might be on
     georesolutions, too?)
+* ~~Which bodies are allowed to be multi-valued? Which ones unique? (Note: QUOTE unique? Everything else - PLACE, PERSON, TAG,
+  TRANSCRIPTION - multivalued?)~~
 * ~~'Bodies' can be very different in nature (commentary vs. semantic tag vs. combinations). The
   ElasticSearch mapping has to be a superset to all of those. No way around that though (and
   probably not a big deal anyway)~~

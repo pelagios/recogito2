@@ -40,11 +40,13 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
 * Clean up & organize the `test/resources` folder
 * Refactor some of the bulkier unit tests in the `models.place` package
 * ElasticSearch gazetteer framework
-  * While updating, even unchanged places are re-written to the index. Might not have such a
-    huge performance impact, but investigate.
   * Max number of SHOULD clauses is currently not checked - we should do this in the PlaceStore
     class to be sure weird gazetteer records don't break the import
-  * Implement PlaceLink records! (And rewriting of PlaceLinks after gazetteer updates)
-  * PlaceLinks updates also need to make use of optimistic locking
-  * The place schema doesn't yet include hierarchical relations. Q: how do we deal with
+  * Implement PlaceLink rewriting after gazetteer updates (using optimistic locking)
+  * The place schema doesn't yet include is_part_of relations. Q: how do we deal with
     incoherent hierarchy relations reported by different gazetteers?
+* Check the build file: do we need 'ws' dependency? Remove Groovy dependency in case we don't use
+  ElasticSearch scripting after all
+* Accordingly, clean up elasticsearch.yml in case we don't use scripting
+* Fix the various compiler warnings introduced with the Play 2.5 upgrade
+* Upgrade to latest ElasticSearch version

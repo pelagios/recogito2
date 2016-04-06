@@ -53,10 +53,10 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
   def showStep1(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUpload(loggedIn.user.getUsername).map(_ match {
       case Some(pendingUpload) =>
-        Ok(views.html.my.upload.upload_1(usernameInPath, newDocumentForm.fill(pendingUpload)))
+        Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm.fill(pendingUpload)))
 
       case None =>
-        Ok(views.html.my.upload.upload_1(usernameInPath, newDocumentForm))
+        Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm))
     })
   }
 
@@ -64,14 +64,14 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
   def storeDocumentMetadata(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     newDocumentForm.bindFromRequest.fold(
       formWithErrors =>
-        Future.successful(BadRequest(views.html.my.upload.upload_1(usernameInPath, formWithErrors))),
+        Future.successful(BadRequest(views.html.my.upload.step1(usernameInPath, formWithErrors))),
 
       docData =>
         UploadService.storePendingUpload(loggedIn.user.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
           .flatMap(user => Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath))))
           .recover { case t: Throwable => {
             t.printStackTrace()
-            Ok(views.html.my.upload.upload_1(usernameInPath, newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
+            Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
           }}
     )
   }
@@ -80,7 +80,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
   def showStep2(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.findPendingUploadWithFileparts(loggedIn.user.getUsername).map(_ match {
       case Some((pendingUpload, fileparts)) =>
-        Ok(views.html.my.upload.upload_2(usernameInPath, fileparts))
+        Ok(views.html.my.upload.step2(usernameInPath, fileparts))
 
       case None =>
         Redirect(controllers.my.upload.routes.UploadController.showStep1(usernameInPath))
@@ -168,7 +168,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
               runningTasks.append(TilingService.TASK_TILING)
             }
 
-            Ok(views.html.my.upload.upload_3(usernameInPath, doc, docParts, runningTasks))
+            Ok(views.html.my.upload.step3(usernameInPath, doc, docParts, runningTasks))
           }}
         }
 
