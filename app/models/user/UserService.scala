@@ -14,12 +14,6 @@ import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
-case class UserWithRoles(user: UserRecord, roles: Seq[UserRoleRecord]) {
-  
-  def hasRole(role: Roles.Role): Boolean = roles.exists(_.getHasRole == role.toString)
-  
-}
-
 object UserService extends BaseService with FileAccess {
   
   private val SHA_256 = "SHA-256"
