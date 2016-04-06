@@ -8,6 +8,7 @@ import play.api.cache.CacheApi
 import play.api.mvc.Controller
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.{ DB, FileAccess }
+import play.api.Logger
 
 class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with FileAccess {
 
@@ -17,43 +18,27 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) 
   }
 
   def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val username = loggedIn.user.getUsername
+    val username = loggedIn.user.getUsername  
+  
+    renderDocumentPartResponse(documentId, partNo, username, { case (document, parts, thisPart) =>
+      ContentType.withName(thisPart.getContentType) match {
+                    
+        case ContentType.IMAGE_UPLOAD => 
+          Ok(views.html.document.annotation.image(username, document, parts, thisPart))
+        
+        case ContentType.TEXT_PLAIN => {
+          readTextfile(username, document.getId, thisPart.getFilename) match {
+            case Some(content) =>
+              Ok(views.html.document.annotation.text(username, document, parts, thisPart, content))
 
-    DocumentService.findByIdWithFileparts(documentId).map(_ match {
-      case Some((document, fileparts)) => {
-        // Verify if the user is allowed to access this document - TODO what about shared content?
-        if (document.getOwner == username) {
-          fileparts.find(_.getSequenceNo == partNo) match {
-            case Some(filepart) => ContentType.withName(filepart.getContentType) match {
-              
-              case ContentType.IMAGE_UPLOAD => 
-                Ok(views.html.document.annotation.image(username, document, fileparts, filepart))
-                
-              case ContentType.TEXT_PLAIN => {
-                readTextfile(username, document.getId, filepart.getFilename) match {
-                  case Some(content) =>
-                    Ok(views.html.document.annotation.text(username, document, fileparts, filepart, content))
-
-                  case None => {
-                    // Filepart found in DB, but not file on filesystem
-                    InternalServerError
-                  }
-                }
-              }
+            case None => {
+              // Filepart found in DB, but not file on filesystem
+              Logger.error("Filepart recorded in the DB is missing on the filesystem: " + username + ", " + document.getId)
+              InternalServerError
             }
-
-            case None =>
-              // No filepart with the specified sequence no
-              NotFound
           }
-        } else {
-          Forbidden
         }
       }
-
-      case None =>
-        // No document with that ID found in DB
-        NotFound
     })
   }
 
