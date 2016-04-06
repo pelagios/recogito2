@@ -36,6 +36,9 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
 
 ## Upcoming TODOs
 
+* Clean up & refactor the `models` package
+* Clean up & organize the `test/resources` folder
+* Refactor some of the bulkier unit tests in the `models.place` package
 * ElasticSearch gazetteer framework
   * While updating, even unchanged places are re-written to the index. Might not have such a
     huge performance impact, but investigate.
