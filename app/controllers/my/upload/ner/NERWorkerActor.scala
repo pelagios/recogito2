@@ -34,7 +34,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       
       parseFilepart(document, part, documentDir).map { result =>
         val annotations = phrasesToAnnotations(result, document, part)
-        AnnotationService.insertAnnotations(annotations)
+        AnnotationService.insertOrUpdateAnnotations(annotations)
         progress = 1.0
         status = ProgressStatus.COMPLETED
         origSender ! Completed

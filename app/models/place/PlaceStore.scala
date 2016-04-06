@@ -66,12 +66,10 @@ private[place] class ESPlaceStore extends PlaceStore {
       update id place.id in ES.IDX_RECOGITO / PLACE source place docAsUpsert 
     } map { r =>
       (true, r.getVersion)
-    } recover { 
-      case t: Throwable => {
-        Logger.error("Error indexing place " + place.id + ": " + t.getMessage)
-        t.printStackTrace
-        (false, -1l)
-      }
+    } recover { case t: Throwable =>
+      Logger.error("Error indexing place " + place.id + ": " + t.getMessage)
+      t.printStackTrace
+      (false, -1l)
     }
     
   def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =

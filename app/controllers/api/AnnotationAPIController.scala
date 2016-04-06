@@ -59,7 +59,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
         DocumentService.findPartByDocAndSeqNo(id, seqNo).flatMap(_ match {
           case Some(filepart) =>
             AnnotationService.findByFilepartId(filepart.getId)
-              .map(annotations => Ok(Json.toJson(annotations)))
+              .map(annotations => Ok(Json.toJson(annotations.map(_._1))))
 
           case None =>
             Future.successful(NotFound)
@@ -67,7 +67,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
 
       case (Some(id), None) =>
         // Load annotations for entire doc
-        AnnotationService.findByDocId(id).map(annotations => Ok(Json.toJson(annotations)))
+        AnnotationService.findByDocId(id).map(annotations => Ok(Json.toJson(annotations.map(_._1))))
 
       case _ =>
         // No doc ID
@@ -101,7 +101,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                 AnnotationStatus(AnnotationStatus.UNVERIFIED, Some(user), now))
 
             // TODO error reporting?
-            AnnotationService.insertAnnotations(Seq(annotation))
+            AnnotationService.insertOrUpdateAnnotation(annotation)
             Ok(Json.toJson(annotation))
           }
 
