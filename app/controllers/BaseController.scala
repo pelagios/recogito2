@@ -4,7 +4,7 @@ import java.io.File
 import jp.t2v.lab.play2.auth.AuthElement
 import models.content.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.Logger
+import play.api.Application
 import play.api.cache.CacheApi
 import play.api.mvc.{ Request, Result, Controller, AnyContent }
 import play.api.mvc.MultipartFormData.FilePart
@@ -13,14 +13,17 @@ import play.api.libs.Files.TemporaryFile
 import storage.DB
 import jp.t2v.lab.play2.stackc.RequestWithAttributes
 
-/** Helper trait so we can hand the injected DB to the Security trait **/
+/** Helper trait so we can hand the injected DB into other traits **/
 trait HasDatabase { def db: DB } 
 
-/** Helper trait so we can hand the injected Cache to the Security trait **/
+/** Helper trait so we can hand the injected Cache into other traits **/
 trait HasCache { def cache: CacheApi }
 
+/** Helper trait so we can hand the injected Application into other traits **/
+trait HasApplication { def application: Application }
+
 /** Currently (mostly) a placeholder for future common Controller functionality **/
-abstract class BaseController extends Controller with HasCache with HasDatabase with AuthElement with Security {
+abstract class BaseController extends Controller with HasCache with HasDatabase with HasApplication with AuthElement with Security {
 
   /** Returns the value of the specified query string parameter **/
   protected def getQueryParam(key: String)(implicit request: Request[AnyContent]): Option[String] =

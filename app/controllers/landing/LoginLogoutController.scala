@@ -4,19 +4,18 @@ import controllers.BaseController
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.LoginLogout
 import models.user.UserService
-import play.api.Play.current
+import play.api.Application
 import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.Messages.Implicits._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import storage.DB
 
 case class LoginData(username: String, password: String)
 
-class LoginLogoutController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with LoginLogout {
+class LoginLogoutController @Inject() (implicit val cache: CacheApi, val db: DB, val application: Application, context: ExecutionContext) extends BaseController with LoginLogout {
 
   private val MESSAGE = "message"
 

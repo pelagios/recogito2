@@ -11,6 +11,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.FileAccess
 import sys.process._
+import controllers.HasApplication
 
 object TilingService extends ProcessingService with FileAccess {
 

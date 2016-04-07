@@ -11,8 +11,7 @@ import models.content.ContentIdentificationFailures._
 import models.content.{ ContentType, DocumentService, UploadService }
 import models.generated.tables.records.UploadRecord
 import models.user.Roles._
-import play.api.Logger
-import play.api.Play.current
+import play.api.{ Application, Logger }
 import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
@@ -28,7 +27,7 @@ case class UploadSuccess(contentType: String)
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
 
-class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem, context: ExecutionContext) extends BaseController {
+class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem, val application: Application, context: ExecutionContext) extends BaseController {
 
   private val FILE_ARG = "file"
 

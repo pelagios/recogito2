@@ -7,7 +7,7 @@ import models.annotation._
 import models.content.DocumentService
 import models.user.Roles._
 import org.joda.time.DateTime
-import play.api.Logger
+import play.api.{ Application, Logger }
 import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
@@ -41,7 +41,7 @@ object AnnotationStub {
 
 }
 
-class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
+class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB, val application: Application) extends BaseController {
 
   private val PARAM_DOC = "doc"
 
