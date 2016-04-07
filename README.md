@@ -34,7 +34,7 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
 * Be sure to set a random application secret in `conf/application.conf`. Play includes a utility
   to generate one for you - type `activator playGenerateSecret`.
 
-## Upcoming TODOs
+## Upcoming TODOs & Questions
 
 * Clean up & refactor the `models` package
 * Clean up & organize the `test/resources` folder
@@ -51,3 +51,6 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
 * Fix the various compiler warnings introduced with the Play 2.5 upgrade
 * Upgrade to latest ElasticSearch version
 * Deleting a doc currently doesn't delete its annotations
+* Q: do we want people to be able to upload their own gazetteers, for exclusive use within a team.
+  How would we model in ES? One separate index for user gazetteers + owner field + multi-index
+  query? No conflation with "normal" gazetteers?
