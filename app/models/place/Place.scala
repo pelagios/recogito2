@@ -1,9 +1,7 @@
 package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
-import java.io.StringWriter
-import models.HasDate
-import org.geotools.geojson.geom.GeometryJSON
+import models.{ HasDate, HasGeometry }
 import org.joda.time.{ DateTime, DateTimeZone }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -71,35 +69,7 @@ case class Place(
 
 /** JSON (de)serialization **/
 
-object Place {
-  
-  private val DECIMAL_PRECISION = 12
-  
-  implicit val geometryFormat: Format[Geometry] =
-    Format(
-      JsPath.read[JsValue].map { json =>
-        new GeometryJSON(DECIMAL_PRECISION).read(Json.stringify(json))
-      },
-      
-      Writes[Geometry] { geom =>
-        val writer = new StringWriter()
-        new GeometryJSON(DECIMAL_PRECISION).write(geom, writer)
-        Json.parse(writer.toString)
-      }
-    )
-  
-  implicit val coordinateFormat: Format[Coordinate] =
-    Format(
-      JsPath.read[JsArray].map { json =>
-        val lon = json.value(0).as[Double]
-        val lat = json.value(1).as[Double]
-        new Coordinate(lon, lat)
-      },
-      
-      Writes[Coordinate] { c =>
-        Json.toJson(Seq(c.x, c.y))
-      }
-    )
+object Place extends HasGeometry {
   
   implicit val placeFormat: Format[Place] = (
     (JsPath \ "_id").format[String] and
