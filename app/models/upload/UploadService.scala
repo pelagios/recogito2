@@ -1,11 +1,11 @@
-package models.content
+package models.upload
 
 import collection.JavaConverters._
 import java.io.File
 import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.time.OffsetDateTime
 import java.util.UUID
-import models.content.ContentIdentificationFailures._
+import models.ContentIdentificationFailures._
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -14,10 +14,12 @@ import play.api.libs.Files.TemporaryFile
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import storage.{ DB, FileAccess }
+import models.document.DocumentService
+import models.ContentType
 
 object UploadService extends FileAccess {
 
-  /** Ugly helper that turns empty strings to null, so they are properly to the DB **/
+  /** Java-interop helper that turns empty strings to null, so they are properly inserted by JOOQ **/
   private def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
 
   /** Inserts a new upload, or updates an existing one if it already exists **/
@@ -26,7 +28,7 @@ object UploadService extends FileAccess {
       val upload =
         Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(owner)).fetchOne()) match {
           case Some(upload) => {
-            // Pending upload - update
+            // Pending upload exists - update
             upload.setCreatedAt(OffsetDateTime.now)
             upload.setTitle(title)
             upload.setAuthor(nullIfEmpty(author))
@@ -68,7 +70,6 @@ object UploadService extends FileAccess {
     val file = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
     
     ContentType.fromFile(file) match {
-      
       case Right(contentType) => {      
         filepart.ref.moveTo(file)    
         val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize)
@@ -77,9 +78,7 @@ object UploadService extends FileAccess {
         Right(filepartRecord)
       }
         
-      case Left(identificationFailure) =>
-        Left(identificationFailure)
-        
+      case Left(identificationFailure) => Left(identificationFailure)
     }
   }
 
@@ -150,17 +149,7 @@ object UploadService extends FileAccess {
 
   /** Promotes a pending upload in the staging area to actual document **/
   def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
-    val document = new DocumentRecord(
-          DocumentService.generateRandomID(),
-          upload.getOwner,
-          upload.getCreatedAt,
-          upload.getTitle,
-          upload.getAuthor,
-          null, // TODO timestamp_numeric
-          upload.getDateFreeform,
-          upload.getDescription,
-          upload.getSource,
-          upload.getLanguage)
+    val document = DocumentService.createDocument(upload)
 
     // Insert document
     sql.insertInto(DOCUMENT).set(document).execute()

@@ -5,7 +5,7 @@ import controllers.my.upload.ProgressStatus
 import java.io.File
 import java.util.UUID
 import models.annotation._
-import models.content.ContentType
+import models.ContentType
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.Logger

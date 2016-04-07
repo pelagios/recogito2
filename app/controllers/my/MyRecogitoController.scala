@@ -4,7 +4,7 @@ import controllers.BaseController
 import javax.inject.Inject
 import models.user.Roles._
 import models.user.UserService
-import models.content.DocumentService
+import models.document.DocumentService
 import play.api.Application
 import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -21,7 +21,7 @@ class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB, 
     val loggedInUser = loggedIn.user.getUsername
     if (loggedInUser == usernameInPath) {
       // Personal space
-      DocumentService.findByUser(loggedInUser).map(documents => {
+      DocumentService.findByOwner(loggedInUser).map(documents => {
         Ok(views.html.my.index(loggedIn.user, UserService.getUsedDiskspaceKB(loggedInUser), documents))
       })
     } else {

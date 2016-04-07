@@ -7,8 +7,10 @@ import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
 import java.io.File
 import javax.inject.Inject
-import models.content.ContentIdentificationFailures._
-import models.content.{ ContentType, DocumentService, UploadService }
+import models.ContentType
+import models.ContentIdentificationFailures._
+import models.document.DocumentService
+import models.upload.UploadService
 import models.generated.tables.records.UploadRecord
 import models.user.Roles._
 import play.api.{ Application, Logger }

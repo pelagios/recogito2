@@ -1,24 +1,14 @@
-package models.content
+package models
 
+import ContentIdentificationFailures._
 import java.io.File
 import play.api.Logger
-import scala.language.postfixOps
 import scala.util.Try
+import scala.language.postfixOps
 import sys.process._
 
 object ContentType extends Enumeration {
-
-  // Images are only supported if VIPS is installed on the system
-  private val VIPS_INSTALLED = {
-    val testVips = Try("vips help" !)
-    if (testVips.isFailure)
-      Logger.warn("VIPS not installed - image support disabled")
-      
-    testVips.isSuccess
-  }
-
-  import ContentIdentificationFailures._
-
+  
   val TEXT_PLAIN =    Value("TEXT_PLAIN")
 
   val TEXT_MARKDOWN = Value("TEXT_MARKDOWN")
@@ -31,10 +21,18 @@ object ContentType extends Enumeration {
 
   val DATA_CSV =      Value("DATA_CSV")
 
+  // Images are only supported if VIPS is installed on the system
+  private val VIPS_INSTALLED = {
+    val testVips = Try("vips help" !)
+    if (testVips.isFailure)
+      Logger.warn("VIPS not installed - image support disabled")
+      
+    testVips.isSuccess
+  }
+
   /** TODO analyze based on the actual file, not just the extension! **/
   def fromFile(file: File): Either[ContentIdentificationFailure, ContentType.Value] = {
     val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
-
     extension match {
       case "txt" =>
         Right(TEXT_PLAIN)
@@ -48,4 +46,12 @@ object ContentType extends Enumeration {
 
   }
 
+}
+
+object ContentIdentificationFailures {
+  
+  sealed trait ContentIdentificationFailure
+  
+  case object UnsupportedContentType extends ContentIdentificationFailure
+    
 }

@@ -2,7 +2,7 @@ package controllers
 
 import java.io.File
 import jp.t2v.lab.play2.auth.AuthElement
-import models.content.DocumentService
+import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.Application
 import play.api.cache.CacheApi

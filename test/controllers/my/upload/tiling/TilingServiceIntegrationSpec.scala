@@ -5,7 +5,7 @@ import akka.testkit.{ TestKit, ImplicitSender }
 import controllers.my.upload.ProgressStatus
 import java.io.File
 import java.time.OffsetDateTime
-import models.content.ContentType
+import models.ContentType
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.apache.commons.io.FileUtils
 import org.specs2.mutable._

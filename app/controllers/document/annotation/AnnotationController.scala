@@ -2,7 +2,8 @@ package controllers.document.annotation
 
 import controllers.BaseController
 import javax.inject.Inject
-import models.content.{ ContentType, DocumentService }
+import models.ContentType
+import models.document.DocumentService
 import models.user.Roles._
 import play.api.Application
 import play.api.cache.CacheApi

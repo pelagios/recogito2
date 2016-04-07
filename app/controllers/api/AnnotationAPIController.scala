@@ -4,7 +4,7 @@ import controllers.BaseController
 import java.util.UUID
 import javax.inject.Inject
 import models.annotation._
-import models.content.DocumentService
+import models.document.DocumentService
 import models.user.Roles._
 import org.joda.time.DateTime
 import play.api.{ Application, Logger }

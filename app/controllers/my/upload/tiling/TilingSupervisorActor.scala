@@ -3,7 +3,7 @@ package controllers.my.upload.tiling
 import akka.actor.Props
 import java.io.File
 import controllers.my.upload.{ BaseSupervisorActor, TaskType }
-import models.content.ContentType
+import models.ContentType
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.duration.FiniteDuration
 

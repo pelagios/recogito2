@@ -3,7 +3,7 @@ package controllers.document
 import controllers.BaseController
 import java.io.File
 import javax.inject.Inject
-import models.content.DocumentService
+import models.document.DocumentService
 import models.user.Roles._
 import play.api.Application
 import play.api.cache.CacheApi

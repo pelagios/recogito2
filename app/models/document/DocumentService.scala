@@ -1,25 +1,34 @@
-package models.content
+package models.document
 
 import collection.JavaConversions._
 import models.BaseService
 import models.generated.Tables._
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord }
+import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
-import org.jooq.Record
 import play.api.Logger
 import play.api.cache.CacheApi
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.{ DB, FileAccess }
-import org.apache.commons.io.FileUtils
 
 object DocumentService extends BaseService with FileAccess {
   
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
   
-  private[content] def generateRandomID(retries: Int = 10)(implicit db: DB): String = {
+  private[document] def generateRandomID(retriesLeft: Int = 10)(implicit db: DB): String = {
+    
+    // Takes a set of strings and returns those that already exist in the DB as doc IDs
+    def findIDs(ids: Set[String])(implicit db: DB) = db.query { sql =>
+      sql.select(DOCUMENT.ID)
+         .from(DOCUMENT)
+         .where(DOCUMENT.ID.in(ids))
+         .fetchArray()
+         .map(_.value1).toSet    
+    }
+    
     // Generate 10 random IDs
     val randomIds = 
       (1 to 10).map(_ => RandomStringUtils.randomAlphanumeric(ID_LENGTH).toLowerCase).toSet
@@ -30,50 +39,37 @@ object DocumentService extends BaseService with FileAccess {
     
     if (uniqueIds.size > 0) {
       uniqueIds.head
-    } else if (retries > 0) {
+    } else if (retriesLeft > 0) {
       Logger.warn("Failed to generate unique random document ID")
-      generateRandomID(retries - 1)
+      generateRandomID(retriesLeft - 1)
     } else {
       throw new RuntimeException("Failed to create unique document ID")
     }
   }
   
-  private def findIDs(ids: Set[String])(implicit db: DB) = db.query { sql =>
-    sql.select(DOCUMENT.ID)
-       .from(DOCUMENT)
-       .where(DOCUMENT.ID.in(ids))
-       .fetchArray()
-       .map(_.value1).toSet    
-  }
+  /** Creates a new DocumentRecord from an UploadRecord **/
+  def createDocument(upload: UploadRecord)(implicit db: DB) =
+    new DocumentRecord(
+          generateRandomID(),
+          upload.getOwner,
+          upload.getCreatedAt,
+          upload.getTitle,
+          upload.getAuthor,
+          null, // TODO timestamp_numeric
+          upload.getDateFreeform,
+          upload.getDescription,
+          upload.getSource,
+          upload.getLanguage)
   
+  /** Retrieves a document by its ID **/
   def findById(id: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne())
   }
   
-  def delete(document: DocumentRecord)(implicit db: DB) = db.withTransaction { sql =>
-    sql.deleteFrom(DOCUMENT_FILEPART)
-       .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
-       .execute()
-
-    // Note: some documents may not have local files - e.g. IIIF  
-    val maybeDocumentDir = getDocumentDir(document.getOwner, document.getId)
-    if (maybeDocumentDir.isDefined)
-      FileUtils.deleteDirectory(maybeDocumentDir.get)
-    
-    sql.deleteFrom(DOCUMENT)
-       .where(DOCUMENT.ID.equal(document.getId))
-       .execute()
-  }
-
-  def findByUser(username: String, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
-    sql.selectFrom(DOCUMENT)
-       .where(DOCUMENT.OWNER.equal(username))
-       .limit(limit)
-       .offset(offset)
-       .fetchArray().toSeq
-  }
-
-  /** This method is cached as it gets accessed a lot **/
+  /** Retrieves a document by ID, along with fileparts.
+    *
+    * This method is cached as it will get accessed a lot.
+    */
   def findByIdWithFileparts(id: String)(implicit db: DB, cache: CacheApi) =
     cachedLookup("doc", id, findByIdWithFilepartsNoCache)
   
@@ -93,11 +89,37 @@ object DocumentService extends BaseService with FileAccess {
     grouped.headOption
   }
 
+  /** Retrieves a filepart by document ID and sequence number **/
   def findPartByDocAndSeqNo(docId: String, seqNo: Int)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(DOCUMENT_FILEPART)
               .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId))
               .and(DOCUMENT_FILEPART.SEQUENCE_NO.equal(seqNo))
               .fetchOne())
+  }
+  
+  /** Retrieves documents by their owner **/
+  def findByOwner(owner: String, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
+    sql.selectFrom(DOCUMENT)
+       .where(DOCUMENT.OWNER.equal(owner))
+       .limit(limit)
+       .offset(offset)
+       .fetchArray().toSeq
+  }
+  
+  /** Deletes a document by its ID, along with filepart records and files **/
+  def delete(document: DocumentRecord)(implicit db: DB) = db.withTransaction { sql =>
+    sql.deleteFrom(DOCUMENT_FILEPART)
+       .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
+       .execute()
+
+    // Note: some documents may not have local files - e.g. IIIF  
+    val maybeDocumentDir = getDocumentDir(document.getOwner, document.getId)
+    if (maybeDocumentDir.isDefined)
+      FileUtils.deleteDirectory(maybeDocumentDir.get)
+    
+    sql.deleteFrom(DOCUMENT)
+       .where(DOCUMENT.ID.equal(document.getId))
+       .execute()
   }
 
 }
