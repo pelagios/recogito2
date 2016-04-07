@@ -2,14 +2,14 @@ package controllers.my.upload.tiling
 
 import akka.actor.Props
 import java.io.File
-import controllers.my.upload.{ SupervisorActor, TaskType }
+import controllers.my.upload.{ BaseSupervisorActor, TaskType }
 import models.content.ContentType
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.duration.FiniteDuration
 
 private[tiling] 
   class TilingSupervisorActor(task: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord], documentDir: File, keepalive: FiniteDuration)
-  extends SupervisorActor(task, document, parts, documentDir, keepalive) {
+  extends BaseSupervisorActor(task, document, parts, documentDir, keepalive) {
   
   /** Creates workers for every image upload **/
   override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =

@@ -13,6 +13,7 @@ import org.specs2.specification.AfterAll
 import org.junit.runner._
 import play.api.Logger
 import play.api.test._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.test.Helpers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -45,8 +46,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
     Logger.info("[NERServiceIntegrationSpec] Submitting 2 documents to NER service")
       
     val processStartTime = System.currentTimeMillis
-    NERService.spawnNERProcess(document1, parts1, dir, KEEP_ALIVE)
-    NERService.spawnNERProcess(document2, parts2, dir, KEEP_ALIVE)
+    NERService.spawnTask(document1, parts1, dir, KEEP_ALIVE)
+    NERService.spawnTask(document2, parts2, dir, KEEP_ALIVE)
     
     "start NER on the 2 test documents without blocking" in { 
       (System.currentTimeMillis - processStartTime).toInt must be <(1000)

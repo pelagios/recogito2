@@ -9,7 +9,7 @@ import scala.concurrent.Future
 
 class TilingWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File) extends Actor{
 
-  import controllers.my.upload.Messages._
+  import controllers.my.upload.ProcessingTaskMessages._
 
   var progress = 0.0
   var status = ProgressStatus.PENDING

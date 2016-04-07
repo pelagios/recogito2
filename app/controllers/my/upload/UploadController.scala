@@ -2,7 +2,7 @@ package controllers.my.upload
 
 import akka.actor.ActorSystem
 import controllers.BaseController
-import controllers.my.upload.Messages._
+import controllers.my.upload.ProcessingTaskMessages._
 import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
 import java.io.File
@@ -20,8 +20,7 @@ import play.api.i18n.Messages.Implicits._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.implicitConversions
 import storage.DB
 
@@ -29,7 +28,7 @@ case class UploadSuccess(contentType: String)
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
 
-class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem) extends BaseController {
+class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem, context: ExecutionContext) extends BaseController {
 
   private val FILE_ARG = "file"
 
@@ -157,14 +156,14 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
             // Apply NER if requested
             val applyNER = checkParamValue("apply-ner", "on")
             if (applyNER) {
-              NERService.spawnNERProcess(doc, docParts)
+              NERService.spawnTask(doc, docParts)
               runningTasks.append(NERService.TASK_NER)
             }
 
             // Tile images
             val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
             if (imageParts.size > 0) {
-              TilingService.spawnTilingProcess(doc, imageParts)
+              TilingService.spawnTask(doc, imageParts)
               runningTasks.append(TilingService.TASK_TILING)
             }
 

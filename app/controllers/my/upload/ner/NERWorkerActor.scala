@@ -21,7 +21,7 @@ private[ner] object NERWorkerActor {
 
 private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File) extends Actor {
 
-  import controllers.my.upload.Messages._
+  import controllers.my.upload.ProcessingTaskMessages._
 
   var progress = 0.0
   var status = ProgressStatus.PENDING

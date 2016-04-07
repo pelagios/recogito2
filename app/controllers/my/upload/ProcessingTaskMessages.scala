@@ -1,6 +1,6 @@
 package controllers.my.upload
 
-object Messages {
+private[upload] object ProcessingTaskMessages {
 
   sealed abstract trait Message
 
@@ -20,7 +20,7 @@ object Messages {
 
 }
 
-object ProgressStatus extends Enumeration {
+private[upload] object ProgressStatus extends Enumeration {
 
   val PENDING = Value("PENDING")
   

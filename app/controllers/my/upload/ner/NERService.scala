@@ -9,10 +9,8 @@ import edu.stanford.nlp.pipeline.{ Annotation, StanfordCoreNLP }
 import java.io.File
 import java.util.Properties
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConverters._
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.FileAccess
@@ -28,13 +26,13 @@ object NERService extends ProcessingService with FileAccess {
 
   private var pipeline: StanfordCoreNLP = null
 
-  private val futurePipeline = Future {
+  private def futurePipeline(implicit context: ExecutionContext) = Future {
     val coreNLP = new StanfordCoreNLP(props)
     pipeline = coreNLP
     coreNLP
   }
 
-  private[ner] def parse(text: String): Future[Seq[Phrase]] = {
+  private[ner] def parse(text: String)(implicit context: ExecutionContext): Future[Seq[Phrase]] = {
 
     def parseWithPipeline(text: String, pipeline: StanfordCoreNLP): Seq[Phrase] = {
       val document = new Annotation(text)
@@ -76,21 +74,21 @@ object NERService extends ProcessingService with FileAccess {
     * for any of the fileparts does not exist. This should, however, never
     * happen. If it does, something is seriously broken with the DB integrity.
     */
-  def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
-    spawnNERProcess(document, parts, getDocumentDir(document.getOwner, document.getId).get)
+  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
+    spawnTask(document, parts, getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
-  private[ner] def spawnNERProcess(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
+  private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
     val actor = system.actorOf(Props(classOf[NERSupervisorActor], TASK_NER, document, parts, sourceFolder, keepalive), name = "ner_doc_" + document.getId)
-    actor ! Messages.Start
+    actor ! ProcessingTaskMessages.Start
   }
 
   /** Queries the progress for a specific process **/
-  override def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit system: ActorSystem) = {
-    Supervisor.getSupervisorActor(TASK_NER, documentId) match {
+  override def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit context: ExecutionContext, system: ActorSystem) = {
+    ProcessingTaskSupervisor.getSupervisorActor(TASK_NER, documentId) match {
       case Some(actor) => {
         implicit val t = Timeout(timeout)
-        (actor ? Messages.QueryProgress).mapTo[Messages.DocumentProgress].map(Some(_))
+        (actor ? ProcessingTaskMessages.QueryProgress).mapTo[ProcessingTaskMessages.DocumentProgress].map(Some(_))
       }
 
       case None =>

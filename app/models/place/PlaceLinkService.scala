@@ -104,7 +104,7 @@ object PlaceLinkService {
     for {
       linksToInsert <- buildPlaceLinks(annotation)
       deleteSuccess <- deleteByAnnotationId(annotation.annotationId)
-      insertSuccess <- if (deleteSuccess) insertPlaceLinks(linksToInsert) else Future.successful(false) 
+      insertSuccess <- if (deleteSuccess && linksToInsert.size > 0) insertPlaceLinks(linksToInsert) else Future.successful(false) 
     } yield insertSuccess
   }
   

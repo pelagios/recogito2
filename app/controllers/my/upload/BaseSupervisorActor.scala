@@ -8,11 +8,15 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-abstract class SupervisorActor(taskType: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord], documentDir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
+case class TaskType(name: String)
+
+/** A base class that encapsulates most of the functionality needed by task supervisor actors **/
+abstract class BaseSupervisorActor(taskType: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord],
+    documentDir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
   
-  import Messages._
+  import ProcessingTaskMessages._
   
-  Supervisor.registerSupervisorActor(taskType, document.getId, self)
+  ProcessingTaskSupervisor.registerSupervisorActor(taskType, document.getId, self)
   
   private val workers = spawnWorkers(document, parts, documentDir)
 
@@ -78,7 +82,7 @@ abstract class SupervisorActor(taskType: TaskType, document: DocumentRecord, par
   /** Waits for KEEPALIVE time, and then shuts down **/
   private def shutdown(keepalive: FiniteDuration) = {
     context.system.scheduler.scheduleOnce(keepalive) {
-      Supervisor.deregisterSupervisorActor(taskType, document.getId)
+      ProcessingTaskSupervisor.deregisterSupervisorActor(taskType, document.getId)
       workers.foreach(context.stop(_))
       context.stop(self)
     }
