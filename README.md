@@ -50,3 +50,4 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
 * Accordingly, clean up elasticsearch.yml in case we don't use scripting
 * Fix the various compiler warnings introduced with the Play 2.5 upgrade
 * Upgrade to latest ElasticSearch version
+* Deleting a doc currently doesn't delete its annotations
