@@ -10,7 +10,7 @@ import play.api.Play
 import play.api.cache.CacheApi
 import play.api.mvc.{ Result, Results, RequestHeader }
 
-trait Security extends AuthConfig { self: HasDatabase with HasCache with HasApplication =>
+trait Security extends AuthConfig { self: HasDatabase with HasCache =>
 
   private val NO_PERMISSION = "No permission"
 
@@ -49,7 +49,7 @@ trait Security extends AuthConfig { self: HasDatabase with HasCache with HasAppl
   }
 
   override lazy val tokenAccessor = new CookieTokenAccessor(
-    cookieSecureOption = application.configuration.getBoolean("auth.cookie.secure").getOrElse(false),
+    cookieSecureOption = Play.current.configuration.getBoolean("auth.cookie.secure").getOrElse(false),
     cookieMaxAge       = Some(sessionTimeoutInSeconds)
   )
 

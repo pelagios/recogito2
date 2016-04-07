@@ -1,6 +1,5 @@
 package storage
 
-import controllers.HasApplication
 import java.io.File
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.{ Logger, Play }

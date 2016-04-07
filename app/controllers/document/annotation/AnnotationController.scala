@@ -5,14 +5,13 @@ import javax.inject.Inject
 import models.ContentType
 import models.document.DocumentService
 import models.user.Roles._
-import play.api.Application
 import play.api.cache.CacheApi
 import play.api.mvc.Controller
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.{ DB, FileAccess }
 import play.api.Logger
 
-class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, val application: Application) extends BaseController with FileAccess {
+class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with FileAccess {
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: String) = StackAction(AuthorityKey -> Normal) { implicit request =>

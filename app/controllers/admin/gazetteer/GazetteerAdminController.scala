@@ -4,7 +4,6 @@ import controllers.BaseController
 import java.io.FileInputStream
 import javax.inject.Inject
 import models.user.Roles._
-import play.api.Application
 import play.api.cache.CacheApi
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -12,7 +11,7 @@ import scala.concurrent.Future
 import storage.DB
 import models.place.{ Gazetteer, PlaceService }
 
-class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: DB, val application: Application) extends BaseController {
+class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
   
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.gazetteers())
