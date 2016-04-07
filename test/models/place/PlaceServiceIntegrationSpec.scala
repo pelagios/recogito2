@@ -48,7 +48,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
     
     "After importing the DARE sample, the PlaceService" should {
       
-      val dareRecords = Gazetteer.loadFromRDF(new File(DARE_RDF), "DARE")
+      val dareRecords = GazetteerUtils.loadRDF(new File(DARE_RDF), "DARE")
       
       "contain 4 places" in {
         val failedRecords = importRecords(dareRecords)
@@ -76,7 +76,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
     
     "After importing the Pleiades sample, the PlaceService" should {
       
-      val pleiadesRecords = Gazetteer.loadFromRDF(new File(PLEIADES_RDF), "Pleiades")
+      val pleiadesRecords = GazetteerUtils.loadRDF(new File(PLEIADES_RDF), "Pleiades")
         
       "contain 5 places" in {
         val failedRecords = importRecords(pleiadesRecords)

@@ -9,7 +9,7 @@ import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import storage.DB
-import models.place.{ Gazetteer, PlaceService }
+import models.place.{ GazetteerUtils, PlaceService }
 
 class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
   
@@ -21,7 +21,7 @@ class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: 
     request.body.asMultipartFormData.flatMap(_.file("gazetteer-file")) match {
       case Some(formData) => {
         Future {
-          val places = Gazetteer.loadFromRDF(new FileInputStream(formData.ref.file), formData.filename, formData.filename.substring(0, formData.filename.lastIndexOf('.')))
+          val places = GazetteerUtils.loadRDF(new FileInputStream(formData.ref.file), formData.filename, formData.filename.substring(0, formData.filename.lastIndexOf('.')))
           Logger.info("Importing gazetteer " + formData.filename.substring(0, formData.filename.lastIndexOf('.')))
           PlaceService.importRecords(places)
         }

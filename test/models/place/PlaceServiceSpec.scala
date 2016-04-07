@@ -104,7 +104,7 @@ class PlaceServiceSpec extends Specification {
   
   "After importing the DARE sample, the PlaceService" should {
     
-    val dareRecords = Gazetteer.loadFromRDF(new File(DARE_RDF), "DARE")
+    val dareRecords = GazetteerUtils.loadRDF(new File(DARE_RDF), "DARE")
     
     "contain 4 places" in {
       // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec
@@ -161,7 +161,7 @@ class PlaceServiceSpec extends Specification {
   
   "After importing the Pleiades sample, the PlaceService" should {
     
-    val pleiadesRecords = Gazetteer.loadFromRDF(new File(PLEIADES_RDF), "Pleiades")
+    val pleiadesRecords = GazetteerUtils.loadRDF(new File(PLEIADES_RDF), "Pleiades")
       
     "contain 5 places" in {
       val failedRecords = importRecords(pleiadesRecords)

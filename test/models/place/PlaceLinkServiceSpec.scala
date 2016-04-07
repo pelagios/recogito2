@@ -125,10 +125,10 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
     "After creating 2 annotations with 1 place link each, the PlaceLinkService" should {
       
       "contain 2 correct place links" in {  
-        Await.result(PlaceService.importRecords(Gazetteer.loadFromRDF(new File( "test/resources/gazetteer_sample_dare.ttl"), "DARE")), 10 seconds)
+        Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/gazetteer_sample_dare.ttl"), "DARE")), 10 seconds)
         flush()
       
-        Await.result(PlaceService.importRecords(Gazetteer.loadFromRDF(new File( "test/resources/gazetteer_sample_pleiades.ttl"), "Pleiades")), 10 seconds)
+        Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/gazetteer_sample_pleiades.ttl"), "Pleiades")), 10 seconds)
         flush()
       
         val (successInsertBarcelona, _) = insertAnnotation(annotatesBarcelona)

@@ -15,7 +15,7 @@ class GazetteerSpec extends Specification {
   
   "The Gazetteer utility" should {
     
-    val records = Gazetteer.loadFromRDF(new File(GAZETTEER_RDF), "Pleiades")
+    val records = GazetteerUtils.loadRDF(new File(GAZETTEER_RDF), "Pleiades")
     
     "properly load all gazetteer records from RDF" in {
       records.size must equalTo(5)
