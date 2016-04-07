@@ -15,7 +15,7 @@ class PlaceSpec extends Specification {
 
   "The sample place" should {
 
-    val json = Source.fromFile("test/resources/place.json").getLines().mkString("\n")
+    val json = Source.fromFile("test/resources/models/place/place.json").getLines().mkString("\n")
     val parseResult = Json.fromJson[Place](Json.parse(json))
     
     "be properly created from JSON" in {

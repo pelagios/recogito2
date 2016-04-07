@@ -22,11 +22,11 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
   // Force Specs2 to execute tests in sequential order
   sequential 
   
-  private val DARE_RDF = "test/resources/gazetteer_sample_dare.ttl"
+  private val DARE_RDF = "test/resources/models/place/gazetteer_sample_dare.ttl"
   
-  private val PLEIADES_RDF = "test/resources/gazetteer_sample_pleiades.ttl"
+  private val PLEIADES_RDF = "test/resources/models/place/gazetteer_sample_pleiades.ttl"
   
-  private val TMP_IDX_DIR = "test/resources/tmp-idx"
+  private val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
   
   /** Async Await shorthands **/
   private def flush() = 

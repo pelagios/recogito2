@@ -15,7 +15,7 @@ class PlaceLinkSpec extends Specification {
   "The sample place link" should {
     
     "be properly created from JSON" in {
-      val json = Source.fromFile("test/resources/place-link.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/models/place/place-link.json").getLines().mkString("\n")
       val result = Json.fromJson[PlaceLink](Json.parse(json))
       
       // Parsed without errors?

@@ -19,9 +19,9 @@ class PlaceServiceSpec extends Specification {
   // Force Specs2 to execute tests in sequential order
   sequential 
   
-  private val DARE_RDF = "test/resources/gazetteer_sample_dare.ttl"
+  private val DARE_RDF = "test/resources/models/place/gazetteer_sample_dare.ttl"
   
-  private val PLEIADES_RDF = "test/resources/gazetteer_sample_pleiades.ttl"
+  private val PLEIADES_RDF = "test/resources/models/place/gazetteer_sample_pleiades.ttl"
   
   val mockStore = new MockPlaceStore()
   

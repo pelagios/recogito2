@@ -82,7 +82,7 @@ class GazetteerRecordSpec extends Specification {
   "sample gazetteer records" should {
     
     "be properly created from place JSON" in {
-      val json = Source.fromFile("test/resources/place.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/models/place/place.json").getLines().mkString("\n")
       val parseResult = Json.fromJson[Place](Json.parse(json))
       
       parseResult.isSuccess must equalTo(true)

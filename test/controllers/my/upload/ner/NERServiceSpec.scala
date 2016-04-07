@@ -14,7 +14,7 @@ import scala.io.Source
 class NERServiceSpec extends Specification {
 
   val TEST_TEXT = 
-    Source.fromFile("test/resources/text-for-ner-01.txt").getLines().mkString("\n")
+    Source.fromFile("test/resources/controllers/my/upload/ner/text-for-ner-01.txt").getLines().mkString("\n")
   
   "The NER parse function" should {
     

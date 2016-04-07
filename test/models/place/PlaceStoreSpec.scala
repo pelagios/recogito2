@@ -22,7 +22,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
   // Force Specs2 to execute tests in sequential order
   sequential 
   
-  val TMP_IDX_DIR = "test/resources/tmp-idx"
+  val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
   
   override def afterAll =
     FileUtils.deleteDirectory(new File(TMP_IDX_DIR))

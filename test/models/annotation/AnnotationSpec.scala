@@ -19,7 +19,7 @@ class AnnotationSpec extends Specification {
   "The sample text annotation" should {
     
     "be properly created from JSON" in {
-      val json = Source.fromFile("test/resources/text-annotation.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/models/annotation/text-annotation.json").getLines().mkString("\n")
       val result = Json.fromJson[Annotation](Json.parse(json))
       
       // Parsed without errors?
@@ -51,7 +51,7 @@ class AnnotationSpec extends Specification {
   "The sample image annotation" should {
     
     "be properly created from JSON" in {
-      val json = Source.fromFile("test/resources/image-annotation.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/models/annotation/image-annotation.json").getLines().mkString("\n")
       val result = Json.fromJson[Annotation](Json.parse(json))
       
       // Parsed without errors?

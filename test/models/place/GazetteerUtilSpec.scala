@@ -11,7 +11,7 @@ import play.api.test.Helpers._
 @RunWith(classOf[JUnitRunner])
 class GazetteerUtilSpec extends Specification {
   
-  private val GAZETTEER_RDF = "test/resources/gazetteer_sample_pleiades.ttl"
+  private val GAZETTEER_RDF = "test/resources/models/place/gazetteer_sample_pleiades.ttl"
   
   "The Gazetteer utility" should {
     

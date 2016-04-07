@@ -25,7 +25,7 @@ class TilingServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitS
   // Force Specs2 to execute tests in sequential order
   sequential 
   
-  private val DEST_DIR = new File("test/resources/Ptolemy_map_15th_century")
+  private val DEST_DIR = new File("test/resources/controllers/my/upload/tiling/Ptolemy_map_15th_century")
   
   override def afterAll = FileUtils.deleteDirectory(DEST_DIR)
   
@@ -37,7 +37,7 @@ class TilingServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitS
     
     val document = new DocumentRecord("hcylkmacy4xgkb", "rainer", OffsetDateTime.now, "A test image", null, null, null, null, null, null)
     val parts = Seq(new DocumentFilepartRecord(1, "hcylkmacy4xgkb", "Ptolemy_map_15th_century.jpg", ContentType.IMAGE_UPLOAD.toString, "Ptolemy_map_15th_century.jpg", 0))
-    val dir = new File("test/resources")
+    val dir = new File("test/resources/controllers/my/upload/tiling")
     
     
     val processStartTime = System.currentTimeMillis

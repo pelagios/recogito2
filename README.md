@@ -36,7 +36,6 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
 
 ## Upcoming TODOs & Questions
 
-* Clean up & organize the `test/resources` folder
 * Refactor some of the bulkier unit tests in the `models.place` package
 * ElasticSearch gazetteer framework
   * Max number of SHOULD clauses is currently not checked - we should do this in the PlaceStore
