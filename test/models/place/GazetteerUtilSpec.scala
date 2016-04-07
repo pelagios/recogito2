@@ -9,7 +9,7 @@ import play.api.test._
 import play.api.test.Helpers._
 
 @RunWith(classOf[JUnitRunner])
-class GazetteerSpec extends Specification {
+class GazetteerUtilSpec extends Specification {
   
   private val GAZETTEER_RDF = "test/resources/gazetteer_sample_pleiades.ttl"
   

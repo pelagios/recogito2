@@ -190,9 +190,8 @@ class PlaceServiceSpec extends Specification {
       try {
         findByURI("http://pleiades.stoa.org/places/128537")
         success
-      } catch {
-        case t: Throwable => 
-          failure
+      } catch { case t: Throwable => 
+        failure
       }
     }
     
