@@ -8,13 +8,14 @@ import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
 import storage.DB
+import controllers.HasJSONRespone
 
-class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController {
+class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController with HasJSONRespone {
   
   /** Search on the entire gazetteer (use case: geo-resolution) is restricted to logged-in users **/ 
   def search(query: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     PlaceService.searchPlaces(query).map { results => 
-      Ok(Json.prettyPrint(Json.toJson(results.map(_._1))))
+      jsonOk(Json.toJson(results.map(_._1)))
     }
   }
   
