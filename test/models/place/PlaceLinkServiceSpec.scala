@@ -120,7 +120,7 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
     def insertAnnotation(a: Annotation) = Await.result(AnnotationService.insertOrUpdateAnnotation(a), 10 seconds)
     def totalPlaceLinks() = Await.result(PlaceLinkService.totalPlaceLinks(), 10 seconds)
     def findByAnnotationId(id: UUID) = Await.result(PlaceLinkService.findByAnnotationId(id), 10 seconds)
-    def searchPlaces(query: String, documentId: String) = Await.result(PlaceLinkService.searchPlacesInDocument(query, documentId), 10 seconds)
+    def searchPlacesInDocument(query: String, documentId: String) = Await.result(PlaceLinkService.searchPlacesInDocument(query, documentId), 10 seconds)
     
     "After creating 2 annotations with 1 place link each, the PlaceLinkService" should {
       
@@ -166,19 +166,15 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
   
     "When searching for 'Vindobona', the PlaceLinkService" should {
       
-      "retrieve only the Vindobona that has a link, not the one without" in {
-        val places = searchPlaces("vindobona", annotatesVindobonaAndThessaloniki.annotates.document)
-        
-        play.api.Logger.info(places.toString)
-        
-        failure
+      "retrieve only the Vindobona linked to the test document" in {
+        val places = searchPlacesInDocument("vindobona", annotatesVindobonaAndThessaloniki.annotates.document)
+        places.size must equalTo(1)
+        places.head.id must equalTo("http://pleiades.stoa.org/places/128537")
       }
       
-      "not return any places if the search is restricted by document ID" in {
-        
-        // TODO test has_child query
-        
-        success
+      "not return any places if the search is restricted to another document ID" in {
+        val places = searchPlacesInDocument("vindobona", "not-a-document-id")
+        places.size must equalTo(0)
       }
       
     }
@@ -189,7 +185,7 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
         
         // TODO delete place via PlaceService
         
-        success
+        failure
       }
       
     }
@@ -200,7 +196,7 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
         
         // TODO zero links?
         
-        success
+        failure
       }
       
     }

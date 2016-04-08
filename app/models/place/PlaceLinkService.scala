@@ -108,6 +108,12 @@ object PlaceLinkService {
     } yield insertSuccess
   }
   
+  // TODO get rid of this! Clean up mix between PlaceService, PlaceStore, PlaceLinkService
+  implicit object PlaceHitAs extends HitAs[Place] {
+    override def as(hit: RichSearchHit): Place =
+      Json.fromJson[Place](Json.parse(hit.sourceAsString)).get
+  }
+  
   def searchPlacesInDocument(q: String, documentId: String)(implicit context: ExecutionContext) =
     ES.client execute {
       search in ES.IDX_RECOGITO / "place" query {
@@ -143,9 +149,8 @@ object PlaceLinkService {
             }
           )
         }
-
       }
-    }  
+    } map { _.as[Place] }  
     
   def totalPlaceLinks()(implicit context: ExecutionContext): Future[Long] =
     ES.client execute {
