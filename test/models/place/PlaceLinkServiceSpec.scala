@@ -88,34 +88,34 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
   
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     
-      val linkToBarcelona = PlaceLink(
-        "http://dare.ht.lu.se/places/6534",
-        annotatesBarcelona.annotationId,
-        annotatesBarcelona.annotates.document,
-        annotatesBarcelona.annotates.filepart,
-        "http://pleiades.stoa.org/places/246343")
-      
-      val linkToLancaster = PlaceLink(
-          "http://dare.ht.lu.se/places/23712",
-          annotatesLancaster.annotationId,
-          annotatesLancaster.annotates.document,
-          annotatesLancaster.annotates.filepart,
-          "http://pleiades.stoa.org/places/89222")
-          
-      val linkToVindobona = PlaceLink(
-          "http://pleiades.stoa.org/places/128537",
-          annotatesVindobonaAndThessaloniki.annotationId,
-          annotatesVindobonaAndThessaloniki.annotates.document,
-          annotatesVindobonaAndThessaloniki.annotates.filepart,
-          "http://pleiades.stoa.org/places/128537")
-          
-      val linkToThessaloniki = PlaceLink(
-          "http://dare.ht.lu.se/places/17068",
-          annotatesVindobonaAndThessaloniki.annotationId,
-          annotatesVindobonaAndThessaloniki.annotates.document,
-          annotatesVindobonaAndThessaloniki.annotates.filepart,
-          "http://pleiades.stoa.org/places/491741")
+    val linkToBarcelona = PlaceLink(
+      "http://dare.ht.lu.se/places/6534",
+      annotatesBarcelona.annotationId,
+      annotatesBarcelona.annotates.document,
+      annotatesBarcelona.annotates.filepart,
+      "http://pleiades.stoa.org/places/246343")
     
+    val linkToLancaster = PlaceLink(
+        "http://dare.ht.lu.se/places/23712",
+        annotatesLancaster.annotationId,
+        annotatesLancaster.annotates.document,
+        annotatesLancaster.annotates.filepart,
+        "http://pleiades.stoa.org/places/89222")
+        
+    val linkToVindobona = PlaceLink(
+        "http://pleiades.stoa.org/places/128537",
+        annotatesVindobonaAndThessaloniki.annotationId,
+        annotatesVindobonaAndThessaloniki.annotates.document,
+        annotatesVindobonaAndThessaloniki.annotates.filepart,
+        "http://pleiades.stoa.org/places/128537")
+        
+    val linkToThessaloniki = PlaceLink(
+        "http://dare.ht.lu.se/places/17068",
+        annotatesVindobonaAndThessaloniki.annotationId,
+        annotatesVindobonaAndThessaloniki.annotates.document,
+        annotatesVindobonaAndThessaloniki.annotates.filepart,
+        "http://pleiades.stoa.org/places/491741")
+              
     def flush() = Await.result(ES.flushIndex, 10 seconds)
     def insertAnnotation(a: Annotation) = Await.result(AnnotationService.insertOrUpdateAnnotation(a), 10 seconds)
     def totalPlaceLinks() = Await.result(PlaceLinkService.totalPlaceLinks(), 10 seconds)
@@ -182,10 +182,19 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
     "Deleting a parent place" should {
       
       "be possible without losing the link" in {
+        // That's hacky, but works they way we've set things up currently    
+        // In any case - deleting a place is something that only happens underneath the hood,
+        // so we don't want to expose this as a functionality in the PlaceService
+        val store = new ESPlaceStore()
+        val deleteSuccess = Await.result(store.deletePlace("http://pleiades.stoa.org/places/128537"), 10 seconds)
+        deleteSuccess must equalTo(true)
+        flush()
         
-        // TODO delete place via PlaceService
+        totalPlaceLinks() must equalTo(3)
         
-        failure
+        val totalPlaces = Await.result(PlaceService.totalPlaces(), 10 seconds)
+        totalPlaces must equalTo(4)
+        
       }
       
     }

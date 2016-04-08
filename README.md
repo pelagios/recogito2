@@ -56,5 +56,10 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
   close/exactMatches not linked to any gazetteer record, it would mean moving matches to the level
   of the place itself. (May make sense in terms of query performance anyway)
 * What about documents consisting of a mix of text and image "layers". E.g. scanned image in latin,
-  scanned image in other language, transcription (in differnt languages) - with each "layer"
-  linking through to the others.
+  scanned image in other language, transcription (in differnt languages) - with each layer
+  "linking through" to the others.
+  * General Q about "linking through": should this be modeled as a relation between annotations?
+    Or as another type of annotation body ("hyperlink")? (In OA, a link would be modeled as an
+    additional annotation that has two annotations as target I guess? Prob. more complicated
+    than it needs to be. In our case: e.g. a body of type HYPERLINK with a URI? (Disadvantage:
+    we don't know if its an internal link in the same doc or not, unless we parse the URI.)
