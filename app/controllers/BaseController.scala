@@ -20,7 +20,7 @@ trait HasDatabase { def db: DB }
 trait HasCache { def cache: CacheApi }
 
 /** Helper for creating pretty-printed JSON responses with proper content-type header **/
-trait HasJSONRespone { self: Controller =>
+trait HasPrettyPrintJSON { self: Controller =>
 
   /** Pretty print URL param name **/
   private val PRETTY = "pretty"

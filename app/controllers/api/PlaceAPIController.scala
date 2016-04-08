@@ -1,6 +1,6 @@
 package controllers.api
 
-import controllers.BaseController
+import controllers.{ BaseController, HasPrettyPrintJSON }
 import javax.inject.Inject
 import models.user.Roles._
 import models.place.PlaceService
@@ -8,9 +8,8 @@ import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
 import storage.DB
-import controllers.HasJSONRespone
 
-class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController with HasJSONRespone {
+class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController with HasPrettyPrintJSON {
   
   /** Search on the entire gazetteer (use case: geo-resolution) is restricted to logged-in users **/ 
   def search(query: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
