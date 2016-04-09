@@ -202,10 +202,14 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
     "After deleting the annotations, the PlaceLinkService" should {
       
       "contain no links" in {
+        val success = 
+          Seq(annotatesBarcelona.annotationId,
+            annotatesVindobonaAndThessaloniki.annotationId).map { annotationId => 
+              AnnotationService.deleteAnnotation(annotationId)      
+          }
         
-        // TODO zero links?
-        
-        failure
+        success must equalTo(Seq(true, true))
+        totalPlaceLinks() must equalTo(0)
       }
       
     }

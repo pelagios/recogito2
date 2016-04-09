@@ -4,6 +4,7 @@ import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
+import java.util.UUID
 import models.place.{ PlaceLink, PlaceLinkService }
 import play.api.Logger
 import play.api.libs.json.Json
@@ -46,6 +47,10 @@ object AnnotationService {
   def insertOrUpdateAnnotations(annotations: Seq[Annotation])(implicit context: ExecutionContext) =
     Future.sequence(for (result <- annotations.map(insertOrUpdateAnnotation(_))) yield result) 
   
+  def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext) = {
+    throw new Exception("Implement me!")
+  }
+    
   def findByDocId(id: String)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document" -> id)) limit 1000
