@@ -47,8 +47,22 @@ object AnnotationService {
   def insertOrUpdateAnnotations(annotations: Seq[Annotation])(implicit context: ExecutionContext) =
     Future.sequence(for (result <- annotations.map(insertOrUpdateAnnotation(_))) yield result) 
   
-  def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext) = {
-    throw new Exception("Implement me!")
+  def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] = {
+    // TODO can we eleminate cross-dependency to PlaceLinkService? Both the PlaceService and the Annotation service, by
+    // definition, need to deal with PlaceLinks. Trait?
+    
+    // TODO problem: annotations currently don't use the annotationId in the _id field - change!
+    ES.client execute {
+      delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
+    } flatMap { response =>
+      if (response.isFound)
+        PlaceLinkService.deleteByAnnotationId(annotationId)
+      else
+        Future.successful(false)
+    } recover { case t: Throwable =>
+      t.printStackTrace()
+      false
+    }    
   }
     
   def findByDocId(id: String)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
