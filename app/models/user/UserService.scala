@@ -40,7 +40,6 @@ object UserService extends BaseService with FileAccess {
   }
   
   def findByUsernameIgnoreCase(username: String)(implicit db: DB) = db.query { sql =>
-    play.api.Logger("grouping2")
     Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
 
