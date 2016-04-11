@@ -47,7 +47,7 @@ object Annotation extends HasDate {
 
   /** JSON conversion **/
   implicit val annotationFormat: Format[Annotation] = (
-    (JsPath \ "_id").format[UUID] and
+    (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "version_id").format[UUID] and
     (JsPath \ "annotates").format[AnnotatedObject] and
     (JsPath \ "has_previous_versions").formatNullable[Int] and

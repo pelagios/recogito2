@@ -50,8 +50,6 @@ object AnnotationService {
   def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] = {
     // TODO can we eleminate cross-dependency to PlaceLinkService? Both the PlaceService and the Annotation service, by
     // definition, need to deal with PlaceLinks. Trait?
-    
-    // TODO problem: annotations currently don't use the annotationId in the _id field - change!
     ES.client execute {
       delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
     } flatMap { response =>

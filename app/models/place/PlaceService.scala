@@ -40,9 +40,7 @@ object PlaceService {
         None 
       else
         Some(TemporalBounds.computeUnion(bounds))
-      
-    // TODO in case we're conflating more than one places, we will need to update PlaceReferences in the store accordingly
-        
+              
     Place(
       definingPlace.map(_.id).getOrElse(normalizedRecord.uri),
       definingPlace.map(_.title).getOrElse(normalizedRecord.title),
