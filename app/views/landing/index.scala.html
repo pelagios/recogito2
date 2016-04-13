@@ -6,21 +6,64 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/index.css")"/>
   </head>
   <body>
-    <div id="landing-header">
-      <h1>Recogito</h1>
-      <p>
-        <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm" class="btn">
-          <span class="icon">&#xf090;</span>
-          LOG IN
-        </a>
-        <a href="@controllers.landing.routes.SignupController.showSignupForm" class="btn grey">CREATE ACCOUNT</a>
-      </p>
+    <div class="header">
+      <div class="header-inner">
+        <span class="logo">
+          <img class="logo-recogito" src="@routes.Assets.versioned("images/logo-recogito.png")">
+          <img class="logo-commons" src="@routes.Assets.versioned("images/logo-commons.png")">
+        </span>
+
+        <span class="header-buttons">
+          <button class="btn outline">Sign In</button>
+        </span>
+      </div>
     </div>
 
-    <div class="landing-content three-columns">
+    <div class="jumbotron">
+      <div class="jumbotron-inner">
+        <div class="jumbotron-left">
+          <h2>Linked Data annotation</br>without the pointy brackets</h2>
+          <p>
+            Create maps from text. Annotate images. Connect your
+            research to other data on the Web and make it more open, visible
+            and re-usable. Without the need to become a Semantic Web expert.
+          </p>
+          <a href="#">Learn More</a>
+        </div> <!-- jumbotron-left -->
 
+        <div class="jumbotron-right">
+          <form action="/signup" method="POST" autocomplete="off">
+            <dl id="username_field">
+              <dd>
+                <input type="text" id="username" name="username" placeholder="Pick a username" autocomplete="off"/>
+              </dd>
+            </dl>
+
+            <dl id="email_field">
+              <dd>
+                <input type="text" id="email" name="email"placeholder="Your email address" autocomplete="off"/>
+              </dd>
+            </dl>
+
+            <dl id="password_field">
+              <dd>
+                <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="off"/>
+              </dd>
+            </dl>
+
+            <button type="submit" class="btn btn-blue btn-large">Sign Up for Recogito</button>
+
+            <p class="disclaimer">
+              Signing up signifies you have read and agree to our <a href="">Terms and Conditions of Use</a>.
+            </p>
+          </form>
+        </div> <!-- jumbotron-right -->
+      </div> <!-- jumbotron-inner -->
+    </div> <!-- jumbotron -->
+
+    <!-- div class="landing-content three-columns">
       <div class="column">
-        <!-- placeholder -->
+        <!-- placeholder -
         <img style="height:80px" src="@routes.Assets.versioned("images/nounproject/noun_168261_cc.svg")">
         <h2>Annotate</h2>
         <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
@@ -29,7 +72,7 @@
       </div>
 
       <div class="column">
-        <!-- placeholder -->
+        <!-- placeholder -
         <img style="height:80px" src="@routes.Assets.versioned("images/nounproject/noun_283731_cc.svg")">
         <h2>Map</h2>
         <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
@@ -38,14 +81,13 @@
       </div>
 
       <div class="column">
-        <!-- placeholder -->
+        <!-- placeholder -
         <img style="height:80px" src="@routes.Assets.versioned("images/nounproject/noun_116760_cc.svg")">
         <h2>Share</h2>
         <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
           eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
           voluptua.</p>
       </div>
-
-    </div>
+    </div -->
   </body>
 </html>
