@@ -1,0 +1,54 @@
+.text-annotation-editor {
+  position:absolute;
+  top:290px;
+  left:400px;
+  width:400px;
+  height:300px;
+  background-color:#fff;
+  .box-shadow(2px, 2px, 30px, rgba(0, 0, 0, 0.3));
+  .rounded-corners(3px);
+  overflow:hidden;
+  color:@nightsky;
+
+  .handle {
+    background-color:@ocean;
+    height:12px;
+  }
+
+  .category-buttons {
+    border-bottom:1px solid @lightgrey-border-darker;
+
+    .category {
+      display:inline-block;
+      width:33%;
+      text-align:center;
+      padding:7px 0;
+
+      .icon {
+        font-size:90%;
+        vertical-align:top;
+        margin-right:4px;
+      }
+
+    }
+
+    .category:not(:last-child) {
+      border-right:1px solid @lightgrey-border;
+    }
+
+  }
+
+  .footer {
+    position:absolute;
+    bottom:0;
+    width:100%;
+    text-align:right;
+    padding:6px 0;
+
+    button:last-child {
+      margin-right:6px;
+    }
+
+  }
+
+}

@@ -3,9 +3,10 @@ require([
   'highlighter',
   'selectionHandler',
   'toolbar',
+  'editor/editor',
   '../apiConnector',
   '../../common/config',
-  '../../common/annotationUtils'], function(Events, Highlighter, SelectionHandler, Toolbar, APIConnector, Config, Utils) {
+  '../../common/annotationUtils'], function(Events, Highlighter, SelectionHandler, Toolbar, Editor, APIConnector, Config, Utils) {
 
   jQuery(document).ready(function() {
 
@@ -18,6 +19,9 @@ require([
         highlighter = new Highlighter(contentNode),
 
         selectionHandler = new SelectionHandler(contentNode),
+
+        // TODO just for testing & & formatting - clean up later
+        editor = new Editor(),
 
         API = new APIConnector(),
 
