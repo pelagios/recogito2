@@ -1,4 +1,4 @@
-define([], function() {
+define(['editor/commentsection'], function(CommentSection) {
 
   /** The main annotation editor popup **/
   var Editor = function() {
@@ -14,16 +14,17 @@ define([], function() {
                 '<span class="icon">&#xf007;</span> Mark as Person' +
               '</div>' +
               '<div class="category event">' +
-                '<span class="icon"></span> Mark as Event' +
+                '<span class="icon">&#xf005;</span> Mark as Event' +
               '</div>' +
             '</div>' +
-            '<div class="bodies">' +
-            '</div>' +
+            '<div class="bodies"></div>' +
             '<div class="footer">' +
               '<button class="btn small outline">Cancel</button>' +
               '<button class="btn small">OK</button>' +
             '</div>' +
           '</div>'),
+
+        commentSection = new CommentSection(element.find('.bodies')),
 
         makeDraggable = function() {
           // TODO will become more elaborate later
