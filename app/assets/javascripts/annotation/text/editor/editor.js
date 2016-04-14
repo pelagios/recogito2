@@ -19,21 +19,35 @@ define(['editor/commentsection'], function(CommentSection) {
             '</div>' +
             '<div class="bodies"></div>' +
             '<div class="footer">' +
-              '<button class="btn small outline">Cancel</button>' +
-              '<button class="btn small">OK</button>' +
+              '<button class="btn small outline cancel">Cancel</button>' +
+              '<button class="btn small ok">OK</button>' +
             '</div>' +
           '</div>'),
 
+        btnCancel = element.find('button.cancel'),
+        btnOk = element.find('button.ok'),
+
         commentSection = new CommentSection(element.find('.bodies')),
 
-        makeDraggable = function() {
-          // TODO will become more elaborate later
-          element.draggable({ handle: '.handle' });
+
+        show = function() {
+          element.show();
+        },
+
+        hide = function() {
+          element.hide();
         };
 
+    hide();
     jQuery(document.body).append(element);
-    makeDraggable();
+    element.draggable({ handle: '.handle' });
 
+    // TODO just a dummy
+    btnCancel.click(hide);
+    btnOk.click(hide);
+
+    this.show = show;
+    this.hide = hide;
   };
 
   return Editor;

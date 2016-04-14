@@ -62,8 +62,9 @@ require([
 
         onAnnotationCreated = function(annotationStub) {
           // TODO just a dummy for now
-          annotationStub.bodies.push({ type: toolbar.getCurrentMode().type });
-          API.storeAnnotation(annotationStub);
+          // annotationStub.bodies.push({ type: toolbar.getCurrentMode().type });
+          // API.storeAnnotation(annotationStub);
+          editor.show();
         };
 
     // API event handling
