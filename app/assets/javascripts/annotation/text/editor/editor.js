@@ -38,7 +38,7 @@ define(['editor/commentsection'], function(CommentSection) {
           element.hide();
         };
 
-    hide();
+    // hide();
     jQuery(document.body).append(element);
     element.draggable({ handle: '.handle' });
 

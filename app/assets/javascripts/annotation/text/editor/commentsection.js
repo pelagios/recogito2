@@ -2,10 +2,20 @@ define([], function() {
 
   var CommentSection = function(parent) {
     var element = jQuery(
-      '<div class="section comments">' +
-        '<textarea placeholder="Write a comment..." spellcheck="false" />' +
-      '</div>');
+          '<div class="section comments">' +
+            '<div contenteditable="true" spellcheck="false" class="textarea" />' + // placeholder="Write a comment..."  />' +
+          '</div>'),
 
+          textArea = element.find('textarea'),
+
+          /** Resizes the comment box so that it fits the whole text without scrollbar **/
+          fitVertical = function() {
+            console.log(textArea[0].scrollHeight);
+            textArea.css('height', 'auto');
+            textArea.height(textArea[0].scrollHeight);
+          };
+
+    textArea.keyup(fitVertical);
     parent.append(element);
   };
 
