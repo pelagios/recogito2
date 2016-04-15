@@ -49,8 +49,21 @@ case class Place(
       .groupBy(_._1)
       .map { case (description, s) => (description -> s.map(_._2)) }.toMap
     
+  /** The list of name forms (without language), sorted by frequency of appearance in gazetteers **/
+  lazy val labels = {
+    val titlesAndNames = 
+      isConflationOf.map(_.title) ++
+      isConflationOf.flatMap(_.names.map(_.name))
+      
+    titlesAndNames
+      .flatMap(_.split(",").map(_.trim)) // Separate on commas
+      .groupBy(identity).toSeq
+      .sortBy(- _._2.size)
+      .map(_._1)
+  }
+      
   /** Names assigned to this place as Map[name -> list of gazetteers including the name] **/
-  lazy val names =
+  lazy val names=
     isConflationOf
       .flatMap(g => g.names.map((_, g.sourceGazetteer)))
       .groupBy(_._1)

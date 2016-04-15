@@ -19,7 +19,6 @@ class PlaceSpec extends Specification {
     val parseResult = Json.fromJson[Place](Json.parse(json))
     
     "be properly created from JSON" in {
-      
       parseResult.isSuccess must equalTo(true)
     }
     
@@ -79,6 +78,15 @@ class PlaceSpec extends Specification {
       place.names.get(Name("Ad Mauros/Marinianio, Eferding")).get must equalTo(Seq(Gazetteer("DARE")))
       place.names.get(Name("Eferding")).get must equalTo(Seq(Gazetteer("Trismegistos")))
       place.names.get(Name("Marianianio", Some("la"))).get must equalTo(Seq(Gazetteer("Trismegistos")))      
+    }
+    
+    "list the expected name labels, sorted by frequency" in {
+      val labels = parseResult.get.labels
+      
+      labels.size must equalTo(4)
+      labels(0) must equalTo("Ad Mauros")
+      labels(1) must equalTo("Eferding")
+      Seq(labels(2), labels(3)) must containAllOf(Seq("Ad Mauros/Marinianio", "Marianianio"))
     }
     
     "list the expected close- and exactMatches" in {
