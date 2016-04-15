@@ -12,6 +12,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{ Json, JsValue }
 import play.api.libs.Files.TemporaryFile
 import storage.DB
+import scala.util.Try
 
 /** Helper trait so we can hand the injected DB into other traits **/
 trait HasDatabase { def db: DB }
@@ -26,7 +27,7 @@ trait HasPrettyPrintJSON { self: Controller =>
   private val PRETTY = "pretty"
 
   protected def jsonOk(obj: JsValue)(implicit request: Request[AnyContent]) = {
-    val pretty = request.queryString.get(PRETTY).map(_.head.toBoolean).getOrElse(false)
+    val pretty = Try(request.queryString.get(PRETTY).map(_.head.toBoolean).getOrElse(false)).getOrElse(false)
     if (pretty)
       Ok(Json.prettyPrint(obj)).withHeaders(("Content-Type", "application/json; charset=utf-8"))
     else

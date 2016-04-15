@@ -3,6 +3,7 @@ package models.place
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.source.Indexable
+import models.Page
 import org.elasticsearch.search.sort.SortOrder
 import play.api.Logger
 import play.api.libs.json.Json
@@ -37,7 +38,7 @@ trait PlaceStore {
   def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
   
   /** Place search **/
-  def searchPlaces(query: String, limit: Int = 20)(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
+  def searchPlaces(query: String, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
   
 }
 
@@ -110,7 +111,7 @@ private[place] class ESPlaceStore extends PlaceStore {
     }
   }
 
-  def searchPlaces(q: String, l: Int)(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =
+  def searchPlaces(q: String, l: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query {
         nestedQuery("is_conflation_of").query {
@@ -137,6 +138,9 @@ private[place] class ESPlaceStore extends PlaceStore {
           }
         }
       } limit l
-    } map { _.as[(Place, Long)].toSeq } 
+    } map { response =>
+      val places = response.as[(Place, Long)].toSeq 
+      Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, l, places)
+    } 
 
 }
