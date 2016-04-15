@@ -6,7 +6,13 @@ define([], function() {
             '<div class="section place">' +
               '<div class="map"></div>' +
               '<div class="panel-container">' +
-                '<div class="panel"></div>' +
+                '<div class="panel">' +
+                  '<h3>Carnuntum</h3>' +
+                  '<p class="names">' +
+                    'Col. Carnuntum, Bad Deutsch-Altenburg, Bad Deutsch-Altenburg AUS,' +
+                    'Petronell-Carnuntum, Col. Septimia Aurelia Antoniniana, Petronell AUS, Petronell-Carnuntum' +
+                  '</p>' +
+                '</div>' +
               '</div>' +
             '</div>');
 

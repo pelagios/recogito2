@@ -3,6 +3,7 @@
   padding:0;
   margin:0;
   height:100px;
+  color:@nightsky;
 
   .map {
     position:absolute;
@@ -18,12 +19,30 @@
     padding-right:130px;
     pointer-events:none;
     border-bottom:1px solid @lightgrey-border;
+    overflow:hidden;
   }
 
   .panel {
-    background-color:rgba(255, 255, 255, 0.7);
+    background-color:rgba(255, 255, 255, 0.8);
     height:100%;
     pointer-events:auto;
+    padding:10px 20px 10px 15px;
+    .box-shadow(0, 0, 18px, rgba(0, 0, 0, 0.12));
+  }
+
+  h3, p {
+    margin:0;
+    padding:0;
+    line-height:21px;
+    font-size:16px;
+    font-weight:normal;
+    white-space:nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  h3 {
+    font-weight:bold;
   }
 
 }
