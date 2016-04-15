@@ -1,0 +1,33 @@
+.section.place {
+  position:relative;
+  padding:0;
+  margin:0;
+  height:100px;
+
+  .map {
+    position:absolute;
+    width:100%;
+    height:100%;
+  }
+
+  .panel-container {
+    position:relative;
+    width:100%;
+    height:100%;
+    box-sizing:border-box;
+    padding-right:130px;
+    pointer-events:none;
+    border-bottom:1px solid @lightgrey-border;
+  }
+
+  .panel {
+    background-color:rgba(255, 255, 255, 0.7);
+    height:100%;
+    pointer-events:auto;
+  }
+
+}
+
+.leaflet-control-attribution {
+  display:none;
+}
