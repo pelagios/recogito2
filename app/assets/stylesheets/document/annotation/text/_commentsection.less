@@ -12,24 +12,9 @@
     outline:none;
   }
 
-  textarea {
-    display:block;
-    background-color:#fff;
-    margin:0;
-    border:0;
-    padding:10px 0;
-    outline:none;
-    width:100%;
-    font-family:PTSansNarrow;
-    font-size:17px;
-    line-height:20px;
-    color:@nightsky;
-    resize:none;
-    overflow-y:hidden;
-    height:60px;
-    max-height:120px;
+  .textarea:empty:not(:focus):before {
+    content:attr(data-placeholder);
+    color:darken(@lightgrey-border-darker, 15%);
   }
-
-
 
 }

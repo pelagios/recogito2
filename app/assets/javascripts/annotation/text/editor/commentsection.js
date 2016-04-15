@@ -3,7 +3,7 @@ define([], function() {
   var CommentSection = function(parent) {
     var element = jQuery(
           '<div class="section comments">' +
-            '<div contenteditable="true" spellcheck="false" class="textarea" />' + // placeholder="Write a comment..."  />' +
+            '<div contenteditable="true" spellcheck="false" class="textarea" data-placeholder="Write a comment..." />' +
           '</div>'),
 
           textArea = element.find('textarea'),
