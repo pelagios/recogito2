@@ -1,6 +1,6 @@
 {
   "_id": "http://pleiades.stoa.org/places/118543",
-  "title": "Ad Mauros",
+  "labels": [ "Ad Mauros" ],
   "geometry": {
      "type": "Point",
      "coordinates": [ 14.02358, 48.31058 ]
@@ -50,7 +50,7 @@
     },{
       "uri": "http://www.trismegistos.org/place/35191",
       "source_gazetteer": "Trismegistos",
-      "last_changed_at": "2016-04-03T11:23:00Z", 
+      "last_changed_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros",
       "names": [
         { "name": "Ad Mauros" },

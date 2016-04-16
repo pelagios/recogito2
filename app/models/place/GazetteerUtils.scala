@@ -35,7 +35,20 @@ object GazetteerUtils {
       r.temporalBounds,
       r.closeMatches.map(normalizeURI(_)),
       r.exactMatches.map(normalizeURI(_)))
+   
+    
+  /** Generates a list of name forms (without language), sorted by frequency of appearance in gazetteer records **/
+  def collectLabels(records: Seq[GazetteerRecord]): Seq[String] = {
+    val titlesAndNames = 
+      records.map(_.title) ++
+      records.flatMap(_.names.map(_.name))
       
+    titlesAndNames
+      .flatMap(_.split(",|/").map(_.trim)) // Separate on commas
+      .groupBy(identity).toSeq
+      .sortBy(- _._2.size)
+      .map(_._1)
+  }
       
   def loadRDF(file: File, gazetteerName: String): Seq[GazetteerRecord] = {
     val (is, filename) = if (file.getName.endsWith(".gz"))

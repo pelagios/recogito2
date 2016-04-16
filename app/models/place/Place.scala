@@ -12,8 +12,8 @@ case class Place(
   /** The ID equals the URI of the gazetteer record added first **/
   id: String,
     
-  /** One title - usually that of the first gazetteer record added **/
-  title: String,
+  /** Labels determined from gazetteer record names, sorted by frequency **/
+  labels: Seq[String],
     
   /** One representative geometry - usually that of a 'preferred geometry provider' **/ 
   geometry: Option[Geometry],
@@ -48,19 +48,6 @@ case class Place(
       .flatMap(g => g.descriptions.map((_, g.sourceGazetteer)))
       .groupBy(_._1)
       .map { case (description, s) => (description -> s.map(_._2)) }.toMap
-    
-  /** The list of name forms (without language), sorted by frequency of appearance in gazetteers **/
-  lazy val labels = {
-    val titlesAndNames = 
-      isConflationOf.map(_.title) ++
-      isConflationOf.flatMap(_.names.map(_.name))
-      
-    titlesAndNames
-      .flatMap(_.split(",").map(_.trim)) // Separate on commas
-      .groupBy(identity).toSeq
-      .sortBy(- _._2.size)
-      .map(_._1)
-  }
       
   /** Names assigned to this place as Map[name -> list of gazetteers including the name] **/
   lazy val names=
@@ -86,7 +73,7 @@ object Place extends HasGeometry {
   
   implicit val placeFormat: Format[Place] = (
     (JsPath \ "_id").format[String] and
-    (JsPath \ "title").format[String] and
+    (JsPath \ "labels").format[Seq[String]] and
     (JsPath \ "geometry").formatNullable[Geometry] and
     (JsPath \ "representative_point").formatNullable[Coordinate] and
     (JsPath \ "temporal_bounds").formatNullable[TemporalBounds] and

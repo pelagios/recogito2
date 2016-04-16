@@ -26,7 +26,7 @@ class PlaceSpec extends Specification {
       val place = parseResult.get
       
       place.id must equalTo ("http://pleiades.stoa.org/places/118543")
-      place.title must equalTo("Ad Mauros")
+      place.labels must contain("Ad Mauros")
 
       val location = new Coordinate(14.02358, 48.31058)
       place.representativePoint must equalTo(Some(location))
@@ -80,15 +80,6 @@ class PlaceSpec extends Specification {
       place.names.get(Name("Marianianio", Some("la"))).get must equalTo(Seq(Gazetteer("Trismegistos")))      
     }
     
-    "list the expected name labels, sorted by frequency" in {
-      val labels = parseResult.get.labels
-      
-      labels.size must equalTo(4)
-      labels(0) must equalTo("Ad Mauros")
-      labels(1) must equalTo("Eferding")
-      Seq(labels(2), labels(3)) must containAllOf(Seq("Ad Mauros/Marinianio", "Marianianio"))
-    }
-    
     "list the expected close- and exactMatches" in {
       val place = parseResult.get
       val expectedCloseMatches = Seq(
@@ -116,7 +107,7 @@ class PlaceSpec extends Specification {
       
       val before = Place(
         "http://pleiades.stoa.org/places/118543",
-        "Ad Mauros",
+        Seq("Ad Mauros"),
         dareRecord.geometry,
         dareRecord.representativePoint,
         dareRecord.temporalBounds,

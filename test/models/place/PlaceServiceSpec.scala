@@ -116,16 +116,16 @@ class PlaceServiceSpec extends Specification {
     "return DARE places based on their URI" in {
       // Except for URI normalization this mostly tests the mock impl - but see above
       val barcelona = findByURI("http://dare.ht.lu.se/places/6534")
-      barcelona.title must equalTo("Col. Barcino, Barcelona")
+      barcelona.labels must containAllOf(Seq("Col. Barcino", "Barcelona"))
       
       val vindobona = findByURI("http://dare.ht.lu.se/places/10783")
-      vindobona.title must equalTo("Mun. Vindobona, Wien")
+      vindobona.labels must containAllOf(Seq("Mun. Vindobona", "Wien"))
       
       val thessaloniki = findByURI("http://dare.ht.lu.se/places/17068")
-      thessaloniki.title must equalTo("Thessalonica, Thessaloniki")
+      thessaloniki.labels must containAllOf(Seq("Thessalonica", "Thessaloniki"))
           
       val lancaster = findByURI("http://dare.ht.lu.se/places/23712")
-      lancaster.title must equalTo("Calunium?, Lancaster")      
+      lancaster.labels must containAllOf(Seq("Calunium?", "Lancaster"))      
     }
     
   }
@@ -197,16 +197,16 @@ class PlaceServiceSpec extends Specification {
     
     "retain the original title from DARE" in { 
       val barcelonaPleiades = findByURI("http://pleiades.stoa.org/places/246343")
-      barcelonaPleiades.title must equalTo("Col. Barcino, Barcelona")
+      barcelonaPleiades.labels must containAllOf(Seq("Col. Barcino", "Barcelona"))
       
       val vindobonaPleiades = findByURI("http://pleiades.stoa.org/places/128460")
-      vindobonaPleiades.title must equalTo("Mun. Vindobona, Wien")
+      vindobonaPleiades.labels must containAllOf(Seq("Mun. Vindobona", "Wien"))
       
       val thessalonikiPleiades = findByURI("http://pleiades.stoa.org/places/491741")
-      thessalonikiPleiades.title must equalTo("Thessalonica, Thessaloniki")
+      thessalonikiPleiades.labels must containAllOf(Seq("Thessalonica", "Thessaloniki"))
           
       val lancasterPleiades = findByURI("http://pleiades.stoa.org/places/89222")
-      lancasterPleiades.title must equalTo("Calunium?, Lancaster")
+      lancasterPleiades.labels must containAllOf(Seq("Calunium?", "Lancaster"))
     }
     
     "have properly conflated the sample place Vindobona (pleiades:128460)" in {

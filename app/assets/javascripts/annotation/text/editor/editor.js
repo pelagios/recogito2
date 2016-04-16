@@ -1,4 +1,4 @@
-define(['editor/placesection', 'editor/commentsection'], function(PlaceSection, CommentSection) {
+define(['editor/placeSection', 'editor/commentSection'], function(PlaceSection, CommentSection) {
 
   /** The main annotation editor popup **/
   var Editor = function() {

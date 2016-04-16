@@ -4,6 +4,7 @@ import collection.JavaConverters._
 import java.util.concurrent.ConcurrentHashMap
 import play.api.Logger
 import scala.concurrent.{ ExecutionContext, Future }
+import models.Page
 
 class MockPlaceStore extends PlaceStore {
   
@@ -52,12 +53,13 @@ class MockPlaceStore extends PlaceStore {
   
   def searchPlaces(name: String, limit: Int)(implicit context: ExecutionContext) =
     Future {
-      mockIndex.asScala.values.toSeq
+      val results = mockIndex.asScala.values.toSeq
         .filter(place => {
           val names = place.names.keys.toSeq.map(_.name.toLowerCase)
           names.contains(name.toLowerCase)
-        })
-        .map((_, 0l)).take(limit)
+        }).map((_, 0l))
+      
+      Page(0l, results.size, 0, limit, results.take(limit))
     }
       
 }

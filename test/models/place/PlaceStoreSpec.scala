@@ -42,7 +42,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
       Seq("http://www.example.com/match"),
       Seq.empty[String])
       
-    Place(record.uri, record.title, None, None, None, Seq(record))
+    Place(record.uri, GazetteerUtils.collectLabels(Seq(record)), None, None, None, Seq(record))
   }
     
   val store = new ESPlaceStore()
@@ -106,8 +106,9 @@ class PlaceStoreSpec extends Specification with AfterAll {
       
       "return the test place by name" in {
         val result = findByName(initialPlace.names.head._1.name)
-        result.size must equalTo(1)
-        result.head._1 must equalTo(initialPlace)
+        result.total must equalTo(1)
+        result.items.size must equalTo(1)
+        result.items.head._1 must equalTo(initialPlace)
       }
       
       "increase version numbers on subsequent updates" in {

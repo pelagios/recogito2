@@ -1,4 +1,4 @@
-define([], function() {
+define(['../../../common/placeUtils'], function(PlaceUtils) {
 
   var PlaceSection = function(parent) {
     var element = (function() {
@@ -7,7 +7,7 @@ define([], function() {
               '<div class="map"></div>' +
               '<div class="panel-container">' +
                 '<div class="panel">' +
-                  '<h3>Carnuntum</h3>' +
+                  '<h3></h3>' +
                   '<p class="names">' +
                     'Col. Carnuntum, Bad Deutsch-Altenburg, Bad Deutsch-Altenburg AUS,' +
                     'Petronell-Carnuntum, Col. Septimia Aurelia Antoniniana, Petronell AUS, Petronell-Carnuntum' +
@@ -19,6 +19,10 @@ define([], function() {
           parent.append(el);
           return el;
         })(),
+
+        titleEl = element.find('h3'),
+
+        namesEl = element.find('p.names'),
 
         awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
           attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
@@ -32,7 +36,24 @@ define([], function() {
           zoom: 3,
           zoomControl: false,
           layers: [ awmc ]
-        });
+        }),
+
+        fillWithDummyContent = function(selectedText) {
+          jQuery.getJSON('/api/places/search?q=' + selectedText, function(response) {
+            var topHit = response.items[0],
+
+                labels = PlaceUtils.getLabels(topHit),
+
+                topLabel = labels[0];
+
+            titleEl.html(topLabel);
+
+            // TODO splice array and fill namesEl
+
+          });
+        };
+
+    fillWithDummyContent('troia');
   };
 
   return PlaceSection;

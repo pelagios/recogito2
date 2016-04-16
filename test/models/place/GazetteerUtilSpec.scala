@@ -39,6 +39,18 @@ class GazetteerUtilSpec extends Specification {
       records.map(_.uri) must containAllOf(expectedURIs)
     }
     
+    /*
+    
+    "list the expected name labels, sorted by frequency" in {
+      val labels = parseResult.get.labels
+      
+      labels.size must equalTo(4)
+      labels(0) must equalTo("Ad Mauros")
+      labels(1) must equalTo("Eferding")
+      Seq(labels(2), labels(3)) must containAllOf(Seq("Ad Mauros/Marinianio", "Marianianio"))
+    }
+     */
+    
     "properly import all properties of the test record" in {
       val testRecord = records.find(_.uri == "http://pleiades.stoa.org/places/128460").get
       

@@ -33,6 +33,7 @@ object PlaceService {
     // ID and title of the conflated places
     val affectedPlacesSorted = places.sortBy(- _.isConflationOf.size)
     val definingPlace = affectedPlacesSorted.headOption
+    val allRecords = places.flatMap(_.isConflationOf) :+ normalizedRecord
     
     // Temporal bounds are computed as the union of all gazetteer records
     def temporalBoundsUnion(bounds: Seq[TemporalBounds]): Option[TemporalBounds] =
@@ -43,11 +44,11 @@ object PlaceService {
               
     Place(
       definingPlace.map(_.id).getOrElse(normalizedRecord.uri),
-      definingPlace.map(_.title).getOrElse(normalizedRecord.title),
+      GazetteerUtils.collectLabels(allRecords),
       definingPlace.map(_.geometry).getOrElse(normalizedRecord.geometry), // TODO implement rules for preferred geometry
       definingPlace.map(_.representativePoint).getOrElse(normalizedRecord.representativePoint), // TODO implement rules for preferred point
       temporalBoundsUnion((places.map(_.temporalBounds) :+ normalizedRecord.temporalBounds).flatten),
-      places.toSeq.flatMap(_.isConflationOf) :+ normalizedRecord
+      allRecords
     )
   }
 
