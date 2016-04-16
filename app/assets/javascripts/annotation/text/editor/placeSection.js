@@ -8,10 +8,7 @@ define(['../../../common/placeUtils'], function(PlaceUtils) {
               '<div class="panel-container">' +
                 '<div class="panel">' +
                   '<h3></h3>' +
-                  '<p class="names">' +
-                    'Col. Carnuntum, Bad Deutsch-Altenburg, Bad Deutsch-Altenburg AUS,' +
-                    'Petronell-Carnuntum, Col. Septimia Aurelia Antoniniana, Petronell AUS, Petronell-Carnuntum' +
-                  '</p>' +
+                  '<p class="names"></p>' +
                 '</div>' +
               '</div>' +
             '</div>');
@@ -40,20 +37,19 @@ define(['../../../common/placeUtils'], function(PlaceUtils) {
 
         fillWithDummyContent = function(selectedText) {
           jQuery.getJSON('/api/places/search?q=' + selectedText, function(response) {
-            var topHit = response.items[0],
+            var topPlace = response.items[0],
+                pt = topPlace.representative_point,
+                bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
+                labels = PlaceUtils.getLabels(bestRecord);
 
-                labels = PlaceUtils.getLabels(topHit),
+            titleEl.html(labels[0]);
+            namesEl.html(labels.slice(1).join(', '));
 
-                topLabel = labels[0];
-
-            titleEl.html(topLabel);
-
-            // TODO splice array and fill namesEl
-
+            L.marker([pt[1], pt[0]]).addTo(map);
           });
         };
 
-    fillWithDummyContent('troia');
+    fillWithDummyContent('ithaca');
   };
 
   return PlaceSection;
