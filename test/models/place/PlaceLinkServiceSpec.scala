@@ -205,10 +205,12 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
         val success = 
           Seq(annotatesBarcelona.annotationId,
             annotatesVindobonaAndThessaloniki.annotationId).map { annotationId => 
-              AnnotationService.deleteAnnotation(annotationId)      
+              Await.result(AnnotationService.deleteAnnotation(annotationId), 10 seconds)  
           }
         
-        success must equalTo(Seq(true, true))
+        flush()
+        
+        success.filter(_ == true).size must equalTo(2)
         totalPlaceLinks() must equalTo(0)
       }
       
