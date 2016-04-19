@@ -26,8 +26,35 @@
     background-color:rgba(255, 255, 255, 0.8);
     height:100%;
     pointer-events:auto;
-    padding:10px 20px 10px 15px;
+    padding:10px 15px;
     .box-shadow(0, 0, 18px, rgba(0, 0, 0, 0.12));
+  }
+
+  .warning-unverified {
+    position:relative;
+    background-color:#fcf8f2;
+    border:1px solid #f0ad4e;
+    padding:1px 6px;
+    color:darken(#f0ad4e, 10%);
+    margin-bottom:5px;
+    font-size:16px;
+    .rounded-corners(2px);
+    
+    .icon {
+      padding-right:5px;
+    }
+
+    .buttons {
+      position:absolute;
+      right:6px;
+      top:3px;
+
+      button {
+        color:rgba(0, 0, 0, 0.6);
+      }
+
+    }
+
   }
 
   h3, p {
@@ -39,10 +66,12 @@
     white-space:nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display:inline-block;
   }
 
   h3 {
     font-weight:bold;
+    padding-right:5px;
   }
 
 }

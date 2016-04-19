@@ -7,6 +7,13 @@ define(['../../../common/placeUtils'], function(PlaceUtils) {
               '<div class="map"></div>' +
               '<div class="panel-container">' +
                 '<div class="panel">' +
+                  '<div class="warning-unverified">' +
+                    '<span class="icon">&#xf071;</span> Automatic Match ' +
+                    '<div class="buttons">' +
+                      '<button class="link">Confirm</button>' +
+                      '<button class="link">Change</button>' +
+                    '</div>' +
+                  '</div>' +
                   '<h3></h3>' +
                   '<p class="names"></p>' +
                 '</div>' +
@@ -30,10 +37,16 @@ define(['../../../common/placeUtils'], function(PlaceUtils) {
 
         map = new L.Map(element.find('.map')[0], {
           center: new L.LatLng(41.893588, 12.488022),
-          zoom: 3,
+          zoom: 5,
           zoomControl: false,
           layers: [ awmc ]
         }),
+
+        setCenter = function(lat, lon) {
+          var centerOnLayer = map.latLngToContainerPoint([lat, lon]);
+          centerOnLayer = centerOnLayer.subtract([320, 10]);
+          map.setView(map.layerPointToLatLng(centerOnLayer), 4, { animate: false });
+        },
 
         fillWithDummyContent = function(selectedText) {
           jQuery.getJSON('/api/places/search?q=' + selectedText, function(response) {
@@ -46,10 +59,11 @@ define(['../../../common/placeUtils'], function(PlaceUtils) {
             namesEl.html(labels.slice(1).join(', '));
 
             L.marker([pt[1], pt[0]]).addTo(map);
+            setCenter(pt[1], pt[0]);
           });
         };
 
-    fillWithDummyContent('ithaca');
+    fillWithDummyContent('rome');
   };
 
   return PlaceSection;
