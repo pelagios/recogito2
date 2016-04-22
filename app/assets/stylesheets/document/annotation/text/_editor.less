@@ -3,62 +3,95 @@
 
 .text-annotation-editor {
   position:absolute;
-  top:290px;
-  left:400px;
+  top:412px;
+  left:358px;
   width:450px;
-  background-color:@blueish-white;
   .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.25));
-  .rounded-corners(3px);
-  overflow:hidden;
-  color:@nightsky;
 
-  .handle {
-    background-color:@ocean;
-    height:12px;
-    cursor:move;
+  .arrow {
+    position:absolute;
+    overflow:hidden;
+    top:-12px;
+    left:12px;
+  	width:28px;
+  	height:12px;
   }
 
-  .category-buttons {
-    border-bottom:1px solid @lightgrey-border;
+  .arrow::after {
+    content:'';
+    position:absolute;
+    width:18px;
+    height:18px;
+    top:5px;
+    left:5px;
+    .rotate(45deg);
     background-color:#fff;
-    font-size:16px;
+   .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.2));
+  }
 
-    .category {
-      display:inline-block;
-      width:33%;
-      padding:7px 15px;
-      box-sizing:border-box;
-      cursor:pointer;
+  .text-annotation-editor-inner {
+    overflow:hidden;
+    .rounded-corners(2px);
+    background-color:@blueish-white;
+    // .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.25));
+    color:@nightsky;
 
-      .icon {
-        font-size:90%;
-        vertical-align:top;
-        margin-right:4px;
+    .category-buttons {
+      background-color:#fff;
+      font-size:16px;
+
+      .category {
+        display:inline-block;
+        width:33%;
+        padding:7px 15px 3px 15px;
+        border-bottom:4px solid transparent;
+        box-sizing:border-box;
+        cursor:pointer;
+        text-align:center;
+
+        .icon {
+          font-size:90%;
+          vertical-align:top;
+          margin-right:4px;
+        }
+
+        .icon::after {
+          content:'+';
+          position:relative;
+          font-family:OpenSans;
+          top:-6px;
+          left:1px;
+        }
+
+      }
+
+      .category.active {
+        border-color:@ocean;
+      }
+
+      .category:last-child {
+        width:34%;
+      }
+
+      .category:hover {
+        background-color:@blueish-white-hi;
+      }
+
+      .category:not(:last-child) {
+        border-right:1px solid @lightgrey-border;
       }
 
     }
 
-    .category:last-child {
-      width:34%;
-    }
+    .footer {
+      text-align:right;
+      padding:6px 0;
+      background-color:#fff;
 
-    .category:hover {
-      background-color:@blueish-white-hi;
-    }
+      button:last-child {
+        margin-right:6px;
+      }
 
-    .category:not(:last-child) {
-      border-right:1px solid @lightgrey-border;
-    }
-
-  }
-
-  .footer {
-    text-align:right;
-    padding:6px 0;
-    background-color:#fff;
-
-    button:last-child {
-      margin-right:6px;
     }
 
   }

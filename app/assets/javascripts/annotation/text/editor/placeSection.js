@@ -1,4 +1,4 @@
-define(['../../../common/placeUtils'], function(PlaceUtils) {
+define(['../../../common/formatting', '../../../common/placeUtils'], function(Formatting, PlaceUtils) {
 
   var PlaceSection = function(parent) {
     var element = (function() {
@@ -7,15 +7,26 @@ define(['../../../common/placeUtils'], function(PlaceUtils) {
               '<div class="map"></div>' +
               '<div class="panel-container">' +
                 '<div class="panel">' +
-                  '<div class="warning-unverified">' +
-                    '<span class="icon">&#xf071;</span> Automatic Match ' +
-                    '<div class="buttons">' +
-                      '<button class="link">Confirm</button>' +
-                      '<button class="link">Change</button>' +
-                    '</div>' +
-                  '</div>' +
                   '<h3></h3>' +
+                  '<p class="gazetteer"></p>' +
+                  '<p class="description"></p>' +
                   '<p class="names"></p>' +
+                  '<p class="date"></p>' +
+                  '<div class="created">' +
+                    '<a class="by" href="#">rainer</a>' +
+                    '<span class="at">2 days ago</span>' +
+                  '</div>' +
+                  '<a href="#" class="btn tiny change">Change</a>' +
+                '</div>' +
+
+
+
+                  // '<!-- div class="warning-unverified">' +
+                  //   '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
+                  //   '<button>Change</button>' +
+                  //   '<button>Confirm</button>' +
+                  // '</div -->' +
+
                 '</div>' +
               '</div>' +
             '</div>');
@@ -24,9 +35,11 @@ define(['../../../common/placeUtils'], function(PlaceUtils) {
           return el;
         })(),
 
-        titleEl = element.find('h3'),
-
-        namesEl = element.find('p.names'),
+        title = element.find('h3'),
+        gazetteerId = element.find('.gazetteer'),
+        date = element.find('.date'),
+        names = element.find('.names'),
+        description = element.find('.description'),
 
         awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
           attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
@@ -42,28 +55,51 @@ define(['../../../common/placeUtils'], function(PlaceUtils) {
           layers: [ awmc ]
         }),
 
-        setCenter = function(lat, lon) {
-          var centerOnLayer = map.latLngToContainerPoint([lat, lon]);
+        setCenter = function(latLon) {
+          var centerOnLayer = map.latLngToContainerPoint(latLon);
           centerOnLayer = centerOnLayer.subtract([320, 10]);
           map.setView(map.layerPointToLatLng(centerOnLayer), 4, { animate: false });
+        },
+
+        fillTemplate = function(gazetteerRecord, labels, latLon) {
+          // Mandatory fields
+          title.html(gazetteerRecord.title);
+          gazetteerId.html(Formatting.formatGazetteerURI(gazetteerRecord.uri));
+          names.html(labels.slice(1).join(', '));
+
+          // Optional fields
+          if (gazetteerRecord.temporal_bounds) {
+            date.html(Formatting.yyyyMMddToYear(gazetteerRecord.temporal_bounds.from) + ' - ' +
+                      Formatting.yyyyMMddToYear(gazetteerRecord.temporal_bounds.to));
+            date.show();
+          } else {
+            date.empty();
+            date.hide();
+          }
+
+          if (gazetteerRecord.descriptions) {
+            description.html(gazetteerRecord.descriptions[0].description);
+            description.show();
+          } else {
+            description.empty();
+            description.hide();
+          }
+
+          // Map
+          L.marker(latLon).addTo(map);
+          setCenter(latLon);
         },
 
         fillWithDummyContent = function(selectedText) {
           jQuery.getJSON('/api/places/search?q=' + selectedText, function(response) {
             var topPlace = response.items[0],
-                pt = topPlace.representative_point,
-                bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
-                labels = PlaceUtils.getLabels(bestRecord);
-
-            titleEl.html(labels[0]);
-            namesEl.html(labels.slice(1).join(', '));
-
-            L.marker([pt[1], pt[0]]).addTo(map);
-            setCenter(pt[1], pt[0]);
+                coord = topPlace.representative_point,
+                bestRecord = PlaceUtils.getBestMatchingRecord(topPlace);
+                fillTemplate(bestRecord, topPlace.labels, [ coord[1], coord[0] ]);
           });
         };
 
-    fillWithDummyContent('rome');
+    fillWithDummyContent('carnuntum');
   };
 
   return PlaceSection;

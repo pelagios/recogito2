@@ -46,3 +46,10 @@
   -webkit-box-shadow: @x @y @r @color;
   box-shadow: @x @y @r @color;
 }
+
+.rotate(@angle) {
+  -moz-transform:rotate(@angle);
+  -webkit-transform:rotate(@angle);
+  -o-transform:rotate(@angle);
+  -ms-transform:rotate(@angle);
+}
