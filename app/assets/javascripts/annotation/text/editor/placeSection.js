@@ -57,7 +57,7 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
 
         setCenter = function(latLon) {
           var centerOnLayer = map.latLngToContainerPoint(latLon);
-          centerOnLayer = centerOnLayer.subtract([320, 10]);
+          centerOnLayer = centerOnLayer.subtract([290, 10]);
           map.setView(map.layerPointToLatLng(centerOnLayer), 4, { animate: false });
         },
 
@@ -99,7 +99,7 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
           });
         };
 
-    fillWithDummyContent('linz');
+    fillWithDummyContent('flavia solva');
   };
 
   return PlaceSection;
