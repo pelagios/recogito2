@@ -99,7 +99,7 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
           });
         };
 
-    fillWithDummyContent('flavia solva');
+    fillWithDummyContent('ithaca');
   };
 
   return PlaceSection;
