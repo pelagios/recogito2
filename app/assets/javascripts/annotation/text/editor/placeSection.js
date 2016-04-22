@@ -99,7 +99,7 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
           });
         };
 
-    fillWithDummyContent('carnuntum');
+    fillWithDummyContent('linz');
   };
 
   return PlaceSection;
