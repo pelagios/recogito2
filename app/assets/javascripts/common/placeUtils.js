@@ -4,7 +4,8 @@ define(function() {
 
     getBestMatchingRecord : function(place, name) {
       // TODO implement
-      return place.is_conflation_of[0];
+      console.log(place);
+      return place.is_conflation_of[3];
     },
 
     getLabels : function(gazetteerRecord) {

@@ -12,21 +12,16 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
                   '<p class="description"></p>' +
                   '<p class="names"></p>' +
                   '<p class="date"></p>' +
-                  '<div class="created">' +
-                    '<a class="by" href="#">rainer</a>' +
-                    '<span class="at">2 days ago</span>' +
+                  // '<div class="created">' +
+                  //   '<a class="by" href="#">rainer</a>' +
+                  //   '<span class="at">2 days ago</span>' +
+                  // '</div>' +
+                  // '<a href="#" class="btn tiny change">Change</a>' +
+                  '<div class="warning-unverified">' +
+                    '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
+                    '<button>Change</button>' +
+                    '<button>Confirm</button>' +
                   '</div>' +
-                  '<a href="#" class="btn tiny change">Change</a>' +
-                '</div>' +
-
-
-
-                  // '<!-- div class="warning-unverified">' +
-                  //   '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-                  //   '<button>Change</button>' +
-                  //   '<button>Confirm</button>' +
-                  // '</div -->' +
-
                 '</div>' +
               '</div>' +
             '</div>');
@@ -93,9 +88,10 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
         fillWithDummyContent = function(selectedText) {
           jQuery.getJSON('/api/places/search?q=' + selectedText, function(response) {
             var topPlace = response.items[0],
-                coord = topPlace.representative_point,
-                bestRecord = PlaceUtils.getBestMatchingRecord(topPlace);
-                fillTemplate(bestRecord, topPlace.labels, [ coord[1], coord[0] ]);
+                bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
+                coord = bestRecord.representative_point;
+                
+            fillTemplate(bestRecord, topPlace.labels, [ coord[1], coord[0] ]);
           });
         };
 

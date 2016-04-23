@@ -95,49 +95,57 @@
       right:14px;
     }
 
+    .warning-unverified {
+      width:100%;
+      box-sizing:border-box;
+      position:absolute;
+      bottom:0;
+      left:0;
+      padding:2px 15px 0 15px;
+      font-size:15px;      
+      background-color:fade(#f0ad4e, 18%);
+      border-top:1px solid #f0ad4e;
+      color:darken(#f0ad4e, 10%);
+
+      button {
+        float:right;
+        .rounded-corners(2px);
+        line-height:21px;
+        background:none;
+        background-color:#f0ad4e;
+        border:none;
+        color:#fff;
+        cursor:pointer;
+        outline:none;
+        font-family:PTSansNarrow;
+        font-size:14px;
+        margin:1px 5px 0 0;
+        padding:0 7px;
+      }
+
+    }
+
 /*
 
 
-      .warning-unverified {
-        width:100%;
-        box-sizing:border-box;
-        margin-bottom:5px;
-        color:darken(#f0ad4e, 10%);
-        background-color:fade(#f0ad4e, 18%);
-        border-style:solid;
-        border-color:#f0ad4e;
-        border-width:1px 0;
-        padding:3px 0 4px 11px;
-        white-space:nowrap;
+    .warning-unverified {
+       padding:3px 0 4px 11px;
+      white-space:nowrap;
 
-        .warning {
-          display:inline-block;
-          padding:3px 2px;
-          font-size:16px;
-          .rounded-corners(2px);
+      .warning {
+        display:inline-block;
+        padding:3px 2px;
+        font-size:16px;
+        .rounded-corners(2px);
 
-          .icon {
-            padding-right:5px;
-          }
-
+        .icon {
+          padding-right:5px;
         }
 
-        button {
-          float:right;
-          .rounded-corners(2px);
-          background:none;
-          background-color:#f0ad4e;
-          border:none;
-          color:#fff;
-          cursor:pointer;
-          outline:none;
-          font-family:PTSansNarrow;
-          font-size:16px;
-          margin:1px 5px 0 0;
-          padding:5px 18px;
-        }
+      }
 
-      } ** .panel-footer **/
+
+    } ** .panel-footer **/
 
 
   } /** .panel **/
