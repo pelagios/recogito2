@@ -12,24 +12,11 @@ require([
 
         contentNode = document.getElementById('content'),
 
-        textNode = contentNode.childNodes[0],
-
         highlighter = new Highlighter(contentNode),
 
         editor = new Editor(contentNode),
 
         API = new APIConnector(),
-
-        renderAnnotation = function(annotation) {
-          var anchor = annotation.anchor.substr(12),
-              quote = Utils.getQuote(annotation),
-              entityType = Utils.getEntityType(annotation),
-              cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation',
-              range = rangy.createRange();
-
-          range.selectCharacters(textNode, parseInt(anchor), parseInt(anchor) + quote.length);
-          highlighter.wrapRange(range, cssClass);
-        },
 
         onAnnotationsLoaded = function(annotations) {
           var sorted = Utils.sortByOffset(annotations);
@@ -39,7 +26,7 @@ require([
           // TODO revise, so that DOM manipulation happens in batches, with a
           // bit of wait time in between, so that we don't freeze the browser
           jQuery.each(sorted, function(idx, annotation) {
-            renderAnnotation(annotation);
+            highlighter.renderAnnotation(annotation);
           });
         },
 

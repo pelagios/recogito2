@@ -1,10 +1,12 @@
-define([], function() {
+define(['../../common/annotationUtils'], function(Utils) {
 
   var TEXT = 3; // HTML DOM node type for text nodes
 
   var Highlighter = function(rootNode) {
 
-    var walkTextNodes = function(node, nodeArray) {
+    var textNode = rootNode.childNodes[0],
+
+        walkTextNodes = function(node, nodeArray) {
           var nodes = (nodeArray) ? nodeArray : [];
 
           if (node.nodeType === TEXT)
@@ -78,8 +80,20 @@ define([], function() {
               surround(r, cssClass);
             });
           }
+        },
+
+        renderAnnotation = function(annotation) {
+          var anchor = annotation.anchor.substr(12),
+              quote = Utils.getQuote(annotation),
+              entityType = Utils.getEntityType(annotation),
+              cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation',
+              range = rangy.createRange();
+
+          range.selectCharacters(textNode, parseInt(anchor), parseInt(anchor) + quote.length);
+          wrapRange(range, cssClass);
         };
 
+    this.renderAnnotation = renderAnnotation;
     this.wrapRange = wrapRange;
   };
 

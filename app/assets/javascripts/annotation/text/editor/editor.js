@@ -101,9 +101,11 @@ define(['../../../common/annotationUtils',
           var comment = commentSection.getComment();
           if (comment)
             annotationStub.bodies.push(comment);
-            
-          self.fireEvent('updateAnnotation', annotationStub);
+
           close();
+
+          highlighter.renderAnnotation(annotationStub);
+          self.fireEvent('updateAnnotation', annotationStub);
         },
 
         onCancel = function() {
@@ -111,6 +113,9 @@ define(['../../../common/annotationUtils',
         };
 
     selectionHandler.on('select', onSelect);
+
+    // Ctrl+Enter on comment section doubles as OK
+    commentSection.on('submit', onOk);
 
     btnPlace.click(onAddPlace);
     btnPerson.click(onAddPerson);
