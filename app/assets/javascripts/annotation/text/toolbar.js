@@ -1,4 +1,4 @@
-define(['events', '../../common/config', '../../common/hasEvents'], function(Events, Config, HasEvents) {
+define(['../../common/config', '../../common/hasEvents'], function(Config, HasEvents) {
 
   var Toolbar = function(rootNode) {
     var self = this,
@@ -46,7 +46,7 @@ define(['events', '../../common/config', '../../common/hasEvents'], function(Eve
                 t.addClass('active');
               }
               currentMode = { mode: mode, type: type };
-              self.fireEvent(Events.ANNOTATION_MODE_CHANGED, currentMode);
+              self.fireEvent('annotationModeChanged', currentMode);
             }
           });
 
@@ -58,7 +58,7 @@ define(['events', '../../common/config', '../../common/hasEvents'], function(Eve
             if (!active) {
               colorSchemes.find('.active').removeClass('active');
               t.addClass('active');
-              self.fireEvent(Events.MODE_CHANGED, scheme);
+              self.fireEvent('colorModeChange', scheme);
             }
           });
         },

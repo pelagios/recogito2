@@ -1,4 +1,4 @@
-define(['../../../common/formatting', '../../../common/placeUtils'], function(Formatting, PlaceUtils) {
+define(['../../../../common/formatting', '../../../../common/placeUtils'], function(Formatting, PlaceUtils) {
 
   var PlaceSection = function(parent) {
     var element = (function() {
@@ -26,7 +26,7 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
               '</div>' +
             '</div>');
 
-          parent.append(el);
+          parent.prepend(el);
           return el;
         })(),
 
@@ -43,7 +43,7 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
                        '<a href="http://creativecommons.org/licenses/by-nc/3.0/deed.en_US" target="_blank">CC-BY-NC 3.0</a>'
         }),
 
-        map = new L.Map(element.find('.map')[0], {
+        map = L.map(element.find('.map')[0], {
           center: new L.LatLng(41.893588, 12.488022),
           zoom: 5,
           zoomControl: false,
@@ -85,17 +85,22 @@ define(['../../../common/formatting', '../../../common/placeUtils'], function(Fo
           setCenter(latLon);
         },
 
-        fillWithDummyContent = function(selectedText) {
-          jQuery.getJSON('/api/places/search?q=' + selectedText, function(response) {
+        automatch = function(str) {
+          jQuery.getJSON('/api/places/search?q=' + str, function(response) {
             var topPlace = response.items[0],
                 bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
                 coord = bestRecord.representative_point;
-                
+
             fillTemplate(bestRecord, topPlace.labels, [ coord[1], coord[0] ]);
           });
+        },
+
+        destroy = function() {
+          element.remove();
         };
 
-    fillWithDummyContent('ithaca');
+    this.automatch = automatch;
+    this.destroy = destroy;
   };
 
   return PlaceSection;

@@ -1,6 +1,6 @@
-define(['../../common/hasEvents', 'events', '../../common/config'], function(HasEvents, Events, Config) {
+define(['../../../common/hasEvents', '../../../common/config'], function(HasEvents, Config) {
 
-  var SelectionHandler = function(rootNode) {
+  var SelectionHandler = function(rootNode, highlighter) {
 
     var self = this,
 
@@ -48,8 +48,20 @@ define(['../../common/hasEvents', 'events', '../../common/config'], function(Has
           };
         },
 
+        /** Helper that clears the visible selection by 'unwrapping' the created span elements **/
+        unwrapSelectionSpans = function() {
+          jQuery.each(jQuery('.selection'), function(idx, el) {
+            var span = jQuery(el),
+                text = span.text();
+
+            span.replaceWith(text);
+          });
+        },
+
         /** cf. http://stackoverflow.com/questions/3169786/clear-text-selection-with-javascript **/
         clearSelection = function() {
+          unwrapSelectionSpans();
+
           if (window.getSelection) {
             if (window.getSelection().empty)
               window.getSelection().empty();
@@ -62,23 +74,36 @@ define(['../../common/hasEvents', 'events', '../../common/config'], function(Has
 
         onSelect = function(e) {
           var selection = rangy.getSelection(),
-              selectedRange, annotationStub;
+              scrollTop = jQuery(document).scrollTop(),
+              selectedRange, annotationStub, bounds;
 
           if (!selection.isCollapsed &&
                selection.rangeCount == 1 &&
                selection.getRangeAt(0).toString().trim().length > 0) {
 
             selectedRange = trimRange(selection.getRangeAt(0));
-            annotationStub = rangeToAnnotationStub(selectedRange);
+            annotation = rangeToAnnotationStub(selectedRange);
+            bounds = selectedRange.nativeRange.getBoundingClientRect();
 
             clearSelection();
+            highlighter.wrapRange(selectedRange, 'selection');
 
-            self.fireEvent(Events.ANNOTATION_CREATED, annotationStub);
+            self.fireEvent('select', {
+              annotation: annotation,
+              bounds: {
+                top: bounds.top + scrollTop,
+                right: bounds.right,
+                bottom: bounds.bottom + scrollTop,
+                left: bounds.left
+              }
+            });
           }
         };
 
-
     jQuery(rootNode).mouseup(onSelect);
+
+    this.clearSelection = clearSelection;
+
     HasEvents.apply(this);
   };
   SelectionHandler.prototype = Object.create(HasEvents.prototype);

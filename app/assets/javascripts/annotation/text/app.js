@@ -1,12 +1,10 @@
 require([
-  'events',
   'highlighter',
-  'selectionHandler',
   'toolbar',
   'editor/editor',
   '../apiConnector',
   '../../common/config',
-  '../../common/annotationUtils'], function(Events, Highlighter, SelectionHandler, Toolbar, Editor, APIConnector, Config, Utils) {
+  '../../common/annotationUtils'], function(Highlighter, Toolbar, Editor, APIConnector, Config, Utils) {
 
   jQuery(document).ready(function() {
 
@@ -18,10 +16,7 @@ require([
 
         highlighter = new Highlighter(contentNode),
 
-        selectionHandler = new SelectionHandler(contentNode),
-
-        // TODO just for testing & & formatting - clean up later
-        editor = new Editor(),
+        editor = new Editor(contentNode),
 
         API = new APIConnector(),
 
@@ -51,30 +46,27 @@ require([
           // TODO visual notification
         },
 
+        onAnnotationUpdated = function(e) {
+
+        },
+
         onAnnotationStored = function(annotation) {
-          renderAnnotation(annotation);
+          // renderAnnotation(annotation);
         },
 
         onAnnotationStoreError = function(error) {
           // TODO visual notification
           console.log(error);
-        },
-
-        onAnnotationCreated = function(annotationStub) {
-          // TODO just a dummy for now
-          // annotationStub.bodies.push({ type: toolbar.getCurrentMode().type });
-          // API.storeAnnotation(annotationStub);
-          editor.show();
         };
 
-    // API event handling
-    API.on(Events.API_ANNOTATIONS_LOADED, onAnnotationsLoaded);
-    API.on(Events.API_ANNOTATIONS_LOAD_ERROR, onAnnotationsLoadError);
-    API.on(Events.API_CREATE_SUCCESS, onAnnotationStored);
-    API.on(Events.API_CREATE_ERROR, onAnnotationStoreError);
+    // Editor events
+    editor.on('ok', onAnnotationUpdated);
 
-    // Annotation event handling
-    selectionHandler.on(Events.ANNOTATION_CREATED, onAnnotationCreated);
+    // API events
+    API.on('annotationsLoaded', onAnnotationsLoaded);
+    API.on('loadError', onAnnotationsLoadError);
+    API.on('createSuccess', onAnnotationStored);
+    API.on('createError', onAnnotationStoreError);
 
     // Init
     rangy.init();

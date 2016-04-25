@@ -3,11 +3,14 @@
 
 .text-annotation-editor {
   position:absolute;
-  top:412px;
-  left:358px;
+  top:10;
+  left:10;
+  margin-top:14px;
+  margin-left:-8px;
   width:450px;
   .box-shadow(2px, 2px, 42px, rgba(0, 0, 0, 0.4));
   .rounded-corners(4px);
+  font-family:PTSansNarrow;
 
   .arrow {
     position:absolute;
@@ -39,16 +42,27 @@
     .category-buttons {
       background-color:#fff;
       font-size:16px;
-      border-bottom:1px solid @lightgrey-border-darker;
+      border-bottom:1px solid @lightgrey-border;
+
+      .category-container {
+        box-sizing:border-box;
+        display:inline-block;
+        cursor:pointer;
+        width:33%;
+      }
+
+      .category-container:last-child {
+        width:34%;
+      }
+
+      .category-container:not(:last-child) {
+        border-right:1px solid @lightgrey-border;
+      }
 
       .category {
-        display:inline-block;
-        width:33%;
         padding:7px 15px 3px 15px;
-        border-bottom:4px solid transparent;
-        box-sizing:border-box;
-        cursor:pointer;
         text-align:center;
+        border-bottom:4px solid transparent;
 
         .icon {
           font-size:90%;
@@ -70,16 +84,8 @@
         border-color:@ocean;
       }
 
-      .category:last-child {
-        width:34%;
-      }
-
       .category:hover {
         background-color:@blueish-white-hi;
-      }
-
-      .category:not(:last-child) {
-        border-right:1px solid @lightgrey-border;
       }
 
     }

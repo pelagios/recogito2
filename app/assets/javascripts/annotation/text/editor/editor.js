@@ -1,22 +1,41 @@
-define(['editor/placeSection', 'editor/commentSection'], function(PlaceSection, CommentSection) {
+define(['../../../common/annotationUtils',
+        '../../../common/hasEvents',
+        'highlighter',
+        'editor/selectionHandler',
+        'editor/components/placeSection',
+        'editor/components/commentSection'], function(Utils, HasEvents, Highlighter, SelectionHandler, PlaceSection, CommentSection) {
 
   /** The main annotation editor popup **/
-  var Editor = function() {
+  var Editor = function(parentNode, eventBroker) {
 
-    var element = (function() {
+    var self = this,
+
+        highlighter = new Highlighter(parentNode),
+
+        selectionHandler = new SelectionHandler(parentNode, highlighter),
+
+        annotationStub = false,
+
+        element = (function() {
           var el = jQuery(
             '<div class="text-annotation-editor">' +
               '<div class="arrow"></div>' +
               '<div class="text-annotation-editor-inner">' +
                 '<div class="category-buttons">' +
-                  '<div class="category place active">' +
-                    '<span class="icon">&#xf041;</span> Place' +
+                  '<div class="category-container">' +
+                    '<div class="category place">' +
+                      '<span class="icon">&#xf041;</span> Place' +
+                    '</div>' +
                   '</div>' +
-                  '<div class="category person">' +
-                    '<span class="icon">&#xf007;</span> Person' +
+                  '<div class="category-container">' +
+                    '<div class="category person">' +
+                      '<span class="icon">&#xf007;</span> Person' +
+                    '</div>' +
                   '</div>' +
-                  '<div class="category event">' +
-                    '<span class="icon">&#xf005;</span> Event' +
+                  '<div class="category-container">' +
+                    '<div class="category event">' +
+                      '<span class="icon">&#xf005;</span> Event' +
+                    '</div>' +
                   '</div>' +
                 '</div>' +
                 '<div class="bodies"></div>' +
@@ -27,39 +46,77 @@ define(['editor/placeSection', 'editor/commentSection'], function(PlaceSection, 
               '</div>' +
             '</div>');
 
-          jQuery(document.body).append(el);
-          el.draggable({ handle: '.arrow' });
+          jQuery(parentNode).append(el);
+          el.hide();
           return el;
         })(),
+
+        bodyContainer = element.find('.bodies'),
+        bodySections = [],
+
+        commentBody = new CommentSection(bodyContainer),
+
+        btnPlace = element.find('.category.place'),
+        btnPerson = element.find('.category.person'),
+        btnEvent = element.find('.category.event'),
 
         btnCancel = element.find('button.cancel'),
         btnOk = element.find('button.ok'),
 
-        bodies = element.find('.bodies'),
-
-        // Just for testing & styling
-        dummyPlaceSection = new PlaceSection(bodies),
-
-        commentSection = new CommentSection(bodies),
-
-        show = function() {
+        onSelect = function(e) {
+          annotationStub = e.annotation;
+          element.css({ top: e.bounds.bottom, left: e.bounds.left });
           element.show();
         },
 
-        hide = function() {
+        close = function() {
+          jQuery.each(bodySections, function(idx, section) {
+            section.destroy();
+          });
+          selectionHandler.clearSelection();
           element.hide();
+        },
+
+        onAddPlace = function() {
+          // Add a place body stub to the annotation
+          var placeBodyStub = { type: 'PLACE' },
+              placeSection = new PlaceSection(bodyContainer, placeBodyStub);
+
+          annotationStub.bodies.push(placeBodyStub);
+          bodySections.push(placeSection);
+          placeSection.automatch(Utils.getQuote(annotationStub));
+        },
+
+        onAddPerson = function() {
+          // TODO implement
+        },
+
+        onAddEvent = function() {
+          // TODO implement
+        },
+
+        onOk = function() {
+          close();
+        },
+
+        onCancel = function() {
+          close();
         };
 
-    // hide();
 
 
-    // TODO just a dummy
-    btnCancel.click(hide);
-    btnOk.click(hide);
+    selectionHandler.on('select', onSelect);
 
-    this.show = show;
-    this.hide = hide;
+    btnPlace.click(onAddPlace);
+    btnPerson.click(onAddPerson);
+    btnEvent.click(onAddEvent);
+
+    btnCancel.click(onCancel);
+    btnOk.click(onOk);
+
+    HasEvents.apply(this);
   };
+  Editor.prototype = Object.create(HasEvents.prototype);
 
   return Editor;
 

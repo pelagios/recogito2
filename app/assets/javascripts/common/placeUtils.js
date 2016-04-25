@@ -3,9 +3,7 @@ define(function() {
   var PlaceUtils = {
 
     getBestMatchingRecord : function(place, name) {
-      // TODO implement
-      console.log(place);
-      return place.is_conflation_of[3];
+      return place.is_conflation_of[0];
     },
 
     getLabels : function(gazetteerRecord) {

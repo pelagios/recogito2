@@ -1,4 +1,4 @@
-define(['../common/hasEvents', './apiEvents'], function(HasEvents, Events) {
+define(['../common/hasEvents'], function(HasEvents) {
 
   var APIConnector = function() {
     HasEvents.apply(this);
@@ -14,11 +14,11 @@ define(['../common/hasEvents', './apiEvents'], function(HasEvents, Events) {
       },
 
       success: function(data) {
-        self.fireEvent(Events.API_ANNOTATIONS_LOADED, data);
+        self.fireEvent('annotationsLoaded', data);
       },
 
       error: function(error) {
-        self.fireEvent(Events.API_ANNOTATIONS_LOAD_ERROR, error);
+        self.fireEvent('loadError', error);
       }
     });
   };
@@ -31,11 +31,11 @@ define(['../common/hasEvents', './apiEvents'], function(HasEvents, Events) {
       contentType: 'application/json',
 
       success: function(annotation) {
-        self.fireEvent(Events.API_CREATE_SUCCESS, annotation);
+        self.fireEvent('createSuccess', annotation);
       },
 
       error: function(error) {
-        self.fireEvent(Events.API_CREATE_ERROR, error);
+        self.fireEvent('createError', error);
       }
     });
   };
