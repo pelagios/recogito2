@@ -124,22 +124,20 @@ pre {
   background-color:fade(@ocean, 35%);
 }
 
-.entity {
+.annotation {
   border-style:dotted;
   border-width:0 0 1px 0;
+  border-color:rgba(172, 172, 0, 0.7);
+  background-color:rgba(255, 255, 0, 0.25);
+  cursor:pointer;
 }
 
-.entity.PLACE {
+.annotation.place {
   border-color:rgba(33, 147, 29, 0.75);
   background-color:rgba(33, 147, 29, 0.3);
 }
 
-.entity.PERSON {
+.annotation.person {
   border-color:rgba(201, 38, 0, 0.6);
   background-color:rgba(201, 38, 0, 0.2);
-}
-
-.entity.COMMENT {
-  border-color:rgba(255, 255, 0, 0.4);
-  background-color:rgba(255, 255, 0, 0.25);
 }

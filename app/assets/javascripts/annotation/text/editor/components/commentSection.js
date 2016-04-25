@@ -6,16 +6,24 @@ define([], function() {
             '<div contenteditable="true" spellcheck="false" class="textarea" data-placeholder="Add a comment..." />' +
           '</div>'),
 
-          textArea = element.find('textarea'),
+          textarea = element.find('.textarea'),
 
-          /** Resizes the comment box so that it fits the whole text without scrollbar **/
-          fitVertical = function() {
-            textArea.css('height', 'auto');
-            textArea.height(textArea[0].scrollHeight);
+          clear = function() {
+            textarea.empty();
+          },
+
+          getComment = function() {
+            var val = textarea.text().trim();
+            if (val)
+              return { type: 'COMMENT', value: val };
+            else
+              return false;
           };
 
-    textArea.keyup(fitVertical);
     parent.append(element);
+
+    this.clear = clear;
+    this.getComment = getComment;
   };
 
   return CommentSection;

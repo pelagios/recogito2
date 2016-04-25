@@ -6,7 +6,7 @@ define(['../../../common/annotationUtils',
         'editor/components/commentSection'], function(Utils, HasEvents, Highlighter, SelectionHandler, PlaceSection, CommentSection) {
 
   /** The main annotation editor popup **/
-  var Editor = function(parentNode, eventBroker) {
+  var Editor = function(parentNode) {
 
     var self = this,
 
@@ -54,7 +54,7 @@ define(['../../../common/annotationUtils',
         bodyContainer = element.find('.bodies'),
         bodySections = [],
 
-        commentBody = new CommentSection(bodyContainer),
+        commentSection = new CommentSection(bodyContainer),
 
         btnPlace = element.find('.category.place'),
         btnPerson = element.find('.category.person'),
@@ -73,6 +73,8 @@ define(['../../../common/annotationUtils',
           jQuery.each(bodySections, function(idx, section) {
             section.destroy();
           });
+
+          commentSection.clear();
           selectionHandler.clearSelection();
           element.hide();
         },
@@ -96,14 +98,17 @@ define(['../../../common/annotationUtils',
         },
 
         onOk = function() {
+          var comment = commentSection.getComment();
+          if (comment)
+            annotationStub.bodies.push(comment);
+            
+          self.fireEvent('updateAnnotation', annotationStub);
           close();
         },
 
         onCancel = function() {
           close();
         };
-
-
 
     selectionHandler.on('select', onSelect);
 

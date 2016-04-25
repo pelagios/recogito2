@@ -24,10 +24,11 @@ require([
           var anchor = annotation.anchor.substr(12),
               quote = Utils.getQuote(annotation),
               entityType = Utils.getEntityType(annotation),
+              cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation',
               range = rangy.createRange();
 
           range.selectCharacters(textNode, parseInt(anchor), parseInt(anchor) + quote.length);
-          highlighter.wrapRange(range, 'entity ' + entityType);
+          highlighter.wrapRange(range, cssClass);
         },
 
         onAnnotationsLoaded = function(annotations) {
@@ -46,8 +47,8 @@ require([
           // TODO visual notification
         },
 
-        onAnnotationUpdated = function(e) {
-
+        onUpdateAnnotation = function(annotationStub) {
+          API.storeAnnotation(annotationStub);
         },
 
         onAnnotationStored = function(annotation) {
@@ -60,7 +61,7 @@ require([
         };
 
     // Editor events
-    editor.on('ok', onAnnotationUpdated);
+    editor.on('updateAnnotation', onUpdateAnnotation);
 
     // API events
     API.on('annotationsLoaded', onAnnotationsLoaded);
