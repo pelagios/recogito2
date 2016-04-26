@@ -58,6 +58,7 @@ require([
 
     // Init
     rangy.init();
+
     API.loadAnnotations(Config.documentId, Config.partSequenceNo);
   });
 

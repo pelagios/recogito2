@@ -51,11 +51,9 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
         /** Helper that clears the visible selection by 'unwrapping' the created span elements **/
         unwrapSelectionSpans = function() {
           jQuery.each(jQuery('.selection'), function(idx, el) {
-            var span = jQuery(el),
-                text = span.text();
-
-            span.replaceWith(text);
+            jQuery(el).contents().unwrap();
           });
+          rootNode.normalize();
         },
 
         /** cf. http://stackoverflow.com/questions/3169786/clear-text-selection-with-javascript **/

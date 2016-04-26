@@ -75,6 +75,11 @@ define(['../../../common/annotationUtils',
 
         /** Closes the editor, cleaning up all components **/
         close = function() {
+          element.hide();
+          selectionHandler.clearSelection();
+        },
+
+        clear = function() {
           currentAnnotation = false;
 
           // Destroy body sections
@@ -84,9 +89,6 @@ define(['../../../common/annotationUtils',
 
           // Clear comment field & text selection, if any
           commentSection.clear();
-          selectionHandler.clearSelection();
-
-          element.hide();
         },
 
         /** Selecting text (i.e. creating a new annotation) opens the editor **/
@@ -95,7 +97,13 @@ define(['../../../common/annotationUtils',
         },
 
         onSelectAnnotation = function(e) {
-          console.log(e);
+          var annotation = e.target.annotation,
+              quote = Utils.getQuote(annotation);
+
+          console.log(quote);
+
+          // To avoid repeated events from overlapping annotations below
+          return false;
         },
 
         onAddPlace = function() {
@@ -119,12 +127,13 @@ define(['../../../common/annotationUtils',
         onOk = function() {
           var comment = commentSection.getComment();
           if (comment)
-            annotationStub.bodies.push(comment);
+            currentAnnotation.bodies.push(comment);
+
+          highlighter.renderAnnotation(currentAnnotation);
 
           close();
 
-          highlighter.renderAnnotation(annotationStub);
-          self.fireEvent('updateAnnotation', annotationStub);
+          self.fireEvent('updateAnnotation', currentAnnotation);
         },
 
         onCancel = function() {

@@ -4,9 +4,7 @@ define(['../../common/annotationUtils'], function(Utils) {
 
   var Highlighter = function(rootNode) {
 
-    var textNode = rootNode.childNodes[0],
-
-        walkTextNodes = function(node, nodeArray) {
+    var walkTextNodes = function(node, nodeArray) {
           var nodes = (nodeArray) ? nodeArray : [];
 
           if (node.nodeType === TEXT)
@@ -51,11 +49,12 @@ define(['../../common/annotationUtils'], function(Utils) {
           var wrapper = document.createElement('SPAN');
           wrapper.className = css;
           range.surroundContents(wrapper);
+          return wrapper;
         },
 
         wrapRange = function(range, cssClass) {
           if (range.startContainer === range.endContainer) {
-            surround(range, cssClass);
+            return [ surround(range, cssClass) ];
           } else {
             // The tricky part - we need to break the range apart and create
             // sub-ranges for each segment
@@ -66,19 +65,21 @@ define(['../../common/annotationUtils'], function(Utils) {
             var startRange = rangy.createRange();
             startRange.selectNodeContents(range.startContainer);
             startRange.setStart(range.startContainer, range.startOffset);
-            surround(startRange, cssClass);
+            var startWrapper = surround(startRange, cssClass);
 
             var endRange = rangy.createRange();
             endRange.selectNode(range.endContainer);
             endRange.setEnd(range.endContainer, range.endOffset);
-            surround(endRange, cssClass);
+            var endWrapper = surround(endRange, cssClass);
 
             // And wrap nodes in between, if any
-            jQuery.each(nodesBetween, function(idx, node) {
+            var centerWrappers = jQuery.map(nodesBetween, function(node) {
               var r = rangy.createRange();
               r.selectNodeContents(node);
-              surround(r, cssClass);
+              return surround(r, cssClass);
             });
+
+            return [ startWrapper ].concat(centerWrappers,  [ endWrapper ]);
           }
         },
 
@@ -87,10 +88,18 @@ define(['../../common/annotationUtils'], function(Utils) {
               quote = Utils.getQuote(annotation),
               entityType = Utils.getEntityType(annotation),
               cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation',
-              range = rangy.createRange();
+              range = rangy.createRange(),
+              spans;
 
-          range.selectCharacters(textNode, parseInt(anchor), parseInt(anchor) + quote.length);
-          wrapRange(range, cssClass);
+          range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
+          spans = wrapRange(range, cssClass, annotation);
+
+          // Attach annotation data as payload to the SPANs and set id, if any
+          jQuery.each(spans, function(idx, span) {
+            span.annotation = annotation;
+            if (annotation.annotation_id)
+              span.dataset.id = annotation.annotation_id;
+          });
         };
 
     this.renderAnnotation = renderAnnotation;
