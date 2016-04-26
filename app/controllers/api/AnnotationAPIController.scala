@@ -110,8 +110,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                   Some(b.lastModifiedBy.getOrElse(user)),
                   b.lastModifiedAt.getOrElse(now),
                   b.value, 
-                  b.uri)),
-                AnnotationStatus(AnnotationStatus.UNVERIFIED, Some(user), now))
+                  b.uri)))
 
             // TODO error reporting?
             AnnotationService.insertOrUpdateAnnotation(annotation)

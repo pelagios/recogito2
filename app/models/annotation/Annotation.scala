@@ -25,9 +25,7 @@ case class Annotation(
 
   lastModifiedAt: DateTime,
 
-  bodies: Seq[AnnotationBody],
-
-  status: AnnotationStatus
+  bodies: Seq[AnnotationBody]
 
 )
 
@@ -55,8 +53,7 @@ object Annotation extends HasDate {
     (JsPath \ "anchor").format[String] and
     (JsPath \ "last_modified_by").formatNullable[String] and
     (JsPath \ "last_modified_at").format[DateTime] and
-    (JsPath \ "bodies").format[Seq[AnnotationBody]] and
-    (JsPath \ "status").format[AnnotationStatus]
+    (JsPath \ "bodies").format[Seq[AnnotationBody]]
   )(Annotation.apply, unlift(Annotation.unapply))
 
 }

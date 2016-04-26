@@ -3,7 +3,7 @@ define([], function() {
   var CommentSection = function(parent, commentBody) {
     var element = jQuery(
           '<div class="section comment">' +
-            '<div>' + commentBody.value + '</div>' +
+            '<div class="comment-body">' + commentBody.value + '</div>' +
             '<div class="created">' +
               '<a class="by" href="/' + commentBody.last_modified_by + '">' +
                 commentBody.last_modified_by +

@@ -100,11 +100,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
               now,
               None,
               None)
-          ),
-          AnnotationStatus(
-            AnnotationStatus.UNVERIFIED,
-            None,
-            now)
+          )
         )
       })
 
