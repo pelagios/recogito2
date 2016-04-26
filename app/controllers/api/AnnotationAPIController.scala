@@ -18,25 +18,19 @@ import scala.concurrent.Future
 import storage.DB
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
-case class AnnotationBodyStub(hasType: AnnotationBody.Type, lastModifiedBy: Option[String], lastModifiedAt: Option[DateTime], value: Option[String], uri: Option[String])
-
-object AnnotationBodyStub extends HasDate {
-
-  implicit val annotationBodyStubFormat: Reads[AnnotationBodyStub] = (
-    (JsPath \ "type").read[AnnotationBody.Value] and
-    (JsPath \ "last_modified_by").readNullable[String] and
-    (JsPath \ "last_modified_at").readNullable[DateTime] and
-    (JsPath \ "value").readNullable[String] and
-    (JsPath \ "uri").readNullable[String]
-  )(AnnotationBodyStub.apply _)
-
-}
-
-case class AnnotationStub(annotationId: Option[UUID], annotates: AnnotatedObject, anchor: String, bodies: Seq[AnnotationBodyStub])
+case class AnnotationStub(
+    
+  annotationId: Option[UUID],
+  
+  annotates: AnnotatedObject, 
+  
+  anchor: String, 
+  
+  bodies: Seq[AnnotationBodyStub])
 
 object AnnotationStub {
 
-  implicit val annotationStubFormat: Reads[AnnotationStub] = (
+  implicit val annotationStubReads: Reads[AnnotationStub] = (
     (JsPath \ "annotation_id").readNullable[UUID] and
     (JsPath \ "annotates").read[AnnotatedObject] and
     (JsPath \ "anchor").read[String] and
@@ -44,6 +38,56 @@ object AnnotationStub {
   )(AnnotationStub.apply _)
 
 }
+
+/** Partial annotation body **/
+case class AnnotationBodyStub(
+    
+  hasType: AnnotationBody.Type,
+  
+  lastModifiedBy: Option[String],
+  
+  lastModifiedAt: Option[DateTime],
+  
+  value: Option[String],
+  
+  uri: Option[String],
+  
+  status: Option[AnnotationStatusStub])
+  
+object AnnotationBodyStub extends HasDate {
+
+  implicit val annotationBodyStubReads: Reads[AnnotationBodyStub] = (
+    (JsPath \ "type").read[AnnotationBody.Value] and
+    (JsPath \ "last_modified_by").readNullable[String] and
+    (JsPath \ "last_modified_at").readNullable[DateTime] and
+    (JsPath \ "value").readNullable[String] and
+    (JsPath \ "uri").readNullable[String] and
+    (JsPath \ "status").readNullable[AnnotationStatusStub]
+  )(AnnotationBodyStub.apply _)
+
+}
+
+/** Partial annotation status **/
+case class AnnotationStatusStub(
+
+  value: AnnotationStatus.Value,
+
+  setBy: Option[String],
+
+  setAt: Option[DateTime]
+
+)
+
+object AnnotationStatusStub extends HasDate {
+  
+  implicit val annotationStatusStubReads: Reads[AnnotationStatusStub] = (
+    (JsPath \ "value").read[AnnotationStatus.Value] and
+    (JsPath \ "set_by").readNullable[String] and
+    (JsPath \ "set_at").readNullable[DateTime]
+  )(AnnotationStatusStub.apply _)
+  
+}
+
 
 class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
@@ -110,7 +154,12 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                   Some(b.lastModifiedBy.getOrElse(user)),
                   b.lastModifiedAt.getOrElse(now),
                   b.value, 
-                  b.uri)))
+                  b.uri,
+                  b.status.map(s =>
+                    AnnotationStatus(
+                      s.value,
+                      Some(s.setBy.getOrElse(user)),
+                      s.setAt.getOrElse(now))))))
 
             // TODO error reporting?
             AnnotationService.insertOrUpdateAnnotation(annotation)

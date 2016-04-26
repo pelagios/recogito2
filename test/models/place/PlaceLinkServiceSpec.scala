@@ -41,7 +41,8 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
       None,
       now,
       None,
-      Some("http://pleiades.stoa.org/places/246343"))))
+      Some("http://pleiades.stoa.org/places/246343"),
+      Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
     
   val annotatesLancaster = Annotation(
     UUID.fromString("7cfa1504-26de-45ef-a590-8b60ea8a60e8"),
@@ -57,7 +58,8 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
       None,
       now,
       None,
-      Some("http://pleiades.stoa.org/places/89222"))))
+      Some("http://pleiades.stoa.org/places/89222"),
+      Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
     
   val annotatesVindobonaAndThessaloniki = Annotation(
     annotatesLancaster.annotationId,
@@ -74,13 +76,15 @@ class PlaceLinkServiceSpec extends Specification with AfterAll {
         Some("rainer"),
         now.plusMinutes(10),
         None,
-        Some("http://pleiades.stoa.org/places/128537")),
+        Some("http://pleiades.stoa.org/places/128537"),
+        Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now))),
       AnnotationBody(
         AnnotationBody.PLACE,
         Some("rainer"),
         now.plusMinutes(10),
         None,
-        Some("http://pleiades.stoa.org/places/491741"))))
+        Some("http://pleiades.stoa.org/places/491741"),
+        Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
   
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     

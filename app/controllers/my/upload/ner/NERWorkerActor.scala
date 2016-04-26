@@ -90,16 +90,21 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
           Seq(
             AnnotationBody(
               AnnotationBody.QUOTE,
-              None, // no last modifying user
+              None,  // no last modifying user
               now,
               Some(p.chars),
-              None), // uri
+              None,  // uri
+              None), // status
             AnnotationBody(
               annotationType,
               None,
               now,
               None,
-              None)
+              None,
+              Some(AnnotationStatus(
+                AnnotationStatus.UNVERIFIED,
+                None,
+                now)))
           )
         )
       })

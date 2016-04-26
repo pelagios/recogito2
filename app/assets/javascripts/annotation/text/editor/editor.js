@@ -122,7 +122,7 @@ define(['../../../common/annotationUtils',
 
         onAddPlace = function() {
           // Add a place body stub to the annotation
-          var placeBodyStub = { type: 'PLACE' },
+          var placeBodyStub = { type: 'PLACE', status: { value: 'UNVERIFIED' } },
               placeSection = new PlaceSection(bodyContainer, placeBodyStub);
 
           bodySections.push(placeSection);

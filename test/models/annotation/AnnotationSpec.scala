@@ -80,8 +80,8 @@ class AnnotationSpec extends Specification {
       // Two bodies, representing result of NER, without georesolution
       val bodies = 
         Seq(
-          AnnotationBody(AnnotationBody.QUOTE, None, now, Some("Meidling"), None),
-          AnnotationBody(AnnotationBody.PLACE, None, now, None, None))
+          AnnotationBody(AnnotationBody.QUOTE, None, now, Some("Meidling"), None, Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now))),
+          AnnotationBody(AnnotationBody.PLACE, None, now, None, None, Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now))))
       
       val source = 
         Annotation(
