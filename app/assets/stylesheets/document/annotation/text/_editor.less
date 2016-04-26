@@ -1,5 +1,6 @@
 @import "_placesection.less";
 @import "_commentsection.less";
+@import "_replyfield.less";
 
 .text-annotation-editor {
   position:absolute;
@@ -90,6 +91,28 @@
 
     }
 
+    .created {
+      position:absolute;
+      left:14px;
+      font-size:14px;
+      .rounded-corners(2px);
+      display:inline-block;
+      padding:3px 7px 4px 7px;
+      margin-top:5px;
+      line-height:14px;
+
+      .by {
+        color:desaturate(@nightsky, 100%);
+        text-decoration:none;
+      }
+
+      .at {
+        padding-left:5px;
+        color:lighten(desaturate(@nightsky, 100%), 30%);
+      }
+
+    }
+
     .footer {
       text-align:right;
       padding:6px 0;
@@ -101,6 +124,6 @@
 
     }
 
-  }
+  } /** .text-annotation-editor-inner **/
 
 }

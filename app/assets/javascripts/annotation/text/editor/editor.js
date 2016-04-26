@@ -2,8 +2,9 @@ define(['../../../common/annotationUtils',
         '../../../common/hasEvents',
         'highlighter',
         'editor/selectionHandler',
+        'editor/components/commentSection',
         'editor/components/placeSection',
-        'editor/components/commentSection'], function(Utils, HasEvents, Highlighter, SelectionHandler, PlaceSection, CommentSection) {
+        'editor/components/replyField'], function(Utils, HasEvents, Highlighter, SelectionHandler, CommentSection, PlaceSection, ReplyField) {
 
   /** The main annotation editor popup **/
   var Editor = function(parentNode) {
@@ -37,6 +38,7 @@ define(['../../../common/annotationUtils',
                   '</div>' +
                 '</div>' +
                 '<div class="bodies"></div>' +
+                '<div class="fields"></div>' +
                 '<div class="footer">' +
                   '<button class="btn small outline cancel">Cancel</button>' +
                   '<button class="btn small ok">OK</button>' +
@@ -52,7 +54,8 @@ define(['../../../common/annotationUtils',
         bodyContainer = element.find('.bodies'),
         bodySections = [],
 
-        commentSection = new CommentSection(bodyContainer),
+        fieldContainer = element.find('.fields'),
+        replyField = new ReplyField(fieldContainer),
 
         btnPlace = element.find('.category.place'),
         btnPerson = element.find('.category.person'),
@@ -65,11 +68,19 @@ define(['../../../common/annotationUtils',
 
         /** Opens the editor with an annotation, at the specified bounds **/
         open = function(annotation, bounds) {
+          var scrollTop = jQuery(document).scrollTop();
+
+          clear();
           currentAnnotation = annotation;
 
-          // TODO populate the template
+          // Add place body sections
 
-          element.css({ top: bounds.bottom, left: bounds.left });
+          // Add comment body sections
+          jQuery.each(Utils.getBodiesOfType(annotation, 'COMMENT'), function(idx, commentBody) {
+            bodySections.push(new CommentSection(bodyContainer, commentBody));
+          });
+
+          element.css({ top: bounds.bottom + scrollTop, left: bounds.left });
           element.show();
         },
 
@@ -77,18 +88,19 @@ define(['../../../common/annotationUtils',
         close = function() {
           element.hide();
           selectionHandler.clearSelection();
+          clear();
         },
 
         clear = function() {
-          currentAnnotation = false;
-
           // Destroy body sections
           jQuery.each(bodySections, function(idx, section) {
             section.destroy();
           });
 
-          // Clear comment field & text selection, if any
-          commentSection.clear();
+          // Clear reply field & text selection, if any
+          replyField.clear();
+
+          currentAnnotation = false;
         },
 
         /** Selecting text (i.e. creating a new annotation) opens the editor **/
@@ -98,9 +110,9 @@ define(['../../../common/annotationUtils',
 
         onSelectAnnotation = function(e) {
           var annotation = e.target.annotation,
-              quote = Utils.getQuote(annotation);
+              bounds = e.target.getBoundingClientRect();
 
-          console.log(quote);
+          open(annotation, bounds);
 
           // To avoid repeated events from overlapping annotations below
           return false;
@@ -112,7 +124,7 @@ define(['../../../common/annotationUtils',
               placeSection = new PlaceSection(bodyContainer, placeBodyStub);
 
           bodySections.push(placeSection);
-          placeSection.automatch(Utils.getQuote(annotationStub));
+          placeSection.automatch(Utils.getQuote(currentAnnotation));
           currentAnnotation.bodies.push(placeBodyStub);
         },
 
@@ -125,9 +137,9 @@ define(['../../../common/annotationUtils',
         },
 
         onOk = function() {
-          var comment = commentSection.getComment();
-          if (comment)
-            currentAnnotation.bodies.push(comment);
+          var reply = replyField.getComment();
+          if (reply)
+            currentAnnotation.bodies.push(reply);
 
           highlighter.renderAnnotation(currentAnnotation);
 
@@ -146,8 +158,8 @@ define(['../../../common/annotationUtils',
     // Monitor select of existing annotations via DOM
     jQuery(parentNode).on('click', '.annotation', onSelectAnnotation);
 
-    // Ctrl+Enter on comment section doubles as OK
-    commentSection.on('submit', onOk);
+    // Ctrl+Enter on reply field doubles as 'OK'
+    replyField.on('submit', onOk);
 
     // Wire button events
     btnPlace.click(onAddPlace);

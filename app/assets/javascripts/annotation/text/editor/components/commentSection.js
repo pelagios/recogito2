@@ -1,40 +1,27 @@
-define(['../../../../common/hasEvents'], function(HasEvents) {
+define([], function() {
 
-  var CommentSection = function(parent) {
-    var self = this,
-
-        element = jQuery(
-          '<div class="section comments">' +
-            '<div contenteditable="true" spellcheck="false" class="textarea" data-placeholder="Add a comment..." />' +
+  var CommentSection = function(parent, commentBody) {
+    var element = jQuery(
+          '<div class="section comment">' +
+            '<div>' + commentBody.value + '</div>' +
+            '<div class="created">' +
+              '<a class="by" href="/' + commentBody.last_modified_by + '">' +
+                commentBody.last_modified_by +
+              '</a>' +
+              '<span class="at">' +
+                jQuery.timeago(commentBody.last_modified_at) +
+              '</span>' +
+            '</div>' +
           '</div>'),
 
-          textarea = element.find('.textarea'),
-
-          clear = function() {
-            textarea.empty();
-          },
-
-          getComment = function() {
-            var val = textarea.text().trim();
-            if (val)
-              return { type: 'COMMENT', value: val };
-            else
-              return false;
+          destroy = function() {
+            element.remove();
           };
-
-    textarea.keyup(function(e) {
-      if (e.ctrlKey && e.keyCode == 13)
-        self.fireEvent('submit', getComment());
-    });
 
     parent.append(element);
 
-    this.clear = clear;
-    this.getComment = getComment;
-
-    HasEvents.apply(this);
+    this.destroy = destroy;
   };
-  CommentSection.prototype = Object.create(HasEvents.prototype);
 
   return CommentSection;
 

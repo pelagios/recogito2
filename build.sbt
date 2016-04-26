@@ -46,6 +46,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "openlayers" % "3.13.0",
   "org.webjars" % "requirejs" % "2.1.22",
   "org.webjars.bower" % "rangy" % "1.3.0",
+  "org.webjars.bower" % "timeago" % "1.4.1",
 
   specs2 % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"

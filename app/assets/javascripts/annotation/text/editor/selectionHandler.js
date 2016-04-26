@@ -72,7 +72,6 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
 
         onSelect = function(e) {
           var selection = rangy.getSelection(),
-              scrollTop = jQuery(document).scrollTop(),
               selectedRange, annotationStub, bounds;
 
           if (!selection.isCollapsed &&
@@ -86,15 +85,7 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
             clearSelection();
             highlighter.wrapRange(selectedRange, 'selection');
 
-            self.fireEvent('select', {
-              annotation: annotation,
-              bounds: {
-                top: bounds.top + scrollTop,
-                right: bounds.right,
-                bottom: bounds.bottom + scrollTop,
-                left: bounds.left
-              }
-            });
+            self.fireEvent('select', { annotation: annotation, bounds: bounds });
           }
         };
 
