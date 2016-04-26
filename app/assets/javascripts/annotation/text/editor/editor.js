@@ -14,8 +14,6 @@ define(['../../../common/annotationUtils',
 
         selectionHandler = new SelectionHandler(parentNode, highlighter),
 
-        annotationStub = false,
-
         element = (function() {
           var el = jQuery(
             '<div class="text-annotation-editor">' +
@@ -63,20 +61,41 @@ define(['../../../common/annotationUtils',
         btnCancel = element.find('button.cancel'),
         btnOk = element.find('button.ok'),
 
-        onSelect = function(e) {
-          annotationStub = e.annotation;
-          element.css({ top: e.bounds.bottom, left: e.bounds.left });
+        currentAnnotation = false,
+
+        /** Opens the editor with an annotation, at the specified bounds **/
+        open = function(annotation, bounds) {
+          currentAnnotation = annotation;
+
+          // TODO populate the template
+
+          element.css({ top: bounds.bottom, left: bounds.left });
           element.show();
         },
 
+        /** Closes the editor, cleaning up all components **/
         close = function() {
+          currentAnnotation = false;
+
+          // Destroy body sections
           jQuery.each(bodySections, function(idx, section) {
             section.destroy();
           });
 
+          // Clear comment field & text selection, if any
           commentSection.clear();
           selectionHandler.clearSelection();
+
           element.hide();
+        },
+
+        /** Selecting text (i.e. creating a new annotation) opens the editor **/
+        onSelectText = function(e) {
+          open(e.annotation, e.bounds);
+        },
+
+        onSelectAnnotation = function(e) {
+          console.log(e);
         },
 
         onAddPlace = function() {
@@ -84,9 +103,9 @@ define(['../../../common/annotationUtils',
           var placeBodyStub = { type: 'PLACE' },
               placeSection = new PlaceSection(bodyContainer, placeBodyStub);
 
-          annotationStub.bodies.push(placeBodyStub);
           bodySections.push(placeSection);
           placeSection.automatch(Utils.getQuote(annotationStub));
+          currentAnnotation.bodies.push(placeBodyStub);
         },
 
         onAddPerson = function() {
@@ -112,15 +131,19 @@ define(['../../../common/annotationUtils',
           close();
         };
 
-    selectionHandler.on('select', onSelect);
+    // Monitor text selections through the selectionHandler
+    selectionHandler.on('select', onSelectText);
+
+    // Monitor select of existing annotations via DOM
+    jQuery(parentNode).on('click', '.annotation', onSelectAnnotation);
 
     // Ctrl+Enter on comment section doubles as OK
     commentSection.on('submit', onOk);
 
+    // Wire button events
     btnPlace.click(onAddPlace);
     btnPerson.click(onAddPerson);
     btnEvent.click(onAddEvent);
-
     btnCancel.click(onCancel);
     btnOk.click(onOk);
 
