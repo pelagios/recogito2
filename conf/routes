@@ -59,6 +59,7 @@ GET     /api/annotations                           controllers.api.AnnotationAPI
 POST    /api/annotation                            controllers.api.AnnotationAPIController.createAnnotation
 
 GET     /api/places/search                         controllers.api.PlaceAPIController.search(q: String)
+GET     /api/places/:uri                           controllers.api.PlaceAPIController.findByURI(uri: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # User/team personal space

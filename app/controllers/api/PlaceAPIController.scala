@@ -11,7 +11,13 @@ import storage.DB
 
 class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController with HasPrettyPrintJSON {
   
-  /** Search on the entire gazetteer (use case: geo-resolution) is restricted to logged-in users **/ 
+  def findByURI(uri: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    PlaceService.findByURI(uri).map { _ match {
+      case Some((place, _)) => jsonOk(Json.toJson(place))
+      case None => NotFound
+    }}
+  }
+  
   def search(query: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     PlaceService.searchPlaces(query).map { results => 
       jsonOk(Json.toJson(results.map(_._1)))

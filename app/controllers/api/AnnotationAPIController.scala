@@ -167,7 +167,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
           }
 
           case e: JsError => {
-            Logger.warn("POST to /annotations but invalid JSON")
+            Logger.warn("POST to /annotations but invalid JSON: " + e.toString)
             BadRequest
           }
         }

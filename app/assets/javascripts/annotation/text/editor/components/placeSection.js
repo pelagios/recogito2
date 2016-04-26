@@ -1,7 +1,11 @@
-define(['../../../../common/formatting', '../../../../common/placeUtils'], function(Formatting, PlaceUtils) {
+define(['../../../../common/hasEvents',
+        '../../../../common/formatting',
+        '../../../../common/placeUtils'], function(HasEvents, Formatting, PlaceUtils) {
 
-  var PlaceSection = function(parent) {
-    var element = (function() {
+  var PlaceSection = function(parent, placeBodyOrName) {
+    var self = this,
+
+        element = (function() {
           var el = jQuery(
             '<div class="section place">' +
               '<div class="map"></div>' +
@@ -12,29 +16,37 @@ define(['../../../../common/formatting', '../../../../common/placeUtils'], funct
                   '<p class="description"></p>' +
                   '<p class="names"></p>' +
                   '<p class="date"></p>' +
-                  // '<div class="created">' +
-                  //   '<a class="by" href="#">rainer</a>' +
-                  //   '<span class="at">2 days ago</span>' +
-                  // '</div>' +
-                  // '<a href="#" class="btn tiny change">Change</a>' +
+                  '<div class="created">' +
+                    '<a class="by" href="#">rainer</a>' +
+                    '<span class="at">2 days ago</span>' +
+                  '</div>' +
                   '<div class="warning-unverified">' +
                     '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-                    '<button>Change</button>' +
-                    '<button>Confirm</button>' +
+                    '<button class="change">Change</button>' +
+                    '<button class="confirm">Confirm</button>' +
                   '</div>' +
                 '</div>' +
               '</div>' +
             '</div>');
 
-          parent.prepend(el);
+          el.find('.created').hide();
+          parent.append(el);
           return el;
         })(),
 
         title = element.find('h3'),
         gazetteerId = element.find('.gazetteer'),
-        date = element.find('.date'),
-        names = element.find('.names'),
         description = element.find('.description'),
+        names = element.find('.names'),
+        date = element.find('.date'),
+
+        createdSection = element.find('.created'),
+        warningSection = element.find('.warning-unverified'),
+
+        btnConfirm = element.find('button.confirm'),
+        btnChange = element.find('button.change'),
+
+        currentGazetteerRecord = false,
 
         awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
           attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
@@ -85,23 +97,48 @@ define(['../../../../common/formatting', '../../../../common/placeUtils'], funct
           setCenter(latLon);
         },
 
-        automatch = function(str) {
+        fillWithAutomatch = function(str) {
           jQuery.getJSON('/api/places/search?q=' + str, function(response) {
             var topPlace = response.items[0],
                 bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
                 coord = bestRecord.representative_point;
 
+            currentGazetteerRecord = bestRecord;
             fillTemplate(bestRecord, topPlace.labels, [ coord[1], coord[0] ]);
           });
+        },
+
+        /** TODO implement **/
+        fillWithPlace = function(placeBody) {
+          jQuery.getJSON('/api/places/' + encodeURIComponent(placeBody.uri), function(response) {
+            // TODO implement
+            console.log(response);
+          });
+        },
+
+        onConfirm = function() {
+          createdSection.show();
+          warningSection.hide();
+          self.fireEvent('confirm', currentGazetteerRecord.uri);
         },
 
         destroy = function() {
           element.remove();
         };
 
-    this.automatch = automatch;
+    // Button events
+    btnConfirm.click(onConfirm);
+
     this.destroy = destroy;
+
+    if (jQuery.type(placeBodyOrName) === 'string')
+      fillWithAutomatch(placeBodyOrName);
+    else
+      fillWithPlace(placeBodyOrName);
+
+    HasEvents.apply(this);
   };
+  PlaceSection.prototype = Object.create(HasEvents.prototype);
 
   return PlaceSection;
 

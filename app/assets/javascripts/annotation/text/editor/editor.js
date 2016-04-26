@@ -37,7 +37,10 @@ define(['../../../common/annotationUtils',
                     '</div>' +
                   '</div>' +
                 '</div>' +
-                '<div class="bodies"></div>' +
+                '<div class="bodies">' +
+                  '<div class="bodies-place"></div>' +
+                  '<div class="bodies-comment"></div>' +
+                '</div>' +
                 '<div class="fields"></div>' +
                 '<div class="footer">' +
                   '<button class="btn small outline cancel">Cancel</button>' +
@@ -52,6 +55,9 @@ define(['../../../common/annotationUtils',
         })(),
 
         bodyContainer = element.find('.bodies'),
+        placeBodyContainer = bodyContainer.find('.bodies-place'),
+        commentBodyContainer = bodyContainer.find('.bodies-comment'),
+
         bodySections = [],
 
         fieldContainer = element.find('.fields'),
@@ -74,11 +80,15 @@ define(['../../../common/annotationUtils',
           currentAnnotation = annotation;
 
           // Add place body sections
+          var places = Utils.getBodiesOfType(annotation, 'PLACE');
+          jQuery.each(places, function(idx, placeBody) {
+            bodySections.push(new PlaceSection(placeBodyContainer, placeBody));
+          });
 
           // Add comment body sections
           var comments = Utils.getBodiesOfType(annotation, 'COMMENT');
           jQuery.each(comments, function(idx, commentBody) {
-            bodySections.push(new CommentSection(bodyContainer, commentBody));
+            bodySections.push(new CommentSection(commentBodyContainer, commentBody));
           });
           if (comments.length > 0)
             replyField.setPlaceHolder('Write a reply...');
@@ -87,12 +97,13 @@ define(['../../../common/annotationUtils',
           element.show();
         },
 
-        /** Closes the editor, cleaning up all components **/
+        /** Closes the editor, clearing all editor components **/
         close = function() {
           element.hide();
           clear();
         },
 
+        /** Clears all editor components **/
         clear = function() {
           // Destroy body sections
           jQuery.each(bodySections, function(idx, section) {
@@ -101,49 +112,57 @@ define(['../../../common/annotationUtils',
 
           // Clear reply field & text selection, if any
           replyField.clear();
-
           currentAnnotation = false;
         },
 
-        /** Selecting text (i.e. creating a new annotation) opens the editor **/
+        /** Opens the editor on a newly created text selection **/
         onSelectText = function(e) {
           open(e.annotation, e.bounds);
         },
 
+        /** Opens the editor on an existing annotation **/
         onSelectAnnotation = function(e) {
           var annotation = e.target.annotation,
               bounds = e.target.getBoundingClientRect();
 
           open(annotation, bounds);
 
+          // TODO perhaps we need to check for the 'topmost' annotation?
+
           // To avoid repeated events from overlapping annotations below
           return false;
         },
 
+        /** Click on 'Place' button adds a place body **/
         onAddPlace = function() {
-          // Add a place body stub to the annotation
-          var placeBodyStub = { type: 'PLACE', status: { value: 'UNVERIFIED' } },
-              placeSection = new PlaceSection(bodyContainer, placeBodyStub);
+          var quote = Utils.getQuote(currentAnnotation),
+              placeBody = { type: 'PLACE', status: { value: 'UNVERIFIED' } },
+              placeSection = new PlaceSection(placeBodyContainer, quote);
 
+          // Even without gazetteer match & verification, we want to record it as a place
           bodySections.push(placeSection);
-          placeSection.automatch(Utils.getQuote(currentAnnotation));
-          currentAnnotation.bodies.push(placeBodyStub);
+          currentAnnotation.bodies.push(placeBody);
+
+          placeSection.on('confirm', function(uri) {
+            placeBody.uri = uri;
+            placeBody.status.value = 'VERIFIED';
+            storeAnnotation();
+          });
         },
 
+        /** TODO implement **/
         onAddPerson = function() {
-          // TODO implement
+
         },
 
+        /** TODO implement **/
         onAddEvent = function() {
-          // TODO implement
+
         },
 
-        onOk = function() {
-          var reply = replyField.getComment(),
-              annotationSpans;
-
-          if (reply)
-            currentAnnotation.bodies.push(reply);
+        /** Stores the annotation (converting selection to annotation highlight, if any) **/
+        storeAnnotation = function() {
+          var annotationSpans;
 
           if (currentAnnotation.annotation_id) {
             // Annotation is already stored at the server - update
@@ -155,9 +174,22 @@ define(['../../../common/annotationUtils',
           }
 
           self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
+        },
+
+        /**
+         * 'OK' adds the content of the reply field as comment, stores the
+         * annotation (which will clear the selection) and closes the editor.
+         */
+        onOk = function() {
+          var reply = replyField.getComment();
+          if (reply)
+            currentAnnotation.bodies.push(reply);
+
+          storeAnnotation();
           close();
         },
 
+        /** 'Cancel' clears the selection and closes the editor **/
         onCancel = function() {
           selectionHandler.clearSelection();
           close();
