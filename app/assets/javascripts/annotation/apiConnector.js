@@ -23,20 +23,11 @@ define(['../common/hasEvents'], function(HasEvents) {
     });
   };
 
-  APIConnector.prototype.storeAnnotation = function(annotationStub) {
-    var self = this;
-    jsRoutes.controllers.api.AnnotationAPIController.createAnnotation().ajax({
+  APIConnector.prototype.storeAnnotation = function(annotation) {
+    return jsRoutes.controllers.api.AnnotationAPIController.createAnnotation().ajax({
       type: 'POST',
-      data: JSON.stringify(annotationStub),
-      contentType: 'application/json',
-
-      success: function(annotation) {
-        self.fireEvent('createSuccess', annotation);
-      },
-
-      error: function(error) {
-        self.fireEvent('createError', error);
-      }
+      data: JSON.stringify(annotation),
+      contentType: 'application/json'
     });
   };
 

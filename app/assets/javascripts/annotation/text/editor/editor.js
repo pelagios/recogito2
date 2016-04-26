@@ -90,7 +90,6 @@ define(['../../../common/annotationUtils',
         /** Closes the editor, cleaning up all components **/
         close = function() {
           element.hide();
-          selectionHandler.clearSelection();
           clear();
         },
 
@@ -140,17 +139,22 @@ define(['../../../common/annotationUtils',
         },
 
         onOk = function() {
-          var reply = replyField.getComment();
+          var reply = replyField.getComment(),
+              annotationSpans;
+
           if (reply)
             currentAnnotation.bodies.push(reply);
 
-          highlighter.renderAnnotation(currentAnnotation);
+          // TODO only if this is a new annotation! (How do we find out?)
+          selectionHandler.clearSelection();
+          annotationSpans = highlighter.renderAnnotation(currentAnnotation);
 
-          self.fireEvent('updateAnnotation', currentAnnotation);
+          self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
           close();
         },
 
         onCancel = function() {
+          selectionHandler.clearSelection();
           close();
         };
 

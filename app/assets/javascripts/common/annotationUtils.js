@@ -2,6 +2,13 @@ define(function() {
 
   var AnnotationUtils = {
 
+    /** Attaches an annotation as payload to a DOM element **/
+    attachAnnotation: function(element, annotation) {
+      element.annotation = annotation;
+      if (annotation.annotation_id)
+        element.dataset.id = annotation.annotation_id;
+    },
+
     /** Returns the value of the QUOTE body, if any **/
     getQuote: function(annotation) {
       var i, len;
@@ -33,7 +40,7 @@ define(function() {
           return t;
       }
     },
-    
+
     sortByOffset: function(annotations) {
       return annotations.sort(function(a, b) {
         var offsetA = a.anchor.substr(12),

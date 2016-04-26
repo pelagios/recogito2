@@ -96,10 +96,10 @@ define(['../../common/annotationUtils'], function(Utils) {
 
           // Attach annotation data as payload to the SPANs and set id, if any
           jQuery.each(spans, function(idx, span) {
-            span.annotation = annotation;
-            if (annotation.annotation_id)
-              span.dataset.id = annotation.annotation_id;
+            Utils.attachAnnotation(span, annotation);
           });
+
+          return spans;
         };
 
     this.renderAnnotation = renderAnnotation;

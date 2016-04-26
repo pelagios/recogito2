@@ -34,8 +34,18 @@ require([
           // TODO visual notification
         },
 
-        onUpdateAnnotation = function(annotationStub) {
-          API.storeAnnotation(annotationStub);
+        onUpdateAnnotation = function(e) {
+          API.storeAnnotation(e.annotation)
+             .done(function(annotation) {
+               // Update the annotation references in the elements
+               jQuery.each(e.elements, function(idx, el) {
+                 console.log(el);
+                 Utils.attachAnnotation(el, annotation);
+               });
+             })
+             .fail(function(error) {
+               console.log(error);
+             });
         },
 
         onAnnotationStored = function(annotation) {
