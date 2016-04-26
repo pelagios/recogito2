@@ -39,7 +39,6 @@ require([
              .done(function(annotation) {
                // Update the annotation references in the elements
                jQuery.each(e.elements, function(idx, el) {
-                 console.log(el);
                  Utils.attachAnnotation(el, annotation);
                });
              })

@@ -11,14 +11,12 @@ define(function() {
     /** Shortens a gazetteer URI to a shortcode **/
     formatGazetteerURI : function(uri) {
       var shortCode = uri;
-          // style = 'background-color:#ddd; border:1px solid #ccc;';
 
       jQuery.each(KNOWN_GAZETTEERS, function(i, g) {
         var cont = true;
         jQuery.each(g.url_patterns, function(j, pattern) {
           if (uri.indexOf(pattern) === 0) {
             shortCode = g.prefix + ':' + uri.substring(pattern.length);
-            // style = 'background-color:' + g.colors[0] + '; border:1px solid ' + g.colors[1] + ';';
             cont = false;
             return cont;
           }

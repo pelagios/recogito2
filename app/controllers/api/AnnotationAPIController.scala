@@ -29,11 +29,12 @@ object AnnotationBodyStub {
 
 }
 
-case class AnnotationStub(annotates: AnnotatedObject, anchor: String, bodies: Seq[AnnotationBodyStub])
+case class AnnotationStub(annotationId: Option[UUID], annotates: AnnotatedObject, anchor: String, bodies: Seq[AnnotationBodyStub])
 
 object AnnotationStub {
 
   implicit val annotationStubFormat: Reads[AnnotationStub] = (
+    (JsPath \ "annotation_id").readNullable[UUID] and
     (JsPath \ "annotates").read[AnnotatedObject] and
     (JsPath \ "anchor").read[String] and
     (JsPath \ "bodies").read[Seq[AnnotationBodyStub]]
@@ -89,7 +90,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
             val user = loggedIn.user.getUsername
             val annotation =
               Annotation(
-                UUID.randomUUID,
+                s.get.annotationId.getOrElse(UUID.randomUUID),
                 UUID.randomUUID,
                 s.get.annotates,
                 None,
