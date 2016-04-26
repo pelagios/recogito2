@@ -3,6 +3,7 @@ package controllers.api
 import controllers.BaseController
 import java.util.UUID
 import javax.inject.Inject
+import models.HasDate
 import models.annotation._
 import models.document.DocumentService
 import models.user.Roles._
@@ -17,12 +18,14 @@ import scala.concurrent.Future
 import storage.DB
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
-case class AnnotationBodyStub(hasType: AnnotationBody.Type, value: Option[String], uri: Option[String])
+case class AnnotationBodyStub(hasType: AnnotationBody.Type, lastModifiedBy: Option[String], lastModifiedAt: Option[DateTime], value: Option[String], uri: Option[String])
 
-object AnnotationBodyStub {
+object AnnotationBodyStub extends HasDate {
 
   implicit val annotationBodyStubFormat: Reads[AnnotationBodyStub] = (
     (JsPath \ "type").read[AnnotationBody.Value] and
+    (JsPath \ "last_modified_by").readNullable[String] and
+    (JsPath \ "last_modified_at").readNullable[DateTime] and
     (JsPath \ "value").readNullable[String] and
     (JsPath \ "uri").readNullable[String]
   )(AnnotationBodyStub.apply _)
@@ -83,6 +86,10 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
   def createAnnotation() = StackAction(AuthorityKey -> Normal) { implicit request =>
     request.body.asJson match {
 
+      // TODO createdAt/By info for existing bodies is taken from the JSON, without
+      // verifying against data stored on the server, i.e. potentially hackable
+      // should we build in protection against this?
+      
       case Some(json) => {
         Json.fromJson[AnnotationStub](json) match {
           case s: JsSuccess[AnnotationStub] => {
@@ -98,7 +105,12 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                 s.get.anchor,
                 Some(user),
                 now,
-                s.get.bodies.map(b => AnnotationBody(b.hasType, Some(user), now, b.value, b.uri)),
+                s.get.bodies.map(b => AnnotationBody(
+                  b.hasType, 
+                  Some(b.lastModifiedBy.getOrElse(user)),
+                  b.lastModifiedAt.getOrElse(now),
+                  b.value, 
+                  b.uri)),
                 AnnotationStatus(AnnotationStatus.UNVERIFIED, Some(user), now))
 
             // TODO error reporting?

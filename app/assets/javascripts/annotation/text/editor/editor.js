@@ -145,9 +145,14 @@ define(['../../../common/annotationUtils',
           if (reply)
             currentAnnotation.bodies.push(reply);
 
-          // TODO only if this is a new annotation! (How do we find out?)
-          selectionHandler.clearSelection();
-          annotationSpans = highlighter.renderAnnotation(currentAnnotation);
+          if (currentAnnotation.annotation_id) {
+            // Annotation is already stored at the server - update
+            annotationSpans = jQuery('[data-id=' + currentAnnotation.annotation_id + ']');
+          } else {
+            // New annotation, created from a fresh selection
+            selectionHandler.clearSelection();
+            annotationSpans = highlighter.renderAnnotation(currentAnnotation);
+          }
 
           self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
           close();
