@@ -76,9 +76,12 @@ define(['../../../common/annotationUtils',
           // Add place body sections
 
           // Add comment body sections
-          jQuery.each(Utils.getBodiesOfType(annotation, 'COMMENT'), function(idx, commentBody) {
+          var comments = Utils.getBodiesOfType(annotation, 'COMMENT');
+          jQuery.each(comments, function(idx, commentBody) {
             bodySections.push(new CommentSection(bodyContainer, commentBody));
           });
+          if (comments.length > 0)
+            replyField.setPlaceHolder('Write a reply...');
 
           element.css({ top: bounds.bottom + scrollTop, left: bounds.left });
           element.show();
@@ -143,9 +146,8 @@ define(['../../../common/annotationUtils',
 
           highlighter.renderAnnotation(currentAnnotation);
 
-          close();
-
           self.fireEvent('updateAnnotation', currentAnnotation);
+          close();
         },
 
         onCancel = function() {

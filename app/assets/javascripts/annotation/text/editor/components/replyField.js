@@ -1,6 +1,6 @@
 define(['../../../../common/hasEvents'], function(HasEvents) {
 
-  var ReplyField = function(parent) {
+  var ReplyField = function(parent, isReply) {
     var self = this,
 
         element = jQuery(
@@ -8,19 +8,27 @@ define(['../../../../common/hasEvents'], function(HasEvents) {
             '<div contenteditable="true" spellcheck="false" class="textarea" data-placeholder="Add a comment..." />' +
           '</div>'),
 
-          textarea = element.find('.textarea'),
+        textarea = element.find('.textarea'),
 
-          clear = function() {
-            textarea.empty();
-          },
+        clear = function() {
+          textarea.empty();
+          setPlaceHolder();
+        },
 
-          getComment = function() {
-            var val = textarea.text().trim();
-            if (val)
-              return { type: 'COMMENT', value: val };
-            else
-              return false;
-          };
+        setPlaceHolder = function(placeholder) {
+          if (placeholder)
+            textarea.attr('data-placeholder', placeholder);
+          else
+            textarea.attr('data-placeholder', 'Add a comment...');
+        },
+
+        getComment = function() {
+          var val = textarea.text().trim();
+          if (val)
+            return { type: 'COMMENT', value: val };
+          else
+            return false;
+        };
 
     textarea.keyup(function(e) {
       if (e.ctrlKey && e.keyCode == 13)
@@ -31,6 +39,7 @@ define(['../../../../common/hasEvents'], function(HasEvents) {
 
     this.clear = clear;
     this.getComment = getComment;
+    this.setPlaceHolder = setPlaceHolder;
 
     HasEvents.apply(this);
   };
