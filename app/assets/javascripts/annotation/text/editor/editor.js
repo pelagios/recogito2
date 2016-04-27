@@ -74,7 +74,8 @@ define(['../../../common/annotationUtils',
 
         /** Opens the editor with an annotation, at the specified bounds **/
         open = function(annotation, bounds) {
-          var scrollTop = jQuery(document).scrollTop();
+          var scrollTop = jQuery(document).scrollTop(),
+              quote = Utils.getQuote(annotation);
 
           clear();
           currentAnnotation = annotation;
@@ -82,7 +83,7 @@ define(['../../../common/annotationUtils',
           // Add place body sections
           var places = Utils.getBodiesOfType(annotation, 'PLACE');
           jQuery.each(places, function(idx, placeBody) {
-            bodySections.push(new PlaceSection(placeBodyContainer, placeBody));
+            bodySections.push(new PlaceSection(placeBodyContainer, placeBody, quote));
           });
 
           // Add comment body sections
@@ -135,19 +136,12 @@ define(['../../../common/annotationUtils',
 
         /** Click on 'Place' button adds a place body **/
         onAddPlace = function() {
-          var quote = Utils.getQuote(currentAnnotation),
-              placeBody = { type: 'PLACE', status: { value: 'UNVERIFIED' } },
-              placeSection = new PlaceSection(placeBodyContainer, quote);
+          var placeBody = { type: 'PLACE', status: { value: 'UNVERIFIED' } },
+              quote = Utils.getQuote(currentAnnotation),
+              placeSection = new PlaceSection(placeBodyContainer, placeBody, quote);
 
-          // Even without gazetteer match & verification, we want to record it as a place
-          bodySections.push(placeSection);
           currentAnnotation.bodies.push(placeBody);
-
-          placeSection.on('confirm', function(uri) {
-            placeBody.uri = uri;
-            placeBody.status.value = 'VERIFIED';
-            storeAnnotation();
-          });
+          bodySections.push(placeSection);
         },
 
         /** TODO implement **/

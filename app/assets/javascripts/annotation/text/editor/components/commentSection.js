@@ -1,4 +1,4 @@
-define([], function() {
+define(['../../../../common/formatting'], function(Formatting) {
 
   var CommentSection = function(parent, commentBody) {
     var element = jQuery(
@@ -9,7 +9,7 @@ define([], function() {
                 commentBody.last_modified_by +
               '</a>' +
               '<span class="at">' +
-                jQuery.timeago(commentBody.last_modified_at) +
+                Formatting.timeSince(commentBody.last_modified_at) +
               '</span>' +
             '</div>' +
           '</div>'),

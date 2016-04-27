@@ -2,12 +2,24 @@ define(function() {
 
   var PlaceUtils = {
 
-    getBestMatchingRecord : function(place, name) {
+    getBestMatchingRecord: function(place, name) {
       return place.is_conflation_of[0];
     },
 
-    getLabels : function(gazetteerRecord) {
-      var labels = {},       asArray = [],
+    getRecord: function(place, uri) {
+      var matchingRecords = jQuery.grep(place.is_conflation_of, function(record) {
+        return record.uri === uri;
+      });
+
+      if (matchingRecords.length > 0)
+        return matchingRecords[0];
+      else
+        return false;
+    },
+
+    getLabels: function(gazetteerRecord) {
+      var labels = {},
+          asArray = [],
 
            add = function(name) {
              jQuery.each(name.split(',|/'), function(idx, label) {
