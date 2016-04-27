@@ -28,6 +28,7 @@ define(['../../../../common/formatting',
               '</div>' +
             '</div>');
 
+          el.find('.warning-unverified').hide();
           parent.append(el);
           return el;
         })(),

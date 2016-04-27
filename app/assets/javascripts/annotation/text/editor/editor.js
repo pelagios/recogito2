@@ -89,8 +89,10 @@ define(['../../../common/annotationUtils',
           // Add comment body sections
           var comments = Utils.getBodiesOfType(annotation, 'COMMENT');
           jQuery.each(comments, function(idx, commentBody) {
-            bodySections.push(new CommentSection(commentBodyContainer, commentBody));
+            var zIndex = comments.length - idx;
+            bodySections.push(new CommentSection(commentBodyContainer, commentBody, zIndex));
           });
+
           if (comments.length > 0)
             replyField.setPlaceHolder('Write a reply...');
 

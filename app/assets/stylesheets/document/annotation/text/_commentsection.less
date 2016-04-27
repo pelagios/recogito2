@@ -11,10 +11,57 @@
     padding:0;
   }
 
+  .edit {
+    position:absolute;
+    height:24px;
+    width:22px;
+    line-height:24px;
+    font-size:14px;
+    background-color:#fff;
+    text-align:center;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    border:1px solid @lightgrey-border;
+    top:6px;
+    right:8px;
+    color:lighten(desaturate(@nightsky, 100%), 35%);
+    cursor:pointer;
+  }
+
+  .edit.focus {
+    background-color:#fff;
+    border-color:@form-blue-border;
+  }
+
+  .edit:hover {
+    background-color:lighten(@blueish-white-hi, 2%);
+  }
+
+  .edit-dropdown {
+    position:absolute;
+    top:32px;
+    right:8px;
+    .box-shadow(0, 2px, 4px, rgba(0, 0, 0, 0.2));
+    background-color:#fff;
+    border:1px solid @lightgrey-border-darker;
+    list-style-type:none;
+    margin:0;
+    padding:5px 0;
+
+    li {
+      font-size:15px;
+      padding:0 15px;
+      cursor:pointer;
+    }
+
+    li:hover {
+      background-color:@blueish-white;
+    }
+
+  }
+
   .created {
     bottom:9px;
-    background-color:#fff;
-    border:1px solid @lightgrey-border;
   }
 
 }
