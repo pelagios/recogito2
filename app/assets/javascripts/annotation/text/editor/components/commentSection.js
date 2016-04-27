@@ -1,7 +1,11 @@
-define(['../../../../common/formatting', '../../../../common/config',], function(Formatting, Config) {
+define(['../../../../common/hasEvents',
+        '../../../../common/formatting',
+        '../../../../common/config',], function(HasEvents, Formatting, Config) {
 
   var CommentSection = function(parent, commentBody, zIndex) {
-    var element = jQuery(
+    var self = this,
+
+        element = jQuery(
           '<div class="section comment" style="z-index:' + zIndex + '">' +
             '<div class="comment-body">' + commentBody.value + '</div>' +
             '<div class="icon edit">&#xf142;</div>' +
@@ -53,7 +57,11 @@ define(['../../../../common/formatting', '../../../../common/config',], function
             // Make menu items clickable
             dropdownMenu.on('click', 'li', function(e) {
               var fn = jQuery(e.target).data('fn');
-              console.log(fn);
+              if (fn === 'delete') {
+                self.fireEvent('delete');
+              } else {
+                // TODO implement editing
+              }
             });
           },
 
@@ -70,7 +78,9 @@ define(['../../../../common/formatting', '../../../../common/config',], function
     parent.append(element);
 
     this.destroy = destroy;
+    HasEvents.apply(this);
   };
+  CommentSection.prototype = Object.create(HasEvents.prototype);
 
   return CommentSection;
 

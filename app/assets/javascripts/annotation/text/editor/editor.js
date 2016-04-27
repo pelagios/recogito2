@@ -72,6 +72,20 @@ define(['../../../common/annotationUtils',
 
         currentAnnotation = false,
 
+        /** Removes a body + corresponding section **/
+        removeBody = function(section, body) {
+          // Remove the body from the annotation
+          Utils.deleteBody(currentAnnotation, body);
+
+          // Destroy the section element, removing it from the DOM
+          section.destroy();
+
+          // Remove the section from the list
+          var idx = bodySections.indexOf(section);
+          if (idx > -1)
+            bodySections.splice(idx, 1);
+        },
+
         /** Opens the editor with an annotation, at the specified bounds **/
         open = function(annotation, bounds) {
           var scrollTop = jQuery(document).scrollTop(),
@@ -89,8 +103,11 @@ define(['../../../common/annotationUtils',
           // Add comment body sections
           var comments = Utils.getBodiesOfType(annotation, 'COMMENT');
           jQuery.each(comments, function(idx, commentBody) {
-            var zIndex = comments.length - idx;
-            bodySections.push(new CommentSection(commentBodyContainer, commentBody, zIndex));
+            var zIndex = comments.length - idx,
+                commentSection = new CommentSection(commentBodyContainer, commentBody, zIndex);
+
+            bodySections.push(commentSection);
+            commentSection.on('delete', function() { removeBody(commentSection, commentBody); });
           });
 
           if (comments.length > 0)

@@ -48,6 +48,12 @@ define(function() {
 
         return offsetA - offsetB;
       });
+    },
+
+    deleteBody: function(annotation, body) {
+      var idx = annotation.bodies.indexOf(body);
+      if (idx > -1)
+        annotation.bodies.splice(idx, 1);
     }
 
   };
