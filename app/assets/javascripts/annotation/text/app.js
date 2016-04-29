@@ -12,14 +12,13 @@ require([
 
         contentNode = document.getElementById('content'),
 
-        highlighter = new Highlighter(contentNode),
-
         editor = new Editor(contentNode),
 
         API = new APIConnector(),
 
         onAnnotationsLoaded = function(annotations) {
-          var sorted = Utils.sortByOffset(annotations);
+          var highlighter = new Highlighter(contentNode),
+              sorted = Utils.sortByOffset(annotations);
 
           jQuery('.annotations').html(annotations.length);
 
