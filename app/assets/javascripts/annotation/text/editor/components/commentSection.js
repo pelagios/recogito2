@@ -5,9 +5,14 @@ define(['../../../../common/hasEvents',
   var CommentSection = function(parent, commentBody, zIndex) {
     var self = this,
 
+        /** TODO we may want to allow HTML later - but then need to sanitize **/
+        escapeHtml = function(text) {
+          return jQuery('<div/>').text(text).html();
+        },
+
         element = jQuery(
           '<div class="section comment" style="z-index:' + zIndex + '">' +
-            '<div class="comment-body">' + commentBody.value + '</div>' +
+            '<div class="comment-body">' + escapeHtml(commentBody.value) + '</div>' +
             '<div class="icon edit">&#xf142;</div>' +
             '<div class="created">' +
               '<a class="by" href="/' + commentBody.last_modified_by + '">' +
