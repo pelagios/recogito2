@@ -143,9 +143,12 @@ require(['../../common/config'], function(Config) {
         };
 
     // Start polling task progress
-    jQuery.each(Config.tasks, function(idx, taskURL) {
-      pollProcessingProgress(taskURL);
-    });
+    if (Config.tasks.length === 0)
+      jQuery('.btn.next').prop('disabled', false);
+    else
+      jQuery.each(Config.tasks, function(idx, taskURL) {
+        pollProcessingProgress(taskURL);
+      });
 
     // Make filepart elements sortable (and disable selection)
     jQuery('ul.fileparts').sortable();
