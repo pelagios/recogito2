@@ -140,18 +140,44 @@ define(['../../../common/annotationUtils',
         },
 
         /** Opens the editor on a newly created text selection **/
-        onSelectText = function(e) {
-          open(e.annotation, e.bounds);
+        onSelectText = function(selection) {
+          open(selection.annotation, selection.bounds);
+          return false;
         },
 
         /** Opens the editor on an existing annotation **/
         onSelectAnnotation = function(e) {
-          var annotation = e.target.annotation,
-              bounds = e.target.getBoundingClientRect();
+          var selection = selectionHandler.getSelection(),
+              allAnnotations, topAnnotation, bounds,
 
-          open(annotation, bounds);
+              /** This helper gets all annotations in case of multipe nested annotation spans **/
+              getAnnotationsRecursive = function(element, a) {
+                var annotations = (a) ? a : [ ],
+                    parent = element.parentNode;
 
-          // TODO perhaps we need to check for the 'topmost' annotation?
+                annotations.push(element.annotation);
+
+                if (jQuery(parent).hasClass('annotation'))
+                  return getAnnotationsRecursive(parent, annotations);
+                else
+                  return annotations;
+              },
+
+              /** Helper that sorts annotations by quote length, so we can pick the shortest **/
+              sortByQuoteLength = function(annotations) {
+                return annotations.sort(function(a, b) {
+                  return Utils.getQuote(a).length - Utils.getQuote(b).length;
+                });
+              };
+
+          if (selection) {
+            onSelectText(selection);
+          } else {
+            allAnnotations = sortByQuoteLength(getAnnotationsRecursive(e.target));
+            topAnnotation = allAnnotations[0];
+            bounds = e.target.getBoundingClientRect();
+            open(topAnnotation, bounds);
+          }
 
           // To avoid repeated events from overlapping annotations below
           return false;
@@ -166,7 +192,7 @@ define(['../../../common/annotationUtils',
           bodySections.push(placeSection);
 
           queuedUpdates.push(function() {
-            currentAnnotation.bodies.push(placeBody);            
+            currentAnnotation.bodies.push(placeBody);
           });
         },
 

@@ -4,6 +4,8 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
 
     var self = this,
 
+        currentSelection = false,
+
         trimRange = function(range) {
           var quote = range.toString(),
               leadingSpaces = 0,
@@ -58,6 +60,7 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
 
         /** cf. http://stackoverflow.com/questions/3169786/clear-text-selection-with-javascript **/
         clearSelection = function() {
+          currentSelection = false;
           unwrapSelectionSpans();
 
           if (window.getSelection) {
@@ -70,6 +73,10 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
           }
         },
 
+        getSelection = function() {
+          return currentSelection;
+        },
+
         onSelect = function(e) {
           var selection = rangy.getSelection(),
               selectedRange, annotationStub, bounds;
@@ -78,19 +85,23 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
                selection.rangeCount == 1 &&
                selection.getRangeAt(0).toString().trim().length > 0) {
 
-            selectedRange = trimRange(selection.getRangeAt(0));
-            annotation = rangeToAnnotationStub(selectedRange);
-            bounds = selectedRange.nativeRange.getBoundingClientRect();
+             selectedRange = trimRange(selection.getRangeAt(0));
+             annotation = rangeToAnnotationStub(selectedRange);
+             bounds = selectedRange.nativeRange.getBoundingClientRect();
 
-            clearSelection();
-            highlighter.wrapRange(selectedRange, 'selection');
+             clearSelection();
+             highlighter.wrapRange(selectedRange, 'selection');
 
-            self.fireEvent('select', { annotation: annotation, bounds: bounds });
+             currentSelection = { annotation: annotation, bounds: bounds };
+             self.fireEvent('select', currentSelection);
           }
+
+          return false;
         };
 
     jQuery(rootNode).mouseup(onSelect);
 
+    this.getSelection = getSelection;
     this.clearSelection = clearSelection;
 
     HasEvents.apply(this);
