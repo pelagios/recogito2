@@ -18,23 +18,21 @@ define(['../../../../common/config',
                   '<p class="description"></p>' +
                   '<p class="names"></p>' +
                   '<p class="date"></p>' +
-                  '<div class="created-container">' +
-                    '<div class="created">' +
-                      '<a class="by"></a>' +
-                      '<span class="at"></span>' +
-                    '</div>' +
-                    '<button class="change">Change</button>' +
+                  '<div class="created">' +
+                    '<a class="by"></a>' +
+                    '<span class="at"></span>' +
                   '</div>' +
+                  '<button class="change btn tiny">Change</button>' +
                   '<div class="warning-unverified">' +
                     '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-                    '<button class="change">Change</button>' +
-                    '<button class="confirm">Confirm</button>' +
+                    '<button class="unverified-change">Change</button>' +
+                    '<button class="unverified-confirm">Confirm</button>' +
                   '</div>' +
                 '</div>' +
               '</div>' +
             '</div>');
 
-          el.find('.warning-unverified, .created').hide();
+          el.find('.warning-unverified, .created, .change').hide();
           parent.append(el);
           return el;
         })(),
@@ -45,14 +43,14 @@ define(['../../../../common/config',
         names = element.find('.names'),
         date = element.find('.date'),
 
-        createdSection = element.find('.created'),
+        createdSection = element.find('.created, .change'),
         createdBy = createdSection.find('.by'),
         createdAt = createdSection.find('.at'),
 
         warningSection = element.find('.warning-unverified'),
 
-        btnConfirm = element.find('button.confirm'),
-        btnChange = element.find('button.change'),
+        btnChange = element.find('.unverified-change, .change'),
+        btnConfirm = element.find('.unverified-confirm'),
 
         currentGazetteerRecord = false,
 
