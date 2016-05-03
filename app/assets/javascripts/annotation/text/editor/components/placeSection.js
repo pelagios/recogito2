@@ -1,5 +1,8 @@
-define(['../../../../common/formatting',
-        '../../../../common/placeUtils'], function(Formatting, PlaceUtils) {
+define(['../../../../common/config',
+        '../../../../common/formatting',
+        '../../../../common/placeUtils'], function(Config, Formatting, PlaceUtils) {
+
+  var SLIDE_DURATION = 200;
 
   var PlaceSection = function(parent, placeBody, quote) {
     var self = this,
@@ -88,7 +91,7 @@ define(['../../../../common/formatting',
             description.hide();
           }
 
-          // names.html(labels.slice(1).join(', '));
+          // names.htmlcreatedBy(labels.slice(1).join(', '));
 
           if (gazetteerRecord.temporal_bounds) {
             date.html(Formatting.yyyyMMddToYear(gazetteerRecord.temporal_bounds.from) + ' - ' +
@@ -177,8 +180,10 @@ define(['../../../../common/formatting',
 
         onConfirm = function() {
           placeBody.status.value = 'VERIFIED';
-          createdSection.hide();
-          warningSection.hide();
+          createdBy.html(Config.me);
+          createdAt.html(Formatting.timeSince(new Date()));
+          createdSection.fadeIn(SLIDE_DURATION);
+          warningSection.slideUp(SLIDE_DURATION);
         },
 
         destroy = function() {
