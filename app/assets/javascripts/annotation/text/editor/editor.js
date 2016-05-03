@@ -217,6 +217,12 @@ define(['../../../common/annotationUtils',
     // Ctrl+Enter on reply field doubles as 'OK'
     replyField.on('submit', onOk);
 
+    // ESC closes the editor
+    jQuery(document).keyup(function(e) {
+      if (e.which === 27)
+        onCancel();
+    });
+
     // Wire button events
     btnPlace.click(onAddPlace);
     btnPerson.click(onAddPerson);

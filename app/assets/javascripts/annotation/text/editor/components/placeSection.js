@@ -18,9 +18,12 @@ define(['../../../../common/config',
                   '<p class="description"></p>' +
                   '<p class="names"></p>' +
                   '<p class="date"></p>' +
-                  '<div class="created">' +
-                    '<a class="by"></a>' +
-                    '<span class="at"></span>' +
+                  '<div class="created-container">' +
+                    '<div class="created">' +
+                      '<a class="by"></a>' +
+                      '<span class="at"></span>' +
+                    '</div>' +
+                    '<button class="change">Change</button>' +
                   '</div>' +
                   '<div class="warning-unverified">' +
                     '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
@@ -31,7 +34,7 @@ define(['../../../../common/config',
               '</div>' +
             '</div>');
 
-          el.find('.warning-unverified').hide();
+          el.find('.warning-unverified, .created').hide();
           parent.append(el);
           return el;
         })(),
