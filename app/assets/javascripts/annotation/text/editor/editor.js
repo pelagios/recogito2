@@ -58,7 +58,11 @@ define(['../../../common/annotationUtils',
         placeBodyContainer = bodyContainer.find('.bodies-place'),
         commentBodyContainer = bodyContainer.find('.bodies-comment'),
 
+        /** Currently visible body sections **/
         bodySections = [],
+
+        /** Changes to be applied to the annotation when the user clicks OK **/
+        queuedUpdates = [],
 
         fieldContainer = element.find('.fields'),
         replyField = new ReplyField(fieldContainer),
@@ -74,9 +78,6 @@ define(['../../../common/annotationUtils',
 
         /** Removes a body + corresponding section **/
         removeBody = function(section, body) {
-          // Remove the body from the annotation
-          Utils.deleteBody(currentAnnotation, body);
-
           // Destroy the section element, removing it from the DOM
           section.destroy();
 
@@ -84,6 +85,9 @@ define(['../../../common/annotationUtils',
           var idx = bodySections.indexOf(section);
           if (idx > -1)
             bodySections.splice(idx, 1);
+
+          // Queue the delete operation
+          queuedUpdates.push(function() { Utils.deleteBody(currentAnnotation, body); });
         },
 
         /** Opens the editor with an annotation, at the specified bounds **/
@@ -159,8 +163,11 @@ define(['../../../common/annotationUtils',
               quote = Utils.getQuote(currentAnnotation),
               placeSection = new PlaceSection(placeBodyContainer, placeBody, quote);
 
-          currentAnnotation.bodies.push(placeBody);
           bodySections.push(placeSection);
+
+          queuedUpdates.push(function() {
+            currentAnnotation.bodies.push(placeBody);            
+          });
         },
 
         /** TODO implement **/
@@ -198,6 +205,9 @@ define(['../../../common/annotationUtils',
           if (reply)
             currentAnnotation.bodies.push(reply);
 
+          // Apply changes
+          jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
+
           storeAnnotation();
           close();
         },
@@ -205,6 +215,10 @@ define(['../../../common/annotationUtils',
         /** 'Cancel' clears the selection and closes the editor **/
         onCancel = function() {
           selectionHandler.clearSelection();
+
+          // Discard changes
+          queuedUpdates = [];
+
           close();
         };
 
