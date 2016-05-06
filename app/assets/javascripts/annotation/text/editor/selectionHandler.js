@@ -78,8 +78,13 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
         },
 
         onSelect = function(e) {
-          var selection = rangy.getSelection(),
+          var isSelectionOnEditor = jQuery(e.target).closest('.text-annotation-editor').length > 0,
+              selection = rangy.getSelection(),
               selectedRange, annotationStub, bounds;
+
+          // If the selection happened on the editor, we'll ignore
+          if (isSelectionOnEditor)
+            return;
 
           if (!selection.isCollapsed &&
                selection.rangeCount == 1 &&
