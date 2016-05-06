@@ -31,7 +31,7 @@ define(['../../common/config', '../../common/hasEvents'], function(Config, HasEv
         attachButtonHandlers = function() {
           annotationModes.on('click', '>li', function(e) {
             var menuItemQuick = annotationModes.find('.quick'),
-                t = jQuery(e.target),
+                t = jQuery(e.target).closest('li'),
                 mode = t.data('mode'),
                 type = t.data('type');
 

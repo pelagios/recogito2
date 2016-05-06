@@ -20,6 +20,7 @@ body {
   position:absolute;
   left:0;
   right:0;
+  height:33px;
 
   ul {
     display:inline-block;
@@ -34,8 +35,12 @@ body {
     padding:0;
     display:inline-block;
     font-weight:normal;
-    border-bottom:4px solid transparent;
     cursor:pointer;
+  }
+
+  li > .tool-label {
+    padding-bottom:4px;
+    border-bottom:4px solid transparent;
   }
 
   .has-sub-options:hover {
@@ -44,7 +49,7 @@ body {
 
   ul.annotation-mode {
 
-    li.active, li:hover {
+    li.active > .tool-label, li:not(.quick):hover > .tool-label {
       border-color:@ocean;
     }
 
@@ -52,10 +57,14 @@ body {
 
   ul.color-scheme {
 
-    li.active, li:hover {
+    li.active > .tool-label, li:hover > .tool-label {
       border-color:@shore;
     }
 
+  }
+
+  li.quick .tool-label {
+    margin:0 0 0 15px;
   }
 
   li.quick:before {
@@ -79,7 +88,7 @@ body {
 
   li.quick.TAGS:before {
     content:'\f02c';
-    left:0;
+    left:-1px;
   }
 
 } /** .header-toolbar **/
