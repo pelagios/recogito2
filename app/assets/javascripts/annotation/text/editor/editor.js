@@ -86,7 +86,7 @@ define(['../../../common/annotationUtils',
           if (idx > -1)
             bodySections.splice(idx, 1);
 
-          // Queue the delete operation
+          // Queue the delete operation for later, when user click 'OK'
           queuedUpdates.push(function() { Utils.deleteBody(currentAnnotation, body); });
         },
 
@@ -206,35 +206,41 @@ define(['../../../common/annotationUtils',
 
         },
 
-        /** Stores the annotation (converting selection to annotation highlight, if any) **/
-        storeAnnotation = function() {
-          var annotationSpans;
-
-          if (currentAnnotation.annotation_id) {
-            // Annotation is already stored at the server - update
-            annotationSpans = jQuery('[data-id=' + currentAnnotation.annotation_id + ']');
-          } else {
-            // New annotation, created from a fresh selection
-            selectionHandler.clearSelection();
-            annotationSpans = highlighter.renderAnnotation(currentAnnotation);
-          }
-
-          self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
-        },
-
         /**
-         * 'OK' adds the content of the reply field as comment, stores the
-         * annotation (which will clear the selection) and closes the editor.
+         * 'OK' adds the content of the reply field as comment, stores the annotation, updates
+         * selection/annotation highlight if necessary and closes the editor.
          */
         onOk = function() {
-          var reply = replyField.getComment();
+          var reply = replyField.getComment(),
+              bodies = currentAnnotation.bodies,
+              annotationSpans;
+
+          // Push the current reply body, if any
           if (reply)
             currentAnnotation.bodies.push(reply);
 
-          // Apply changes
+          // Apply queued changes
           jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
 
-          storeAnnotation();
+          // Determine which CRUD action to perform
+          if (currentAnnotation.annotation_id) {
+            // There's an ID - annotation already stored on the server
+            if (bodies.length === 1 && bodies[0].type === 'QUOTE') {
+              // Annotation has no bodies left except the QUOTE - DELETE
+              highlighter.removeAnnotation(currentAnnotation);
+              self.fireEvent('deleteAnnotation', currentAnnotation);
+            } else {
+              // UPDATE
+              annotationSpans = jQuery('[data-id=' + currentAnnotation.annotation_id + ']');
+              self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
+            }
+          } else {
+            // No ID? New annotation from fresh selection - CREATE
+            selectionHandler.clearSelection();
+            annotationSpans = highlighter.renderAnnotation(currentAnnotation);
+            self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
+          }
+
           close();
         },
 

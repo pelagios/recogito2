@@ -47,6 +47,19 @@ object AnnotationService {
   def insertOrUpdateAnnotations(annotations: Seq[Annotation])(implicit context: ExecutionContext) =
     Future.sequence(for (result <- annotations.map(insertOrUpdateAnnotation(_))) yield result) 
   
+  def findById(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[(Annotation, Long)]] = {
+    ES.client execute {
+      get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION 
+    } map { response =>
+      if (response.isExists) {
+        val source = Json.parse(response.getSourceAsString)
+        Some((Json.fromJson[Annotation](source).get, response.getVersion))    
+      } else {
+        None
+      }
+    }
+  }
+    
   def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] = {
     // TODO can we eleminate cross-dependency to PlaceLinkService? Both the PlaceService and the Annotation service, by
     // definition, need to deal with PlaceLinks. Trait?

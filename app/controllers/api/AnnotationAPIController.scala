@@ -180,5 +180,38 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
 
     }
   }
+  
+  def deleteAnnotation(id: UUID) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    AnnotationService.findById(id).flatMap(_ match {
+      case Some((annotation, version)) => {
+        // Fetch the associated document
+        DocumentService.findById(annotation.annotates.document).flatMap(_ match {
+          case Some(document) => {
+            // TODO check if the user has write permissions
+            // TODO for now we'll just check ownership
+            if (document.getOwner == loggedIn.user.getUsername) {
+              // If so, are there any comment nodes left that are *not* by this user?
+              AnnotationService.deleteAnnotation(id).map(success => {
+                if (success)
+                  Status(204)
+                else
+                  InternalServerError
+              })
+            } else {
+              Future.successful(Forbidden)
+            }
+          }
+            
+          case None => {
+            // Annotation on a non-existing document? Can't happen except DB integrity is broken
+            Logger.warn("Annotation points to document " + annotation.annotates.document + " but not in DB")
+            Future.successful(InternalServerError)
+          }
+        })
+      }
+      
+      case None => Future.successful(NotFound)
+    })
+  }
 
 }

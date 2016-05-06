@@ -31,6 +31,10 @@ define(['../common/hasEvents'], function(HasEvents) {
     });
   };
 
+  APIConnector.prototype.deleteAnnotation = function(id) {
+    return jsRoutes.controllers.api.AnnotationAPIController.deleteAnnotation(id).ajax();
+  };
+
   return APIConnector;
 
 });

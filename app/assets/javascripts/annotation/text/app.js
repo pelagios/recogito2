@@ -46,6 +46,13 @@ require([
              });
         },
 
+        onDeleteAnnotation = function(annotation) {
+          API.deleteAnnotation(annotation.annotation_id)
+             .fail(function(error) {
+               console.log(error);
+             });
+        },
+
         onAnnotationStored = function(annotation) {
           // renderAnnotation(annotation);
         },
@@ -57,6 +64,7 @@ require([
 
     // Editor events
     editor.on('updateAnnotation', onUpdateAnnotation);
+    editor.on('deleteAnnotation', onDeleteAnnotation);
 
     // API events
     API.on('annotationsLoaded', onAnnotationsLoaded);

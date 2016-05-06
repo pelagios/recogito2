@@ -92,7 +92,7 @@ define(['../../common/annotationUtils'], function(Utils) {
               spans;
 
           range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
-          spans = wrapRange(range, cssClass, annotation);
+          spans = wrapRange(range, cssClass);
 
           // Attach annotation data as payload to the SPANs and set id, if any
           jQuery.each(spans, function(idx, span) {
@@ -100,8 +100,18 @@ define(['../../common/annotationUtils'], function(Utils) {
           });
 
           return spans;
+        },
+
+        removeAnnotation = function(annotation) {
+          var spans = jQuery('[data-id="' + annotation.annotation_id + '"]');
+          jQuery.each(spans, function(idx, span) {
+            var el = jQuery(span);
+            el.replaceWith(el.contents());
+          });
+          rootNode.normalize();
         };
 
+    this.removeAnnotation = removeAnnotation;
     this.renderAnnotation = renderAnnotation;
     this.wrapRange = wrapRange;
   };
