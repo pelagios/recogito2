@@ -64,6 +64,15 @@
       text-overflow:ellipsis;
     }
 
+    button {
+      .rounded-corners(2px);
+      border:none;
+      color:#fff;
+      cursor:pointer;
+      outline:none;
+      font-family:PTSansNarrow;
+    }
+
     .created {
       bottom:6px;
     }
@@ -89,15 +98,8 @@
 
       button {
         float:right;
-        .rounded-corners(2px);
         line-height:21px;
-        background:none;
         background-color:#f0ad4e;
-        border:none;
-        color:#fff;
-        cursor:pointer;
-        outline:none;
-        font-family:PTSansNarrow;
         font-size:14px;
         margin:1px 5px 0 0;
         padding:0 7px;
@@ -106,6 +108,23 @@
     }
 
   } /** .panel **/
+
+  .panel .no-match {
+    text-align:center;
+    padding-top:25px;
+
+    h3 {
+      color:darken(#f0ad4e, 10%);
+      margin-bottom:10px;
+    }
+
+    button {
+      background-color:#f0ad4e;
+      font-size:15px;
+      padding:2px 10px;
+    }
+
+  } /** .panel .no-match **/
 
 }
 

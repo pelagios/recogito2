@@ -37,6 +37,14 @@ define(['../../../../common/config',
           return el;
         })(),
 
+        noMatchTemplate = jQuery(
+          '<div class="no-match">' +
+            '<h3>No automatic match found</h3>' +
+            '<button>Search</button>' +
+          '</div>'),
+
+        panel = element.find('.panel'),
+
         title = element.find('h3'),
         gazetteerId = element.find('.gazetteer'),
         description = element.find('.description'),
@@ -126,12 +134,23 @@ define(['../../../../common/config',
 
         /** Renders a 'no match' place card, due to yellow status or failed match **/
         renderNoMatchCard = function() {
-
+          panel.html(noMatchTemplate);
         },
 
         /** Renders the error edge cases where the place body has a URI that can't be resolved **/
         renderResolveErrorCard = function() {
+          gazetteerId.html(Formatting.formatGazetteerURI(placeBody.uri));
 
+          if (placeBody.last_modified_by) {
+            createdBy.html(placeBody.last_modified_by);
+            createdBy.attr('href', '/' + placeBody.last_modified_by);
+          }
+
+          if (placeBody.last_modified_at)
+            createdAt.html(Formatting.timeSince(placeBody.last_modified_at));
+
+          createdSection.show();
+          warningSection.hide();
         },
 
         /** Fills the template by delegating to the appropriate place card renderer **/
@@ -187,6 +206,10 @@ define(['../../../../common/config',
           warningSection.slideUp(SLIDE_DURATION);
         },
 
+        commit = function() {
+          // TODO implement
+        },
+
         destroy = function() {
           element.remove();
         };
@@ -198,6 +221,7 @@ define(['../../../../common/config',
     else
       fillFromQuote();
 
+    this.commit = commit;
     this.destroy = destroy;
   };
 
