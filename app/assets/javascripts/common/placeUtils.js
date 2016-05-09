@@ -2,6 +2,10 @@ define(function() {
 
   var PlaceUtils = {
 
+    findMatches: function(query) {
+      return jQuery.getJSON('/api/places/search?q=' + query);
+    },
+
     getBestMatchingRecord: function(place, name) {
       return place.is_conflation_of[0];
     },

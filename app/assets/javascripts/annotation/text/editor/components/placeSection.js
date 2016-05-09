@@ -183,7 +183,7 @@ define(['../../../../common/config',
 
         /** Fills the place card based on a search on the provided quote string **/
         fillFromQuote = function() {
-          jQuery.getJSON('/api/places/search?q=' + quote, function(response) {
+          PlaceUtils.findMatches(quote).done(function(response) {
             if (response.total > 0) {
               var topPlace = response.items[0],
                   bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),

@@ -1,15 +1,25 @@
 define(['../../../common/annotationUtils',
+        '../../../common/placeUtils',
         '../../../common/hasEvents',
         'highlighter',
         'editor/selectionHandler',
         'editor/components/commentSection',
         'editor/components/placeSection',
-        'editor/components/replyField'], function(Utils, HasEvents, Highlighter, SelectionHandler, CommentSection, PlaceSection, ReplyField) {
+        'editor/components/replyField'], function(AnnotationUtils,
+                                                  PlaceUtils,
+                                                  HasEvents,
+                                                  Highlighter,
+                                                  SelectionHandler,
+                                                  CommentSection,
+                                                  PlaceSection,
+                                                  ReplyField) {
 
   /** The main annotation editor popup **/
   var Editor = function(parentNode) {
 
     var self = this,
+
+        annotationMode = { mode: 'NORMAL' },
 
         highlighter = new Highlighter(parentNode),
 
@@ -87,25 +97,25 @@ define(['../../../common/annotationUtils',
             bodySections.splice(idx, 1);
 
           // Queue the delete operation for later, when user click 'OK'
-          queuedUpdates.push(function() { Utils.deleteBody(currentAnnotation, body); });
+          queuedUpdates.push(function() { AnnotationUtils.deleteBody(currentAnnotation, body); });
         },
 
         /** Opens the editor with an annotation, at the specified bounds **/
         open = function(annotation, bounds) {
           var scrollTop = jQuery(document).scrollTop(),
-              quote = Utils.getQuote(annotation);
+              quote = AnnotationUtils.getQuote(annotation);
 
           clear();
           currentAnnotation = annotation;
 
           // Add place body sections
-          var places = Utils.getBodiesOfType(annotation, 'PLACE');
+          var places = AnnotationUtils.getBodiesOfType(annotation, 'PLACE');
           jQuery.each(places, function(idx, placeBody) {
             bodySections.push(new PlaceSection(placeBodyContainer, placeBody, quote));
           });
 
           // Add comment body sections
-          var comments = Utils.getBodiesOfType(annotation, 'COMMENT');
+          var comments = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT');
           jQuery.each(comments, function(idx, commentBody) {
             var zIndex = comments.length - idx,
                 commentSection = new CommentSection(commentBodyContainer, commentBody, zIndex);
@@ -120,6 +130,10 @@ define(['../../../common/annotationUtils',
 
           element.css({ top: bounds.bottom + scrollTop, left: bounds.left });
           element.show();
+        },
+
+        setMode = function(mode) {
+          annotationMode = mode;
         },
 
         /** Closes the editor, clearing all editor components **/
@@ -141,8 +155,35 @@ define(['../../../common/annotationUtils',
         },
 
         /** Opens the editor on a newly created text selection **/
-        onSelectText = function(selection) {
-          open(selection.annotation, selection.bounds);
+        onSelectText = function(e) {
+          var quote, record, body;
+
+          if (annotationMode.mode === 'NORMAL') {
+            open(e.annotation, e.bounds);
+
+          } else if (annotationMode.mode === 'QUICK' && annotationMode.type === 'PLACE') {
+            quote = AnnotationUtils.getQuote(e.annotation);
+            currentAnnotation = e.annotation;
+            body = { type: 'PLACE', status: { value: 'UNVERIFIED' } };
+
+            PlaceUtils.findMatches(quote).done(function(response) {
+              if (response.total > 0) {
+                record = PlaceUtils.getBestMatchingRecord(response.items[0], quote);
+                body.uri = record.uri;
+              }
+
+              currentAnnotation.bodies.push(body);
+              onOk();
+            });
+
+          } else if (annotationMode.mode === 'QUICK' && annotationMode.type === 'PERSON') {
+            currentAnnotation = e.annotation;
+            currentAnnotation.bodies.push({ type: 'PERSON' });
+            onOk();
+          }
+
+          // TODO what happens on mode == bulk?
+
           return false;
         },
 
@@ -167,7 +208,7 @@ define(['../../../common/annotationUtils',
               /** Helper that sorts annotations by quote length, so we can pick the shortest **/
               sortByQuoteLength = function(annotations) {
                 return annotations.sort(function(a, b) {
-                  return Utils.getQuote(a).length - Utils.getQuote(b).length;
+                  return AnnotationUtils.getQuote(a).length - AnnotationUtils.getQuote(b).length;
                 });
               };
 
@@ -187,7 +228,7 @@ define(['../../../common/annotationUtils',
         /** Click on 'Place' button adds a place body **/
         onAddPlace = function() {
           var placeBody = { type: 'PLACE', status: { value: 'UNVERIFIED' } },
-              quote = Utils.getQuote(currentAnnotation),
+              quote = AnnotationUtils.getQuote(currentAnnotation),
               placeSection = new PlaceSection(placeBodyContainer, placeBody, quote);
 
           bodySections.push(placeSection);
@@ -281,6 +322,8 @@ define(['../../../common/annotationUtils',
     btnEvent.click(onAddEvent);
     btnCancel.click(onCancel);
     btnOk.click(onOk);
+
+    this.setMode = setMode;
 
     HasEvents.apply(this);
   };

@@ -106,8 +106,8 @@ define(['../../../common/hasEvents', '../../../common/config'], function(HasEven
 
     jQuery(rootNode).mouseup(onSelect);
 
-    this.getSelection = getSelection;
     this.clearSelection = clearSelection;
+    this.getSelection = getSelection;
 
     HasEvents.apply(this);
   };

@@ -62,6 +62,9 @@ require([
           console.log(error);
         };
 
+    // Toolbar events
+    toolbar.on('annotationModeChanged', editor.setMode);
+
     // Editor events
     editor.on('updateAnnotation', onUpdateAnnotation);
     editor.on('deleteAnnotation', onDeleteAnnotation);
