@@ -16,10 +16,8 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   jdbc,
   cache,
-  ws,
 
-  "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.4",
-  "org.codehaus.groovy" % "groovy-all"  % "2.4.6",
+  "com.sksamuel.elastic4s" %% "elastic4s-streams" % "2.3.0",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
   "com.vividsolutions" % "jts" % "1.13",

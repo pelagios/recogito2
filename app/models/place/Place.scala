@@ -72,7 +72,7 @@ case class Place(
 object Place extends HasGeometry {
   
   implicit val placeFormat: Format[Place] = (
-    (JsPath \ "_id").format[String] and
+    (JsPath \ "id").format[String] and
     (JsPath \ "labels").format[Seq[String]] and
     (JsPath \ "geometry").formatNullable[Geometry] and
     (JsPath \ "representative_point").formatNullable[Coordinate] and

@@ -42,11 +42,7 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
   * Implement PlaceLink rewriting after gazetteer updates (using optimistic locking)
   * The place schema doesn't yet include is_part_of relations. Q: how do we deal with
     incoherent hierarchy relations reported by different gazetteers?
-* Check the build file: do we need 'ws' dependency? Remove Groovy dependency in case we don't use
-  ElasticSearch scripting after all
-* Accordingly, clean up elasticsearch.yml in case we don't use scripting
 * Fix the various compiler warnings introduced with the Play 2.5 upgrade
-* Upgrade to latest ElasticSearch version
 * Deleting a doc currently doesn't delete its annotations
 * Q: do we want people to be able to upload their own gazetteers, for exclusive use within a team.
   How would we model in ES? One separate index for user gazetteers + owner field + multi-index
@@ -62,10 +58,3 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
     additional annotation that has two annotations as target I guess? Prob. more complicated
     than it needs to be. In our case: e.g. a body of type HYPERLINK with a URI? (Disadvantage:
     we don't know if its an internal link in the same doc or not, unless we parse the URI.)
-* Next steps on text annotation UI:
-  * Place body section needs to show: gazetteer URI; gazetteer place type (if any); indication
-    of whether confirmation still needed (in general: do we show validation status?); description;
-    a "change" and "delete" option
-  * How do we structure the 'Change' dialog for geo-resolution? In general there's the issue
-    of changing between different gazetteer URIs representing the same place vs. changing the
-    mapping to a different place altogether.

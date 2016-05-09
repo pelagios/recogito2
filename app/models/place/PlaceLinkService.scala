@@ -74,7 +74,7 @@ object PlaceLinkService {
         ES.client execute {
           bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.IDX_RECOGITO / PLACE_LINK } )
         } map { 
-          !_.hasFailures() 
+          !_.hasFailures 
         } recover { case t: Throwable =>
           t.printStackTrace()
           false

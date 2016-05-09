@@ -52,7 +52,7 @@ object AnnotationService {
       get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION 
     } map { response =>
       if (response.isExists) {
-        val source = Json.parse(response.getSourceAsString)
+        val source = Json.parse(response.sourceAsString)
         Some((Json.fromJson[Annotation](source).get, response.getVersion))    
       } else {
         None

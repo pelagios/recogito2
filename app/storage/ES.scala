@@ -3,7 +3,7 @@ package storage
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
-import org.elasticsearch.common.settings.ImmutableSettings
+import org.elasticsearch.common.settings.Settings
 import play.api.{ Logger, Play }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.io.Source
@@ -21,7 +21,7 @@ object ES {
     }
     
     val settings =
-      ImmutableSettings.settingsBuilder()
+      Settings.settingsBuilder()
         .put("http.enabled", true)
         .put("path.home", home.getAbsolutePath)
         
@@ -37,11 +37,15 @@ object ES {
     
     if (!response.isExists()) {
       Logger.info("No ES index - initializing...")
-      val create = client.admin.indices().prepareCreate(IDX_RECOGITO)
+      
+      val create = client.admin.indices().prepareCreate(IDX_RECOGITO) 
+      create.setSettings(loadSettings())
+      
       loadMappings.foreach { case (name, json) =>  { 
         Logger.info("Create mapping - " + name)
-        create.addMapping(name, json) 
+        create.addMapping(name, json)
       }}
+      
       create.execute().actionGet()
     }
   }
@@ -55,13 +59,17 @@ object ES {
     Logger.info("Stopping ElasticSearch local node")
     client.close()
   }
+  
+  private def loadSettings(): String =
+    Source.fromFile("conf/elasticsearch.json").getLines().mkString("\n")
 
   /** Loads all JSON files from the mappings directory **/
   private def loadMappings(): Seq[(String, String)] =
     new File("conf/es-mappings").listFiles.toSeq.filter(_.getName.endsWith(".json")).map(f => {
-      val name = f.getName.substring(0, f.getName.lastIndexOf('.'))
+      val number = f.getName.substring(0, 2).toInt
+      val name = f.getName.substring(3, f.getName.lastIndexOf('.'))
       val json = Source.fromFile(f).getLines.mkString("\n")
-      (name, json)
-    }).sortBy(_._1)
+      (number, (name, json))
+    }).sortBy(_._1).map(_._2)
     
 }
