@@ -5,6 +5,9 @@ define(['../../../../common/hasEvents',
   var CommentSection = function(parent, commentBody, zIndex) {
     var self = this,
 
+        // Flag indicating whether the user has switched to editing mode
+        contentEdited = false,
+
         /** TODO we may want to allow HTML later - but then need to sanitize **/
         escapeHtml = function(text) {
           return jQuery('<div/>').text(text).html();
@@ -23,6 +26,10 @@ define(['../../../../common/hasEvents',
               '</span>' +
             '</div>' +
           '</div>'),
+
+          commentDiv = element.find('.comment-body'),
+
+          created = element.find('.created'),
 
           btnOpenDropdown = element.find('.edit'),
 
@@ -65,9 +72,42 @@ define(['../../../../common/hasEvents',
               if (fn === 'delete') {
                 self.fireEvent('delete');
               } else {
-                // TODO implement editing
+                makeEditable();
               }
             });
+          },
+
+          // Cf. http://stackoverflow.com/questions/13513329/set-cursor-to-the-end-of-contenteditable-div
+          placeCaretAtEnd = function(element) {
+            var range = document.createRange(),
+                selection = window.getSelection();
+
+            range.setStart(element[0], 1);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            element.focus();
+          },
+
+          makeEditable = function() {
+            contentEdited = true;
+            element.addClass('editable');
+            commentDiv.prop('contenteditable', true);
+            placeCaretAtEnd(commentDiv);
+            created.remove();
+
+            commentDiv.keyup(function(e) {
+              if (e.ctrlKey && e.keyCode == 13)
+                self.fireEvent('submit');
+            });
+          },
+
+          commit = function() {
+            if (contentEdited) {
+              delete commentBody.last_modified_at;
+              delete commentBody.last_modified_by;
+              commentBody.value = commentDiv.text().trim();
+            }
           },
 
           destroy = function() {
@@ -82,6 +122,7 @@ define(['../../../../common/hasEvents',
 
     parent.append(element);
 
+    this.commit = commit;
     this.destroy = destroy;
     HasEvents.apply(this);
   };

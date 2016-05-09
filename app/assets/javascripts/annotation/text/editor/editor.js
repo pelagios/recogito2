@@ -112,6 +112,7 @@ define(['../../../common/annotationUtils',
 
             bodySections.push(commentSection);
             commentSection.on('delete', function() { removeBody(commentSection, commentBody); });
+            commentSection.on('submit', onOk);
           });
 
           if (comments.length > 0)
@@ -214,6 +215,11 @@ define(['../../../common/annotationUtils',
           var reply = replyField.getComment(),
               bodies = currentAnnotation.bodies,
               annotationSpans;
+
+          // Commit all changes that may have happend inside sections
+          jQuery.each(bodySections, function(idx, section) {
+            section.commit();
+          });
 
           // Push the current reply body, if any
           if (reply)
