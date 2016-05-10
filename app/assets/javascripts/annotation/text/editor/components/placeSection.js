@@ -29,6 +29,10 @@ define(['../../../../common/config',
                     '<button class="unverified-confirm">Confirm</button>' +
                   '</div>' +
                 '</div>' +
+                '<div class="warning-unlocated">' +
+                  '<span class="icon">&#xf29c;</span>' +
+                  '<span class="caption">NO LOCATION</span>' +
+                '</div>' +
               '</div>' +
             '</div>');
 
@@ -43,6 +47,7 @@ define(['../../../../common/config',
             '<button>Search</button>' +
           '</div>'),
 
+        panelContainer = element.find('.panel-container'),
         panel = element.find('.panel'),
 
         title = element.find('h3'),
@@ -55,7 +60,8 @@ define(['../../../../common/config',
         createdBy = createdSection.find('.by'),
         createdAt = createdSection.find('.at'),
 
-        warningSection = element.find('.warning-unverified'),
+        warningUnverified = element.find('.warning-unverified'),
+        warningUnlocated = element.find('.warning-unlocated'),
 
         btnChange = element.find('.unverified-change, .change'),
         btnConfirm = element.find('.unverified-confirm'),
@@ -87,7 +93,7 @@ define(['../../../../common/config',
 
         /** Renders the standard place card with gazetteer record **/
         renderStandardCard = function(gazetteerRecord, coord) {
-          var latLon = [ coord[1], coord[0] ];
+          var latLon = (coord) ? [coord[1], coord[0]] : false;
 
           title.html(gazetteerRecord.title);
           gazetteerId.html(Formatting.formatGazetteerURI(gazetteerRecord.uri));
@@ -121,15 +127,21 @@ define(['../../../../common/config',
 
           if (placeBody.status.value === 'UNVERIFIED') {
             createdSection.hide();
-            warningSection.show();
+            warningUnverified.show();
           } else {
             createdSection.show();
-            warningSection.hide();
+            warningUnverified.hide();
           }
 
           // Map
-          L.marker(latLon).addTo(map);
-          setCenter(latLon);
+          if (latLon) {
+            panelContainer.removeClass('unlocated');
+            L.marker(latLon).addTo(map);
+            setCenter(latLon);
+          } else {
+            setCenter([37.98, 23.73]);
+            panelContainer.addClass('unlocated');
+          }
         },
 
         /** Renders a 'no match' place card, due to yellow status or failed match **/
@@ -150,7 +162,7 @@ define(['../../../../common/config',
             createdAt.html(Formatting.timeSince(placeBody.last_modified_at));
 
           createdSection.show();
-          warningSection.hide();
+          warningUnverified.hide();
         },
 
         /** Fills the template by delegating to the appropriate place card renderer **/
@@ -203,7 +215,7 @@ define(['../../../../common/config',
           createdBy.html(Config.me);
           createdAt.html(Formatting.timeSince(new Date()));
           createdSection.fadeIn(SLIDE_DURATION);
-          warningSection.slideUp(SLIDE_DURATION);
+          warningUnverified.slideUp(SLIDE_DURATION);
         },
 
         commit = function() {

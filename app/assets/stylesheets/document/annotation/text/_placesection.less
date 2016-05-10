@@ -21,6 +21,41 @@
     border-bottom:1px solid @lightgrey-border-darker;
   }
 
+  .panel-container .warning-unlocated {
+    display:none;
+  }
+
+  .panel-container.unlocated .warning-unlocated {
+    display:block;
+    position:absolute;
+    background-color:rgba(255, 255, 255, 0.5);
+    top:0;
+    right:0;
+    width:165px;
+    height:140px;
+    text-align:center;
+
+    span {
+      display:block;
+      position:absolute;
+      width:100%;
+    }
+
+    .icon {
+      top:45px;
+      font-size:95px;
+      color:rgba(0, 0, 0, 0.25);
+    }
+
+    .caption {
+      top:105px;
+      font-family:OpenSans;
+      font-size:14px;
+      color:rgba(0, 0, 0, 0.5);
+    }
+
+  }
+
   .panel {
     pointer-events:auto;
     padding:3px 15px;
