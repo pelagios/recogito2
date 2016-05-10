@@ -64,16 +64,21 @@ define(['../../common/config', '../../common/hasEvents'], function(Config, HasEv
         },
 
         makeToolbarSticky = function() {
-          if (Config.IS_TOUCH)
+          var onScroll = function() {
+            var scrollTop = jQuery(window).scrollTop();
+            if (scrollTop > 147)
+              rootNode.addClass('fixed');
+            else
+              rootNode.removeClass('fixed');
+          };
+
+          if (Config.IS_TOUCH) {
             rootNode.addClass('sticky');
-          else
-            jQuery(window).scroll(function() {
-              var scrollTop = jQuery(window).scrollTop();
-              if (scrollTop > 147)
-                rootNode.addClass('fixed');
-              else
-                rootNode.removeClass('fixed');
-            });
+          } else {
+            // In case the page is initally scrolled after load
+            onScroll();
+            jQuery(window).scroll(onScroll);
+          }
         },
 
         getCurrentMode = function() {
