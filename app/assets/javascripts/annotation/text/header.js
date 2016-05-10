@@ -16,7 +16,7 @@ define(['../../common/config'], function(Config) {
          * and returns the new annotation count for convenience.
          */
         incrementAnnotationCount = function(incrementBy) {
-          var inc = (incrementBy) ? incrementBy : 1,
+          var inc = (incrementBy !== undefined) ? incrementBy : 1,
               currentCount = parseInt(annotationCountEl.text()),
               updatedCount = (currentCount) ? currentCount + inc : inc;
 

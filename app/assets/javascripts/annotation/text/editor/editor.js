@@ -144,10 +144,13 @@ define(['../../../common/annotationUtils',
 
         /** Clears all editor components **/
         clear = function() {
+
           // Destroy body sections
           jQuery.each(bodySections, function(idx, section) {
             section.destroy();
           });
+
+          bodySections = [];
 
           // Clear reply field & text selection, if any
           replyField.clear();
