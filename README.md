@@ -1,6 +1,6 @@
 # Recogito 2
 
-Future home of Recogito v2.0.
+Development home of Recogito v2.0. Track our progress on [Waffle.io](http://waffle.io/pelagios/recogito2).
 
 ## Prerequisites
 
@@ -33,22 +33,3 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
   docs](https://www.playframework.com/documentation/2.5.x/Production)
 * Be sure to set a random application secret in `conf/application.conf`. Play includes a utility
   to generate one for you - type `activator playGenerateSecret`.
-
-## Upcoming TODOs & Questions
-
-[... I'm about to move these over to the issue list...]
-
-* ElasticSearch gazetteer framework
-  * Max number of SHOULD clauses is currently not checked - we should do this in the PlaceStore
-    class to be sure weird gazetteer records don't break the import
-  * Implement PlaceLink rewriting after gazetteer updates (using optimistic locking)
-  * The place schema doesn't yet include is_part_of relations. Q: how do we deal with
-    incoherent hierarchy relations reported by different gazetteers?
-* What about documents consisting of a mix of text and image "layers". E.g. scanned image in latin,
-  scanned image in other language, transcription (in differnt languages) - with each layer
-  "linking through" to the others. General Q about "linking through": should this be modeled
-  as a relation between annotations? Or as another type of annotation body ("hyperlink")?
-  (In OA, a link would be modeled as an additional annotation that has two annotations as target I
-  guess? Prob. more complicated than it needs to be. In our case: e.g. a body of type HYPERLINK
-  with a URI? (Disadvantage: we don't know if its an internal link in the same doc or not, unless
-  we parse the URI.)
