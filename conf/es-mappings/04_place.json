@@ -14,6 +14,7 @@
       },
       "is_conflation_of": {
         "type": "nested",
+        "dynamic": "false",
         "properties": {
           "uri": { "type": "string", "index": "not_analyzed" },
           "source_gazetteer": { "type": "string", "index": "not_analyzed" },
@@ -45,8 +46,6 @@
               "language": { "type": "string", "index": "not_analyzed" }
             }
           },
-          "geometry": { "type": "geo_shape", "tree": "geohash", "precision": "50m" },
-          "representative_point": { "type": "geo_point" },
           "temporal_bounds": {
             "type": "nested",
             "properties": {

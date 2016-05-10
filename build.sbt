@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
 
-  "com.sksamuel.elastic4s" %% "elastic4s-streams" % "2.3.0",
+  "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.6",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
   "com.vividsolutions" % "jts" % "1.13",

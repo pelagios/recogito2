@@ -3,7 +3,7 @@ package storage
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
-import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.common.settings.ImmutableSettings
 import play.api.{ Logger, Play }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.io.Source
@@ -21,7 +21,7 @@ object ES {
     }
     
     val settings =
-      Settings.settingsBuilder()
+      ImmutableSettings.settingsBuilder()
         .put("http.enabled", true)
         .put("path.home", home.getAbsolutePath)
         
