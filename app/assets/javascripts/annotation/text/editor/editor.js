@@ -15,15 +15,15 @@ define(['../../../common/annotationUtils',
                                                   ReplyField) {
 
   /** The main annotation editor popup **/
-  var Editor = function(parentNode) {
+  var Editor = function(container) {
 
     var self = this,
 
         annotationMode = { mode: 'NORMAL' },
 
-        highlighter = new Highlighter(parentNode),
+        highlighter = new Highlighter(container),
 
-        selectionHandler = new SelectionHandler(parentNode, highlighter),
+        selectionHandler = new SelectionHandler(container, highlighter),
 
         element = (function() {
           var el = jQuery(
@@ -59,7 +59,7 @@ define(['../../../common/annotationUtils',
               '</div>' +
             '</div>');
 
-          jQuery(parentNode).append(el);
+          jQuery(container).append(el);
           el.hide();
           return el;
         })(),
@@ -100,12 +100,50 @@ define(['../../../common/annotationUtils',
           queuedUpdates.push(function() { AnnotationUtils.deleteBody(currentAnnotation, body); });
         },
 
+        showEditorElement = function(bounds) {
+          var scrollTop = jQuery(document).scrollTop(),
+
+              offset = jQuery(container).offset(),
+
+              // Fixes bounds to take into account text container offset and scroll
+              translatedBounds = {
+                bottom: bounds.bottom - offset.top + scrollTop,
+                height: bounds.height,
+                left: bounds.left - offset.left,
+                right: bounds.right - offset.left,
+                top: bounds.top - offset.top + scrollTop,
+                width: bounds.width
+              },
+
+              rect;
+
+          // Default orientation
+          element.show();
+          element.css({ top: translatedBounds.bottom, left: translatedBounds.left, bottom: 'auto' });
+          rect = element[0].getBoundingClientRect();
+
+          // Flip horizontally, if popup exceeds screen width
+          if (rect.right > jQuery(window).width()) {
+            element.addClass('align-right');
+            element.css('left', translatedBounds.right - element.width());
+          } else {
+            element.removeClass('align-right');
+          }
+
+          // Flip vertically if popup exceeds screen height
+          if (rect.bottom > jQuery(window).height()) {
+            element.addClass('align-bottom');
+            element.css({ top: 'auto', bottom: container.scrollHeight - translatedBounds.top });
+          } else {
+            element.removeClass('align-bottom');
+          }
+        },
+
         /** Opens the editor with an annotation, at the specified bounds **/
         open = function(annotation, bounds) {
-          var scrollTop = jQuery(document).scrollTop(),
-              quote = AnnotationUtils.getQuote(annotation);
-
+          var quote = AnnotationUtils.getQuote(annotation);
           clear();
+
           currentAnnotation = annotation;
 
           // Add place body sections
@@ -128,8 +166,7 @@ define(['../../../common/annotationUtils',
           if (comments.length > 0)
             replyField.setPlaceHolder('Write a reply...');
 
-          element.css({ top: bounds.bottom + scrollTop, left: bounds.left });
-          element.show();
+          showEditorElement(bounds);
         },
 
         setMode = function(mode) {
@@ -139,7 +176,6 @@ define(['../../../common/annotationUtils',
         /** Closes the editor, clearing all editor components **/
         close = function() {
           element.hide();
-          clear();
         },
 
         /** Clears all editor components **/
@@ -199,7 +235,7 @@ define(['../../../common/annotationUtils',
               /** This helper gets all annotations in case of multipe nested annotation spans **/
               getAnnotationsRecursive = function(element, a) {
                 var annotations = (a) ? a : [ ],
-                    parent = element.parentNode;
+                    parent = element.container;
 
                 annotations.push(element.annotation);
 
@@ -309,7 +345,7 @@ define(['../../../common/annotationUtils',
     selectionHandler.on('select', onSelectText);
 
     // Monitor select of existing annotations via DOM
-    jQuery(parentNode).on('click', '.annotation', onSelectAnnotation);
+    jQuery(container).on('click', '.annotation', onSelectAnnotation);
 
     // Ctrl+Enter on reply field doubles as 'OK'
     replyField.on('submit', onOk);

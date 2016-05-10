@@ -13,27 +13,6 @@
   .rounded-corners(4px);
   font-family:PTSansNarrow;
 
-  .arrow {
-    position:absolute;
-    overflow:hidden;
-    top:-12px;
-    left:12px;
-  	width:28px;
-  	height:12px;
-  }
-
-  .arrow::after {
-    content:'';
-    position:absolute;
-    width:18px;
-    height:18px;
-    top:5px;
-    left:5px;
-    .rotate(45deg);
-    background-color:#fff;
-   .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.2));
-  }
-
   .text-annotation-editor-inner {
     .rounded-corners(4px);
     overflow:hidden;
@@ -126,5 +105,56 @@
     }
 
   } /** .text-annotation-editor-inner **/
+
+}
+
+/** Arrow styles **/
+.text-annotation-editor {
+
+  .arrow {
+    position:absolute;
+    overflow:hidden;
+    top:-12px;
+    left:12px;
+    width:28px;
+    height:12px;
+  }
+
+  .arrow::after {
+    content:'';
+    position:absolute;
+    width:18px;
+    height:18px;
+    top:5px;
+    left:5px;
+    .rotate(45deg);
+    background-color:#fff;
+   .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.2));
+  }
+
+}
+
+.text-annotation-editor.align-right {
+  margin-left:8px;
+
+  .arrow {
+    left:auto;
+    right:12px;
+  }
+
+}
+
+.text-annotation-editor.align-bottom {
+  margin-bottom:14px;
+
+  .arrow {
+    top:auto;
+    bottom:-12px;
+  }
+
+  .arrow::after {
+    top:-11px;
+    box-shadow:none;
+  }
 
 }
