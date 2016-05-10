@@ -1,24 +1,12 @@
-define(['../common/hasEvents'], function(HasEvents) {
+define([], function() {
 
-  var APIConnector = function() {
-    HasEvents.apply(this);
-  };
-  APIConnector.prototype = Object.create(HasEvents.prototype);
+  var APIConnector = function() { };
 
   APIConnector.prototype.loadAnnotations = function(documentId, partNumber) {
-    var self = this;
-    jsRoutes.controllers.api.AnnotationAPIController.loadAnnotations().ajax({
+    return jsRoutes.controllers.api.AnnotationAPIController.loadAnnotations().ajax({
       data: {
         doc: documentId,
         part: partNumber
-      },
-
-      success: function(data) {
-        self.fireEvent('annotationsLoaded', data);
-      },
-
-      error: function(error) {
-        self.fireEvent('loadError', error);
       }
     });
   };

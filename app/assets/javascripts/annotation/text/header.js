@@ -1,9 +1,11 @@
 define(['../../common/config'], function(Config) {
 
-  var Header = function(parentEl) {
-        /** DOM elements holding annotation and contributor information **/
-    var annotationCountEl = parentEl.find('.quick-stats .annotations'),
-        contributorsEl = parentEl.find('.quick-stats .contributors'),
+  var Header = function() {
+    var annotationCountEl = jQuery('.quick-stats .annotations'),
+        contributorsEl = jQuery('.quick-stats .contributors'),
+
+        saveMessageEl = jQuery('.save-msg'),
+        saveMessageTimer = false,
 
         /** Document owner username **/
         owner = Config.documentOwner,
@@ -44,10 +46,39 @@ define(['../../common/config'], function(Config) {
 
             contributorEl.html(updateCount + label);
           }
+        },
+
+        clearMessageFadeTimer = function() {
+          if (saveMessageTimer) {
+            clearTimeout(saveMessageTimer);
+            saveMessageTimer = false;
+          }
+          saveMessageEl.show();
+        },
+
+        showStatusSaving = function() {
+          clearMessageFadeTimer();
+          saveMessageEl.html('Saving...');
+        },
+
+        showStatusSaved = function() {
+          clearMessageFadeTimer();
+          saveMessageEl.html('All edits saved');
+          saveMessageTimer = setTimeout(function() {
+            saveMessageEl.fadeOut();
+            saveMessageTimer = false;
+          }, 5000);
+        },
+
+        showSaveError = function(error) {
+          // TODO implement
         };
 
     this.incrementAnnotationCount = incrementAnnotationCount;
     this.updateContributorInfo = updateContributorInfo;
+    this.showStatusSaving = showStatusSaving;
+    this.showStatusSaved = showStatusSaved;
+    this.showSaveError = showSaveError;
   };
 
   return Header;

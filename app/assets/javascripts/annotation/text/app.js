@@ -9,7 +9,7 @@ require([
 
   jQuery(document).ready(function() {
 
-    var header = new Header(jQuery('.header-infobox')),
+    var header = new Header(),
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
@@ -37,11 +37,14 @@ require([
         },
 
         onUpdateAnnotation = function(e) {
+          header.showStatusSaving();
+
           API.storeAnnotation(e.annotation)
              .done(function(annotation) {
                // Update header info
                header.incrementAnnotationCount();
                header.updateContributorInfo(Config.me);
+               header.showStatusSaved();
 
                // Update the annotation references in the elements
                jQuery.each(e.elements, function(idx, el) {
@@ -49,27 +52,21 @@ require([
                });
              })
              .fail(function(error) {
-               console.log(error);
+               header.showSaveError(error);
              });
         },
 
         onDeleteAnnotation = function(annotation) {
+          header.showStatusSaving();
+
           API.deleteAnnotation(annotation.annotation_id)
              .done(function() {
                header.incrementAnnotationCount(-1);
+               header.showStatusSaved();
              })
              .fail(function(error) {
-               console.log(error);
+               header.showSaveError(error);
              });
-        },
-
-        onAnnotationStored = function(annotation) {
-          // renderAnnotation(annotation);
-        },
-
-        onAnnotationStoreError = function(error) {
-          // TODO visual notification
-          console.log(error);
         };
 
     // Toolbar events
@@ -79,16 +76,12 @@ require([
     editor.on('updateAnnotation', onUpdateAnnotation);
     editor.on('deleteAnnotation', onDeleteAnnotation);
 
-    // API events
-    API.on('annotationsLoaded', onAnnotationsLoaded);
-    API.on('loadError', onAnnotationsLoadError);
-    API.on('createSuccess', onAnnotationStored);
-    API.on('createError', onAnnotationStoreError);
-
     // Init
     rangy.init();
 
-    API.loadAnnotations(Config.documentId, Config.partSequenceNo);
+    API.loadAnnotations(Config.documentId, Config.partSequenceNo)
+       .done(onAnnotationsLoaded)
+       .fail(onAnnotationsLoadError);
   });
 
 });
