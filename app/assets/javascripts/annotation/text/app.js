@@ -1,14 +1,17 @@
 require([
+  'header',
   'highlighter',
   'toolbar',
   'editor/editor',
   '../apiConnector',
   '../../common/config',
-  '../../common/annotationUtils'], function(Highlighter, Toolbar, Editor, APIConnector, Config, Utils) {
+  '../../common/annotationUtils'], function(Header, Highlighter, Toolbar, Editor, APIConnector, Config, Utils) {
 
   jQuery(document).ready(function() {
 
-    var toolbar = new Toolbar(jQuery('.header-toolbar')),
+    var header = new Header(jQuery('.header-infobox')),
+
+        toolbar = new Toolbar(jQuery('.header-toolbar')),
 
         contentNode = document.getElementById('content'),
 
@@ -20,7 +23,7 @@ require([
           var highlighter = new Highlighter(contentNode),
               sorted = Utils.sortByOffset(annotations);
 
-          jQuery('.annotations').html(annotations.length);
+          header.incrementAnnotationCount(annotations.length);
 
           // TODO revise, so that DOM manipulation happens in batches, with a
           // bit of wait time in between, so that we don't freeze the browser
@@ -36,6 +39,10 @@ require([
         onUpdateAnnotation = function(e) {
           API.storeAnnotation(e.annotation)
              .done(function(annotation) {
+               // Update header info
+               header.incrementAnnotationCount();
+               header.updateContributorInfo(Config.me);
+
                // Update the annotation references in the elements
                jQuery.each(e.elements, function(idx, el) {
                  Utils.attachAnnotation(el, annotation);
@@ -48,6 +55,9 @@ require([
 
         onDeleteAnnotation = function(annotation) {
           API.deleteAnnotation(annotation.annotation_id)
+             .done(function() {
+               header.incrementAnnotationCount(-1);
+             })
              .fail(function(error) {
                console.log(error);
              });
