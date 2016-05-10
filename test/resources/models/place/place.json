@@ -1,5 +1,5 @@
 {
-  "_id": "http://pleiades.stoa.org/places/118543",
+  "id": "http://pleiades.stoa.org/places/118543",
   "labels": [ "Ad Mauros" ],
   "geometry": {
      "type": "Point",
