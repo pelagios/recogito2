@@ -151,6 +151,7 @@ define(['../../../common/annotationUtils',
           });
 
           bodySections = [];
+          queuedUpdates = [];
 
           // Clear reply field & text selection, if any
           replyField.clear();

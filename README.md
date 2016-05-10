@@ -42,7 +42,6 @@ we recommend a PostgreSQL DB and a separate ElasticSearch installation. Modify y
   * Implement PlaceLink rewriting after gazetteer updates (using optimistic locking)
   * The place schema doesn't yet include is_part_of relations. Q: how do we deal with
     incoherent hierarchy relations reported by different gazetteers?
-* Fix the various compiler warnings introduced with the Play 2.5 upgrade
 * Deleting a doc currently doesn't delete its annotations
 * Q: do we want people to be able to upload their own gazetteers, for exclusive use within a team.
   How would we model in ES? One separate index for user gazetteers + owner field + multi-index
