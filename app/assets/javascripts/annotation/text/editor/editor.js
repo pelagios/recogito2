@@ -133,7 +133,7 @@ define(['../../../common/annotationUtils',
           // Flip vertically if popup exceeds screen height
           if (rect.bottom > jQuery(window).height()) {
             element.addClass('align-bottom');
-            element.css({ top: 'auto', bottom: container.scrollHeight - translatedBounds.top });
+            element.css({ top: 'auto', bottom: container.clientHeight - translatedBounds.top });
           } else {
             element.removeClass('align-bottom');
           }
