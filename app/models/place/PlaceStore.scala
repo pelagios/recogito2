@@ -42,7 +42,7 @@ trait PlaceStore {
   
 }
 
-private[place] class ESPlaceStore extends PlaceStore {
+private[models] class ESPlaceStore extends PlaceStore {
 
   private[place] val PLACE = "place"
   

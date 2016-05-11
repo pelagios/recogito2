@@ -1,32 +1,34 @@
-package models.place
+package models.geotag
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
-import models.annotation.Annotation
-import models.annotation.AnnotationBody
+import models.annotation.{ Annotation, AnnotationBody }
+import models.place.Place
+import models.place.PlaceService
 import play.api.libs.json.Json
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.ES
 
-object PlaceLinkService {
+/** A trait for adding GeoTag read/write functionality to a service **/
+object GeoTagServiceLike {
  
-  private val PLACE_LINK = "place_link"
+  private val GEOTAG = "geotag"
   
-  implicit object PlaceLinkIndexable extends Indexable[PlaceLink] {
-    override def json(link: PlaceLink): String = Json.stringify(Json.toJson(link))
+  implicit object GeoTagIndexable extends Indexable[GeoTag] {
+    override def json(link: GeoTag): String = Json.stringify(Json.toJson(link))
   }
 
-  implicit object PlaceLinkHitAs extends HitAs[(String, PlaceLink)] {
-    override def as(hit: RichSearchHit): (String, PlaceLink) =
-      (hit.id, Json.fromJson[PlaceLink](Json.parse(hit.sourceAsString)).get)
+  implicit object GeoTagHitAs extends HitAs[(String, GeoTag)] {
+    override def as(hit: RichSearchHit): (String, GeoTag) =
+      (hit.id, Json.fromJson[GeoTag](Json.parse(hit.sourceAsString)).get)
   }
   
-  private def buildPlaceLinks(annotation: Annotation)(implicit context: ExecutionContext): Future[Seq[PlaceLink]] = {
+  private def buildGeoTags(annotation: Annotation)(implicit context: ExecutionContext): Future[Seq[GeoTag]] = {
 
-    def createPlaceLink(annotation: Annotation, placeBody: AnnotationBody, placeId: String) =
-      PlaceLink(
+    def createGeoTag(annotation: Annotation, placeBody: AnnotationBody, placeId: String) =
+      GeoTag(
         placeId,
         annotation.annotationId,
         annotation.annotates.document,
@@ -37,12 +39,12 @@ object PlaceLinkService {
     val placeBodies = annotation.bodies.filter(body => body.hasType == AnnotationBody.PLACE && body.uri.isDefined)
     
     if (placeBodies.isEmpty)
-      Future.successful(Seq.empty[PlaceLink])
+      Future.successful(Seq.empty[GeoTag])
       
     else
       Future.sequence(placeBodies.map(body => 
         PlaceService.findByURI(body.uri.get).map(_ match {
-          case Some((place, version)) => createPlaceLink(annotation, body, place.id)
+          case Some((place, version)) => createGeoTag(annotation, body, place.id)
             
           case None =>
             // Annotation links to a place not found in the gazetteer - can never happen unless something's broken
@@ -51,28 +53,28 @@ object PlaceLinkService {
       ))
   }
   
-  /** Helper method that retrieves place links along with their internal _id field **/
-  private def findByAnnotationIdWith_Id(annotationId: String)(implicit context: ExecutionContext): Future[Seq[(String, PlaceLink)]] =
+  /** Helper method that retrieves geotags along with their internal _id field **/
+  private def findGeoTagsByAnnotationWithId(annotationId: String)(implicit context: ExecutionContext): Future[Seq[(String, GeoTag)]] =
     ES.client execute {
-      search in ES.IDX_RECOGITO / PLACE_LINK query {
+      search in ES.IDX_RECOGITO / GEOTAG query {
         termQuery("annotation_id", annotationId)
       }
-    } map { _.as[(String, PlaceLink)].toSeq }
+    } map { _.as[(String, GeoTag)].toSeq }
   
   /** Retrieves the links for a specific annotation ID **/
-  def findByAnnotationId(annotationId: UUID)(implicit context: ExecutionContext): Future[Seq[PlaceLink]] =
-    findByAnnotationIdWith_Id(annotationId.toString).map(_.map(_._2))   
+  def findGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Seq[GeoTag]] =
+    findGeoTagsByAnnotationWithId(annotationId.toString).map(_.map(_._2))   
   
   /** Deletes the links for a specific annotation ID.
     *
     * Unfortunately, ElasticSearch doesn't support delete-by-query directly,
     * so this is a two-step-process.  
     */
-  def deleteByAnnotationId(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
-    findByAnnotationIdWith_Id(annotationId.toString).flatMap { idsAndLinks => 
+  def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
+    findGeoTagsByAnnotationWithId(annotationId.toString).flatMap { idsAndLinks => 
       if (idsAndLinks.size > 0) {
         ES.client execute {
-          bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.IDX_RECOGITO / PLACE_LINK } )
+          bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.IDX_RECOGITO / GEOTAG } )
         } map { 
           !_.hasFailures 
         } recover { case t: Throwable =>
@@ -86,11 +88,11 @@ object PlaceLinkService {
     }
   
   /** Inserts or updates place links for an annotation **/
-  def insertOrUpdatePlaceLinksForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean] = {
+  def insertOrUpdateGeoTagsForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean] = {
     
-    def insertPlaceLinks(links: Seq[PlaceLink]): Future[Boolean] = {      
+    def insertGeoTags(tags: Seq[GeoTag]): Future[Boolean] = {      
       ES.client execute {
-        bulk ( links.map(link => index into ES.IDX_RECOGITO / PLACE_LINK source link parent link.placeId) )
+        bulk ( tags.map(tag => index into ES.IDX_RECOGITO / GEOTAG source tag parent tag.placeId) )
       } map {
         !_.hasFailures
       } recover { case t: Throwable => 
@@ -102,9 +104,9 @@ object PlaceLinkService {
     // Since checking for changes would require an extra request cycle (and application-side comparison) anyway,
     // we just delete existing links and create the new ones
     for {
-      linksToInsert <- buildPlaceLinks(annotation)
-      deleteSuccess <- deleteByAnnotationId(annotation.annotationId)
-      insertSuccess <- if (deleteSuccess && linksToInsert.size > 0) insertPlaceLinks(linksToInsert) else Future.successful(false) 
+      tagsToInsert <- buildGeoTags(annotation)
+      deleteSuccess <- deleteGeoTagsByAnnotation(annotation.annotationId)
+      insertSuccess <- if (deleteSuccess && tagsToInsert.size > 0) insertGeoTags(tagsToInsert) else Future.successful(false) 
     } yield insertSuccess
   }
   
@@ -117,7 +119,7 @@ object PlaceLinkService {
   def getPlacesInDocument(docId: String)(implicit context: ExecutionContext) =
     ES.client execute {
       search in ES.IDX_RECOGITO / "place" query {
-        hasChildQuery("place_link").query {
+        hasChildQuery(GEOTAG).query {
           termQuery("document_id", docId)
         }
       }
@@ -153,7 +155,7 @@ object PlaceLinkService {
               }
             },  
             
-            hasChildQuery("place_link").query {
+            hasChildQuery(GEOTAG).query {
               termQuery("document_id", documentId)
             }
           )
@@ -161,9 +163,9 @@ object PlaceLinkService {
       }
     } map { _.as[Place] }  
     
-  def totalPlaceLinks()(implicit context: ExecutionContext): Future[Long] =
+  def totalGeoTags()(implicit context: ExecutionContext): Future[Long] =
     ES.client execute {
-      search in ES.IDX_RECOGITO -> PLACE_LINK limit 0
+      search in ES.IDX_RECOGITO -> GEOTAG limit 0
     } map { _.getHits.getTotalHits }
   
 }

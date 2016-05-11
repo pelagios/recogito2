@@ -1,11 +1,12 @@
-package models.place
+package models.geotag
 
 import java.util.UUID
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-case class PlaceLink(
+/** GeoTag is an associative entity that creates a many-to-many relationship between places and annotations **/
+case class GeoTag(
   
   /** ID of the place this link is attached to via parent relationship **/ 
   placeId: String,
@@ -26,14 +27,14 @@ case class PlaceLink(
 
 /** JSON (de)serialization **/
 
-object PlaceLink {
+object GeoTag {
   
-  implicit val placeLinkFormat: Format[PlaceLink] = (
+  implicit val placeLinkFormat: Format[GeoTag] = (
     (JsPath \ "place_id").format[String] and
     (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "document_id").format[String] and
     (JsPath \ "filepart_id").format[Int] and
     (JsPath \ "gazetteer_uri").format[String]
-  )(PlaceLink.apply, unlift(PlaceLink.unapply))
+  )(GeoTag.apply, unlift(GeoTag.unapply))
   
 }

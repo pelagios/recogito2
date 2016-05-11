@@ -8,7 +8,7 @@ import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
 import storage.DB
-import models.place.PlaceLinkService
+import models.geotag.GeoTagServiceLike
 
 class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController with HasPrettyPrintJSON {
   
@@ -26,7 +26,7 @@ class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, co
   }
   
   def getPlacesInDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    PlaceLinkService.getPlacesInDocument(docId).map(places => jsonOk(Json.toJson(places)))
+    GeoTagServiceLike.getPlacesInDocument(docId).map(places => jsonOk(Json.toJson(places)))
   }
  
 }

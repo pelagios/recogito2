@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
-import models.place.{ PlaceLink, PlaceLinkService }
+import models.geotag.GeoTagServiceLike
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ ExecutionContext, Future }
@@ -40,7 +40,7 @@ object AnnotationService {
     
     for {
       (annotationCreated, version) <- upsertAnnotation(annotation)
-      linksCreated <- if (annotationCreated) PlaceLinkService.insertOrUpdatePlaceLinksForAnnotation(annotation) else Future.successful(false)
+      linksCreated <- if (annotationCreated) GeoTagServiceLike.insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
     } yield (linksCreated, version)    
   }
 
@@ -67,7 +67,7 @@ object AnnotationService {
       delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
     } flatMap { response =>
       if (response.isFound)
-        PlaceLinkService.deleteByAnnotationId(annotationId)
+        GeoTagServiceLike.deleteGeoTagsByAnnotation(annotationId)
       else
         Future.successful(false)
     } recover { case t: Throwable =>
