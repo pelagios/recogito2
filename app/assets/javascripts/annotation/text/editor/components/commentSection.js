@@ -1,8 +1,10 @@
-define(['../../../../common/hasEvents',
-        '../../../../common/formatting',
-        '../../../../common/config',], function(HasEvents, Formatting, Config) {
+define([
+  '../../../../common/helpers/formatting',
+  '../../../../common/config',
+  '../../../../common/hasEvents'], function(Formatting, Config, HasEvents) {
 
   var CommentSection = function(parent, commentBody, zIndex) {
+
     var self = this,
 
         // Flag indicating whether the user has switched to editing mode
@@ -13,6 +15,7 @@ define(['../../../../common/hasEvents',
           return jQuery('<div/>').text(text).html();
         },
 
+        // TODO replace hard-wired z-index with number derived from sibling count
         element = jQuery(
           '<div class="section comment" style="z-index:' + zIndex + '">' +
             '<div class="comment-body">' + escapeHtml(commentBody.value) + '</div>' +

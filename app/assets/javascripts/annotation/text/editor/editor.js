@@ -1,18 +1,14 @@
-define(['../../../common/annotationUtils',
-        '../../../common/placeUtils',
-        '../../../common/hasEvents',
-        'highlighter',
-        'editor/selectionHandler',
-        'editor/components/commentSection',
-        'editor/components/placeSection',
-        'editor/components/replyField'], function(AnnotationUtils,
-                                                  PlaceUtils,
-                                                  HasEvents,
-                                                  Highlighter,
-                                                  SelectionHandler,
-                                                  CommentSection,
-                                                  PlaceSection,
-                                                  ReplyField) {
+define([
+  '../../../common/helpers/annotationUtils',
+  '../../../common/helpers/placeUtils',
+  '../../../common/api',
+  '../../../common/hasEvents',
+  'editor/components/commentSection',
+  'editor/components/placeSection',
+  'editor/components/replyField',
+  'editor/selectionHandler',
+  'highlighter'], function(AnnotationUtils, PlaceUtils, API, HasEvents, CommentSection,
+                           PlaceSection, ReplyField, SelectionHandler, Highlighter) {
 
   /** The main annotation editor popup **/
   var Editor = function(container) {
@@ -206,7 +202,7 @@ define(['../../../common/annotationUtils',
             currentAnnotation = e.annotation;
             body = { type: 'PLACE', status: { value: 'UNVERIFIED' } };
 
-            PlaceUtils.findMatches(quote).done(function(response) {
+            API.searchPlaces(quote).done(function(response) {
               if (response.total > 0) {
                 record = PlaceUtils.getBestMatchingRecord(response.items[0], quote);
                 body.uri = record.uri;

@@ -1,6 +1,10 @@
 define(['../../common/config'], function(Config) {
 
+      // Duration for showing the 'Save OK' status info
+  var SHOW_STATUS_SAVED_FOR_MS = 5000;
+
   var Header = function() {
+
     var annotationCountEl = jQuery('.quick-stats .annotations'),
         contributorsEl = jQuery('.quick-stats .contributors'),
 
@@ -67,7 +71,7 @@ define(['../../common/config'], function(Config) {
           saveMessageTimer = setTimeout(function() {
             saveMessageEl.fadeOut();
             saveMessageTimer = false;
-          }, 5000);
+          }, SHOW_STATUS_SAVED_FOR_MS);
         },
 
         showSaveError = function(error) {

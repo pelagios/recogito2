@@ -1,8 +1,8 @@
 require([
-  '../common/annotationUtils',
-  '../common/apiConnector',
-  '../common/config',
-  '../common/placeUtils',], function(AnnotationUtils, API, Config, PlaceUtils) {
+  '../common/helpers/annotationUtils',
+  '../common/helpers/placeUtils',
+  '../common/api',
+  '../common/config'], function(AnnotationUtils, PlaceUtils, API, Config) {
 
   jQuery(document).ready(function() {
     var awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {

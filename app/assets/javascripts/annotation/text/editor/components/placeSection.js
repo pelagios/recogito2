@@ -1,6 +1,8 @@
-define(['../../../../common/config',
-        '../../../../common/formatting',
-        '../../../../common/placeUtils'], function(Config, Formatting, PlaceUtils) {
+define([
+  '../../../../common/helpers/formatting',
+  '../../../../common/helpers/placeUtils',
+  '../../../../common/api',
+  '../../../../common/config'], function(Formatting, PlaceUtils, API, Config) {
 
   var SLIDE_DURATION = 200;
 
@@ -195,7 +197,7 @@ define(['../../../../common/config',
 
         /** Fills the place card based on a search on the provided quote string **/
         fillFromQuote = function() {
-          PlaceUtils.findMatches(quote).done(function(response) {
+          API.searchPlaces(quote).done(function(response) {
             if (response.total > 0) {
               var topPlace = response.items[0],
                   bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),

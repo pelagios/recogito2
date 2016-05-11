@@ -1,6 +1,7 @@
 define(['../../../../common/hasEvents'], function(HasEvents) {
 
   var ReplyField = function(parent, isReply) {
+
     var self = this,
 
         element = jQuery(
@@ -28,13 +29,14 @@ define(['../../../../common/hasEvents'], function(HasEvents) {
             return { type: 'COMMENT', value: val };
           else
             return false;
+        },
+
+        onKeyUp = function(e) {
+          if (e.ctrlKey && e.keyCode == 13)
+            self.fireEvent('submit', getComment());
         };
 
-    textarea.keyup(function(e) {
-      if (e.ctrlKey && e.keyCode == 13)
-        self.fireEvent('submit', getComment());
-    });
-
+    textarea.keyup(onKeyUp);
     parent.append(element);
 
     this.clear = clear;

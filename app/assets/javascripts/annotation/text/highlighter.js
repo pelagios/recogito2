@@ -1,4 +1,4 @@
-define(['../../common/annotationUtils'], function(Utils) {
+define(['../../common/helpers/annotationUtils'], function(AnnotationUtils) {
 
   var TEXT = 3; // HTML DOM node type for text nodes
 
@@ -85,8 +85,8 @@ define(['../../common/annotationUtils'], function(Utils) {
 
         renderAnnotation = function(annotation) {
           var anchor = annotation.anchor.substr(12),
-              quote = Utils.getQuote(annotation),
-              entityType = Utils.getEntityType(annotation),
+              quote = AnnotationUtils.getQuote(annotation),
+              entityType = AnnotationUtils.getEntityType(annotation),
               cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation',
               range = rangy.createRange(),
               spans;
@@ -96,7 +96,7 @@ define(['../../common/annotationUtils'], function(Utils) {
 
           // Attach annotation data as payload to the SPANs and set id, if any
           jQuery.each(spans, function(idx, span) {
-            Utils.attachAnnotation(span, annotation);
+            AnnotationUtils.attachAnnotation(span, annotation);
           });
 
           return spans;

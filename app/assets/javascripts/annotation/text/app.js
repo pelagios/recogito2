@@ -1,11 +1,11 @@
 require([
+  '../../common/helpers/annotationUtils',
+  '../../common/api',
+  '../../common/config',
+  'editor/editor',
   'header',
   'highlighter',
-  'toolbar',
-  'editor/editor',
-  '../../common/apiConnector',
-  '../../common/config',
-  '../../common/annotationUtils'], function(Header, Highlighter, Toolbar, Editor, API, Config, Utils) {
+  'toolbar'], function(AnnotationUtils, API, Config, Editor, Header, Highlighter, Toolbar) {
 
   jQuery(document).ready(function() {
 
@@ -19,7 +19,7 @@ require([
 
         onAnnotationsLoaded = function(annotations) {
           var highlighter = new Highlighter(contentNode),
-              sorted = Utils.sortByOffset(annotations);
+              sorted = AnnotationUtils.sortByOffset(annotations);
 
           header.incrementAnnotationCount(annotations.length);
 
@@ -46,7 +46,7 @@ require([
 
                // Update the annotation references in the elements
                jQuery.each(e.elements, function(idx, el) {
-                 Utils.attachAnnotation(el, annotation);
+                 AnnotationUtils.attachAnnotation(el, annotation);
                });
              })
              .fail(function(error) {
