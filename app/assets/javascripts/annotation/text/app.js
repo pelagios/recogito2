@@ -3,9 +3,9 @@ require([
   'highlighter',
   'toolbar',
   'editor/editor',
-  '../apiConnector',
+  '../../common/apiConnector',
   '../../common/config',
-  '../../common/annotationUtils'], function(Header, Highlighter, Toolbar, Editor, APIConnector, Config, Utils) {
+  '../../common/annotationUtils'], function(Header, Highlighter, Toolbar, Editor, API, Config, Utils) {
 
   jQuery(document).ready(function() {
 
@@ -16,8 +16,6 @@ require([
         contentNode = document.getElementById('content'),
 
         editor = new Editor(contentNode),
-
-        API = new APIConnector(),
 
         onAnnotationsLoaded = function(annotations) {
           var highlighter = new Highlighter(contentNode),
