@@ -91,39 +91,31 @@ object AnnotationStatusStub extends HasDate {
 
 class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
-  private val PARAM_DOC = "doc"
-
-  private val PARAM_PART = "part"
+  def getAnnotationsForDocument(docId: String) = getAnnotations(docId, None)
+    
+  def getAnnotationsForPart(docId: String, partNo: Int) = getAnnotations(docId, Some(partNo))
 
   /** TODO currently annotation read access is unlimited to any logged in user - do we want that? **/
-  def loadAnnotations() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val docId = getQueryParam(PARAM_DOC)
-    val partNo = getQueryParam(PARAM_PART).map(_.toInt)
-
+  def getAnnotations(docId: String, partNo: Option[Int]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     (docId, partNo) match {
-
-      case (Some(id), Some(seqNo)) =>
+      case (id, Some(seqNo)) =>
         // Load annotations for specific doc part
         DocumentService.findPartByDocAndSeqNo(id, seqNo).flatMap(_ match {
           case Some(filepart) =>
             AnnotationService.findByFilepartId(filepart.getId)
-              .map(annotations => Ok(Json.toJson(annotations.map(_._1))))
+              .map{ annotations =>
+                // Join in places, if requested
+                Ok(Json.toJson(annotations.map(_._1)))
+              }
 
           case None =>
             Future.successful(NotFound)
         })
 
-      case (Some(id), None) =>
+      case (id, None) =>
         // Load annotations for entire doc
         AnnotationService.findByDocId(id).map(annotations => Ok(Json.toJson(annotations.map(_._1))))
-
-      case _ =>
-        // No doc ID
-        Future.successful(BadRequest)
-
     }
-
-
   }
 
   /** TODO currently annotation creation is unlimited to any logged in user - need to check access rights! **/

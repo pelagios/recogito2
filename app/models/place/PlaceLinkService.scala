@@ -114,6 +114,15 @@ object PlaceLinkService {
       Json.fromJson[Place](Json.parse(hit.sourceAsString)).get
   }
   
+  def getPlacesInDocument(docId: String)(implicit context: ExecutionContext) =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / "place" query {
+        hasChildQuery("place_link").query {
+          termQuery("document_id", docId)
+        }
+      }
+    } map { _.as[Place] }  
+  
   def searchPlacesInDocument(q: String, documentId: String)(implicit context: ExecutionContext) =
     ES.client execute {
       search in ES.IDX_RECOGITO / "place" query {

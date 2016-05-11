@@ -77,7 +77,7 @@ require([
     // Init
     rangy.init();
 
-    API.loadAnnotations(Config.documentId, Config.partSequenceNo)
+    API.getAnnotationsForPart(Config.documentId, Config.partSequenceNo)
        .done(onAnnotationsLoaded)
        .fail(onAnnotationsLoadError);
   });

@@ -1,4 +1,8 @@
-require(['../common/apiConnector', '../common/config'], function(API, Config) {
+require([
+  '../common/annotationUtils',
+  '../common/apiConnector',
+  '../common/config',
+  '../common/placeUtils',], function(AnnotationUtils, API, Config, PlaceUtils) {
 
   jQuery(document).ready(function() {
     var awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
@@ -15,17 +19,68 @@ require(['../common/apiConnector', '../common/config'], function(API, Config) {
           layers: [ awmc ]
        }),
 
-       onAnnotationsLoaded = function(response) {
-         console.log(response);
+       /** Lookuptable { gazetteerUri -> [ annotation] } **/
+       annotationsByGazetteerURI = {},
+
+       getAnnotationsForPlace = function(place) {
+         var uris = PlaceUtils.getURIs(place),
+             annotations = [];
+
+         jQuery.each(uris, function(idx, uri) {
+           var annotationsForURI = annotationsByGazetteerURI[uri];
+           if (annotationsForURI)
+             annotations = annotations.concat(annotationsForURI);
+         });
+         return annotations;
        },
 
-       onAnnotationsLoadError = function(error) {
+       renderPopup = function(coord, place) {
+         var annotations = getAnnotationsForPlace(place),
+             quotes = jQuery.map(annotations, function(annotation) {
+               return AnnotationUtils.getQuote(annotation);
+             }).join(', ');
+
+         if (annotations.length > 0)
+           L.popup().setLatLng(coord).setContent(quotes).openOn(map);
+       },
+
+       onAnnotationsLoaded = function(annotations) {
+         // Loop through all place bodies of all annotations
+         jQuery.each(annotations, function(i, annotation) {
+           jQuery.each(AnnotationUtils.getBodiesOfType(annotation, 'PLACE'), function(j, placeBody) {
+             var annnotationsAtPlace = annotationsByGazetteerURI[placeBody.uri];
+             if (annnotationsAtPlace)
+               annotationsAtPlace.push(annotation);
+             else
+               annotationsByGazetteerURI[placeBody.uri] = [ annotation ];
+           });
+         });
+       },
+
+       onPlacesLoaded = function(places) {
+         // TODO just a quick hack for now
+         jQuery.each(places, function(idx, place) {
+           if (place.representative_point) {
+             // The epic battle between Leaflet vs. GeoJSON
+             var coord = [ place.representative_point[1], place.representative_point[0] ];
+             L.marker(coord).addTo(map).on('click', function() {
+               renderPopup(coord, place);
+             });
+           }
+         });
+       },
+
+       onLoadError = function(error) {
          // TODO implement
        };
 
-    API.loadAnnotations(Config.documentId)
+    API.getAnnotationsForDocument(Config.documentId)
        .done(onAnnotationsLoaded)
-       .fail(onAnnotationsLoadError);
+       .fail(onLoadError);
+
+    API.getPlacesInDocument(Config.documentId)
+       .done(onPlacesLoaded)
+       .fail(onLoadError);
   });
 
 });

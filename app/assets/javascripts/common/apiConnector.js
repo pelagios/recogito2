@@ -2,13 +2,12 @@ define([], function() {
 
   return {
 
-    loadAnnotations : function(documentId, partNumber) {
-      return jsRoutes.controllers.api.AnnotationAPIController.loadAnnotations().ajax({
-        data: {
-          doc: documentId,
-          part: partNumber
-        }
-      });
+    getAnnotationsForDocument : function(docId) {
+      return jsRoutes.controllers.api.AnnotationAPIController.getAnnotationsForDocument(docId).ajax();
+    },
+
+    getAnnotationsForPart : function(docId, partNo) {
+      return jsRoutes.controllers.api.AnnotationAPIController.getAnnotationsForPart(docId, partNo).ajax();
     },
 
     storeAnnotation : function(annotation) {
@@ -21,6 +20,10 @@ define([], function() {
 
     deleteAnnotation : function(id) {
       return jsRoutes.controllers.api.AnnotationAPIController.deleteAnnotation(id).ajax();
+    },
+
+    getPlacesInDocument : function(docId) {
+      return jsRoutes.controllers.api.PlaceAPIController.getPlacesInDocument(docId).ajax();
     }
 
   };

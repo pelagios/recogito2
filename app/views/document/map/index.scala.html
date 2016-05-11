@@ -75,7 +75,8 @@
     <div id="map"></div>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.api.routes.javascript.AnnotationAPIController.loadAnnotations
+      controllers.api.routes.javascript.AnnotationAPIController.getAnnotationsForDocument,
+      controllers.api.routes.javascript.PlaceAPIController.getPlacesInDocument
     )
   </body>
 </html>

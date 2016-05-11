@@ -53,6 +53,12 @@ define(function() {
        return jQuery.map(asArray, function(val) {
          return val[0];
        });
+    },
+
+    getURIs : function(place) {
+      return jQuery.map(place.is_conflation_of, function(record) {
+        return record.uri;        
+      });
     }
 
   };
