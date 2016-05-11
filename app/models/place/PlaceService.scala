@@ -1,6 +1,7 @@
 package models.place
 
 import GazetteerUtils._
+import models.geotag.GeoTagServiceLike
 import play.api.Logger
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
@@ -154,10 +155,19 @@ object PlaceService {
       }
     }
  
-  def totalPlaces(store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.totalPlaces
+  def totalPlaces(store: PlaceStore = esStore)(implicit context: ExecutionContext) = 
+    store.totalPlaces
   
-  def findByURI(uri: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.findByURI(uri)
+  def findByURI(uri: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) =
+    store.findByURI(uri)
+
+  def findPlacesInDocument(docId: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) =
+    store.findPlacesInDocument(docId)
   
-  def searchPlaces(query: String, store: PlaceStore = esStore)(implicit context: ExecutionContext) = store.searchPlaces(query)
+  def searchPlaces(query: String, limit: Int = 20, store: PlaceStore = esStore)(implicit context: ExecutionContext) =
+    store.searchPlaces(query, limit)
+  
+  def searchPlacesInDocument(query: String, docId: String, limit: Int = 20, store: PlaceStore = esStore)(implicit context: ExecutionContext) =
+    store.searchPlacesInDocument(query, docId, limit)
 
 }

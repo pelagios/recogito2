@@ -116,12 +116,14 @@ class GeoTagServiceLikeServiceSpec extends Specification with AfterAll {
         annotatesVindobonaAndThessaloniki.annotates.document,
         annotatesVindobonaAndThessaloniki.annotates.filepart,
         "http://pleiades.stoa.org/places/491741")
+        
+    val store = new ESPlaceStore() // Store extends GeoTagServiceLike
               
     def flush() = Await.result(ES.flushIndex, 10 seconds)
     def insertAnnotation(a: Annotation) = Await.result(AnnotationService.insertOrUpdateAnnotation(a), 10 seconds)
-    def totalGeoTags() = Await.result(GeoTagServiceLike.totalGeoTags(), 10 seconds)
-    def findByAnnotationId(id: UUID) = Await.result(GeoTagServiceLike.findGeoTagsByAnnotation(id), 10 seconds)
-    def searchPlacesInDocument(query: String, documentId: String) = Await.result(GeoTagServiceLike.searchPlacesInDocument(query, documentId), 10 seconds)
+    def totalGeoTags() = Await.result(store.totalGeoTags(), 10 seconds)
+    def findByAnnotationId(id: UUID) = Await.result(store.findGeoTagsByAnnotation(id), 10 seconds)
+    def searchPlacesInDocument(query: String, documentId: String) = Await.result(PlaceService.searchPlacesInDocument(query, documentId), 10 seconds)
     
     "After creating 2 annotations with 1 geotag each, the GeoTagService" should {
       
@@ -169,13 +171,13 @@ class GeoTagServiceLikeServiceSpec extends Specification with AfterAll {
       
       "retrieve only the Vindobona linked to the test document" in {
         val places = searchPlacesInDocument("vindobona", annotatesVindobonaAndThessaloniki.annotates.document)
-        places.size must equalTo(1)
-        places.head.id must equalTo("http://pleiades.stoa.org/places/128537")
+        places.total must equalTo(1)
+        places.items.head._1.id must equalTo("http://pleiades.stoa.org/places/128537")
       }
       
       "not return any places if the search is restricted to another document ID" in {
         val places = searchPlacesInDocument("vindobona", "not-a-document-id")
-        places.size must equalTo(0)
+        places.total must equalTo(0)
       }
       
     }
@@ -186,7 +188,7 @@ class GeoTagServiceLikeServiceSpec extends Specification with AfterAll {
         // That's hacky, but works they way we've set things up currently    
         // In any case - deleting a place is something that only happens underneath the hood,
         // so we don't want to expose this as a functionality in the PlaceService
-        val store = new ESPlaceStore()
+
         val deleteSuccess = Await.result(store.deletePlace("http://pleiades.stoa.org/places/128537"), 10 seconds)
         deleteSuccess must equalTo(true)
         flush()

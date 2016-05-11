@@ -4,6 +4,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.source.Indexable
 import models.Page
+import models.geotag.GeoTagServiceLike
 import org.elasticsearch.search.sort.SortOrder
 import play.api.Logger
 import play.api.libs.json.Json
@@ -36,13 +37,19 @@ trait PlaceStore {
   
   /** Finds all places with a record URI or close/exactMatch URI that matches any of the supplied URIs **/
   def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
+
+  /** Finds all places in a document **/ 
+  def findPlacesInDocument(docId: String)(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
   
   /** Place search **/
   def searchPlaces(query: String, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
   
+  /** Search places in a document **/
+  def searchPlacesInDocument(query: String, docId: String, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
+  
 }
 
-private[models] class ESPlaceStore extends PlaceStore {
+private[models] class ESPlaceStore extends PlaceStore with GeoTagServiceLike {
 
   private[place] val PLACE = "place"
   
@@ -110,6 +117,15 @@ private[models] class ESPlaceStore extends PlaceStore {
     } map { _.as[(Place, Long)].toSeq 
     }
   }
+  
+  def findPlacesInDocument(docId: String)(implicit context: ExecutionContext) =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / "place" query {
+        hasChildQuery(GEOTAG).query {
+          termQuery("document_id", docId)
+        }
+      }
+    } map { _.as[(Place, Long)] }
 
   def searchPlaces(q: String, l: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
     ES.client execute {
@@ -141,6 +157,47 @@ private[models] class ESPlaceStore extends PlaceStore {
     } map { response =>
       val places = response.as[(Place, Long)].toSeq 
       Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, l, places)
-    } 
-
+    }
+    
+  def searchPlacesInDocument(q: String, docId: String, l: Int)(implicit context: ExecutionContext) =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / "place" query {
+        bool {
+          
+          must(
+            nestedQuery("is_conflation_of").query {
+              bool {
+                should (
+                  // Search inside record titles...
+                  matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
+                  matchPhraseQuery("is_conflation_of.title", q),
+                 
+                  // ...names...
+                  nestedQuery("is_conflation_of.names").query {
+                    matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
+                  },
+                 
+                  nestedQuery("is_conflation_of.names").query {
+                    matchQuery("is_conflation_of.names.name", q)
+                  },
+                 
+                  // ...and descriptions (with lower boost)
+                  nestedQuery("is_conflation_of.descriptions").query {
+                    matchQuery("is_conflation_of.descriptions.description", q)
+                  }.boost(0.2)
+                )
+              }
+            },  
+            
+            hasChildQuery(GEOTAG).query {
+              termQuery("document_id", docId)
+            }
+          )
+        }
+      } limit l
+    } map { response =>
+      val places = response.as[(Place, Long)].toSeq 
+      Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, l, places)
+    }  
+    
 }

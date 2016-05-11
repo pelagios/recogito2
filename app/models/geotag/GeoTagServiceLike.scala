@@ -12,9 +12,9 @@ import scala.concurrent.{ ExecutionContext, Future }
 import storage.ES
 
 /** A trait for adding GeoTag read/write functionality to a service **/
-object GeoTagServiceLike {
+trait GeoTagServiceLike {
  
-  private val GEOTAG = "geotag"
+  protected val GEOTAG = "geotag"
   
   implicit object GeoTagIndexable extends Indexable[GeoTag] {
     override def json(link: GeoTag): String = Json.stringify(Json.toJson(link))
@@ -108,61 +108,8 @@ object GeoTagServiceLike {
       deleteSuccess <- deleteGeoTagsByAnnotation(annotation.annotationId)
       insertSuccess <- if (deleteSuccess && tagsToInsert.size > 0) insertGeoTags(tagsToInsert) else Future.successful(false) 
     } yield insertSuccess
-  }
+  } 
   
-  // TODO get rid of this! Clean up mix between PlaceService, PlaceStore, PlaceLinkService
-  implicit object PlaceHitAs extends HitAs[Place] {
-    override def as(hit: RichSearchHit): Place =
-      Json.fromJson[Place](Json.parse(hit.sourceAsString)).get
-  }
-  
-  def getPlacesInDocument(docId: String)(implicit context: ExecutionContext) =
-    ES.client execute {
-      search in ES.IDX_RECOGITO / "place" query {
-        hasChildQuery(GEOTAG).query {
-          termQuery("document_id", docId)
-        }
-      }
-    } map { _.as[Place] }  
-  
-  def searchPlacesInDocument(q: String, documentId: String)(implicit context: ExecutionContext) =
-    ES.client execute {
-      search in ES.IDX_RECOGITO / "place" query {
-        bool {
-          
-          must(
-            nestedQuery("is_conflation_of").query {
-              bool {
-                should (
-                  // Search inside record titles...
-                  matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
-                  matchPhraseQuery("is_conflation_of.title", q),
-                 
-                  // ...names...
-                  nestedQuery("is_conflation_of.names").query {
-                    matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
-                  },
-                 
-                  nestedQuery("is_conflation_of.names").query {
-                    matchQuery("is_conflation_of.names.name", q)
-                  },
-                 
-                  // ...and descriptions (with lower boost)
-                  nestedQuery("is_conflation_of.descriptions").query {
-                    matchQuery("is_conflation_of.descriptions.description", q)
-                  }.boost(0.2)
-                )
-              }
-            },  
-            
-            hasChildQuery(GEOTAG).query {
-              termQuery("document_id", documentId)
-            }
-          )
-        }
-      }
-    } map { _.as[Place] }  
-    
   def totalGeoTags()(implicit context: ExecutionContext): Future[Long] =
     ES.client execute {
       search in ES.IDX_RECOGITO -> GEOTAG limit 0

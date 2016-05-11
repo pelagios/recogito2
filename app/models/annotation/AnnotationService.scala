@@ -11,8 +11,9 @@ import play.api.libs.json.Json
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.postfixOps
 import storage.ES
+import models.geotag.GeoTagServiceLike
 
-object AnnotationService {
+object AnnotationService extends GeoTagServiceLike {
 
   private val ANNOTATION = "annotation"
 
@@ -40,7 +41,7 @@ object AnnotationService {
     
     for {
       (annotationCreated, version) <- upsertAnnotation(annotation)
-      linksCreated <- if (annotationCreated) GeoTagServiceLike.insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
+      linksCreated <- if (annotationCreated) insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
     } yield (linksCreated, version)    
   }
 
@@ -61,13 +62,11 @@ object AnnotationService {
   }
     
   def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] = {
-    // TODO can we eleminate cross-dependency to PlaceLinkService? Both the PlaceService and the Annotation service, by
-    // definition, need to deal with PlaceLinks. Trait?
     ES.client execute {
       delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
     } flatMap { response =>
       if (response.isFound)
-        GeoTagServiceLike.deleteGeoTagsByAnnotation(annotationId)
+        deleteGeoTagsByAnnotation(annotationId)
       else
         Future.successful(false)
     } recover { case t: Throwable =>

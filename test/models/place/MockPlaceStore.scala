@@ -61,5 +61,12 @@ class MockPlaceStore extends PlaceStore {
       
       Page(0l, results.size, 0, limit, results.take(limit))
     }
+  
+  def findPlacesInDocument(docId: String)(implicit context: ExecutionContext) =
+    throw new UnsupportedOperationException
+  
+  def searchPlacesInDocument(query: String, docId: String, limit: Int = 20)(implicit context: ExecutionContext) =
+    throw new UnsupportedOperationException
+    
       
 }
