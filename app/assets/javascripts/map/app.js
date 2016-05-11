@@ -48,8 +48,8 @@ require([
          // Loop through all place bodies of all annotations
          jQuery.each(annotations, function(i, annotation) {
            jQuery.each(AnnotationUtils.getBodiesOfType(annotation, 'PLACE'), function(j, placeBody) {
-             var annnotationsAtPlace = annotationsByGazetteerURI[placeBody.uri];
-             if (annnotationsAtPlace)
+             var annotationsAtPlace = annotationsByGazetteerURI[placeBody.uri];
+             if (annotationsAtPlace)
                annotationsAtPlace.push(annotation);
              else
                annotationsByGazetteerURI[placeBody.uri] = [ annotation ];

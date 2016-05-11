@@ -77,12 +77,7 @@ object PlaceService {
       getAffectedPlaces(normalizedRecord, store).map(p => {
         // Sorted affected places by no. of gazetteer records
         val affectedPlaces = p.sortBy(- _._1.isConflationOf.size)
-        
-        if (affectedPlaces.size > 0) {
-          Logger.warn("Wait - what?")
-          Logger.warn(affectedPlaces.toString)
-        }
-    
+
         val affectedRecords = 
           affectedPlaces
             .flatMap(_._1.isConflationOf) // all gazetteer records contained in the affected places
