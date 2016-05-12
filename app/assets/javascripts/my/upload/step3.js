@@ -85,20 +85,27 @@ require(['../../common/config'], function(Config) {
               return failedTasks.length > 0;
             };
 
-            // Updates the filepart element with the given progress information
-            this.update = function(progress) {
-              if (applicableRunningTasks.indexOf(progress.task_name) > -1) {
-                var progressOnThisPart = jQuery.grep(progress.progress, function(p) {
-                                           return p.filepart_id === id;
-                                         })[0];
+        /** Returns the current sort index in the list **/
+        this.getSortPosition = function() {
+          return jQuery(containerElement).index();
+        };
 
-                progressPerTask[progress.task_name] = progressOnThisPart.status;
-                updateElement(progress);
-              }
-            };
+        /** Updates the filepart element with the given progress information **/
+        this.update = function(progress) {
+          if (applicableRunningTasks.indexOf(progress.task_name) > -1) {
+            var progressOnThisPart = jQuery.grep(progress.progress, function(p) {
+                                       return p.filepart_id === id;
+                                     })[0];
 
-            // Returns true if this filepart is still being processed
-            this.isPending = isPending;
+            progressPerTask[progress.task_name] = progressOnThisPart.status;
+            updateElement(progress);
+          }
+        };
+
+        this.id = id;
+
+        // Returns true if this filepart is still being processed
+        this.isPending = isPending;
       };
 
   jQuery(document).ready(function() {
@@ -140,6 +147,12 @@ require(['../../common/config'], function(Config) {
             if (allPartsFinished())
               jQuery('.btn.next').prop('disabled', false);
           });
+        },
+
+        onOrderChanged = function() {
+          jQuery.each(fileparts, function(idx, part) {
+            console.log("ID: " + part.id + ", Position: " + part.getSortPosition());
+          });
         };
 
     // Start polling task progress
@@ -151,8 +164,10 @@ require(['../../common/config'], function(Config) {
       });
 
     // Make filepart elements sortable (and disable selection)
-    jQuery('ul.fileparts').sortable();
     jQuery('ul.fileparts').disableSelection();
+    jQuery('ul.fileparts').sortable({
+      stop: onOrderChanged
+    });
   });
 
 });

@@ -12,6 +12,13 @@ import storage.{ DB, FileAccess }
 
 class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with FileAccess {
   
+  def setSortOrder(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    
+    // TODO implement
+    
+    Future.successful(Status(200))
+  }
+  
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart) =>
       // ownerDataDir must exist, unless DB integrity is broken - renderDocumentResponse will handle the exception if .get fails

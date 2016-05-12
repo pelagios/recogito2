@@ -47,6 +47,7 @@ GET     /document/:id/settings                     controllers.document.settings
 # Document content
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+PUT     /document/:id/sortorder                    controllers.document.DocumentController.setSortOrder(id: String)
 GET     /document/:id/part/:partNo/tiles/*path     controllers.document.DocumentController.getImageTile(id: String, partNo: Int, path: String)
 GET     /document/:id/part/:partNo/thumb.jpg       controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
 DELETE  /document/:id                              controllers.document.DocumentController.deleteDocument(id: String)
