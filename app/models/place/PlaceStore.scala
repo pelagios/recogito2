@@ -38,7 +38,7 @@ trait PlaceStore {
   def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
 
   /** Place search **/
-  def searchPlaces(query: String, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
+  def searchPlaces(query: String, offset: Int = 0, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
   
 }
 
@@ -111,7 +111,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     }
   }
 
-  override def searchPlaces(q: String, l: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
+  override def searchPlaces(q: String, offset: Int, limit: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query {
         nestedQuery("is_conflation_of").query {
@@ -137,10 +137,10 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
             )
           }
         }
-      } limit l
+      } start offset limit limit
     } map { response =>
       val places = response.as[(Place, Long)].toSeq 
-      Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, l, places)
+      Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, limit, places)
     }
     
 }

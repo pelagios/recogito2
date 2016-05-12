@@ -51,7 +51,7 @@ class MockPlaceStore extends PlaceStore {
         .map((_, 0l))
     }
   
-  def searchPlaces(name: String, limit: Int)(implicit context: ExecutionContext) =
+  def searchPlaces(name: String, offset: Int, limit: Int)(implicit context: ExecutionContext) =
     Future {
       val results = mockIndex.asScala.values.toSeq
         .filter(place => {
@@ -61,12 +61,5 @@ class MockPlaceStore extends PlaceStore {
       
       Page(0l, results.size, 0, limit, results.take(limit))
     }
-  
-  def findPlacesInDocument(docId: String)(implicit context: ExecutionContext) =
-    throw new UnsupportedOperationException
-  
-  def searchPlacesInDocument(query: String, docId: String, limit: Int = 20)(implicit context: ExecutionContext) =
-    throw new UnsupportedOperationException
-    
       
 }

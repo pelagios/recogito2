@@ -6,6 +6,7 @@ import java.io.File
 import java.util.UUID
 import models.annotation._
 import models.ContentType
+import models.place.PlaceService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.Logger
@@ -32,12 +33,18 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       status = ProgressStatus.IN_PROGRESS
       val origSender = sender
       
-      parseFilepart(document, part, documentDir).map { result =>
-        val annotations = phrasesToAnnotations(result, document, part)
-        AnnotationService.insertOrUpdateAnnotations(annotations)
-        progress = 1.0
-        status = ProgressStatus.COMPLETED
-        origSender ! Completed
+      parseFilepart(document, part, documentDir).map { phrases =>
+        val entities = phrases.filter(p => (p.entityTag == "LOCATION" || p.entityTag == "PERSON"))
+        resolve(entities).map { annotations =>
+          AnnotationService.insertOrUpdateAnnotations(annotations).map { result =>
+            progress = 1.0
+            status = ProgressStatus.COMPLETED
+            if (result.exists(_._1 == false))
+              origSender ! Failed
+            else
+              origSender ! Completed
+          }
+        }
       }.recover { case t => {
         t.printStackTrace
         status = ProgressStatus.FAILED
@@ -66,47 +73,59 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     val text = Source.fromFile(file).getLines.mkString("\n")
     NERService.parse(text)
   }
-
-  private def phrasesToAnnotations(phrases: Seq[Phrase], document: DocumentRecord, part: DocumentFilepartRecord) =
-    phrases
-      .filter(p => (p.entityTag == "LOCATION" || p.entityTag == "PERSON"))
-      .map(p => {
-        val now = DateTime.now
-        val annotationType =
-          p.entityTag match {
-            case "LOCATION" => AnnotationBody.PLACE
-            case "PERSON" => AnnotationBody.PERSON
+  
+  private def resolve(entities: Seq[Phrase]): Future[Seq[Annotation]] =
+    // Chaining futures to resolve annotation sequentially
+    entities.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, phrase) => 
+      future.flatMap { annotations =>
+        val fAnnotation = 
+          if (phrase.entityTag == "LOCATION") {
+            PlaceService.searchPlaces(phrase.chars, 0, 1).map { topHits =>
+              if (topHits.total > 0)
+                // TODO be smarter about choosing the right URI from the place
+                toAnnotation(phrase, AnnotationBody.PLACE, Some(topHits.items(0)._1.id))
+              else
+                // No gazetteer match found
+                toAnnotation(phrase, AnnotationBody.PLACE)
+            }
+          } else {       
+            Future.successful(toAnnotation(phrase, AnnotationBody.PERSON))
           }
-
-        Annotation(
-          UUID.randomUUID,
-          UUID.randomUUID,
-          AnnotatedObject(document.getId, part.getId),
-          None, // no previous versions
-          Seq.empty[String], // No contributing users
-          "char-offset:" + p.charOffset,
-          None, // no last modifying user
+        
+        fAnnotation.map(annotation => annotations :+ annotation)
+      }
+    }
+  
+  private def toAnnotation(phrase: Phrase, annotationType: AnnotationBody.Value, uri: Option[String] = None): Annotation = {
+    val now = DateTime.now
+    
+    Annotation(
+      UUID.randomUUID,
+      UUID.randomUUID,
+      AnnotatedObject(document.getId, part.getId),
+      None, // no previous versions
+      Seq.empty[String], // No contributing users
+      "char-offset:" + phrase.charOffset,
+      None, // no last modifying user
+      now,
+      Seq(
+        AnnotationBody(
+          AnnotationBody.QUOTE,
+          None,  // no last modifying user
           now,
-          Seq(
-            AnnotationBody(
-              AnnotationBody.QUOTE,
-              None,  // no last modifying user
-              now,
-              Some(p.chars),
-              None,  // uri
-              None), // status
-            AnnotationBody(
-              annotationType,
-              None,
-              now,
-              None,
-              None,
-              Some(AnnotationStatus(
-                AnnotationStatus.UNVERIFIED,
-                None,
-                now)))
-          )
-        )
-      })
+          Some(phrase.chars),
+          None,  // uri
+          None), // status
+        AnnotationBody(
+          annotationType,
+          None,
+          now,
+          None,
+          uri,
+          Some(AnnotationStatus(
+            AnnotationStatus.UNVERIFIED,
+            None,
+            now)))))
+  }
 
 }

@@ -44,6 +44,10 @@ object AnnotationService extends ESGeoTagStore {
     } yield (linksCreated, version)    
   }
 
+  // TODO 
+  // * perform sequentially, using a proper foldLeft + map construct
+  // * generate proper success/failed result, with list of failed annotations
+  // * perform retries with failed imports (cf. place import)
   def insertOrUpdateAnnotations(annotations: Seq[Annotation])(implicit context: ExecutionContext) =
     Future.sequence(for (result <- annotations.map(insertOrUpdateAnnotation(_))) yield result) 
   
