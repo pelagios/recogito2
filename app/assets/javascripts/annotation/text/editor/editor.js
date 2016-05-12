@@ -318,6 +318,7 @@ define([
             } else {
               // UPDATE
               annotationSpans = jQuery('[data-id=' + currentAnnotation.annotation_id + ']');
+              highlighter.updateAnnotationSpans(currentAnnotation, annotationSpans);
               self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
             }
           } else {

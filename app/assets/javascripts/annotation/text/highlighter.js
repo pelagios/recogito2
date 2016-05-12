@@ -83,16 +83,21 @@ define(['../../common/helpers/annotationUtils'], function(AnnotationUtils) {
           }
         },
 
+        determineCSSClass = function(annotation) {
+          var entityType = AnnotationUtils.getEntityType(annotation),
+              cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation';
+
+          return cssClass;
+        },
+
         renderAnnotation = function(annotation) {
           var anchor = annotation.anchor.substr(12),
               quote = AnnotationUtils.getQuote(annotation),
-              entityType = AnnotationUtils.getEntityType(annotation),
-              cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation',
               range = rangy.createRange(),
               spans;
 
           range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
-          spans = wrapRange(range, cssClass);
+          spans = wrapRange(range, determineCSSClass(annotation));
 
           // Attach annotation data as payload to the SPANs and set id, if any
           jQuery.each(spans, function(idx, span) {
@@ -100,6 +105,11 @@ define(['../../common/helpers/annotationUtils'], function(AnnotationUtils) {
           });
 
           return spans;
+        },
+
+        updateAnnotationSpans = function(annotation, spans) {
+          spans.removeClass();
+          spans.addClass(determineCSSClass(annotation));
         },
 
         removeAnnotation = function(annotation) {
@@ -113,6 +123,7 @@ define(['../../common/helpers/annotationUtils'], function(AnnotationUtils) {
 
     this.removeAnnotation = removeAnnotation;
     this.renderAnnotation = renderAnnotation;
+    this.updateAnnotationSpans = updateAnnotationSpans;
     this.wrapRange = wrapRange;
   };
 
