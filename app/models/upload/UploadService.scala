@@ -61,23 +61,23 @@ object UploadService extends FileAccess {
   }
 
   /** Inserts a new filepart - metadata goes to the DB, content to the pending-uploads dir **/
-  def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile])(implicit db: DB): 
+  def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile])(implicit db: DB):
     Future[Either[ContentIdentificationFailure, UploadFilepartRecord]] = db.withTransaction { sql =>
-      
+
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filesize = filepart.ref.file.length.toDouble / 1024
     val file = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
-    
+
     ContentType.fromFile(file) match {
-      case Right(contentType) => {      
-        filepart.ref.moveTo(file)    
+      case Right(contentType) => {
+        filepart.ref.moveTo(file)
         val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize)
-    
+
         sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
         Right(filepartRecord)
       }
-        
+
       case Left(identificationFailure) => Left(identificationFailure)
     }
   }
@@ -112,12 +112,12 @@ object UploadService extends FileAccess {
       sql.selectFrom(UPLOAD_FILEPART)
          .where(UPLOAD_FILEPART.OWNER.equal(username))
          .fetchArray
-         
+
     fileparts.foreach(part => {
       val file = new File(PENDING_UPLOADS_DIR, part.getFilename)
       file.delete()
     })
-         
+
     sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.OWNER.equal(username)).execute
     sql.deleteFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).execute() == 1
   }
@@ -151,7 +151,6 @@ object UploadService extends FileAccess {
   def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
     val document = DocumentService.createDocument(upload)
 
-    // Insert document
     sql.insertInto(DOCUMENT).set(document).execute()
 
     // Insert filepart records - I couldn't find a way to do a batch-insert that also returns

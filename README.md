@@ -1,6 +1,7 @@
 # Recogito 2
 
-Development home of Recogito v2.0. Track our progress on [Waffle.io](http://waffle.io/pelagios/recogito2).
+Development home of Recogito v2.0 - a Linked Data annotation tool for texts and images. Track
+our progress on [Waffle.io](http://waffle.io/pelagios/recogito2).
 
 ## Prerequisites
 
@@ -19,7 +20,7 @@ Development home of Recogito v2.0. Track our progress on [Waffle.io](http://waff
 * Point your browser to [http://localhost:9000](http://localhost:9000)
 * To generate an Eclipse project, type `activator eclipse`.
 
-## Database Configuration
+## Database & Index Configuration
 
 If you stick with the default settings, Recogito will automatically create an SQLite database and
 an embedded ElasticSearch index, so there's nothing you need to do. However, for production use
