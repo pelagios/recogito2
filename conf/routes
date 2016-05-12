@@ -64,7 +64,7 @@ GET     /api/document/:id/part/:part/annotations   controllers.api.AnnotationAPI
 GET     /api/places/search                         controllers.api.PlaceAPIController.searchPlaces(q: String)
 GET     /api/places/:uri                           controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
 
-GET     /api/document/:id/places                   controllers.api.PlaceAPIController.getPlacesInDocument(id: String)
+GET     /api/document/:id/places                   controllers.api.PlaceAPIController.listPlacesInDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # User/team personal space

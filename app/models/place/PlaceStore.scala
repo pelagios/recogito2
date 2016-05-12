@@ -4,7 +4,6 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.source.Indexable
 import models.Page
-import models.geotag.GeoTagServiceLike
 import org.elasticsearch.search.sort.SortOrder
 import play.api.Logger
 import play.api.libs.json.Json
@@ -38,20 +37,14 @@ trait PlaceStore {
   /** Finds all places with a record URI or close/exactMatch URI that matches any of the supplied URIs **/
   def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
 
-  /** Finds all places in a document **/ 
-  def findPlacesInDocument(docId: String)(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
-  
   /** Place search **/
   def searchPlaces(query: String, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
   
-  /** Search places in a document **/
-  def searchPlacesInDocument(query: String, docId: String, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
-  
 }
 
-private[models] class ESPlaceStore extends PlaceStore with GeoTagServiceLike {
+private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
 
-  private[place] val PLACE = "place"
+  private val PLACE = "place"
   
   implicit object PlaceIndexable extends Indexable[Place] {
     override def json(p: Place): String = Json.stringify(Json.toJson(p))
@@ -62,12 +55,12 @@ private[models] class ESPlaceStore extends PlaceStore with GeoTagServiceLike {
       (Json.fromJson[Place](Json.parse(hit.sourceAsString)).get, hit.version)
   }
   
-  def totalPlaces()(implicit context: ExecutionContext): Future[Long] =
+  override def totalPlaces()(implicit context: ExecutionContext): Future[Long] =
     ES.client execute {
       search in ES.IDX_RECOGITO -> PLACE limit 0
     } map { _.getHits.getTotalHits }
     
-  def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
+  override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
     ES.client execute { 
       update id place.id in ES.IDX_RECOGITO / PLACE source place docAsUpsert 
     } map { r =>
@@ -78,14 +71,14 @@ private[models] class ESPlaceStore extends PlaceStore with GeoTagServiceLike {
       (false, -1l)
     }
     
-  def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =
+  override def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =
     ES.client execute { 
       delete id id from ES.IDX_RECOGITO / PLACE
     } map { response =>
       response.isFound
     }    
  
-  def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]] =
+  override def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO -> PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.uri" -> uri)) limit 10
     } map { response =>
@@ -101,7 +94,7 @@ private[models] class ESPlaceStore extends PlaceStore with GeoTagServiceLike {
       }
     }
 
-  def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] = {
+  override def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] = {
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query { 
         nestedQuery("is_conflation_of").query {
@@ -117,17 +110,8 @@ private[models] class ESPlaceStore extends PlaceStore with GeoTagServiceLike {
     } map { _.as[(Place, Long)].toSeq 
     }
   }
-  
-  def findPlacesInDocument(docId: String)(implicit context: ExecutionContext) =
-    ES.client execute {
-      search in ES.IDX_RECOGITO / "place" query {
-        hasChildQuery(GEOTAG).query {
-          termQuery("document_id", docId)
-        }
-      }
-    } map { _.as[(Place, Long)] }
 
-  def searchPlaces(q: String, l: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
+  override def searchPlaces(q: String, l: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query {
         nestedQuery("is_conflation_of").query {
@@ -158,46 +142,5 @@ private[models] class ESPlaceStore extends PlaceStore with GeoTagServiceLike {
       val places = response.as[(Place, Long)].toSeq 
       Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, l, places)
     }
-    
-  def searchPlacesInDocument(q: String, docId: String, l: Int)(implicit context: ExecutionContext) =
-    ES.client execute {
-      search in ES.IDX_RECOGITO / "place" query {
-        bool {
-          
-          must(
-            nestedQuery("is_conflation_of").query {
-              bool {
-                should (
-                  // Search inside record titles...
-                  matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
-                  matchPhraseQuery("is_conflation_of.title", q),
-                 
-                  // ...names...
-                  nestedQuery("is_conflation_of.names").query {
-                    matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
-                  },
-                 
-                  nestedQuery("is_conflation_of.names").query {
-                    matchQuery("is_conflation_of.names.name", q)
-                  },
-                 
-                  // ...and descriptions (with lower boost)
-                  nestedQuery("is_conflation_of.descriptions").query {
-                    matchQuery("is_conflation_of.descriptions.description", q)
-                  }.boost(0.2)
-                )
-              }
-            },  
-            
-            hasChildQuery(GEOTAG).query {
-              termQuery("document_id", docId)
-            }
-          )
-        }
-      } limit l
-    } map { response =>
-      val places = response.as[(Place, Long)].toSeq 
-      Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, l, places)
-    }  
     
 }

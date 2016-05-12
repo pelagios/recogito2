@@ -13,6 +13,9 @@ import play.api.test.Helpers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+// So we can instantiate a PlaceService running on a mock store
+class TestPlaceService extends MockPlaceStore with PlaceImporter
+
 @RunWith(classOf[JUnitRunner])
 class PlaceServiceSpec extends Specification {
   
@@ -23,17 +26,17 @@ class PlaceServiceSpec extends Specification {
   
   private val PLEIADES_RDF = "test/resources/models/place/gazetteer_sample_pleiades.ttl"
   
-  val mockStore = new MockPlaceStore()
+  val testPlaceService = new TestPlaceService()
   
   /** Async Await shorthands **/
   private def importRecords(records: Seq[GazetteerRecord]): Seq[GazetteerRecord] =
-    Await.result(PlaceService.importRecords(records, mockStore), 10 seconds)
+    Await.result(testPlaceService.importRecords(records), 10 seconds)
   
   private def findByURI(uri: String): Place =
-    Await.result(PlaceService.findByURI(uri, mockStore), 10 seconds).get._1
+    Await.result(testPlaceService.findByURI(uri), 10 seconds).get._1
     
   private def getTotalPlaces(): Long =
-    Await.result(PlaceService.totalPlaces(mockStore), 10 seconds)
+    Await.result(testPlaceService.totalPlaces(), 10 seconds)
   
   "The conflate method" should {
     
@@ -152,7 +155,7 @@ class PlaceServiceSpec extends Specification {
         "http://dare.ht.lu.se/places/17068",
         "http://dare.ht.lu.se/places/23712")
                 
-      val affectedPlaces = Await.result(PlaceService.getAffectedPlaces(fakeVindobona, mockStore), 10 seconds)
+      val affectedPlaces = Await.result(testPlaceService.getAffectedPlaces(fakeVindobona), 10 seconds)
       affectedPlaces.size must equalTo(3)
       affectedPlaces.map(_._1.id) must containAllOf(expectedPlaceURIs)
     }

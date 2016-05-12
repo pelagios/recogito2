@@ -17,8 +17,11 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import storage.ES
 
+// So we can instantiate an ES Place + GeoTagStore
+class TestGeoTagStore extends ESPlaceStore with ESGeoTagStore  
+
 @RunWith(classOf[JUnitRunner])
-class GeoTagServiceLikeServiceSpec extends Specification with AfterAll {
+class GeoTagStoreSpec extends Specification with AfterAll {
   
   sequential 
 
@@ -117,13 +120,13 @@ class GeoTagServiceLikeServiceSpec extends Specification with AfterAll {
         annotatesVindobonaAndThessaloniki.annotates.filepart,
         "http://pleiades.stoa.org/places/491741")
         
-    val store = new ESPlaceStore() // Store extends GeoTagServiceLike
+    val testStore = new TestGeoTagStore() // Store extends GeoTagServiceLike
               
     def flush() = Await.result(ES.flushIndex, 10 seconds)
     def insertAnnotation(a: Annotation) = Await.result(AnnotationService.insertOrUpdateAnnotation(a), 10 seconds)
-    def totalGeoTags() = Await.result(store.totalGeoTags(), 10 seconds)
-    def findByAnnotationId(id: UUID) = Await.result(store.findGeoTagsByAnnotation(id), 10 seconds)
-    def searchPlacesInDocument(query: String, documentId: String) = Await.result(PlaceService.searchPlacesInDocument(query, documentId), 10 seconds)
+    def totalGeoTags() = Await.result(testStore.totalGeoTags(), 10 seconds)
+    def findByAnnotationId(id: UUID) = Await.result(testStore.findGeoTagsByAnnotation(id), 10 seconds)
+    def searchPlacesInDocument(query: String, documentId: String) = Await.result(testStore.searchPlacesInDocument(query, documentId), 10 seconds)
     
     "After creating 2 annotations with 1 geotag each, the GeoTagService" should {
       
@@ -189,7 +192,7 @@ class GeoTagServiceLikeServiceSpec extends Specification with AfterAll {
         // In any case - deleting a place is something that only happens underneath the hood,
         // so we don't want to expose this as a functionality in the PlaceService
 
-        val deleteSuccess = Await.result(store.deletePlace("http://pleiades.stoa.org/places/128537"), 10 seconds)
+        val deleteSuccess = Await.result(testStore.deletePlace("http://pleiades.stoa.org/places/128537"), 10 seconds)
         deleteSuccess must equalTo(true)
         flush()
         

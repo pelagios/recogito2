@@ -24,12 +24,12 @@ class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, co
     }}
   }
   
-  def getPlacesInDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    PlaceService.findPlacesInDocument(docId).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
+  def listPlacesInDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    PlaceService.listPlacesInDocument(docId).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
   }
   
   def searchPlacesInDocument(query: String, docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    PlaceService.searchPlacesInDocument(query, docId).map { results =>
+    PlaceService.searchPlacesInDocument(query, docId, 0, Int.MaxValue).map { results =>
       jsonOk(Json.toJson(results.map(_._1)))
     }
   }

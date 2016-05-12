@@ -5,15 +5,14 @@ import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
-import models.geotag.GeoTagServiceLike
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.postfixOps
 import storage.ES
-import models.geotag.GeoTagServiceLike
+import models.geotag.ESGeoTagStore
 
-object AnnotationService extends GeoTagServiceLike {
+object AnnotationService extends ESGeoTagStore {
 
   private val ANNOTATION = "annotation"
 
