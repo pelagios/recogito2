@@ -27,7 +27,7 @@ define([], function() {
     /** Place API methods **/
 
     getPlacesInDocument : function(docId) {
-      return jsRoutes.controllers.api.PlaceAPIController.getPlacesInDocument(docId).ajax();
+      return jsRoutes.controllers.api.PlaceAPIController.listPlacesInDocument(docId).ajax();
     },
 
     searchPlaces : function(query) {

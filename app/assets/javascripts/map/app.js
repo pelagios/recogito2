@@ -57,9 +57,9 @@ require([
          });
        },
 
-       onPlacesLoaded = function(places) {
+       onPlacesLoaded = function(response) {
          // TODO just a quick hack for now
-         jQuery.each(places, function(idx, place) {
+         jQuery.each(response.items, function(idx, place) {
            if (place.representative_point) {
              // The epic battle between Leaflet vs. GeoJSON
              var coord = [ place.representative_point[1], place.representative_point[0] ];
