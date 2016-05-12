@@ -2,7 +2,8 @@ define([
   '../../../../common/helpers/formatting',
   '../../../../common/helpers/placeUtils',
   '../../../../common/api',
-  '../../../../common/config'], function(Formatting, PlaceUtils, API, Config) {
+  '../../../../common/config',
+  '../../../../common/hasEvents'], function(Formatting, PlaceUtils, API, Config, HasEvents) {
 
   var SLIDE_DURATION = 200;
 
@@ -24,7 +25,10 @@ define([
                     '<a class="by"></a>' +
                     '<span class="at"></span>' +
                   '</div>' +
-                  '<button class="change btn tiny">Change</button>' +
+                  '<div class="edit-buttons">' +
+                    '<button class="change btn tiny">Change</button>' +
+                    '<button class="delete btn tiny icon">&#xf014;</button>' +
+                  '</div>' +
                   '<div class="warning-unverified">' +
                     '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
                     '<button class="unverified-change">Change</button>' +
@@ -38,7 +42,7 @@ define([
               '</div>' +
             '</div>');
 
-          el.find('.warning-unverified, .created, .change').hide();
+          el.find('.warning-unverified, .created, .edit-buttons').hide();
           parent.append(el);
           return el;
         })(),
@@ -58,7 +62,7 @@ define([
         names = element.find('.names'),
         date = element.find('.date'),
 
-        createdSection = element.find('.created, .change'),
+        createdSection = element.find('.created, .edit-buttons'),
         createdBy = createdSection.find('.by'),
         createdAt = createdSection.find('.at'),
 
@@ -67,6 +71,7 @@ define([
 
         btnChange = element.find('.unverified-change, .change'),
         btnConfirm = element.find('.unverified-confirm'),
+        btnDelete = element.find('.delete'),
 
         currentGazetteerRecord = false,
 
@@ -220,6 +225,10 @@ define([
           warningUnverified.slideUp(SLIDE_DURATION);
         },
 
+        onDelete = function() {
+          self.fireEvent('delete');
+        },
+
         commit = function() {
           // TODO implement
         },
@@ -229,15 +238,19 @@ define([
         };
 
     btnConfirm.click(onConfirm);
+    btnDelete.click(onDelete);
 
     if (placeBody.uri)
       fillFromURI();
     else
       fillFromQuote();
 
+    this.body = placeBody;
     this.commit = commit;
     this.destroy = destroy;
+    HasEvents.apply(this);
   };
+  PlaceSection.prototype = Object.create(HasEvents.prototype);
 
   return PlaceSection;
 

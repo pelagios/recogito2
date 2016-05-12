@@ -125,6 +125,7 @@ define([
 
     parent.append(element);
 
+    this.body = commentBody;
     this.commit = commit;
     this.destroy = destroy;
     HasEvents.apply(this);

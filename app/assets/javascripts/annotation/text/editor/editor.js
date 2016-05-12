@@ -82,8 +82,8 @@ define([
 
         currentAnnotation = false,
 
-        /** Removes a body + corresponding section **/
-        removeBody = function(section, body) {
+        /** Removes a section + queues removal of corresponding body **/
+        removeSection = function(section) {
           // Destroy the section element, removing it from the DOM
           section.destroy();
 
@@ -93,7 +93,7 @@ define([
             bodySections.splice(idx, 1);
 
           // Queue the delete operation for later, when user click 'OK'
-          queuedUpdates.push(function() { AnnotationUtils.deleteBody(currentAnnotation, body); });
+          queuedUpdates.push(function() { AnnotationUtils.deleteBody(currentAnnotation, section.body); });
         },
 
         showEditorElement = function(bounds) {
@@ -155,8 +155,11 @@ define([
                 commentSection = new CommentSection(commentBodyContainer, commentBody, zIndex);
 
             bodySections.push(commentSection);
-            commentSection.on('delete', function() { removeBody(commentSection, commentBody); });
             commentSection.on('submit', onOk);
+          });
+
+          jQuery.each(bodySections, function(idx, section) {
+            section.on('delete', function() { removeSection(section); });
           });
 
           if (comments.length > 0)
