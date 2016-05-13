@@ -74,9 +74,8 @@ CREATE TABLE document_filepart (
   title TEXT NOT NULL,
   content_type TEXT NOT NULL,
   filename TEXT NOT NULL,
-  sequence_no INTEGER NOT NULL,
+  sequence_no INTEGER NOT NULL
   -- TODO filepart metadata (source, identifier,... ?)
-  UNIQUE (document_id, sequence_no)
 );
 
 -- users can organize documents into folders

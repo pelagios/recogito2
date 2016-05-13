@@ -150,8 +150,17 @@ require(['../../common/config'], function(Config) {
         },
 
         onOrderChanged = function() {
-          jQuery.each(fileparts, function(idx, part) {
-            console.log("ID: " + part.id + ", Position: " + part.getSortPosition());
+          var sortOrder = jQuery.map(fileparts, function(part) {
+            // console.log("ID: " + part.id + ", Position: " + part.getSortPosition());
+            return { id: part.id, sequence_no: part.getSortPosition() + 1 };
+          });
+
+          jsRoutes.controllers.document.DocumentController.setSortOrder(Config.documentId).ajax({
+            data: JSON.stringify(sortOrder),
+            contentType: 'application/json'
+          }).fail(function(error) {
+            // TODO present error to user
+            console.log(error);
           });
         };
 

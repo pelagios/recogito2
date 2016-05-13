@@ -3,20 +3,39 @@ package controllers.document
 import controllers.BaseController
 import java.io.File
 import javax.inject.Inject
-import models.document.DocumentService
+import models.document.{ DocumentService, PartOrdering }
 import models.user.Roles._
 import play.api.cache.CacheApi
+import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._ 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 
 class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with FileAccess {
   
+  implicit val orderingReads: Reads[PartOrdering] = (
+    (JsPath \ "id").read[Int] and
+    (JsPath \ "sequence_no").read[Int]
+  )(PartOrdering.apply _)
+  
   def setSortOrder(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    
-    // TODO implement
-    
-    Future.successful(Status(200))
+    request.body.asJson match {
+      case Some(json) => Json.fromJson[Seq[PartOrdering]](json) match {
+
+        case s: JsSuccess[Seq[PartOrdering]] =>
+          // TODO verify the user has right access on this document
+          DocumentService.setFilepartSortOrder(docId, s.get).map(_ => Status(200))
+        
+        case e: JsError => 
+          Future.successful(BadRequest)
+        
+      }
+        
+      case None =>
+        Future.successful(BadRequest)
+    }    
   }
   
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>

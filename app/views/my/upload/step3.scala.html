@@ -1,7 +1,7 @@
 @(username: String,
   document: models.generated.tables.records.DocumentRecord,
   fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord],
-  tasks: Seq[controllers.my.upload.TaskType])
+  tasks: Seq[controllers.my.upload.TaskType])(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
@@ -48,5 +48,9 @@
         </div>
       </div>
     </div>
+
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.document.routes.javascript.DocumentController.setSortOrder
+    )
   </body>
 </html>

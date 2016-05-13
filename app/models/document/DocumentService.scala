@@ -12,6 +12,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.{ DB, FileAccess }
+import models.generated.tables.records.DocumentFilepartRecord
+
+case class PartOrdering(partId: Int, seqNo: Int)
 
 object DocumentService extends BaseService with FileAccess {
   
@@ -60,6 +63,39 @@ object DocumentService extends BaseService with FileAccess {
           upload.getDescription,
           upload.getSource,
           upload.getLanguage)
+  
+  /** Changes the sequence numbers of fileparts for a specific document **/
+  def setFilepartSortOrder(docId: String, sortOrder: Seq[PartOrdering])(implicit db: DB) = db.withTransaction { sql =>
+    // To verify validaty of the request, load the fileparts from the DB first...
+    val fileparts = 
+      sql.selectFrom(DOCUMENT_FILEPART).where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId)).fetchArray()
+    
+    // ...discard parts that are not associated with the document and log a warning
+    val foundIds = fileparts.map(_.getId).toSet
+    val requestedIds = sortOrder.map(_.partId).toSet
+    if (requestedIds != foundIds)
+      Logger.warn("Attempt to re-order fileparts that don't belong to the specified doc")
+    val sanitizedOrder = sortOrder.filter(ordering => foundIds.contains(ordering.partId))
+    
+    // Should normally be empty
+    val unchangedParts = fileparts.filter(part => !requestedIds.contains(part.getId))
+    if (unchangedParts.size > 0)
+      Logger.warn("Request for re-ordering fileparts is missing " + unchangedParts.size + " rows")
+   
+    // There is no uniquness constraint in the DB on (documentId, seqNo), since we wouldn't be able to
+    // update sequence numbers without changing part IDs then. Therefore we enforce uniqueness here.
+    val updatedSequenceNumbers = sanitizedOrder.map(_.seqNo) ++ unchangedParts.map(_.getSequenceNo)
+    if (updatedSequenceNumbers.size != updatedSequenceNumbers.distinct.size)
+      throw new Exception("Uniqueness constraint violated for Filepart (document_id, sequence_no)")
+      
+    // Update fileparts in DB
+    val updates = sanitizedOrder.map(ordering =>
+      sql.update(DOCUMENT_FILEPART)
+         .set(DOCUMENT_FILEPART.SEQUENCE_NO, ordering.seqNo.asInstanceOf[java.lang.Integer])
+         .where(DOCUMENT_FILEPART.ID.equal(ordering.partId)))
+
+    sql.batch(updates:_*).execute()
+  }
   
   /** Retrieves a document by its ID **/
   def findById(id: String)(implicit db: DB) = db.query { sql =>
