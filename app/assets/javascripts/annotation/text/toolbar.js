@@ -35,6 +35,10 @@ define(['../../common/config', '../../common/hasEvents'], function(Config, HasEv
                 mode = t.data('mode'),
                 type = t.data('type');
 
+            // TODO temporary: disable PERSON & TAGS quick modes for 1st pre-release
+            if (type === 'PERSON' || type === 'TAGS')
+              return;
+
             if (isModeChanged(mode, type)) {
               annotationModes.find('.active').removeClass('active');
               menuItemQuick.removeClass(currentMode.type);
