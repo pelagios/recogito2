@@ -1,25 +1,61 @@
-@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, documents: Seq[models.generated.tables.records.DocumentRecord])(implicit request: RequestHeader)
+@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long,
+  documents: Seq[models.generated.tables.records.DocumentRecord])(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
     <title>MY RECOGITO</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
   </head>
   <body>
-    <h1>My Recogito</h1>
-    <p>you are logged in as: @user.getUsername</p>
-    <p><a href="@controllers.landing.routes.LoginLogoutController.logout">logout</a></p>
+    <div class="page-header">
 
-    <p>Used Diskspace: @{ usedDiskspace / 1024 } kBytes</p>
+      <div class="user-section">
+        <div class="user-avatar"></div>
+        <div class="user-info">
+          <h1>@user.getUsername</h1>
+          <!-- TODO date formatting -->
+          <p class="member-since">Joined on @user.getMemberSince</p>
+          <p class="disk-quota"> <!-- TODO meter graph + size formatting -->
+            @{ usedDiskspace / 1024 } kB of 100 MB Used
+          </p>
+          <a href="@controllers.landing.routes.LoginLogoutController.logout">logout</a>
+        </div>
+      </div> <!-- .user-section -->
 
-    <ul>
-      @for(document <- documents) {
-        <li>
-          <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a>
-          <button onclick="deleteDocument('@document.getId');">Delete</button>
-        </li>
-      }
-    </ul>
+      <div class="activity">
+
+      </div> <!-- .activity -->
+
+    </div> <!-- .header -->
+
+    <div class="document-list">
+      <div class="list-header">
+        <ul class="tabs">
+          <li><a href="#">My documentss</a></li>
+          <li><a href="?tab=shared">Shared with me</a></li>
+        </ul>
+
+        <div class="search-box">
+          <!-- TODO -->
+        </div>
+
+        <div class="actions">
+          <button class="btn small icon">&#xe645;</span>
+          <button class="btn small icon">&#xe636;</span>
+          <button class="btn small icon">&#xe8c9;</button>
+        </div>
+      </div>
+
+      <ul>
+        @for(document <- documents) {
+          <li>
+            <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a>
+            <button onclick="deleteDocument('@document.getId');">Delete</button>
+          </li>
+        }
+      </ul>
+    </div>
 
     <a href="@controllers.my.upload.routes.UploadController.showStep1(user.getUsername.toLowerCase)">Upload New Document</a>
 
