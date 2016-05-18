@@ -29,35 +29,41 @@
 
     </div> <!-- .header -->
 
-    <div class="document-list">
-      <div class="list-header">
-        <ul class="tabs">
-          <li><a href="#">My documentss</a></li>
-          <li><a href="?tab=shared">Shared with me</a></li>
-        </ul>
+    <div class="toolbar">
+      <ul class="tabs">
+        <li><a href="#">My documents</a></li>
+        <li class="disabled"><a href="?tab=shared">Shared with me</a></li>
+      </ul>
 
-        <div class="search-box">
-          <!-- TODO -->
-        </div>
-
-        <div class="actions">
-          <button class="btn small icon">&#xe645;</span>
-          <button class="btn small icon">&#xe636;</span>
-          <button class="btn small icon">&#xe8c9;</button>
-        </div>
+      <div class="search">
+        <input class="searchbox" type="text" placeholder="Search..."/>
+        <span class="icon">&#xf002;</span>
       </div>
 
-      <ul>
-        @for(document <- documents) {
-          <li>
-            <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a>
-            <button onclick="deleteDocument('@document.getId');">Delete</button>
-          </li>
-        }
-      </ul>
-    </div>
+      <div class="tools">
+        <ul>
+          <li class="display-mode">&#xe645;</li> <!-- list: &#xe636; -->
+          <li class="add-folder">&#xe890;</li>
+        </ul>
 
-    <a href="@controllers.my.upload.routes.UploadController.showStep1(user.getUsername.toLowerCase)">Upload New Document</a>
+        <div class="import">
+          <a class="btn" href="@controllers.my.upload.routes.UploadController.showStep1(user.getUsername.toLowerCase)">Import</a>
+        </div>
+
+      </div> <!-- .tools -->
+
+    </div> <!-- .toolbar -->
+
+    <ul class="document-list">
+      @for(document <- documents) {
+        <li>
+          <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a>
+          <button onclick="deleteDocument('@document.getId');">Delete</button>
+        </li>
+      }
+    </ul>
+
+
 
     @helper.javascriptRouter("jsRoutes")(
       controllers.document.routes.javascript.DocumentController.deleteDocument
