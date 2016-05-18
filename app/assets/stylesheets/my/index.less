@@ -7,6 +7,17 @@ body {
 .page-header {
   background-color:#fff;
   border-bottom:1px solid @lightgrey-border;
+  padding:20px 50px;
+
+  p {
+    color:@lightblue-type;
+  }
+
+}
+
+.page-header * {
+  margin:0;
+  padding:2px 0;
 }
 
 .toolbar * {
@@ -25,11 +36,8 @@ body {
   .tabs {
     padding:0;
 
-    li {
-      padding:8px 50px;
-    }
-
     a {
+      padding:7px 50px;
       text-decoration:none;
       color:@nightsky;
     }
@@ -38,12 +46,11 @@ body {
       background-color:@blueish-white-hi;
       border-width:0 1px;
       border-style:solid;
-      border-color:@blueish-white;
-      color:@lightblue-type;
+      border-color:@lightgrey-border;
     }
 
     .disabled a {
-      color:@lightblue-type;
+      color:lighten(@lightblue-type, 10%);
     }
 
   } /** .tabs **/
@@ -56,28 +63,29 @@ body {
     text-align:top;
 
     .searchbox {
-      padding:0;
+      padding:0 12px 0 0;
       position:relative;
       top:-8px;
 
       input {
-        width:280px;
+        width:220px;
+        font-size:15px;
       }
 
       .icon {
         position:absolute;
         top:5px;
-        right:2px;
+        right:14px;
       }
 
     }  /** .searchbox **/
 
     button.nostyle {
       text-align:middle;
-      padding:5px 12px;
+      padding:5px 12px 5px 0;
       position:relative;
       font-family:Tonicons;
-      font-size:32px;
+      font-size:30px;
       color:@lightblue-type;
     }
 
@@ -92,10 +100,11 @@ body {
 
     .import {
       position:relative;
-      top:-9px;
+      top:-8px;
 
       .btn {
-        padding:4px 30px;
+        font-size:15px;
+        padding:2px 15px;
       }
 
     } /** .import **/

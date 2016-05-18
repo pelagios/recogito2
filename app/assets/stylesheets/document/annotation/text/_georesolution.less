@@ -51,16 +51,61 @@
 
   }
 
-  button.cancel, button.flag {
+  .flag-this-place {
+    padding:0 15px;
+    display:inline-block;
+    color:@lightblue-type;
+
+    .flag {
+      cursor:pointer;
+
+      button {
+        position:relative;
+        top:6px;
+        color:@lightblue-type;
+        font-size:28px;
+        padding-left:10px;
+      }
+
+    }
+
+    .flag:hover > .label {
+      text-decoration:underline;
+    }
+
+  } /** .flag-this-place **/
+
+  button.cancel {
     color:@lightblue-type;
     font-size:24px;
     cursor:pointer;
-  }
-
-  button.cancel {
     position:absolute;
     top:8px;
     right:4px;
   }
 
-}
+} /** .geores-editor-header **/
+
+.geores-editor-body {
+  position:absolute;
+  top:43px;
+  bottom:0;
+  left:0;
+  right:0;
+
+  .geores-sidebar {
+    box-sizing:border-box;
+    height:100%;
+    width:326px;
+    padding:10px;
+  }
+
+  .geores-map {
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:326px;
+  }
+
+} /** .geores-editor-body **/
