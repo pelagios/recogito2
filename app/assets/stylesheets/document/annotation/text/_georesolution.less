@@ -1,0 +1,66 @@
+.clicktrap {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background-color:rgba(0, 0, 0, 0.6);
+  z-index:99999;
+}
+
+.geores-wrapper {
+  width:90%;
+  height:100%;
+  max-width:1200px;
+  margin:0 auto;
+  position:relative;
+}
+
+.geores-editor {
+  position:absolute;
+  top:10%;
+  bottom:10%;
+  right:0;
+  left:0;
+  background-color:#fff;
+  .rounded-corners(4px);
+  .box-shadow(2px, 2px, 42px, rgba(0, 0, 0, 0.4));
+}
+
+.geores-editor-header {
+  width:100%;
+  border-bottom:1px solid @lightgrey-border-darker;
+  display:inline-block;
+  height:42px;
+  position:relative;
+
+  .geores-search {
+    display:inline-block;
+    position:relative;
+    margin:5px;
+
+    input {
+      width:320px;
+    }
+
+    button.search.icon {
+      position:absolute;
+      right:2px;
+      top:6px;
+    }
+
+  }
+
+  button.cancel, button.flag {
+    color:@lightblue-type;
+    font-size:24px;
+    cursor:pointer;
+  }
+
+  button.cancel {
+    position:absolute;
+    top:8px;
+    right:4px;
+  }
+
+}

@@ -35,19 +35,17 @@
         <li class="disabled"><a href="?tab=shared">Shared with me</a></li>
       </ul>
 
-      <div class="search">
-        <input class="searchbox" type="text" placeholder="Search..."/>
-        <span class="icon">&#xf002;</span>
-      </div>
-
       <div class="tools">
-        <ul>
-          <li class="display-mode">&#xe645;</li> <!-- list: &#xe636; -->
-          <li class="add-folder">&#xe890;</li>
-        </ul>
+        <div class="searchbox">
+          <input class="search inline" type="text" placeholder="Search..."/>
+          <button class="search icon">&#xf002;</button>
+        </div>
+
+        <button class="nostyle display-mode">&#xe645;</button> <!-- list: &#xe636; -->
+        <button class="nostyle add-folder">&#xe890;</button>
 
         <div class="import">
-          <a class="btn" href="@controllers.my.upload.routes.UploadController.showStep1(user.getUsername.toLowerCase)">Import</a>
+          <a class="btn" href="@controllers.my.upload.routes.UploadController.showStep1(user.getUsername.toLowerCase)">New Document</a>
         </div>
 
       </div> <!-- .tools -->
@@ -62,8 +60,6 @@
         </li>
       }
     </ul>
-
-
 
     @helper.javascriptRouter("jsRoutes")(
       controllers.document.routes.javascript.DocumentController.deleteDocument

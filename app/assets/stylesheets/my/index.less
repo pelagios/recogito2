@@ -21,7 +21,6 @@ body {
   padding:0;
   margin:0;
   border-bottom:1px solid @lightgrey-border-darker;
-  color:@lightblue-type;
 
   .tabs {
     padding:0;
@@ -47,37 +46,7 @@ body {
       color:@lightblue-type;
     }
 
-
   } /** .tabs **/
-
-  .search {
-    padding:0 30px;
-    position:relative;
-
-    .searchbox {
-      border-width:0 0 1px 0;
-      font-size:16px;
-      padding:4px 25px 4px 1px;
-      width:240px;
-    }
-
-    .searchbox:focus {
-      box-shadow:none;
-      border-color:@form-grey-border;
-    }
-
-    .searchbox::-webkit-input-placeholder {
-      color:lighten(@lightblue-type, 15%);
-    }
-
-    .icon {
-      color:lighten(@lightblue-type, 15%);
-      position:absolute;
-      top:1px;
-      right:32px;
-    }
-
-  } /** .search **/
 
   .tools {
     position:absolute;
@@ -86,13 +55,31 @@ body {
     padding-right:30px;
     text-align:top;
 
-    li {
-      padding:9px 12px;
+    .searchbox {
+      padding:0;
+      position:relative;
+      top:-8px;
+
+      input {
+        width:280px;
+      }
+
+      .icon {
+        position:absolute;
+        top:5px;
+        right:2px;
+      }
+
+    }  /** .searchbox **/
+
+    button.nostyle {
+      text-align:middle;
+      padding:5px 12px;
       position:relative;
       font-family:Tonicons;
       font-size:32px;
-      cursor:pointer;
-    } /** .buttons **/
+      color:@lightblue-type;
+    }
 
     .add-folder::after {
       content:'+';
@@ -115,4 +102,9 @@ body {
 
   } /** .tools **/
 
+} /** .toolbar **/
+
+.document-list {
+  padding:30px 50px;
+  list-style-type:none;
 }

@@ -7,8 +7,10 @@ define([
   'editor/components/placeSection',
   'editor/components/replyField',
   'editor/selectionHandler',
+  'georesolution/georesEditor',
   'highlighter'], function(AnnotationUtils, PlaceUtils, API, HasEvents, CommentSection,
-                           PlaceSection, ReplyField, SelectionHandler, Highlighter) {
+                           PlaceSection, ReplyField, SelectionHandler, GeoResolutionEditor,
+                           Highlighter) {
 
   /** The main annotation editor popup **/
   var Editor = function(container) {
@@ -82,6 +84,8 @@ define([
 
         currentAnnotation = false,
 
+        georesolutionEditor = new GeoResolutionEditor(),
+
         /** Removes a section + queues removal of corresponding body **/
         removeSection = function(section) {
           // Destroy the section element, removing it from the DOM
@@ -145,7 +149,11 @@ define([
           // Add place body sections
           var places = AnnotationUtils.getBodiesOfType(annotation, 'PLACE');
           jQuery.each(places, function(idx, placeBody) {
-            bodySections.push(new PlaceSection(placeBodyContainer, placeBody, quote));
+            var placeSection = new PlaceSection(placeBodyContainer, placeBody, quote);
+            placeSection.on('change', function() {
+              georesolutionEditor.open(quote, placeBody);
+            });
+            bodySections.push(placeSection);
           });
 
           // Add comment body sections

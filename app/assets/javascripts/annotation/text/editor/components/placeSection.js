@@ -225,6 +225,10 @@ define([
           warningUnverified.slideUp(SLIDE_DURATION);
         },
 
+        onChange = function() {
+          self.fireEvent('change');
+        },
+
         onDelete = function() {
           self.fireEvent('delete');
         },
@@ -238,6 +242,7 @@ define([
         };
 
     btnConfirm.click(onConfirm);
+    btnChange.click(onChange);
     btnDelete.click(onDelete);
 
     if (placeBody.uri)

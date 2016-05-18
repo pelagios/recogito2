@@ -55,3 +55,39 @@ input[type=checkbox] + label:before {
 input[type=checkbox]:checked + label:before {
   content:'\f046';
 }
+
+/** Inline search box style **/
+
+input.inline {
+  border:1px solid @lightgrey-border;
+  padding:4px 25px 4px 6px;
+  background-color:@blueish-white;
+  .rounded-corners(2px);
+}
+
+input.inline:focus {
+  box-shadow:none;
+}
+
+input.inline::-webkit-input-placeholder { color:lighten(@lightblue-type, 10%); }
+input.inline:-moz-placeholder { color:lighten(@lightblue-type, 10%); }
+input.inline::-moz-placeholder { color:lighten(@lightblue-type, 10%); }
+input.inline:-ms-input-placeholder { color:lighten(@lightblue-type, 10%); }
+
+button.search.icon {
+  color:lighten(@lightblue-type, 10%);
+  background:none;
+  border:none;
+  outline:none;
+  font-size:18px;
+}
+
+/*
+  content:'a';
+  color:lighten(@lightblue-type, 15%);
+  position:absolute;
+  top:1px;
+  right:32px;
+  font-family:FontAwesome;
+  // content:'\f002';
+}*/
