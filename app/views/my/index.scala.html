@@ -17,13 +17,17 @@
 
           <p class="member-since">
             <span class="icon">&#xf017;</span>
-            Joined on @user.getMemberSince.format(java.time.format.DateTimeFormatter.ofPattern(
-              "d MMM YYYY", java.util.Locale.ENGLISH))
+            Joined on @user.getMemberSince.format(java.time.format.DateTimeFormatter.ofPattern("d MMM YYYY", java.util.Locale.ENGLISH))
           </p>
 
-          <!-- p class="disk-quota">
-            @{ usedDiskspace / 1024 } kB of 100 MB Used
-          </p -->
+          <div class="used-diskspace">
+            <div class="meter">
+              <div class="bar" style="width:@{Math.max(1.5, 100 * usedDiskspace.toDouble / (200 * 1024 * 1024)) }%"></div>
+            </div>
+            <span class="label">
+              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / (1024 * 1024)) } of 200 MB Used
+            </span>
+          </div>
 
           <p>
             <a href="#">
