@@ -14,12 +14,30 @@
         <div class="user-avatar"></div>
         <div class="user-info">
           <h1>@user.getUsername</h1>
-          <!-- TODO date formatting -->
-          <p class="member-since">Joined on @user.getMemberSince</p>
-          <p class="disk-quota"> <!-- TODO meter graph + size formatting -->
-            @{ usedDiskspace / 1024 } kB of 100 MB Used
+
+          <p class="member-since">
+            <span class="icon">&#xf017;</span>
+            Joined on @user.getMemberSince.format(java.time.format.DateTimeFormatter.ofPattern(
+              "d MMM YYYY", java.util.Locale.ENGLISH))
           </p>
-          <a href="@controllers.landing.routes.LoginLogoutController.logout">logout</a>
+
+          <!-- p class="disk-quota">
+            @{ usedDiskspace / 1024 } kB of 100 MB Used
+          </p -->
+
+          <p>
+            <a href="#">
+              <span class="icon">&#xf0ad;</span>
+              <span class="label">Account Settings</span>
+            </a>
+         </p>
+
+          <p>
+            <a href="@controllers.landing.routes.LoginLogoutController.logout">
+              <span class="icon">&#xf011;</span>
+              <span class="label">logout</span>
+            </a>
+          </p>
         </div>
       </div> <!-- .user-section -->
 

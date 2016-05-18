@@ -7,10 +7,52 @@ body {
 .page-header {
   background-color:#fff;
   border-bottom:1px solid @lightgrey-border;
-  padding:20px 50px;
+  padding:20px 20px 15px 50px;
 
-  p {
+  .user-avatar {
+    position:relative;
+    width:120px;
+    height:120px;
+    .rounded-corners(6px);
+    background-color:@blueish-white-hi;
+    border:1px solid @lightgrey-border;
+  }
+
+  .user-avatar::after {
+    position:absolute;
+    content:'\f007'; // '\fe863';
+    font-family:Tonicons;
+    color:lighten(@lightgrey-border-darker, 2%);
+    font-size:80px;
+    width:100%;
+    line-height:105px;
+    text-align:center;
+  }
+
+  h1 {
+    margin:3px 0;
+    color:@nightsky;
+    font-weight:normal;
+  }
+
+  p, a {
     color:@lightblue-type;
+    font-size:15px;
+    line-height:17px;
+    text-decoration:none;
+
+    .icon {
+      font-size:14px;
+      position:relative;
+      top:-1px;
+      padding-right:2px;
+      color:lighten(@lightblue-type, 10%);
+    }
+
+  }
+
+  a:hover .label {
+    text-decoration:underline;
   }
 
 }
