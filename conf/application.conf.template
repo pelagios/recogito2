@@ -38,6 +38,9 @@ recogito.index.dir = index
 # Uploads location
 recogito.upload.dir = uploads
 
+# Max. disk space per user in MB
+recogito.upload.quota = 200
+
 # Database configuration
 # ~~~~~
 # You can declare as many datasources as you want.

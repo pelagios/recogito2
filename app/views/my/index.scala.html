@@ -1,4 +1,4 @@
-@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long,
+@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, quotaMB: Int,
   documents: Seq[models.generated.tables.records.DocumentRecord])(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
@@ -11,7 +11,6 @@
     <div class="page-header">
 
       <div class="user-section">
-        <div class="user-avatar"></div>
         <div class="user-info">
           <h1>@user.getUsername</h1>
 
@@ -22,10 +21,10 @@
 
           <div class="used-diskspace">
             <div class="meter">
-              <div class="bar" style="width:@{Math.max(1.5, 100 * usedDiskspace.toDouble / (200 * 1024 * 1024)) }%"></div>
+              <div class="bar" style="width:@{Math.max(1.5, 100 * usedDiskspace.toDouble / (quotaMB * 1024 * 1024)) }%"></div>
             </div>
             <span class="label">
-              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / (1024 * 1024)) } of 200 MB Used
+              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / (1024 * 1024)) } of @quotaMB MB Used
             </span>
           </div>
 
@@ -53,8 +52,8 @@
 
     <div class="toolbar">
       <ul class="tabs">
-        <li><a href="#">My documents</a></li>
-        <li class="disabled"><a href="?tab=shared">Shared with me</a></li>
+        <li><a href="#">My documents (@documents.size)</a></li>
+        <li class="disabled"><a href="?tab=shared">Shared with me (0)</a></li>
       </ul>
 
       <div class="tools">
