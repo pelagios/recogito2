@@ -15,7 +15,7 @@ define([
             '<div class="section place">' +
               '<div class="map"></div>' +
               '<div class="panel-container">' +
-                '<div class="panel">' +
+                '<div class="panel place-details">' +
                   '<h3></h3>' +
                   '<p class="gazetteer"></p>' +
                   '<p class="description"></p>' +

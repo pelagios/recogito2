@@ -34,7 +34,10 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       val origSender = sender
       
       parseFilepart(document, part, documentDir).map { phrases =>
-        val entities = phrases.filter(p => (p.entityTag == "LOCATION" || p.entityTag == "PERSON"))
+        // val entities = phrases.filter(p => (p.entityTag == "LOCATION" || p.entityTag == "PERSON"))
+        
+        // TODO temporarily disabling PERSON tags for first pre-release
+        val entities = phrases.filter(p => p.entityTag == "LOCATION")
         resolve(entities).map { annotations =>
           AnnotationService.insertOrUpdateAnnotations(annotations).map { result =>
             progress = 1.0

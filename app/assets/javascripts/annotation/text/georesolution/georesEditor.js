@@ -1,4 +1,6 @@
-define([], function() {
+define([
+  '../../../common/api',
+  'georesolution/placeResult'], function(API, Result) {
 
   var GeoResolutionEditor = function() {
     var element = (function() {
@@ -21,6 +23,8 @@ define([], function() {
                       '</div>' +
                       '<div class="geores-editor-body">' +
                         '<div class="geores-sidebar">' +
+                          '<div class="results-header"></div>' +
+                          '<ul class="results-list"></ul>' +
                         '</div>' +
                         '<div class="geores-map">' +
                         '</div>' +
@@ -29,7 +33,6 @@ define([], function() {
                   '</div>' +
                 '</div>');
 
-            el.hide();
             jQuery(document.body).append(el);
             return el;
           })(),
@@ -37,6 +40,10 @@ define([], function() {
           searchInput = element.find('.search'),
 
           btnCancel = element.find('.cancel'),
+
+          resultsHeader = element.find('.results-header'),
+
+          resultsList = element.find('.results-list'),
 
           awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
             attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
@@ -55,10 +62,18 @@ define([], function() {
           open = function(quote, placeBody) {
             searchInput.val(quote);
             element.show();
+            API.searchPlaces(quote).done(function(response) {
+              // TODO dummy only
+              resultsHeader.html("Total: " + response.total + ", took " + response.took);
+              jQuery.each(response.items, function(idx, place) {
+                new Result(resultsList, place);
+              });
+            });
           },
 
           close = function() {
             element.hide();
+            resultsList.empty();
           };
 
     btnCancel.click(close);

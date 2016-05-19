@@ -97,7 +97,26 @@
     box-sizing:border-box;
     height:100%;
     width:326px;
-    padding:10px;
+    background-color:@blueish-white;
+
+    .results-header {
+      padding:10px;
+      border-bottom:1px solid @lightgrey-border;
+    }
+
+    .results-list {
+      margin:0;
+      padding:0;
+      list-style-type:none;
+
+      li {
+        background-color:#fff;
+        border-bottom:1px solid @lightgrey-border;
+        padding:10px;
+      }
+
+    }
+
   }
 
   .geores-map {
