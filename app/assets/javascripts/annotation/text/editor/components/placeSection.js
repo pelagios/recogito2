@@ -31,6 +31,7 @@ define([
                   '</div>' +
                   '<div class="warning-unverified">' +
                     '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
+                    '<button class="delete">&#xf014;</button>' +
                     '<button class="unverified-change">Change</button>' +
                     '<button class="unverified-confirm">Confirm</button>' +
                   '</div>' +
@@ -50,7 +51,8 @@ define([
         noMatchTemplate = jQuery(
           '<div class="no-match">' +
             '<h3>No automatic match found</h3>' +
-            '<button>Search</button>' +
+            '<button class="change">Search</button> ' +
+            '<button class="delete">&#xf014;</button>' +
           '</div>'),
 
         panelContainer = element.find('.panel-container'),
@@ -68,10 +70,6 @@ define([
 
         warningUnverified = element.find('.warning-unverified'),
         warningUnlocated = element.find('.warning-unlocated'),
-
-        btnChange = element.find('.unverified-change, .change'),
-        btnConfirm = element.find('.unverified-confirm'),
-        btnDelete = element.find('.delete'),
 
         currentGazetteerRecord = false,
 
@@ -154,6 +152,7 @@ define([
         /** Renders a 'no match' place card, due to yellow status or failed match **/
         renderNoMatchCard = function() {
           panel.html(noMatchTemplate);
+          setCenter([37.98, 23.73]);
         },
 
         /** Renders the error edge cases where the place body has a URI that can't be resolved **/
@@ -170,6 +169,8 @@ define([
 
           createdSection.show();
           warningUnverified.hide();
+
+          setCenter([37.98, 23.73]);
         },
 
         /** Fills the template by delegating to the appropriate place card renderer **/
@@ -241,9 +242,9 @@ define([
           element.remove();
         };
 
-    btnConfirm.click(onConfirm);
-    btnChange.click(onChange);
-    btnDelete.click(onDelete);
+    element.on('click', '.unverified-confirm', onConfirm);
+    element.on('click', '.unverified-change, .change', onChange);
+    element.on('click', '.delete', onDelete);
 
     if (placeBody.uri)
       fillFromURI();
