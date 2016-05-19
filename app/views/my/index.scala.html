@@ -63,8 +63,12 @@
           <button class="search icon">&#xf002;</button>
         </div>
 
-        <button class="nostyle display-mode">&#xe645;</button> <!-- list: &#xe636; -->
-        <button class="nostyle add-folder">&#xe890;</button>
+        <div class="document-tools">
+          <button class="nostyle delete disabled" title="Delete selected documents">&#xe609;</button>
+        </div>
+
+        <button class="nostyle display-mode" title="Show documents as grid">&#xe645;</button> <!-- list: &#xe636; -->
+        <button class="nostyle add-folder" title="Create new folder">&#xe890;</button>
 
         <div class="import">
           <a class="btn" href="@controllers.my.upload.routes.UploadController.showStep1(user.getUsername.toLowerCase)">New Document</a>
@@ -74,7 +78,7 @@
 
     </div> <!-- .toolbar -->
 
-    <table class="document-pane">
+    <table class="document-panel">
       <thead>
         <tr>
           <td>Author</td>
@@ -86,8 +90,7 @@
       </thead>
       <tbody>
         @for(document <- documents) {
-          <tr class="document"
-              data-href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">
+          <tr class="document" data-id="@document.getId">
             <td>@document.getAuthor</td>
             <td>@document.getTitle</td>
             <td>@document.getDateFreeform</td>
@@ -99,6 +102,7 @@
     </ul>
 
     @helper.javascriptRouter("jsRoutes")(
+      controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationViewForDocPart,
       controllers.document.routes.javascript.DocumentController.deleteDocument
     )
   </body>
