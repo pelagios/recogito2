@@ -81,19 +81,23 @@
     <table class="document-panel">
       <thead>
         <tr>
+          <td></td> <!-- content type icon -->
           <td>Author</td>
           <td>Name</td>
           <td>Date</td>
           <td>Last Edit</td>
           <td>File Size</td>
+          <td>Annotations</td>
         </tr>
       </thead>
       <tbody>
         @for(document <- documents) {
           <tr class="document" data-id="@document.getId">
+            <td></td> <!-- content type icon -->
             <td>@document.getAuthor</td>
             <td>@document.getTitle</td>
             <td>@document.getDateFreeform</td>
+            <td>-</td>
             <td>-</td>
             <td>-</td>
           </tr>

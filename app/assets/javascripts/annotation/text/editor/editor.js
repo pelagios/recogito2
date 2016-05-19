@@ -52,6 +52,7 @@ define([
                 '<div class="fields"></div>' +
                 '<div class="footer">' +
                   '<button class="btn small outline cancel">Cancel</button>' +
+                  '<button class="btn small outline ok-next">OK &amp Next</button>' +
                   '<button class="btn small ok">OK</button>' +
                 '</div>' +
               '</div>' +
@@ -80,6 +81,7 @@ define([
         btnEvent = element.find('.category.event'),
 
         btnCancel = element.find('button.cancel'),
+        btnOkAndNext = element.find('button.ok-next'),
         btnOk = element.find('button.ok'),
 
         currentAnnotation = false,
@@ -368,6 +370,7 @@ define([
     btnPlace.click(onAddPlace);
     btnPerson.click(onAddPerson);
     btnEvent.click(onAddEvent);
+
     btnCancel.click(onCancel);
     btnOk.click(onOk);
 
