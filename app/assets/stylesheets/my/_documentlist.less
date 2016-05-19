@@ -1,0 +1,49 @@
+table.document-list {
+  width:100%;
+  border-collapse:collapse;
+
+  tr {
+    height:46px;
+    border-bottom:1px solid @lightgrey-border;
+  }
+
+  td {
+    padding:0 10px;
+    color:@standard-type;
+    font-size:15px;
+  }
+
+  td:first-child {
+    padding-left:50px;
+  }
+
+  td:last-child {
+    padding-right:20px;
+  }
+
+  thead {
+
+    td:hover {
+      background-color:darken(@blueish-white, 3%);
+    }
+
+  }
+
+  tbody {
+
+    tr {
+      background-color:#fff;
+    }
+
+    tr.selected {
+      background-color:@ocean;
+
+      td {
+        color:#fff;
+      }
+
+    }
+
+  }
+
+}

@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>MY RECOGITO</title>
+    <title>My Recogito</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
   </head>
@@ -73,13 +73,29 @@
 
     </div> <!-- .toolbar -->
 
-    <ul class="document-list">
-      @for(document <- documents) {
-        <li>
-          <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a>
-          <button onclick="deleteDocument('@document.getId');">Delete</button>
-        </li>
-      }
+    <table class="document-list">
+      <thead>
+        <tr>
+          <td>Author</td>
+          <td>Name</td>
+          <td>Date</td>
+          <td>Last Edit</td>
+          <td>File Size</td>
+        </tr>
+      </thead>
+      <tbody>
+        @for(document <- documents) {
+          <tr>
+            <td>@document.getAuthor</td>
+            <td>@document.getTitle</td>
+            <td>@document.getDateFreeform</td>
+            <td>-</td>
+            <td>-</td>
+            <!-- a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a -->
+            <!-- button onclick="deleteDocument('@document.getId');">Delete</button -->
+          </tr>
+        }
+      </tbody>
     </ul>
 
     @helper.javascriptRouter("jsRoutes")(
