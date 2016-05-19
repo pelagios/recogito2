@@ -6,6 +6,7 @@
     <title>My Recogito</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
+    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/my/index.js")"></script>
   </head>
   <body>
     <div class="page-header">
@@ -52,8 +53,8 @@
 
     <div class="toolbar">
       <ul class="tabs">
-        <li><a href="#">My documents (@documents.size)</a></li>
-        <li class="disabled"><a href="?tab=shared">Shared with me (0)</a></li>
+        <li><a href="#" onclick="return false;">My documents (@documents.size)</a></li>
+        <li class="disabled"><a href="#" onclick="return false;">Shared with me (0)</a></li>
       </ul>
 
       <div class="tools">
@@ -73,7 +74,7 @@
 
     </div> <!-- .toolbar -->
 
-    <table class="document-list">
+    <table class="document-pane">
       <thead>
         <tr>
           <td>Author</td>
@@ -85,14 +86,13 @@
       </thead>
       <tbody>
         @for(document <- documents) {
-          <tr>
+          <tr class="document"
+              data-href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">
             <td>@document.getAuthor</td>
             <td>@document.getTitle</td>
             <td>@document.getDateFreeform</td>
             <td>-</td>
             <td>-</td>
-            <!-- a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">@document.getTitle</a -->
-            <!-- button onclick="deleteDocument('@document.getId');">Delete</button -->
           </tr>
         }
       </tbody>
@@ -101,20 +101,5 @@
     @helper.javascriptRouter("jsRoutes")(
       controllers.document.routes.javascript.DocumentController.deleteDocument
     )
-
-    <script>
-      function deleteDocument(id) {
-        console.log('Deleting document ' + id);
-        jsRoutes.controllers.document.DocumentController.deleteDocument(id).ajax({
-          success: function(result) {
-            window.location.reload(true);
-          },
-
-          error: function(error) {
-            console.log(error);
-          }
-        });
-      }
-    </script>
   </body>
 </html>

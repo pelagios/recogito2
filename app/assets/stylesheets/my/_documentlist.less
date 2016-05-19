@@ -1,16 +1,18 @@
-table.document-list {
+table.document-pane {
   width:100%;
   border-collapse:collapse;
 
   tr {
     height:46px;
     border-bottom:1px solid @lightgrey-border;
+    .noselect();
   }
 
   td {
     padding:0 10px;
     color:@standard-type;
     font-size:15px;
+    cursor:default;
   }
 
   td:first-child {
@@ -40,6 +42,23 @@ table.document-list {
 
       td {
         color:#fff;
+      }
+
+      td.actions span {
+        visibility:visible;
+      }
+
+    }
+
+    td.actions {
+      text-align:center;
+
+      span {
+        font-family:Tonicons;
+        font-size:26px;
+        line-height:30px;
+        visibility:hidden;
+        cursor:pointer;
       }
 
     }

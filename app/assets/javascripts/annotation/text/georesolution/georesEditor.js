@@ -29,6 +29,7 @@ define([], function() {
                   '</div>' +
                 '</div>');
 
+            el.hide();
             jQuery(document.body).append(el);
             return el;
           })(),
