@@ -1,5 +1,22 @@
 define(function() {
 
+  var mapConflated = function(place, key) {
+        var flattened = [];
+
+        jQuery.each(place.is_conflation_of, function(idx, record) {
+          var vals = record[key];
+
+          if (vals) {
+            if (jQuery.isArray(vals))
+              flattened = flattened.concat(vals);
+            else
+              flattened.push(vals);
+          }
+        });
+
+        return flattened;
+      };
+
   var PlaceUtils = {
 
     getBestMatchingRecord: function(place, name) {
@@ -51,11 +68,9 @@ define(function() {
        });
     },
 
-    getURIs : function(place) {
-      return jQuery.map(place.is_conflation_of, function(record) {
-        return record.uri;
-      });
-    }
+    getURIs : function(place) { return mapConflated(place, 'uri'); },
+
+    getDescriptions : function(place) { return mapConflated(place, 'descriptions'); },
 
   };
 

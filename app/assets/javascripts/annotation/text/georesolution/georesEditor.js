@@ -59,24 +59,42 @@ define([
             layers: [ awmc ]
           }),
 
-          open = function(quote, placeBody) {
-            searchInput.val(quote);
-            element.show();
-            API.searchPlaces(quote).done(function(response) {
+          onSearch = function() {
+            var query = searchInput.val().trim();
+            if (query.length > 0)
+              search(query);
+          },
+
+          search = function(query) {
+            resultsList.empty();
+            API.searchPlaces(query).done(function(response) {
               // TODO dummy only
               resultsHeader.html("Total: " + response.total + ", took " + response.took);
               jQuery.each(response.items, function(idx, place) {
+                var coord = (place.representative_point) ?
+                      [ place.representative_point[1], place.representative_point[0] ] :
+                      false;
+
                 new Result(resultsList, place);
+                if (coord)
+                  L.marker(coord).addTo(map);
               });
             });
           },
 
+          open = function(quote, placeBody) {
+            searchInput.val(quote);
+            element.show();
+            map.invalidateSize();
+            search(quote);
+          },
+
           close = function() {
             element.hide();
-            resultsList.empty();
           };
 
     btnCancel.click(close);
+    searchInput.keyup(function(e) { if (e.which === 13) onSearch(); });
 
     this.open = open;
   };
