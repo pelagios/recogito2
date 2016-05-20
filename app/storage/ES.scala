@@ -21,9 +21,18 @@ object ES {
       case None => new File("index")
     }
     
-    Try(ElasticClient.remote("localhost", 9300)) match {
-      case Success(client) =>
-        client
+    val remoteClient = ElasticClient.remote("localhost", 9300)
+    
+    // Just fetch cluster stats to see if there's a cluster at all
+    Try(
+      remoteClient execute {
+        get cluster stats
+      }
+    ) match {
+      case Success(_) => {
+        Logger.info("Joining ElasticSearch cluster")
+        remoteClient 
+      }
         
       case Failure(_) => {
         // No ES cluster available - instantiate a local client
@@ -39,8 +48,6 @@ object ES {
   }
   
   def start() = {
-    Logger.info("Starting ElasticSearch local node")
-    
     implicit val timeout = 60 seconds
     val response = client.execute { index exists(IDX_RECOGITO) }.await
     
