@@ -114,28 +114,39 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
   override def searchPlaces(q: String, offset: Int, limit: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query {
-        nestedQuery("is_conflation_of").query {
-          bool {
-            should (
-              // Search inside record titles...
-              matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
-              matchPhraseQuery("is_conflation_of.title", q),
-             
-              // ...names...
-              nestedQuery("is_conflation_of.names").query {
-                matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
-              },
-             
-              nestedQuery("is_conflation_of.names").query {
-                matchQuery("is_conflation_of.names.name", q)
-              },
-             
-              // ...and descriptions (with lower boost)
-              nestedQuery("is_conflation_of.descriptions").query {
-                matchQuery("is_conflation_of.descriptions.description", q)
-              }.boost(0.2)
-            )
-          }
+                      
+        bool {
+          should (
+            // Treat as standard query string query first...
+            queryStringQuery(q).defaultOperator("AND"),
+            
+            // ...and then look for exact matches in specific fields
+            nestedQuery("is_conflation_of").query {
+              bool {
+                should (
+    
+                    
+                  // Search inside record titles...
+                  matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
+                  matchPhraseQuery("is_conflation_of.title", q),
+                 
+                  // ...names...
+                  nestedQuery("is_conflation_of.names").query {
+                    matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
+                  },
+                 
+                  nestedQuery("is_conflation_of.names").query {
+                    matchPhraseQuery("is_conflation_of.names.name", q)
+                  },
+                 
+                  // ...and descriptions (with lower boost)
+                  nestedQuery("is_conflation_of.descriptions").query {
+                    matchQuery("is_conflation_of.descriptions.description", q).operator("AND")
+                  }.boost(0.2)
+                )
+              }
+            }
+          )
         }
       } start offset limit limit
     } map { response =>
