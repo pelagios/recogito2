@@ -32,9 +32,6 @@ auth.cookie.secure=false
 # Default to Routes in the root package (and conf/routes)
 # play.http.router = my.application.Routes
 
-# Index location
-recogito.index.dir = index
-
 # Uploads location
 recogito.upload.dir = uploads
 

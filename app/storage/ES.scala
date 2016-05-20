@@ -9,6 +9,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.io.Source
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import scala.util.{ Try, Success, Failure }
 
 object ES {
   
@@ -20,13 +21,21 @@ object ES {
       case None => new File("index")
     }
     
-    val settings =
-      ImmutableSettings.settingsBuilder()
-        .put("http.enabled", true)
-        .put("path.home", home.getAbsolutePath)
+    Try(ElasticClient.remote("localhost", 9300)) match {
+      case Success(client) =>
+        client
         
-    Logger.info("Using " + home.getAbsolutePath + " as index location")
-    ElasticClient.local(settings.build)
+      case Failure(_) => {
+        // No ES cluster available - instantiate a local client
+        val settings =
+          ImmutableSettings.settingsBuilder()
+            .put("http.enabled", true)
+            .put("path.home", home.getAbsolutePath)
+        
+        Logger.info("Local index - using " + home.getAbsolutePath + " as location")
+        ElasticClient.local(settings.build)
+      }
+    }
   }
   
   def start() = {
