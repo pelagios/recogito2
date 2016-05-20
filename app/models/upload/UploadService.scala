@@ -3,8 +3,8 @@ package models.upload
 import collection.JavaConverters._
 import java.io.File
 import java.nio.file.{ Files, Paths, StandardCopyOption }
-import java.time.OffsetDateTime
-import java.util.UUID
+import java.sql.Timestamp
+import java.util.{ Date, UUID }
 import models.ContentIdentificationFailures._
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord }
@@ -29,7 +29,7 @@ object UploadService extends FileAccess {
         Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(owner)).fetchOne()) match {
           case Some(upload) => {
             // Pending upload exists - update
-            upload.setCreatedAt(OffsetDateTime.now)
+            upload.setCreatedAt(new Timestamp(new Date().getTime))
             upload.setTitle(title)
             upload.setAuthor(nullIfEmpty(author))
             upload.setDateFreeform(nullIfEmpty(dateFreeform))
@@ -43,7 +43,7 @@ object UploadService extends FileAccess {
             // No pending upload - create new
             val upload = new UploadRecord(null,
                 owner,
-                OffsetDateTime.now,
+                new Timestamp(new Date().getTime),
                 nullIfEmpty(title),
                 nullIfEmpty(author),
                 nullIfEmpty(dateFreeform),
@@ -73,7 +73,7 @@ object UploadService extends FileAccess {
     ContentType.fromFile(file) match {
       case Right(contentType) => {
         filepart.ref.moveTo(file)
-        val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize)
+        val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize.toFloat)
         filepartRecord.changed(UPLOAD_FILEPART.ID, false)
         
         sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()

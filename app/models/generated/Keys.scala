@@ -40,7 +40,7 @@ import org.jooq.impl.AbstractKeys
 
 
 /**
- * A class modelling foreign key relationships between tables of the <code></code> 
+ * A class modelling foreign key relationships between tables of the <code>public</code> 
  * schema
  */
 @Generated(
@@ -57,6 +57,9 @@ object Keys {
 	// -------------------------------------------------------------------------
 
 	val IDENTITY_DOCUMENT_FILEPART = Identities0.IDENTITY_DOCUMENT_FILEPART
+	val IDENTITY_FOLDER = Identities0.IDENTITY_FOLDER
+	val IDENTITY_SHARING_EVENT_LOG = Identities0.IDENTITY_SHARING_EVENT_LOG
+	val IDENTITY_SHARING_POLICY = Identities0.IDENTITY_SHARING_POLICY
 	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
 	val IDENTITY_UPLOAD_FILEPART = Identities0.IDENTITY_UPLOAD_FILEPART
 	val IDENTITY_USER_ROLE = Identities0.IDENTITY_USER_ROLE
@@ -65,40 +68,42 @@ object Keys {
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
-	val PK_DOCUMENT = UniqueKeys0.PK_DOCUMENT
-	val PK_DOCUMENT_FILEPART = UniqueKeys0.PK_DOCUMENT_FILEPART
-	val PK_FOLDER = UniqueKeys0.PK_FOLDER
-	val PK_SHARING_EVENT_LOG = UniqueKeys0.PK_SHARING_EVENT_LOG
-	val PK_SHARING_POLICY = UniqueKeys0.PK_SHARING_POLICY
-	val PK_TEAM = UniqueKeys0.PK_TEAM
-	val PK_UPLOAD = UniqueKeys0.PK_UPLOAD
-	val PK_UPLOAD_FILEPART = UniqueKeys0.PK_UPLOAD_FILEPART
-	val PK_USER = UniqueKeys0.PK_USER
-	val PK_USER_ROLE = UniqueKeys0.PK_USER_ROLE
+	val DOCUMENT_PKEY = UniqueKeys0.DOCUMENT_PKEY
+	val DOCUMENT_FILEPART_PKEY = UniqueKeys0.DOCUMENT_FILEPART_PKEY
+	val FOLDER_PKEY = UniqueKeys0.FOLDER_PKEY
+	val SHARING_EVENT_LOG_PKEY = UniqueKeys0.SHARING_EVENT_LOG_PKEY
+	val SHARING_POLICY_PKEY = UniqueKeys0.SHARING_POLICY_PKEY
+	val TEAM_PKEY = UniqueKeys0.TEAM_PKEY
+	val UPLOAD_PKEY = UniqueKeys0.UPLOAD_PKEY
+	val UPLOAD_OWNER_KEY = UniqueKeys0.UPLOAD_OWNER_KEY
+	val UPLOAD_FILEPART_PKEY = UniqueKeys0.UPLOAD_FILEPART_PKEY
+	val UPLOAD_FILEPART_OWNER_TITLE_KEY = UniqueKeys0.UPLOAD_FILEPART_OWNER_TITLE_KEY
+	val USER_PKEY = UniqueKeys0.USER_PKEY
+	val USER_ROLE_PKEY = UniqueKeys0.USER_ROLE_PKEY
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
-	val FK_DOCUMENT_USER_1 = ForeignKeys0.FK_DOCUMENT_USER_1
-	val FK_DOCUMENT_FILEPART_DOCUMENT_1 = ForeignKeys0.FK_DOCUMENT_FILEPART_DOCUMENT_1
-	val FK_FOLDER_USER_1 = ForeignKeys0.FK_FOLDER_USER_1
-	val FK_FOLDER_FOLDER_1 = ForeignKeys0.FK_FOLDER_FOLDER_1
-	val FK_FOLDER_ASSOCIATION_FOLDER_1 = ForeignKeys0.FK_FOLDER_ASSOCIATION_FOLDER_1
-	val FK_FOLDER_ASSOCIATION_DOCUMENT_1 = ForeignKeys0.FK_FOLDER_ASSOCIATION_DOCUMENT_1
-	val FK_SHARING_EVENT_LOG_USER_1 = ForeignKeys0.FK_SHARING_EVENT_LOG_USER_1
-	val FK_SHARING_EVENT_LOG_SHARING_POLICY_1 = ForeignKeys0.FK_SHARING_EVENT_LOG_SHARING_POLICY_1
-	val FK_SHARING_POLICY_FOLDER_1 = ForeignKeys0.FK_SHARING_POLICY_FOLDER_1
-	val FK_SHARING_POLICY_DOCUMENT_1 = ForeignKeys0.FK_SHARING_POLICY_DOCUMENT_1
-	val FK_SHARING_POLICY_USER_2 = ForeignKeys0.FK_SHARING_POLICY_USER_2
-	val FK_SHARING_POLICY_USER_1 = ForeignKeys0.FK_SHARING_POLICY_USER_1
-	val FK_TEAM_USER_1 = ForeignKeys0.FK_TEAM_USER_1
-	val FK_TEAM_MEMBERSHIP_USER_1 = ForeignKeys0.FK_TEAM_MEMBERSHIP_USER_1
-	val FK_TEAM_MEMBERSHIP_TEAM_1 = ForeignKeys0.FK_TEAM_MEMBERSHIP_TEAM_1
-	val FK_UPLOAD_USER_1 = ForeignKeys0.FK_UPLOAD_USER_1
-	val FK_UPLOAD_FILEPART_UPLOAD_1 = ForeignKeys0.FK_UPLOAD_FILEPART_UPLOAD_1
-	val FK_UPLOAD_FILEPART_USER_1 = ForeignKeys0.FK_UPLOAD_FILEPART_USER_1
-	val FK_USER_ROLE_USER_1 = ForeignKeys0.FK_USER_ROLE_USER_1
+	val DOCUMENT__DOCUMENT_OWNER_FKEY = ForeignKeys0.DOCUMENT__DOCUMENT_OWNER_FKEY
+	val DOCUMENT_FILEPART__DOCUMENT_FILEPART_DOCUMENT_ID_FKEY = ForeignKeys0.DOCUMENT_FILEPART__DOCUMENT_FILEPART_DOCUMENT_ID_FKEY
+	val FOLDER__FOLDER_OWNER_FKEY = ForeignKeys0.FOLDER__FOLDER_OWNER_FKEY
+	val FOLDER__FOLDER_PARENT_FKEY = ForeignKeys0.FOLDER__FOLDER_PARENT_FKEY
+	val FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY = ForeignKeys0.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY
+	val FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY = ForeignKeys0.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY
+	val SHARING_EVENT_LOG__SHARING_EVENT_LOG_ACTION_BY_FKEY = ForeignKeys0.SHARING_EVENT_LOG__SHARING_EVENT_LOG_ACTION_BY_FKEY
+	val SHARING_EVENT_LOG__SHARING_EVENT_LOG_POLICY_ID_FKEY = ForeignKeys0.SHARING_EVENT_LOG__SHARING_EVENT_LOG_POLICY_ID_FKEY
+	val SHARING_POLICY__SHARING_POLICY_FOLDER_ID_FKEY = ForeignKeys0.SHARING_POLICY__SHARING_POLICY_FOLDER_ID_FKEY
+	val SHARING_POLICY__SHARING_POLICY_DOCUMENT_ID_FKEY = ForeignKeys0.SHARING_POLICY__SHARING_POLICY_DOCUMENT_ID_FKEY
+	val SHARING_POLICY__SHARING_POLICY_SHARED_BY_FKEY = ForeignKeys0.SHARING_POLICY__SHARING_POLICY_SHARED_BY_FKEY
+	val SHARING_POLICY__SHARING_POLICY_SHARED_WITH_FKEY = ForeignKeys0.SHARING_POLICY__SHARING_POLICY_SHARED_WITH_FKEY
+	val TEAM__TEAM_CREATED_BY_FKEY = ForeignKeys0.TEAM__TEAM_CREATED_BY_FKEY
+	val TEAM_MEMBERSHIP__TEAM_MEMBERSHIP_USERNAME_FKEY = ForeignKeys0.TEAM_MEMBERSHIP__TEAM_MEMBERSHIP_USERNAME_FKEY
+	val TEAM_MEMBERSHIP__TEAM_MEMBERSHIP_TEAM_FKEY = ForeignKeys0.TEAM_MEMBERSHIP__TEAM_MEMBERSHIP_TEAM_FKEY
+	val UPLOAD__UPLOAD_OWNER_FKEY = ForeignKeys0.UPLOAD__UPLOAD_OWNER_FKEY
+	val UPLOAD_FILEPART__UPLOAD_FILEPART_UPLOAD_ID_FKEY = ForeignKeys0.UPLOAD_FILEPART__UPLOAD_FILEPART_UPLOAD_ID_FKEY
+	val UPLOAD_FILEPART__UPLOAD_FILEPART_OWNER_FKEY = ForeignKeys0.UPLOAD_FILEPART__UPLOAD_FILEPART_OWNER_FKEY
+	val USER_ROLE__USER_ROLE_USERNAME_FKEY = ForeignKeys0.USER_ROLE__USER_ROLE_USERNAME_FKEY
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
@@ -106,43 +111,48 @@ object Keys {
 
 	private object Identities0 extends AbstractKeys {
 		val IDENTITY_DOCUMENT_FILEPART : Identity[DocumentFilepartRecord, Integer] = AbstractKeys.createIdentity(DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.ID)
+		val IDENTITY_FOLDER : Identity[FolderRecord, Integer] = AbstractKeys.createIdentity(Folder.FOLDER, Folder.FOLDER.ID)
+		val IDENTITY_SHARING_EVENT_LOG : Identity[SharingEventLogRecord, Integer] = AbstractKeys.createIdentity(SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ID)
+		val IDENTITY_SHARING_POLICY : Identity[SharingPolicyRecord, Integer] = AbstractKeys.createIdentity(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
 		val IDENTITY_UPLOAD_FILEPART : Identity[UploadFilepartRecord, Integer] = AbstractKeys.createIdentity(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.ID)
 		val IDENTITY_USER_ROLE : Identity[UserRoleRecord, Integer] = AbstractKeys.createIdentity(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)
 	}
 
 	private object UniqueKeys0 extends AbstractKeys {
-		val PK_DOCUMENT : UniqueKey[DocumentRecord] = AbstractKeys.createUniqueKey(Document.DOCUMENT, Document.DOCUMENT.ID)
-		val PK_DOCUMENT_FILEPART : UniqueKey[DocumentFilepartRecord] = AbstractKeys.createUniqueKey(DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.ID)
-		val PK_FOLDER : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
-		val PK_SHARING_EVENT_LOG : UniqueKey[SharingEventLogRecord] = AbstractKeys.createUniqueKey(SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ID)
-		val PK_SHARING_POLICY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
-		val PK_TEAM : UniqueKey[TeamRecord] = AbstractKeys.createUniqueKey(Team.TEAM, Team.TEAM.TITLE)
-		val PK_UPLOAD : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.ID)
-		val PK_UPLOAD_FILEPART : UniqueKey[UploadFilepartRecord] = AbstractKeys.createUniqueKey(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.ID)
-		val PK_USER : UniqueKey[UserRecord] = AbstractKeys.createUniqueKey(User.USER, User.USER.USERNAME)
-		val PK_USER_ROLE : UniqueKey[UserRoleRecord] = AbstractKeys.createUniqueKey(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)
+		val DOCUMENT_PKEY : UniqueKey[DocumentRecord] = AbstractKeys.createUniqueKey(Document.DOCUMENT, Document.DOCUMENT.ID)
+		val DOCUMENT_FILEPART_PKEY : UniqueKey[DocumentFilepartRecord] = AbstractKeys.createUniqueKey(DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.ID)
+		val FOLDER_PKEY : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
+		val SHARING_EVENT_LOG_PKEY : UniqueKey[SharingEventLogRecord] = AbstractKeys.createUniqueKey(SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ID)
+		val SHARING_POLICY_PKEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
+		val TEAM_PKEY : UniqueKey[TeamRecord] = AbstractKeys.createUniqueKey(Team.TEAM, Team.TEAM.TITLE)
+		val UPLOAD_PKEY : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.ID)
+		val UPLOAD_OWNER_KEY : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.OWNER)
+		val UPLOAD_FILEPART_PKEY : UniqueKey[UploadFilepartRecord] = AbstractKeys.createUniqueKey(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.ID)
+		val UPLOAD_FILEPART_OWNER_TITLE_KEY : UniqueKey[UploadFilepartRecord] = AbstractKeys.createUniqueKey(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.OWNER, UploadFilepart.UPLOAD_FILEPART.TITLE)
+		val USER_PKEY : UniqueKey[UserRecord] = AbstractKeys.createUniqueKey(User.USER, User.USER.USERNAME)
+		val USER_ROLE_PKEY : UniqueKey[UserRoleRecord] = AbstractKeys.createUniqueKey(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)
 	}
 
 	private object ForeignKeys0 extends AbstractKeys {
-		val FK_DOCUMENT_USER_1 : ForeignKey[DocumentRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Document.DOCUMENT, Document.DOCUMENT.OWNER)
-		val FK_DOCUMENT_FILEPART_DOCUMENT_1 : ForeignKey[DocumentFilepartRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_DOCUMENT, DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.DOCUMENT_ID)
-		val FK_FOLDER_USER_1 : ForeignKey[FolderRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Folder.FOLDER, Folder.FOLDER.OWNER)
-		val FK_FOLDER_FOLDER_1 : ForeignKey[FolderRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, Folder.FOLDER, Folder.FOLDER.PARENT)
-		val FK_FOLDER_ASSOCIATION_FOLDER_1 : ForeignKey[FolderAssociationRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.FOLDER_ID)
-		val FK_FOLDER_ASSOCIATION_DOCUMENT_1 : ForeignKey[FolderAssociationRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_DOCUMENT, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.DOCUMENT_ID)
-		val FK_SHARING_EVENT_LOG_USER_1 : ForeignKey[SharingEventLogRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ACTION_BY)
-		val FK_SHARING_EVENT_LOG_SHARING_POLICY_1 : ForeignKey[SharingEventLogRecord, SharingPolicyRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_SHARING_POLICY, SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.POLICY_ID)
-		val FK_SHARING_POLICY_FOLDER_1 : ForeignKey[SharingPolicyRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_FOLDER, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.FOLDER_ID)
-		val FK_SHARING_POLICY_DOCUMENT_1 : ForeignKey[SharingPolicyRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_DOCUMENT, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.DOCUMENT_ID)
-		val FK_SHARING_POLICY_USER_2 : ForeignKey[SharingPolicyRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.SHARED_BY)
-		val FK_SHARING_POLICY_USER_1 : ForeignKey[SharingPolicyRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.SHARED_WITH)
-		val FK_TEAM_USER_1 : ForeignKey[TeamRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Team.TEAM, Team.TEAM.CREATED_BY)
-		val FK_TEAM_MEMBERSHIP_USER_1 : ForeignKey[TeamMembershipRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.USERNAME)
-		val FK_TEAM_MEMBERSHIP_TEAM_1 : ForeignKey[TeamMembershipRecord, TeamRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_TEAM, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.TEAM)
-		val FK_UPLOAD_USER_1 : ForeignKey[UploadRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, Upload.UPLOAD, Upload.UPLOAD.OWNER)
-		val FK_UPLOAD_FILEPART_UPLOAD_1 : ForeignKey[UploadFilepartRecord, UploadRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_UPLOAD, UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.UPLOAD_ID)
-		val FK_UPLOAD_FILEPART_USER_1 : ForeignKey[UploadFilepartRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.OWNER)
-		val FK_USER_ROLE_USER_1 : ForeignKey[UserRoleRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.PK_USER, UserRole.USER_ROLE, UserRole.USER_ROLE.USERNAME)
+		val DOCUMENT__DOCUMENT_OWNER_FKEY : ForeignKey[DocumentRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, Document.DOCUMENT, Document.DOCUMENT.OWNER)
+		val DOCUMENT_FILEPART__DOCUMENT_FILEPART_DOCUMENT_ID_FKEY : ForeignKey[DocumentFilepartRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.DOCUMENT_PKEY, DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.DOCUMENT_ID)
+		val FOLDER__FOLDER_OWNER_FKEY : ForeignKey[FolderRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, Folder.FOLDER, Folder.FOLDER.OWNER)
+		val FOLDER__FOLDER_PARENT_FKEY : ForeignKey[FolderRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.FOLDER_PKEY, Folder.FOLDER, Folder.FOLDER.PARENT)
+		val FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY : ForeignKey[FolderAssociationRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.FOLDER_PKEY, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.FOLDER_ID)
+		val FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY : ForeignKey[FolderAssociationRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.DOCUMENT_PKEY, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.DOCUMENT_ID)
+		val SHARING_EVENT_LOG__SHARING_EVENT_LOG_ACTION_BY_FKEY : ForeignKey[SharingEventLogRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.ACTION_BY)
+		val SHARING_EVENT_LOG__SHARING_EVENT_LOG_POLICY_ID_FKEY : ForeignKey[SharingEventLogRecord, SharingPolicyRecord] = AbstractKeys.createForeignKey(models.generated.Keys.SHARING_POLICY_PKEY, SharingEventLog.SHARING_EVENT_LOG, SharingEventLog.SHARING_EVENT_LOG.POLICY_ID)
+		val SHARING_POLICY__SHARING_POLICY_FOLDER_ID_FKEY : ForeignKey[SharingPolicyRecord, FolderRecord] = AbstractKeys.createForeignKey(models.generated.Keys.FOLDER_PKEY, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.FOLDER_ID)
+		val SHARING_POLICY__SHARING_POLICY_DOCUMENT_ID_FKEY : ForeignKey[SharingPolicyRecord, DocumentRecord] = AbstractKeys.createForeignKey(models.generated.Keys.DOCUMENT_PKEY, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.DOCUMENT_ID)
+		val SHARING_POLICY__SHARING_POLICY_SHARED_BY_FKEY : ForeignKey[SharingPolicyRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.SHARED_BY)
+		val SHARING_POLICY__SHARING_POLICY_SHARED_WITH_FKEY : ForeignKey[SharingPolicyRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.SHARED_WITH)
+		val TEAM__TEAM_CREATED_BY_FKEY : ForeignKey[TeamRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, Team.TEAM, Team.TEAM.CREATED_BY)
+		val TEAM_MEMBERSHIP__TEAM_MEMBERSHIP_USERNAME_FKEY : ForeignKey[TeamMembershipRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.USERNAME)
+		val TEAM_MEMBERSHIP__TEAM_MEMBERSHIP_TEAM_FKEY : ForeignKey[TeamMembershipRecord, TeamRecord] = AbstractKeys.createForeignKey(models.generated.Keys.TEAM_PKEY, TeamMembership.TEAM_MEMBERSHIP, TeamMembership.TEAM_MEMBERSHIP.TEAM)
+		val UPLOAD__UPLOAD_OWNER_FKEY : ForeignKey[UploadRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, Upload.UPLOAD, Upload.UPLOAD.OWNER)
+		val UPLOAD_FILEPART__UPLOAD_FILEPART_UPLOAD_ID_FKEY : ForeignKey[UploadFilepartRecord, UploadRecord] = AbstractKeys.createForeignKey(models.generated.Keys.UPLOAD_PKEY, UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.UPLOAD_ID)
+		val UPLOAD_FILEPART__UPLOAD_FILEPART_OWNER_FKEY : ForeignKey[UploadFilepartRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.OWNER)
+		val USER_ROLE__USER_ROLE_USERNAME_FKEY : ForeignKey[UserRoleRecord, UserRecord] = AbstractKeys.createForeignKey(models.generated.Keys.USER_PKEY, UserRole.USER_ROLE, UserRole.USER_ROLE.USERNAME)
 	}
 }

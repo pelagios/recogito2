@@ -31,14 +31,14 @@ import org.jooq.impl.UpdatableRecordImpl
 class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord](DocumentFilepart.DOCUMENT_FILEPART) with Record6[Integer, String, String, String, String, Integer] {
 
 	/**
-	 * Setter for <code>document_filepart.id</code>.
+	 * Setter for <code>public.document_filepart.id</code>.
 	 */
 	def setId(value : Integer) : Unit = {
 		setValue(0, value)
 	}
 
 	/**
-	 * Getter for <code>document_filepart.id</code>.
+	 * Getter for <code>public.document_filepart.id</code>.
 	 */
 	def getId : Integer = {
 		val r = getValue(0)
@@ -46,14 +46,14 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	}
 
 	/**
-	 * Setter for <code>document_filepart.document_id</code>.
+	 * Setter for <code>public.document_filepart.document_id</code>.
 	 */
 	def setDocumentId(value : String) : Unit = {
 		setValue(1, value)
 	}
 
 	/**
-	 * Getter for <code>document_filepart.document_id</code>.
+	 * Getter for <code>public.document_filepart.document_id</code>.
 	 */
 	def getDocumentId : String = {
 		val r = getValue(1)
@@ -61,14 +61,14 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	}
 
 	/**
-	 * Setter for <code>document_filepart.title</code>.
+	 * Setter for <code>public.document_filepart.title</code>.
 	 */
 	def setTitle(value : String) : Unit = {
 		setValue(2, value)
 	}
 
 	/**
-	 * Getter for <code>document_filepart.title</code>.
+	 * Getter for <code>public.document_filepart.title</code>.
 	 */
 	def getTitle : String = {
 		val r = getValue(2)
@@ -76,14 +76,14 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	}
 
 	/**
-	 * Setter for <code>document_filepart.content_type</code>.
+	 * Setter for <code>public.document_filepart.content_type</code>.
 	 */
 	def setContentType(value : String) : Unit = {
 		setValue(3, value)
 	}
 
 	/**
-	 * Getter for <code>document_filepart.content_type</code>.
+	 * Getter for <code>public.document_filepart.content_type</code>.
 	 */
 	def getContentType : String = {
 		val r = getValue(3)
@@ -91,14 +91,14 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	}
 
 	/**
-	 * Setter for <code>document_filepart.filename</code>.
+	 * Setter for <code>public.document_filepart.filename</code>.
 	 */
 	def setFilename(value : String) : Unit = {
 		setValue(4, value)
 	}
 
 	/**
-	 * Getter for <code>document_filepart.filename</code>.
+	 * Getter for <code>public.document_filepart.filename</code>.
 	 */
 	def getFilename : String = {
 		val r = getValue(4)
@@ -106,14 +106,14 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	}
 
 	/**
-	 * Setter for <code>document_filepart.sequence_no</code>.
+	 * Setter for <code>public.document_filepart.sequence_no</code>.
 	 */
 	def setSequenceNo(value : Integer) : Unit = {
 		setValue(5, value)
 	}
 
 	/**
-	 * Getter for <code>document_filepart.sequence_no</code>.
+	 * Getter for <code>public.document_filepart.sequence_no</code>.
 	 */
 	def getSequenceNo : Integer = {
 		val r = getValue(5)

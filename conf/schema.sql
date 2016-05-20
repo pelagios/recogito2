@@ -50,7 +50,7 @@ CREATE TABLE upload_filepart (
   title TEXT NOT NULL,
   content_type TEXT NOT NULL,
   filename TEXT NOT NULL,
-  filesize_kb REAL,
+  filesize_kb DOUBLE PRECISON,
   -- TODO filepart metadata (source, identifier,... ?)
   UNIQUE (owner, title)
 );

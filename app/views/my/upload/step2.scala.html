@@ -1,11 +1,11 @@
 @(username: String, fileparts: Seq[models.generated.tables.records.UploadFilepartRecord])(implicit request: RequestHeader)
 
-@formatSize(sizeKb: Double) = @{
+@formatSize(sizeKb: Float) = @{
   val fmt = new java.text.DecimalFormat("#.#")
   if (sizeKb < 100)
-    fmt.format(sizeKb) + " KB"
+    fmt.format(sizeKb.toDouble) + " KB"
   else
-    fmt.format(sizeKb / 1000) + " MB"
+    fmt.format(sizeKb.toDouble / 1000) + " MB"
 }
 
 <!DOCTYPE html>

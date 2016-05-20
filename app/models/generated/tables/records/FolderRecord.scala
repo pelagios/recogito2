@@ -31,14 +31,14 @@ import org.jooq.impl.UpdatableRecordImpl
 class FolderRecord extends UpdatableRecordImpl[FolderRecord](Folder.FOLDER) with Record4[Integer, String, String, Integer] {
 
 	/**
-	 * Setter for <code>folder.id</code>.
+	 * Setter for <code>public.folder.id</code>.
 	 */
 	def setId(value : Integer) : Unit = {
 		setValue(0, value)
 	}
 
 	/**
-	 * Getter for <code>folder.id</code>.
+	 * Getter for <code>public.folder.id</code>.
 	 */
 	def getId : Integer = {
 		val r = getValue(0)
@@ -46,14 +46,14 @@ class FolderRecord extends UpdatableRecordImpl[FolderRecord](Folder.FOLDER) with
 	}
 
 	/**
-	 * Setter for <code>folder.owner</code>.
+	 * Setter for <code>public.folder.owner</code>.
 	 */
 	def setOwner(value : String) : Unit = {
 		setValue(1, value)
 	}
 
 	/**
-	 * Getter for <code>folder.owner</code>.
+	 * Getter for <code>public.folder.owner</code>.
 	 */
 	def getOwner : String = {
 		val r = getValue(1)
@@ -61,14 +61,14 @@ class FolderRecord extends UpdatableRecordImpl[FolderRecord](Folder.FOLDER) with
 	}
 
 	/**
-	 * Setter for <code>folder.title</code>.
+	 * Setter for <code>public.folder.title</code>.
 	 */
 	def setTitle(value : String) : Unit = {
 		setValue(2, value)
 	}
 
 	/**
-	 * Getter for <code>folder.title</code>.
+	 * Getter for <code>public.folder.title</code>.
 	 */
 	def getTitle : String = {
 		val r = getValue(2)
@@ -76,14 +76,14 @@ class FolderRecord extends UpdatableRecordImpl[FolderRecord](Folder.FOLDER) with
 	}
 
 	/**
-	 * Setter for <code>folder.parent</code>.
+	 * Setter for <code>public.folder.parent</code>.
 	 */
 	def setParent(value : Integer) : Unit = {
 		setValue(3, value)
 	}
 
 	/**
-	 * Getter for <code>folder.parent</code>.
+	 * Getter for <code>public.folder.parent</code>.
 	 */
 	def getParent : Integer = {
 		val r = getValue(3)

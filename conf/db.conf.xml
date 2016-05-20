@@ -4,8 +4,8 @@
   <jdbc>
     <driver>org.postgresql.Driver</driver>
     <url>jdbc:postgresql://localhost/recogito2</url>
-    <user>dev</user>
-    <password>dev</password>
+    <user>postgres</user>
+    <password>postgres</password>
   </jdbc>
 
   <generator>

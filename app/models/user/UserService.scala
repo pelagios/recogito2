@@ -2,7 +2,8 @@ package models.user
 
 import java.math.BigInteger
 import java.security.MessageDigest
-import java.time.OffsetDateTime
+import java.sql.Timestamp
+import java.util.Date
 import models.BaseService
 import models.generated.Tables._
 import models.generated.tables.records.{ UserRecord, UserRoleRecord }
@@ -14,13 +15,14 @@ import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
+
 object UserService extends BaseService with FileAccess {
   
   private val SHA_256 = "SHA-256"
 
   def insertUser(username: String, email: String, password: String)(implicit db: DB) = db.withTransaction { sql =>
     val salt = randomSalt
-    val user = new UserRecord(username, email, computeHash(salt + password), salt, OffsetDateTime.now, true)
+    val user = new UserRecord(username, email, computeHash(salt + password), salt, new Timestamp(new Date().getTime), true)
     sql.insertInto(USER).set(user).execute()
     user
   }

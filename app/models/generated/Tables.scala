@@ -12,7 +12,6 @@ import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
 import models.generated.tables.SharingEventLog
 import models.generated.tables.SharingPolicy
-import models.generated.tables.SqliteSequence
 import models.generated.tables.Team
 import models.generated.tables.TeamMembership
 import models.generated.tables.Upload
@@ -22,7 +21,7 @@ import models.generated.tables.UserRole
 
 
 /**
- * Convenience access to all tables in 
+ * Convenience access to all tables in public
  */
 @Generated(
 	value = Array(
@@ -34,67 +33,62 @@ import models.generated.tables.UserRole
 object Tables {
 
 	/**
-	 * The table document
+	 * The table public.document
 	 */
 	val DOCUMENT = models.generated.tables.Document.DOCUMENT
 
 	/**
-	 * The table document_filepart
+	 * The table public.document_filepart
 	 */
 	val DOCUMENT_FILEPART = models.generated.tables.DocumentFilepart.DOCUMENT_FILEPART
 
 	/**
-	 * The table folder
+	 * The table public.folder
 	 */
 	val FOLDER = models.generated.tables.Folder.FOLDER
 
 	/**
-	 * The table folder_association
+	 * The table public.folder_association
 	 */
 	val FOLDER_ASSOCIATION = models.generated.tables.FolderAssociation.FOLDER_ASSOCIATION
 
 	/**
-	 * The table sharing_event_log
+	 * The table public.sharing_event_log
 	 */
 	val SHARING_EVENT_LOG = models.generated.tables.SharingEventLog.SHARING_EVENT_LOG
 
 	/**
-	 * The table sharing_policy
+	 * The table public.sharing_policy
 	 */
 	val SHARING_POLICY = models.generated.tables.SharingPolicy.SHARING_POLICY
 
 	/**
-	 * The table sqlite_sequence
-	 */
-	val SQLITE_SEQUENCE = models.generated.tables.SqliteSequence.SQLITE_SEQUENCE
-
-	/**
-	 * The table team
+	 * The table public.team
 	 */
 	val TEAM = models.generated.tables.Team.TEAM
 
 	/**
-	 * The table team_membership
+	 * The table public.team_membership
 	 */
 	val TEAM_MEMBERSHIP = models.generated.tables.TeamMembership.TEAM_MEMBERSHIP
 
 	/**
-	 * The table upload
+	 * The table public.upload
 	 */
 	val UPLOAD = models.generated.tables.Upload.UPLOAD
 
 	/**
-	 * The table upload_filepart
+	 * The table public.upload_filepart
 	 */
 	val UPLOAD_FILEPART = models.generated.tables.UploadFilepart.UPLOAD_FILEPART
 
 	/**
-	 * The table user
+	 * The table public.user
 	 */
 	val USER = models.generated.tables.User.USER
 
 	/**
-	 * The table user_role
+	 * The table public.user_role
 	 */
 	val USER_ROLE = models.generated.tables.UserRole.USER_ROLE
 }

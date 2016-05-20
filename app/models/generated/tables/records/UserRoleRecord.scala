@@ -31,14 +31,14 @@ import org.jooq.impl.UpdatableRecordImpl
 class UserRoleRecord extends UpdatableRecordImpl[UserRoleRecord](UserRole.USER_ROLE) with Record3[Integer, String, String] {
 
 	/**
-	 * Setter for <code>user_role.id</code>.
+	 * Setter for <code>public.user_role.id</code>.
 	 */
 	def setId(value : Integer) : Unit = {
 		setValue(0, value)
 	}
 
 	/**
-	 * Getter for <code>user_role.id</code>.
+	 * Getter for <code>public.user_role.id</code>.
 	 */
 	def getId : Integer = {
 		val r = getValue(0)
@@ -46,14 +46,14 @@ class UserRoleRecord extends UpdatableRecordImpl[UserRoleRecord](UserRole.USER_R
 	}
 
 	/**
-	 * Setter for <code>user_role.username</code>.
+	 * Setter for <code>public.user_role.username</code>.
 	 */
 	def setUsername(value : String) : Unit = {
 		setValue(1, value)
 	}
 
 	/**
-	 * Getter for <code>user_role.username</code>.
+	 * Getter for <code>public.user_role.username</code>.
 	 */
 	def getUsername : String = {
 		val r = getValue(1)
@@ -61,14 +61,14 @@ class UserRoleRecord extends UpdatableRecordImpl[UserRoleRecord](UserRole.USER_R
 	}
 
 	/**
-	 * Setter for <code>user_role.has_role</code>.
+	 * Setter for <code>public.user_role.has_role</code>.
 	 */
 	def setHasRole(value : String) : Unit = {
 		setValue(2, value)
 	}
 
 	/**
-	 * Getter for <code>user_role.has_role</code>.
+	 * Getter for <code>public.user_role.has_role</code>.
 	 */
 	def getHasRole : String = {
 		val r = getValue(2)
