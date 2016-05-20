@@ -285,6 +285,11 @@ define([
           queuedUpdates.push(function() {
             currentAnnotation.bodies.push(placeBody);
           });
+
+          // The user might delete right after
+          placeSection.on('delete', function() {
+            removeSection(placeSection);
+          });
         },
 
         /** TODO implement **/
@@ -321,7 +326,7 @@ define([
           // Determine which CRUD action to perform
           if (currentAnnotation.annotation_id) {
             // There's an ID - annotation already stored on the server
-            if (bodies.length === 1 && bodies[0].type === 'QUOTE') {
+            if (AnnotationUtils.isEmpty(currentAnnotation)) {
               // Annotation has no bodies left except the QUOTE - DELETE
               highlighter.removeAnnotation(currentAnnotation);
               self.fireEvent('deleteAnnotation', currentAnnotation);
@@ -332,10 +337,12 @@ define([
               self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
             }
           } else {
-            // No ID? New annotation from fresh selection - CREATE
+            // No ID? New annotation from fresh selection - CREATE (if not empty)
             selectionHandler.clearSelection();
-            annotationSpans = highlighter.renderAnnotation(currentAnnotation);
-            self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
+            if (!AnnotationUtils.isEmpty(currentAnnotation)) {
+              annotationSpans = highlighter.renderAnnotation(currentAnnotation);
+              self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
+            }
           }
 
           close();

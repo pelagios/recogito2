@@ -2,6 +2,16 @@ define(function() {
 
   var AnnotationUtils = {
 
+    /** Tests if this annotation is empty **/
+    isEmpty: function(annotation) {
+      if (annotation.bodies.length === 0)
+        // Yep, definitely empty
+        return true;
+      else
+        // If all that's left is a QUOTE body, consider it empty, too
+        return annotation.bodies.length === 1 && annotation.bodies[0].type === 'QUOTE';
+    },
+
     /** Attaches an annotation as payload to a DOM element **/
     attachAnnotation: function(element, annotation) {
       element.annotation = annotation;
