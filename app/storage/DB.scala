@@ -30,6 +30,8 @@ class DB @Inject() (db: Database, system: ActorSystem) {
 
 object DB {
 
-  val CURRENT_SQLDIALECT = SQLDialect.SQLITE
+  // val CURRENT_SQLDIALECT = SQLDialect.SQLITE
+  
+  val CURRENT_SQLDIALECT = SQLDialect.POSTGRES_9_4
 
 }

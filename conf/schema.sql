@@ -1,4 +1,5 @@
-CREATE TABLE user (
+-- note: 'user' is a keyword in posgres, so we need those quotes
+CREATE TABLE "user" (
   username TEXT NOT NULL PRIMARY KEY,
   email TEXT NOT NULL,
   password_hash TEXT,
@@ -8,8 +9,8 @@ CREATE TABLE user (
 );
 
 CREATE TABLE user_role (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  username TEXT NOT NULL REFERENCES user(username),
+  id SERIAL PRIMARY KEY,
+  username TEXT NOT NULL REFERENCES "user"(username),
   has_role TEXT NOT NULL
 );
 
@@ -31,8 +32,8 @@ CREATE TABLE user_role (
 
 -- staging area for documents during upload workflow
 CREATE TABLE upload (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  owner TEXT NOT NULL UNIQUE REFERENCES user(username),
+  id SERIAL PRIMARY KEY,
+  owner TEXT NOT NULL UNIQUE REFERENCES "user"(username),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   title TEXT NOT NULL,
   author TEXT,
@@ -43,13 +44,13 @@ CREATE TABLE upload (
 );
 
 CREATE TABLE upload_filepart (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   upload_id INTEGER NOT NULL REFERENCES upload(id) ON DELETE CASCADE,
-  owner TEXT NOT NULL REFERENCES user(username),
+  owner TEXT NOT NULL REFERENCES "user"(username),
   title TEXT NOT NULL,
   content_type TEXT NOT NULL,
   filename TEXT NOT NULL,
-  filesize_kb DOUBLE,
+  filesize_kb REAL,
   -- TODO filepart metadata (source, identifier,... ?)
   UNIQUE (owner, title)
 );
@@ -57,7 +58,7 @@ CREATE TABLE upload_filepart (
 -- users own (and can share) documents
 CREATE TABLE document (
   id TEXT NOT NULL PRIMARY KEY,
-  owner TEXT NOT NULL REFERENCES user(username),
+  owner TEXT NOT NULL REFERENCES "user"(username),
   uploaded_at TIMESTAMP WITH TIME ZONE NOT NULL,
   title TEXT NOT NULL,
   author TEXT,
@@ -69,7 +70,7 @@ CREATE TABLE document (
 );
 
 CREATE TABLE document_filepart (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   document_id TEXT NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   content_type TEXT NOT NULL,
@@ -80,8 +81,8 @@ CREATE TABLE document_filepart (
 
 -- users can organize documents into folders
 CREATE TABLE folder (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  owner TEXT NOT NULL REFERENCES user(username),
+  id SERIAL PRIMARY KEY,
+  owner TEXT NOT NULL REFERENCES "user"(username),
   title TEXT NOT NULL,
   -- if parent is empty then it's a root folder
   parent INTEGER REFERENCES folder(id)
@@ -89,39 +90,39 @@ CREATE TABLE folder (
 
 CREATE TABLE folder_association (
   folder_id INTEGER NOT NULL REFERENCES folder(id),
-  document_id INTEGER NOT NULL REFERENCES document(id)
+  document_id TEXT NOT NULL REFERENCES document(id)
 );
 
 -- teams are a first level entities similar to user
 CREATE TABLE team (
   title TEXT NOT NULL PRIMARY KEY,
-  created_by TEXT NOT NULL REFERENCES user(username),
+  created_by TEXT NOT NULL REFERENCES "user"(username),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE team_membership (
-  username TEXT NOT NULL REFERENCES user(username),
+  username TEXT NOT NULL REFERENCES "user"(username),
   team TEXT NOT NULL REFERENCES team(title),
   member_since TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 -- ledger of shared documents and folders
 CREATE TABLE sharing_policy (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   -- one of the following two needs to be defined
   folder_id INTEGER REFERENCES folder(id),
-  document_id INTEGER REFERENCES document(id),
-  shared_by TEXT NOT NULL REFERENCES user(username),
-  shared_with TEXT NOT NULL REFERENCES user(username),
+  document_id TEXT REFERENCES document(id),
+  shared_by TEXT NOT NULL REFERENCES "user"(username),
+  shared_with TEXT NOT NULL REFERENCES "user"(username),
   shared_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 -- keep a log of what happened for shared elements
 -- e.g. to inform users about what happened
 CREATE TABLE sharing_event_log (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   type_of_action TEXT,
-  action_by TEXT NOT NULL REFERENCES user(username),
-  action_at TIMESTAMP WITH TIME ZONE NO NULL,
+  action_by TEXT NOT NULL REFERENCES "user"(username),
+  action_at TIMESTAMP WITH TIME ZONE NOT NULL,
   policy_id INTEGER NOT NULL REFERENCES sharing_policy(id)
 );

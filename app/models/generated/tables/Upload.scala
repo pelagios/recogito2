@@ -19,6 +19,7 @@ import models.generated.tables.records.UploadRecord
 
 import org.jooq.Field
 import org.jooq.ForeignKey
+import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -113,6 +114,10 @@ class Upload(alias : String, aliased : Table[UploadRecord], parameters : Array[ 
 
 	private def this(alias : String, aliased : Table[UploadRecord]) = {
 		this(alias, aliased, null)
+	}
+
+	override def getIdentity : Identity[UploadRecord, Integer] = {
+		Keys.IDENTITY_UPLOAD
 	}
 
 	override def getPrimaryKey : UniqueKey[UploadRecord] = {

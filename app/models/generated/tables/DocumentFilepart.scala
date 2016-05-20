@@ -18,6 +18,7 @@ import models.generated.tables.records.DocumentFilepartRecord
 
 import org.jooq.Field
 import org.jooq.ForeignKey
+import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -97,6 +98,10 @@ class DocumentFilepart(alias : String, aliased : Table[DocumentFilepartRecord], 
 
 	private def this(alias : String, aliased : Table[DocumentFilepartRecord]) = {
 		this(alias, aliased, null)
+	}
+
+	override def getIdentity : Identity[DocumentFilepartRecord, Integer] = {
+		Keys.IDENTITY_DOCUMENT_FILEPART
 	}
 
 	override def getPrimaryKey : UniqueKey[DocumentFilepartRecord] = {

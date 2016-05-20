@@ -37,6 +37,8 @@ libraryDependencies ++= Seq(
   "org.openrdf.sesame" % "sesame-rio-n3" % "2.7.5",
   "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.7.5",
 
+  "org.postgresql" % "postgresql" % "9.4.1208.jre7",
+
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",

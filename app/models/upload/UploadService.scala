@@ -52,6 +52,7 @@ object UploadService extends FileAccess {
                 nullIfEmpty(language))
 
             sql.attach(upload)
+            upload.changed(UPLOAD.ID, false);
             upload
           }
         }
@@ -73,7 +74,8 @@ object UploadService extends FileAccess {
       case Right(contentType) => {
         filepart.ref.moveTo(file)
         val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize)
-
+        filepartRecord.changed(UPLOAD_FILEPART.ID, false)
+        
         sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
         Right(filepartRecord)
       }
@@ -163,6 +165,7 @@ object UploadService extends FileAccess {
             part.getFilename,
             idx + 1)
 
+      docFilepart.changed(DOCUMENT_FILEPART.ID, false)
       val docFilepartId =
         sql.insertInto(DOCUMENT_FILEPART).set(docFilepart).returning(DOCUMENT_FILEPART.ID).fetchOne()
       docFilepart.setId(docFilepartId.getId)

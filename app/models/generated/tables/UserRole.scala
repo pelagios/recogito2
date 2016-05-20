@@ -18,6 +18,7 @@ import models.generated.tables.records.UserRoleRecord
 
 import org.jooq.Field
 import org.jooq.ForeignKey
+import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -82,6 +83,10 @@ class UserRole(alias : String, aliased : Table[UserRoleRecord], parameters : Arr
 
 	private def this(alias : String, aliased : Table[UserRoleRecord]) = {
 		this(alias, aliased, null)
+	}
+
+	override def getIdentity : Identity[UserRoleRecord, Integer] = {
+		Keys.IDENTITY_USER_ROLE
 	}
 
 	override def getPrimaryKey : UniqueKey[UserRoleRecord] = {

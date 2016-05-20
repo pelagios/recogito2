@@ -19,6 +19,7 @@ import models.generated.tables.records.UploadFilepartRecord
 
 import org.jooq.Field
 import org.jooq.ForeignKey
+import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -103,6 +104,10 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 
 	private def this(alias : String, aliased : Table[UploadFilepartRecord]) = {
 		this(alias, aliased, null)
+	}
+
+	override def getIdentity : Identity[UploadFilepartRecord, Integer] = {
+		Keys.IDENTITY_UPLOAD_FILEPART
 	}
 
 	override def getPrimaryKey : UniqueKey[UploadFilepartRecord] = {

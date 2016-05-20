@@ -4,6 +4,8 @@
 package models.generated
 
 
+import java.lang.Integer
+
 import javax.annotation.Generated
 
 import models.generated.tables.Document
@@ -32,6 +34,7 @@ import models.generated.tables.records.UserRecord
 import models.generated.tables.records.UserRoleRecord
 
 import org.jooq.ForeignKey
+import org.jooq.Identity
 import org.jooq.UniqueKey
 import org.jooq.impl.AbstractKeys
 
@@ -53,6 +56,10 @@ object Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
+	val IDENTITY_DOCUMENT_FILEPART = Identities0.IDENTITY_DOCUMENT_FILEPART
+	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
+	val IDENTITY_UPLOAD_FILEPART = Identities0.IDENTITY_UPLOAD_FILEPART
+	val IDENTITY_USER_ROLE = Identities0.IDENTITY_USER_ROLE
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
@@ -96,6 +103,13 @@ object Keys {
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
 	// -------------------------------------------------------------------------
+
+	private object Identities0 extends AbstractKeys {
+		val IDENTITY_DOCUMENT_FILEPART : Identity[DocumentFilepartRecord, Integer] = AbstractKeys.createIdentity(DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.ID)
+		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
+		val IDENTITY_UPLOAD_FILEPART : Identity[UploadFilepartRecord, Integer] = AbstractKeys.createIdentity(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.ID)
+		val IDENTITY_USER_ROLE : Identity[UserRoleRecord, Integer] = AbstractKeys.createIdentity(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)
+	}
 
 	private object UniqueKeys0 extends AbstractKeys {
 		val PK_DOCUMENT : UniqueKey[DocumentRecord] = AbstractKeys.createUniqueKey(Document.DOCUMENT, Document.DOCUMENT.ID)
