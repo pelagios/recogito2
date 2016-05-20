@@ -73,7 +73,7 @@ object UploadService extends FileAccess {
     ContentType.fromFile(file) match {
       case Right(contentType) => {
         filepart.ref.moveTo(file)
-        val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize.toFloat)
+        val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize)
         filepartRecord.changed(UPLOAD_FILEPART.ID, false)
         
         sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()

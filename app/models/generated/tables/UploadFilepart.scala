@@ -5,7 +5,7 @@ package models.generated.tables
 
 
 import java.lang.Class
-import java.lang.Float
+import java.lang.Double
 import java.lang.Integer
 import java.lang.String
 import java.util.Arrays
@@ -86,7 +86,7 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	/**
 	 * The column <code>public.upload_filepart.filesize_kb</code>.
 	 */
-	val FILESIZE_KB : TableField[UploadFilepartRecord, Float] = createField("filesize_kb", org.jooq.impl.SQLDataType.REAL, "")
+	val FILESIZE_KB : TableField[UploadFilepartRecord, Double] = createField("filesize_kb", org.jooq.impl.SQLDataType.DOUBLE, "")
 
 	/**
 	 * Create a <code>public.upload_filepart</code> table reference
