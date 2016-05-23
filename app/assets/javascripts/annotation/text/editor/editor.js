@@ -381,6 +381,13 @@ define([
     btnCancel.click(onCancel);
     btnOk.click(onOk);
 
+    georesolutionEditor.on('update', function(body, uri) {
+      queuedUpdates.push(function() {
+        body.uri = uri;
+        body.status.value = 'VERIFIED';
+      });
+    });
+
     this.setMode = setMode;
 
     HasEvents.apply(this);

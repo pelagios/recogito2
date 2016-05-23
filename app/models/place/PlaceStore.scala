@@ -15,37 +15,37 @@ trait PlaceStore {
 
   /** Returns the total number of places in the store **/
   def totalPlaces()(implicit context: ExecutionContext): Future[Long]
-  
+
   /** Inserts a place
     *
-    * Returns true if insert was successful  
+    * Returns true if insert was successful
     */
   def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)]
-  
+
   /** Deletes the place with the specified ID
     *
     * Returns true if the delete was successful
     */
   def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean]
-  
+
   /** Retrieves a place by one of its gazetteer record URIs
-    * 
+    *
     * Returns the place and a version number
     */
   def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]]
-  
+
   /** Finds all places with a record URI or close/exactMatch URI that matches any of the supplied URIs **/
   def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
 
   /** Place search **/
   def searchPlaces(query: String, offset: Int = 0, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
-  
+
 }
 
 private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
 
   private val PLACE = "place"
-  
+
   implicit object PlaceIndexable extends Indexable[Place] {
     override def json(p: Place): String = Json.stringify(Json.toJson(p))
   }
@@ -54,15 +54,15 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     override def as(hit: RichSearchHit): (Place, Long) =
       (Json.fromJson[Place](Json.parse(hit.sourceAsString)).get, hit.version)
   }
-  
+
   override def totalPlaces()(implicit context: ExecutionContext): Future[Long] =
     ES.client execute {
       search in ES.IDX_RECOGITO -> PLACE limit 0
     } map { _.getHits.getTotalHits }
-    
+
   override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
-    ES.client execute { 
-      update id place.id in ES.IDX_RECOGITO / PLACE source place docAsUpsert 
+    ES.client execute {
+      update id place.id in ES.IDX_RECOGITO / PLACE source place docAsUpsert
     } map { r =>
       (true, r.getVersion)
     } recover { case t: Throwable =>
@@ -70,75 +70,75 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
       t.printStackTrace
       (false, -1l)
     }
-    
+
   override def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =
-    ES.client execute { 
+    ES.client execute {
       delete id id from ES.IDX_RECOGITO / PLACE
     } map { response =>
       response.isFound
-    }    
- 
+    }
+
   override def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO -> PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.uri" -> uri)) limit 10
     } map { response =>
-      val placesAndVersions = response.as[(Place, Long)].toSeq 
+      val placesAndVersions = response.as[(Place, Long)].toSeq
       if (placesAndVersions.isEmpty) {
         None // No place with that URI
-      } else { 
+      } else {
         if (placesAndVersions.size > 1)
           // This should never happen, unless something is wrong with the index!
-          Logger.warn("Multiple places with URI " + uri) 
-      
+          Logger.warn("Multiple places with URI " + uri)
+
         Some(placesAndVersions.head)
       }
     }
 
   override def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] = {
     ES.client execute {
-      search in ES.IDX_RECOGITO / PLACE query { 
+      search in ES.IDX_RECOGITO / PLACE query {
         nestedQuery("is_conflation_of").query {
           bool {
-            should { 
+            should {
               uris.map(uri => termQuery("is_conflation_of.uri" -> uri)) ++
               uris.map(uri => termQuery("is_conflation_of.close_matches" -> uri)) ++
               uris.map(uri => termQuery("is_conflation_of.exact_matches" -> uri))
             }
           }
-        } 
+        }
       } limit 100
-    } map { _.as[(Place, Long)].toSeq 
+    } map { _.as[(Place, Long)].toSeq
     }
   }
 
   override def searchPlaces(q: String, offset: Int, limit: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query {
-                      
+
         bool {
           should (
             // Treat as standard query string query first...
             queryStringQuery(q).defaultOperator("AND"),
-            
+
             // ...and then look for exact matches in specific fields
             nestedQuery("is_conflation_of").query {
               bool {
                 should (
-    
-                    
+
+
                   // Search inside record titles...
                   matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
                   matchPhraseQuery("is_conflation_of.title", q),
-                 
+
                   // ...names...
                   nestedQuery("is_conflation_of.names").query {
                     matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
                   },
-                 
+
                   nestedQuery("is_conflation_of.names").query {
                     matchPhraseQuery("is_conflation_of.names.name", q)
                   },
-                 
+
                   // ...and descriptions (with lower boost)
                   nestedQuery("is_conflation_of.descriptions").query {
                     matchQuery("is_conflation_of.descriptions.description", q).operator("AND")
@@ -150,8 +150,8 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
         }
       } start offset limit limit
     } map { response =>
-      val places = response.as[(Place, Long)].toSeq 
+      val places = response.as[(Place, Long)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, limit, places)
     }
-    
+
 }

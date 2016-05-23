@@ -3,9 +3,6 @@ define([
   '../../../common/helpers/placeUtils'], function(Formatting, PlaceUtils) {
 
   var placeResult = function(ul, place) {
-
-    console.log(place);
-
     var li = (function() {
                var el = jQuery(
                  '<li class="place-details">' +
