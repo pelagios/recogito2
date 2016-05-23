@@ -20,11 +20,11 @@ define([
                         '<div class="flag-this-place">' +
                           'Can\'t find the right match?' +
                           '<span class="flag">' +
-                            '<button class="nostyle">&#xe842;</button>' +
+                            '<button class="outline-icon nostyle">&#xe842;</button>' +
                             '<span class="label">Flag this place</span>' +
                           '</span>' +
                         '</div>' +
-                        '<button class="nostyle cancel">&#xe897;</button>' +
+                        '<button class="nostyle outline-icon cancel">&#xe897;</button>' +
                       '</div>' +
                       '<div class="geores-editor-body">' +
                         '<div class="geores-sidebar">' +
@@ -78,7 +78,6 @@ define([
                       '<p class="date"></p>' +
                     '</div>' +
                     '<div class="popup-choices">' +
-                      '<p>Select Gazetteer</p>' +
                       '<table></table>' +
                     '</div>' +
                   '</div>'),

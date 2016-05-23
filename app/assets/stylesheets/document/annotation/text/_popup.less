@@ -1,17 +1,56 @@
-.leaflet-popup-content {
-  width:400px !important;
+.geores-map .leaflet-popup-close-button {
+  color:transparent !important;
+}
+
+.geores-map .leaflet-popup-close-button::after {
+  position:absolute;
+  top:11px;
+  right:10px;
+  font-family:Tonicons;
+  content:'\e897';
+  color:@lightblue-type;
+}
+
+.geores-map .leaflet-popup-content-wrapper {
+  .rounded-corners(4px) !important;
+  padding:0;
+  width:400px;
   background-color:#fff;
+}
+
+.geores-map .leaflet-popup-content {
+  width:100% !important;
+  margin:0;
+  font-family:PTSansNarrow;
+  color:@nightsky;
 
   .popup-header {
+    border-bottom:1px solid @lightgrey-border;
+    padding-right:20px;
+
+    h3 {
+      font-size:17px;
+      font-weight:normal;
+      margin:0;
+      padding:7px 0 7px 10px;
+    }
 
   }
 
   .popup-details {
+    padding:10px;
+    background-color:@blueish-white-hi;
+    border-bottom:1px solid @lightgrey-border;
+
+    p {
+      font-size:16px;
+      margin:0;
+      padding:0;
+    }
 
   }
 
   .popup-choices {
-
     ul {
       list-style-type:none;
       margin:0;
