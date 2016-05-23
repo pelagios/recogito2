@@ -21,8 +21,8 @@ class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: 
     request.body.asMultipartFormData.flatMap(_.file("gazetteer-file")) match {
       case Some(formData) => {
         Future {
-          val places = GazetteerUtils.loadRDF(new FileInputStream(formData.ref.file), formData.filename, formData.filename.substring(0, formData.filename.lastIndexOf('.')))
-          Logger.info("Importing gazetteer " + formData.filename.substring(0, formData.filename.lastIndexOf('.')))
+          Logger.info("Importing gazetteer from " + formData.filename)
+          val places = GazetteerUtils.loadRDF(formData.ref.file, formData.filename)
           PlaceService.importRecords(places)
         }
         Ok(views.html.admin.gazetteers())

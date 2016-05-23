@@ -42,7 +42,13 @@ object ES {
             .put("path.home", home.getAbsolutePath)
         
         Logger.info("Local index - using " + home.getAbsolutePath + " as location")
-        ElasticClient.local(settings.build)
+        val client = ElasticClient.local(settings.build)
+        
+        // Introduce wait time, otherwise local index init is so slow that subsequent
+        // .isExists request returns false despite an existing index (note: this is only
+        // relevant in dev mode, anyway)
+        Thread.sleep(1000)
+        client
       }
     }
   }

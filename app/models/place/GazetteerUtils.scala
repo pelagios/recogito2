@@ -50,11 +50,12 @@ object GazetteerUtils {
       .map(_._1)
   }
       
-  def loadRDF(file: File, gazetteerName: String): Seq[GazetteerRecord] = {
-    val (is, filename) = if (file.getName.endsWith(".gz"))
-        (new GZIPInputStream(new FileInputStream(file)), file.getName.substring(0, file.getName.lastIndexOf('.')))
+  def loadRDF(file: File, filename: String): Seq[GazetteerRecord] = {
+    val gazetteerName = filename.substring(0, filename.indexOf('.'))
+    val is = if (filename.endsWith(".gz"))
+        new GZIPInputStream(new FileInputStream(file))
       else
-        (new FileInputStream(file), file.getName)
+        new FileInputStream(file)
         
     loadRDF(is, filename, gazetteerName)
   }
