@@ -73,18 +73,12 @@ define([
                     '<div class="popup-header">' +
                       '<h3>' + place.labels.join(', ') + '</h3>' +
                     '</div>' +
-                    '<div class="popup-details">' +
-                      '<p class="description"></p>' +
-                      '<p class="date"></p>' +
-                    '</div>' +
                     '<div class="popup-choices">' +
                       '<table></table>' +
                     '</div>' +
-                  '</div>'),
+                  '</div>');
 
-                descriptions =  PlaceUtils.getDescriptions(place);
-
-            // Details
+            /* Details
             if (descriptions.length > 0)
               popup.find('.description').html(descriptions[0].description);
             else
@@ -96,14 +90,32 @@ define([
                 Formatting.yyyyMMddToYear(place.temporal_bounds.to));
             else
               popup.find('.date').hide();
+            */
 
-            // Gazetteer choices
             jQuery.each(place.is_conflation_of, function(idx, choice) {
-              popup.find('.popup-choices table').append(
+              var template = jQuery(
                 '<tr data-uri="' + choice.uri + '">' +
                   '<td>' + Formatting.formatGazetteerURI(choice.uri) + '</td>' +
-                  '<td class="select">SELECT</td>' +
+                  '<td class="select">' +
+                    '<h4>' + choice.title + '</h4>' +
+                    '<p class="date"></p>' +
+                    '<p class="description"></p>' +
+                  '</td>' +
                 '</tr>');
+
+              if (choice.descriptions.length > 0)
+                template.find('.description').html(choice.descriptions[0].description);
+              else
+                template.find('.description').hide();
+
+              if (choice.temporal_bounds)
+                template.find('.date').html(
+                  Formatting.yyyyMMddToYear(choice.temporal_bounds.from) + ' - ' +
+                  Formatting.yyyyMMddToYear(choice.temporal_bounds.to));
+              else
+                template.find('.date').hide();
+
+              popup.find('.popup-choices table').append(template);
             });
 
             popup.find('table').on('click', 'tr', function(e) {

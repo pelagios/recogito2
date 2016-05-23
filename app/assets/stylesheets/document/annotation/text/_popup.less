@@ -13,9 +13,9 @@
 
 .geores-map .leaflet-popup-content-wrapper {
   .rounded-corners(4px) !important;
+  overflow:hidden;
   padding:0;
   width:400px;
-  background-color:#fff;
 }
 
 .geores-map .leaflet-popup-content {
@@ -26,7 +26,7 @@
 
   .popup-header {
     border-bottom:1px solid @lightgrey-border;
-    padding-right:20px;
+    padding-right:35px;
 
     h3 {
       font-size:17px;
@@ -37,29 +37,48 @@
 
   }
 
-  .popup-details {
-    padding:10px;
-    background-color:@blueish-white-hi;
-    border-bottom:1px solid @lightgrey-border;
+  .popup-choices {
+    padding:0;
+
+    table {
+      padding:0;
+      margin:0;
+      border-collapse:collapse;
+    }
+
+    td {
+      padding:10px;
+    }
+
+    h4 {
+      font-weight:normal;
+      font-size:17px;
+      margin:0;
+      padding:0;
+    }
 
     p {
-      font-size:16px;
+      font-size:15px;
+      line-height:19px;
       margin:0;
       padding:0;
     }
 
-  }
-
-  .popup-choices {
-    ul {
-      list-style-type:none;
-      margin:0;
-      padding:0;
+    tr {
+      border-bottom:1px solid @lightgrey-border;
+      cursor:default;
     }
 
-    li {
-      padding:10px;
-      background-color:@blueish-white;
+    tr:hover td {
+      background-color:@blueish-white-hi;
+    }
+
+    tr:last-child {
+      border:none;
+    }
+
+    .date {
+      color:lighten(desaturate(@nightsky, 100%), 20%);
     }
 
   }
