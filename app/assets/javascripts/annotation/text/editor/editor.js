@@ -189,7 +189,6 @@ define([
 
         /** Clears all editor components **/
         clear = function() {
-
           // Destroy body sections
           jQuery.each(bodySections, function(idx, section) {
             section.destroy();
@@ -280,6 +279,9 @@ define([
               quote = AnnotationUtils.getQuote(currentAnnotation),
               placeSection = new PlaceSection(placeBodyContainer, placeBody, quote);
 
+          placeSection.on('change', function() {
+            georesolutionEditor.open(quote, placeBody);
+          });
           bodySections.push(placeSection);
 
           queuedUpdates.push(function() {
