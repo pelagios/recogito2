@@ -8,11 +8,10 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import play.api.Logger
 import play.api.cache.CacheApi
-import scala.concurrent.Await
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.{ DB, FileAccess }
-import models.generated.tables.records.DocumentFilepartRecord
 
 case class PartOrdering(partId: Int, seqNo: Int)
 
@@ -143,7 +142,7 @@ object DocumentService extends BaseService with FileAccess {
   }
   
   /** Deletes a document by its ID, along with filepart records and files **/
-  def delete(document: DocumentRecord)(implicit db: DB) = db.withTransaction { sql =>
+  def delete(document: DocumentRecord)(implicit db: DB): Future[Unit] = db.withTransaction { sql =>
     sql.deleteFrom(DOCUMENT_FILEPART)
        .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
        .execute()

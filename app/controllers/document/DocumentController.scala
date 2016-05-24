@@ -3,6 +3,7 @@ package controllers.document
 import controllers.BaseController
 import java.io.File
 import javax.inject.Inject
+import models.annotation.AnnotationService
 import models.document.{ DocumentService, PartOrdering }
 import models.user.Roles._
 import play.api.cache.CacheApi
@@ -69,7 +70,10 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
       case Some(document) => {
         // Only the owner can delete a document
         if (document.getOwner == loggedIn.user.getUsername)
-          DocumentService.delete(document).map(_ => Status(200))
+          for {
+            _ <- DocumentService.delete(document)
+            success <- AnnotationService.deleteByDocId(docId)
+          } yield if (success) Status(200) else InternalServerError
         else
           Future.successful(Forbidden)
       }

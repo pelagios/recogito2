@@ -64,7 +64,7 @@ object AnnotationService extends ESGeoTagStore {
     }
   }
     
-  def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] = {
+  def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
     ES.client execute {
       delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
     } flatMap { response =>
@@ -76,13 +76,49 @@ object AnnotationService extends ESGeoTagStore {
       t.printStackTrace()
       false
     }    
-  }
+  
+  /*
+    findGeoTagsByAnnotationWithId(annotationId.toString).flatMap { idsAndLinks =>
+      if (idsAndLinks.size > 0) {
+        ES.client execute {
+          bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.IDX_RECOGITO / GEOTAG } )
+        } map {
+          !_.hasFailures
+        } recover { case t: Throwable =>
+          t.printStackTrace()
+          false
+        }
+      } else {
+        // Nothing to delete
+        Future.successful(true)
+      }
+    }
+   */
+    
     
   def findByDocId(id: String)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document" -> id)) limit 1000
     } map(_.as[(Annotation, Long)].toSeq)
   }
+  
+  /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
+  def deleteByDocId(docId: String)(implicit context: ExecutionContext): Future[Boolean] =
+    findByDocId(docId).flatMap { annotationsAndVersions =>
+      if (annotationsAndVersions.size > 0) {
+        ES.client execute {
+          bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId from ES.IDX_RECOGITO / ANNOTATION } )
+        } map {
+          !_.hasFailures
+        } recover { case t: Throwable =>
+          t.printStackTrace()
+          false
+        }
+      } else {
+        // Nothing to delete
+        Future.successful(true)
+      }
+    }
   
   def findByFilepartId(id: Int)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
