@@ -28,28 +28,33 @@ define([
           return el;
         })(),
 
-        standardTemplate = jQuery(
-          '<div>' +
-            '<h3></h3>' +
-            '<p class="gazetteer"></p>' +
-            '<p class="description"></p>' +
-            '<p class="names"></p>' +
-            '<p class="date"></p>' +
-            '<div class="created">' +
-              '<a class="by"></a>' +
-              '<span class="at"></span>' +
-            '</div>' +
-            '<div class="edit-buttons">' +
-              '<button class="change btn tiny">Change</button>' +
-              '<button class="delete btn tiny icon">&#xf014;</button>' +
-            '</div>' +
-            '<div class="warning-unverified">' +
-              '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-              '<button class="delete">&#xf014;</button>' +
-              '<button class="unverified-change">Change</button>' +
-              '<button class="unverified-confirm">Confirm</button>' +
-            '</div>' +
-          '</div>'),
+        standardTemplate = (function() {
+          var el = jQuery(
+            '<div>' +
+              '<h3></h3>' +
+              '<p class="gazetteer"></p>' +
+              '<p class="description"></p>' +
+              '<p class="names"></p>' +
+              '<p class="date"></p>' +
+              '<div class="created">' +
+                '<a class="by"></a>' +
+                '<span class="at"></span>' +
+              '</div>' +
+              '<div class="edit-buttons">' +
+                '<button class="change btn tiny">Change</button>' +
+                '<button class="delete btn tiny icon">&#xf014;</button>' +
+              '</div>' +
+              '<div class="warning-unverified">' +
+                '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
+                '<button class="delete">&#xf014;</button>' +
+                '<button class="unverified-change">Change</button>' +
+                '<button class="unverified-confirm">Confirm</button>' +
+              '</div>' +
+            '</div>');
+
+          el.find('.created, .edit-buttons').hide();
+          return el;
+        })(),
 
         noMatchTemplate = jQuery(
           '<div class="no-match">' +
@@ -164,9 +169,13 @@ define([
         },
 
         setCreated = function() {
-          createdBy.html(lastModified.by);
-          createdBy.attr('href', '/' + lastModified.by);
-          createdAt.html(Formatting.timeSince(lastModified.at));
+          if (lastModified.by) {
+            createdBy.html(lastModified.by);
+            createdBy.attr('href', '/' + lastModified.by);
+          }
+
+          if (lastModified.at)
+            createdAt.html(Formatting.timeSince(lastModified.at));
         },
 
         /** Renders a 'no match' place card, due to yellow status or failed match **/
