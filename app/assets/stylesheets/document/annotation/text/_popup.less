@@ -25,7 +25,6 @@
   color:@nightsky;
 
   .popup-header {
-    border-bottom:1px solid @lightgrey-border;
     padding-right:35px;
 
     h3 {
@@ -33,6 +32,9 @@
       font-weight:normal;
       margin:0;
       padding:7px 0 7px 10px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
   }
@@ -43,11 +45,13 @@
     table {
       padding:0;
       margin:0;
+      width:100%;
       border-collapse:collapse;
     }
 
     td.g {
       text-align:center;
+      color:#fff;
     }
 
     .g-prefix, .g-id {
@@ -63,7 +67,12 @@
     }
 
     td {
+      border-top:1px solid @lightgrey-border;
       padding:10px;
+    }
+
+    td:first-child {
+      border:none;
     }
 
     h4 {
@@ -81,16 +90,11 @@
     }
 
     tr {
-      border-bottom:1px solid @lightgrey-border;
-      cursor:default;
+      cursor:pointer;
     }
 
     tr:hover td {
       background-color:@blueish-white-hi;
-    }
-
-    tr:last-child {
-      border:none;
     }
 
     .date {

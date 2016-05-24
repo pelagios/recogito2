@@ -102,13 +102,20 @@
     height:100%;
     width:326px;
     background-color:@blueish-white;
+    position:relative;
 
     .results-header {
       padding:10px;
       border-bottom:1px solid @lightgrey-border;
+      height:46px;
     }
 
     .results-list {
+      position:absolute;
+      top:46px;
+      bottom:0px;
+      overflow-y:scroll;
+      width:100%;
       margin:0;
       padding:0;
       list-style-type:none;

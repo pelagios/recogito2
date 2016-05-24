@@ -1,9 +1,10 @@
 define([
   '../../../common/helpers/formatting',
+  '../../../common/helpers/gazetteerUtils',
   '../../../common/helpers/placeUtils',
   '../../../common/api',
   '../../../common/hasEvents',
-  'georesolution/placeResult'], function(Formatting, PlaceUtils, API, HasEvents, Result) {
+  'georesolution/placeResult'], function(Formatting, GazetteerUtils, PlaceUtils, API, HasEvents, Result) {
 
   var GeoResolutionEditor = function() {
     var self = this,
@@ -69,6 +70,8 @@ define([
             layers: [ awmc ]
           }),
 
+          markerLayer = L.layerGroup().addTo(map),
+
           openPopup = function(marker, place) {
             var popup = jQuery(
                   '<div class="popup">' +
@@ -81,19 +84,26 @@ define([
                   '</div>');
 
             jQuery.each(place.is_conflation_of, function(idx, choice) {
-              var template = jQuery(
-                '<tr data-uri="' + choice.uri + '">' +
-                  '<td class="g">' +
-                    '<span class="g-prefix">pleiades</span>' +
-                    // Formatting.formatGazetteerURI(choice.uri) +
-                    '<span class="g-id">' + 246381 + '</span>' +
-                  '</td>' +
-                  '<td class="select">' +
-                    '<h4>' + choice.title + '</h4>' +
-                    '<p class="date"></p>' +
-                    '<p class="description"></p>' +
-                  '</td>' +
-                '</tr>');
+              var choiceProps = GazetteerUtils.parseURI(choice.uri),
+
+                  template = jQuery(
+                    '<tr data-uri="' + choice.uri + '">' +
+                      '<td class="g">' +
+                        '<span class="g-shortcode"></span>' +
+                        '<span class="g-id"></span>' +
+                      '</td>' +
+                      '<td class="select">' +
+                        '<h4>' + choice.title + '</h4>' +
+                        '<p class="date"></p>' +
+                        '<p class="description"></p>' +
+                      '</td>' +
+                    '</tr>');
+
+              if (choiceProps.shortcode) {
+                template.find('.g-shortcode').html(choiceProps.shortcode);
+                template.find('.g-id').html(choiceProps.id);
+                template.find('.g').css('background-color', choiceProps.color);
+              }
 
               if (choice.descriptions.length > 0)
                 template.find('.description').html(choice.descriptions[0].description);
@@ -140,6 +150,7 @@ define([
 
           search = function(query) {
             resultsList.empty();
+            markerLayer.clearLayers();
             API.searchPlaces(query).done(function(response) {
               // TODO dummy only
               resultsHeader.html("Total: " + response.total + ", took " + response.took);
@@ -150,7 +161,7 @@ define([
 
                 new Result(resultsList, place);
                 if (coord) {
-                  L.marker(coord).addTo(map).on('click', function(e) {
+                  L.marker(coord).addTo(markerLayer).on('click', function(e) {
                     openPopup(e.target, place);
                   });
                 }
