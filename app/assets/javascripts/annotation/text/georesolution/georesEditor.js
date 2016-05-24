@@ -45,6 +45,8 @@ define([
 
           searchInput = element.find('.search'),
 
+          btnFlag = element.find('.flag'),
+
           btnCancel = element.find('.cancel'),
 
           resultsHeader = element.find('.results-header'),
@@ -78,24 +80,14 @@ define([
                     '</div>' +
                   '</div>');
 
-            /* Details
-            if (descriptions.length > 0)
-              popup.find('.description').html(descriptions[0].description);
-            else
-              popup.find('.description').hide();
-
-            if (place.temporal_bounds)
-              popup.find('.date').html(
-                Formatting.yyyyMMddToYear(place.temporal_bounds.from) + ' - ' +
-                Formatting.yyyyMMddToYear(place.temporal_bounds.to));
-            else
-              popup.find('.date').hide();
-            */
-
             jQuery.each(place.is_conflation_of, function(idx, choice) {
               var template = jQuery(
                 '<tr data-uri="' + choice.uri + '">' +
-                  '<td>' + Formatting.formatGazetteerURI(choice.uri) + '</td>' +
+                  '<td class="g">' +
+                    '<span class="g-prefix">pleiades</span>' +
+                    // Formatting.formatGazetteerURI(choice.uri) +
+                    '<span class="g-id">' + 246381 + '</span>' +
+                  '</td>' +
                   '<td class="select">' +
                     '<h4>' + choice.title + '</h4>' +
                     '<p class="date"></p>' +
@@ -120,7 +112,12 @@ define([
 
             popup.find('table').on('click', 'tr', function(e) {
               var tr = jQuery(e.target).closest('tr');
-              self.fireEvent('update', currentBody, tr.data('uri'));
+
+              self.fireEvent('update', currentBody, {
+                uri: tr.data('uri'),
+                status: { value: 'VERIFIED' }
+              });
+
               close();
             });
 
@@ -131,6 +128,14 @@ define([
             var query = searchInput.val().trim();
             if (query.length > 0)
               search(query);
+          },
+
+          onFlag = function() {
+            self.fireEvent('update', currentBody, {
+              uri: false,
+              status: { value: 'NOT_IDENTIFIABLE' }
+            });
+            close();
           },
 
           search = function(query) {
@@ -167,6 +172,7 @@ define([
             element.hide();
           };
 
+    btnFlag.click(onFlag);
     btnCancel.click(close);
     searchInput.keyup(function(e) { if (e.which === 13) onSearch(); });
 

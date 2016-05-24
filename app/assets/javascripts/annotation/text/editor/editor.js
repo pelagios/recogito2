@@ -302,6 +302,23 @@ define([
 
         },
 
+        findSectionForBody = function(body) {
+          var matchingSections = jQuery.grep(bodySections, function(section) {
+            return body === section.body;
+          });
+
+          if (matchingSections.length === 0)
+            return false;
+          else
+            return matchingSections[0];
+        },
+
+        onUpdateGeoResolution = function(placeBody, diff) {
+          var section = findSectionForBody(placeBody);
+          if (section)
+            section.update(diff);
+        },
+
         /**
          * 'OK' adds the content of the reply field as comment, stores the annotation, updates
          * selection/annotation highlight if necessary and closes the editor.
@@ -381,12 +398,7 @@ define([
     btnCancel.click(onCancel);
     btnOk.click(onOk);
 
-    georesolutionEditor.on('update', function(body, uri) {
-      queuedUpdates.push(function() {
-        body.uri = uri;
-        body.status.value = 'VERIFIED';
-      });
-    });
+    georesolutionEditor.on('update', onUpdateGeoResolution);
 
     this.setMode = setMode;
 

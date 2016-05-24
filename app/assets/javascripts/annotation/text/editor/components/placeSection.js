@@ -73,6 +73,9 @@ define([
 
         currentGazetteerRecord = false,
 
+        /** Changes to be applied to the annotation when the user clicks OK **/
+        queuedUpdates = [],
+
         awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
           attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
                        'Data &copy; <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors, CC-BY-SA | '+
@@ -87,18 +90,24 @@ define([
           layers: [ awmc ]
         }),
 
-        setCenter = function(latLon) {
-          var centerOnLayer = map.latLngToContainerPoint(latLon);
-          centerOnLayer = centerOnLayer.subtract([145, 10]);
-          map.setView(map.layerPointToLatLng(centerOnLayer), 4, { animate: false });
+        markerLayer = L.layerGroup().addTo(map),
 
-          // TODO figure out why we need this!? (bad timing?)
+        setCenter = function(latLon) {
+          var centerPt, centerLatLng;
+
+          // Need to set initial center before we can offset
           map.invalidateSize();
+          map.setView(latLon, 4, { animate: false });
+
+          centerPt = L.point(82, 70);
+          centerLatLng = map.containerPointToLatLng(centerPt);
+
+          map.panTo(centerLatLng, { animate: false});
         },
 
         /** Renders the standard place card with gazetteer record **/
-        renderStandardCard = function(gazetteerRecord, coord) {
-          var latLon = (coord) ? [coord[1], coord[0]] : false;
+        renderStandardCard = function(gazetteerRecord, status, opt_coord) {
+          var latLon = (opt_coord) ? [opt_coord[1], opt_coord[0]] : false;
 
           title.html(gazetteerRecord.title);
           gazetteerId.html(Formatting.formatGazetteerURI(gazetteerRecord.uri));
@@ -130,7 +139,7 @@ define([
           if (placeBody.last_modified_at)
             createdAt.html(Formatting.timeSince(placeBody.last_modified_at));
 
-          if (placeBody.status.value === 'UNVERIFIED') {
+          if (status.value === 'UNVERIFIED') {
             createdSection.hide();
             warningUnverified.show();
           } else {
@@ -139,9 +148,10 @@ define([
           }
 
           // Map
+          markerLayer.clearLayers();
           if (latLon) {
             panelContainer.removeClass('unlocated');
-            L.marker(latLon).addTo(map);
+            L.marker(latLon).addTo(markerLayer);
             setCenter(latLon);
           } else {
             setCenter([37.98, 23.73]);
@@ -150,7 +160,8 @@ define([
         },
 
         /** Renders a 'no match' place card, due to yellow status or failed match **/
-        renderNoMatchCard = function() {
+        renderNoMatchCard = function(status) {
+          // TODO implement
           panel.html(noMatchTemplate);
           setCenter([37.98, 23.73]);
         },
@@ -174,35 +185,35 @@ define([
         },
 
         /** Fills the template by delegating to the appropriate place card renderer **/
-        fillTemplate = function(gazetteerRecord, coord) {
-          if (gazetteerRecord) {
-            // PlaceBody with URI, record for it - we're all set!
-            // (Coord might still be undefined - but the render code will handle that)
-            renderStandardCard(gazetteerRecord, coord);
-          } else if (placeBody.uri) {
-            // No gazetteer record, but a URI!? - edge case
-            renderResolveErrorCard();
+        fillTemplate = function(gazetteerRecordOrURI, status, opt_coord) {
+          if (gazetteerRecordOrURI) {
+            if (jQuery.type(gazetteerRecordOrURI) === 'string') {
+              // A URI, but no record for it!? - edge case
+              renderResolveErrorCard();
+            } else {
+              renderStandardCard(gazetteerRecordOrURI, status, opt_coord);
+            }
           } else {
-            // No record, no URI, no coord - render the 'no match' card
-            renderNoMatchCard();
+            // No record or URI - render the 'no match' card
+            renderNoMatchCard(status);
           }
         },
 
         /** Fills the place card based on the URI contained in the place body **/
-        fillFromURI = function() {
-          jQuery.getJSON('/api/places/' + encodeURIComponent(placeBody.uri), function(place) {
-            var record = PlaceUtils.getRecord(place, placeBody.uri),
+        fillFromURI = function(uri, status) {
+          jQuery.getJSON('/api/places/' + encodeURIComponent(uri), function(place) {
+            var record = PlaceUtils.getRecord(place, uri),
                 coord = place.representative_point;
 
             currentGazetteerRecord = record;
-            fillTemplate(record, coord);
+            fillTemplate(record, status, coord);
           }).fail(function(error) {
-            fillTemplate(false, false);
+            fillTemplate(false, status, false);
           });
         },
 
         /** Fills the place card based on a search on the provided quote string **/
-        fillFromQuote = function() {
+        fillFromQuote = function(quote, status) {
           API.searchPlaces(quote).done(function(response) {
             if (response.total > 0) {
               var topPlace = response.items[0],
@@ -211,19 +222,43 @@ define([
 
               placeBody.uri = bestRecord.uri;
               currentGazetteerRecord = bestRecord;
-              fillTemplate(bestRecord, coord);
+              fillTemplate(bestRecord, status, coord);
             } else {
-              fillTemplate(false, false);
+              fillTemplate(false, status, false);
             }
           });
         },
 
+        update = function(diff) {
+          // Diffs contain uri and status info
+          if (placeBody.uri !== diff.uri && diff.uri) {
+            // There's a new URI - update the place card
+            fillFromURI(diff.uri, diff.status);
+          } else if (!diff.uri){
+            // There's no URI now (but there was one before!) - change to 'No Match' card
+            renderNoMatchCard(diff.status);
+          }
+
+          // Queue updates to the model for later
+          queuedUpdates.push(function() {
+            delete placeBody.last_modified_by;
+            delete placeBody.last_modified_at;
+            placeBody.uri = diff.uri;
+            placeBody.status = diff.status;
+          });
+        },
+
         onConfirm = function() {
-          placeBody.status.value = 'VERIFIED';
+          // Apply UI changes now
           createdBy.html(Config.me);
           createdAt.html(Formatting.timeSince(new Date()));
           createdSection.fadeIn(SLIDE_DURATION);
           warningUnverified.slideUp(SLIDE_DURATION);
+
+          // Queue updates to model for later
+          queuedUpdates.push(function() {
+            placeBody.status.value = 'VERIFIED';
+          });
         },
 
         onChange = function() {
@@ -235,7 +270,7 @@ define([
         },
 
         commit = function() {
-          // TODO implement
+          jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
         },
 
         destroy = function() {
@@ -247,11 +282,12 @@ define([
     element.on('click', '.delete', onDelete);
 
     if (placeBody.uri)
-      fillFromURI();
+      fillFromURI(placeBody.uri, placeBody.status);
     else
-      fillFromQuote();
+      fillFromQuote(quote, placeBody.status);
 
     this.body = placeBody;
+    this.update = update;
     this.commit = commit;
     this.destroy = destroy;
     HasEvents.apply(this);
