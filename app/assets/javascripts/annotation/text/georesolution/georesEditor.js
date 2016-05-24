@@ -131,7 +131,11 @@ define([
               close();
             });
 
-            marker.bindPopup(popup[0]).openPopup();
+            marker.bindPopup(popup[0]);
+            marker.getPopup().on('close', function() {
+              marker.unbindPopup();
+            });
+            marker.openPopup();
           },
 
           onSearch = function() {
@@ -154,15 +158,23 @@ define([
             API.searchPlaces(query).done(function(response) {
               // TODO dummy only
               resultsHeader.html("Total: " + response.total + ", took " + response.took);
+
               jQuery.each(response.items, function(idx, place) {
                 var coord = (place.representative_point) ?
                       [ place.representative_point[1], place.representative_point[0] ] :
-                      false;
+                      false,
 
-                new Result(resultsList, place);
-                if (coord) {
-                  L.marker(coord).addTo(markerLayer).on('click', function(e) {
-                    openPopup(e.target, place);
+                    result = new Result(resultsList, place),
+
+                    marker = (coord) ? L.marker(coord).addTo(markerLayer) : false;
+
+                if (marker) {
+                  result.on('click', function() {
+                    openPopup(marker, place);
+                  });
+
+                  marker.on('click', function(e) {
+                    openPopup(marker, place);
                   });
                 }
               });

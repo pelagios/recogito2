@@ -1,9 +1,12 @@
 define([
   '../../../common/helpers/formatting',
-  '../../../common/helpers/placeUtils'], function(Formatting, PlaceUtils) {
+  '../../../common/helpers/placeUtils',
+  '../../../common/hasEvents'], function(Formatting, PlaceUtils, HasEvents) {
 
-  var placeResult = function(ul, place) {
-    var li = (function() {
+  var PlaceResult = function(ul, place) {
+    var self = this,
+
+        li = (function() {
                var el = jQuery(
                  '<li class="place-details">' +
                    '<h3>' + place.labels.join(', ') + '</h3>' +
@@ -40,9 +43,16 @@ define([
                return el;
              })();
 
-    ul.append(li);
-  };
+    li.click(function() {
+      self.fireEvent('click');
+    });
 
-  return placeResult;
+    ul.append(li);
+
+    HasEvents.apply(this);
+  };
+  PlaceResult.prototype = Object.create(HasEvents.prototype);
+
+  return PlaceResult;
 
 });
