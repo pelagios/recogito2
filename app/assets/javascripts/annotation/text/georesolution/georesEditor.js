@@ -157,27 +157,34 @@ define([
             markerLayer.clearLayers();
             API.searchPlaces(query).done(function(response) {
               // TODO dummy only
-              resultsHeader.html("Total: " + response.total + ", took " + response.took);
+              if (response.total > 0) {
+                resultsHeader.html("Total: " + response.total + ", took " + response.took);
 
-              jQuery.each(response.items, function(idx, place) {
-                var coord = (place.representative_point) ?
-                      [ place.representative_point[1], place.representative_point[0] ] :
-                      false,
+                jQuery.each(response.items, function(idx, place) {
+                  var coord = (place.representative_point) ?
+                        [ place.representative_point[1], place.representative_point[0] ] :
+                        false,
 
-                    result = new Result(resultsList, place),
+                      result = new Result(resultsList, place),
 
-                    marker = (coord) ? L.marker(coord).addTo(markerLayer) : false;
+                      marker = (coord) ? L.marker(coord).addTo(markerLayer) : false;
 
-                if (marker) {
-                  result.on('click', function() {
-                    openPopup(marker, place);
-                  });
+                  if (marker) {
+                    result.on('click', function() {
+                      openPopup(marker, place);
+                    });
 
-                  marker.on('click', function(e) {
-                    openPopup(marker, place);
-                  });
+                    marker.on('click', function(e) {
+                      openPopup(marker, place);
+                    });
+                  }
+                });
+              } else {
+                // Try again with a fuzzy search (unless this is a fuzzy search already)
+                if (query.indexOf('~') < 0) {
+                  search(query + '~');
                 }
-              });
+              }
             });
           },
 

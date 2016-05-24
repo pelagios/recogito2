@@ -21,6 +21,8 @@ object AnnotationStatus extends Enumeration with HasDate {
   val UNVERIFIED = Value("UNVERIFIED")
 
   val VERIFIED = Value("VERIFIED")
+  
+  val NOT_IDENTIFIABLE = Value("NOT_IDENTIFIABLE")
 
   /** JSON conversion **/
   implicit val annotationStatusValueFormat: Format[AnnotationStatus.Value] =

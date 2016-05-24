@@ -16,25 +16,6 @@ define([
               '<div class="map"></div>' +
               '<div class="panel-container">' +
                 '<div class="panel place-details">' +
-                  '<h3></h3>' +
-                  '<p class="gazetteer"></p>' +
-                  '<p class="description"></p>' +
-                  '<p class="names"></p>' +
-                  '<p class="date"></p>' +
-                  '<div class="created">' +
-                    '<a class="by"></a>' +
-                    '<span class="at"></span>' +
-                  '</div>' +
-                  '<div class="edit-buttons">' +
-                    '<button class="change btn tiny">Change</button>' +
-                    '<button class="delete btn tiny icon">&#xf014;</button>' +
-                  '</div>' +
-                  '<div class="warning-unverified">' +
-                    '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-                    '<button class="delete">&#xf014;</button>' +
-                    '<button class="unverified-change">Change</button>' +
-                    '<button class="unverified-confirm">Confirm</button>' +
-                  '</div>' +
                 '</div>' +
                 '<div class="warning-unlocated">' +
                   '<span class="icon">&#xf29c;</span>' +
@@ -43,10 +24,32 @@ define([
               '</div>' +
             '</div>');
 
-          el.find('.warning-unverified, .created, .edit-buttons').hide();
           parent.append(el);
           return el;
         })(),
+
+        standardTemplate = jQuery(
+          '<div>' +
+            '<h3></h3>' +
+            '<p class="gazetteer"></p>' +
+            '<p class="description"></p>' +
+            '<p class="names"></p>' +
+            '<p class="date"></p>' +
+            '<div class="created">' +
+              '<a class="by"></a>' +
+              '<span class="at"></span>' +
+            '</div>' +
+            '<div class="edit-buttons">' +
+              '<button class="change btn tiny">Change</button>' +
+              '<button class="delete btn tiny icon">&#xf014;</button>' +
+            '</div>' +
+            '<div class="warning-unverified">' +
+              '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
+              '<button class="delete">&#xf014;</button>' +
+              '<button class="unverified-change">Change</button>' +
+              '<button class="unverified-confirm">Confirm</button>' +
+            '</div>' +
+          '</div>'),
 
         noMatchTemplate = jQuery(
           '<div class="no-match">' +
@@ -58,20 +61,25 @@ define([
         panelContainer = element.find('.panel-container'),
         panel = element.find('.panel'),
 
-        title = element.find('h3'),
-        gazetteerId = element.find('.gazetteer'),
-        description = element.find('.description'),
-        names = element.find('.names'),
-        date = element.find('.date'),
+        title = standardTemplate.find('h3'),
+        gazetteerId = standardTemplate.find('.gazetteer'),
+        description = standardTemplate.find('.description'),
+        names = standardTemplate.find('.names'),
+        date = standardTemplate.find('.date'),
 
-        createdSection = element.find('.created, .edit-buttons'),
-        createdBy = createdSection.find('.by'),
-        createdAt = createdSection.find('.at'),
+        createdSection = standardTemplate.find('.created, .edit-buttons'),
+        createdBy = standardTemplate.find('.by'),
+        createdAt = standardTemplate.find('.at'),
 
-        warningUnverified = element.find('.warning-unverified'),
-        warningUnlocated = element.find('.warning-unlocated'),
+        warningUnverified = standardTemplate.find('.warning-unverified'),
+        warningUnlocated = standardTemplate.find('.warning-unlocated'),
 
         currentGazetteerRecord = false,
+
+        lastModified = {
+          by: placeBody.last_modified_by,
+          at: placeBody.last_modified_at
+        },
 
         /** Changes to be applied to the annotation when the user clicks OK **/
         queuedUpdates = [],
@@ -109,6 +117,8 @@ define([
         renderStandardCard = function(gazetteerRecord, status, opt_coord) {
           var latLon = (opt_coord) ? [opt_coord[1], opt_coord[0]] : false;
 
+          panel.html(standardTemplate);
+
           title.html(gazetteerRecord.title);
           gazetteerId.html(Formatting.formatGazetteerURI(gazetteerRecord.uri));
 
@@ -131,13 +141,7 @@ define([
             date.hide();
           }
 
-          if (placeBody.last_modified_by) {
-            createdBy.html(placeBody.last_modified_by);
-            createdBy.attr('href', '/' + placeBody.last_modified_by);
-          }
-
-          if (placeBody.last_modified_at)
-            createdAt.html(Formatting.timeSince(placeBody.last_modified_at));
+          setCreated();
 
           if (status.value === 'UNVERIFIED') {
             createdSection.hide();
@@ -157,6 +161,12 @@ define([
             setCenter([37.98, 23.73]);
             panelContainer.addClass('unlocated');
           }
+        },
+
+        setCreated = function() {
+          createdBy.html(lastModified.by);
+          createdBy.attr('href', '/' + lastModified.by);
+          createdAt.html(Formatting.timeSince(lastModified.at));
         },
 
         /** Renders a 'no match' place card, due to yellow status or failed match **/
@@ -230,6 +240,8 @@ define([
         },
 
         update = function(diff) {
+          lastModified = { by: Config.me, at: new Date() };
+
           // Diffs contain uri and status info
           if (placeBody.uri !== diff.uri && diff.uri) {
             // There's a new URI - update the place card
@@ -250,8 +262,9 @@ define([
 
         onConfirm = function() {
           // Apply UI changes now
-          createdBy.html(Config.me);
-          createdAt.html(Formatting.timeSince(new Date()));
+          lastModified = { by: Config.me, at: new Date() };
+          setCreated();
+
           createdSection.fadeIn(SLIDE_DURATION);
           warningUnverified.slideUp(SLIDE_DURATION);
 
