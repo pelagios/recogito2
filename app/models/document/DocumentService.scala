@@ -121,7 +121,11 @@ object DocumentService extends BaseService with FileAccess {
     if (grouped.size > 1)
       throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
 
-    grouped.headOption
+    // Return with parts sorted by sequence number
+    grouped
+      .headOption
+      .map { case (document, parts) =>
+        (document, parts.sortBy(_.getSequenceNo)) }
   }
 
   /** Retrieves a filepart by document ID and sequence number **/

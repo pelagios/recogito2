@@ -1,6 +1,6 @@
 # Recogito 2
 
-Development home of Recogito v2.0 - a Linked Data annotation tool for texts and images. Track
+Home of Recogito v2.0 - a Linked Data annotation tool for texts and images. Track
 our progress on [Waffle.io](http://waffle.io/pelagios/recogito2).
 
 ## Prerequisites
