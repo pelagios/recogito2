@@ -78,7 +78,7 @@ require([
        .done(onAnnotationsLoaded)
        .fail(onLoadError);
 
-    API.getPlacesInDocument(Config.documentId)
+    API.getPlacesInDocument(Config.documentId, 0, 2000)
        .done(onPlacesLoaded)
        .fail(onLoadError);
   });

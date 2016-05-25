@@ -62,10 +62,11 @@ DELETE  /api/annotation/:id                        controllers.api.AnnotationAPI
 GET     /api/document/:id/annotations              controllers.api.AnnotationAPIController.getAnnotationsForDocument(id: String)
 GET     /api/document/:id/part/:part/annotations   controllers.api.AnnotationAPIController.getAnnotationsForPart(id: String, part: Int)
 
-GET     /api/places/search                         controllers.api.PlaceAPIController.searchPlaces(q: String)
+GET     /api/places/search                         controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 0)
 GET     /api/places/:uri                           controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
 
-GET     /api/document/:id/places                   controllers.api.PlaceAPIController.listPlacesInDocument(id: String)
+GET     /api/document/:id/places/search            controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 0)
+GET     /api/document/:id/places                   controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # User/team personal space

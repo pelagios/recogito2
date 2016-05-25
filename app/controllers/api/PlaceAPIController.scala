@@ -11,8 +11,8 @@ import storage.DB
 
 class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController with HasPrettyPrintJSON {
   
-  def searchPlaces(query: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    PlaceService.searchPlaces(query).map { results => 
+  def searchPlaces(query: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    PlaceService.searchPlaces(query, offset, size).map { results => 
       jsonOk(Json.toJson(results.map(_._1)))
     }
   }
@@ -24,12 +24,12 @@ class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, co
     }}
   }
   
-  def listPlacesInDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    PlaceService.listPlacesInDocument(docId).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
+  def listPlacesInDocument(docId: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    PlaceService.listPlacesInDocument(docId, offset, size).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
   }
   
-  def searchPlacesInDocument(query: String, docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    PlaceService.searchPlacesInDocument(query, docId, 0, Int.MaxValue).map { results =>
+  def searchPlacesInDocument(query: String, docId: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    PlaceService.searchPlacesInDocument(query, docId, offset, size).map { results =>
       jsonOk(Json.toJson(results.map(_._1)))
     }
   }
