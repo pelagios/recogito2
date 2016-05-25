@@ -380,6 +380,20 @@ define([
           close();
         },
 
+        onOkAndNext = function() {
+          var currentId = currentAnnotation.annotation_id;
+
+          onOk();
+
+          // TODO refactor/clean up - DRY
+          currentSpan = jQuery('*[data-id="' + currentId + '"]');
+          lastSpan = currentSpan[currentSpan.length - 1];
+          firstNext = jQuery(lastSpan).next('.annotation');
+
+          if (firstNext.length > 0)
+            onSelectAnnotation(firstNext[0]);
+        },
+
         /** 'Cancel' clears the selection and closes the editor **/
         onCancel = function() {
           selectionHandler.clearSelection();
@@ -439,6 +453,7 @@ define([
     btnEvent.click(onAddEvent);
 
     btnCancel.click(onCancel);
+    btnOkAndNext.click(onOkAndNext);
     btnOk.click(onOk);
 
     georesolutionEditor.on('update', onUpdateGeoResolution);
