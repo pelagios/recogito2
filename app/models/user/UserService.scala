@@ -4,13 +4,14 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.sql.Timestamp
 import java.util.Date
-import models.BaseService
+import models.{ BaseService, Page }
 import models.generated.Tables._
 import models.generated.tables.records.{ UserRecord, UserRoleRecord }
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
@@ -19,6 +20,13 @@ import sun.security.provider.SecureRandom
 object UserService extends BaseService with FileAccess {
   
   private val SHA_256 = "SHA-256"
+  
+  def listUsers(offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
+    val startTime = System.currentTimeMillis
+    val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])
+    val users = sql.selectFrom(USER).limit(limit).offset(offset).fetch().into(classOf[UserRecord])
+    Page(System.currentTimeMillis - startTime, total, offset, limit, users.toSeq)
+  }
 
   def insertUser(username: String, email: String, password: String)(implicit db: DB) = db.withTransaction { sql =>
     val salt = randomSalt

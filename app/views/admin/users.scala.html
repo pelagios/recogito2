@@ -1,4 +1,4 @@
-@()
+@(users: Page[models.generated.tables.records.UserRecord])
 <!DOCTYPE html>
 <html>
   <head>
@@ -10,6 +10,15 @@
         <li><a href="#">Users</a></li>
         <li><a href="#">Gazetteers</a></li>
         <li><a href="#">Backup &amp; Restore</a></li>
+      </ul>
+    </div>
+
+    <div class="user-list">
+      <p>Total users: @users.total</p>
+      <ul>
+        @for(user <- users.items) {
+          <li><a href="@controllers.my.routes.MyRecogitoController.index(user.getUsername)">@user.getUsername</a></li>
+        }
       </ul>
     </div>
   </body>

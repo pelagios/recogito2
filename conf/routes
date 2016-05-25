@@ -19,11 +19,12 @@ GET     /logout                                    controllers.landing.LoginLogo
 # Admin area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /admin/gazetteers                          controllers.admin.gazetteer.GazetteerAdminController.index
-POST    /admin/gazetteers                          controllers.admin.gazetteer.GazetteerAdminController.importGazetteer
+GET     /admin/gazetteers                          controllers.admin.gazetteers.GazetteerAdminController.index
+POST    /admin/gazetteers                          controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
+
+GET     /admin/users                               controllers.admin.users.UserAdminController.index
 
 GET     /admin/backup                              controllers.admin.AdminController.backup
-GET     /admin/users                               controllers.admin.AdminController.users
 GET     /admin                                     controllers.admin.AdminController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

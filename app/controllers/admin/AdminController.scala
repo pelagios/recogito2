@@ -12,14 +12,10 @@ class AdminController @Inject() (implicit val cache: CacheApi, val db: DB) exten
   def backup = StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.backup())
   }
-      
-  /** TODO placeholder **/
-  def users = StackAction(AuthorityKey -> Admin) { implicit request =>
-    Ok(views.html.admin.users())
-  }
         
+  /** TODO placeholder **/
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>
-    Redirect(controllers.admin.gazetteer.routes.GazetteerAdminController.index)
+    Redirect(controllers.admin.gazetteers.routes.GazetteerAdminController.index)
   }
   
 }
