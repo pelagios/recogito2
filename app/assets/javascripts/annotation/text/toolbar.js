@@ -54,8 +54,8 @@ define(['../../common/config', '../../common/hasEvents'], function(Config, HasEv
             }
           });
 
-          colorSchemes.on('click', 'li', function(e) {
-            var t = jQuery(e.target),
+          colorSchemes.on('click', '>li', function(e) {
+            var t = jQuery(e.target).closest('li'),
                 active = t.hasClass('active'),
                 scheme = t.data('scheme');
 

@@ -17,6 +17,8 @@ require([
 
         editor = new Editor(contentNode),
 
+        colorschemeStylesheet = jQuery('#colorscheme'),
+
         onAnnotationsLoaded = function(annotations) {
           var highlighter = new Highlighter(contentNode),
               sorted = AnnotationUtils.sortByOffset(annotations);
@@ -65,10 +67,21 @@ require([
              .fail(function(error) {
                header.showSaveError(error);
              });
+        },
+
+        onColorModeChanged = function(mode) {
+          var currentCSSPath = colorschemeStylesheet.attr('href'),
+              basePath = currentCSSPath.substr(0, currentCSSPath.lastIndexOf('/'));
+
+          if (mode === 'BY_TYPE')
+            colorschemeStylesheet.attr('href', basePath + '/colorByType.css');
+          else if (mode === 'BY_STATUS')
+            colorschemeStylesheet.attr('href', basePath + '/colorByStatus.css');
         };
 
     // Toolbar events
     toolbar.on('annotationModeChanged', editor.setMode);
+    toolbar.on('colorModeChange', onColorModeChanged);
 
     // Editor events
     editor.on('updateAnnotation', onUpdateAnnotation);

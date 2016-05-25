@@ -8,6 +8,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text/index.css")"/>
+    <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     <link rel="stylesheet" href="@routes.Assets.versioned("lib/leaflet/leaflet.css")"/>
     <script src="@routes.Assets.versioned("lib/leaflet/leaflet.js")"></script>
     <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
@@ -119,17 +120,15 @@
         -->
       </ul>
 
-      <!--
       <h3>COLOR:</h3>
       <ul class="color-scheme">
         <li data-scheme="BY_TYPE" class="active">
-          <span class="tool-label">BY TYPE</span>
+          <span class="tool-label">BY ENTITY TYPE</span>
         </li>
         <li data-scheme="BY_STATUS">
-          <span class="tool-label">BY STATUS</span>
+          <span class="tool-label">BY VERIFICATION STATUS</span>
         </li>
       </ul>
-      -->
     </div> <!-- .header-toolbar -->
 
     <div class="sidebar">

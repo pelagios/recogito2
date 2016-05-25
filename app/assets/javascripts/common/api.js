@@ -27,14 +27,17 @@ define([], function() {
     /** Place API methods **/
 
     getPlacesInDocument : function(docId, offset, size) {
-      // Set sane defaults
       var o = (offset) ? offset : 0,
           s = (size) ? size : 20;
+
       return jsRoutes.controllers.api.PlaceAPIController.listPlacesInDocument(docId, o, s).ajax();
     },
 
-    searchPlaces : function(query) {
-      return jsRoutes.controllers.api.PlaceAPIController.searchPlaces(query).ajax();
+    searchPlaces : function(query, offset, size) {
+      var o = (offset) ? offset : 0,
+          s = (size) ? size : 20;
+
+      return jsRoutes.controllers.api.PlaceAPIController.searchPlaces(query, o, s).ajax();
     }
 
   };
