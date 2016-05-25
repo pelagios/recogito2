@@ -1,0 +1,25 @@
+@(user: models.user.UserWithRoles, documents: Seq[models.generated.tables.records.DocumentRecord])
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito Administration - User Details</title>
+  </head>
+  <body>
+    <div class="side-navbar">
+      <ul>
+        <li><a href="#">Users</a></li>
+        <li><a href="#">Gazetteers</a></li>
+        <li><a href="#">Backup &amp; Restore</a></li>
+      </ul>
+    </div>
+
+    <ul class="documents">
+      @for(document <- documents) {
+        <li>
+          @document.getTitle
+          <a href="#">@document.getId</a>
+        </li>
+      }
+    </ul>
+  </body>
+</html>

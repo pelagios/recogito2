@@ -17,7 +17,7 @@
       <p>Total users: @users.total</p>
       <ul>
         @for(user <- users.items) {
-          <li><a href="@controllers.my.routes.MyRecogitoController.index(user.getUsername)">@user.getUsername</a></li>
+          <li><a href="@controllers.admin.users.routes.UserAdminController.showDetails(user.getUsername)">@user.getUsername</a></li>
         }
       </ul>
     </div>

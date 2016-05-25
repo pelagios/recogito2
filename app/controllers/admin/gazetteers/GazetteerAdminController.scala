@@ -13,7 +13,7 @@ import models.place.{ GazetteerUtils, PlaceService }
 class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext) extends BaseController {
   
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>
-    Ok(views.html.admin.gazetteers())
+    Ok(views.html.admin.gazetteers.index())
   }
   
   def importGazetteer = StackAction(AuthorityKey -> Admin) { implicit request =>
@@ -24,7 +24,7 @@ class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: 
           val places = GazetteerUtils.loadRDF(formData.ref.file, formData.filename)
           PlaceService.importRecords(places)
         }
-        Ok(views.html.admin.gazetteers())
+        Ok(views.html.admin.gazetteers.index())
       }
         
       case None => BadRequest
