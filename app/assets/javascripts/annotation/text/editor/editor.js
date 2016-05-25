@@ -107,6 +107,8 @@ define([
 
               offset = jQuery(container).offset(),
 
+              windowHeight = jQuery(window).height(),
+
               // Fixes bounds to take into account text container offset and scroll
               translatedBounds = {
                 bottom: bounds.bottom - offset.top + scrollTop,
@@ -117,15 +119,15 @@ define([
                 width: bounds.width
               },
 
-              rect;
+              rectBefore, rectAfter;
 
           // Default orientation
           element.show();
           element.css({ top: translatedBounds.bottom, left: translatedBounds.left, bottom: 'auto' });
-          rect = element[0].getBoundingClientRect();
+          rectBefore = element[0].getBoundingClientRect();
 
           // Flip horizontally, if popup exceeds screen width
-          if (rect.right > jQuery(window).width()) {
+          if (rectBefore.right > jQuery(window).width()) {
             element.addClass('align-right');
             element.css('left', translatedBounds.right - element.width());
           } else {
@@ -133,11 +135,17 @@ define([
           }
 
           // Flip vertically if popup exceeds screen height
-          if (rect.bottom > jQuery(window).height()) {
+          if (rectBefore.bottom > windowHeight) {
             element.addClass('align-bottom');
             element.css({ top: 'auto', bottom: container.clientHeight - translatedBounds.top });
           } else {
             element.removeClass('align-bottom');
+          }
+
+          // Still not visible? Scroll down
+          rectAfter = element[0].getBoundingClientRect();
+          if (rectAfter.bottom > windowHeight || rectAfter.top < 100) {
+            jQuery(document.body).scrollTop(50 + scrollTop + rectAfter.bottom - windowHeight);
           }
         },
 
@@ -176,6 +184,10 @@ define([
             replyField.setPlaceHolder('Write a reply...');
 
           showEditorElement(bounds);
+        },
+
+        isOpen = function() {
+          return element.is(':visible');
         },
 
         setMode = function(mode) {
@@ -238,6 +250,7 @@ define([
         /** Opens the editor on an existing annotation **/
         onSelectAnnotation = function(e) {
           var selection = selectionHandler.getSelection(),
+              target = (e.target) ? e.target: e,
               allAnnotations, topAnnotation, bounds,
 
               /** This helper gets all annotations in case of multipe nested annotation spans **/
@@ -263,9 +276,9 @@ define([
           if (selection) {
             onSelectText(selection);
           } else {
-            allAnnotations = sortByQuoteLength(getAnnotationsRecursive(e.target));
+            allAnnotations = sortByQuoteLength(getAnnotationsRecursive(target));
             topAnnotation = allAnnotations[0];
-            bounds = e.target.getBoundingClientRect();
+            bounds = target.getBoundingClientRect();
             open(topAnnotation, bounds);
           }
 
@@ -375,6 +388,37 @@ define([
           queuedUpdates = [];
 
           close();
+        },
+
+        onKeydown = function(e) {
+          var key = e.which,
+              currentSpan, firstSpan, lastSpan, firstPrev, firstNext;
+
+          if (key === 27) {
+            // ESC closes the editor
+            onCancel();
+          } else if (key === 37 && isOpen()) {
+
+            // TODO refactor/clean up
+            currentSpan = jQuery('*[data-id="' + currentAnnotation.annotation_id + '"]');
+            firstSpan = currentSpan[0];
+            lastPrev = jQuery(firstSpan).prev('.annotation');
+
+            if (lastPrev.length > 0)
+              onSelectAnnotation(lastPrev[0]);
+
+          } else if (key === 39 && isOpen()) {
+            // Right arrow skips to next annotation
+
+            // TODO refactor/clean up
+            currentSpan = jQuery('*[data-id="' + currentAnnotation.annotation_id + '"]');
+            lastSpan = currentSpan[currentSpan.length - 1];
+            firstNext = jQuery(lastSpan).next('.annotation');
+
+            if (firstNext.length > 0)
+              onSelectAnnotation(firstNext[0]);
+
+          }
         };
 
     // Monitor text selections through the selectionHandler
@@ -383,14 +427,11 @@ define([
     // Monitor select of existing annotations via DOM
     jQuery(container).on('click', '.annotation', onSelectAnnotation);
 
+    // Monitor keyboard shortcuts
+    jQuery(document.body).keydown(onKeydown);
+
     // Ctrl+Enter on reply field doubles as 'OK'
     replyField.on('submit', onOk);
-
-    // ESC closes the editor
-    jQuery(document).keyup(function(e) {
-      if (e.which === 27)
-        onCancel();
-    });
 
     // Wire button events
     btnPlace.click(onAddPlace);
