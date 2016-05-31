@@ -46,7 +46,7 @@ define([
               '</div>' +
               '<div class="warning-unverified">' +
                 '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-                '<button class="delete">&#xf014;</button>' +
+                '<button class="delete icon">&#xf014;</button>' +
                 '<button class="unverified-change">Change</button>' +
                 '<button class="unverified-confirm">Confirm</button>' +
               '</div>' +
