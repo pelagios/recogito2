@@ -1,4 +1,4 @@
-define(['../../common/config', '../../common/hasEvents'], function(Config, HasEvents) {
+define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
   var Toolbar = function(rootNode) {
     var self = this,

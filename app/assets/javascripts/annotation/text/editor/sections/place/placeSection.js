@@ -1,9 +1,9 @@
 define([
-  '../../../../common/helpers/formatting',
-  '../../../../common/helpers/placeUtils',
-  '../../../../common/api',
-  '../../../../common/config',
-  '../../../../common/hasEvents'], function(Formatting, PlaceUtils, API, Config, HasEvents) {
+  'annotation/text/editor/sections/section',
+  'common/helpers/formatting',
+  'common/helpers/placeUtils',
+  'common/api',
+  'common/config'], function(Section, Formatting, PlaceUtils, API, Config) {
 
   var SLIDE_DURATION = 200;
 
@@ -308,13 +308,15 @@ define([
     else
       fillFromQuote(quote, placeBody.status);
 
-    this.body = placeBody;
     this.update = update;
+
+    this.body = placeBody;
     this.commit = commit;
     this.destroy = destroy;
-    HasEvents.apply(this);
+
+    Section.apply(this);
   };
-  PlaceSection.prototype = Object.create(HasEvents.prototype);
+  PlaceSection.prototype = Object.create(Section.prototype);
 
   return PlaceSection;
 

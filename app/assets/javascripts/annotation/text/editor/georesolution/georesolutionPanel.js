@@ -1,12 +1,12 @@
 define([
-  '../../../common/helpers/formatting',
-  '../../../common/helpers/gazetteerUtils',
-  '../../../common/helpers/placeUtils',
-  '../../../common/api',
-  '../../../common/hasEvents',
-  'georesolution/placeResult'], function(Formatting, GazetteerUtils, PlaceUtils, API, HasEvents, Result) {
+  'annotation/text/editor/georesolution/placeResult',
+  'common/helpers/formatting',
+  'common/helpers/gazetteerUtils',
+  'common/helpers/placeUtils',
+  'common/api',
+  'common/hasEvents'], function(Result, Formatting, GazetteerUtils, PlaceUtils, API, HasEvents) {
 
-  var GeoResolutionEditor = function() {
+  var GeoresolutionPanel = function() {
     var self = this,
 
         element = (function() {
@@ -123,7 +123,7 @@ define([
             popup.find('table').on('click', 'tr', function(e) {
               var tr = jQuery(e.target).closest('tr');
 
-              self.fireEvent('update', currentBody, {
+              self.fireEvent('change', currentBody, {
                 uri: tr.data('uri'),
                 status: { value: 'VERIFIED' }
               });
@@ -145,7 +145,7 @@ define([
           },
 
           onFlag = function() {
-            self.fireEvent('update', currentBody, {
+            self.fireEvent('change', currentBody, {
               uri: false,
               status: { value: 'NOT_IDENTIFIABLE' }
             });
@@ -209,9 +209,8 @@ define([
     this.open = open;
     HasEvents.apply(this);
   };
-  GeoResolutionEditor.prototype = Object.create(HasEvents.prototype);
+  GeoresolutionPanel.prototype = Object.create(HasEvents.prototype);
 
-
-  return GeoResolutionEditor;
+  return GeoresolutionPanel;
 
 });

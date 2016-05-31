@@ -1,6 +1,4 @@
-define([
-  '../../../common/hasEvents',
-  '../../../common/config'], function(HasEvents, Config) {
+define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
   var SelectionHandler = function(rootNode, highlighter) {
 

@@ -1,4 +1,4 @@
-define(function() {
+define(['../api'], function(API) {
 
   var mapConflated = function(place, key) {
         var flattened = [];
@@ -71,6 +71,20 @@ define(function() {
     getURIs : function(place) { return mapConflated(place, 'uri'); },
 
     getDescriptions : function(place) { return mapConflated(place, 'descriptions'); },
+
+    createAnnotationBody : function(quote) {
+      var self = this;
+
+      return API.searchPlaces(quote).then(function(response) {
+        var body = { type: 'PLACE', status: { value: 'UNVERIFIED' } };
+
+        if (response.total > 0)
+          body.uri = self.getBestMatchingRecord(response.items[0], quote).uri;
+
+        return body;
+      });
+      
+    }
 
   };
 

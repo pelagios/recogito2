@@ -1,4 +1,4 @@
-define(['../../../../common/hasEvents'], function(HasEvents) {
+define(['common/hasEvents'], function(HasEvents) {
 
   var ReplyField = function(parent, isReply) {
 

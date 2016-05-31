@@ -87,6 +87,10 @@ define(function() {
       var idx = annotation.bodies.indexOf(body);
       if (idx > -1)
         annotation.bodies.splice(idx, 1);
+    },
+
+    countComments : function(annotation) {
+      return this.getBodiesOfType(annotation, 'COMMENT').length;
     }
 
   };

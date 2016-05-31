@@ -1,7 +1,7 @@
 define([
-  '../../../common/helpers/formatting',
-  '../../../common/helpers/placeUtils',
-  '../../../common/hasEvents'], function(Formatting, PlaceUtils, HasEvents) {
+  'common/helpers/formatting',
+  'common/helpers/placeUtils',
+  'common/hasEvents'], function(Formatting, PlaceUtils, HasEvents) {
 
   var PlaceResult = function(ul, place) {
     var self = this,

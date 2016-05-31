@@ -1,28 +1,29 @@
+/**
+ *
+ * TODO there is now a hardcoded dependency between the editor and text selection functionality.
+ * We'll need to break this dependency up in order to re-use the editor in image annotation mode.
+ *
+ */
 define([
-  '../../../common/helpers/annotationUtils',
-  '../../../common/helpers/placeUtils',
-  '../../../common/api',
-  '../../../common/hasEvents',
-  'editor/components/commentSection',
-  'editor/components/placeSection',
-  'editor/components/replyField',
-  'editor/selectionHandler',
-  'georesolution/georesEditor',
-  'highlighter'], function(AnnotationUtils, PlaceUtils, API, HasEvents, CommentSection,
-                           PlaceSection, ReplyField, SelectionHandler, GeoResolutionEditor,
-                           Highlighter) {
+  'annotation/text/editor/replyField',
+  'annotation/text/editor/georesolution/georesolutionPanel',
+  'annotation/text/editor/sections/sectionList',
+  'annotation/text/selection/highlighter',
+  'annotation/text/selection/selectionHandler',
+  'common/helpers/annotationUtils',
+  'common/helpers/placeUtils',
+  'common/autoPosition',
+  'common/hasEvents'],
+
+  function(ReplyField, GeoresolutionPanel, SectionList, Highlighter, SelectionHandler,
+    AnnotationUtils, PlaceUtils, AutoPosition, HasEvents) {
 
   /** The main annotation editor popup **/
   var Editor = function(container) {
 
     var self = this,
 
-        annotationMode = { mode: 'NORMAL' },
-
-        highlighter = new Highlighter(container),
-
-        selectionHandler = new SelectionHandler(container, highlighter),
-
+        // Editor DOM element
         element = (function() {
           var el = jQuery(
             '<div class="text-annotation-editor">' +
@@ -45,11 +46,8 @@ define([
                     '</div>' +
                   '</div>' +
                 '</div>' +
-                '<div class="bodies">' +
-                  '<div class="bodies-place"></div>' +
-                  '<div class="bodies-comment"></div>' +
-                '</div>' +
-                '<div class="fields"></div>' +
+                '<div class="sections"></div>' +
+                '<div class="reply-container"></div>' +
                 '<div class="footer">' +
                   '<button class="btn small outline cancel">Cancel</button>' +
                   '<button class="btn small outline ok-next">OK &amp Next</button>' +
@@ -63,18 +61,9 @@ define([
           return el;
         })(),
 
-        bodyContainer = element.find('.bodies'),
-        placeBodyContainer = bodyContainer.find('.bodies-place'),
-        commentBodyContainer = bodyContainer.find('.bodies-comment'),
-
-        /** Currently visible body sections **/
-        bodySections = [],
-
-        /** Changes to be applied to the annotation when the user clicks OK **/
-        queuedUpdates = [],
-
-        fieldContainer = element.find('.fields'),
-        replyField = new ReplyField(fieldContainer),
+        // DOM element shorthands
+        sectionContainer = element.find('.sections'),
+        replyContainer = element.find('.reply-container'),
 
         btnPlace = element.find('.category.place'),
         btnPerson = element.find('.category.person'),
@@ -84,292 +73,170 @@ define([
         btnOkAndNext = element.find('button.ok-next'),
         btnOk = element.find('button.ok'),
 
+        // Renders highlights on the text
+        highlighter = new Highlighter(container),
+
+        // Monitors the page for selection events
+        selectionHandler = new SelectionHandler(container, highlighter),
+
+        // The dialog for changing place geo-resolution
+        georesolutionPanel = new GeoresolutionPanel(),
+
+        // The editor sections (to be initialized once the editor opens on a specific annotation)
+        sectionList = new SectionList(sectionContainer),
+
+        // The reply field
+        replyField = new ReplyField(replyContainer),
+
+        // The current annotation
         currentAnnotation = false,
 
-        georesolutionEditor = new GeoResolutionEditor(),
+        // The current annotation mode (NORMAL, QUICK or BULK)
+        annotationMode = { mode: 'NORMAL' },
 
-        /** Removes a section + queues removal of corresponding body **/
-        removeSection = function(section) {
-          // Destroy the section element, removing it from the DOM
-          section.destroy();
-
-          // Remove the section from the list
-          var idx = bodySections.indexOf(section);
-          if (idx > -1)
-            bodySections.splice(idx, 1);
-
-          // Queue the delete operation for later, when user click 'OK'
-          queuedUpdates.push(function() { AnnotationUtils.deleteBody(currentAnnotation, section.body); });
-        },
-
-        showEditorElement = function(bounds) {
-          var scrollTop = jQuery(document).scrollTop(),
-
-              offset = jQuery(container).offset(),
-
-              windowHeight = jQuery(window).height(),
-
-              // Fixes bounds to take into account text container offset and scroll
-              translatedBounds = {
-                bottom: bounds.bottom - offset.top + scrollTop,
-                height: bounds.height,
-                left: bounds.left - offset.left,
-                right: bounds.right - offset.left,
-                top: bounds.top - offset.top + scrollTop,
-                width: bounds.width
-              },
-
-              rectBefore, rectAfter;
-
-          // Default orientation
-          element.show();
-          element.css({ top: translatedBounds.bottom, left: translatedBounds.left, bottom: 'auto' });
-          rectBefore = element[0].getBoundingClientRect();
-
-          // Flip horizontally, if popup exceeds screen width
-          if (rectBefore.right > jQuery(window).width()) {
-            element.addClass('align-right');
-            element.css('left', translatedBounds.right - element.width());
-          } else {
-            element.removeClass('align-right');
-          }
-
-          // Flip vertically if popup exceeds screen height
-          if (rectBefore.bottom > windowHeight) {
-            element.addClass('align-bottom');
-            element.css({ top: 'auto', bottom: container.clientHeight - translatedBounds.top });
-          } else {
-            element.removeClass('align-bottom');
-          }
-
-          // Still not visible? Scroll down
-          rectAfter = element[0].getBoundingClientRect();
-          if (rectAfter.bottom > windowHeight || rectAfter.top < 100) {
-            jQuery(document.body).scrollTop(50 + scrollTop + rectAfter.bottom - windowHeight);
-          }
+        setAnnotationMode = function(mode) {
+          annotationMode = mode;
         },
 
         /** Opens the editor with an annotation, at the specified bounds **/
         open = function(annotation, bounds) {
-          var quote = AnnotationUtils.getQuote(annotation);
           clear();
 
           currentAnnotation = annotation;
+          sectionList.setAnnotation(annotation);
 
-          // Add place body sections
-          var places = AnnotationUtils.getBodiesOfType(annotation, 'PLACE');
-          jQuery.each(places, function(idx, placeBody) {
-            var placeSection = new PlaceSection(placeBodyContainer, placeBody, quote);
-            placeSection.on('change', function() {
-              georesolutionEditor.open(quote, placeBody);
-            });
-            bodySections.push(placeSection);
-          });
-
-          // Add comment body sections
-          var comments = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT');
-          jQuery.each(comments, function(idx, commentBody) {
-            var zIndex = comments.length - idx,
-                commentSection = new CommentSection(commentBodyContainer, commentBody, zIndex);
-
-            bodySections.push(commentSection);
-            commentSection.on('submit', onOk);
-          });
-
-          jQuery.each(bodySections, function(idx, section) {
-            section.on('delete', function() { removeSection(section); });
-          });
-
-          if (comments.length > 0)
+          if (AnnotationUtils.countComments(annotation) > 0)
             replyField.setPlaceHolder('Write a reply...');
 
-          showEditorElement(bounds);
+          element.show();
+          AutoPosition.set(container, element, bounds);
         },
 
+        /** Shorthand to check if the editor is currently open **/
         isOpen = function() {
           return element.is(':visible');
         },
 
-        setMode = function(mode) {
-          annotationMode = mode;
-        },
-
-        /** Closes the editor, clearing all editor components **/
-        close = function() {
-          element.hide();
-        },
-
         /** Clears all editor components **/
         clear = function() {
-          // Destroy body sections
-          jQuery.each(bodySections, function(idx, section) {
-            section.destroy();
-          });
-
-          bodySections = [];
-          queuedUpdates = [];
-
-          // Clear reply field & text selection, if any
+          sectionList.clear();
           replyField.clear();
           currentAnnotation = false;
         },
 
         /** Opens the editor on a newly created text selection **/
-        onSelectText = function(e) {
+        editSelection = function(e) {
           var quote, record, body;
 
           if (annotationMode.mode === 'NORMAL') {
             open(e.annotation, e.bounds);
 
-          } else if (annotationMode.mode === 'QUICK' && annotationMode.type === 'PLACE') {
-            quote = AnnotationUtils.getQuote(e.annotation);
+          } else if (annotationMode.mode === 'QUICK') {
+            // Quick modes just add an annotation body and trigger instant OK
             currentAnnotation = e.annotation;
-            body = { type: 'PLACE', status: { value: 'UNVERIFIED' } };
 
-            API.searchPlaces(quote).done(function(response) {
-              if (response.total > 0) {
-                record = PlaceUtils.getBestMatchingRecord(response.items[0], quote);
-                body.uri = record.uri;
-              }
+            if (annotationMode.type === 'PLACE') {
+              PlaceUtils.createAnnotationBody(AnnotationUtils.getQuote(e.annotation))
+                .done(function(body) {
+                  e.annotation.bodies.push(body);
+                  onOK();
+                });
 
-              currentAnnotation.bodies.push(body);
-              onOk();
-            });
+            } else if (annotationMode.type === 'PERSON') {
+              e.annotation.bodies.push({ type: 'PERSON' });
+              onOK();
+            }
+          } else if (annnotationMode.mode === 'BULK') {
+            // TODO implement
 
-          } else if (annotationMode.mode === 'QUICK' && annotationMode.type === 'PERSON') {
-            currentAnnotation = e.annotation;
-            currentAnnotation.bodies.push({ type: 'PERSON' });
-            onOk();
           }
-
-          // TODO what happens on mode == bulk?
 
           return false;
         },
 
         /** Opens the editor on an existing annotation **/
-        onSelectAnnotation = function(e) {
+        editAnnotation = function(eventOrElement) {
           var selection = selectionHandler.getSelection(),
-              target = (e.target) ? e.target: e,
-              allAnnotations, topAnnotation, bounds,
-
-              /** This helper gets all annotations in case of multipe nested annotation spans **/
-              getAnnotationsRecursive = function(element, a) {
-                var annotations = (a) ? a : [ ],
-                    parent = element.container;
-
-                annotations.push(element.annotation);
-
-                if (jQuery(parent).hasClass('annotation'))
-                  return getAnnotationsRecursive(parent, annotations);
-                else
-                  return annotations;
-              },
-
-              /** Helper that sorts annotations by quote length, so we can pick the shortest **/
-              sortByQuoteLength = function(annotations) {
-                return annotations.sort(function(a, b) {
-                  return AnnotationUtils.getQuote(a).length - AnnotationUtils.getQuote(b).length;
-                });
-              };
+              targetEl = (eventOrElement.target) ? eventOrElement.target: eventOrElement,
+              allAnnotations;
 
           if (selection) {
             onSelectText(selection);
           } else {
-            allAnnotations = sortByQuoteLength(getAnnotationsRecursive(target));
-            topAnnotation = allAnnotations[0];
-            bounds = target.getBoundingClientRect();
-            open(topAnnotation, bounds);
+            allAnnotations = highlighter.getAnnotationsAt(targetEl);
+            open(allAnnotations[0], targetEl.getBoundingClientRect());
           }
 
           // To avoid repeated events from overlapping annotations below
           return false;
         },
 
-        /** Click on 'Place' button adds a place body **/
+        /** Moves the editor to the previous annotation **/
+        toPreviousAnnotation = function() {
+          var currentSpan = jQuery('*[data-id="' + currentAnnotation.annotation_id + '"]'),
+              firstSpan = currentSpan[0],
+              lastPrev = jQuery(firstSpan).prev('.annotation');
+
+          if (lastPrev.length > 0)
+            editAnnotation(lastPrev[0]);
+        },
+
+        /** Moves the editor to the next annotation **/
+        toNextAnnotation = function() {
+          var currentSpan = jQuery('*[data-id="' + currentAnnotation.annotation_id + '"]'),
+              lastSpan = currentSpan[currentSpan.length - 1],
+              firstNext = jQuery(lastSpan).next('.annotation');
+
+          if (firstNext.length > 0)
+            editAnnotation(firstNext[0]);
+        },
+
+        /** Click on 'Place' button adds a new PLACE body **/
         onAddPlace = function() {
-          var placeBody = { type: 'PLACE', status: { value: 'UNVERIFIED' } },
-              quote = AnnotationUtils.getQuote(currentAnnotation),
-              placeSection = new PlaceSection(placeBodyContainer, placeBody, quote);
-
-          placeSection.on('change', function() {
-            georesolutionEditor.open(quote, placeBody);
-          });
-          bodySections.push(placeSection);
-
-          queuedUpdates.push(function() {
-            currentAnnotation.bodies.push(placeBody);
-          });
-
-          // The user might delete right after
-          placeSection.on('delete', function() {
-            removeSection(placeSection);
-          });
+          sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } });
         },
 
-        /** TODO implement **/
+        /** Click on 'Person' button adds a new PERSON body **/
         onAddPerson = function() {
-
+          // TODO implemenet
         },
 
-        /** TODO implement **/
+        /** Click on 'Event' button adds a new EVENT body **/
         onAddEvent = function() {
-
+          // TODO implemenet
         },
 
-        findSectionForBody = function(body) {
-          var matchingSections = jQuery.grep(bodySections, function(section) {
-            return body === section.body;
-          });
-
-          if (matchingSections.length === 0)
-            return false;
-          else
-            return matchingSections[0];
+        /** 'Cancel' clears the selection and closes the editor **/
+        onCancel = function() {
+          selectionHandler.clearSelection();
+          sectionList.clear();
+          element.hide();
         },
 
-        onUpdateGeoResolution = function(placeBody, diff) {
-          var section = findSectionForBody(placeBody);
-          if (section)
-            section.update(diff);
-        },
+        /** 'OK' updates the annotation & highlight spans and closes the editor **/
+        onOK = function() {
+          var reply = replyField.getComment(), annotationSpans;
 
-        /**
-         * 'OK' adds the content of the reply field as comment, stores the annotation, updates
-         * selection/annotation highlight if necessary and closes the editor.
-         */
-        onOk = function() {
-          var reply = replyField.getComment(),
-              bodies = currentAnnotation.bodies,
-              annotationSpans;
-
-          // Commit all changes that may have happend inside sections
-          jQuery.each(bodySections, function(idx, section) {
-            section.commit();
-          });
+          sectionList.commitChanges();
 
           // Push the current reply body, if any
           if (reply)
             currentAnnotation.bodies.push(reply);
 
-          // Apply queued changes
-          jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
-
           // Determine which CRUD action to perform
           if (currentAnnotation.annotation_id) {
             // There's an ID - annotation already stored on the server
             if (AnnotationUtils.isEmpty(currentAnnotation)) {
-              // Annotation has no bodies left except the QUOTE - DELETE
+              // Annotation empty - DELETE
               highlighter.removeAnnotation(currentAnnotation);
               self.fireEvent('deleteAnnotation', currentAnnotation);
             } else {
               // UPDATE
-              annotationSpans = jQuery('[data-id=' + currentAnnotation.annotation_id + ']');
-              highlighter.updateAnnotationSpans(currentAnnotation, annotationSpans);
+              annotationSpans = highlighter.refreshAnnotation(currentAnnotation);
               self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
             }
           } else {
-            // No ID? New annotation from fresh selection - CREATE (if not empty)
+            // No ID? New annotation from fresh selection - CREATE if not empty
             selectionHandler.clearSelection();
             if (!AnnotationUtils.isEmpty(currentAnnotation)) {
               annotationSpans = highlighter.renderAnnotation(currentAnnotation);
@@ -377,88 +244,69 @@ define([
             }
           }
 
-          close();
+          element.hide();
         },
 
-        onOkAndNext = function() {
-          var currentId = currentAnnotation.annotation_id;
-
-          onOk();
-
-          // TODO refactor/clean up - DRY
-          currentSpan = jQuery('*[data-id="' + currentId + '"]');
-          lastSpan = currentSpan[currentSpan.length - 1];
-          firstNext = jQuery(lastSpan).next('.annotation');
-
-          if (firstNext.length > 0)
-            onSelectAnnotation(firstNext[0]);
+        /** Shortcut: triggers OK and moves the editor to the next annotation **/
+        onOKAndNext = function() {
+          onOK();
+          toPrevAnnotationAnnotation();
         },
 
-        /** 'Cancel' clears the selection and closes the editor **/
-        onCancel = function() {
-          selectionHandler.clearSelection();
+        /** Handles keyboard shortcuts **/
+        onKeyDown = function(e) {
+          var key = e.which;
 
-          // Discard changes
-          queuedUpdates = [];
-
-          close();
-        },
-
-        onKeydown = function(e) {
-          var key = e.which,
-              currentSpan, firstSpan, lastSpan, firstPrev, firstNext;
-
-          if (key === 27) {
+          if (key === 27)
             // ESC closes the editor
             onCancel();
-          } else if (key === 37 && isOpen()) {
+          else if (key === 37 && isOpen())
+            // Left arrow key
+            toPreviousAnnotation();
+          else if (key === 39 && isOpen())
+            // Right arrow key
+            toNextAnnotation();
+        },
 
-            // TODO refactor/clean up
-            currentSpan = jQuery('*[data-id="' + currentAnnotation.annotation_id + '"]');
-            firstSpan = currentSpan[0];
-            lastPrev = jQuery(firstSpan).prev('.annotation');
+        /** User clicked 'change georesolution' - open the panel **/
+        onChangeGeoresolution = function(section) {
+          georesolutionPanel.open(AnnotationUtils.getQuote(currentAnnotation, section.body));
+        },
 
-            if (lastPrev.length > 0)
-              onSelectAnnotation(lastPrev[0]);
-
-          } else if (key === 39 && isOpen()) {
-            // Right arrow skips to next annotation
-
-            // TODO refactor/clean up
-            currentSpan = jQuery('*[data-id="' + currentAnnotation.annotation_id + '"]');
-            lastSpan = currentSpan[currentSpan.length - 1];
-            firstNext = jQuery(lastSpan).next('.annotation');
-
-            if (firstNext.length > 0)
-              onSelectAnnotation(firstNext[0]);
-
-          }
+        /** Georesolution was changed - forward changes to the section list **/
+        onGeoresolutionChanged = function(placeBody, diff) {
+          sectionList.updateSection(placeBody, diff);
         };
 
     // Monitor text selections through the selectionHandler
-    selectionHandler.on('select', onSelectText);
+    selectionHandler.on('select', editSelection);
 
     // Monitor select of existing annotations via DOM
-    jQuery(container).on('click', '.annotation', onSelectAnnotation);
+    jQuery(container).on('click', '.annotation', editAnnotation);
 
-    // Monitor keyboard shortcuts
-    jQuery(document.body).keydown(onKeydown);
+    // Keyboard shortcuts
+    jQuery(document.body).keydown(onKeyDown);
 
-    // Ctrl+Enter on reply field doubles as 'OK'
-    replyField.on('submit', onOk);
+    // Events from the section List
+    sectionList.on('submit', onOK);
+    sectionList.on('change', onChangeGeoresolution);
 
-    // Wire button events
+    // Georesolution change
+    georesolutionPanel.on('change', onGeoresolutionChanged);
+
+    // Ctrl+Enter on the reply field doubles as 'OK'
+    replyField.on('submit', onOK);
+
+    // Button events
     btnPlace.click(onAddPlace);
     btnPerson.click(onAddPerson);
     btnEvent.click(onAddEvent);
 
     btnCancel.click(onCancel);
-    btnOkAndNext.click(onOkAndNext);
-    btnOk.click(onOk);
+    btnOk.click(onOK);
+    btnOkAndNext.click(onOKAndNext);
 
-    georesolutionEditor.on('update', onUpdateGeoResolution);
-
-    this.setMode = setMode;
+    this.setAnnotationMode = setAnnotationMode;
 
     HasEvents.apply(this);
   };

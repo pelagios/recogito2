@@ -1,11 +1,18 @@
+require.config({
+  baseUrl: "/assets/javascripts/",
+  fileExclusionRegExp: /^lib$/
+});
+
 require([
-  '../../common/helpers/annotationUtils',
-  '../../common/api',
-  '../../common/config',
-  'editor/editor',
-  'header',
-  'highlighter',
-  'toolbar'], function(AnnotationUtils, API, Config, Editor, Header, Highlighter, Toolbar) {
+  'annotation/text/editor/editor',
+  'annotation/text/page/header',
+  'annotation/text/page/toolbar',
+  'annotation/text/selection/highlighter',
+  'common/helpers/annotationUtils',
+  'common/api',
+  'common/config'],
+
+  function(Editor, Header, Toolbar, Highlighter, AnnotationUtils, API, Config) {
 
   jQuery(document).ready(function() {
 
@@ -80,7 +87,7 @@ require([
         };
 
     // Toolbar events
-    toolbar.on('annotationModeChanged', editor.setMode);
+    toolbar.on('annotationModeChanged', editor.setAnnotationMode);
     toolbar.on('colorModeChange', onColorModeChanged);
 
     // Editor events

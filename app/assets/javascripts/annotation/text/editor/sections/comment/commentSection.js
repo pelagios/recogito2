@@ -1,7 +1,7 @@
 define([
-  '../../../../common/helpers/formatting',
-  '../../../../common/config',
-  '../../../../common/hasEvents'], function(Formatting, Config, HasEvents) {
+  'annotation/text/editor/sections/section',
+  'common/helpers/formatting',
+  'common/config'], function(Section, Formatting, Config) {
 
   var CommentSection = function(parent, commentBody, zIndex) {
 
@@ -17,7 +17,7 @@ define([
 
         // TODO replace hard-wired z-index with number derived from sibling count
         element = jQuery(
-          '<div class="section comment" style="z-index:' + zIndex + '">' +
+          '<div class="section comment">' + // style="z-index:' + zIndex + '">' +
             '<div class="comment-body">' + escapeHtml(commentBody.value) + '</div>' +
             '<div class="icon edit">&#xf142;</div>' +
             '<div class="created">' +
@@ -128,9 +128,10 @@ define([
     this.body = commentBody;
     this.commit = commit;
     this.destroy = destroy;
-    HasEvents.apply(this);
+
+    Section.apply(this);
   };
-  CommentSection.prototype = Object.create(HasEvents.prototype);
+  CommentSection.prototype = Object.create(Section.prototype);
 
   return CommentSection;
 

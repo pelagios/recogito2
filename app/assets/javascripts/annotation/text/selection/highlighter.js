@@ -1,4 +1,4 @@
-define(['../../common/helpers/annotationUtils'], function(AnnotationUtils) {
+define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
 
   var TEXT = 3; // HTML DOM node type for text nodes
 
@@ -107,11 +107,6 @@ define(['../../common/helpers/annotationUtils'], function(AnnotationUtils) {
           return spans;
         },
 
-        updateAnnotationSpans = function(annotation, spans) {
-          spans.removeClass();
-          spans.addClass(determineCSSClass(annotation));
-        },
-
         removeAnnotation = function(annotation) {
           var spans = jQuery('[data-id="' + annotation.annotation_id + '"]');
           jQuery.each(spans, function(idx, span) {
@@ -119,12 +114,49 @@ define(['../../common/helpers/annotationUtils'], function(AnnotationUtils) {
             el.replaceWith(el.contents());
           });
           rootNode.normalize();
+        },
+
+        refreshAnnotation = function(annotation) {
+          var spans = jQuery('[data-id=' + annotation.annotation_id + ']');
+          spans.removeClass();
+          spans.addClass(determineCSSClass(annotation));
+          return spans;
+        },
+
+        /**
+         * Returns all annotations this DOM element is enclosed in.
+         *
+         * Results are sorted by length, shortest first, so that the 'smallest' annotation
+         * is the first in the list.
+         */
+        getAnnotationsAt = function(element, annotation) {
+          // Helper to get all annotations in case of multipe nested annotation spans
+          var getAnnotationsRecursive = function(element, a) {
+                var annotations = (a) ? a : [ ],
+                    parent = element.container;
+
+                annotations.push(element.annotation);
+
+                if (jQuery(parent).hasClass('annotation'))
+                  return getAnnotationsRecursive(parent, annotations);
+                else
+                  return annotations;
+              },
+
+              sortByQuoteLength = function(annotations) {
+                return annotations.sort(function(a, b) {
+                  return AnnotationUtils.getQuote(a).length - AnnotationUtils.getQuote(b).length;
+                });
+              };
+
+          return sortByQuoteLength(getAnnotationsRecursive(element));
         };
 
-    this.removeAnnotation = removeAnnotation;
-    this.renderAnnotation = renderAnnotation;
-    this.updateAnnotationSpans = updateAnnotationSpans;
     this.wrapRange = wrapRange;
+    this.renderAnnotation = renderAnnotation;
+    this.removeAnnotation = removeAnnotation;
+    this.refreshAnnotation = refreshAnnotation;
+    this.getAnnotationsAt = getAnnotationsAt;
   };
 
   return Highlighter;

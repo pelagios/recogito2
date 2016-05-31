@@ -1,4 +1,4 @@
-define(['../../common/config'], function(Config) {
+define(['common/config'], function(Config) {
 
       // Duration for showing the 'Save OK' status info
   var SHOW_STATUS_SAVED_FOR_MS = 5000;
