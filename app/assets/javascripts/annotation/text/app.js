@@ -27,16 +27,32 @@ require([
         colorschemeStylesheet = jQuery('#colorscheme'),
 
         onAnnotationsLoaded = function(annotations) {
-          var highlighter = new Highlighter(contentNode),
-              sorted = AnnotationUtils.sortByOffset(annotations);
+              // Number of annotations to render in one go
+          var BATCH_SIZE = 50,
+
+              // Idle time between batchs, in milliseconds
+              IDLETIME_MS = 500,
+
+              highlighter = new Highlighter(contentNode),
+
+              sorted = AnnotationUtils.sortByOffset(annotations),
+
+              renderInBatches = function(annotations) {
+                var batch = annotations.slice(0, BATCH_SIZE),
+                    remainder = annotations.slice(BATCH_SIZE);
+
+                jQuery.each(batch, function(idx, annotation) {
+                  highlighter.renderAnnotation(annotation);
+                });
+
+                if (remainder.length > 0)
+                  setTimeout(function() {
+                    renderInBatches(remainder);
+                  }, IDLETIME_MS);
+              };
 
           header.incrementAnnotationCount(annotations.length);
-
-          // TODO revise, so that DOM manipulation happens in batches, with a
-          // bit of wait time in between, so that we don't freeze the browser
-          jQuery.each(sorted, function(idx, annotation) {
-            highlighter.renderAnnotation(annotation);
-          });
+          renderInBatches(sorted);
         },
 
         onAnnotationsLoadError = function(annotations) {
