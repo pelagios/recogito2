@@ -70,7 +70,7 @@ define([
           // TODO implement additional body types
 
           queuedUpdates.push(function() {
-            annotation.bodies.push(body);
+            currentAnnotation.bodies.push(body);
           });
         },
 
@@ -86,7 +86,7 @@ define([
 
           // Queue the delete operation for later
           queuedUpdates.push(function() {
-            AnnotationUtils.deleteBody(annotation, section.body);
+            AnnotationUtils.deleteBody(currentAnnotation, section.body);
           });
         },
 
