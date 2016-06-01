@@ -15,6 +15,9 @@ import models.geotag.ESGeoTagStore
 object AnnotationService extends ESGeoTagStore {
 
   private val ANNOTATION = "annotation"
+  
+  // Maximum number of times an annotation (batch) will be retried in case of failure 
+  private def MAX_RETRIES = 10
 
   implicit object AnnotationIndexable extends Indexable[Annotation] {
     override def json(a: Annotation): String = Json.stringify(Json.toJson(a))
@@ -29,7 +32,7 @@ object AnnotationService extends ESGeoTagStore {
     def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] = {
       ES.client execute {
         update id a.annotationId in ES.IDX_RECOGITO / ANNOTATION source a docAsUpsert
-      } map { r => 
+      } map { r =>
         (true, r.getVersion)
       } recover { case t: Throwable =>
         Logger.error("Error indexing annotation " + annotation.annotationId + ": " + t.getMessage)
@@ -44,13 +47,31 @@ object AnnotationService extends ESGeoTagStore {
     } yield (linksCreated, version)    
   }
 
-  // TODO 
-  // * perform sequentially, using a proper foldLeft + map construct
-  // * generate proper success/failed result, with list of failed annotations
-  // * perform retries with failed imports (cf. place import)
-  def insertOrUpdateAnnotations(annotations: Seq[Annotation])(implicit context: ExecutionContext) =
-    Future.sequence(for (result <- annotations.map(insertOrUpdateAnnotation(_))) yield result) 
-  
+  def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[Annotation]] = {
+    annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
+      future.flatMap { failedAnnotations =>
+        insertOrUpdateAnnotation(annotation).map { case (success, version) =>
+          if (success)
+            failedAnnotations
+          else
+            failedAnnotations :+ annotation
+        }
+      }
+    } flatMap { failed =>
+      if (failed.size > 0 && retries > 0) {
+        Logger.warn(failed.size + " annotations failed to import - retrying")
+        insertOrUpdateAnnotations(failed, retries - 1)
+      } else {
+        Logger.info("Successfully imported " + (annotations.size - failed.size) + " annotations")  
+        if (failed.size > 0)
+          Logger.error(failed.size + " annotations failed without recovery")
+        else
+          Logger.info("No failed imports")
+        Future.successful(failed)
+      }
+    }
+  }
+
   def findById(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[(Annotation, Long)]] = {
     ES.client execute {
       get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION 
@@ -77,28 +98,9 @@ object AnnotationService extends ESGeoTagStore {
       false
     }    
   
-  /*
-    findGeoTagsByAnnotationWithId(annotationId.toString).flatMap { idsAndLinks =>
-      if (idsAndLinks.size > 0) {
-        ES.client execute {
-          bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.IDX_RECOGITO / GEOTAG } )
-        } map {
-          !_.hasFailures
-        } recover { case t: Throwable =>
-          t.printStackTrace()
-          false
-        }
-      } else {
-        // Nothing to delete
-        Future.successful(true)
-      }
-    }
-   */
-    
-    
-  def findByDocId(id: String)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
+  def findByDocId(id: String, limit: Int = Integer.MAX_VALUE)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document" -> id)) limit 1000
+      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
   }
   
@@ -120,9 +122,9 @@ object AnnotationService extends ESGeoTagStore {
       }
     }
   
-  def findByFilepartId(id: Int)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
+  def findByFilepartId(id: Int, limit: Int = Integer.MAX_VALUE)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart" -> id)) limit 1000
+      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
   }
 

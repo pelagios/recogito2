@@ -42,10 +42,10 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
           AnnotationService.insertOrUpdateAnnotations(annotations).map { result =>
             progress = 1.0
             status = ProgressStatus.COMPLETED
-            if (result.exists(_._1 == false))
-              origSender ! Failed
-            else
+            if (result.size == 0)
               origSender ! Completed
+            else
+              origSender ! Failed
           }
         }
       }.recover { case t => {

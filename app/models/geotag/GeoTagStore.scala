@@ -98,7 +98,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore {
     for {
       tagsToInsert <- buildGeoTags(annotation)
       deleteSuccess <- deleteGeoTagsByAnnotation(annotation.annotationId)
-      insertSuccess <- if (deleteSuccess && tagsToInsert.size > 0) insertGeoTags(tagsToInsert) else Future.successful(false)
+      insertSuccess <- if (deleteSuccess && tagsToInsert.size > 0) insertGeoTags(tagsToInsert) else Future.successful(deleteSuccess)
     } yield insertSuccess
   }
 
