@@ -270,7 +270,7 @@ define([
 
         /** User clicked 'change georesolution' - open the panel **/
         onChangeGeoresolution = function(section) {
-          georesolutionPanel.open(AnnotationUtils.getQuote(currentAnnotation, section.body));
+          georesolutionPanel.open(AnnotationUtils.getQuote(currentAnnotation), section.body);
         },
 
         /** Georesolution was changed - forward changes to the section list **/

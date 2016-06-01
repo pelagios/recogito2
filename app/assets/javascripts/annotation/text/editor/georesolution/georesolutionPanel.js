@@ -189,7 +189,7 @@ define([
           },
 
           open = function(quote, placeBody) {
-            currentBody= placeBody;
+            currentBody = placeBody;
 
             searchInput.val(quote);
             element.show();

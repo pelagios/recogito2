@@ -90,6 +90,18 @@ define([
           });
         },
 
+        /** Returns the section for the specified body **/
+        findForBody = function(body) {
+          var matchingSections = jQuery.grep(sections, function(section) {
+            return body === section.body;
+          });
+
+          if (matchingSections.length === 0)
+            return false;
+          else
+            return matchingSections[0];
+        },
+
         /**
          * Updates an existing section.
          *
@@ -101,18 +113,6 @@ define([
           var sectionToUpdate = findForBody(body);
           if (sectionToUpdate)
             sectionToUpdate.update(diff);
-        },
-
-        /** Returns the section for the specified body **/
-        findForBody = function(body) {
-          var matchingSections = jQuery.grep(sections, function(section) {
-            return body === section.body;
-          });
-
-          if (matchingSections.length === 0)
-            return false;
-          else
-            return matchingSections[0];
         },
 
         /** Commits the changes that occured in the list **/
