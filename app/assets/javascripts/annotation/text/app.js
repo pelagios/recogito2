@@ -31,9 +31,17 @@ require([
               sorted = AnnotationUtils.sortByOffset(annotations);
 
           header.incrementAnnotationCount(annotations.length);
+
+          var startTime = new Date().getTime();
+
+          highlighter.initPage(sorted);
+          /*
           jQuery.each(sorted, function(idx, annotation) {
             highlighter.renderAnnotation(annotation);
           });
+          */
+
+          console.log("took " + (new Date().getTime() - startTime));
         },
 
         onAnnotationsLoadError = function(annotations) {

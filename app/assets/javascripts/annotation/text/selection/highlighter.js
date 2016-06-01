@@ -73,7 +73,7 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
             var endWrapper = surround(endRange, cssClass);
 
             // And wrap nodes in between, if any
-            var centerWrappers = jQuery.map(nodesBetween, function(node) {
+            var centerWrappers = jQuery.map(nodesBetween.reverse(), function(node) {
               var r = rangy.createRange();
               r.selectNodeContents(node);
               return surround(r, cssClass);
@@ -89,6 +89,115 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
 
           return cssClass;
         },
+
+        initPage = function(annotations) {
+          var textNodes = (function() {
+                var start = 0;
+
+                // We only have one text element but, alas, browsers split them
+                // up into several nodes
+                return jQuery.map(rootNode.childNodes, function(node) {
+                  var nodeLength = jQuery(node).text().length,
+                      nodeProps = { node: node, start: start, end: start + nodeLength };
+                  start += nodeLength;
+                  return nodeProps;
+                });
+              })(),
+
+              intersects = function(a, b) {
+                return a.start < b.end && a.end > b.start;
+              },
+
+              setNonOverlappingRange = function(range, offset, length) {
+                var startNode, startOffest, endNode, endOffset;
+
+                // Compute start-/endnodes and -offsets based on global offset and length
+                jQuery.each(textNodes, function(idx, node) {
+                  if (offset >= node.start && offset <= node.end) {
+                    startNode = node.node;
+                    startOffset = offset - node.start;
+                  }
+
+                  if ((offset + length) >= node.start && (offset + length) <= node.end) {
+                    endNode = node.node;
+                    endOffset = offset + length - node.start;
+                  }
+                });
+
+                // Set the range
+                if (startNode === endNode) {
+                  range.setStartAndEnd(startNode, startOffset, endOffset);
+                } else {
+                  range.setStart(startNode, startOffset);
+                  range.setEnd(endNode, endOffset);
+                }
+              },
+
+              classApplier = rangy.createClassApplier('annotation');
+
+          // We're folding over the array, with a 2-sliding window so we can
+          // check if this annotation overlaps the previous one
+          annotations.reduce(function(previousBounds, annotation) {
+            var anchor = parseInt(annotation.anchor.substr(12)),
+                quote = AnnotationUtils.getQuote(annotation),
+                bounds = { start: anchor, end: anchor + quote.length },
+                range = rangy.createRange(),
+                spans;
+
+            if (previousBounds && intersects(previousBounds, bounds)) {
+              range.selectCharacters(rootNode.childNodes[0], bounds.start, bounds.end);
+              spans = wrapRange(range, determineCSSClass(annotation));
+            } else {
+              // Fast rendering through Rangy's API
+              setNonOverlappingRange(range, anchor, quote.length);
+              classApplier.applyToRange(range);
+              spans = [ range.getNodes()[0].parentElement ];
+              spans[0].className = determineCSSClass(annotation);
+            }
+
+            // Attach annotation data as payload to the SPANs and set id, if any
+            jQuery.each(spans, function(idx, span) {
+              AnnotationUtils.attachAnnotation(span, annotation);
+            });
+
+            return bounds;
+          }, false);
+        },
+
+        /*
+        renderAnnotation = function(annotation) {
+          var anchor = annotation.anchor.substr(12),
+              quote = AnnotationUtils.getQuote(annotation),
+              range = rangy.createRange(),
+              spans;
+
+          // range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
+          setRange(range, parseInt(anchor), quote.length);
+          annotationApplier.applyToRange(range);
+
+          var span = range.startContainer.parentElement;
+          span.className = determineCSSClass(annotation);
+          AnnotationUtils.attachAnnotation(span, annotation);
+*/
+          /*
+          var cssClass = determineCSSClass(annotation);
+          var node = rage
+          surround(range, cssClass);
+*/
+          /*
+          annotationApplier.applyToRange(range);
+          placeApplier.applyToRange(range);
+          verifiedAppler.applyToRange(range);
+          */
+          // spans = wrapRange(range, determineCSSClass(annotation));
+
+          /* Attach annotation data as payload to the SPANs and set id, if any
+          jQuery.each(spans, function(idx, span) {
+            AnnotationUtils.attachAnnotation(span, annotation);
+          });*/
+
+/*          return spans;
+        },*/
 
         renderAnnotation = function(annotation) {
           var anchor = annotation.anchor.substr(12),
@@ -152,11 +261,12 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
           return sortByQuoteLength(getAnnotationsRecursive(element));
         };
 
-    this.wrapRange = wrapRange;
-    this.renderAnnotation = renderAnnotation;
-    this.removeAnnotation = removeAnnotation;
-    this.refreshAnnotation = refreshAnnotation;
     this.getAnnotationsAt = getAnnotationsAt;
+    this.initPage = initPage;
+    this.refreshAnnotation = refreshAnnotation;
+    this.removeAnnotation = removeAnnotation;
+    this.renderAnnotation = renderAnnotation;
+    this.wrapRange = wrapRange;
   };
 
   return Highlighter;

@@ -79,7 +79,7 @@ define(function() {
         var offsetA = a.anchor.substr(12),
             offsetB = b.anchor.substr(12);
 
-        return offsetA - offsetB;
+        return offsetB - offsetA;
       });
     },
 
