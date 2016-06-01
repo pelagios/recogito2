@@ -32,14 +32,16 @@ define(function() {
 
     /** Attaches an annotation as payload to a DOM element **/
     attachAnnotation : function(element, annotation) {
-      var statusValues = this.getStatus(annotation);
+      var attach = function(element) {
+            element.annotation = annotation;
+            if (annotation.annotation_id)
+              element.dataset.id = annotation.annotation_id;
+          };
 
-      element.annotation = annotation;
-      if (annotation.annotation_id)
-        element.dataset.id = annotation.annotation_id;
-
-      if (statusValues.length > 0)
-        jQuery(element).addClass(statusValues.join(' '));
+      if (jQuery.isArray(element))
+        jQuery.each(element, function(idx, el) { attach(el); });
+      else
+        attach(element);
     },
 
     /** Returns the value of the QUOTE body, if any **/

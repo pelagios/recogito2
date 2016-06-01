@@ -51,7 +51,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         },
 
         /** Helper that clears the visible selection by 'unwrapping' the created span elements **/
-        unwrapSelectionSpans = function() {
+        clearSelection = function() {
+          currentSelection = false;
           jQuery.each(jQuery('.selection'), function(idx, el) {
             jQuery(el).contents().unwrap();
           });
@@ -59,10 +60,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         },
 
         /** cf. http://stackoverflow.com/questions/3169786/clear-text-selection-with-javascript **/
-        clearSelection = function() {
-          currentSelection = false;
-          unwrapSelectionSpans();
-
+        clearNativeSelection = function() {
           if (window.getSelection) {
             if (window.getSelection().empty)
               window.getSelection().empty();
@@ -80,7 +78,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         onSelect = function(e) {
           var isSelectionOnEditor = jQuery(e.target).closest('.text-annotation-editor').length > 0,
               selection = rangy.getSelection(),
-              selectedRange, annotationStub, bounds;
+              selectedRange, annotationStub, bounds, spans;
 
           // If the selection happened on the editor, we'll ignore
           if (isSelectionOnEditor)
@@ -93,11 +91,11 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
              selectedRange = trimRange(selection.getRangeAt(0));
              annotation = rangeToAnnotationStub(selectedRange);
              bounds = selectedRange.nativeRange.getBoundingClientRect();
+             spans = highlighter.wrapRange(selectedRange, 'selection');
 
-             clearSelection();
-             highlighter.wrapRange(selectedRange, 'selection');
+             clearNativeSelection();
 
-             currentSelection = { annotation: annotation, bounds: bounds };
+             currentSelection = { annotation: annotation, bounds: bounds, spans: spans };
              self.fireEvent('select', currentSelection);
           }
 

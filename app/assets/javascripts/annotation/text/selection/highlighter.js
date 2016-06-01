@@ -85,9 +85,20 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
 
         determineCSSClass = function(annotation) {
           var entityType = AnnotationUtils.getEntityType(annotation),
+              statusValues = AnnotationUtils.getStatus(annotation),
               cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation';
 
+          if (statusValues.length > 0)
+            cssClass += ' ' + statusValues.join(' ');
+
           return cssClass;
+        },
+
+        updateStyles = function(annotation, spans) {
+          var cssClass = determineCSSClass(annotation);
+          jQuery.each(spans, function(idx, span) {
+            span.className = cssClass;
+          });
         },
 
         initPage = function(annotations) {
@@ -152,68 +163,32 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
               setNonOverlappingRange(range, anchor, quote.length);
               classApplier.applyToRange(range);
               spans = [ range.getNodes()[0].parentElement ];
-              spans[0].className = determineCSSClass(annotation);
+              updateStyles(annotation, spans);
             }
 
             // Attach annotation data as payload to the SPANs and set id, if any
-            jQuery.each(spans, function(idx, span) {
-              AnnotationUtils.attachAnnotation(span, annotation);
-            });
-
+            if (spans)
+              AnnotationUtils.attachAnnotation(spans, annotation);
             return bounds;
           }, false);
         },
 
-        /*
-        renderAnnotation = function(annotation) {
-          var anchor = annotation.anchor.substr(12),
-              quote = AnnotationUtils.getQuote(annotation),
-              range = rangy.createRange(),
-              spans;
+        renderAnnotation = function(annotation, opt_spans) {
+          // If no spans are provide, we'll determine them from the annotation offset
+          if (!opt_spans) {
+            var anchor = annotation.anchor.substr(12),
+                quote = AnnotationUtils.getQuote(annotation),
+                range = rangy.createRange();
 
-          // range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
-          setRange(range, parseInt(anchor), quote.length);
-          annotationApplier.applyToRange(range);
+            range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
+            opt_spans = wrapRange(range);
+          }
 
-          var span = range.startContainer.parentElement;
-          span.className = determineCSSClass(annotation);
-          AnnotationUtils.attachAnnotation(span, annotation);
-*/
-          /*
-          var cssClass = determineCSSClass(annotation);
-          var node = rage
-          surround(range, cssClass);
-*/
-          /*
-          annotationApplier.applyToRange(range);
-          placeApplier.applyToRange(range);
-          verifiedAppler.applyToRange(range);
-          */
-          // spans = wrapRange(range, determineCSSClass(annotation));
-
-          /* Attach annotation data as payload to the SPANs and set id, if any
-          jQuery.each(spans, function(idx, span) {
-            AnnotationUtils.attachAnnotation(span, annotation);
-          });*/
-
-/*          return spans;
-        },*/
-
-        renderAnnotation = function(annotation) {
-          var anchor = annotation.anchor.substr(12),
-              quote = AnnotationUtils.getQuote(annotation),
-              range = rangy.createRange(),
-              spans;
-
-          range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
-          spans = wrapRange(range, determineCSSClass(annotation));
+          updateStyles(annotation, opt_spans);
 
           // Attach annotation data as payload to the SPANs and set id, if any
-          jQuery.each(spans, function(idx, span) {
-            AnnotationUtils.attachAnnotation(span, annotation);
-          });
-
-          return spans;
+          AnnotationUtils.attachAnnotation(opt_spans, annotation);
+          return opt_spans;
         },
 
         removeAnnotation = function(annotation) {

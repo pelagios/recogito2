@@ -125,25 +125,25 @@ define([
         },
 
         /** Opens the editor on a newly created text selection **/
-        editSelection = function(e) {
+        editSelection = function(selection) {
           var quote, record, body;
 
           if (annotationMode.mode === 'NORMAL') {
-            open(e.annotation, e.bounds);
+            open(selection.annotation, selection.bounds);
 
           } else if (annotationMode.mode === 'QUICK') {
             // Quick modes just add an annotation body and trigger instant OK
-            currentAnnotation = e.annotation;
+            currentAnnotation = selection.annotation;
 
             if (annotationMode.type === 'PLACE') {
-              PlaceUtils.createAnnotationBody(AnnotationUtils.getQuote(e.annotation))
+              PlaceUtils.createAnnotationBody(AnnotationUtils.getQuote(selection.annotation))
                 .done(function(body) {
-                  e.annotation.bodies.push(body);
+                  selection.annotation.bodies.push(body);
                   onOK();
                 });
 
             } else if (annotationMode.type === 'PERSON') {
-              e.annotation.bodies.push({ type: 'PERSON' });
+              selection.annotation.bodies.push({ type: 'PERSON' });
               onOK();
             }
           } else if (annnotationMode.mode === 'BULK') {
@@ -161,7 +161,7 @@ define([
               allAnnotations;
 
           if (selection) {
-            onSelectText(selection);
+            editSelection(selection);
           } else {
             allAnnotations = highlighter.getAnnotationsAt(targetEl);
             open(allAnnotations[0], targetEl.getBoundingClientRect());
@@ -237,9 +237,11 @@ define([
             }
           } else {
             // No ID? New annotation from fresh selection - CREATE if not empty
-            selectionHandler.clearSelection();
-            if (!AnnotationUtils.isEmpty(currentAnnotation)) {
-              annotationSpans = highlighter.renderAnnotation(currentAnnotation);
+            if (AnnotationUtils.isEmpty(currentAnnotation)) {
+              selectionHandler.clearSelection();
+            } else {
+              annotationSpans = selectionHandler.getSelection().spans;
+              highlighter.renderAnnotation(currentAnnotation, annotationSpans);
               self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
             }
           }
