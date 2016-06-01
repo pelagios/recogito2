@@ -27,32 +27,13 @@ require([
         colorschemeStylesheet = jQuery('#colorscheme'),
 
         onAnnotationsLoaded = function(annotations) {
-              // Number of annotations to render in one go
-          var BATCH_SIZE = 50,
-
-              // Idle time between batchs, in milliseconds
-              IDLETIME_MS = 500,
-
-              highlighter = new Highlighter(contentNode),
-
-              sorted = AnnotationUtils.sortByOffset(annotations),
-
-              renderInBatches = function(annotations) {
-                var batch = annotations.slice(0, BATCH_SIZE),
-                    remainder = annotations.slice(BATCH_SIZE);
-
-                jQuery.each(batch, function(idx, annotation) {
-                  highlighter.renderAnnotation(annotation);
-                });
-
-                if (remainder.length > 0)
-                  setTimeout(function() {
-                    renderInBatches(remainder);
-                  }, IDLETIME_MS);
-              };
+          var highlighter = new Highlighter(contentNode),
+              sorted = AnnotationUtils.sortByOffset(annotations);
 
           header.incrementAnnotationCount(annotations.length);
-          renderInBatches(sorted);
+          jQuery.each(sorted, function(idx, annotation) {
+            highlighter.renderAnnotation(annotation);
+          });
         },
 
         onAnnotationsLoadError = function(annotations) {
