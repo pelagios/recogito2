@@ -135,6 +135,7 @@ define([
           });
 
           sections = [];
+          queuedUpdates = [];
         };
 
     this.setAnnotation = setAnnotation;
