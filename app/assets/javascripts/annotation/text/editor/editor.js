@@ -252,7 +252,7 @@ define([
         /** Shortcut: triggers OK and moves the editor to the next annotation **/
         onOKAndNext = function() {
           onOK();
-          toPrevAnnotationAnnotation();
+          toNextAnnotation();
         },
 
         /** Handles keyboard shortcuts **/
