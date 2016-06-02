@@ -91,7 +91,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
              selectedRange = trimRange(selection.getRangeAt(0));
              annotation = rangeToAnnotationStub(selectedRange);
              bounds = selectedRange.nativeRange.getBoundingClientRect();
-             spans = highlighter.wrapRange(selectedRange, 'selection');
+             spans = highlighter.wrapRange(selectedRange);
+             jQuery.each(spans, function(idx, span) { span.className = 'selection'; });
 
              clearNativeSelection();
 

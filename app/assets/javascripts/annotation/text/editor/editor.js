@@ -125,7 +125,7 @@ define([
         },
 
         /** Opens the editor on a newly created text selection **/
-        editSelection = function(selection) {
+        editSelection = function(selection) {          
           var quote, record, body;
 
           if (annotationMode.mode === 'NORMAL') {
