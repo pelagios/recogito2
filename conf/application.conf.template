@@ -43,10 +43,10 @@ recogito.upload.quota = 200
 # You can declare as many datasources as you want.
 # By convention, the default datasource is named `default`
 #
-db.default.driver="org.sqlite.JDBC"
-db.default.url="jdbc:sqlite:recogito.db"
-db.default.username="sa"
-db.default.password=""
+db.default.driver="org.postgresql.Driver"
+db.default.url="jdbc:postgresql://localhost/recogito2"
+db.default.username="postgres-username-goes-here"
+db.default.password="postgres-password-goes-here"
 
 # Evolutions
 # ~~~~~
