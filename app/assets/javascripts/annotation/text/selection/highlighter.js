@@ -4,6 +4,7 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
 
   var Highlighter = function(rootNode) {
 
+        /** Recursively gets all text nodes inside a given node **/
     var walkTextNodes = function(node, nodeArray) {
           var nodes = (nodeArray) ? nodeArray : [];
 
@@ -20,7 +21,11 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
           return nodes;
         },
 
-        /** Basically a hand-coded dropWhile + takeWhile **/
+        /**
+         * Given a rootNode, this helper gets all text between a given
+         * start- and end-node. Basically combines walkTextNodes (above)
+         * with a hand-coded dropWhile & takeWhile.
+         */
         textNodesBetween = function(startNode, endNode, rootNode) {
           var allTextNodes = walkTextNodes(rootNode),
               nodesBetween = [],
@@ -42,6 +47,14 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
           }
 
           return nodesBetween;
+        },
+
+        /**
+         * Given a root node, this method returns the DOM positions (an array of (node, offset)
+         * pairs) that correspond to the given character offsets.
+         */
+        charOffsetToDOMPosition = function(rootNode, charOffsets) {
+
         },
 
         /** Shorthand **/
@@ -173,22 +186,29 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
           }, false);
         },
 
-        renderAnnotation = function(annotation, opt_spans) {
-          // If no spans are provide, we'll determine them from the annotation offset
-          if (!opt_spans) {
-            var anchor = annotation.anchor.substr(12),
-                quote = AnnotationUtils.getQuote(annotation),
-                range = rangy.createRange();
+        /**
+         *'Mounts' an annotation to the given spans, by applying the according
+         * CSS classes, and attaching the annotation object to the elements.
+         */
+        convertSpansToAnnotation = function(spans, annotation) {
+          var anchor = annotation.anchor.substr(12),
+              quote = AnnotationUtils.getQuote(annotation);
 
-            range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
-            opt_spans = wrapRange(range);
-          }
+          updateStyles(annotation, spans);
+          AnnotationUtils.attachAnnotation(spans, annotation);
+        },
 
-          updateStyles(annotation, opt_spans);
+        /**
+         * Creates highlight spans for an annotation and mounts it.
+         * Returns the created spans for convenience.
+         */
+        renderAnnotation = function(annotation) {
+          var range = rangy.createRange(), spans;
 
-          // Attach annotation data as payload to the SPANs and set id, if any
-          AnnotationUtils.attachAnnotation(opt_spans, annotation);
-          return opt_spans;
+          range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
+          spans = wrapRange(range);
+          convertSpansToAnnotation(spans, annotation);
+          return spans;
         },
 
         removeAnnotation = function(annotation) {
@@ -236,6 +256,7 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
           return sortByQuoteLength(getAnnotationsRecursive(element));
         };
 
+    this.convertSpansToAnnotation = convertSpansToAnnotation;
     this.getAnnotationsAt = getAnnotationsAt;
     this.initPage = initPage;
     this.refreshAnnotation = refreshAnnotation;

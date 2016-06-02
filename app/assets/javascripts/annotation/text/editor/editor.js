@@ -241,7 +241,8 @@ define([
               selectionHandler.clearSelection();
             } else {
               annotationSpans = selectionHandler.getSelection().spans;
-              highlighter.renderAnnotation(currentAnnotation, annotationSpans);
+              highlighter.convertSpansToAnnotation(annotationSpans, currentAnnotation);
+              selectionHandler.clearSelection();
               self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
             }
           }

@@ -40,7 +40,6 @@ require([
 
         onUpdateAnnotation = function(e) {
           header.showStatusSaving();
-
           API.storeAnnotation(e.annotation)
              .done(function(annotation) {
                // Update header info
@@ -49,9 +48,7 @@ require([
                header.showStatusSaved();
 
                // Update the annotation references in the elements
-               jQuery.each(e.elements, function(idx, el) {
-                 AnnotationUtils.attachAnnotation(el, annotation);
-               });
+              AnnotationUtils.attachAnnotation(e.elements, annotation);
              })
              .fail(function(error) {
                header.showSaveError(error);
