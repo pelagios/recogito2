@@ -32,9 +32,9 @@ require([
 
           header.incrementAnnotationCount(annotations.length);
 
-          var startTime = new Date().getTime();
+          // var startTime = new Date().getTime();
           highlighter.initPage(sorted);
-          console.log('took ' + (new Date().getTime() - startTime) + 'ms');
+          // console.log('took ' + (new Date().getTime() - startTime) + 'ms');
         },
 
         onAnnotationsLoadError = function(annotations) {
@@ -51,7 +51,7 @@ require([
                header.showStatusSaved();
 
                // Update the annotation references in the elements
-              AnnotationUtils.attachAnnotation(e.elements, annotation);
+               AnnotationUtils.attachAnnotation(e.elements, annotation);
              })
              .fail(function(error) {
                header.showSaveError(error);

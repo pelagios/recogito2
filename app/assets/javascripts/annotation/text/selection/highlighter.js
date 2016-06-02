@@ -251,8 +251,8 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
         refreshAnnotation = function(annotation) {
           var spans = jQuery('[data-id=' + annotation.annotation_id + ']');
           spans.removeClass();
-          spans.addClass(determineCSSClass(annotation));
-          return spans;
+          updateStyles(annotation, spans);
+          return spans.toArray();
         },
 
         /**
