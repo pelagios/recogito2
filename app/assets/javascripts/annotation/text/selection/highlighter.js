@@ -197,19 +197,8 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
             }
 
             // Attach annotation data as payload to the SPANs and set id, if any
-            if (spans) {
-
-
-              /** TODO remove if clause once overlap-case computation is fixed **/
-
-
-              updateStyles(annotation, spans);
-              AnnotationUtils.attachAnnotation(spans, annotation);
-
-
-
-
-            }
+            updateStyles(annotation, spans);
+            AnnotationUtils.attachAnnotation(spans, annotation);
             return bounds;
           }, false);
         },
@@ -265,7 +254,7 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
           // Helper to get all annotations in case of multipe nested annotation spans
           var getAnnotationsRecursive = function(element, a) {
                 var annotations = (a) ? a : [ ],
-                    parent = element.container;
+                    parent = element.parentNode;
 
                 annotations.push(element.annotation);
 

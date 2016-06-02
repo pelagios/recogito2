@@ -28,10 +28,9 @@ require([
 
         onAnnotationsLoaded = function(annotations) {
           var highlighter = new Highlighter(contentNode),
-              sorted = AnnotationUtils.sortByOffset(annotations);
+              sorted = AnnotationUtils.sortByOffsetDesc(annotations);
 
           header.incrementAnnotationCount(annotations.length);
-
           // var startTime = new Date().getTime();
           highlighter.initPage(sorted);
           // console.log('took ' + (new Date().getTime() - startTime) + 'ms');

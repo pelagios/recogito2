@@ -78,10 +78,13 @@ define(function() {
 
     sortByOffset : function(annotations) {
       return annotations.sort(function(a, b) {
-        var offsetA = a.anchor.substr(12),
-            offsetB = b.anchor.substr(12);
+        return a.anchor.substr(12) - b.anchor.substr(12);
+      });
+    },
 
-        return offsetB - offsetA;
+    sortByOffsetDesc : function(annotations) {
+      return annotations.sort(function(a, b) {
+        return b.anchor.substr(12) - a.anchor.substr(12);
       });
     },
 
