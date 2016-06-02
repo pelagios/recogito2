@@ -49,25 +49,56 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
           return nodesBetween;
         },
 
+        /** Private helper method to keep things DRY for overlap/non-overlap offset computation **/
+        calculateDomPositionWithin = function(textNodeProperties, charOffsets) {
+          var positions = [];
+
+          jQuery.each(textNodeProperties, function(i, props) {
+            jQuery.each(charOffsets, function(j, charOffset)  {
+              if (charOffset >= props.start && charOffset <= props.end) {
+                positions.push({
+                  charOffset: charOffset,
+                  node: props.node,
+                  offset: charOffset - props.start
+                });
+              }
+            });
+
+            // Break (i.e. return false) if all positions are computed
+            return positions.length < charOffsets.length;
+          });
+
+          return positions;
+        },
+
         /**
-         * Given a root node, this method returns the DOM positions (an array of (node, offset)
-         * pairs) that correspond to the given character offsets.
+         * In a list of adjancent text nodes, this method computes the (node/offset)
+         * pairs of a list of absolute character offsets in the total text.
          */
-        charOffsetToDOMPosition = function(rootNode, charOffsets) {
+        charOffsetsToDOMPosition = function(charOffsets) {
+          var textNodeProps = (function() {
+                var start = 0;
+                return jQuery.map(walkTextNodes(rootNode), function(node) {
+                  var nodeLength = jQuery(node).text().length,
+                      nodeProps = { node: node, start: start, end: start + nodeLength };
 
+                  start += nodeLength;
+                  return nodeProps;
+                });
+              })();
+
+          return calculateDomPositionWithin(textNodeProps, charOffsets);
         },
 
-        /** Shorthand **/
-        surround = function(range, css) {
-          var wrapper = document.createElement('SPAN');
-          wrapper.className = css;
-          range.surroundContents(wrapper);
-          return wrapper;
-        },
+        wrapRange = function(range) { //, cssClass) {
+          var surround = function(range) {
+                var wrapper = document.createElement('SPAN');
+                range.surroundContents(wrapper);
+                return wrapper;
+              };
 
-        wrapRange = function(range, cssClass) {
           if (range.startContainer === range.endContainer) {
-            return [ surround(range, cssClass) ];
+            return [ surround(range) ];
           } else {
             // The tricky part - we need to break the range apart and create
             // sub-ranges for each segment
@@ -78,25 +109,25 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
             var startRange = rangy.createRange();
             startRange.selectNodeContents(range.startContainer);
             startRange.setStart(range.startContainer, range.startOffset);
-            var startWrapper = surround(startRange, cssClass);
+            var startWrapper = surround(startRange);
 
             var endRange = rangy.createRange();
             endRange.selectNode(range.endContainer);
             endRange.setEnd(range.endContainer, range.endOffset);
-            var endWrapper = surround(endRange, cssClass);
+            var endWrapper = surround(endRange);
 
             // And wrap nodes in between, if any
             var centerWrappers = jQuery.map(nodesBetween.reverse(), function(node) {
               var r = rangy.createRange();
               r.selectNodeContents(node);
-              return surround(r, cssClass);
+              return surround(r);
             });
 
             return [ startWrapper ].concat(centerWrappers,  [ endWrapper ]);
           }
         },
 
-        determineCSSClass = function(annotation) {
+        updateStyles = function(annotation, spans) {
           var entityType = AnnotationUtils.getEntityType(annotation),
               statusValues = AnnotationUtils.getStatus(annotation),
               cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation';
@@ -104,11 +135,6 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
           if (statusValues.length > 0)
             cssClass += ' ' + statusValues.join(' ');
 
-          return cssClass;
-        },
-
-        updateStyles = function(annotation, spans) {
-          var cssClass = determineCSSClass(annotation);
           jQuery.each(spans, function(idx, span) {
             span.className = cssClass;
           });
@@ -133,22 +159,12 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
               },
 
               setNonOverlappingRange = function(range, offset, length) {
-                var startNode, startOffest, endNode, endOffset;
+                var positions = calculateDomPositionWithin(textNodes, [ offset, offset + length ]),
+                    startNode = positions[0].node,
+                    startOffset = positions[0].offset,
+                    endNode = positions[1].node,
+                    endOffset = positions[1].offset;
 
-                // Compute start-/endnodes and -offsets based on global offset and length
-                jQuery.each(textNodes, function(idx, node) {
-                  if (offset >= node.start && offset <= node.end) {
-                    startNode = node.node;
-                    startOffset = offset - node.start;
-                  }
-
-                  if ((offset + length) >= node.start && (offset + length) <= node.end) {
-                    endNode = node.node;
-                    endOffset = offset + length - node.start;
-                  }
-                });
-
-                // Set the range
                 if (startNode === endNode) {
                   range.setStartAndEnd(startNode, startOffset, endOffset);
                 } else {
@@ -166,22 +182,34 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
                 quote = AnnotationUtils.getQuote(annotation),
                 bounds = { start: anchor, end: anchor + quote.length },
                 range = rangy.createRange(),
-                spans;
+                positions, spans;
 
             if (previousBounds && intersects(previousBounds, bounds)) {
-              range.selectCharacters(rootNode.childNodes[0], bounds.start, bounds.end);
-              spans = wrapRange(range, determineCSSClass(annotation));
+              positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
+              range.setStart(positions[0].node, positions[0].offset);
+              range.setEnd(positions[1].node, positions[1].offset);
+              spans = wrapRange(range);
             } else {
               // Fast rendering through Rangy's API
               setNonOverlappingRange(range, anchor, quote.length);
               classApplier.applyToRange(range);
               spans = [ range.getNodes()[0].parentElement ];
-              updateStyles(annotation, spans);
             }
 
             // Attach annotation data as payload to the SPANs and set id, if any
-            if (spans)
+            if (spans) {
+
+
+              /** TODO remove if clause once overlap-case computation is fixed **/
+
+
+              updateStyles(annotation, spans);
               AnnotationUtils.attachAnnotation(spans, annotation);
+
+
+
+
+            }
             return bounds;
           }, false);
         },
