@@ -1,7 +1,7 @@
 package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
-import java.io.File
+import java.io.{ File, FileInputStream }
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -11,11 +11,11 @@ import play.api.test.Helpers._
 @RunWith(classOf[JUnitRunner])
 class GazetteerUtilSpec extends Specification {
   
-  private val GAZETTEER_RDF = "test/resources/models/place/gazetteer_sample_pleiades.ttl"
+  private val GAZETTEER_RDF = new File("test/resources/models/place/gazetteer_sample_pleiades.ttl")
   
   "The Gazetteer utility" should {
     
-    val records = GazetteerUtils.loadRDF(new File(GAZETTEER_RDF), "Pleiades")
+    val records = GazetteerUtils.loadRDF(new FileInputStream(GAZETTEER_RDF), GAZETTEER_RDF.getName, "Pleiades")
     
     "properly load all gazetteer records from RDF" in {
       records.size must equalTo(5)

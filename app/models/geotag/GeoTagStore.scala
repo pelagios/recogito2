@@ -58,8 +58,8 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore {
       GeoTag(
         placeId,
         annotation.annotationId,
-        annotation.annotates.document,
-        annotation.annotates.filepart,
+        annotation.annotates.documentId,
+        annotation.annotates.filepartId,
         placeBody.uri.get)
 
     // These are all place bodies that have a URI set

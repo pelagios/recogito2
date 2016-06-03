@@ -100,7 +100,7 @@ object AnnotationService extends ESGeoTagStore {
   
   def findByDocId(id: String, limit: Int = Integer.MAX_VALUE)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document" -> id)) limit limit
+      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
   }
   
@@ -124,7 +124,7 @@ object AnnotationService extends ESGeoTagStore {
   
   def findByFilepartId(id: Int, limit: Int = Integer.MAX_VALUE)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart" -> id)) limit limit
+      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
   }
 

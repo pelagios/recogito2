@@ -1,7 +1,7 @@
 package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
-import java.io.File
+import java.io.{ File, FileInputStream }
 import org.apache.commons.io.FileUtils
 import org.joda.time.DateTime
 import org.specs2.mutable._
@@ -22,9 +22,9 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
   // Force Specs2 to execute tests in sequential order
   sequential 
   
-  private val DARE_RDF = "test/resources/models/place/gazetteer_sample_dare.ttl"
+  private val DARE_RDF = new File("test/resources/models/place/gazetteer_sample_dare.ttl")
   
-  private val PLEIADES_RDF = "test/resources/models/place/gazetteer_sample_pleiades.ttl"
+  private val PLEIADES_RDF = new File("test/resources/models/place/gazetteer_sample_pleiades.ttl")
   
   private val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
   
@@ -48,7 +48,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
     
     "After importing the DARE sample, the PlaceService" should {
       
-      val dareRecords = GazetteerUtils.loadRDF(new File(DARE_RDF), "DARE")
+      val dareRecords = GazetteerUtils.loadRDF(new FileInputStream(DARE_RDF), DARE_RDF.getName, "DARE")
       
       "contain 4 places" in {
         val failedRecords = importRecords(dareRecords)
@@ -76,7 +76,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
     
     "After importing the Pleiades sample, the PlaceService" should {
       
-      val pleiadesRecords = GazetteerUtils.loadRDF(new File(PLEIADES_RDF), "Pleiades")
+      val pleiadesRecords = GazetteerUtils.loadRDF(new FileInputStream(PLEIADES_RDF), PLEIADES_RDF.getName, "Pleiades")
         
       "contain 5 places" in {
         val failedRecords = importRecords(pleiadesRecords)

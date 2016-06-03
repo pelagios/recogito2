@@ -1,7 +1,7 @@
 package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
-import java.io.File
+import java.io.{ File, FileInputStream }
 import org.joda.time.DateTime
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -22,9 +22,9 @@ class PlaceServiceSpec extends Specification {
   // Force Specs2 to execute tests in sequential order
   sequential 
   
-  private val DARE_RDF = "test/resources/models/place/gazetteer_sample_dare.ttl"
+  private val DARE_RDF = new File("test/resources/models/place/gazetteer_sample_dare.ttl")
   
-  private val PLEIADES_RDF = "test/resources/models/place/gazetteer_sample_pleiades.ttl"
+  private val PLEIADES_RDF = new File("test/resources/models/place/gazetteer_sample_pleiades.ttl")
   
   val testPlaceService = new TestPlaceService()
   
@@ -107,7 +107,7 @@ class PlaceServiceSpec extends Specification {
   
   "After importing the DARE sample, the PlaceService" should {
     
-    val dareRecords = GazetteerUtils.loadRDF(new File(DARE_RDF), "DARE")
+    val dareRecords = GazetteerUtils.loadRDF(new FileInputStream(DARE_RDF), DARE_RDF.getName, "DARE")
     
     "contain 4 places" in {
       // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec
@@ -164,7 +164,7 @@ class PlaceServiceSpec extends Specification {
   
   "After importing the Pleiades sample, the PlaceService" should {
     
-    val pleiadesRecords = GazetteerUtils.loadRDF(new File(PLEIADES_RDF), "Pleiades")
+    val pleiadesRecords = GazetteerUtils.loadRDF(new FileInputStream(PLEIADES_RDF), PLEIADES_RDF.getName, "Pleiades")
       
     "contain 5 places" in {
       val failedRecords = importRecords(pleiadesRecords)

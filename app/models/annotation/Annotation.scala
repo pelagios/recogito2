@@ -29,14 +29,14 @@ case class Annotation(
 
 )
 
-case class AnnotatedObject(document: String, filepart: Int)
+case class AnnotatedObject(documentId: String, filepartId: Int)
 
 object AnnotatedObject {
 
   /** JSON conversion **/
   implicit val annotatedObjectFormat: Format[AnnotatedObject] = (
-    (JsPath \ "document").format[String] and
-    (JsPath \ "filepart").format[Int]
+    (JsPath \ "document_id").format[String] and
+    (JsPath \ "filepart_id").format[Int]
   )(AnnotatedObject.apply, unlift(AnnotatedObject.unapply))
 
 }

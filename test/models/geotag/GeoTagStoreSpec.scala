@@ -95,29 +95,29 @@ class GeoTagStoreSpec extends Specification with AfterAll {
     val linkToBarcelona = GeoTag(
       "http://dare.ht.lu.se/places/6534",
       annotatesBarcelona.annotationId,
-      annotatesBarcelona.annotates.document,
-      annotatesBarcelona.annotates.filepart,
+      annotatesBarcelona.annotates.documentId,
+      annotatesBarcelona.annotates.filepartId,
       "http://pleiades.stoa.org/places/246343")
     
     val linkToLancaster = GeoTag(
         "http://dare.ht.lu.se/places/23712",
         annotatesLancaster.annotationId,
-        annotatesLancaster.annotates.document,
-        annotatesLancaster.annotates.filepart,
+        annotatesLancaster.annotates.documentId,
+        annotatesLancaster.annotates.filepartId,
         "http://pleiades.stoa.org/places/89222")
         
     val linkToVindobona = GeoTag(
         "http://pleiades.stoa.org/places/128537",
         annotatesVindobonaAndThessaloniki.annotationId,
-        annotatesVindobonaAndThessaloniki.annotates.document,
-        annotatesVindobonaAndThessaloniki.annotates.filepart,
+        annotatesVindobonaAndThessaloniki.annotates.documentId,
+        annotatesVindobonaAndThessaloniki.annotates.filepartId,
         "http://pleiades.stoa.org/places/128537")
         
     val linkToThessaloniki = GeoTag(
         "http://dare.ht.lu.se/places/17068",
         annotatesVindobonaAndThessaloniki.annotationId,
-        annotatesVindobonaAndThessaloniki.annotates.document,
-        annotatesVindobonaAndThessaloniki.annotates.filepart,
+        annotatesVindobonaAndThessaloniki.annotates.documentId,
+        annotatesVindobonaAndThessaloniki.annotates.filepartId,
         "http://pleiades.stoa.org/places/491741")
         
     val testStore = new TestGeoTagStore() // Store extends GeoTagServiceLike
@@ -131,10 +131,10 @@ class GeoTagStoreSpec extends Specification with AfterAll {
     "After creating 2 annotations with 1 geotag each, the GeoTagService" should {
       
       "contain 2 correct geotags" in {  
-        Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/models/place/gazetteer_sample_dare.ttl"), "DARE")), 10 seconds)
+        Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File("test/resources/models/place/gazetteer_sample_dare.ttl"), "gazetteer_sample_dare.ttl")), 10 seconds)
         flush()
       
-        Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/models/place/gazetteer_sample_pleiades.ttl"), "Pleiades")), 10 seconds)
+        Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/models/place/gazetteer_sample_pleiades.ttl"), "gazetteer_sample_pleiades.ttl")), 10 seconds)
         flush()
       
         val (successInsertBarcelona, _) = insertAnnotation(annotatesBarcelona)
@@ -173,7 +173,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
     "When searching for 'Vindobona', the GeoTagService" should {
       
       "retrieve only the Vindobona linked to the test document" in {
-        val places = searchPlacesInDocument("vindobona", annotatesVindobonaAndThessaloniki.annotates.document)
+        val places = searchPlacesInDocument("vindobona", annotatesVindobonaAndThessaloniki.annotates.documentId)
         places.total must equalTo(1)
         places.items.head._1.id must equalTo("http://pleiades.stoa.org/places/128537")
       }

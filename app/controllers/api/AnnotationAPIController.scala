@@ -177,7 +177,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
     AnnotationService.findById(id).flatMap(_ match {
       case Some((annotation, version)) => {
         // Fetch the associated document
-        DocumentService.findById(annotation.annotates.document).flatMap(_ match {
+        DocumentService.findById(annotation.annotates.documentId).flatMap(_ match {
           case Some(document) => {
             // TODO check if the user has write permissions
             // TODO for now we'll just check ownership
@@ -196,7 +196,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
             
           case None => {
             // Annotation on a non-existing document? Can't happen except DB integrity is broken
-            Logger.warn("Annotation points to document " + annotation.annotates.document + " but not in DB")
+            Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
             Future.successful(InternalServerError)
           }
         })
