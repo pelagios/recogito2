@@ -40,8 +40,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
           return {
             annotates: {
-              document: Config.documentId,
-              filepart: Config.partId
+              document_id: Config.documentId,
+              filepart_id: Config.partId
             },
             anchor: 'char-offset:' + rangeBefore.toString().length,
             bodies: [

@@ -3,8 +3,9 @@ package controllers.api
 import controllers.BaseController
 import java.util.UUID
 import javax.inject.Inject
-import models.HasDate
+import models.{ ContentType, HasDate }
 import models.annotation._
+import models.contribution._
 import models.document.DocumentService
 import models.user.Roles._
 import org.joda.time.DateTime
@@ -119,7 +120,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
   }
 
   /** TODO currently annotation creation is unlimited to any logged in user - need to check access rights! **/
-  def createAnnotation() = StackAction(AuthorityKey -> Normal) { implicit request =>
+  def createAnnotation() = StackAction(AuthorityKey -> Normal) { implicit request =>    
     request.body.asJson match {
 
       // TODO createdAt/By info for existing bodies is taken from the JSON, without
@@ -153,8 +154,30 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                       Some(s.setBy.getOrElse(user)),
                       s.setAt.getOrElse(now))))))
 
-            // TODO error reporting?
+            // TODO wait for response!
             AnnotationService.insertOrUpdateAnnotation(annotation)
+            
+            
+  
+            // TODO for debug purposes only!
+            ContributionService.insertContribution(Contribution(
+              ContributionAction.CREATE_BODY,
+              user,
+              now,
+              Item(
+                ItemType.PLACE_BODY,
+                annotation.annotates.documentId,
+                Some(annotation.annotates.filepartId),
+                ContentType.TEXT_PLAIN,
+                Some(annotation.annotationId),
+                Some(annotation.versionId)
+              ),
+              Seq.empty[String]
+            ))
+            // TODO for debug purposes only!
+            
+            
+            
             Ok(Json.toJson(annotation))
           }
 
