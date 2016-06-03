@@ -7,20 +7,35 @@ import scala.util.Try
 import scala.language.postfixOps
 import sys.process._
 
-object ContentType extends Enumeration {
+sealed trait ContentType {
   
-  val TEXT_PLAIN =    Value("TEXT_PLAIN")
+  val media: String
+  
+  val subtype: String
+  
+  lazy val name = media + "_" + subtype
+  
+}
 
-  val TEXT_MARKDOWN = Value("TEXT_MARKDOWN")
+object ContentType {
+  
+  case object TEXT_PLAIN    extends ContentType { val media = "TEXT"  ; val subtype = "PLAIN" }
+  case object TEXT_TEIXML   extends ContentType { val media = "TEXT"  ; val subtype = "TEIXML" }
+  case object TEXT_MARKDOWN extends ContentType { val media = "TEXT"  ; val subtype = "MARKDOWN" }
 
-  val TEXT_TEIXML =   Value("TEXT_TEIXML")
+  case object IMAGE_UPLOAD  extends ContentType { val media = "IMAGE" ; val subtype = "UPLOAD" }
+  case object IMAGE_IIIF    extends ContentType { val media = "IMAGE" ; val subtype = "IIIF" }
 
-  val IMAGE_UPLOAD =  Value("IMAGE_UPLOAD")
+  case object DATA_CSV      extends ContentType { val media = "DATA"  ; val subtype = "CSV" }
 
-  val IMAGE_IIIF =    Value("IMAGE_IIIF")
-
-  val DATA_CSV =      Value("DATA_CSV")
-
+  def withName(name: String): Option[ContentType] = Seq(
+    TEXT_PLAIN,
+    TEXT_TEIXML,
+    TEXT_MARKDOWN,
+    IMAGE_UPLOAD,
+    IMAGE_IIIF,
+    DATA_CSV).find(_.name == name)
+  
   // Images are only supported if VIPS is installed on the system
   private val VIPS_INSTALLED = {
     val testVips = Try("vips help" !)
@@ -31,7 +46,7 @@ object ContentType extends Enumeration {
   }
 
   /** TODO analyze based on the actual file, not just the extension! **/
-  def fromFile(file: File): Either[ContentIdentificationFailure, ContentType.Value] = {
+  def fromFile(file: File): Either[ContentIdentificationFailure, ContentType] = {
     val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
     extension match {
       case "txt" =>
@@ -45,7 +60,7 @@ object ContentType extends Enumeration {
     }
 
   }
-
+  
 }
 
 object ContentIdentificationFailures {

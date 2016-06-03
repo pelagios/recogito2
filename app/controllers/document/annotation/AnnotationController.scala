@@ -24,10 +24,10 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) 
     renderDocumentPartResponse(documentId, partNo, username, { case (document, parts, thisPart) =>
       ContentType.withName(thisPart.getContentType) match {
                     
-        case ContentType.IMAGE_UPLOAD => 
+        case Some(ContentType.IMAGE_UPLOAD) => 
           Ok(views.html.document.annotation.image(username, document, parts, thisPart))
         
-        case ContentType.TEXT_PLAIN => {
+        case Some(ContentType.TEXT_PLAIN) => {
           readTextfile(username, document.getId, thisPart.getFilename) match {
             case Some(content) =>
               Ok(views.html.document.annotation.text(username, document, parts, thisPart, content))
@@ -39,6 +39,11 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) 
             }
           }
         }
+        
+        case _ =>
+          // Unknown content type in DB, or content type we don't have an annotation view for - should never happen
+          InternalServerError
+          
       }
     })
   }
