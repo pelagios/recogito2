@@ -1,0 +1,21 @@
+{
+  "contribution": {
+    "properties": {
+      "action": { "type": "string", "index": "not_analyzed" },
+      "made_by": { "type": "string", "index": "not_analyzed" },
+      "made_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
+      "affects_item": {
+        "type": "nested",
+        "properties": {
+          "item_type": { "type": "string", "index": "not_analyzed" },
+          "document_id": { "type": "string", "index": "not_analyzed" },
+          "filepart_id": { "type": "integer" },
+          "content_type": { "type": "integer" },
+          "annotation_id": { "type": "string", "index": "not_analyzed" },
+          "version_id": { "type": "string", "index": "not_analyzed" }
+        }
+      },
+      "affects_users": { "type": "string", "index": "not_analyzed" }
+    }
+  }
+}
