@@ -1,40 +1,18 @@
 package controllers
 
-import java.io.File
 import jp.t2v.lab.play2.auth.AuthElement
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.mvc.{ Request, Result, Controller, AnyContent }
-import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{ Json, JsValue }
-import play.api.libs.Files.TemporaryFile
 import storage.DB
-import scala.util.Try
 
 /** Helper trait so we can hand the injected DB into other traits **/
 trait HasDatabase { def db: DB }
 
 /** Helper trait so we can hand the injected Cache into other traits **/
 trait HasCache { def cache: CacheApi }
-
-/** Helper for creating pretty-printed JSON responses with proper content-type header **/
-trait HasPrettyPrintJSON { self: Controller =>
-
-  /** Pretty print URL param name **/
-  private val PRETTY = "pretty"
-
-  protected def jsonOk(obj: JsValue)(implicit request: Request[AnyContent]) = {
-    val pretty = Try(request.queryString.get(PRETTY).map(_.head.toBoolean).getOrElse(false)).getOrElse(false)
-    if (pretty)
-      Ok(Json.prettyPrint(obj)).withHeaders(("Content-Type", "application/json; charset=utf-8"))
-    else
-      Ok(obj) 
-  }
-
-}
 
 /** Currently (mostly) a placeholder for future common Controller functionality **/
 abstract class BaseController extends Controller with HasCache with HasDatabase with AuthElement with Security {
