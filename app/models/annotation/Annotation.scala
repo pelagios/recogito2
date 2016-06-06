@@ -37,7 +37,7 @@ object AnnotatedObject extends HasContentTypeList {
   implicit val annotatedObjectFormat: Format[AnnotatedObject] = (
     (JsPath \ "document_id").format[String] and
     (JsPath \ "filepart_id").format[Int] and
-    (JsPath \ "content_type").format[Seq[String]].inmap[ContentType](fromCTypeList, toCTypeList)
+    (JsPath \ "content_type").format[JsValue].inmap[ContentType](fromCTypeList, toCTypeList)
   )(AnnotatedObject.apply, unlift(AnnotatedObject.unapply))
 
 }

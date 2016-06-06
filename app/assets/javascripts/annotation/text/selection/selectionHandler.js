@@ -41,7 +41,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           return {
             annotates: {
               document_id: Config.documentId,
-              filepart_id: Config.partId
+              filepart_id: Config.partId,
+              content_type: Config.contentType
             },
             anchor: 'char-offset:' + rangeBefore.toString().length,
             bodies: [

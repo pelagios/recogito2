@@ -30,7 +30,7 @@ object Item extends HasContentTypeList {
     (JsPath \ "item_type").format[ItemType.Value] and
     (JsPath \ "document_id").format[String] and
     (JsPath \ "filepart_id").formatNullable[Int] and
-    (JsPath \ "content_type").format[Seq[String]].inmap[ContentType](fromCTypeList, toCTypeList) and
+    (JsPath \ "content_type").format[JsValue].inmap[ContentType](fromCTypeList, toCTypeList) and
     (JsPath \ "annotation_id").formatNullable[UUID] and
     (JsPath \ "annotation_version_id").formatNullable[UUID]
   )(Item.apply, unlift(Item.unapply))

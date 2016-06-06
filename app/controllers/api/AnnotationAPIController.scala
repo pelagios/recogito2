@@ -157,27 +157,6 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
             // TODO wait for response!
             AnnotationService.insertOrUpdateAnnotation(annotation)
             
-            
-  
-            // TODO for debug purposes only!
-            ContributionService.insertContribution(Contribution(
-              ContributionAction.CREATE_BODY,
-              user,
-              now,
-              Item(
-                ItemType.PLACE_BODY,
-                annotation.annotates.documentId,
-                Some(annotation.annotates.filepartId),
-                ContentType.TEXT_PLAIN,
-                Some(annotation.annotationId),
-                Some(annotation.versionId)
-              ),
-              Seq.empty[String]
-            ))
-            // TODO for debug purposes only!
-            
-            
-            
             Ok(Json.toJson(annotation))
           }
 

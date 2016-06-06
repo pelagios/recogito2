@@ -1,13 +1,24 @@
 package models
 
+import play.api.libs.json.{Json, JsValue }
+
+/** JSON representation converts ContentType to an array [ MediaType, ContentType ].
+  *
+  * This way we can use it for analytics more easily. E.g. 'TEXT_PLAIN' -> [ 'TEXT', 'TEXT_PLAIN' ] 
+  */
 trait HasContentTypeList {
-  
-  // JSON representation converts ContentType to an array [ MediaType, ContentType ]
-  // so we can use it for analytics more easily. E.g. 'TEXT_PLAIN' -> [ 'TEXT', 'TEXT_PLAIN' ] 
-  def fromCTypeList(list: Seq[String]): ContentType =
-    list.flatMap(ContentType.withName(_)).head
     
-  def toCTypeList(ctype: ContentType): Seq[String] =
-    Seq(ctype.media, ctype.name)
+  /** For convenience, this method accepts JSON strings as well as string arrays **/
+  def fromCTypeList(typeOrList: JsValue): ContentType = {
+    typeOrList.asOpt[Seq[String]] match {
+      case Some(list) => list.flatMap(ContentType.withName(_)).head
+      case None => typeOrList.asOpt[String] match {
+        case Some(string) => ContentType.withName(string).get
+      }
+    }
+  }
+    
+  def toCTypeList(ctype: ContentType): JsValue =
+    Json.toJson(Seq(ctype.media, ctype.name))
   
 }
