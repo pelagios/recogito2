@@ -3,7 +3,8 @@
   "version_id": "e868423f-5ea9-42ed-bb7d-5e1fac9195a0",
   "annotates": {
     "document_id": "98muze1cl3saib",
-    "filepart_id": 1
+    "filepart_id": 1,
+    "content_type": [ "TEXT", "TEXT_PLAIN" ]
   },
   "has_previous_versions": 1,
   "contributors": [ "rainer" ],

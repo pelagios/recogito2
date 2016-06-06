@@ -4,8 +4,8 @@ import akka.actor.Actor
 import controllers.my.upload.ProgressStatus
 import java.io.File
 import java.util.UUID
-import models.annotation._
 import models.ContentType
+import models.annotation._
 import models.place.PlaceService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
@@ -13,6 +13,8 @@ import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import scala.io.Source
+
+import models.ContentType
 
 private[ner] object NERWorkerActor {
 
@@ -105,7 +107,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     Annotation(
       UUID.randomUUID,
       UUID.randomUUID,
-      AnnotatedObject(document.getId, part.getId),
+      AnnotatedObject(document.getId, part.getId, ContentType.withName(part.getContentType).get),
       None, // no previous versions
       Seq.empty[String], // No contributing users
       "char-offset:" + phrase.charOffset,

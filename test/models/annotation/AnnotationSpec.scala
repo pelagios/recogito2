@@ -1,15 +1,16 @@
 package models.annotation
 
 import java.util.UUID
+import models.ContentType
+import org.joda.time.{ DateTime, DateTimeZone }
+import org.joda.time.format.DateTimeFormat
+import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 import scala.io.Source
 import play.api.libs.json.Json
-import org.joda.time.{ DateTime, DateTimeZone }
-import org.joda.time.format.DateTimeFormat
 
 @RunWith(classOf[JUnitRunner])
 class AnnotationSpec extends Specification {
@@ -87,7 +88,7 @@ class AnnotationSpec extends Specification {
         Annotation(
           annotationId,
           versionId,
-          AnnotatedObject("98muze1cl3saib", 1),
+          AnnotatedObject("98muze1cl3saib", 1, ContentType.TEXT_PLAIN),
           None,
           Seq.empty[String],
           "char-offset:25",

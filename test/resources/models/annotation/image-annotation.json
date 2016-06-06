@@ -3,7 +3,8 @@
   "version_id": "74de3052-7087-41b3-84cd-cb8f4a1caa79",
   "annotates": {
     "document_id": "hcylkmacy4xgkb",
-    "filepart_id": 1
+    "filepart_id": 1,
+    "content_type": [ "TEXT", "TEXT_PLAIN" ]
   },
   "has_previous_versions": 1,
   "contributors": [ "rainer" ],

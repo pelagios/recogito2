@@ -1,7 +1,7 @@
 package models.annotation
 
 import java.util.UUID
-import models.HasDate
+import models.{ ContentType, HasContentTypeList, HasDate }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -29,14 +29,15 @@ case class Annotation(
 
 )
 
-case class AnnotatedObject(documentId: String, filepartId: Int)
+case class AnnotatedObject(documentId: String, filepartId: Int, contentType: ContentType)
 
-object AnnotatedObject {
+object AnnotatedObject extends HasContentTypeList {
 
   /** JSON conversion **/
   implicit val annotatedObjectFormat: Format[AnnotatedObject] = (
     (JsPath \ "document_id").format[String] and
-    (JsPath \ "filepart_id").format[Int]
+    (JsPath \ "filepart_id").format[Int] and
+    (JsPath \ "content_type").format[Seq[String]].inmap[ContentType](fromCTypeList, toCTypeList)
   )(AnnotatedObject.apply, unlift(AnnotatedObject.unapply))
 
 }

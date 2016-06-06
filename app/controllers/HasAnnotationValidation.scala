@@ -15,14 +15,8 @@ trait HasAnnotationValidation {
       Item(
         ItemType.fromBodyType(createdBody.hasType),
         annotationAfter.annotates.documentId,
-        Some(annotationAfter.annotates.filepartId),
-        
-        /** TODO Fix! **/
-        
-        ContentType.TEXT_PLAIN,
-        
-        /** TODO Fix! **/
-        
+        Some(annotationAfter.annotates.filepartId),        
+        annotationAfter.annotates.contentType,
         Some(annotationBefore.annotationId),
         Some(annotationBefore.versionId)
       ),
@@ -48,13 +42,7 @@ trait HasAnnotationValidation {
         ItemType.fromBodyType(bodyAfter.hasType),
         annotationAfter.annotates.documentId,
         Some(annotationAfter.annotates.filepartId),
-        
-        /** TODO Fix! **/
-        
-        ContentType.TEXT_PLAIN,
-        
-        /** TODO Fix! **/        
-        
+        annotationAfter.annotates.contentType,
         Some(annotationBefore.annotationId),
         Some(annotationBefore.versionId)
       ),
@@ -70,13 +58,7 @@ trait HasAnnotationValidation {
         ItemType.fromBodyType(deletedBody.hasType),
         annotationAfter.annotates.documentId,
         Some(annotationAfter.annotates.filepartId),
-        
-        /** TODO Fix! **/
-        
-        ContentType.TEXT_PLAIN,
-        
-        /** TODO Fix! **/
-        
+        annotationAfter.annotates.contentType,       
         Some(annotationBefore.annotationId),
         Some(annotationBefore.versionId)
       ),
@@ -86,11 +68,14 @@ trait HasAnnotationValidation {
   private def isPredecessorTo(before: AnnotationBody, after: AnnotationBody): Boolean =
     after.hasType == before.hasType
   
-  def validateUpdate(before: Annotation, after: Annotation) = {
+  def validateUpdate(before: Annotation, after: Annotation): Seq[Contribution] = {
     
     // TODO validation!
     // - make sure doc/filepart ID remains unchanged
+    // - make sure filepart content type remains unchanged
     // - make sure annotation ID remains unchanged
+      
+    // TODO any things the current user should not be able to manipulate (timestamps on bodies not changed by that user?)
     
     computeContributions(before, after)
   }

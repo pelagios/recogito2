@@ -1,11 +1,12 @@
 package models.contribution
 
 import java.util.UUID
-import models.ContentType
+import models.{ ContentType, HasContentTypeList }
 import models.annotation.AnnotationBody
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import models.HasContentTypeList
 
 case class Item(
   
@@ -23,16 +24,8 @@ case class Item(
   
 )
 
-object Item {
+object Item extends HasContentTypeList {
   
-  // JSON representation converts ContentType to an array [ MediaType, ContentType ]
-  // so we can use it for analytics more easily. E.g. 'TEXT_PLAIN' -> [ 'TEXT', 'TEXT_PLAIN' ] 
-  private def fromCTypeList(list: Seq[String]): ContentType =
-    list.flatMap(ContentType.withName(_)).head
-    
-  private def toCTypeList(ctype: ContentType): Seq[String] =
-    Seq(ctype.media, ctype.name)
-    
   implicit val itemFormat: Format[Item] = (
     (JsPath \ "item_type").format[ItemType.Value] and
     (JsPath \ "document_id").format[String] and
