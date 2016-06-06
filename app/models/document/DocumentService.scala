@@ -60,8 +60,9 @@ object DocumentService extends BaseService with FileAccess {
           null, // TODO timestamp_numeric
           upload.getDateFreeform,
           upload.getDescription,
+          upload.getLanguage,
           upload.getSource,
-          upload.getLanguage)
+          upload.getEdition)
   
   /** Changes the sequence numbers of fileparts for a specific document **/
   def setFilepartSortOrder(docId: String, sortOrder: Seq[PartOrdering])(implicit db: DB) = db.withTransaction { sql =>

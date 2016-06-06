@@ -17,6 +17,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.Future
 import storage.DB
+import controllers.HasAnnotationValidation
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(
@@ -89,8 +90,7 @@ object AnnotationStatusStub extends HasDate {
   
 }
 
-
-class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
+class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with HasAnnotationValidation {
 
   def getAnnotationsForDocument(docId: String) = getAnnotations(docId, None)
     
@@ -181,8 +181,10 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
         // Fetch the associated document
         DocumentService.findById(annotation.annotates.documentId).flatMap(_ match {
           case Some(document) => {
+            
             // TODO check if the user has write permissions
             // TODO for now we'll just check ownership
+            
             if (document.getOwner == loggedIn.user.getUsername) {
               // If so, are there any comment nodes left that are *not* by this user?
               AnnotationService.deleteAnnotation(id).map(success => {

@@ -29,7 +29,7 @@ import storage.DB
 
 case class UploadSuccess(contentType: String)
 
-case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, source: String, language: String)
+case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)
 
 class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem) extends BaseController {
 
@@ -43,13 +43,14 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
       "author" -> text,
       "date_freeform" -> text,
       "description" -> text,
+      "language" -> text,
       "source" -> text,
-      "language" -> text
+      "edition" -> text
     )(NewDocumentData.apply)(NewDocumentData.unapply)
   )
 
   implicit def uploadRecordToNewDocumentData(r: UploadRecord) =
-    NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getSource, r.getLanguage)
+    NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getLanguage, r.getSource, r.getEdition)
 
 
   def showStep1(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
@@ -69,7 +70,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
         Future.successful(BadRequest(views.html.my.upload.step1(usernameInPath, formWithErrors))),
 
       docData =>
-        UploadService.storePendingUpload(loggedIn.user.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.source, docData.language)
+        UploadService.storePendingUpload(loggedIn.user.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.language, docData.source, docData.edition)
           .flatMap(user => Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath))))
           .recover { case t: Throwable => {
             t.printStackTrace()

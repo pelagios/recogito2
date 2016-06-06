@@ -39,8 +39,9 @@ CREATE TABLE upload (
   author TEXT,
   date_freeform TEXT,
   description TEXT,
+  language TEXT,
   source TEXT,
-  language TEXT
+  edition TEXT
 );
 
 CREATE TABLE upload_filepart (
@@ -65,8 +66,9 @@ CREATE TABLE document (
   date_numeric TIMESTAMP,
   date_freeform TEXT,
   description TEXT,
+  language TEXT,
   source TEXT,
-  language TEXT
+  edition TEXT
 );
 
 CREATE TABLE document_filepart (

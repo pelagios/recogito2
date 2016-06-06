@@ -89,14 +89,19 @@ class Upload(alias : String, aliased : Table[UploadRecord], parameters : Array[ 
 	val DESCRIPTION : TableField[UploadRecord, String] = createField("description", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
+	 * The column <code>public.upload.language</code>.
+	 */
+	val LANGUAGE : TableField[UploadRecord, String] = createField("language", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * The column <code>public.upload.source</code>.
 	 */
 	val SOURCE : TableField[UploadRecord, String] = createField("source", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
-	 * The column <code>public.upload.language</code>.
+	 * The column <code>public.upload.edition</code>.
 	 */
-	val LANGUAGE : TableField[UploadRecord, String] = createField("language", org.jooq.impl.SQLDataType.CLOB, "")
+	val EDITION : TableField[UploadRecord, String] = createField("edition", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * Create a <code>public.upload</code> table reference

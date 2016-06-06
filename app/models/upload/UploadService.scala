@@ -23,7 +23,7 @@ object UploadService extends FileAccess {
   private def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
 
   /** Inserts a new upload, or updates an existing one if it already exists **/
-  def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, source: String, language: String)(implicit db: DB) =
+  def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)(implicit db: DB) =
     db.withTransaction { sql =>
       val upload =
         Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(owner)).fetchOne()) match {
@@ -34,8 +34,9 @@ object UploadService extends FileAccess {
             upload.setAuthor(nullIfEmpty(author))
             upload.setDateFreeform(nullIfEmpty(dateFreeform))
             upload.setDescription(nullIfEmpty(description))
-            upload.setSource(nullIfEmpty(source))
             upload.setLanguage(nullIfEmpty(language))
+            upload.setSource(nullIfEmpty(source))
+            upload.setEdition(nullIfEmpty(edition))
             upload
           }
 
@@ -48,8 +49,9 @@ object UploadService extends FileAccess {
                 nullIfEmpty(author),
                 nullIfEmpty(dateFreeform),
                 nullIfEmpty(description),
+                nullIfEmpty(language),
                 nullIfEmpty(source),
-                nullIfEmpty(language))
+                nullIfEmpty(edition))
 
             sql.attach(upload)
             upload.changed(UPLOAD.ID, false);

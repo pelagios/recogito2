@@ -92,14 +92,19 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	val DESCRIPTION : TableField[DocumentRecord, String] = createField("description", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
+	 * The column <code>public.document.language</code>.
+	 */
+	val LANGUAGE : TableField[DocumentRecord, String] = createField("language", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * The column <code>public.document.source</code>.
 	 */
 	val SOURCE : TableField[DocumentRecord, String] = createField("source", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
-	 * The column <code>public.document.language</code>.
+	 * The column <code>public.document.edition</code>.
 	 */
-	val LANGUAGE : TableField[DocumentRecord, String] = createField("language", org.jooq.impl.SQLDataType.CLOB, "")
+	val EDITION : TableField[DocumentRecord, String] = createField("edition", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * Create a <code>public.document</code> table reference
