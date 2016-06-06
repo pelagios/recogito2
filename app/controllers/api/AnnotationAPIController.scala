@@ -96,8 +96,8 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
     
   def getAnnotationsForPart(docId: String, partNo: Int) = getAnnotations(docId, Some(partNo))
 
-  /** TODO currently annotation read access is unlimited to any logged in user - do we want that? **/
   def getAnnotations(docId: String, partNo: Option[Int]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    // TODO currently annotation read access is unlimited to any logged in user - do we want that?
     (docId, partNo) match {
       case (id, Some(seqNo)) =>
         // Load annotations for specific doc part
@@ -122,14 +122,12 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
   /** TODO currently annotation creation is unlimited to any logged in user - need to check access rights! **/
   def createAnnotation() = StackAction(AuthorityKey -> Normal) { implicit request =>    
     request.body.asJson match {
-
-      // TODO createdAt/By info for existing bodies is taken from the JSON, without
-      // verifying against data stored on the server, i.e. potentially hackable
-      // should we build in protection against this?
-      
       case Some(json) => {
         Json.fromJson[AnnotationStub](json) match {
           case s: JsSuccess[AnnotationStub] => {
+            
+            // TODO fetch document and previous version (if any) for this annotation
+            
             val now = DateTime.now()
             val user = loggedIn.user.getUsername
             val annotation =

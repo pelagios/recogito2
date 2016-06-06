@@ -75,7 +75,8 @@ trait HasAnnotationValidation {
     // - make sure filepart content type remains unchanged
     // - make sure annotation ID remains unchanged
       
-    // TODO any things the current user should not be able to manipulate (timestamps on bodies not changed by that user?)
+    // TODO check any things the current user should not be able to manipulate
+    // - createdAt/By info on bodies not touched by the user must be unchanged      
     
     computeContributions(before, after)
   }
