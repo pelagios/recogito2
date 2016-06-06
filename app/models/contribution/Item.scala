@@ -2,6 +2,7 @@ package models.contribution
 
 import java.util.UUID
 import models.ContentType
+import models.annotation.AnnotationBody
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -47,9 +48,21 @@ object ItemType extends Enumeration {
   
   val DOCUMENT = Value("DOCUMENT")
   
+  val QUOTE_BODY = Value("QUOTE_BODY")
+  
   val COMMENT_BODY = Value("COMMENT_BODY")
   
   val PLACE_BODY = Value("PLACE_BODY")
+  
+  def fromBodyType(bodyType: AnnotationBody.Value) = bodyType match {
+
+    case AnnotationBody.QUOTE => QUOTE_BODY
+      
+    case AnnotationBody.COMMENT => COMMENT_BODY
+
+    case AnnotationBody.PLACE => PLACE_BODY    
+    
+  }
   
   // TODO PERSON_BODY, EVENT_BODY, FORUM_POST
   
