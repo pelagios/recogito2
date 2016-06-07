@@ -7,7 +7,7 @@ import models.annotation.AnnotationStatus
 
 trait HasAnnotationValidation {
 
-  private def createBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, createdBody: AnnotationBody) =
+  private def createBodyContribution(annotationAfter: Annotation, createdBody: AnnotationBody) =
     Contribution(
       ContributionAction.CREATE_BODY,
       annotationAfter.lastModifiedBy.get,
@@ -68,7 +68,7 @@ trait HasAnnotationValidation {
   private def isPredecessorTo(before: AnnotationBody, after: AnnotationBody): Boolean =
     after.hasType == before.hasType
   
-  def validateUpdate(before: Annotation, after: Annotation): Seq[Contribution] = {
+  def validateUpdate(annotation: Annotation, previousVersion: Option[Annotation]): Seq[Contribution] = {
     
     // TODO validation!
     // - make sure doc/filepart ID remains unchanged
@@ -78,31 +78,45 @@ trait HasAnnotationValidation {
     // TODO check any things the current user should not be able to manipulate
     // - createdAt/By info on bodies not touched by the user must be unchanged      
     
-    computeContributions(before, after)
+    computeContributions(annotation, previousVersion)
   }
   
-  def computeContributions(before: Annotation, after: Annotation) =
-    // Body order never changes - so we compare before & after step by step 
-    after.bodies.foldLeft((Seq.empty[Contribution], before.bodies)) { case ((contributions, referenceBodies), nextBodyAfter) =>
-      // Leading bodies that are not predecessors to bodies in the new annotation are DELETIONS 
-      val deletions = referenceBodies
-        .takeWhile(bodyBefore => !isPredecessorTo(bodyBefore, nextBodyAfter))
-        .map(deletedBody => deleteBodyContribution(before, after, deletedBody))
-      
-      // Once we're through detecting deletions, we continue with the remaining before-bodies
-      val remainingReferenceBodies = referenceBodies.drop(deletions.size)       
-      if (remainingReferenceBodies.isEmpty)
-        // None left? Then this new body is an addition
-        (contributions ++ deletions :+ createBodyContribution(before, after, nextBodyAfter),
-          remainingReferenceBodies)
-      else if (remainingReferenceBodies.head == nextBodyAfter)
-        // This body is unchanged - continue with next
-        (contributions ++ deletions,
-          remainingReferenceBodies.tail)
+  def computeContributions(annotation: Annotation, previousVersion: Option[Annotation]) = previousVersion match {
+    
+    case Some(before) => {
+      // Body order never changes - so we compare before & after step by step 
+      annotation.bodies.foldLeft((Seq.empty[Contribution], before.bodies)) { case ((contributions, referenceBodies), nextBodyAfter) =>
+        // Leading bodies that are not predecessors to bodies in the new annotation are DELETIONS 
+        val deletions = referenceBodies
+          .takeWhile(bodyBefore => !isPredecessorTo(bodyBefore, nextBodyAfter))
+          .map(deletedBody => deleteBodyContribution(before, annotation, deletedBody))
+        
+        // Once we're through detecting deletions, we continue with the remaining before-bodies
+        val remainingReferenceBodies = referenceBodies.drop(deletions.size)       
+        if (remainingReferenceBodies.isEmpty)
+          // None left? Then this new body is an addition
+          (contributions ++ deletions :+ createBodyContribution(annotation, nextBodyAfter),
+            remainingReferenceBodies)
+        else if (remainingReferenceBodies.head == nextBodyAfter)
+          // This body is unchanged - continue with next
+          (contributions ++ deletions,
+            remainingReferenceBodies.tail)
+        else
+          // This body was updated 
+          (contributions ++ deletions :+ changeBodyContribution(before, annotation, remainingReferenceBodies.head, nextBodyAfter),
+            remainingReferenceBodies.tail)
+      }._1 // We're not interested in the empty list of 'remaining reference bodies'
+    }
+   
+    case None => {
+      if (annotation.lastModifiedBy.isEmpty)
+        // We don't count 'contributions' made automatic processes
+        // TODO new annotation with no previous version - generate contributions
+        Seq.empty[Contribution]
       else
-        // This body was updated 
-        (contributions ++ deletions :+ changeBodyContribution(before, after, remainingReferenceBodies.head, nextBodyAfter),
-          remainingReferenceBodies.tail)
-    }._1 // We're not interested in the empty list of 'remaining reference bodies'
+        annotation.bodies.map(body => createBodyContribution(annotation, body))
+    }
+
+  }
 
 }

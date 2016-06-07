@@ -138,8 +138,8 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/models/place/gazetteer_sample_pleiades.ttl"), "gazetteer_sample_pleiades.ttl")), 10 seconds)
         flush()
       
-        val (successInsertBarcelona, _) = insertAnnotation(annotatesBarcelona)
-        val (successInsertLancaster, _) = insertAnnotation(annotatesLancaster)
+        val (successInsertBarcelona, _, _) = insertAnnotation(annotatesBarcelona)
+        val (successInsertLancaster, _, _) = insertAnnotation(annotatesLancaster)
         flush()
 
         successInsertBarcelona must equalTo(true)
@@ -157,7 +157,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
     "After changing one annotation to two different places, the GeoTagService" should {
       
       "contain 3 correct geotags" in {
-        val (success, _) = insertAnnotation(annotatesVindobonaAndThessaloniki)
+        val (success, _, _) = insertAnnotation(annotatesVindobonaAndThessaloniki)
         flush()
         
         success must equalTo(true)

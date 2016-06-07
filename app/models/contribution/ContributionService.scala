@@ -11,6 +11,9 @@ import storage.ES
 object  ContributionService {
   
   private val CONTRIBUTION = "contribution"
+ 
+  // Maximum number of times an annotation (batch) will be retried in case of failure 
+  private def MAX_RETRIES = 10
   
   implicit object ContributionIndexable extends Indexable[Contribution] {
     override def json(c: Contribution): String = Json.stringify(Json.toJson(c))
@@ -31,6 +34,30 @@ object  ContributionService {
       Logger.error(contribution.toString)
       t.printStackTrace
       false
+    }
+        
+  def insertContributions(contributions: Seq[Contribution], retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Boolean] =
+    contributions.foldLeft(Future.successful(Seq.empty[Contribution])) { case (future, contribution) =>
+      future.flatMap { failed =>
+        insertContribution(contribution).map { success =>
+          if (success)
+            failed
+          else
+            failed :+ contribution
+        }
+      }
+    } flatMap { failed =>
+      if (failed.size > 0 && retries > 0) {
+        Logger.warn(failed.size + " annotations failed to import - retrying")
+        insertContributions(failed, retries - 1)
+      } else {
+        if (failed.size > 0) {
+          Logger.error(failed.size + " contribution events failed without recovery")
+          Future.successful(false)
+        } else {
+          Future.successful(true)
+        }
+      }
     }
   
 }

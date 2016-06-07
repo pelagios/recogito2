@@ -28,7 +28,7 @@ class HasAnnotationValidationSpec extends Specification {
 
     "produce one 'comment added' contribution" in {
       val annotationWithAddedComment = loadAnnotation("text-annotation-changed-1.json")
-      val contributions = validator.validateUpdate(annotationBefore, annotationWithAddedComment)
+      val contributions = validator.validateUpdate(annotationWithAddedComment, Some(annotationBefore))
       contributions.size must equalTo(1)
       contributions.head.action must equalTo(CREATE_BODY)
       contributions.head.affectsItem.itemType must equalTo(COMMENT_BODY)
@@ -40,7 +40,7 @@ class HasAnnotationValidationSpec extends Specification {
 
     "produce one 'place removed' and one 'comment added' contribution" in {
       val annotationWithRemovedPlaceAndAddedComment = loadAnnotation("text-annotation-changed-2.json")
-      val contributions = validator.validateUpdate(annotationBefore, annotationWithRemovedPlaceAndAddedComment)
+      val contributions = validator.validateUpdate(annotationWithRemovedPlaceAndAddedComment, Some(annotationBefore))
       contributions.size must equalTo(2)
       
       val removedPlace = contributions(0)
@@ -58,7 +58,7 @@ class HasAnnotationValidationSpec extends Specification {
 
     "produce one 'place removed' contribution" in {
       val annotationWithChangedPlace = loadAnnotation("text-annotation-changed-3.json")
-      val contributions = validator.validateUpdate(annotationBefore, annotationWithChangedPlace)
+      val contributions = validator.validateUpdate(annotationWithChangedPlace, Some(annotationBefore))
       contributions.size must equalTo(1)
       contributions.head.action must equalTo(EDIT_BODY)
       contributions.head.affectsItem.itemType must equalTo(PLACE_BODY)
@@ -70,7 +70,7 @@ class HasAnnotationValidationSpec extends Specification {
 
     "produce four contributions (del comment, confirm place, add place, add comment)" in {
       val annotationWithFourContributions = loadAnnotation("text-annotation-changed-4.json")
-      val contributions = validator.validateUpdate(annotationBefore, annotationWithFourContributions)
+      val contributions = validator.validateUpdate(annotationWithFourContributions, Some(annotationBefore))
       
       contributions.size must equalTo(4)
       

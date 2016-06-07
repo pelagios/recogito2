@@ -119,17 +119,17 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
     }
   }
 
-  /** TODO currently annotation creation is unlimited to any logged in user - need to check access rights! **/
-  def createAnnotation() = StackAction(AuthorityKey -> Normal) { implicit request =>    
+  def createAnnotation() = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
     request.body.asJson match {
       case Some(json) => {
         Json.fromJson[AnnotationStub](json) match {
           case s: JsSuccess[AnnotationStub] => {
             
-            // TODO fetch document and previous version (if any) for this annotation
+            // TODO fetch document to check access rights!
             
             val now = DateTime.now()
             val user = loggedIn.user.getUsername
+            
             val annotation =
               Annotation(
                 s.get.annotationId.getOrElse(UUID.randomUUID),
@@ -151,23 +151,28 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                       s.value,
                       Some(s.setBy.getOrElse(user)),
                       s.setAt.getOrElse(now))))))
-
-            // TODO wait for response!
-            AnnotationService.insertOrUpdateAnnotation(annotation, true)
+                      
+            val f = for {
+              (annotationStored, _, previousVersion) <- AnnotationService.insertOrUpdateAnnotation(annotation, true)
+              success <- if (annotationStored) 
+                           ContributionService.insertContributions(validateUpdate(annotation, previousVersion))
+                         else
+                           Future.successful(false)
+            } yield success
             
-            Ok(Json.toJson(annotation))
+            f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
           }
 
           case e: JsError => {
             Logger.warn("POST to /annotations but invalid JSON: " + e.toString)
-            BadRequest
+            Future.successful(BadRequest)
           }
         }
       }
 
       case None => {
         Logger.warn("POST to /annotations but no JSON payload")
-        BadRequest
+        Future.successful(BadRequest)
       }
 
     }

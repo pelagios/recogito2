@@ -32,17 +32,22 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
   // Maximum number of times an annotation (batch) will be retried in case of failure 
   private def MAX_RETRIES = 10
   
-  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = false)(implicit context: ExecutionContext): Future[(Boolean, Long)] = {
+  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = false)(implicit context: ExecutionContext): Future[(Boolean, Long, Option[Annotation])] = {
     
-    def persistPreviousVersion(annotationId: UUID) =
+    /** Persists the previous version of an annotation to the history index.
+      * 
+      * Returns a boolean flag indicating successful completion and the previous annotation version (if exists). 
+      */
+    def persistPreviousVersion(annotationId: UUID): Future[(Boolean, Option[Annotation])] =
       for {
-        // Gets the current version from the index...
         maybeAnnotation <- findById(annotationId)
-        
-        // ...and moves it to the history index if exists
         done <- if (maybeAnnotation.isDefined) insertVersion(maybeAnnotation.get._1) else Future.successful(true)
-      } yield done
-    
+      } yield (done, maybeAnnotation.map(_._1))
+
+    /** Inserts a new latest version of the annotation into the annotation index 
+      *
+      * Returns a boolean flag indicating successful completion and the internal ElasticSearch version number.
+      */
     def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] =
       ES.client execute {
         update id a.annotationId in ES.IDX_RECOGITO / ANNOTATION source a docAsUpsert
@@ -55,17 +60,17 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       }
     
     for {
-      versioningDone <- if (versioned) persistPreviousVersion(annotation.annotationId) else Future.successful(true)
+      (versioningDone, previousAnnotation) <- if (versioned) persistPreviousVersion(annotation.annotationId) else Future.successful((true, None))
       (annotationCreated, esVersionNumber) <- upsertAnnotation(annotation)
       linksCreated <- if (annotationCreated) insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
-    } yield (linksCreated, esVersionNumber)   
+    } yield (linksCreated, esVersionNumber, previousAnnotation)
     
   }
 
-  def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[Annotation]] = {
+  def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[Annotation]] =
     annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
       future.flatMap { failedAnnotations =>
-        insertOrUpdateAnnotation(annotation).map { case (success, version) =>
+        insertOrUpdateAnnotation(annotation).map { case (success, _, _) =>
           if (success)
             failedAnnotations
           else
@@ -85,7 +90,6 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
         Future.successful(failed)
       }
     }
-  }
 
   def findById(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[(Annotation, Long)]] = {
     ES.client execute {
