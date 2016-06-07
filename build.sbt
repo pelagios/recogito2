@@ -30,7 +30,6 @@ libraryDependencies ++= Seq(
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
   "org.jooq" % "jooq-meta" % "3.7.2",
-  // "org.xerial" % "sqlite-jdbc" % "3.8.11.2",
 
   // Scalagios core + transient dependencies
   "org.pelagios" % "scalagios-core" % "2.0.1" from "https://github.com/pelagios/scalagios/releases/download/v2.0.1/scalagios-core.jar",
