@@ -5,7 +5,7 @@ define([], function() {
 
   var Config = {
 
-    IS_TOUCH : 'ontouchstart' in document.documentElement
+    IS_TOUCH : 'ontouchstart' in window || navigator.MaxTouchPoints > 0,
 
   };
 

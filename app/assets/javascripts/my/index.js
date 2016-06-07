@@ -1,4 +1,9 @@
-require([], function() {
+require.config({
+  baseUrl: "/assets/javascripts/",
+  fileExclusionRegExp: /^lib$/
+});
+
+require(['common/config', 'common/hasDoubleTap'], function(Config, HasDoubleTap) {
 
   jQuery(document).ready(function() {
         /** Document elements **/
@@ -112,11 +117,14 @@ require([], function() {
         onClickUnimplemented();
     });
 
-    // Register global click hadler, so we can handle de-selects
+    // Register global click handler, so we can handle de-selects
     jQuery(document).click(onClick);
 
     // Double click on documents opens them
     jQuery('.document-panel').on('dblclick', '.document', openDocument);
+
+    if (Config.IS_TOUCH)
+      jQuery('.document-panel').on('doubletap', '.document', openDocument);
   });
 
 });
