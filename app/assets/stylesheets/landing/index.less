@@ -1,6 +1,7 @@
 @import "../_globals.less";
 
 @body-width:980px;
+@body-width-narrow:880px;
 
 html, body {
   height:100%;
@@ -14,9 +15,10 @@ html, body {
 
   .header-inner {
     position:relative;
-    width:@body-width;
     margin:0 auto;
     padding-top:12px;
+    width:@body-width-narrow;
+    @media (min-width:1025px) { width:@body-width; }
 
     .header-buttons {
       position:absolute;
@@ -39,9 +41,9 @@ html, body {
 
 .jumbotron-inner {
   position:relative;
-  width:@body-width;
   margin:0 auto;
-  padding:0 60px;
+  width:@body-width-narrow;
+  @media (min-width:1025px) { width:@body-width; }
 }
 
 .jumbotron-left {
@@ -75,7 +77,7 @@ html, body {
   position:absolute;
   width:300px;
   top:90px;
-  right:60px;
+  right:0;
   text-align:center;
 
   a {
@@ -114,9 +116,10 @@ html, body {
 
   .footer-inner {
     position:relative;
-    width:@body-width;
     margin:0 auto;
     padding:20px 0;
+    width:@body-width-narrow;
+    @media (min-width:1025px) { width:@body-width; }
   }
 
   a {

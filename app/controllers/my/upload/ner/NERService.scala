@@ -60,7 +60,6 @@ object NERService extends ProcessingService with FileAccess {
         })
       })
   
-      pipeline.
       runningPipelines -= 1
       
       phrases.filter(_.entityTag != "O")
