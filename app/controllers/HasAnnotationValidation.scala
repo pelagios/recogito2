@@ -17,8 +17,8 @@ trait HasAnnotationValidation {
         annotationAfter.annotates.documentId,
         Some(annotationAfter.annotates.filepartId),        
         annotationAfter.annotates.contentType,
-        Some(annotationBefore.annotationId),
-        Some(annotationBefore.versionId)
+        Some(annotationAfter.annotationId),
+        Some(annotationAfter.versionId)
       ),
       Seq.empty[String]
     )
@@ -43,8 +43,8 @@ trait HasAnnotationValidation {
         annotationAfter.annotates.documentId,
         Some(annotationAfter.annotates.filepartId),
         annotationAfter.annotates.contentType,
-        Some(annotationBefore.annotationId),
-        Some(annotationBefore.versionId)
+        Some(annotationAfter.annotationId),
+        Some(annotationAfter.versionId)
       ),
       if (bodyAfter.lastModifiedBy == bodyBefore.lastModifiedBy) Seq.empty[String] else Seq(bodyBefore.lastModifiedBy).flatten
     )
@@ -59,8 +59,8 @@ trait HasAnnotationValidation {
         annotationAfter.annotates.documentId,
         Some(annotationAfter.annotates.filepartId),
         annotationAfter.annotates.contentType,       
-        Some(annotationBefore.annotationId),
-        Some(annotationBefore.versionId)
+        Some(annotationAfter.annotationId),
+        Some(annotationAfter.versionId)
       ),
       if (deletedBody.lastModifiedBy == annotationAfter.lastModifiedBy) Seq.empty[String] else Seq(deletedBody.lastModifiedBy).flatten   
     )

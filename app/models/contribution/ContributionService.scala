@@ -1,6 +1,5 @@
 package models.contribution
 
-import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable

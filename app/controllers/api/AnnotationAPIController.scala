@@ -153,7 +153,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                       s.setAt.getOrElse(now))))))
 
             // TODO wait for response!
-            AnnotationService.insertOrUpdateAnnotation(annotation)
+            AnnotationService.insertOrUpdateAnnotation(annotation, true)
             
             Ok(Json.toJson(annotation))
           }

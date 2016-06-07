@@ -1,6 +1,5 @@
 package models.annotation
 
-import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
@@ -12,13 +11,9 @@ import scala.language.postfixOps
 import storage.ES
 import models.geotag.ESGeoTagStore
 
-object AnnotationService extends ESGeoTagStore {
-
-  private val ANNOTATION = "annotation"
+/** Encapsulates JSON (de-)serialization so we can add it to Annotation- and AnnotationHistoryService **/
+trait HasAnnotationIndexing {
   
-  // Maximum number of times an annotation (batch) will be retried in case of failure 
-  private def MAX_RETRIES = 10
-
   implicit object AnnotationIndexable extends Indexable[Annotation] {
     override def json(a: Annotation): String = Json.stringify(Json.toJson(a))
   }
@@ -28,8 +23,27 @@ object AnnotationService extends ESGeoTagStore {
       (Json.fromJson[Annotation](Json.parse(hit.sourceAsString)).get, hit.version)
   }
   
-  def insertOrUpdateAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[(Boolean, Long)] = {
-    def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] = {
+}
+
+object AnnotationService extends HasAnnotationIndexing with AnnotationHistoryService with ESGeoTagStore {
+
+  private val ANNOTATION = "annotation"
+  
+  // Maximum number of times an annotation (batch) will be retried in case of failure 
+  private def MAX_RETRIES = 10
+  
+  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = false)(implicit context: ExecutionContext): Future[(Boolean, Long)] = {
+    
+    def persistPreviousVersion(annotationId: UUID) =
+      for {
+        // Gets the current version from the index...
+        maybeAnnotation <- findById(annotationId)
+        
+        // ...and moves it to the history index if exists
+        done <- if (maybeAnnotation.isDefined) insertVersion(maybeAnnotation.get._1) else Future.successful(true)
+      } yield done
+    
+    def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] =
       ES.client execute {
         update id a.annotationId in ES.IDX_RECOGITO / ANNOTATION source a docAsUpsert
       } map { r =>
@@ -39,12 +53,13 @@ object AnnotationService extends ESGeoTagStore {
         t.printStackTrace
         (false, -1l)
       }
-    }
     
     for {
-      (annotationCreated, version) <- upsertAnnotation(annotation)
+      versioningDone <- if (versioned) persistPreviousVersion(annotation.annotationId) else Future.successful(true)
+      (annotationCreated, esVersionNumber) <- upsertAnnotation(annotation)
       linksCreated <- if (annotationCreated) insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
-    } yield (linksCreated, version)    
+    } yield (linksCreated, esVersionNumber)   
+    
   }
 
   def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[Annotation]] = {
