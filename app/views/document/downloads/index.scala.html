@@ -55,5 +55,23 @@
         </li>
       </ul>
     </div> <!-- .header-iconbar -->
+
+    <div class="sidebar">
+      <div class="sidebar-header"></div>
+    </div> <!-- .sidebar -->
+
+    <div class="content">
+      <h2>Download Options</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td class="download-type">Annotations</td>
+            <td class="download-format">
+              <a href="@controllers.document.downloads.writers.routes.JSONLinesWriterController.downloadAnnotations(document.getId)">newline-delimited JSON</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>

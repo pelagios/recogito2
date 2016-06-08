@@ -117,7 +117,7 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       false
     }    
   
-  def findByDocId(id: String, limit: Int = Integer.MAX_VALUE)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
+  def findByDocId(id: String, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
@@ -141,7 +141,7 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       }
     }
   
-  def findByFilepartId(id: Int, limit: Int = Integer.MAX_VALUE)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
+  def findByFilepartId(id: Int, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
