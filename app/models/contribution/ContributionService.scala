@@ -3,8 +3,14 @@ package models.contribution
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
+import org.elasticsearch.search.aggregations.bucket.filter.Filter
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram
+import org.elasticsearch.search.aggregations.bucket.terms.Terms
+import org.elasticsearch.search.aggregations.bucket.nested.Nested
+import org.joda.time.{ DateTime, DateTimeZone }
 import play.api.Logger
 import play.api.libs.json.Json
+import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
 import storage.ES
 
@@ -58,6 +64,42 @@ object  ContributionService {
           Future.successful(true)
         }
       }
+    }
+    
+  def getContributionStats()(implicit context: ExecutionContext) = 
+    ES.client execute {
+      search in ES.IDX_RECOGITO / CONTRIBUTION aggs (
+        aggregation terms "by_user" field "made_by",
+        aggregation terms "by_action" field "action",
+        aggregation nested("by_item_type") path "affects_item" aggs (
+          aggregation terms "item_type" field "affects_item.item_type"
+        ),
+        aggregation filter "contribution_history" filter (rangeFilter("made_at") from "now-30d") aggs (
+           aggregation datehistogram "last_30_days" field "made_at" minDocCount 0 interval DateHistogram.Interval.DAY
+        )
+      ) limit 0
+    } map { response =>
+      val byUser = response.getAggregations.get("by_user").asInstanceOf[Terms]
+      val byAction = response.getAggregations.get("by_action").asInstanceOf[Terms]
+      val byItemType = response.getAggregations.get("by_item_type").asInstanceOf[Nested]
+        .getAggregations.get("item_type").asInstanceOf[Terms]
+      val contributionHistory = response.getAggregations.get("contribution_history").asInstanceOf[Filter]
+        .getAggregations.get("last_30_days").asInstanceOf[DateHistogram]
+      
+      ContributionStats(
+        response.getTookInMillis,
+        response.getHits.getTotalHits,
+        byUser.getBuckets.asScala.map(bucket =>
+          (bucket.getKey, bucket.getDocCount)),
+        byAction.getBuckets.asScala.map(bucket => 
+          (ContributionAction.withName(bucket.getKey), bucket.getDocCount)),
+        byItemType.getBuckets.asScala.map(bucket => 
+          (ItemType.withName(bucket.getKey), bucket.getDocCount)),
+        contributionHistory.getBuckets.asScala.map(bucket =>
+          (new DateTime(bucket.getKeyAsDate.getMillis, DateTimeZone.UTC), bucket.getDocCount))
+      )      
+    } recover { case t =>
+      t.printStackTrace()
     }
   
 }

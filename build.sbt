@@ -44,6 +44,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "leaflet" % "0.7.7",
   "org.webjars" % "openlayers" % "3.13.0",
   "org.webjars" % "requirejs" % "2.1.22",
+  "org.webjars.bower" % "plotly.js" % "1.12.0",
   "org.webjars.bower" % "rangy" % "1.3.0",
   "org.webjars.bower" % "timeago" % "1.4.1",
 

@@ -8,11 +8,13 @@ import models.user.UserService
 import play.api.cache.CacheApi
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.DB
+import models.contribution.ContributionService
 
 class UserAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext) extends BaseController {
   
   def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     UserService.listUsers().map { users => 
+      ContributionService.getContributionStats()
       Ok(views.html.admin.users.index(users))   
     }
   }
