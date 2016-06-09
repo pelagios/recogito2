@@ -66,7 +66,7 @@ object  ContributionService {
       }
     }
     
-  def getContributionStats()(implicit context: ExecutionContext) = 
+  def getGlobalStats()(implicit context: ExecutionContext) = 
     ES.client execute {
       search in ES.IDX_RECOGITO / CONTRIBUTION aggs (
         aggregation terms "by_user" field "made_by",
@@ -98,8 +98,6 @@ object  ContributionService {
         contributionHistory.getBuckets.asScala.map(bucket =>
           (new DateTime(bucket.getKeyAsDate.getMillis, DateTimeZone.UTC), bucket.getDocCount))
       )      
-    } recover { case t =>
-      t.printStackTrace()
     }
   
 }

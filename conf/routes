@@ -71,6 +71,8 @@ GET     /api/places/:uri                             controllers.api.PlaceAPICon
 GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 0)
 GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
 
+GET     /api/stats                                   controllers.api.StatsAPIController.getGlobalStats()
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # User/team personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

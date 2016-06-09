@@ -12,10 +12,7 @@ trait HasPrettyPrintJSON { self: Controller =>
 
   protected def jsonOk(obj: JsValue)(implicit request: Request[AnyContent]) = {
     val pretty = Try(request.queryString.get(PRETTY).map(_.head.toBoolean).getOrElse(false)).getOrElse(false)
-    if (pretty)
-      Ok(Json.prettyPrint(obj)).withHeaders(("Content-Type", "application/json; charset=utf-8"))
-    else
-      Ok(obj)
+    if (pretty) Ok(Json.prettyPrint(obj)) else Ok(obj)
   }
 
 }
