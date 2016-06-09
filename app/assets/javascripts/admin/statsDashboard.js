@@ -40,10 +40,21 @@ require([], function() {
         },
 
         updateContributionHistory = function(buckets) {
-          var x = jQuery.map(buckets, function(bucket) { return bucket.date; }),
+          var x = jQuery.map(buckets, function(bucket) { return new Date(bucket.date); }),
               y = jQuery.map(buckets, function(bucket) { return bucket.value; }),
-              data = [{ x: x, y: y, type: 'scatter' }];
-          Plotly.newPlot('contribution-history', data);
+              data = [{ x: x, y: y, type: 'scatter' }],
+              layout = {
+                xaxis: {
+                  type: 'date',
+                  dtick: 86400000.0,
+                  tickformat: '%b %d'
+                },
+                margin: { l:50, r:50, b: 40, t: 30 }
+              },
+              config = {
+                displayModeBar: false
+              };
+          Plotly.newPlot('contribution-history', data, layout, config);
         },
 
         updateAll = function() {
