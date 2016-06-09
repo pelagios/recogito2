@@ -1,10 +1,12 @@
-@(users: Page[models.generated.tables.records.UserRecord])
+@(users: Page[models.generated.tables.records.UserRecord])(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito Administration - Users</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/admin/dashboard.css")"/>
+    <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/plotly.js/dist/plotly.min.js")"></script>
-    <script src="@routes.Assets.versioned("lib/plotly.js/lib/pie.js")"></script>
+    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/admin/statsDashboard.js")"></script>
     <script src=""></script>
   </head>
   <body>
@@ -24,5 +26,19 @@
         }
       </ul>
     </div>
+
+    <div class="dashboard">
+      <div id="contribution-history"></div>
+      <div>
+        <div id="total-contributions"></div>
+        <div id="by-user"></div>
+        <div id="by-action" class="piechart"></div>
+        <div id="by-item-type" class="piechart"></div>
+      </div>
+    </div>
+
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.api.routes.javascript.StatsAPIController.getGlobalStats
+    )
   </body>
 </html>
