@@ -8,9 +8,21 @@ import storage.DB
 
 class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
-  def showDocumentSettings(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
     renderDocumentResponse(documentId, loggedIn.user.getUsername,
-        { case (document, fileparts) =>  Ok(views.html.document.settings.index(loggedIn.user.getUsername, document)) })
+      { case (document, fileparts) =>
+        tab.map(_.toLowerCase) match {
+          case Some(t) if t == "sharing" =>
+            Ok(views.html.document.settings.sharing(loggedIn.user.getUsername, document))
+            
+          case Some(t) if t == "history" =>
+            Ok(views.html.document.settings.history(loggedIn.user.getUsername, document))
+            
+          case _ =>
+            Ok(views.html.document.settings.metadata(loggedIn.user.getUsername, document)) 
+        }
+      }
+    )
   }
 
 }

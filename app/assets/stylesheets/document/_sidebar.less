@@ -12,11 +12,51 @@
     height:70px;
   } /** .sidebar-header **/
 
+  ul.menu {
+    list-style-type:none;
+    margin:0;
+    padding:0;
+    position:relative;
+
+    li {
+      background-color:rgba(255, 255, 255, 0.06);
+      margin:10px 0;
+    }
+
+    li:hover {
+      background-color:rgba(255, 255, 255, 0.09);
+    }
+
+    a {
+      font-size:14px;
+      color:@lightblue-type;
+      box-sizing:border-box;
+      width:100%;
+      display:inline-block;
+      padding:5px 10px;
+      text-decoration:none;
+    }
+
+    a:hover {
+      color:#fff;
+    }
+
+    .icon {
+      padding-right:5px;
+    }
+
+    .label {
+      font-weight:bold;
+    }
+
+  }
+
+  /** TODO clean up **/
+
   .sidebar-parts {
 
     ul {
       text-align:center;
-      list-style-type:none;
       margin:0;
       padding:10px 0 0 0;
     }
@@ -39,6 +79,6 @@
       background-color:fadeout(@nightsky-dark, 50%);
     }
 
-  }
+  } /** .sidebar-parts **/
 
 }

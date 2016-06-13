@@ -1,7 +1,8 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord)
+@(title: String, username: String, document: models.generated.tables.records.DocumentRecord)(content: Html)
 <!DOCTYPE html>
 <html>
   <head>
+    <title>@title</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/settings/index.css")"/>
   </head>
   <body>
@@ -55,5 +56,33 @@
         </li>
       </ul>
     </div> <!-- .header-iconbar -->
+
+    <div class="sidebar">
+      <div class="sidebar-header"></div>
+      <ul class="menu">
+        <li>
+          <a href="?tab=metadata">
+            <span class="icon">&#xf02d;</span> <span class="label">Metadata</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="?tab=sharing">
+            <span class="icon">&#xf234;</span> <span class="label">Sharing</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="?tab=history">
+            <span class="icon">&#xf1da;</span> <span class="label">Edit History</span>
+          </a>
+        </li>
+      </ul>
+    </div> <!-- .sidebar -->
+
+    <div class="content">
+      @content
+    </div>
+
   </body>
 </html>
