@@ -20,5 +20,8 @@ trait HasDate {
         Json.toJson(formatter.print(dt))
       }
     )
+    
+  /** Convenience method for external use, outside JSON serialization **/
+  def formatDate(dt: DateTime) = formatter.print(dt)
 
 }

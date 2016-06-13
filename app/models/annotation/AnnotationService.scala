@@ -4,6 +4,7 @@ import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ ExecutionContext, Future }
@@ -91,7 +92,7 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       }
     }
 
-  def findById(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[(Annotation, Long)]] = {
+  def findById(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[(Annotation, Long)]] =
     ES.client execute {
       get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION 
     } map { response =>
@@ -102,7 +103,6 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
         None
       }
     }
-  }
     
   def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
     ES.client execute {
@@ -145,6 +145,46 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
+  }
+  
+  def findModifiedSince(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Seq[Annotation]] =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / ANNOTATION query filteredQuery query {
+        nestedQuery("annotates").query(termQuery("annotates.document_id" -> documentId))
+      } postFilter {
+        rangeFilter("last_modified_at").gte(formatDate(timestamp))
+      } limit Int.MaxValue
+    } map { _.as[(Annotation, Long)].toSeq.map(_._1) }
+  
+  def rollbackByTime(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+    
+    /** 'Rolls back' - i.e. updates to the latest version in the history - one annotation **/
+    def rollbackOne(annotation: Annotation): Future[Boolean] = {
+      
+      /** TODO implement **/
+      
+      null
+    }
+    
+    def rollbackAnnotations(annotations: Seq[Annotation]): Future[Seq[Annotation]] = {
+      annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
+        future.flatMap { failedAnnotations =>
+          rollbackOne(annotation).map { success =>
+            if (success)
+              failedAnnotations
+            else
+              failedAnnotations :+ annotation
+          }
+        }
+      }
+    }
+    
+    for {
+      deleteVersionsSuccess <- deleteVersionsAfter(documentId, timestamp)
+      annotationsToModify <- if (deleteVersionsSuccess) findModifiedSince(documentId, timestamp) else Future.successful(Seq.empty[Annotation])
+      failedUpdates <- rollbackAnnotations(annotationsToModify)
+    } yield failedUpdates.size > 0
+    
   }
 
 }

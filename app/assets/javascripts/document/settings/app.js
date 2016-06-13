@@ -40,16 +40,19 @@ require(['common/helpers/formatting', 'common/config'], function(Formatting, Con
 
       jQuery.each(history.items, function(idx, contrib) {
         var li = jQuery(
-          '<li class="contribution">'+
-            '<p>' +
-              formatAction(contrib.action) + ' ' +
-              formatItem(contrib.affects_item) +
-            '</p>' +
-            '<p class="made">' +
-              '<span class="by">' + contrib.made_by + '</span> ' +
-              '<span class="at">' + Formatting.timeSince(contrib.made_at) + '</span>' +
-            '</p>' +
-          '</li>');
+          '<tr>'+
+            '<td class="contrib-info">' +
+              '<p>' +
+                formatAction(contrib.action) + ' ' +
+                formatItem(contrib.affects_item) +
+              '</p>' +
+              '<p class="made">' +
+                '<span class="by">' + contrib.made_by + '</span> ' +
+                '<span class="at">' + Formatting.timeSince(contrib.made_at) + '</span>' +
+              '</p>' +
+            '</td>' +
+            '<td class="action rollback icon">&#xf0e2;</td>' +
+          '</tr>');
 
         contributions.append(li);
       });

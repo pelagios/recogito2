@@ -3,12 +3,15 @@ package models.annotation
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
+import java.util.UUID
+import models.HasDate
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.ES
 
-trait AnnotationHistoryService extends HasAnnotationIndexing {
+trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
   
   private val ANNOTATION_HISTORY = "annotation_history"
     
@@ -22,6 +25,48 @@ trait AnnotationHistoryService extends HasAnnotationIndexing {
       Logger.error(t.toString)
       t.printStackTrace
       false
+    } 
+    
+  def findVersionById(annotationId: UUID, versionId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
+    ES.client execute {
+      get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION_HISTORY
+    } map { response =>
+      if (response.isExists) {
+        val source = Json.parse(response.getSourceAsString)
+        Some(Json.fromJson[Annotation](source).get)
+      } else {
+        None
+      }
+    }
+    
+  /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
+  def deleteVersionsAfter(docId: String, datetime: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+    
+    def findVersionsAfter() = ES.client execute {
+      search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query filteredQuery query {
+        nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
+      } postFilter {
+        rangeFilter("last_modified_at").gte(formatDate(datetime))
+      } limit Int.MaxValue
+    } map { _.getHits.getHits }
+      
+    // TODO this might break if we add too many annotations to the same bulk request
+    
+    findVersionsAfter().flatMap { hits =>
+      if (hits.size > 0) {
+        ES.client execute {
+          bulk ( hits.map(h => delete id h.getId from ES.IDX_RECOGITO / ANNOTATION_HISTORY) )
+        } map {
+          !_.hasFailures
+        } recover { case t: Throwable =>
+          t.printStackTrace()
+          false
+        }
+      } else {
+        // Nothing to delete
+        Future.successful(true)
+      }
     }    
+  }
   
 }
