@@ -1,5 +1,5 @@
 define([
-  'annotation/text/editor/sections/section',
+  'document/annotation/text/editor/sections/section',
   'common/helpers/formatting',
   'common/helpers/placeUtils',
   'common/api',

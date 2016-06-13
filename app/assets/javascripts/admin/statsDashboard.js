@@ -58,7 +58,7 @@ require([], function() {
         },
 
         updateAll = function() {
-          jsRoutes.controllers.api.StatsAPIController.getGlobalStats().ajax().done(function(stats) {
+          jsRoutes.controllers.api.ContributionAPIController.getGlobalStats().ajax().done(function(stats) {
             console.log(stats);
             updateTotalContributions(stats.total_contributions);
             updateByUser(stats.by_user);

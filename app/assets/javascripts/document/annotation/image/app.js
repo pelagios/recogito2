@@ -1,4 +1,4 @@
-require(['../../common/config'], function(Config) {
+require(['../../../common/config'], function(Config) {
 
   jQuery(document).ready(function() {
 

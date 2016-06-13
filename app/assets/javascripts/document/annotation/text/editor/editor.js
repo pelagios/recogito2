@@ -5,11 +5,11 @@
  *
  */
 define([
-  'annotation/text/editor/replyField',
-  'annotation/text/editor/georesolution/georesolutionPanel',
-  'annotation/text/editor/sections/sectionList',
-  'annotation/text/selection/highlighter',
-  'annotation/text/selection/selectionHandler',
+  'document/annotation/text/editor/replyField',
+  'document/annotation/text/editor/georesolution/georesolutionPanel',
+  'document/annotation/text/editor/sections/sectionList',
+  'document/annotation/text/selection/highlighter',
+  'document/annotation/text/selection/selectionHandler',
   'common/helpers/annotationUtils',
   'common/helpers/placeUtils',
   'common/autoPosition',
@@ -125,7 +125,7 @@ define([
         },
 
         /** Opens the editor on a newly created text selection **/
-        editSelection = function(selection) {          
+        editSelection = function(selection) {
           var quote, record, body;
 
           if (annotationMode.mode === 'NORMAL') {

@@ -3,10 +3,12 @@ package models.contribution
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
+import models.Page
 import org.elasticsearch.search.aggregations.bucket.filter.Filter
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.elasticsearch.search.aggregations.bucket.nested.Nested
+import org.elasticsearch.search.sort.SortOrder
 import org.joda.time.{ DateTime, DateTimeZone }
 import play.api.Logger
 import play.api.libs.json.Json
@@ -64,6 +66,18 @@ object  ContributionService {
           Future.successful(true)
         }
       }
+    }
+    
+  def getHistory(documentId: String, offset: Int = 0, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Contribution)]] =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / CONTRIBUTION query nestedQuery("affects_item").query (
+        termQuery("affects_item.document_id" -> documentId)
+      ) sort (
+        field sort "made_at" order SortOrder.DESC
+      ) start offset limit limit
+    } map { response =>
+      val contributions = response.as[Contribution].toSeq
+      Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, contributions)      
     }
     
   def getGlobalStats()(implicit context: ExecutionContext) = 

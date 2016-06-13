@@ -4,10 +4,10 @@ require.config({
 });
 
 require([
-  'annotation/text/editor/editor',
-  'annotation/text/page/header',
-  'annotation/text/page/toolbar',
-  'annotation/text/selection/highlighter',
+  'document/annotation/text/editor/editor',
+  'document/annotation/text/page/header',
+  'document/annotation/text/page/toolbar',
+  'document/annotation/text/selection/highlighter',
   'common/helpers/annotationUtils',
   'common/api',
   'common/config'],

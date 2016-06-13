@@ -1,5 +1,5 @@
 define([
-  'annotation/text/editor/georesolution/placeResult',
+  'document/annotation/text/editor/georesolution/placeResult',
   'common/helpers/formatting',
   'common/helpers/gazetteerUtils',
   'common/helpers/placeUtils',

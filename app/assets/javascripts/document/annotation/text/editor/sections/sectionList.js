@@ -1,6 +1,6 @@
 define([
-  'annotation/text/editor/sections/comment/commentSection',
-  'annotation/text/editor/sections/place/placeSection',
+  'document/annotation/text/editor/sections/comment/commentSection',
+  'document/annotation/text/editor/sections/place/placeSection',
   'common/helpers/annotationUtils',
   'common/hasEvents'], function(CommentSection, PlaceSection, AnnotationUtils, HasEvents) {
 

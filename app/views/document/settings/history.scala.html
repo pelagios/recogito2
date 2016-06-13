@@ -1,4 +1,17 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord)
+@(username: String, document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader)
 @_layout("Settings - Edit History", username, document) {
-  </h1>Hello World</h1>
+  <h1>Edit History</h1>
+  <ul class="edit-history"></ul>
+  <script>
+    jQuery(document).ready(function() {
+      jsRoutes.controllers.api.ContributionAPIController.getContributionHistory('@document.getId').ajax().done(function(history) {
+        jQuery.each(history.items, function(idx, contribution) {
+          console.log(contribution);
+        });
+      });
+    });
+  </script>
+  @helper.javascriptRouter("jsRoutes")(
+    controllers.api.routes.javascript.ContributionAPIController.getContributionHistory
+  )
 }
