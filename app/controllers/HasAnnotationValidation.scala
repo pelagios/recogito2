@@ -20,7 +20,9 @@ trait HasAnnotationValidation {
         Some(annotationAfter.annotationId),
         Some(annotationAfter.versionId)
       ),
-      Seq.empty[String]
+      Seq.empty[String],
+      None, /** TODO compute value before **/
+      None  /** TODO compute value after **/
     )
 
   /** Changes to bodies are either general 'edits' or status changes (confirmations or flags) **/
@@ -46,7 +48,9 @@ trait HasAnnotationValidation {
         Some(annotationAfter.annotationId),
         Some(annotationAfter.versionId)
       ),
-      if (bodyAfter.lastModifiedBy == bodyBefore.lastModifiedBy) Seq.empty[String] else Seq(bodyBefore.lastModifiedBy).flatten
+      if (bodyAfter.lastModifiedBy == bodyBefore.lastModifiedBy) Seq.empty[String] else Seq(bodyBefore.lastModifiedBy).flatten,
+      None, /** TODO compute value before **/
+      None  /** TODO compute value after **/
     )
   
   private def deleteBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, deletedBody: AnnotationBody) =
@@ -62,7 +66,9 @@ trait HasAnnotationValidation {
         Some(annotationAfter.annotationId),
         Some(annotationAfter.versionId)
       ),
-      if (deletedBody.lastModifiedBy == annotationAfter.lastModifiedBy) Seq.empty[String] else Seq(deletedBody.lastModifiedBy).flatten   
+      if (deletedBody.lastModifiedBy == annotationAfter.lastModifiedBy) Seq.empty[String] else Seq(deletedBody.lastModifiedBy).flatten,
+      None, /** TODO compute value before **/
+      None  /** TODO compute value after **/
     )
   
   private def isPredecessorTo(before: AnnotationBody, after: AnnotationBody): Boolean =

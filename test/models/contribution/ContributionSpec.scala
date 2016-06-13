@@ -60,7 +60,9 @@ class ContributionSpec extends Specification {
           Some(UUID.fromString("7cfa1504-26de-45ef-a590-8b60ea8a60e8")),
           Some(UUID.fromString("e868423f-5ea9-42ed-bb7d-5e1fac9195a0"))
         ),
-        Seq("rainer"))
+        Seq("rainer"),
+        Some("just a comment"),
+        None)
         
       // Convert to JSON
       val serialized = Json.prettyPrint(Json.toJson(contribution))
