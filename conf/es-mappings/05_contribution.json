@@ -17,7 +17,7 @@
           "value_after": { "type": "string" }
         }
       },
-      "affects_users": { "type": "string", "index": "not_analyzed" },
+      "affects_users": { "type": "string", "index": "not_analyzed" }
     }
   }
 }
