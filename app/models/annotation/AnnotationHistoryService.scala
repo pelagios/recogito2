@@ -5,6 +5,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
 import models.HasDate
+import org.elasticsearch.search.sort.SortOrder
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
@@ -37,6 +38,17 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
       } else {
         None
       }
+    }
+    
+  def findLatestVersion(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query (
+        termQuery("annotation_id" -> annotationId.toString) 
+      ) sort (
+        field sort "last_modified_at" order SortOrder.DESC
+      ) limit 1
+    } map {
+      _.as[(Annotation, Long)].toSeq.headOption.map(_._1)
     }
     
   /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/

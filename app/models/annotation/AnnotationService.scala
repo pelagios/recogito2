@@ -158,12 +158,19 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
   
   def rollbackByTime(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
     
-    /** 'Rolls back' - i.e. updates to the latest version in the history - one annotation **/
+    /** 'Rolls back' one annotation, i.e. updates to the latest version in the history **/
     def rollbackOne(annotation: Annotation): Future[Boolean] = {
-      
-      /** TODO implement **/
-      
-      null
+      findLatestVersion(annotation.annotationId).map(_ match {
+        
+        case Some(version) =>
+          // TODO replace this annotation with the latest version
+          false
+          
+        case None =>
+          // TODO no version left in the history - delete this annotation
+          false
+          
+      })
     }
     
     def rollbackAnnotations(annotations: Seq[Annotation]): Future[Seq[Annotation]] = {
