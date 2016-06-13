@@ -16,11 +16,7 @@ case class Contribution(
   
   affectsItem: Item,
   
-  affectsUsers: Seq[String],
-  
-  valueBefore: Option[String],
-  
-  valueAfter: Option[String]
+  affectsUsers: Seq[String]
 
 )
 
@@ -33,9 +29,7 @@ object Contribution extends HasDate with HasNullableSeq{
     (JsPath \ "made_at").format[DateTime] and
     (JsPath \ "affects_item").format[Item] and
     (JsPath \ "affects_users").formatNullable[Seq[String]]
-      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
-    (JsPath \ "value_before").formatNullable[String] and
-    (JsPath \ "value_after").formatNullable[String]
+      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String])
   )(Contribution.apply, unlift(Contribution.unapply))
   
 }

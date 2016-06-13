@@ -20,7 +20,11 @@ case class Item(
   
   annotationId: Option[UUID],
   
-  annotationVersionId: Option[UUID]
+  annotationVersionId: Option[UUID],
+  
+  valueBefore: Option[String],
+  
+  valueAfter: Option[String]
   
 )
 
@@ -32,7 +36,9 @@ object Item extends HasContentTypeList {
     (JsPath \ "filepart_id").formatNullable[Int] and
     (JsPath \ "content_type").format[JsValue].inmap[ContentType](fromCTypeList, toCTypeList) and
     (JsPath \ "annotation_id").formatNullable[UUID] and
-    (JsPath \ "annotation_version_id").formatNullable[UUID]
+    (JsPath \ "annotation_version_id").formatNullable[UUID] and
+    (JsPath \ "value_before").formatNullable[String] and
+    (JsPath \ "value_after").formatNullable[String]
   )(Item.apply, unlift(Item.unapply))
 
 }

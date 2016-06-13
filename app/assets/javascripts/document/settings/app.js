@@ -6,7 +6,11 @@ require.config({
 require(['common/helpers/formatting', 'common/config'], function(Formatting, Config) {
   var formatAction = function(action) {
         if (action === 'CREATE_BODY')
-          return '<span class="create">Created</span>';
+          return '<span class="create">New</span>';
+      },
+
+      formatChange = function(item) {
+
       },
 
       formatItem = function(item) {
@@ -25,10 +29,14 @@ require(['common/helpers/formatting', 'common/config'], function(Formatting, Con
       jQuery.each(history.items, function(idx, contrib) {
         var li = jQuery(
           '<li class="contribution">'+
-            formatAction(contrib.action) +
-            formatItem(contrib.affects_item) +
-            '<span class="made-by">' + contrib.made_by + '</span> made' +
-            Formatting.timeSince(contrib.made_at) +
+            '<p>' +
+              formatAction(contrib.action) + ' ' +
+              formatItem(contrib.affects_item) +
+            '</p>' +
+            '<p class="made">' +
+              '<span class="by">' + contrib.made_by + '</span> ' +
+              '<span class="at">' + Formatting.timeSince(contrib.made_at) + '</span>' +
+            '</p>' +
           '</li>');
 
         console.log(contrib);

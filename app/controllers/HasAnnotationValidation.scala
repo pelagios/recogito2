@@ -18,11 +18,12 @@ trait HasAnnotationValidation {
         Some(annotationAfter.annotates.filepartId),        
         annotationAfter.annotates.contentType,
         Some(annotationAfter.annotationId),
-        Some(annotationAfter.versionId)
+        Some(annotationAfter.versionId),
+        None,
+        // At least currently, bodies have either value or URI - never both
+        if (createdBody.value.isDefined) createdBody.value else createdBody.uri
       ),
-      Seq.empty[String],
-      None, /** TODO compute value before **/
-      None  /** TODO compute value after **/
+      Seq.empty[String]
     )
 
   /** Changes to bodies are either general 'edits' or status changes (confirmations or flags) **/
@@ -46,11 +47,12 @@ trait HasAnnotationValidation {
         Some(annotationAfter.annotates.filepartId),
         annotationAfter.annotates.contentType,
         Some(annotationAfter.annotationId),
-        Some(annotationAfter.versionId)
+        Some(annotationAfter.versionId),
+        // At least currently, bodies have either value or URI - never both
+        if (bodyBefore.value.isDefined) bodyBefore.value else bodyBefore.uri,
+        if (bodyAfter.value.isDefined) bodyAfter.value else bodyAfter.uri
       ),
-      if (bodyAfter.lastModifiedBy == bodyBefore.lastModifiedBy) Seq.empty[String] else Seq(bodyBefore.lastModifiedBy).flatten,
-      None, /** TODO compute value before **/
-      None  /** TODO compute value after **/
+      if (bodyAfter.lastModifiedBy == bodyBefore.lastModifiedBy) Seq.empty[String] else Seq(bodyBefore.lastModifiedBy).flatten
     )
   
   private def deleteBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, deletedBody: AnnotationBody) =
@@ -64,11 +66,12 @@ trait HasAnnotationValidation {
         Some(annotationAfter.annotates.filepartId),
         annotationAfter.annotates.contentType,       
         Some(annotationAfter.annotationId),
-        Some(annotationAfter.versionId)
+        Some(annotationAfter.versionId),
+        // At least currently, bodies have either value or URI - never both
+        if (deletedBody.value.isDefined) deletedBody.value else deletedBody.uri,
+        None
       ),
-      if (deletedBody.lastModifiedBy == annotationAfter.lastModifiedBy) Seq.empty[String] else Seq(deletedBody.lastModifiedBy).flatten,
-      None, /** TODO compute value before **/
-      None  /** TODO compute value after **/
+      if (deletedBody.lastModifiedBy == annotationAfter.lastModifiedBy) Seq.empty[String] else Seq(deletedBody.lastModifiedBy).flatten
     )
   
   private def isPredecessorTo(before: AnnotationBody, after: AnnotationBody): Boolean =
