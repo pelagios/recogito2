@@ -45,6 +45,7 @@ GET     /document/:id/downloads/annotations.jsonl    controllers.document.downlo
 GET     /document/:id/share                          controllers.document.share.ShareController.showShareSettings(id: String)
 
 GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
+POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document content

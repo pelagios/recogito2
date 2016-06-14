@@ -3,7 +3,8 @@ package models.contribution
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
-import models.Page
+import java.util.UUID
+import models.{ HasDate, Page }
 import org.elasticsearch.search.aggregations.bucket.filter.Filter
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
@@ -16,7 +17,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
 import storage.ES
 
-object  ContributionService {
+object  ContributionService extends HasDate {
   
   private val CONTRIBUTION = "contribution"
  
@@ -79,6 +80,50 @@ object  ContributionService {
       val contributions = response.as[Contribution].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, contributions)      
     }
+    
+  /** Returns the contributions associated with a specific annotation version **/
+  def getContributions(annotationId: UUID, versionId: UUID)(implicit context: ExecutionContext): Future[Seq[Contribution]] =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / CONTRIBUTION query nestedQuery("affects_item").query {
+        bool {
+          must (
+            termQuery("affects_item.annotation_id" -> annotationId.toString),
+            termQuery("affects_item.annotation_version_id" -> versionId.toString)
+          )
+        }
+      }
+    } map { _.as[Contribution] }
+    
+  def deleteHistoryAfter(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+    Logger.info("Purging history for " + documentId + " after " + timestamp)
+    
+    // The usual 2-step process find->delete
+    def findContributionsAfter()= ES.client execute {
+      search in ES.IDX_RECOGITO / CONTRIBUTION query filteredQuery query {
+        nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
+      } postFilter {
+        rangeFilter("made_at").gt(formatDate(timestamp))
+      } limit Int.MaxValue
+    } map { _.getHits.getHits }
+    
+    findContributionsAfter().flatMap { hits =>
+      Logger.info("Affects " + hits.size + " records")
+      if (hits.size > 0) {
+        ES.client execute {
+          bulk ( hits.map(h => delete id h.getId from ES.IDX_RECOGITO / CONTRIBUTION) )
+        } map {
+          !_.hasFailures
+        } recover { case t: Throwable =>
+          t.printStackTrace()
+          false
+        }
+      } else {
+        // Nothing to delete
+        Future.successful(true) 
+      }
+    }
+  }
+    
     
   def getGlobalStats()(implicit context: ExecutionContext) = 
     ES.client execute {

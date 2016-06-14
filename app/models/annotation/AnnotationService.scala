@@ -4,13 +4,13 @@ import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
+import models.geotag.ESGeoTagStore
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.postfixOps
 import storage.ES
-import models.geotag.ESGeoTagStore
 
 /** Encapsulates JSON (de-)serialization so we can add it to Annotation- and AnnotationHistoryService **/
 trait HasAnnotationIndexing {
@@ -147,33 +147,41 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
     } map(_.as[(Annotation, Long)].toSeq)
   }
   
-  def findModifiedSince(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Seq[Annotation]] =
+  def findModifiedSince(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Seq[Annotation]] = {
+    Logger.info("Fetching updatable annotations in document")
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query filteredQuery query {
         nestedQuery("annotates").query(termQuery("annotates.document_id" -> documentId))
       } postFilter {
-        rangeFilter("last_modified_at").gte(formatDate(timestamp))
+        rangeFilter("last_modified_at").gt(formatDate(timestamp))
       } limit Int.MaxValue
-    } map { _.as[(Annotation, Long)].toSeq.map(_._1) }
+    } map { response =>
+      val annotations = response.as[(Annotation, Long)].toSeq.map(_._1)
+      Logger.info("... " + annotations.size + " annotations")
+      annotations
+    }
+  }
   
   def rollbackByTime(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+    Logger.info("Rolling back " + documentId + " to " + timestamp)
     
     /** 'Rolls back' one annotation, i.e. updates to the latest version in the history **/
     def rollbackOne(annotation: Annotation): Future[Boolean] = {
-      findLatestVersion(annotation.annotationId).map(_ match {
-        
+      findLatestVersion(annotation.annotationId).flatMap(_ match {
         case Some(version) =>
-          // TODO replace this annotation with the latest version
-          false
+          insertOrUpdateAnnotation(version, false).map { case (success, _, _) => success }
           
         case None =>
-          // TODO no version left in the history - delete this annotation
-          false
-          
-      })
+          deleteAnnotation(annotation.annotationId)          
+      }).recover { case t: Throwable =>
+        t.printStackTrace()
+        Logger.warn("Rollback failed for " + annotation.annotationId)
+        false
+      }
     }
     
     def rollbackAnnotations(annotations: Seq[Annotation]): Future[Seq[Annotation]] = {
+      Logger.info("Rolling back " + annotations.size + " annotations")
       annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
         future.flatMap { failedAnnotations =>
           rollbackOne(annotation).map { success =>
@@ -186,12 +194,16 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       }
     }
     
-    for {
+    val failed = for {
       deleteVersionsSuccess <- deleteVersionsAfter(documentId, timestamp)
       annotationsToModify <- if (deleteVersionsSuccess) findModifiedSince(documentId, timestamp) else Future.successful(Seq.empty[Annotation])
       failedUpdates <- rollbackAnnotations(annotationsToModify)
-    } yield failedUpdates.size > 0
+    } yield failedUpdates.size
     
+    failed.map{ f =>
+      Logger.info(f + " failed rollbacks")
+      f == 0
+    }
   }
 
 }

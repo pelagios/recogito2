@@ -32,9 +32,27 @@ require(['common/helpers/formatting', 'common/config'], function(Formatting, Con
           return '<span class="comment">comment ' + formatChange(item) + '</span>';
         else if (item.item_type === 'PLACE_BODY')
           return '<span class="place">place ' + formatChange(item) + '</span>';
+      },
+
+      rollback = function(annotationId, versionId) {
+        jsRoutes.controllers.document.settings.SettingsController.rollbackByTime(Config.documentId).ajax({
+          contentType: 'application/json',
+          data: JSON.stringify({ annotation_id: annotationId, version_id: versionId })
+        }).done(function(response) {
+          window.setTimeout(function() { location.reload(); }, 500);
+        });
       };
 
   jQuery(document).ready(function() {
+
+    jQuery('.edit-history').on('click', '.rollback', function(e) {
+      var el = jQuery(e.target),
+          annotationId = el.data('annotation'),
+          versionId = el.data('version');
+
+      rollback(annotationId, versionId);
+    });
+
     jsRoutes.controllers.api.ContributionAPIController.getContributionHistory(Config.documentId).ajax().done(function(history) {
       var contributions = jQuery('.edit-history');
 
@@ -51,7 +69,9 @@ require(['common/helpers/formatting', 'common/config'], function(Formatting, Con
                 '<span class="at">' + Formatting.timeSince(contrib.made_at) + '</span>' +
               '</p>' +
             '</td>' +
-            '<td class="action rollback icon">&#xf0e2;</td>' +
+            '<td class="action rollback icon" data-annotation="' +
+              contrib.affects_item.annotation_id + '" data-version="' +
+              contrib.affects_item.annotation_version_id + '">&#xf0e2;</td>' +
           '</tr>');
 
         contributions.append(li);

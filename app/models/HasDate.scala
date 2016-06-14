@@ -22,6 +22,6 @@ trait HasDate {
     )
     
   /** Convenience method for external use, outside JSON serialization **/
-  def formatDate(dt: DateTime) = formatter.print(dt)
+  def formatDate(dt: DateTime) = formatter.print(dt.withZone(DateTimeZone.UTC))
 
 }

@@ -28,17 +28,20 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
       false
     } 
     
-  def findVersionById(annotationId: UUID, versionId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
+  def findVersionById(annotationId: UUID, versionId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] = {
     ES.client execute {
-      get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION_HISTORY
-    } map { response =>
-      if (response.isExists) {
-        val source = Json.parse(response.getSourceAsString)
-        Some(Json.fromJson[Annotation](source).get)
-      } else {
-        None
+      search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query {
+        bool {
+          must (
+            termQuery("annotation_id" -> annotationId.toString),
+            termQuery("version_id" -> versionId.toString)
+          )
+        }
       }
+    } map {
+      _.response.as[(Annotation, Long)].toSeq.headOption.map(_._1)
     }
+  }
     
   def findLatestVersion(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
     ES.client execute {
@@ -53,18 +56,20 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
     
   /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
   def deleteVersionsAfter(docId: String, datetime: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+    Logger.info("Purging history for " + docId + " after " + datetime)
     
     def findVersionsAfter() = ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query filteredQuery query {
         nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
       } postFilter {
-        rangeFilter("last_modified_at").gte(formatDate(datetime))
+        rangeFilter("last_modified_at").gt(formatDate(datetime))
       } limit Int.MaxValue
     } map { _.getHits.getHits }
       
     // TODO this might break if we add too many annotations to the same bulk request
     
     findVersionsAfter().flatMap { hits =>
+      Logger.info("Affects " + hits.size + " records")
       if (hits.size > 0) {
         ES.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.IDX_RECOGITO / ANNOTATION_HISTORY) )
