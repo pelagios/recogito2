@@ -2,8 +2,9 @@
 @import "../_meter.less";
 @import "_documentlist.less";
 
-body {
+body, html {
   background-color:@blueish-white;
+  height:100%;
 }
 
 .page-header {
@@ -167,3 +168,23 @@ body {
   } /** .tools **/
 
 } /** .toolbar **/
+
+.no-docs-yet {
+  display:table;
+  position:absolute;
+  height:80%;
+  width:100%;
+  box-sizing:border-box;
+  padding:0 30px;
+  text-align:center;
+
+  span {
+    font-size:55px;
+    line-height:65px;
+    color:darken(@blueish-white, 9%);
+    display:table-cell;
+    vertical-align:middle;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.9), -1px -1px 0 rgba(0, 0, 0, 0.22);
+  }
+
+}
