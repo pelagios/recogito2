@@ -1,0 +1,30 @@
+@(owner: models.generated.tables.records.UserRecord)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Recogito</title>
+    <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,height=device-height,target-densitydpi=device-dpi,user-scalable=yes" />
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
+  </head>
+  <body>
+    <div class="page-header">
+
+      <div class="user-section">
+        <div class="user-info">
+          <h1>@owner.getUsername</h1>
+
+          <p class="member-since">
+            <span class="icon">&#xf017;</span>
+            Joined on @owner.getMemberSince.format("d MMM YYYY")
+          </p>
+        </div>
+      </div> <!-- .user-section -->
+
+      <div class="activity">
+
+      </div> <!-- .activity -->
+
+    </div> <!-- .header -->
+    
+  </body>
+</html>
