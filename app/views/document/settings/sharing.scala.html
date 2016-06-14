@@ -1,4 +1,13 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord)
+@(username: String, document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader)
+
 @_layout("Settings - Sharing", username, document) {
-  
+  <input type="checkbox" id="public-visibility" name="public-visibility"/>
+  <label for="public-visibility">
+    Visible to all
+    <p class="description">
+      Make this document visible to the public. Visitors can see your annotations, but
+      not edit. Link to share:
+    </p>
+    <input type="text" id="public-link" value="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1).absoluteURL"/>
+  </label>
 }

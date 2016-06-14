@@ -1,14 +1,21 @@
 @import "../../_globals.less";
+@import "../../_forms.less";
 @import "../_header.less";
 @import "../_sidebar.less";
+@import "_sharing.less";
+
+.header-iconbar {
+  border-bottom:1px solid @lightgrey-border;
+}
 
 .content {
   position:absolute;
-  top:70px;
+  top:71px;
   right:0;
   bottom:0;
   left:200px;
-  padding:10px 30px;
+  padding:20px 30px;
+  background-color:@blueish-white-hi;
   color:@standard-type;
 
   h1 {
