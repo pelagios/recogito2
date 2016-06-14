@@ -38,7 +38,7 @@ class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB) ex
               _.headOption match {
                 case Some(contribution) => { 
                   val f = for {
-                    rollbackSuccess <- AnnotationService.rollbackByTime(documentId, contribution.madeAt)
+                    rollbackSuccess <- AnnotationService.rollbackToTimestamp(documentId, contribution.madeAt)
                     purgeHistorySuccess <- if (rollbackSuccess) ContributionService.deleteHistoryAfter(documentId, contribution.madeAt) else Future.successful(false)
                   } yield purgeHistorySuccess
                   

@@ -13,11 +13,12 @@ import scala.concurrent.{ ExecutionContext, Future }
 import storage.ES
 
 trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
-  
+
   private val ANNOTATION_HISTORY = "annotation_history"
-    
+
+  /** Inserts a new version into the history index **/
   def insertVersion(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean] =
-    ES.client execute {      
+    ES.client execute {
       index into ES.IDX_RECOGITO / ANNOTATION_HISTORY source annotation
     } map {
       _.isCreated
@@ -26,9 +27,10 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
       Logger.error(t.toString)
       t.printStackTrace
       false
-    } 
-    
-  def findVersionById(annotationId: UUID, versionId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] = {
+    }
+
+  /** Retrieves a version by annotationId and versionId **/
+  def findVersionById(annotationId: UUID, versionId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query {
         bool {
@@ -38,38 +40,31 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
           )
         }
       }
-    } map {
-      _.response.as[(Annotation, Long)].toSeq.headOption.map(_._1)
-    }
-  }
-    
+    } map { _.response.as[(Annotation, Long)].toSeq.headOption.map(_._1) }
+
+  /** Retrieves the latest version stored in the history for a given annotation ID **/
   def findLatestVersion(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query (
-        termQuery("annotation_id" -> annotationId.toString) 
+        termQuery("annotation_id" -> annotationId.toString)
       ) sort (
         field sort "last_modified_at" order SortOrder.DESC
       ) limit 1
-    } map {
-      _.as[(Annotation, Long)].toSeq.headOption.map(_._1)
-    }
-    
-  /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
-  def deleteVersionsAfter(docId: String, datetime: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
-    Logger.info("Purging history for " + docId + " after " + datetime)
-    
+    } map { _.as[(Annotation, Long)].toSeq.headOption.map(_._1) }
+
+  /** Deletes all annotation versions in the history for a document, after a given timestamp **/
+  def deleteVersionsAfter(docId: String, after: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+
+    // Retrieves all versions on the document after the the given timestamp
     def findVersionsAfter() = ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query filteredQuery query {
         nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
       } postFilter {
-        rangeFilter("last_modified_at").gt(formatDate(datetime))
+        rangeFilter("last_modified_at").gt(formatDate(after))
       } limit Int.MaxValue
     } map { _.getHits.getHits }
-      
-    // TODO this might break if we add too many annotations to the same bulk request
-    
+
     findVersionsAfter().flatMap { hits =>
-      Logger.info("Affects " + hits.size + " records")
       if (hits.size > 0) {
         ES.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.IDX_RECOGITO / ANNOTATION_HISTORY) )
@@ -83,7 +78,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
         // Nothing to delete
         Future.successful(true)
       }
-    }    
+    }
   }
-  
+
 }

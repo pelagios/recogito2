@@ -14,7 +14,7 @@ import storage.ES
 
 /** Encapsulates JSON (de-)serialization so we can add it to Annotation- and AnnotationHistoryService **/
 trait HasAnnotationIndexing {
-  
+
   implicit object AnnotationIndexable extends Indexable[Annotation] {
     override def json(a: Annotation): String = Json.stringify(Json.toJson(a))
   }
@@ -23,32 +23,32 @@ trait HasAnnotationIndexing {
     override def as(hit: RichSearchHit): (Annotation, Long) =
       (Json.fromJson[Annotation](Json.parse(hit.sourceAsString)).get, hit.version)
   }
-  
+
 }
 
 object AnnotationService extends HasAnnotationIndexing with AnnotationHistoryService with ESGeoTagStore {
 
   private val ANNOTATION = "annotation"
-  
-  // Maximum number of times an annotation (batch) will be retried in case of failure 
-  private def MAX_RETRIES = 10
-  
+
+  private def MAX_RETRIES = 10 // Max number of import retires in case of failure
+
+  /** Upserts an annotation, automatically dealing with updating version history and geotags.
+    *
+    * Returns a boolean flag indicating successful completion, the internal ElasticSearch
+    * version, and the previous version of the annotation, if any.
+    */
   def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = false)(implicit context: ExecutionContext): Future[(Boolean, Long, Option[Annotation])] = {
-    
-    /** Persists the previous version of an annotation to the history index.
-      * 
-      * Returns a boolean flag indicating successful completion and the previous annotation version (if exists). 
-      */
+
+    // Persists the previous version of an annotation to the history index; returns a
+    // boolean flag indicating successful completion, plus the previous annotation version if any
     def persistPreviousVersion(annotationId: UUID): Future[(Boolean, Option[Annotation])] =
       for {
         maybeAnnotation <- findById(annotationId)
         done <- if (maybeAnnotation.isDefined) insertVersion(maybeAnnotation.get._1) else Future.successful(true)
       } yield (done, maybeAnnotation.map(_._1))
 
-    /** Inserts a new latest version of the annotation into the annotation index 
-      *
-      * Returns a boolean flag indicating successful completion and the internal ElasticSearch version number.
-      */
+    // Upsert annotation in the annotation index; returns a boolean flag indicating success, plus
+    // the internal ElasticSearch version number
     def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] =
       ES.client execute {
         update id a.annotationId in ES.IDX_RECOGITO / ANNOTATION source a docAsUpsert
@@ -59,23 +59,21 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
         t.printStackTrace
         (false, -1l)
       }
-    
+
     for {
       (versioningDone, previousAnnotation) <- if (versioned) persistPreviousVersion(annotation.annotationId) else Future.successful((true, None))
       (annotationCreated, esVersionNumber) <- upsertAnnotation(annotation)
       linksCreated <- if (annotationCreated) insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
     } yield (linksCreated, esVersionNumber, previousAnnotation)
-    
+
   }
 
+  /** Upserts a list of annotations, handling non-blocking chaining & retries in case of failure **/
   def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[Annotation]] =
     annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
       future.flatMap { failedAnnotations =>
         insertOrUpdateAnnotation(annotation).map { case (success, _, _) =>
-          if (success)
-            failedAnnotations
-          else
-            failedAnnotations :+ annotation
+          if (success) failedAnnotations else failedAnnotations :+ annotation
         }
       }
     } flatMap { failed =>
@@ -83,7 +81,7 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
         Logger.warn(failed.size + " annotations failed to import - retrying")
         insertOrUpdateAnnotations(failed, retries - 1)
       } else {
-        Logger.info("Successfully imported " + (annotations.size - failed.size) + " annotations")  
+        Logger.info("Successfully imported " + (annotations.size - failed.size) + " annotations")
         if (failed.size > 0)
           Logger.error(failed.size + " annotations failed without recovery")
         else
@@ -92,18 +90,20 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       }
     }
 
+  /** Retrieves an annotation by ID **/
   def findById(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[(Annotation, Long)]] =
     ES.client execute {
-      get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION 
+      get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
     } map { response =>
       if (response.isExists) {
         val source = Json.parse(response.getSourceAsString)
-        Some((Json.fromJson[Annotation](source).get, response.getVersion))    
+        Some((Json.fromJson[Annotation](source).get, response.getVersion))
       } else {
         None
       }
     }
-    
+
+  /** Deletes the annotation with the given ID **/
   def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
     ES.client execute {
       delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
@@ -115,15 +115,15 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
     } recover { case t: Throwable =>
       t.printStackTrace()
       false
-    }    
-  
-  def findByDocId(id: String, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
+    }
+
+  /** Retrieves all annotations on a given document **/
+  def findByDocId(id: String, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
-  }
-  
-  /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
+
+  /** Deletes all annotations on a given document **/
   def deleteByDocId(docId: String)(implicit context: ExecutionContext): Future[Boolean] =
     findByDocId(docId).flatMap { annotationsAndVersions =>
       if (annotationsAndVersions.size > 0) {
@@ -140,69 +140,59 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
         Future.successful(true)
       }
     }
-  
-  def findByFilepartId(id: Int, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] = {
+
+  /** Retrieves all annotations on a given filepart **/
+  def findByFilepartId(id: Int, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
-  }
-  
-  def findModifiedSince(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Seq[Annotation]] = {
-    Logger.info("Fetching updatable annotations in document")
+
+  /** Retrieves annotations on a document last updated after a given timestamp **/
+  def findModifiedAfter(documentId: String, after: DateTime)(implicit context: ExecutionContext): Future[Seq[Annotation]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION query filteredQuery query {
         nestedQuery("annotates").query(termQuery("annotates.document_id" -> documentId))
       } postFilter {
-        rangeFilter("last_modified_at").gt(formatDate(timestamp))
+        rangeFilter("last_modified_at").gt(formatDate(after))
       } limit Int.MaxValue
-    } map { response =>
-      val annotations = response.as[(Annotation, Long)].toSeq.map(_._1)
-      Logger.info("... " + annotations.size + " annotations")
-      annotations
-    }
-  }
-  
-  def rollbackByTime(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
-    Logger.info("Rolling back " + documentId + " to " + timestamp)
-    
-    /** 'Rolls back' one annotation, i.e. updates to the latest version in the history **/
-    def rollbackOne(annotation: Annotation): Future[Boolean] = {
+    } map { _.as[(Annotation, Long)].toSeq.map(_._1) }
+
+  /** Rolls back the document to the state at the given timestamp **/ 
+  def rollbackToTimestamp(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+
+    // Rolls back one annotation, i.e. updates to the latest version in the history or deletes
+    def rollbackOne(annotation: Annotation): Future[Boolean] =
       findLatestVersion(annotation.annotationId).flatMap(_ match {
         case Some(version) =>
           insertOrUpdateAnnotation(version, false).map { case (success, _, _) => success }
-          
+
         case None =>
-          deleteAnnotation(annotation.annotationId)          
+          deleteAnnotation(annotation.annotationId)
       }).recover { case t: Throwable =>
         t.printStackTrace()
         Logger.warn("Rollback failed for " + annotation.annotationId)
         false
       }
-    }
-    
-    def rollbackAnnotations(annotations: Seq[Annotation]): Future[Seq[Annotation]] = {
-      Logger.info("Rolling back " + annotations.size + " annotations")
+
+    // Rolls back a list of annotations, i.e. updates to latest version in history or deletes
+    def rollbackAnnotations(annotations: Seq[Annotation]): Future[Seq[Annotation]] =
       annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
         future.flatMap { failedAnnotations =>
           rollbackOne(annotation).map { success =>
-            if (success)
-              failedAnnotations
-            else
-              failedAnnotations :+ annotation
+            if (success) failedAnnotations else failedAnnotations :+ annotation
           }
         }
       }
-    }
-    
-    val failed = for {
+
+    val numberOfFailedRollbacks = for {
       deleteVersionsSuccess <- deleteVersionsAfter(documentId, timestamp)
-      annotationsToModify <- if (deleteVersionsSuccess) findModifiedSince(documentId, timestamp) else Future.successful(Seq.empty[Annotation])
+      annotationsToModify <- if (deleteVersionsSuccess) findModifiedAfter(documentId, timestamp) else Future.successful(Seq.empty[Annotation])
       failedUpdates <- rollbackAnnotations(annotationsToModify)
     } yield failedUpdates.size
-    
-    failed.map{ f =>
-      Logger.info(f + " failed rollbacks")
-      f == 0
+
+    numberOfFailedRollbacks.map { failed =>
+      Logger.warn(failed + " failed rollbacks")
+      failed == 0
     }
   }
 
