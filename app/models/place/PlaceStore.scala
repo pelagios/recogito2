@@ -94,7 +94,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
       }
     }
 
-  override def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] = {
+  override def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query {
         nestedQuery("is_conflation_of").query {
@@ -107,14 +107,11 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
           }
         }
       } limit 100
-    } map { _.as[(Place, Long)].toSeq
-    }
-  }
+    } map { _.as[(Place, Long)].toSeq }
 
   override def searchPlaces(q: String, offset: Int, limit: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query {
-
         bool {
           should (
             // Treat as standard query string query first...

@@ -16,11 +16,10 @@ import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
-
 object UserService extends BaseService with FileAccess {
-  
+
   private val SHA_256 = "SHA-256"
-  
+
   def listUsers(offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
     val startTime = System.currentTimeMillis
     val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])
@@ -38,17 +37,17 @@ object UserService extends BaseService with FileAccess {
   /** This method is cached, since it's basically called on every request **/
   def findByUsername(username: String)(implicit db: DB, cache: CacheApi) =
     cachedLookup("user", username, findByUsernameNoCache)
-  
+
   def findByUsernameNoCache(username: String)(implicit db: DB) = db.query { sql =>
-    val records = 
+    val records =
       sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
          .where(USER.USERNAME.equal(username))
          .fetchArray()
-         
+
     groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord]).headOption
       .map { case (user, roles) => UserWithRoles(user, roles) }
   }
-  
+
   def findByUsernameIgnoreCase(username: String)(implicit db: DB) = db.query { sql =>
     Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
