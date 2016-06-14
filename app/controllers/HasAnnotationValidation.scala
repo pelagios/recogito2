@@ -1,9 +1,8 @@
 package controllers
 
 import models.ContentType
-import models.annotation.{ Annotation, AnnotationBody }
+import models.annotation.{ Annotation, AnnotationBody, AnnotationStatus }
 import models.contribution._
-import models.annotation.AnnotationStatus
 
 trait HasAnnotationValidation {
 
@@ -15,7 +14,7 @@ trait HasAnnotationValidation {
       Item(
         ItemType.fromBodyType(createdBody.hasType),
         annotationAfter.annotates.documentId,
-        Some(annotationAfter.annotates.filepartId),        
+        Some(annotationAfter.annotates.filepartId),
         annotationAfter.annotates.contentType,
         Some(annotationAfter.annotationId),
         Some(annotationAfter.versionId),
@@ -35,7 +34,7 @@ trait HasAnnotationValidation {
       }
     else
       ContributionAction.EDIT_BODY
-    
+
   private def changeBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, bodyBefore: AnnotationBody, bodyAfter: AnnotationBody) =
     Contribution(
       determineChangeAction(bodyBefore, bodyAfter),
@@ -54,7 +53,7 @@ trait HasAnnotationValidation {
       ),
       if (bodyAfter.lastModifiedBy == bodyBefore.lastModifiedBy) Seq.empty[String] else Seq(bodyBefore.lastModifiedBy).flatten
     )
-  
+
   private def deleteBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, deletedBody: AnnotationBody) =
     Contribution(
       ContributionAction.DELETE_BODY,
@@ -64,7 +63,7 @@ trait HasAnnotationValidation {
         ItemType.fromBodyType(deletedBody.hasType),
         annotationAfter.annotates.documentId,
         Some(annotationAfter.annotates.filepartId),
-        annotationAfter.annotates.contentType,       
+        annotationAfter.annotates.contentType,
         Some(annotationAfter.annotationId),
         Some(annotationAfter.versionId),
         // At least currently, bodies have either value or URI - never both
@@ -73,35 +72,36 @@ trait HasAnnotationValidation {
       ),
       if (deletedBody.lastModifiedBy == annotationAfter.lastModifiedBy) Seq.empty[String] else Seq(deletedBody.lastModifiedBy).flatten
     )
-  
+
+  /** At the moment, just checks for equal types, but may become more sophisticated in the future **/
   private def isPredecessorTo(before: AnnotationBody, after: AnnotationBody): Boolean =
     after.hasType == before.hasType
-  
+
   def validateUpdate(annotation: Annotation, previousVersion: Option[Annotation]): Seq[Contribution] = {
-    
+
     // TODO validation!
     // - make sure doc/filepart ID remains unchanged
     // - make sure filepart content type remains unchanged
     // - make sure annotation ID remains unchanged
-      
+
     // TODO check any things the current user should not be able to manipulate
-    // - createdAt/By info on bodies not touched by the user must be unchanged      
-    
+    // - createdAt/By info on bodies not touched by the user must be unchanged
+
     computeContributions(annotation, previousVersion)
   }
-  
+
+  /** Performs a 'diff' on the annotations, returning the corresponding Contributions **/
   def computeContributions(annotation: Annotation, previousVersion: Option[Annotation]) = previousVersion match {
-    
     case Some(before) => {
-      // Body order never changes - so we compare before & after step by step 
+      // Body order never changes - so we compare before & after step by step
       annotation.bodies.foldLeft((Seq.empty[Contribution], before.bodies)) { case ((contributions, referenceBodies), nextBodyAfter) =>
-        // Leading bodies that are not predecessors to bodies in the new annotation are DELETIONS 
+        // Leading bodies that are not predecessors to bodies in the new annotation are DELETIONS
         val deletions = referenceBodies
           .takeWhile(bodyBefore => !isPredecessorTo(bodyBefore, nextBodyAfter))
           .map(deletedBody => deleteBodyContribution(before, annotation, deletedBody))
-        
+
         // Once we're through detecting deletions, we continue with the remaining before-bodies
-        val remainingReferenceBodies = referenceBodies.drop(deletions.size)       
+        val remainingReferenceBodies = referenceBodies.drop(deletions.size)
         if (remainingReferenceBodies.isEmpty)
           // None left? Then this new body is an addition
           (contributions ++ deletions :+ createBodyContribution(annotation, nextBodyAfter),
@@ -111,12 +111,12 @@ trait HasAnnotationValidation {
           (contributions ++ deletions,
             remainingReferenceBodies.tail)
         else
-          // This body was updated 
+          // This body was updated
           (contributions ++ deletions :+ changeBodyContribution(before, annotation, remainingReferenceBodies.head, nextBodyAfter),
             remainingReferenceBodies.tail)
       }._1 // We're not interested in the empty list of 'remaining reference bodies'
     }
-   
+
     case None => {
       if (annotation.lastModifiedBy.isEmpty)
         // We don't count 'contributions' made automatic processes
@@ -125,7 +125,6 @@ trait HasAnnotationValidation {
       else
         annotation.bodies.map(body => createBodyContribution(annotation, body))
     }
-
   }
 
 }

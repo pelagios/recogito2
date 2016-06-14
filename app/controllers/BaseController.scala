@@ -51,9 +51,7 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
       case Some((document, fileparts)) => {
         // Verify if the user is allowed to access this document - TODO what about shared content?
         if (document.getOwner == user)
-
           response(document, fileparts)
-
         else
           Forbidden
       }
@@ -73,16 +71,13 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
 
     renderDocumentResponse(docId, user, { case (document, fileparts) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
-      if (selectedPart.isEmpty) {
+      if (selectedPart.isEmpty)
         NotFound
-      } else if (selectedPart.size == 1) {
-
+      else if (selectedPart.size == 1)
         response(document, fileparts, selectedPart.head)
-
-      } else {
+      else
         // More than one part with this sequence number - DB integrity broken!
         throw new Exception("Invalid ocument part")
-      }
     })
   }
 

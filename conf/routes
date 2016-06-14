@@ -32,8 +32,8 @@ GET     /admin                                       controllers.admin.AdminCont
 # Document views
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id/part/:partNo/edit              controllers.document.annotation.AnnotationController.showAnnotationViewForDocPart(id: String, partNo: Int)
 GET     /document/:id/edit                           controllers.document.annotation.AnnotationController.showAnnotationViewForDoc(id: String)
+GET     /document/:id/part/:partNo/edit              controllers.document.annotation.AnnotationController.showAnnotationViewForDocPart(id: String, partNo: Int)
 
 GET     /document/:id/map                            controllers.document.map.MapController.showMap(id: String)
 
@@ -66,11 +66,11 @@ DELETE  /api/annotation/:id                          controllers.api.AnnotationA
 GET     /api/document/:id/annotations                controllers.api.AnnotationAPIController.getAnnotationsForDocument(id: String)
 GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationAPIController.getAnnotationsForPart(id: String, part: Int)
 
-GET     /api/places/search                           controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20)
-GET     /api/places/:uri                             controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
-
 GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
 GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
+
+GET     /api/places/search                           controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20)
+GET     /api/places/:uri                             controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
 
 GET     /api/contributions/document/:id              controllers.api.ContributionAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 20)
 GET     /api/contributions/stats                     controllers.api.ContributionAPIController.getGlobalStats()
