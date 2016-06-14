@@ -1,11 +1,23 @@
 package controllers.landing
 
-import play.api.mvc.{ Action, Controller }
+import controllers.{ HasCache, HasDatabase, Security }
+import javax.inject.Inject
+import jp.t2v.lab.play2.auth.OptionalAuthElement
+import play.api.cache.CacheApi
+import play.api.mvc.Controller
+import storage.DB
+  
+class LandingController @Inject() (implicit val cache: CacheApi, val db: DB) 
+  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security {
 
-class LandingController extends Controller {
-
-  def index = Action {
-    Ok(views.html.landing.index())
+  def index = StackAction { implicit request =>
+    loggedIn match {
+      case Some(user) =>
+        Redirect(controllers.my.routes.MyRecogitoController.index(user.user.getUsername))
+        
+      case None =>
+        Ok(views.html.landing.index())
+    }
   }
 
 }
