@@ -1,8 +1,13 @@
+require.config({
+  baseUrl: "/assets/javascripts/",
+  fileExclusionRegExp: /^lib$/
+});
+
 require([
-  '../common/helpers/annotationUtils',
-  '../common/helpers/placeUtils',
-  '../common/api',
-  '../common/config'], function(AnnotationUtils, PlaceUtils, API, Config) {
+  'common/helpers/annotationUtils',
+  'common/helpers/placeUtils',
+  'common/api',
+  'common/config'], function(AnnotationUtils, PlaceUtils, API, Config) {
 
   jQuery(document).ready(function() {
     var awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
