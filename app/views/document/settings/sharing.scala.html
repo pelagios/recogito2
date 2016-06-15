@@ -8,6 +8,11 @@
       Make this document visible to the public. Visitors can see your annotations, but
       not edit. Link to share:
     </p>
-    <input type="text" id="public-link" value="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1).absoluteURL"/>
+    <input type="text" id="public-link" value="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(document.getId).absoluteURL"/>
+    <script>
+      jQuery(document).ready(function() {
+        $("#public-link").focus(function() { jQuery(this).select(); } );
+      });
+    </script>
   </label>
 }
