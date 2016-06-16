@@ -1,7 +1,7 @@
 @(username: String, document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader)
 
 @_layout("Settings - Sharing", username, document, Some("sharing")) {
-  <input type="checkbox" id="public-visibility" name="public-visibility"/>
+  <input type="checkbox" id="public-visibility" name="public-visibility" @if(document.getIsPublic) { checked="checked" }>
   <label for="public-visibility">
     Visible to all
     <p class="description">
@@ -11,8 +11,22 @@
     <input type="text" id="public-link" value="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(document.getId).absoluteURL"/>
     <script>
       jQuery(document).ready(function() {
-        $("#public-link").focus(function() { jQuery(this).select(); } );
+        var checkbox = jQuery('#public-visibility'),
+            link = jQuery("#public-link");
+
+        checkbox.change(function() {
+          var checked = checkbox.is(':checked');
+          checkbox.prop('disabled', true);
+          jsRoutes.controllers.document.DocumentController.setIsPublic('@document.getId', checked).ajax().done(function() {
+            checkbox.prop('disabled', false);
+          });
+        });
+
+        link.focus(function() { jQuery(this).select(); } );
       });
     </script>
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.document.routes.javascript.DocumentController.setIsPublic
+    )
   </label>
 }

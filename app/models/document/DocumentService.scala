@@ -74,6 +74,11 @@ object DocumentService extends BaseService with FileAccess {
           upload.getEdition,
           false)
   
+  /** Changes the public visibility flag for the given document **/
+  def setPublicVisibility(docId: String, enabled: Boolean)(implicit db: DB) = db.withTransaction { sql =>
+    sql.update(DOCUMENT).set[java.lang.Boolean](DOCUMENT.IS_PUBLIC, enabled).where(DOCUMENT.ID.equal(docId)).execute()
+  }
+  
   /** Changes the sequence numbers of fileparts for a specific document **/
   def setFilepartSortOrder(docId: String, sortOrder: Seq[PartOrdering])(implicit db: DB) = db.withTransaction { sql =>
     // To verify validaty of the request, load the fileparts from the DB first...
