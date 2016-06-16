@@ -69,7 +69,7 @@ CREATE TABLE document (
   language TEXT,
   source TEXT,
   edition TEXT,
-  is_public BOOLEAN
+  is_public BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE document_filepart (
