@@ -49,6 +49,15 @@ object DocumentService extends BaseService with FileAccess {
     }
   }
   
+  private def determineAccessLevel(document: DocumentRecord, forUser: Option[String]): DocumentAccessLevel = forUser match {      
+    case Some(user) if (document.getOwner == user) => DocumentAccessLevel.OWNER
+
+    // TODO check sharing policies
+
+    case _ if (document.getIsPublic)               => DocumentAccessLevel.READ
+    case _                                         => DocumentAccessLevel.FORBIDDEN
+  }
+  
   /** Creates a new DocumentRecord from an UploadRecord **/
   def createDocument(upload: UploadRecord)(implicit db: DB) =
     new DocumentRecord(
@@ -98,19 +107,14 @@ object DocumentService extends BaseService with FileAccess {
     sql.batch(updates:_*).execute()
   }
   
-  /** Retrieves a document by its ID **/
-  def findById(id: String)(implicit db: DB) = db.query { sql =>
-    Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne())
+  /** Retrieves a document by its ID, along with access permissions for the given user **/
+  def findById(id: String, loggedInUser: Option[String] = None)(implicit db: DB) = db.query { sql =>
+    Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne()).map(document =>
+      (document, determineAccessLevel(document, loggedInUser)))
   }
   
-  /** Retrieves a document by ID, along with fileparts.
-    *
-    * This method is cached as it will get accessed a lot.
-    */
-  def findByIdWithFileparts(id: String)(implicit db: DB, cache: CacheApi) =
-    cachedLookup("doc", id, findByIdWithFilepartsNoCache)
-  
-  private def findByIdWithFilepartsNoCache(id: String)(implicit db: DB) = db.query { sql =>
+  /** Retrieves a document by ID, along with fileparts **/
+  def findByIdWithFileparts(id: String, loggedInUser: Option[String] = None)(implicit db: DB) = db.query { sql =>
     val records =
       sql.selectFrom(DOCUMENT
         .join(DOCUMENT_FILEPART)
@@ -127,7 +131,7 @@ object DocumentService extends BaseService with FileAccess {
     grouped
       .headOption
       .map { case (document, parts) =>
-        (document, parts.sortBy(_.getSequenceNo)) }
+        (document, parts.sortBy(_.getSequenceNo), determineAccessLevel(document, loggedInUser)) }
   }
 
   /** Retrieves a filepart by document ID and sequence number **/

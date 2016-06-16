@@ -183,23 +183,12 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
       case Some((annotation, version)) => {
         // Fetch the associated document
         DocumentService.findById(annotation.annotates.documentId).flatMap(_ match {
-          case Some(document) => {
-            
-            // TODO check if the user has write permissions
-            // TODO for now we'll just check ownership
-            
-            if (document.getOwner == loggedIn.user.getUsername) {
-              // If so, are there any comment nodes left that are *not* by this user?
-              AnnotationService.deleteAnnotation(id).map(success => {
-                if (success)
-                  Status(204)
-                else
-                  InternalServerError
-              })
-            } else {
+          case Some((document, accesslevel)) =>
+            if (accesslevel.canWrite)
+              AnnotationService.deleteAnnotation(id).map(success =>
+                if (success) Status(204) else InternalServerError)
+            else
               Future.successful(Forbidden)
-            }
-          }
             
           case None => {
             // Annotation on a non-existing document? Can't happen except DB integrity is broken

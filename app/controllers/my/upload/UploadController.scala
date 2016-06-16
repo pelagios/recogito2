@@ -197,10 +197,11 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
   /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
   private def queryTaskProgress(username: String, docId: String, service: ProcessingService) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
-    import UploadController._  // Message (de)serialization
+    import UploadController._ 
 
-    DocumentService.findById(docId).flatMap(_ match {
-      case Some(document) if document.getOwner == loggedIn.user.getUsername => {
+    DocumentService.findById(docId, Some(username)).flatMap(_ match {
+      // Make sure only users with read access can see the progress
+      case Some((document, accesslevel)) if accesslevel.canRead => {
         service.queryProgress(docId).map(_ match {
           case Some(result) =>
             Ok(Json.toJson(result))
@@ -210,7 +211,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
       }
 
       case Some(document) =>
-        // Document exists, but belongs to another user
+        // Document exists, but no read permission
         Future.successful(Forbidden)
 
       case None =>

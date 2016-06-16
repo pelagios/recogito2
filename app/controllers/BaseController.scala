@@ -48,7 +48,7 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
       response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Result)(implicit cache: CacheApi, db: DB) = {
 
     DocumentService.findByIdWithFileparts(docId).map(_ match {
-      case Some((document, fileparts)) => {
+      case Some((document, fileparts, accesslevel)) => {
         // Verify if the user is allowed to access this document - TODO what about shared content?
         if (document.getOwner == user)
           response(document, fileparts)
