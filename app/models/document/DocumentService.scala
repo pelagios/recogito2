@@ -148,12 +148,13 @@ object DocumentService extends BaseService with FileAccess {
   }
   
   /** Retrieves documents by their owner **/
-  def findByOwner(owner: String, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
-    sql.selectFrom(DOCUMENT)
-       .where(DOCUMENT.OWNER.equal(owner))
-       .limit(limit)
-       .offset(offset)
-       .fetchArray().toSeq
+  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
+    val q = if (publicOnly)
+      sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true)))
+    else
+      sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner))
+
+    q.limit(limit).offset(offset).fetchArray().toSeq
   }
   
   /** Deletes a document by its ID, along with filepart records and files **/

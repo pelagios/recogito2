@@ -1,8 +1,8 @@
-@(owner: models.generated.tables.records.UserRecord)
+@(owner: models.generated.tables.records.UserRecord, documents: Seq[models.generated.tables.records.DocumentRecord])
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Recogito</title>
+    <title>@@@owner.getUsername | Recogito</title>
     <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,height=device-height,target-densitydpi=device-dpi,user-scalable=yes" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
   </head>
@@ -27,9 +27,38 @@
     </div> <!-- .header -->
 
     <div class="document-panel">
-      <div class="no-docs-yet">
-        <span>@owner.getUsername has not shared any public documents yet</span>
-      </div>
+      @if(documents.size == 0) {
+        <div class="no-docs-yet">
+          <span>@owner.getUsername has not shared any public documents yet</span>
+        </div>
+      } else {
+        <table class="document-list">
+          <thead>
+            <tr>
+              <td></td> <!-- content type icon -->
+              <td>Author</td>
+              <td>Name</td>
+              <td>Date</td>
+              <td>Last Edit</td>
+              <td>File Size</td>
+              <td>Annotations</td>
+            </tr>
+          </thead>
+          <tbody>
+            @for(document <- documents) {
+              <tr class="document" data-id="@document.getId">
+                <td></td> <!-- content type icon -->
+                <td>@document.getAuthor</td>
+                <td>@document.getTitle</td>
+                <td>@document.getDateFreeform</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
     </div>
   </body>
 </html>
