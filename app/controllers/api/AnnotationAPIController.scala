@@ -119,48 +119,60 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
     }
   }
 
+  private def stubToAnnotation(stub: AnnotationStub, user: String) = {
+    val now = DateTime.now()
+    Annotation(
+      stub.annotationId.getOrElse(UUID.randomUUID),
+      UUID.randomUUID,
+      stub.annotates,
+      None,
+      Seq(user),
+      stub.anchor,
+      Some(user),
+      now,
+      stub.bodies.map(b => AnnotationBody(
+        b.hasType, 
+        Some(b.lastModifiedBy.getOrElse(user)),
+        b.lastModifiedAt.getOrElse(now),
+        b.value, 
+        b.uri,
+        b.status.map(s =>
+          AnnotationStatus(
+            s.value,
+            Some(s.setBy.getOrElse(user)),
+            s.setAt.getOrElse(now))))))         
+  }
+  
   def createAnnotation() = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
     request.body.asJson match {
       case Some(json) => {
         Json.fromJson[AnnotationStub](json) match {
-          case s: JsSuccess[AnnotationStub] => {
-            
-            // TODO fetch document to check access rights!
-            
-            val now = DateTime.now()
-            val user = loggedIn.user.getUsername
-            
-            val annotation =
-              Annotation(
-                s.get.annotationId.getOrElse(UUID.randomUUID),
-                UUID.randomUUID,
-                s.get.annotates,
-                None,
-                Seq(user),
-                s.get.anchor,
-                Some(user),
-                now,
-                s.get.bodies.map(b => AnnotationBody(
-                  b.hasType, 
-                  Some(b.lastModifiedBy.getOrElse(user)),
-                  b.lastModifiedAt.getOrElse(now),
-                  b.value, 
-                  b.uri,
-                  b.status.map(s =>
-                    AnnotationStatus(
-                      s.value,
-                      Some(s.setBy.getOrElse(user)),
-                      s.setAt.getOrElse(now))))))
-                      
-            val f = for {
-              (annotationStored, _, previousVersion) <- AnnotationService.insertOrUpdateAnnotation(annotation, true)
-              success <- if (annotationStored) 
-                           ContributionService.insertContributions(validateUpdate(annotation, previousVersion))
-                         else
-                           Future.successful(false)
-            } yield success
-            
-            f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
+          case s: JsSuccess[AnnotationStub] => {            
+            // Fetch the associated document to check access privileges
+            DocumentService.findById(s.get.annotates.documentId, Some(loggedIn.user.getUsername)).flatMap(_ match {
+              case Some((document, accesslevel)) => {
+                if (accesslevel.canWrite) {
+                  val annotation = stubToAnnotation(s.get, loggedIn.user.getUsername)
+                  val f = for {
+                    (annotationStored, _, previousVersion) <- AnnotationService.insertOrUpdateAnnotation(annotation, true)
+                    success <- if (annotationStored) 
+                                 ContributionService.insertContributions(validateUpdate(annotation, previousVersion))
+                               else
+                                 Future.successful(false)
+                  } yield success
+                  
+                  f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
+                } else {
+                  // No write permissions
+                  Future.successful(Forbidden)
+                }
+              }
+                  
+              case None => {
+                Logger.warn("POST to /annotations but annotation points to unknown document: " + s.get.annotates.documentId)
+                Future.successful(NotFound)  
+              }
+            })
           }
 
           case e: JsError => {
@@ -182,7 +194,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
     AnnotationService.findById(id).flatMap(_ match {
       case Some((annotation, version)) => {
         // Fetch the associated document
-        DocumentService.findById(annotation.annotates.documentId).flatMap(_ match {
+        DocumentService.findById(annotation.annotates.documentId, Some(loggedIn.user.getUsername)).flatMap(_ match {
           case Some((document, accesslevel)) =>
             if (accesslevel.canWrite)
               AnnotationService.deleteAnnotation(id).map(success =>

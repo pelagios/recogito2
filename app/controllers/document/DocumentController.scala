@@ -73,7 +73,7 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
   }
   
   def deleteDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    DocumentService.findById(docId).flatMap(_ match {
+    DocumentService.findById(docId, Some(loggedIn.user.getUsername)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         // Only the owner is allowed to delete a document
         if (accesslevel == DocumentAccessLevel.OWNER)
