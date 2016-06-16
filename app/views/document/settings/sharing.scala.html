@@ -1,6 +1,6 @@
 @(username: String, document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader)
 
-@_layout("Settings - Sharing", username, document) {
+@_layout("Settings - Sharing", username, document, Some("sharing")) {
   <input type="checkbox" id="public-visibility" name="public-visibility"/>
   <label for="public-visibility">
     Visible to all

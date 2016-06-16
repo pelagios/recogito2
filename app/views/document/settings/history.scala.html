@@ -1,6 +1,6 @@
 @(username: String, document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader)
 
-@_layout("Settings - Edit History", username, document) {
+@_layout("Settings - Edit History", username, document, Some("history")) {
   <h1>Edit History</h1>
 
   <table class="edit-history"></table>

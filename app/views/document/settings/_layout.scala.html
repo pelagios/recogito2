@@ -1,4 +1,5 @@
-@(title: String, username: String, document: models.generated.tables.records.DocumentRecord)(content: Html)
+@(title: String, username: String, document: models.generated.tables.records.DocumentRecord,
+  active: Option[String] = None)(content: Html)
 <!DOCTYPE html>
 <html>
   <head>
@@ -61,19 +62,19 @@
     <div class="sidebar">
       <div class="sidebar-header"></div>
       <ul class="menu">
-        <li>
+        <li @if(active == Some("metadata")) { class="active" }>
           <a href="?tab=metadata">
             <span class="icon">&#xf02d;</span> <span class="label">Metadata</span>
           </a>
         </li>
 
-        <li>
+        <li @if(active == Some("sharing")) { class="active" }>
           <a href="?tab=sharing">
             <span class="icon">&#xf234;</span> <span class="label">Sharing</span>
           </a>
         </li>
 
-        <li>
+        <li @if(active == Some("history")) { class="active" }>
           <a href="?tab=history">
             <span class="icon">&#xf1da;</span> <span class="label">Edit History</span>
           </a>
