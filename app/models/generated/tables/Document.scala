@@ -4,6 +4,7 @@
 package models.generated.tables
 
 
+import java.lang.Boolean
 import java.lang.Class
 import java.lang.String
 import java.sql.Timestamp
@@ -105,6 +106,11 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	 * The column <code>public.document.edition</code>.
 	 */
 	val EDITION : TableField[DocumentRecord, String] = createField("edition", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
+	 * The column <code>public.document.is_public</code>.
+	 */
+	val IS_PUBLIC : TableField[DocumentRecord, Boolean] = createField("is_public", org.jooq.impl.SQLDataType.BOOLEAN, "")
 
 	/**
 	 * Create a <code>public.document</code> table reference

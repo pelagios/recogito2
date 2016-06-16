@@ -68,7 +68,8 @@ CREATE TABLE document (
   description TEXT,
   language TEXT,
   source TEXT,
-  edition TEXT
+  edition TEXT,
+  is_public BOOLEAN
 );
 
 CREATE TABLE document_filepart (
@@ -116,7 +117,8 @@ CREATE TABLE sharing_policy (
   document_id TEXT REFERENCES document(id),
   shared_by TEXT NOT NULL REFERENCES "user"(username),
   shared_with TEXT NOT NULL REFERENCES "user"(username),
-  shared_at TIMESTAMP WITH TIME ZONE NOT NULL
+  shared_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  access_level TEXT NOT NULL
 );
 
 -- keep a log of what happened for shared elements

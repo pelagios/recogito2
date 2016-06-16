@@ -84,6 +84,11 @@ class SharingPolicy(alias : String, aliased : Table[SharingPolicyRecord], parame
 	val SHARED_AT : TableField[SharingPolicyRecord, Timestamp] = createField("shared_at", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), "")
 
 	/**
+	 * The column <code>public.sharing_policy.access_level</code>.
+	 */
+	val ACCESS_LEVEL : TableField[SharingPolicyRecord, String] = createField("access_level", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+
+	/**
 	 * Create a <code>public.sharing_policy</code> table reference
 	 */
 	def this() = {
