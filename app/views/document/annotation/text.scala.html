@@ -134,19 +134,21 @@
 
     <div class="sidebar">
       <div class="sidebar-header"></div>
-      <div class="sidebar-parts">
-        <ul>
-          @for(part <- allParts) {
-            @if(part == currentPart) {
-              <li class="active part-title">@part.getTitle</li>
-            } else {
-              <li>
-                <a class="part-title" href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">@part.getTitle</a>
-              </li>
-            }
+      <ul class="menu">
+        @for(part <- allParts) {
+          @if(part == currentPart) {
+            <li class="active">
+              <a href="#"><span class="label">@part.getTitle</span></a>
+            </li>
+          } else {
+            <li>
+              <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">
+                <span class="label">@part.getTitle</span>
+              </a>
+            </li>
           }
-        </ul>
-      </div>
+        }
+      </ul>
     </div> <!-- .sidebar -->
 
     <pre id="content">@content</pre>
