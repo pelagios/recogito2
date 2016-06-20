@@ -23,18 +23,23 @@ object CollaboratorStub {
 
 trait SharingActions extends HasAdminAction { self: BaseController =>
     
-  /** Sets the is_public flag for the given document **/
   def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { document =>
       DocumentService.setPublicVisibility(document.getId, enabled)(self.db).map(_ => Status(200))
     })
   }
   
-  /** Adds a collaborator to the document **/
   def addCollaborator(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     jsonDocumentAdminAction[CollaboratorStub](documentId, loggedIn.user.getUsername, { case (document, collaborator) =>
       // TODO implement
       Future.successful(Status(200))
+    })
+  }
+  
+  def removeCollaborator(documentId: String, username: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    documentAdminAction(documentId, loggedIn.user.getUsername, { document =>      
+      DocumentService.removeDocumentCollaborator(documentId, username)(self.db).map(success =>
+        if (success) Status(200) else InternalServerError)
     })
   }
   

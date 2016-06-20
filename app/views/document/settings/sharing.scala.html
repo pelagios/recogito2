@@ -28,10 +28,10 @@
         } else {
           <table class="collaborators">
             @for(shared <- sharingPolicies) {
-              <tr>
+              <tr data-username="@shared.getSharedWith">
                 <td>@shared.getSharedWith</td>
                 <td>@shared.getAccessLevel</td>
-                <td>X</td>
+                <td class="outline-icon remove-collaborator">&#xe897;</td>
               </tr>
             }
           </table>
@@ -50,6 +50,8 @@
 
             publicLink = jQuery("#public-link"),
 
+            collaborators = jQuery('.collaborators'),
+
             addCollabForm = jQuery('.add-collaborators form'),
 
             addCollaborator = function(e) {
@@ -60,17 +62,24 @@
 
               // JSON.stringify(data));
               return false;
+            },
+
+            removeCollaborator = function(e) {
+              var username = jQuery(e.target).closest('tr').data('username');
+              console.log(username);
             };
 
         checkbox.change(function() {
           var checked = checkbox.is(':checked');
           checkbox.prop('disabled', true);
-          jsRoutes.controllers.document.DocumentController.setIsPublic('@document.getId', checked).ajax().done(function() {
+          jsRoutes.controllers.document.settings.SettingsController.setIsPublic('@document.getId', checked).ajax().done(function() {
             checkbox.prop('disabled', false);
           });
         });
 
         publicLink.focus(function() { jQuery(this).select(); } );
+
+        collaborators.on('click', '.remove-collaborator', removeCollaborator);
 
         addCollabForm.submit(addCollaborator);
       });
