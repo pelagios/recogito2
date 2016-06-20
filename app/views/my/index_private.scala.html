@@ -1,5 +1,5 @@
 @(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, quotaMB: Int,
-  documents: Seq[models.generated.tables.records.DocumentRecord])(implicit request: RequestHeader)
+  documents: Seq[models.generated.tables.records.DocumentRecord], sharedCount: Int)(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
@@ -55,7 +55,7 @@
     <div class="toolbar">
       <ul class="tabs">
         <li class="my-documents"><a href="#" onclick="return false;">My documents (@documents.size)</a></li>
-        <li class="shared-with-me disabled"><a href="#" onclick="return false;">Shared with me (0)</a></li>
+        <li class="shared-with-me disabled"><a href="#" onclick="return false;">Shared with me (@sharedCount)</a></li>
       </ul>
 
       <div class="tools">

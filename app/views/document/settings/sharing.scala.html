@@ -38,14 +38,29 @@
         }
       </div>
       <div class="add-collaborators">
-        <input class="add-collaborator" type="text" placeholder="Enter name or e-mail address"/>
+        <form method="POST">
+          <input type="text" name="collaborator" placeholder="Enter name or e-mail address"/>
+        <form>
       </div>
     </div>
 
     <script>
       jQuery(document).ready(function() {
         var checkbox = jQuery('#public-access'),
-            link = jQuery("#public-link");
+
+            publicLink = jQuery("#public-link"),
+
+            addCollabForm = jQuery('.add-collaborators form'),
+
+            addCollaborator = function(e) {
+              var data = addCollabForm.serializeArray().reduce(function(obj, item) {
+                obj[item.name] = item.value;
+                return obj;
+              }, {});
+
+              // JSON.stringify(data));
+              return false;
+            };
 
         checkbox.change(function() {
           var checked = checkbox.is(':checked');
@@ -55,11 +70,13 @@
           });
         });
 
-        link.focus(function() { jQuery(this).select(); } );
+        publicLink.focus(function() { jQuery(this).select(); } );
+
+        addCollabForm.submit(addCollaborator);
       });
     </script>
     @helper.javascriptRouter("jsRoutes")(
-      controllers.document.routes.javascript.DocumentController.setIsPublic
+      controllers.document.settings.routes.javascript.SettingsController.setIsPublic
     )
   </label>
 }

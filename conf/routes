@@ -45,14 +45,15 @@ GET     /document/:id/downloads/annotations.jsonl    controllers.document.downlo
 GET     /document/:id/share                          controllers.document.share.ShareController.showShareSettings(id: String)
 
 GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
+PUT     /document/:id/settings/sortorder             controllers.document.settings.SettingsController.setSortOrder(id: String)
+PUT     /document/:id/settings/public                controllers.document.settings.SettingsController.setIsPublic(id: String, enabled: Boolean)
+PUT     /document/:id/settings/add-collaborator      controllers.document.settings.SettingsController.addCollaborator(id: String)
 POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document content & settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PUT     /document/:id/public                         controllers.document.DocumentController.setIsPublic(id: String, enabled: Boolean)
-PUT     /document/:id/sortorder                      controllers.document.DocumentController.setSortOrder(id: String)
 GET     /document/:id/part/:partNo/tiles/*path       controllers.document.DocumentController.getImageTile(id: String, partNo: Int, path: String)
 GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
 DELETE  /document/:id                                controllers.document.DocumentController.deleteDocument(id: String)

@@ -21,7 +21,7 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) 
   def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     val username = loggedIn.user.getUsername  
   
-    renderDocumentPartResponse(documentId, partNo, username, { case (document, parts, thisPart) =>
+    renderDocumentPartResponse(documentId, partNo, username, { case (document, parts, thisPart, accesslevel) =>
       ContentType.withName(thisPart.getContentType) match {
                     
         case Some(ContentType.IMAGE_UPLOAD) => 

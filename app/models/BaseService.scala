@@ -15,7 +15,7 @@ import play.api.Logger
 trait BaseService {
 
   /** JOOQ happily creates domain objects where all properties are null - this method is to check **/
-  private def isNotNull(record: Record) =
+  protected def isNotNull(record: Record) =
     (0 to record.size - 1).map(idx => {
       record.getValue(idx) != null
     }).exists(_ == true)

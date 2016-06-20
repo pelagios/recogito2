@@ -10,7 +10,7 @@ class MapController @Inject() (implicit val cache: CacheApi, val db: DB) extends
 
   def showMap(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.user.getUsername,
-        { case (document, fileparts) =>  Ok(views.html.document.map.index(loggedIn.user.getUsername, document)) })
+        { case (document, fileparts, accesslevel) =>  Ok(views.html.document.map.index(loggedIn.user.getUsername, document)) })
   }
 
 }

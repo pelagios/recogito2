@@ -42,7 +42,8 @@ class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB)
       if (isProfileOwner) {
         // Personal space
         val user = loggedIn.get.user
-        Future.successful(Ok(views.html.my.index_private(user, UserService.getUsedDiskspaceKB(user.getUsername), QUOTA, documents)))
+        DocumentService.countSharedDocuments(user.getUsername).map { sharedCount =>
+          Ok(views.html.my.index_private(user, UserService.getUsedDiskspaceKB(user.getUsername), QUOTA, documents, sharedCount)) }
       } else {
         // Public profile
         UserService.findByUsername(usernameInPath).map(_ match {

@@ -7,60 +7,15 @@ import models.annotation.AnnotationService
 import models.document.{ DocumentService, PartOrdering }
 import models.user.Roles._
 import play.api.cache.CacheApi
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 import models.document.DocumentAccessLevel
 
 class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with FileAccess {
-  
-  implicit val orderingReads: Reads[PartOrdering] = (
-    (JsPath \ "id").read[Int] and
-    (JsPath \ "sequence_no").read[Int]
-  )(PartOrdering.apply _)
-  
-  def setIsPublic(docId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    DocumentService.findById(docId, Some(loggedIn.user.getUsername)).flatMap(_ match {
-      case Some((document, accesslevel)) if accesslevel == DocumentAccessLevel.OWNER =>
-        DocumentService.setPublicVisibility(document.getId, enabled).map(_ => Status(200))
-        
-      case Some(_) =>
-        Future.successful(Forbidden)
-        
-      case None =>
-        Future.successful(NotFound)
-    })
-  }
-  
-  def setSortOrder(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    request.body.asJson match {
-      case Some(json) => Json.fromJson[Seq[PartOrdering]](json) match {
-        case s: JsSuccess[Seq[PartOrdering]] =>
-          DocumentService.findById(docId, Some(loggedIn.user.getUsername)).flatMap(_ match {
-            case Some((document, accesslevel)) if accesslevel.canWrite =>
-              DocumentService.setFilepartSortOrder(docId, s.get).map(_ => Status(200))
-              
-            case Some(_) =>
-              Future.successful(Forbidden)
-              
-            case None =>
-              Future.successful(NotFound)
-          })
-        
-        case e: JsError => 
-          Future.successful(BadRequest)
-      }
-        
-      case None =>
-        Future.successful(BadRequest)
-    }    
-  }
-  
+    
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderDocumentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart) =>
+    renderDocumentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
       // ownerDataDir must exist, unless DB integrity is broken - renderDocumentResponse will handle the exception if .get fails
       val documentDir = getDocumentDir(document.getOwner, document.getId).get
       
@@ -77,7 +32,7 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
   }
   
   def getThumbnail(docId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderDocumentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart) =>
+    renderDocumentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
       openThumbnail(loggedIn.user.getUsername, docId, filepart.getFilename) match {
         case Some(file) => Ok.sendFile(file)
         case None => NotFound

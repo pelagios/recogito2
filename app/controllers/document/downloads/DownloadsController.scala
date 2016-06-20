@@ -10,7 +10,7 @@ class DownloadsController @Inject() (implicit val cache: CacheApi, val db: DB) e
 
   def showDownloadOptions(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.user.getUsername,
-        { case (document, fileparts) =>  Ok(views.html.document.downloads.index(loggedIn.user.getUsername, document)) })
+        { case (document, fileparts, accesslevel) =>  Ok(views.html.document.downloads.index(loggedIn.user.getUsername, document)) })
   }
 
 }

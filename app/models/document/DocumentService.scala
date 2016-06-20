@@ -3,7 +3,7 @@ package models.document
 import collection.JavaConversions._
 import models.BaseService
 import models.generated.Tables._
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord }
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, SharingPolicyRecord }
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import play.api.Logger
@@ -12,10 +12,11 @@ import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.{ DB, FileAccess }
+import models.generated.tables.records.SharingPolicyRecord
 
 case class PartOrdering(partId: Int, seqNo: Int)
 
-object DocumentService extends BaseService with FileAccess {
+object DocumentService extends BaseService with FileAccess with SharingPolicies {
   
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
@@ -49,13 +50,16 @@ object DocumentService extends BaseService with FileAccess {
     }
   }
   
-  private def determineAccessLevel(document: DocumentRecord, forUser: Option[String]): DocumentAccessLevel = forUser match {      
-    case Some(user) if (document.getOwner == user) => DocumentAccessLevel.OWNER
-
-    // TODO check sharing policies
-
-    case _ if (document.getIsPublic)               => DocumentAccessLevel.READ
-    case _                                         => DocumentAccessLevel.FORBIDDEN
+  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel = forUser match {      
+    case Some(user) if (document.getOwner == user) => 
+      DocumentAccessLevel.OWNER
+    case Some(user) => 
+      sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => DocumentAccessLevel.withName(p.getAccessLevel))
+        .getOrElse(DocumentAccessLevel.FORBIDDEN)
+    case _ if (document.getIsPublic) =>
+      DocumentAccessLevel.READ
+    case _ =>
+      DocumentAccessLevel.FORBIDDEN
   }
   
   /** Creates a new DocumentRecord from an UploadRecord **/
@@ -114,29 +118,66 @@ object DocumentService extends BaseService with FileAccess {
   
   /** Retrieves a document by its ID, along with access permissions for the given user **/
   def findById(id: String, loggedInUser: Option[String] = None)(implicit db: DB) = db.query { sql =>
-    Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne()).map(document =>
-      (document, determineAccessLevel(document, loggedInUser)))
+    loggedInUser match {
+      case Some(user) => {
+        val records = 
+          sql.selectFrom(DOCUMENT
+               .leftJoin(SHARING_POLICY)
+               .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
+               .and(SHARING_POLICY.SHARED_WITH.equal(SHARING_POLICY.DOCUMENT_ID)))
+             .where(DOCUMENT.ID.equal(id))
+             .fetchArray
+             
+        val grouped = groupLeftJoinResult(records, classOf[DocumentRecord], classOf[SharingPolicyRecord])
+        if (grouped.size > 1)
+          throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
+                      
+        grouped.headOption.map { case (document, sharingPolicies) =>
+          (document, determineAccessLevel(document, sharingPolicies, loggedInUser)) }
+      }
+      
+      case None =>
+        // Anonymous request - just retrieve document
+        Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne()).map(document =>
+          (document, determineAccessLevel(document, Seq.empty[SharingPolicyRecord], loggedInUser)))
+    }
   }
   
   /** Retrieves a document by ID, along with fileparts **/
   def findByIdWithFileparts(id: String, loggedInUser: Option[String] = None)(implicit db: DB) = db.query { sql =>
-    val records =
-      sql.selectFrom(DOCUMENT
-        .join(DOCUMENT_FILEPART)
-        .on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID)))
-      .where(DOCUMENT.ID.equal(id))
-      .fetchArray()
-
+    val records = loggedInUser match {
+      case Some(user) =>
+        // Retrieve with sharing policies that may apply
+        sql.selectFrom(DOCUMENT
+             .join(DOCUMENT_FILEPART)
+             .on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+             .leftJoin(SHARING_POLICY)
+             .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
+             .and(SHARING_POLICY.SHARED_WITH.equal(loggedInUser.get)))
+           .where(DOCUMENT.ID.equal(id))
+           .fetchArray
+        
+      case None =>
+        // Anonymous request - just retrieve document and fileparts
+        sql.selectFrom(DOCUMENT
+             .join(DOCUMENT_FILEPART)
+             .on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID)))
+           .where(DOCUMENT.ID.equal(id))
+           .fetchArray()
+    }
+    
     // Convert to (DocumentRecord, Seq[DocumentFilepartRecord) tuple
     val grouped = groupLeftJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
     if (grouped.size > 1)
       throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
+    
+    val sharingPolicies = records.map(_.into(classOf[SharingPolicyRecord])).filter(record => isNotNull(record)).distinct
 
     // Return with parts sorted by sequence number
     grouped
       .headOption
       .map { case (document, parts) =>
-        (document, parts.sortBy(_.getSequenceNo), determineAccessLevel(document, loggedInUser)) }
+        (document, parts.sortBy(_.getSequenceNo), determineAccessLevel(document, sharingPolicies, loggedInUser)) }
   }
 
   /** Retrieves a filepart by document ID and sequence number **/

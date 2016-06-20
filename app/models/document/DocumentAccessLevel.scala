@@ -1,5 +1,7 @@
 package models.document
 
+import play.api.libs.json.JsPath
+
 sealed trait DocumentAccessLevel {
   
   val canRead: Boolean
@@ -18,5 +20,8 @@ object DocumentAccessLevel {
   
   def withName(name: String): Option[DocumentAccessLevel] =
     Seq(FORBIDDEN, READ, WRITE, ADMIN, OWNER).find(_.toString == name)
+   
+  // JSON serialization
+  implicit val documentAccessLevelReads = JsPath.read[String].map(DocumentAccessLevel.withName(_).get)
 
 }

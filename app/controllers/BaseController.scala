@@ -8,6 +8,7 @@ import play.api.mvc.{ Request, Result, Controller, AnyContent }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import storage.DB
+import models.document.DocumentAccessLevel
 
 /** Helper trait so we can hand the injected DB into other traits **/
 trait HasDatabase { def db: DB }
@@ -46,13 +47,13 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
     * the method handles Forbidden/Not Found error cases.
     */
   protected def renderDocumentResponse(docId: String, user: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Result)(implicit cache: CacheApi, db: DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Result)(implicit cache: CacheApi, db: DB) = {
 
-    DocumentService.findByIdWithFileparts(docId).map(_ match {
+    DocumentService.findByIdWithFileparts(docId, Some(user)).map(_ match {
       case Some((document, fileparts, accesslevel)) => {
         // Verify if the user is allowed to access this document - TODO what about shared content?
         if (document.getOwner == user)
-          response(document, fileparts)
+          response(document, fileparts, accesslevel)
         else
           Forbidden
       }
@@ -67,13 +68,13 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
   }
   
   protected def renderAsyncDocumentResponse(docId: String, user: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Future[Result])(implicit cache: CacheApi, db: DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Future[Result])(implicit cache: CacheApi, db: DB) = {
 
     DocumentService.findByIdWithFileparts(docId).flatMap(_ match {
       case Some((document, fileparts, accesslevel)) => {
         // Verify if the user is allowed to access this document - TODO what about shared content?
         if (document.getOwner == user)
-          response(document, fileparts)
+          response(document, fileparts, accesslevel)
         else
           Future.successful(Forbidden)
       }
@@ -89,14 +90,14 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
 
   /** Helper that covers the boilerplate for all document part views **/
   protected def renderDocumentPartResponse(docId: String, partNo: Int, user: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord) => Result)(implicit cache: CacheApi, db: DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Result)(implicit cache: CacheApi, db: DB) = {
 
-    renderDocumentResponse(docId, user, { case (document, fileparts) =>
+    renderDocumentResponse(docId, user, { case (document, fileparts, accesslevel) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
       if (selectedPart.isEmpty)
         NotFound
       else if (selectedPart.size == 1)
-        response(document, fileparts, selectedPart.head)
+        response(document, fileparts, selectedPart.head, accesslevel)
       else
         // More than one part with this sequence number - DB integrity broken!
         throw new Exception("Invalid ocument part")
