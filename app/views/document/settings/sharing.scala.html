@@ -1,14 +1,34 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader)
+@(username: String, document: models.generated.tables.records.DocumentRecord,
+  sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord])(implicit request: RequestHeader)
 
 @_layout("Settings - Sharing", username, document, Some("sharing")) {
-  <input type="checkbox" id="public-visibility" name="public-visibility" @if(document.getIsPublic) { checked="checked" }>
-  <label for="public-visibility">
-    Visible to all
-    <p class="description">
-      Make this document visible to the public. Visitors can see your annotations, but
-      not edit. Link to share:
-    </p>
-    <input type="text" id="public-link" value="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(document.getId).absoluteURL"/>
+  <div class="share-public">
+    <input type="checkbox" id="public-visibility" name="public-visibility" @if(document.getIsPublic) { checked="checked" }>
+    <label for="public-visibility">
+      Visible to all
+      <p class="description">
+        Make this document visible to the public. Visitors can see your annotations, but
+        not edit. Link to share:
+      </p>
+      <input type="text" id="public-link" value="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(document.getId).absoluteURL"/>
+    </div>
+
+    <!-- div class="share-collab">
+      <h2>Collaborators</h2>
+      <table>
+        @for(shared <- sharingPolicies) {
+          <tr>
+            <td>@shared.getSharedWith</td>
+            <td>@shared.getAccessLevel</td>
+            <td>X</td>
+          </tr>
+        }
+      </table>
+      <div class="add-collaborator">
+        <input type="text" placeholder="Enter name or e-mail address"/>
+      </div>
+    </div -->
+
     <script>
       jQuery(document).ready(function() {
         var checkbox = jQuery('#public-visibility'),

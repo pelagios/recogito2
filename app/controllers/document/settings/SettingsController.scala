@@ -15,6 +15,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.Future
 import storage.DB
+import models.sharing.SharingPolicyService
 
 case class RollbackData(annotationId: UUID, versionId: UUID)
 
@@ -26,6 +27,8 @@ object RollbackData {
   )(RollbackData.apply _)
 
 }
+
+// case class DocumentSharingPolicy(sharedWith: String, accessLevel: DocumentAcce
 
 class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
 
@@ -67,17 +70,22 @@ class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB) ex
   }
   
   def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
-    renderDocumentResponse(documentId, loggedIn.user.getUsername,
+    renderAsyncDocumentResponse(documentId, loggedIn.user.getUsername,
       { case (document, fileparts) =>
-        tab.map(_.toLowerCase) match {
-          case Some(t) if t == "sharing" =>
-            Ok(views.html.document.settings.sharing(loggedIn.user.getUsername, document))
+        tab.map(_.toLowerCase) match { 
+          case Some(t) if t == "sharing" => {
+            val f = for {
+              sharingPolicies <- SharingPolicyService.listDocumentCollaborators(documentId)
+            } yield sharingPolicies
+            
+            f.map(t => (Ok(views.html.document.settings.sharing(loggedIn.user.getUsername, document, t))))
+          }
             
           case Some(t) if t == "history" =>
-            Ok(views.html.document.settings.history(loggedIn.user.getUsername, document))
+            Future.successful(Ok(views.html.document.settings.history(loggedIn.user.getUsername, document)))
             
           case _ =>
-            Ok(views.html.document.settings.metadata(loggedIn.user.getUsername, document)) 
+            Future.successful(Ok(views.html.document.settings.metadata(loggedIn.user.getUsername, document))) 
         }
       }
     )

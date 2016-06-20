@@ -6,6 +6,7 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import play.api.cache.CacheApi
 import play.api.mvc.{ Request, Result, Controller, AnyContent }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.Future
 import storage.DB
 
 /** Helper trait so we can hand the injected DB into other traits **/
@@ -59,6 +60,27 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
       case None =>
         // No document with that ID found in DB
         NotFound
+    }).recover { case t =>
+      t.printStackTrace()
+      InternalServerError(t.getMessage)
+    }
+  }
+  
+  protected def renderAsyncDocumentResponse(docId: String, user: String,
+      response: (DocumentRecord, Seq[DocumentFilepartRecord]) => Future[Result])(implicit cache: CacheApi, db: DB) = {
+
+    DocumentService.findByIdWithFileparts(docId).flatMap(_ match {
+      case Some((document, fileparts, accesslevel)) => {
+        // Verify if the user is allowed to access this document - TODO what about shared content?
+        if (document.getOwner == user)
+          response(document, fileparts)
+        else
+          Future.successful(Forbidden)
+      }
+
+      case None =>
+        // No document with that ID found in DB
+        Future.successful(NotFound)
     }).recover { case t =>
       t.printStackTrace()
       InternalServerError(t.getMessage)

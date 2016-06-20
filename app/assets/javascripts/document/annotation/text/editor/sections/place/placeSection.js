@@ -60,7 +60,7 @@ define([
           '<div class="no-match">' +
             '<h3>No automatic match found</h3>' +
             '<button class="change">Search</button> ' +
-            '<button class="delete">&#xf014;</button>' +
+            '<button class="delete icon">&#xf014;</button>' +
           '</div>'),
 
         panelContainer = element.find('.panel-container'),
