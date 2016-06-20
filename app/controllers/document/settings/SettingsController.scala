@@ -1,82 +1,65 @@
 package controllers.document.settings
 
 import controllers.BaseController
-import java.util.UUID
+import controllers.document.settings.actions._
 import javax.inject.Inject
-import models.annotation.AnnotationService
-import models.contribution.ContributionService
-import models.document.DocumentAccessLevel
+import models.document.DocumentService
 import models.generated.tables.records.DocumentRecord
 import models.user.Roles._
-import play.api.Logger
 import play.api.cache.CacheApi
+import play.api.mvc.{ AnyContent, Result, Request }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
 import scala.concurrent.Future
 import storage.DB
-import controllers.document.settings.sortorder.SortOrderSettings
-import controllers.document.settings.access.AccessSettings
-import controllers.document.settings.rollback.RollbackActions
-import models.document.DocumentService
+import play.api.libs.json.{ Json, JsSuccess, JsError, Reads }
 
-case class CollaboratorStub(collaborator: String, accessLevel: Option[DocumentAccessLevel])
-
-object CollaboratorStub {
+/** Holds the boilerplate needed to verify user access level is OWNER or ADMIN **/
+trait HasAdminAction { self: BaseController =>
   
-  implicit val collaboratorStubReads: Reads[CollaboratorStub] = (
-    (JsPath \ "collaborator").read[String] and
-    (JsPath \ "access_level").readNullable[DocumentAccessLevel]
-  )(CollaboratorStub.apply _)
+  import models.document.DocumentAccessLevel._
+  
+  def documentAdminAction(documentId: String, username: String, action: DocumentRecord => Future[Result]) = {
+    DocumentService.findById(documentId, Some(username))(self.db).flatMap(_ match {      
+      case Some((document, accesslvl)) if (accesslvl == OWNER || accesslvl == ADMIN) => action(document)
+      case Some(_) => Future.successful(Forbidden)
+      case None => Future.successful(NotFound)
+    })
+  }
+  
+  def jsonDocumentAdminAction[T](documentId: String, username: String, action: (DocumentRecord, T) => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]) = {
+    request.body.asJson match {
+      case Some(json) => Json.fromJson[T](json) match {
+        case s: JsSuccess[T] =>
+          DocumentService.findById(documentId, Some(username))(self.db).flatMap(_ match {
+            case Some((document, accesslvl)) if (accesslvl == OWNER || accesslvl == ADMIN) => action(document, s.get)
+            case Some(_) => Future.successful(Forbidden)
+            case None => Future.successful(NotFound)
+          })
+        
+        case e: JsError => Future.successful(BadRequest)
+      }
+        
+      case None => Future.successful(BadRequest)
+    }    
+  }
   
 }
 
 class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB)
-  extends BaseController with SortOrderSettings with AccessSettings with RollbackActions {
-  
-  def addCollaborator(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderAsyncDocumentResponse(documentId, loggedIn.user.getUsername, { case (document, fileparts, accesslevel) => 
-      request.body.asJson match {
-        case Some(json) => Json.fromJson[CollaboratorStub](json) match {
-          case s: JsSuccess[CollaboratorStub] => {
-            Logger.info("Add collaborator " + s.get.collaborator)
-            null
-          }
-          
-          case e: JsError => {
-            Logger.warn("POST to /settings/add-collaborator but invalid JSON: " + e.toString)
-            Future.successful(BadRequest)
-          }
-        }
-          
-        case None => {
-          Logger.warn("POST to /settings/rollback but no JSON payload")
-          Future.successful(BadRequest)
-        }
-      }
-    })
-  }
-  
-  /*
-  def documentAdminAction(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderAsyncDocumentResponse(documentId, loggedIn.user.getUsername, { case (document, fileparts, accesslevel) =>
-      if (document.g
-    }
-  }
-  * 
-  */
-  
+  extends BaseController
+    with HasAdminAction
+    with MetadataActions 
+    with RollbackActions
+    with SharingActions {
+    
   def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    
-    /** TODO settings only visible to OWNER and ADMIN **/
-    
-    renderAsyncDocumentResponse(documentId, loggedIn.user.getUsername, { case (document, fileparts, accesslevel) =>
+    // Settings page is only visible to OWNER or ADMIN access levels
+    documentAdminAction(documentId, loggedIn.user.getUsername, { document =>
       tab.map(_.toLowerCase) match { 
         case Some(t) if t == "sharing" => {
           val f = for {
-            sharingPolicies <- DocumentService.listDocumentCollaborators(documentId)
-          } yield sharingPolicies
+            collaborators <- DocumentService.listDocumentCollaborators(documentId)
+          } yield collaborators
            
           f.map(t => (Ok(views.html.document.settings.sharing(loggedIn.user.getUsername, document, t))))
         }
