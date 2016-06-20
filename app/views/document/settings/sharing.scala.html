@@ -6,7 +6,7 @@
     <h2>Public Access</h2>
       <div class="inner">
         <input type="checkbox" id="public-access" name="public-access" @if(document.getIsPublic) { checked="checked" } />
-        <label for="public-visibility">Visible to all</label>
+        <label for="public-access">Visible to all</label>
         <p class="checkbox-details">
           This document will be visible to the public. Visitors can see your annotations, but
           not edit. Link to share:
@@ -20,24 +20,31 @@
     <div class="panel share-collab">
       <h2>Collaborators</h2>
       <div class="inner">
-        <table>
-          @for(shared <- sharingPolicies) {
-            <tr>
-              <td>@shared.getSharedWith</td>
-              <td>@shared.getAccessLevel</td>
-              <td>X</td>
-            </tr>
-          }
-        </table>
-        <div class="panel add-collaborator">
-          <input type="text" placeholder="Enter name or e-mail address"/>
-        </div>
+        @if(sharingPolicies.isEmpty) {
+          <p class="no-collaborators">
+            This document doesn't have any collaborators yet.
+            Use the form below to add a collaborator.
+          </p>
+        } else {
+          <table class="collaborators">
+            @for(shared <- sharingPolicies) {
+              <tr>
+                <td>@shared.getSharedWith</td>
+                <td>@shared.getAccessLevel</td>
+                <td>X</td>
+              </tr>
+            }
+          </table>
+        }
+      </div>
+      <div class="add-collaborators">
+        <input class="add-collaborator" type="text" placeholder="Enter name or e-mail address"/>
       </div>
     </div>
 
     <script>
       jQuery(document).ready(function() {
-        var checkbox = jQuery('#public-visibility'),
+        var checkbox = jQuery('#public-access'),
             link = jQuery("#public-link");
 
         checkbox.change(function() {
