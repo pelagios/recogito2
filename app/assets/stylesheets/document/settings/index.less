@@ -16,9 +16,8 @@
   left:200px;
   padding:20px 30px;
   background-color:@blueish-white-hi;
-  color:@standard-type;
 
-  h1 {
+/*  h1 {
     font-weight:normal;
     padding:10px 0;
   }
@@ -40,7 +39,7 @@
       padding:0;
     }
 
-  } /** td **/
+  } /** td **
 
   td.action {
     width:0;
@@ -52,6 +51,36 @@
 
   td.action:hover {
     color:@ocean;
+  } */
+
+}
+
+.panel {
+  background-color:#fff;
+  padding:0;
+  margin-bottom:15px;
+  border:1px solid @lightgrey-border-darker;
+  .rounded-corners(2px);
+
+  h2 {
+    background-color:@blueish-white;
+    font-weight:normal;
+    font-size:18px;
+    padding:6px 15px;
+    border-bottom:1px solid @lightgrey-border-darker;
+  }
+
+  .inner {
+    font-size:16px;
+    line-height:21px;
+    padding:15px;
+    padding-bottom:20px;
+  }
+
+  .checkbox-details {
+    margin:0;
+    padding:0 0 0 20px;
+    color:darken(@lightgrey-type, 12%);
   }
 
 }

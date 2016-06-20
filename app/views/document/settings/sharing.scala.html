@@ -2,32 +2,38 @@
   sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord])(implicit request: RequestHeader)
 
 @_layout("Settings - Sharing", username, document, Some("sharing")) {
-  <div class="share-public">
-    <input type="checkbox" id="public-visibility" name="public-visibility" @if(document.getIsPublic) { checked="checked" }>
-    <label for="public-visibility">
-      Visible to all
-      <p class="description">
-        Make this document visible to the public. Visitors can see your annotations, but
-        not edit. Link to share:
-      </p>
-      <input type="text" id="public-link" value="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(document.getId).absoluteURL"/>
+  <div class="panel share-public">
+    <h2>Public Access</h2>
+      <div class="inner">
+        <input type="checkbox" id="public-access" name="public-access" @if(document.getIsPublic) { checked="checked" } />
+        <label for="public-visibility">Visible to all</label>
+        <p class="checkbox-details">
+          This document will be visible to the public. Visitors can see your annotations, but
+          not edit. Link to share:
+        </p>
+        <p class="checkbox-details">
+          <input type="text" id="public-link" value="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(document.getId).absoluteURL"/>
+        </p>
+      </div>
     </div>
 
-    <!-- div class="share-collab">
+    <div class="panel share-collab">
       <h2>Collaborators</h2>
-      <table>
-        @for(shared <- sharingPolicies) {
-          <tr>
-            <td>@shared.getSharedWith</td>
-            <td>@shared.getAccessLevel</td>
-            <td>X</td>
-          </tr>
-        }
-      </table>
-      <div class="add-collaborator">
-        <input type="text" placeholder="Enter name or e-mail address"/>
+      <div class="inner">
+        <table>
+          @for(shared <- sharingPolicies) {
+            <tr>
+              <td>@shared.getSharedWith</td>
+              <td>@shared.getAccessLevel</td>
+              <td>X</td>
+            </tr>
+          }
+        </table>
+        <div class="panel add-collaborator">
+          <input type="text" placeholder="Enter name or e-mail address"/>
+        </div>
       </div>
-    </div -->
+    </div>
 
     <script>
       jQuery(document).ready(function() {
