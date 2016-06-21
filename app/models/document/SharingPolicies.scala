@@ -17,6 +17,7 @@ trait SharingPolicies {
       new Timestamp(new Date().getTime),
       accessLevel.toString)
     
+    sharingPolicy.changed(SHARING_POLICY.ID, false)
     sql.insertInto(SHARING_POLICY).set(sharingPolicy).execute() == 1
   } 
   
