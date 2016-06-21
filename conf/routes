@@ -47,7 +47,9 @@ GET     /document/:id/share                          controllers.document.share.
 GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
 PUT     /document/:id/settings/sortorder             controllers.document.settings.SettingsController.setSortOrder(id: String)
 PUT     /document/:id/settings/public                controllers.document.settings.SettingsController.setIsPublic(id: String, enabled: Boolean)
-PUT     /document/:id/settings/add-collaborator      controllers.document.settings.SettingsController.addCollaborator(id: String)
+PUT     /document/:id/settings/collaborator          controllers.document.settings.SettingsController.addCollaborator(id: String)
+DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
+GET     /document/:id/settings/collaborator/search   controllers.document.settings.SettingsController.searchUsers(id: String, q: String)
 POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -38,54 +38,24 @@
         }
       </div>
       <div class="add-collaborators">
-        <form method="POST">
+        <form>
           <input type="text" name="collaborator" placeholder="Enter name or e-mail address"/>
         <form>
       </div>
     </div>
 
     <script>
-      jQuery(document).ready(function() {
-        var checkbox = jQuery('#public-access'),
-
-            publicLink = jQuery("#public-link"),
-
-            collaborators = jQuery('.collaborators'),
-
-            addCollabForm = jQuery('.add-collaborators form'),
-
-            addCollaborator = function(e) {
-              var data = addCollabForm.serializeArray().reduce(function(obj, item) {
-                obj[item.name] = item.value;
-                return obj;
-              }, {});
-
-              // JSON.stringify(data));
-              return false;
-            },
-
-            removeCollaborator = function(e) {
-              var username = jQuery(e.target).closest('tr').data('username');
-              console.log(username);
-            };
-
-        checkbox.change(function() {
-          var checked = checkbox.is(':checked');
-          checkbox.prop('disabled', true);
-          jsRoutes.controllers.document.settings.SettingsController.setIsPublic('@document.getId', checked).ajax().done(function() {
-            checkbox.prop('disabled', false);
-          });
-        });
-
-        publicLink.focus(function() { jQuery(this).select(); } );
-
-        collaborators.on('click', '.remove-collaborator', removeCollaborator);
-
-        addCollabForm.submit(addCollaborator);
-      });
+      window.config = {
+        documentId: '@document.getId'
+      }
     </script>
+    <script src="@routes.Assets.versioned("lib/typeaheadjs/typeahead.jquery.min.js")"></script>
+    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/document/settings/sharing.js")"></script>
     @helper.javascriptRouter("jsRoutes")(
-      controllers.document.settings.routes.javascript.SettingsController.setIsPublic
+      controllers.document.settings.routes.javascript.SettingsController.setIsPublic,
+      controllers.document.settings.routes.javascript.SettingsController.searchUsers,
+      controllers.document.settings.routes.javascript.SettingsController.addCollaborator,
+      controllers.document.settings.routes.javascript.SettingsController.removeCollaborator
     )
   </label>
 }

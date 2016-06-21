@@ -57,6 +57,22 @@ object UserService extends BaseService with FileAccess {
       case Some(userWithRoles) => computeHash(userWithRoles.user.getSalt + password) == userWithRoles.user.getPasswordHash
       case None => false
     })
+    
+  /** Runs a prefix search on usernames.
+    *
+    * To keep result size low (and add some extra 'privacy') the method only matches on
+    * usernames that are at most 2 characters longer than the query.
+    */
+  def searchUsers(query: String)(implicit db: DB): Future[Seq[String]] = db.query { sql =>
+    if (query.size > 2)
+      sql.selectFrom(USER)
+         .where(USER.USERNAME.like(query + "%")
+           .and(USER.USERNAME.length().lt(query.size + 4)))
+         .fetch()
+         .getValues(USER.USERNAME, classOf[String]).toSeq
+    else
+      Seq.empty[String]
+  }
 
   def getUsedDiskspaceKB(username: String) =
     getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l)

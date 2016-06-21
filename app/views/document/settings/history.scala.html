@@ -11,7 +11,7 @@
     }
   </script>
   <script src="@routes.Assets.versioned("lib/timeago/jquery.timeago.js")"></script>
-  <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/document/settings/app.js")"></script>
+  <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/document/settings/history.js")"></script>
   @helper.javascriptRouter("jsRoutes")(
     controllers.api.routes.javascript.ContributionAPIController.getContributionHistory,
     controllers.document.settings.routes.javascript.SettingsController.rollbackByTime
