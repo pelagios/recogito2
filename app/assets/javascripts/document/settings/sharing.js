@@ -65,8 +65,11 @@ require(['common/config'], function(Config) {
             var row =
               '<tr data-username="' + result.collaborator + '">' +
                 '<td>' + result.collaborator + '</td>' +
-                '<td>' + result.access_level + '</td>' +
+                '<td>' +
+                  '<button class="btn small">' + result.access_level + '<span class="icon">&#xf0dd;</span></button>' +
+                '</td>' +
                 '<td class="outline-icon remove-collaborator">&#xe897;</td>' +
+
               '</tr>';
 
             noCollaboratorsMessage.hide();

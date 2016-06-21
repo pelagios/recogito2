@@ -28,7 +28,9 @@
           @for(shared <- sharingPolicies) {
             <tr data-username="@shared.getSharedWith">
               <td>@shared.getSharedWith</td>
-              <td>@shared.getAccessLevel</td>
+              <td>
+                <button class="btn small">@shared.getAccessLevel<span class="icon">&#xf0dd;</span></button>
+              </td>
               <td class="outline-icon remove-collaborator">&#xe897;</td>
             </tr>
           }
