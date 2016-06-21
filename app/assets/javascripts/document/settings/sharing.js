@@ -14,7 +14,26 @@ require(['common/config'], function(Config) {
   };
 
   jQuery(document).ready(function() {
-    var publicAccessCheckbox = jQuery('#public-access'),
+    var permissionSelector = jQuery(
+          '<div class="permission-selector">' +
+            '<h3>Permission Level</h3>' +
+            '<ul>' +
+              '<li>' +
+                '<h4>Admin</h4>' +
+                '<p>Collaborators can edit document metadata, invite other collaborators, backup and restore, and roll back the edit history.</p>' +
+              '</li>' +
+              '<li>' +
+                '<h4>Write</h4>' +
+                '<p>Collaborators can read document and annotations, create new annotations, and add comments.</p>' +
+              '</li>' +
+              '<li>' +
+                '<h4>Read</h4>' +
+                '<p>Collaborators can read the document and annotations.</p>' +
+              '</li>' +
+            '</ul>' +
+          '</div>'),
+
+        publicAccessCheckbox = jQuery('#public-access'),
         publicAccessLink = jQuery("#public-link"),
 
         noCollaboratorsMessage = jQuery('.no-collaborators'),
@@ -51,6 +70,21 @@ require(['common/config'], function(Config) {
             });
         },
 
+        togglePermissions = function(e) {
+          var button = jQuery(e.target).closest('button'),
+              position = button.position();
+
+          if (permissionSelector.is(':visible')) {
+            permissionSelector.hide();
+          } else {
+            permissionSelector.css({
+              top: position.top + button.height() + 14,
+              left: position.left + 2
+            });
+            permissionSelector.show();
+          }
+        },
+
         addCollaborator = function(e) {
           // Convert form data to object
           var data = addCollaboratorForm.serializeArray().reduce(function(obj, item) {
@@ -66,7 +100,7 @@ require(['common/config'], function(Config) {
                 row = '<tr data-username="' + result.collaborator + '">' +
                         '<td><a href="' + collabHome + '">' + result.collaborator + '</a></td>' +
                         '<td>' +
-                          '<button class="btn small">' + result.access_level + '<span class="icon">&#xf0dd;</span></button>' +
+                          '<button class="permissions btn small">' + result.access_level + '<span class="icon">&#xf0dd;</span></button>' +
                         '</td>' +
                         '<td class="outline-icon remove-collaborator">&#xe897;</td>' +
                       '</tr>';
@@ -102,7 +136,13 @@ require(['common/config'], function(Config) {
 
     // Add collaborators panel
     initAutosuggest();
+    permissionSelector.hide();
+
+    // TODO append (and re-append) to corresponding TD
+    jQuery('.share-collab').append(permissionSelector);
+
     collaboratorsTable.on('click', '.remove-collaborator', removeCollaborator);
+    collaboratorsTable.on('click', '.permissions', togglePermissions);
     addCollaboratorForm.submit(addCollaborator);
   });
 
