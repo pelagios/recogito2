@@ -118,7 +118,8 @@ CREATE TABLE sharing_policy (
   shared_by TEXT NOT NULL REFERENCES "user"(username),
   shared_with TEXT NOT NULL REFERENCES "user"(username),
   shared_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  access_level TEXT NOT NULL
+  access_level TEXT NOT NULL,
+  UNIQUE (document_id, shared_with)
 );
 
 -- keep a log of what happened for shared elements

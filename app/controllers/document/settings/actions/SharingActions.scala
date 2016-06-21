@@ -3,6 +3,7 @@ package controllers.document.settings.actions
 import controllers.BaseController
 import controllers.document.settings.HasAdminAction
 import models.document.{ DocumentAccessLevel, DocumentService }
+import models.generated.tables.records.SharingPolicyRecord
 import models.user.Roles._
 import models.user.UserService
 import play.api.libs.json._
@@ -16,10 +17,13 @@ case class CollaboratorStub(collaborator: String, accessLevel: Option[DocumentAc
 
 object CollaboratorStub {
   
-  implicit val collaboratorStubReads: Reads[CollaboratorStub] = (
-    (JsPath \ "collaborator").read[String] and
-    (JsPath \ "access_level").readNullable[DocumentAccessLevel]
-  )(CollaboratorStub.apply _)
+  implicit val collaboratorStubFormat: Format[CollaboratorStub] = (
+    (JsPath \ "collaborator").format[String] and
+    (JsPath \ "access_level").formatNullable[DocumentAccessLevel]
+  )(CollaboratorStub.apply, unlift(CollaboratorStub.unapply))
+  
+  def fromSharingPolicy(policy: SharingPolicyRecord) = 
+    CollaboratorStub(policy.getSharedWith, DocumentAccessLevel.withName(policy.getAccessLevel))
   
 }
 
@@ -39,7 +43,7 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
       UserService.findByUsername(stub.collaborator)(self.db, self.cache).flatMap { _ match {
         case Some(userWithRoles) => 
           DocumentService.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)(self.db)
-            .map { success => if (success) Status(200) else InternalServerError }
+            .map(policy => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy))))
           
         case None => 
           Future.successful(NotFound)

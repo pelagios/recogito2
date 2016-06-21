@@ -17,6 +17,7 @@ require(['common/config'], function(Config) {
     var publicAccessCheckbox = jQuery('#public-access'),
         publicAccessLink = jQuery("#public-link"),
 
+        noCollaboratorsMessage = jQuery('.no-collaborators'),
         collaboratorsTable = jQuery('.collaborators'),
         addCollaboratorForm = jQuery('.add-collaborators form'),
         addCollaboratorInput = addCollaboratorForm.find('input'),
@@ -60,9 +61,19 @@ require(['common/config'], function(Config) {
           jsRoutes.controllers.document.settings.SettingsController.addCollaborator(Config.documentId).ajax({
             contentType: 'application/json',
             data: JSON.stringify(data)
+          }).done(function(result) {
+            var row =
+              '<tr data-username="' + result.collaborator + '">' +
+                '<td>' + result.collaborator + '</td>' +
+                '<td>' + result.access_level + '</td>' +
+                '<td class="outline-icon remove-collaborator">&#xe897;</td>' +
+              '</tr>';
+
+            noCollaboratorsMessage.hide();
+            collaboratorsTable.append(row);
           });
 
-          // TODO feedback on success or failure
+          // TODO what in case of failure?
 
           e.preventDefault();
           return false;
@@ -70,9 +81,16 @@ require(['common/config'], function(Config) {
 
         removeCollaborator = function(e) {
           var username = jQuery(e.target).closest('tr').data('username');
-          jsRoutes.controllers.document.settings.SettingsController.removeCollaborator(Config.documentId, username).ajax();
+          jsRoutes.controllers.document.settings.SettingsController.removeCollaborator(Config.documentId, username)
+            .ajax().done(function() {
+              var row = jQuery('tr[data-username="' + username + '"]');
+              row.remove();
 
-          // TODO feedback on success or failure
+              if (collaboratorsTable.find('tr').length === 0)
+                noCollaboratorsMessage.show();
+            });
+
+            // TODO what in case of failure?
 
         };
 

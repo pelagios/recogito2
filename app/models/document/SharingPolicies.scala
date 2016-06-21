@@ -18,7 +18,8 @@ trait SharingPolicies {
       accessLevel.toString)
     
     sharingPolicy.changed(SHARING_POLICY.ID, false)
-    sql.insertInto(SHARING_POLICY).set(sharingPolicy).execute() == 1
+    sql.insertInto(SHARING_POLICY).set(sharingPolicy).execute()
+    sharingPolicy
   } 
   
   def removeDocumentCollaborator(documentId: String, sharedWith: String)(implicit db: DB) = db.query { sql =>

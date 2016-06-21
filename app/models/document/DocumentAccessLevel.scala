@@ -1,6 +1,8 @@
 package models.document
 
-import play.api.libs.json.JsPath
+import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._
 
 sealed trait DocumentAccessLevel {
   
@@ -22,6 +24,10 @@ object DocumentAccessLevel {
     Seq(FORBIDDEN, READ, WRITE, ADMIN, OWNER).find(_.toString == name)
    
   // JSON serialization
-  implicit val documentAccessLevelReads = JsPath.read[String].map(DocumentAccessLevel.withName(_).get)
+  implicit val documentAccessLevelFromat: Format[DocumentAccessLevel] = 
+    Format(
+      JsPath.read[String].map(DocumentAccessLevel.withName(_).get),
+      Writes[DocumentAccessLevel](l => JsString(l.toString))
+    )
 
 }

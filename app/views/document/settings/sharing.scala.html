@@ -20,22 +20,19 @@
     <div class="panel share-collab">
       <h2>Collaborators</h2>
       <div class="inner">
-        @if(sharingPolicies.isEmpty) {
-          <p class="no-collaborators">
-            This document doesn't have any collaborators yet.
-            Use the form below to add a collaborator.
-          </p>
-        } else {
-          <table class="collaborators">
-            @for(shared <- sharingPolicies) {
-              <tr data-username="@shared.getSharedWith">
-                <td>@shared.getSharedWith</td>
-                <td>@shared.getAccessLevel</td>
-                <td class="outline-icon remove-collaborator">&#xe897;</td>
-              </tr>
-            }
-          </table>
-        }
+        <p class="no-collaborators" @if(!sharingPolicies.isEmpty) { style="display:none" }>
+          This document doesn't have any collaborators yet.
+          Use the form below to add a collaborator.
+        </p>
+        <table class="collaborators">
+          @for(shared <- sharingPolicies) {
+            <tr data-username="@shared.getSharedWith">
+              <td>@shared.getSharedWith</td>
+              <td>@shared.getAccessLevel</td>
+              <td class="outline-icon remove-collaborator">&#xe897;</td>
+            </tr>
+          }
+        </table>
       </div>
       <div class="add-collaborators">
         <form>
