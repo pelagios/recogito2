@@ -61,7 +61,13 @@ class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB)
             collaborators <- DocumentService.listDocumentCollaborators(documentId)
           } yield collaborators
            
-          f.map(t => (Ok(views.html.document.settings.sharing(loggedIn.user.getUsername, document, t))))
+          f.map(t => 
+            // Make sure this page isn't cached, since stuff gets added via AJAX
+            Ok(views.html.document.settings.sharing(loggedIn.user.getUsername, document, t))
+              .withHeaders(
+                CACHE_CONTROL -> "no-cache, no-store, must-revalidate",
+                PRAGMA -> "no-cache",
+                EXPIRES -> "0"))
         }
             
         case Some(t) if t == "history" =>

@@ -27,7 +27,9 @@
         <table class="collaborators">
           @for(shared <- sharingPolicies) {
             <tr data-username="@shared.getSharedWith">
-              <td>@shared.getSharedWith</td>
+              <td>
+                <a href="@controllers.my.routes.MyRecogitoController.index(shared.getSharedWith, None)">@shared.getSharedWith</a>
+              </td>
               <td>
                 <button class="btn small">@shared.getAccessLevel<span class="icon">&#xf0dd;</span></button>
               </td>
@@ -51,6 +53,7 @@
     <script src="@routes.Assets.versioned("lib/typeaheadjs/typeahead.jquery.min.js")"></script>
     <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/document/settings/sharing.js")"></script>
     @helper.javascriptRouter("jsRoutes")(
+      controllers.my.routes.javascript.MyRecogitoController.index,
       controllers.document.settings.routes.javascript.SettingsController.setIsPublic,
       controllers.document.settings.routes.javascript.SettingsController.searchUsers,
       controllers.document.settings.routes.javascript.SettingsController.addCollaborator,

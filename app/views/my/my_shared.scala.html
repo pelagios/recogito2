@@ -1,6 +1,16 @@
 @(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, quotaMB: Int, myDocCount: Int,
   sharedDocuments: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord)])(implicit request: RequestHeader)
 
+@accessLevel(lvl: String) = {
+  @if(lvl == "READ") {
+    <span title="Read-only Access" class="icon">&#xf06e;</span>
+  } else { @if(lvl == "WRITE") {
+    <span title="Write Access" class="icon">&#xf044;</span>
+  } else { @if(lvl == "ADMIN") {
+    <span title="Admin Privileges" class="icon">&#xf0ad;]</span>
+  }}}
+}
+
 @_layout(user, usedDiskspace, quotaMB, myDocCount, sharedDocuments.total, "shared") {
   <table class="document-list">
     <thead>
@@ -9,6 +19,9 @@
         <td>Author</td>
         <td>Name</td>
         <td>Date</td>
+        <td>Owner</td>
+        <td>Shared By</td>
+        <td class="centered">Access Level</td>
         <td>Last Edit</td>
         <td>File Size</td>
         <td>Annotations</td>
@@ -21,6 +34,9 @@
           <td>@document.getAuthor</td>
           <td>@document.getTitle</td>
           <td>@document.getDateFreeform</td>
+          <td>@document.getOwner</td>
+          <td>@sharingPolicy.getSharedBy</td>
+          <td class="centered">@accessLevel(sharingPolicy.getAccessLevel)</td>
           <td>-</td>
           <td>-</td>
           <td>-</td>

@@ -62,15 +62,14 @@ require(['common/config'], function(Config) {
             contentType: 'application/json',
             data: JSON.stringify(data)
           }).done(function(result) {
-            var row =
-              '<tr data-username="' + result.collaborator + '">' +
-                '<td>' + result.collaborator + '</td>' +
-                '<td>' +
-                  '<button class="btn small">' + result.access_level + '<span class="icon">&#xf0dd;</span></button>' +
-                '</td>' +
-                '<td class="outline-icon remove-collaborator">&#xe897;</td>' +
-
-              '</tr>';
+            var collabHome = jsRoutes.controllers.my.MyRecogitoController.index(result.collaborator).url,
+                row = '<tr data-username="' + result.collaborator + '">' +
+                        '<td><a href="' + collabHome + '">' + result.collaborator + '</a></td>' +
+                        '<td>' +
+                          '<button class="btn small">' + result.access_level + '<span class="icon">&#xf0dd;</span></button>' +
+                        '</td>' +
+                        '<td class="outline-icon remove-collaborator">&#xe897;</td>' +
+                      '</tr>';
 
             noCollaboratorsMessage.hide();
             collaboratorsTable.append(row);
