@@ -186,11 +186,11 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
       .deletePendingUpload(loggedIn.user.getUsername)
       .map(success => {
         // TODO add error message if success == false
-        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
+        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None))
       })
       .recover{ case t =>
         // TODO add error message
-        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
+        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None))
       }
   }
 

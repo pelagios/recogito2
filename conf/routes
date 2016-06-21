@@ -97,7 +97,7 @@ GET     /:username/upload/tiling-progress/:docId     controllers.my.upload.Uploa
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my                                          controllers.my.MyRecogitoController.my
-GET     /:username                                   controllers.my.MyRecogitoController.index(username: String)
+GET     /:username                                   controllers.my.MyRecogitoController.index(username: String, tab: Option[String])
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Application root

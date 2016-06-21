@@ -3,12 +3,15 @@ package controllers.my
 import controllers.{ HasCache, HasDatabase, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
+import models.Page
 import models.user.UserService
 import models.document.DocumentService
+import models.generated.tables.records.{ DocumentRecord, UserRecord }
+import models.generated.tables.records.UserRecord
 import play.api.Play
 import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.mvc.Controller
+import play.api.mvc.{ Controller, RequestHeader }
 import storage.DB
 import scala.concurrent.Future
 
@@ -22,7 +25,7 @@ class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB)
   def my = StackAction { implicit request =>
     loggedIn match {
       case Some(userWithRoles) =>
-        Redirect(routes.MyRecogitoController.index(userWithRoles.user.getUsername))
+        Redirect(routes.MyRecogitoController.index(userWithRoles.user.getUsername, None))
         
       case None =>
         // Not logged in - go to log in and then come back here
@@ -31,32 +34,61 @@ class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB)
     }
   }
   
-  def index(usernameInPath: String) = AsyncStack { implicit request =>    
+  private def renderPublicProfile(username: String) = {
+    val f = for {
+      userWithRoles   <- UserService.findByUsername(username)
+      publicDocuments <- if (userWithRoles.isDefined)
+                           DocumentService.findByOwner(userWithRoles.get.user.getUsername, true)
+                         else
+                           Future.successful(Page.empty[DocumentRecord])
+    } yield (userWithRoles, publicDocuments)
+    
+    f.map { case (userWithRoles, publicDocuments) => userWithRoles match {
+      case Some(u) => Ok(views.html.my.my_public(u.user, publicDocuments))
+      case None => NotFound
+    }}  
+  }
+  
+  private def renderMyDocuments(user: UserRecord, usedSpace: Long)(implicit request: RequestHeader) = {
+    val f = for {
+      myDocuments <- DocumentService.findByOwner(user.getUsername, false)
+      sharedCount <- DocumentService.countBySharedWith(user.getUsername)
+    } yield (myDocuments, sharedCount)
+    
+    f.map { case (myDocuments, sharedCount) =>
+      Ok(views.html.my.my_private(user, usedSpace, QUOTA, myDocuments, sharedCount))
+    }
+  }
+  
+  private def renderSharedWithMe(user: UserRecord, usedSpace: Long)(implicit request: RequestHeader) = {
+    val f = for {
+      myDocsCount <- DocumentService.countByOwner(user.getUsername, false)
+      docsSharedWithMe <- DocumentService.findBySharedWith(user.getUsername)
+    } yield (myDocsCount, docsSharedWithMe)
+    
+    f.map { case (myDocsCount, docsSharedWithMe) =>
+      Ok(views.html.my.my_shared(user, usedSpace, QUOTA, myDocsCount, docsSharedWithMe))
+    }  
+  }
+  
+  def index(usernameInPath: String, tab: Option[String]) = AsyncStack { implicit request =>    
     // If the user is logged in & the name in the path == username it's the profile owner
     val isProfileOwner = loggedIn match {
       case Some(userWithRoles) => userWithRoles.user.getUsername.equalsIgnoreCase(usernameInPath)
       case None => false
     }
     
-    DocumentService.findByOwner(usernameInPath, !isProfileOwner).flatMap(documents =>
-      if (isProfileOwner) {
-        // Personal space
-        val user = loggedIn.get.user
-        DocumentService.countSharedDocuments(user.getUsername).map { sharedCount =>
-          Ok(views.html.my.index_private(user, UserService.getUsedDiskspaceKB(user.getUsername), QUOTA, documents, sharedCount)) }
-      } else {
-        // Public profile
-        UserService.findByUsername(usernameInPath).map(_ match {
-          case Some(userWithRoles) =>
-            // Show public profile
-            Ok(views.html.my.index_public(userWithRoles.user, documents))
-              
-          case None =>
-            // There is no user with the specified name
-            NotFound
-        })
+    if (isProfileOwner) {
+      val user = loggedIn.get.user
+      val usedSpace = UserService.getUsedDiskspaceKB(user.getUsername)
+      
+      tab match {
+        case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace)
+        case _ => renderMyDocuments(user, usedSpace)
       }
-    ) 
+    } else {
+      renderPublicProfile(usernameInPath)
+    }
   }
 
 }

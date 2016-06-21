@@ -13,7 +13,7 @@ class LandingController @Inject() (implicit val cache: CacheApi, val db: DB)
   def index = StackAction { implicit request =>
     loggedIn match {
       case Some(user) =>
-        Redirect(controllers.my.routes.MyRecogitoController.index(user.user.getUsername))
+        Redirect(controllers.my.routes.MyRecogitoController.index(user.user.getUsername, None))
         
       case None =>
         Ok(views.html.landing.index())

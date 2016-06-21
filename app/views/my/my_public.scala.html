@@ -1,4 +1,4 @@
-@(owner: models.generated.tables.records.UserRecord, documents: Seq[models.generated.tables.records.DocumentRecord])
+@(owner: models.generated.tables.records.UserRecord, documents: models.Page[models.generated.tables.records.DocumentRecord])
 <!DOCTYPE html>
 <html>
   <head>
@@ -27,7 +27,7 @@
     </div> <!-- .header -->
 
     <div class="document-panel">
-      @if(documents.size == 0) {
+      @if(documents.total == 0) {
         <div class="no-docs-yet">
           <span>@owner.getUsername has not shared any public documents yet</span>
         </div>
@@ -45,7 +45,7 @@
             </tr>
           </thead>
           <tbody>
-            @for(document <- documents) {
+            @for(document <- documents.items) {
               <tr class="document" data-id="@document.getId">
                 <td></td> <!-- content type icon -->
                 <td>@document.getAuthor</td>

@@ -18,7 +18,7 @@ class DB @Inject() (db: Database, system: ActorSystem) {
       block(sql)
     }
   }(databaseContext)
-
+  
   def withTransaction[A](block: DSLContext => A): Future[A] = Future {
     db.withTransaction { connection =>
       val sql = DSL.using(connection, DB.CURRENT_SQLDIALECT)

@@ -1,4 +1,4 @@
-@(user: models.user.UserWithRoles, documents: Seq[models.generated.tables.records.DocumentRecord])
+@(user: models.user.UserWithRoles, documents: models.Page[models.generated.tables.records.DocumentRecord])
 <!DOCTYPE html>
 <html>
   <head>
@@ -14,7 +14,7 @@
     </div>
 
     <ul class="documents">
-      @for(document <- documents) {
+      @for(document <- documents.items) {
         <li>
           @document.getTitle
           <a href="#">@document.getId</a>

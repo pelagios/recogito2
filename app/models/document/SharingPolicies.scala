@@ -2,8 +2,9 @@ package models.document
 
 import java.sql.Timestamp
 import java.util.Date
+import models.Page
 import models.generated.Tables._
-import models.generated.tables.records.SharingPolicyRecord
+import models.generated.tables.records.{ DocumentRecord, SharingPolicyRecord }
 import storage.DB
 
 trait SharingPolicies {
@@ -35,7 +36,21 @@ trait SharingPolicies {
   }
   
   def findBySharedWith(sharedWith: String, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
+    val startTime = System.currentTimeMillis
     
+    val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
+    
+    val records = 
+      sql.selectFrom(SHARING_POLICY
+           .join(DOCUMENT)
+           .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
+         .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
+         .limit(limit)
+         .offset(offset)
+         .fetchArray.toSeq
+         .map(r => (r.into(classOf[DocumentRecord]), r.into(classOf[SharingPolicyRecord])))
+
+    Page(System.currentTimeMillis - startTime, total, offset, limit, records)
   }
   
 }

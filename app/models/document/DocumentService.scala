@@ -1,18 +1,17 @@
 package models.document
 
 import collection.JavaConversions._
-import models.BaseService
+import models.{ BaseService, Page }
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, SharingPolicyRecord }
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import play.api.Logger
 import play.api.cache.CacheApi
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{ Await, Future, ExecutionContext }
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.{ DB, FileAccess }
-import models.generated.tables.records.SharingPolicyRecord
 
 case class PartOrdering(partId: Int, seqNo: Int)
 
@@ -188,14 +187,29 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
               .fetchOne())
   }
   
+  def countByOwner(owner: String, publicOnly: Boolean = false)(implicit db: DB) = db.query { sql =>
+    if (publicOnly)
+      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true))).fetchOne(0, classOf[Int])
+    else
+      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
+  }
+  
   /** Retrieves documents by their owner **/
-  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
-    val q = if (publicOnly)
+  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20)(implicit db: DB, context: ExecutionContext) = db.query { sql =>
+    val startTime = System.currentTimeMillis
+    
+    val total = if (publicOnly)
+      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true))).fetchOne(0, classOf[Int])
+    else
+      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
+    
+    val query = if (publicOnly)
       sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true)))
     else
       sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner))
 
-    q.limit(limit).offset(offset).fetchArray().toSeq
+    val items = query.limit(limit).offset(offset).fetchArray().toSeq
+    Page(System.currentTimeMillis - startTime, total, offset, limit, items)
   }
   
   /** Deletes a document by its ID, along with filepart records and files **/

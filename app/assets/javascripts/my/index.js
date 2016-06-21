@@ -17,7 +17,6 @@ require(['common/config', 'common/hasDoubleTap'], function(Config, HasDoubleTap)
         searchbox = jQuery('input.search'),
 
         /** TODO these will be normal links later **/
-        btnSharedTab = jQuery('.shared-with-me'),
         btnAccountSettings = jQuery('.account-settings'),
         btnGridView = jQuery('.display-mode'),
 
@@ -109,7 +108,6 @@ require(['common/config', 'common/hasDoubleTap'], function(Config, HasDoubleTap)
 
     // TODO temporary: register dummy handlers on icons for unimplemented features
     btnCreateFolder.click(onClickUnimplemented);
-    btnSharedTab.click(onClickUnimplemented);
     btnAccountSettings.click(onClickUnimplemented);
     btnGridView.click(onClickUnimplemented);
     searchbox.keyup(function(e) {

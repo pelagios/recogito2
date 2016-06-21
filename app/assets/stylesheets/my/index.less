@@ -76,22 +76,22 @@ body, html {
 
   .tabs {
     padding:0;
+    margin:0;
 
     a {
       padding:7px 50px;
       text-decoration:none;
-      color:@nightsky-type;
     }
 
-    li.disabled {
+    li {
       background-color:@blueish-white-hi;
-      border-width:0 1px;
-      border-style:solid;
-      border-color:@lightgrey-border;
+      border-right:1px solid @lightgrey-border;
+      a { color:lighten(@lightblue-type, 10%); }
     }
 
-    .disabled a {
-      color:lighten(@lightblue-type, 10%);
+    li.enabled {
+      background-color:#fff;
+      a { color:@nightsky-type; }
     }
 
   } /** .tabs **/
