@@ -16,7 +16,7 @@ require(['common/config'], function(Config) {
   jQuery(document).ready(function() {
     var permissionSelector = jQuery(
           '<div class="permission-selector">' +
-            '<h3>Permission Level</h3>' +
+            '<h3>Permission Level<span class="close outline-icon">&#xe897;</close></h3>' +
             '<ul>' +
               '<li class="READ">' +
                 '<div class="checked"><div class="icon"></div></div>' +
@@ -43,6 +43,8 @@ require(['common/config'], function(Config) {
         collaboratorsTable = jQuery('.collaborators'),
         addCollaboratorForm = jQuery('.add-collaborators form'),
         addCollaboratorInput = addCollaboratorForm.find('input'),
+
+        closePermissionButton = permissionSelector.find('.close'),
 
         currentCollaborator = false,
 
@@ -114,7 +116,7 @@ require(['common/config'], function(Config) {
               position = button.position();
 
           if (permissionSelector.is(':visible')) {
-            permissionSelector.hide();
+            closePermissions();
           } else {
             // Remember collaborator for later
             currentCollaborator = collaborator;
@@ -130,6 +132,10 @@ require(['common/config'], function(Config) {
             });
             permissionSelector.show();
           }
+        },
+
+        closePermissions = function() {
+          permissionSelector.hide();
         },
 
         clearCollaboratorInput = function() {
@@ -161,7 +167,7 @@ require(['common/config'], function(Config) {
                           '<td class="outline-icon remove-collaborator">&#xe897;</td>' +
                         '</tr>';
 
-              noCollaboratorsMessage.hide();
+              closePermissions();
               collaboratorsTable.append(row);
               clearCollaboratorInput();
             }
@@ -214,6 +220,8 @@ require(['common/config'], function(Config) {
     initAutosuggest();
     permissionSelector.hide();
     permissionSelector.on('click', 'li', changePermissionLevel);
+
+    closePermissionButton.click(closePermissions);
 
     // TODO append (and re-append) to corresponding TD
     jQuery('.share-collab').append(permissionSelector);

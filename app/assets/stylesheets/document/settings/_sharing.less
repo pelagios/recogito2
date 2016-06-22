@@ -37,6 +37,18 @@ input[type=checkbox] + label:before {
     border-style:solid;
     border-color:@lightgrey-border-darker;
     border-width:1px 1px 0 1px;
+
+    .close {
+     float:right;
+     line-height:27px;
+     color:lighten(@standard-type, 40%);
+     cursor:pointer;
+    }
+
+    .close:hover {
+      color:@standard-type;
+    }
+
   }
 
   .checked {
