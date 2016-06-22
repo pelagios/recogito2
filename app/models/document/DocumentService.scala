@@ -214,6 +214,12 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
   
   /** Deletes a document by its ID, along with filepart records and files **/
   def delete(document: DocumentRecord)(implicit db: DB): Future[Unit] = db.withTransaction { sql =>
+    // Delete sharing policies
+    sql.deleteFrom(SHARING_POLICY)
+       .where(SHARING_POLICY.DOCUMENT_ID.equal(document.getId))
+       .execute()
+    
+    // Delete filepart records
     sql.deleteFrom(DOCUMENT_FILEPART)
        .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
        .execute()
