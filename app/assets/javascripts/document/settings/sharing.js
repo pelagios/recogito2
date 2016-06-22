@@ -112,6 +112,7 @@ require(['common/config'], function(Config) {
 
         togglePermissions = function(e) {
           var button = jQuery(e.target).closest('button'),
+              td = button.closest('td'),
               collaborator = getCollaboratorForRow(button.closest('tr')),
               position = button.position();
 
@@ -126,16 +127,14 @@ require(['common/config'], function(Config) {
             permissionSelector.find('.' + collaborator.access_level + ' .icon').html('&#xf00c;');
 
             // Set position
-            permissionSelector.css({
-              top: position.top + button.height() + 14,
-              left: position.left + 2
-            });
+            td.append(permissionSelector);
             permissionSelector.show();
           }
         },
 
         closePermissions = function() {
           permissionSelector.hide();
+          // permissionSelector.remove();
         },
 
         clearCollaboratorInput = function() {
@@ -224,7 +223,7 @@ require(['common/config'], function(Config) {
     closePermissionButton.click(closePermissions);
 
     // TODO append (and re-append) to corresponding TD
-    jQuery('.share-collab').append(permissionSelector);
+    // jQuery('.share-collab').append(permissionSelector);
 
     collaboratorsTable.on('click', '.remove-collaborator', removeCollaborator);
     collaboratorsTable.on('click', '.permissions', togglePermissions);
