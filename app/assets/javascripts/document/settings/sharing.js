@@ -48,13 +48,28 @@ require(['common/config'], function(Config) {
             minLength: 3
           }, {
             source: function(query, syncCallback, asyncCallback) {
+              // Remove current user and users that are already collaborators
+              var toRemove = getCollaborators();
+              toRemove.push(Config.me);
+
               jsRoutes.controllers.document.settings.SettingsController.searchUsers(Config.documentId, query)
-                .ajax().done(asyncCallback);
+                .ajax().done(function(results) {
+                  var filtered = jQuery.grep(results, function(username) {
+                    return toRemove.indexOf(username) == -1;
+                  });
+                  asyncCallback(filtered);
+                });
             }
           });
 
           addCollaboratorInput.on('typeahead:selected', function(e) {
             addCollaboratorForm.submit();
+          });
+        },
+
+        getCollaborators = function() {
+          return jQuery.map(collaboratorsTable.find('tr'), function(tr) {
+            return tr.dataset.username;
           });
         },
 
@@ -85,6 +100,11 @@ require(['common/config'], function(Config) {
           }
         },
 
+        clearCollaboratorInput = function() {
+          addCollaboratorInput.blur();
+          addCollaboratorInput.val('');
+        },
+
         addCollaborator = function(e) {
           // Convert form data to object
           var data = addCollaboratorForm.serializeArray().reduce(function(obj, item) {
@@ -107,6 +127,7 @@ require(['common/config'], function(Config) {
 
             noCollaboratorsMessage.hide();
             collaboratorsTable.append(row);
+            clearCollaboratorInput();
           });
 
           // TODO what in case of failure?

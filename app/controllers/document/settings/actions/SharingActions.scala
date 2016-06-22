@@ -38,16 +38,21 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
   def addCollaborator(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     val currentUser = loggedIn.user.getUsername    
     jsonDocumentAdminAction[CollaboratorStub](documentId, currentUser, { case (document, stub) =>
-      // If no access level given, use READ as minimum default
-      val accessLevel = stub.accessLevel.getOrElse(DocumentAccessLevel.READ)
-      UserService.findByUsername(stub.collaborator)(self.db, self.cache).flatMap { _ match {
-        case Some(userWithRoles) => 
-          DocumentService.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)(self.db)
-            .map(policy => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy))))
-          
-        case None => 
-          Future.successful(NotFound)
-      }}
+      if (stub.collaborator == document.getOwner) {
+        // Doc owner as collaborator wouldn't make sense
+        Future.successful(BadRequest)
+      } else {
+        // If no access level given, use READ as minimum default
+        val accessLevel = stub.accessLevel.getOrElse(DocumentAccessLevel.READ)
+        UserService.findByUsername(stub.collaborator)(self.db, self.cache).flatMap { _ match {
+          case Some(userWithRoles) => 
+            DocumentService.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)(self.db)
+              .map(policy => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy))))
+            
+          case None => 
+            Future.successful(NotFound)
+        }}
+      }
     })
   }
   
