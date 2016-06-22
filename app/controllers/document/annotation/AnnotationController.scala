@@ -30,7 +30,7 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) 
         case Some(ContentType.TEXT_PLAIN) => {
           readTextfile(document.getOwner, document.getId, thisPart.getFilename) match {
             case Some(content) =>
-              Ok(views.html.document.annotation.text(username, document, parts, thisPart, content))
+              Ok(views.html.document.annotation.text(username, document, parts, thisPart, accesslevel, content))
 
             case None => {
               // Filepart found in DB, but not file on filesystem

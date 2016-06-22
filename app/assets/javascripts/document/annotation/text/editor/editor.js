@@ -13,10 +13,11 @@ define([
   'common/helpers/annotationUtils',
   'common/helpers/placeUtils',
   'common/autoPosition',
+  'common/config',
   'common/hasEvents'],
 
   function(ReplyField, GeoresolutionPanel, SectionList, Highlighter, SelectionHandler,
-    AnnotationUtils, PlaceUtils, AutoPosition, HasEvents) {
+    AnnotationUtils, PlaceUtils, AutoPosition, Config, HasEvents) {
 
   /** The main annotation editor popup **/
   var Editor = function(container) {
@@ -25,36 +26,46 @@ define([
 
         // Editor DOM element
         element = (function() {
-          var el = jQuery(
-            '<div class="text-annotation-editor">' +
-              '<div class="arrow"></div>' +
-              '<div class="text-annotation-editor-inner">' +
-                '<div class="category-buttons">' +
-                  '<div class="category-container">' +
-                    '<div class="category place">' +
-                      '<span class="icon">&#xf041;</span> Place' +
+          var el = (Config.writeAccess) ? jQuery(
+                '<div class="text-annotation-editor">' +
+                  '<div class="arrow"></div>' +
+                  '<div class="text-annotation-editor-inner">' +
+                    '<div class="category-buttons">' +
+                      '<div class="category-container">' +
+                        '<div class="category place">' +
+                          '<span class="icon">&#xf041;</span> Place' +
+                        '</div>' +
+                      '</div>' +
+                      '<div class="category-container">' +
+                        '<div class="category person">' +
+                          '<span class="icon">&#xf007;</span> Person' +
+                        '</div>' +
+                      '</div>' +
+                      '<div class="category-container">' +
+                        '<div class="category event">' +
+                          '<span class="icon">&#xf005;</span> Event' +
+                        '</div>' +
+                      '</div>' +
+                    '</div>' +
+                    '<div class="sections"></div>' +
+                    '<div class="reply-container"></div>' +
+                    '<div class="footer">' +
+                      '<button class="btn small outline cancel">Cancel</button>' +
+                      '<button class="btn small outline ok-next">OK &amp Next</button>' +
+                      '<button class="btn small ok">OK</button>' +
                     '</div>' +
                   '</div>' +
-                  '<div class="category-container">' +
-                    '<div class="category person">' +
-                      '<span class="icon">&#xf007;</span> Person' +
+                '</div>') : jQuery(
+                // Simplified version for read-only mode
+                '<div class="text-annotation-editor">' +
+                  '<div class="arrow"></div>' +
+                  '<div class="text-annotation-editor-inner">' +
+                    '<div class="sections"></div>' +
+                    '<div class="footer">' +
+                      '<button class="btn small ok">Close</button>' +
                     '</div>' +
                   '</div>' +
-                  '<div class="category-container">' +
-                    '<div class="category event">' +
-                      '<span class="icon">&#xf005;</span> Event' +
-                    '</div>' +
-                  '</div>' +
-                '</div>' +
-                '<div class="sections"></div>' +
-                '<div class="reply-container"></div>' +
-                '<div class="footer">' +
-                  '<button class="btn small outline cancel">Cancel</button>' +
-                  '<button class="btn small outline ok-next">OK &amp Next</button>' +
-                  '<button class="btn small ok">OK</button>' +
-                '</div>' +
-              '</div>' +
-            '</div>');
+                '</div>');
 
           jQuery(container).append(el);
           el.hide();
@@ -77,7 +88,7 @@ define([
         highlighter = new Highlighter(container),
 
         // Monitors the page for selection events
-        selectionHandler = new SelectionHandler(container, highlighter),
+        selectionHandler = (Config.writeAccess) ? new SelectionHandler(container, highlighter) : false,
 
         // The dialog for changing place geo-resolution
         georesolutionPanel = new GeoresolutionPanel(),
@@ -86,7 +97,7 @@ define([
         sectionList = new SectionList(sectionContainer),
 
         // The reply field
-        replyField = new ReplyField(replyContainer),
+        replyField = (Config.writeAccess) ? new ReplyField(replyContainer) : false,
 
         // The current annotation
         currentAnnotation = false,
@@ -105,7 +116,7 @@ define([
           currentAnnotation = annotation;
           sectionList.setAnnotation(annotation);
 
-          if (AnnotationUtils.countComments(annotation) > 0)
+          if (replyField && AnnotationUtils.countComments(annotation) > 0)
             replyField.setPlaceHolder('Write a reply...');
 
           element.show();
@@ -120,7 +131,8 @@ define([
         /** Clears all editor components **/
         clear = function() {
           sectionList.clear();
-          replyField.clear();
+          if (replyField)
+            replyField.clear();
           currentAnnotation = false;
         },
 
@@ -156,7 +168,7 @@ define([
 
         /** Opens the editor on an existing annotation **/
         editAnnotation = function(eventOrElement) {
-          var selection = selectionHandler.getSelection(),
+          var selection = (selectionHandler) ? selectionHandler.getSelection() : false,
               targetEl = (eventOrElement.target) ? eventOrElement.target: eventOrElement,
               allAnnotations;
 
@@ -215,35 +227,37 @@ define([
 
         /** 'OK' updates the annotation & highlight spans and closes the editor **/
         onOK = function() {
-          var reply = replyField.getComment(), annotationSpans;
+          if (Config.writeAccess) {
+            var reply = replyField.getComment(), annotationSpans;
 
-          sectionList.commitChanges();
+            sectionList.commitChanges();
 
-          // Push the current reply body, if any
-          if (reply)
-            currentAnnotation.bodies.push(reply);
+            // Push the current reply body, if any
+            if (reply)
+              currentAnnotation.bodies.push(reply);
 
-          // Determine which CRUD action to perform
-          if (currentAnnotation.annotation_id) {
-            // There's an ID - annotation already stored on the server
-            if (AnnotationUtils.isEmpty(currentAnnotation)) {
-              // Annotation empty - DELETE
-              highlighter.removeAnnotation(currentAnnotation);
-              self.fireEvent('deleteAnnotation', currentAnnotation);
+            // Determine which CRUD action to perform
+            if (currentAnnotation.annotation_id) {
+              // There's an ID - annotation already stored on the server
+              if (AnnotationUtils.isEmpty(currentAnnotation)) {
+                // Annotation empty - DELETE
+                highlighter.removeAnnotation(currentAnnotation);
+                self.fireEvent('deleteAnnotation', currentAnnotation);
+              } else {
+                // UPDATE
+                annotationSpans = highlighter.refreshAnnotation(currentAnnotation);
+                self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
+              }
             } else {
-              // UPDATE
-              annotationSpans = highlighter.refreshAnnotation(currentAnnotation);
-              self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
-            }
-          } else {
-            // No ID? New annotation from fresh selection - CREATE if not empty
-            if (AnnotationUtils.isEmpty(currentAnnotation)) {
-              selectionHandler.clearSelection();
-            } else {
-              annotationSpans = selectionHandler.getSelection().spans;
-              highlighter.convertSpansToAnnotation(annotationSpans, currentAnnotation);
-              selectionHandler.clearSelection();
-              self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
+              // No ID? New annotation from fresh selection - CREATE if not empty
+              if (AnnotationUtils.isEmpty(currentAnnotation)) {
+                selectionHandler.clearSelection();
+              } else {
+                annotationSpans = selectionHandler.getSelection().spans;
+                highlighter.convertSpansToAnnotation(annotationSpans, currentAnnotation);
+                selectionHandler.clearSelection();
+                self.fireEvent('updateAnnotation', { annotation: currentAnnotation, elements: annotationSpans });
+              }
             }
           }
 
@@ -262,7 +276,10 @@ define([
 
           if (key === 27)
             // ESC closes the editor
-            onCancel();
+            if (Config.writeAccess)
+              onCancel();
+            else
+              onOK();
           else if (key === 37 && isOpen())
             // Left arrow key
             toPreviousAnnotation();
@@ -282,7 +299,8 @@ define([
         };
 
     // Monitor text selections through the selectionHandler
-    selectionHandler.on('select', editSelection);
+    if (selectionHandler)
+      selectionHandler.on('select', editSelection);
 
     // Monitor select of existing annotations via DOM
     jQuery(container).on('click', '.annotation', editAnnotation);
@@ -298,7 +316,8 @@ define([
     georesolutionPanel.on('change', onGeoresolutionChanged);
 
     // Ctrl+Enter on the reply field doubles as 'OK'
-    replyField.on('submit', onOK);
+    if (replyField)
+      replyField.on('submit', onOK);
 
     // Button events
     btnPlace.click(onAddPlace);

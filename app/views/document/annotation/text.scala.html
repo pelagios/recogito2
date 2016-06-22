@@ -2,6 +2,7 @@
   document: models.generated.tables.records.DocumentRecord,
   allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
+  accessLevel: models.document.DocumentAccessLevel,
   content: String)(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
@@ -24,7 +25,8 @@
         documentOwner: '@document.getOwner',
         partId: @currentPart.getId,
         partSequenceNo: @currentPart.getSequenceNo,
-        contentType: '@currentPart.getContentType'
+        contentType: '@currentPart.getContentType',
+        writeAccess: @accessLevel.canWrite
       }
     </script>
   </head>

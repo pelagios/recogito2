@@ -29,7 +29,7 @@ define([
         })(),
 
         standardTemplate = (function() {
-          var el = jQuery(
+          var el = (Config.writeAccess) ? jQuery(
             '<div>' +
               '<h3></h3>' +
               '<p class="gazetteer"></p>' +
@@ -50,17 +50,37 @@ define([
                 '<button class="unverified-change">Change</button>' +
                 '<button class="unverified-confirm">Confirm</button>' +
               '</div>' +
-            '</div>');
+            '</div>') : jQuery(
+              // Simplified version for read-only mode
+              '<div>' +
+                '<h3></h3>' +
+                '<p class="gazetteer"></p>' +
+                '<p class="description"></p>' +
+                '<p class="names"></p>' +
+                '<p class="date"></p>' +
+                '<div class="created">' +
+                  '<a class="by"></a>' +
+                  '<span class="at"></span>' +
+                '</div>' +
+                '<div class="warning-unverified">' +
+                  '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
+                '</div>' +
+              '</div>'
+            );
 
           el.find('.created, .edit-buttons').hide();
           return el;
         })(),
 
-        noMatchTemplate = jQuery(
+        noMatchTemplate = (Config.writeAccess) ? jQuery(
           '<div class="no-match">' +
             '<h3>No automatic match found</h3>' +
             '<button class="change">Search</button> ' +
             '<button class="delete icon">&#xf014;</button>' +
+          '</div>') : jQuery(
+          // Simplified version for read-only mode
+          '<div class="no-match">' +
+            '<h3>No automatic match found</h3>' +
           '</div>'),
 
         panelContainer = element.find('.panel-container'),

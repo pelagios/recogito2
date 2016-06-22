@@ -118,7 +118,7 @@ define([
             element.remove();
           };
 
-    if (commentBody.last_modified_by === Config.me)
+    if (Config.writeAccess && commentBody.last_modified_by === Config.me)
       enableEditDropdown();
     else
       element.find('.edit').hide();
