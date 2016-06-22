@@ -134,7 +134,6 @@ require(['common/config'], function(Config) {
 
         closePermissions = function() {
           permissionSelector.hide();
-          // permissionSelector.remove();
         },
 
         clearCollaboratorInput = function() {
@@ -211,8 +210,15 @@ require(['common/config'], function(Config) {
           }
         },
 
-        onKeyup = function(e) {
+        onDocumentKeyup = function(e) {
           if (e.which === 27) // ESC
+            closePermissions();
+        },
+
+        onDocumentClick = function(e) {
+          // Check if the click was outside the permissions selector & close if necessary
+          var isOutside = jQuery(e.target).closest('.permission-selector, .permissions').length === 0;
+          if (isOutside && permissionSelector.is(':visible'))
             closePermissions();
         };
 
@@ -231,7 +237,8 @@ require(['common/config'], function(Config) {
     addCollaboratorForm.submit(addCollaborator);
 
     // Global events
-    jQuery(document).keyup(onKeyup);
+    jQuery(document).keyup(onDocumentKeyup);
+    jQuery(document).on('click', ':not(> .permission-selector)', onDocumentClick);
   });
 
 });
