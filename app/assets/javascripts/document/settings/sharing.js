@@ -209,6 +209,11 @@ require(['common/config'], function(Config) {
               permissionSelector.hide();
             });
           }
+        },
+
+        onKeyup = function(e) {
+          if (e.which === 27) // ESC
+            closePermissions();
         };
 
     // Public access panel
@@ -219,15 +224,14 @@ require(['common/config'], function(Config) {
     initAutosuggest();
     permissionSelector.hide();
     permissionSelector.on('click', 'li', changePermissionLevel);
-
     closePermissionButton.click(closePermissions);
-
-    // TODO append (and re-append) to corresponding TD
-    // jQuery('.share-collab').append(permissionSelector);
 
     collaboratorsTable.on('click', '.remove-collaborator', removeCollaborator);
     collaboratorsTable.on('click', '.permissions', togglePermissions);
     addCollaboratorForm.submit(addCollaborator);
+
+    // Global events
+    jQuery(document).keyup(onKeyup);
   });
 
 });
