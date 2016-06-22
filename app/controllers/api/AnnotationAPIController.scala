@@ -1,13 +1,13 @@
 package controllers.api
 
-import controllers.BaseController
+import controllers.{ HasAnnotationValidation, HasCache, HasDatabase, Security }
 import java.util.UUID
 import javax.inject.Inject
-import models.{ ContentType, HasDate }
+import jp.t2v.lab.play2.auth.OptionalAuthElement
+import models.HasDate
 import models.annotation._
 import models.contribution._
 import models.document.DocumentService
-import models.user.Roles._
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.cache.CacheApi
@@ -15,9 +15,9 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.mvc.Controller
 import scala.concurrent.Future
 import storage.DB
-import controllers.HasAnnotationValidation
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(
@@ -90,13 +90,14 @@ object AnnotationStatusStub extends HasDate {
   
 }
 
-class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with HasAnnotationValidation {
+class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) 
+  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security with HasAnnotationValidation {
 
   def getAnnotationsForDocument(docId: String) = getAnnotations(docId, None)
     
   def getAnnotationsForPart(docId: String, partNo: Int) = getAnnotations(docId, Some(partNo))
 
-  def getAnnotations(docId: String, partNo: Option[Int]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def getAnnotations(docId: String, partNo: Option[Int]) = AsyncStack { implicit request =>
     // TODO currently annotation read access is unlimited to any logged in user - do we want that?
     (docId, partNo) match {
       case (id, Some(seqNo)) =>
@@ -143,16 +144,16 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
             s.setAt.getOrElse(now))))))         
   }
   
-  def createAnnotation() = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
+  def createAnnotation() = AsyncStack { implicit request =>    
     request.body.asJson match {
       case Some(json) => {
         Json.fromJson[AnnotationStub](json) match {
           case s: JsSuccess[AnnotationStub] => {            
             // Fetch the associated document to check access privileges
-            DocumentService.findById(s.get.annotates.documentId, Some(loggedIn.user.getUsername)).flatMap(_ match {
+            DocumentService.findById(s.get.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
               case Some((document, accesslevel)) => {
                 if (accesslevel.canWrite) {
-                  val annotation = stubToAnnotation(s.get, loggedIn.user.getUsername)
+                  val annotation = stubToAnnotation(s.get, loggedIn.map(_.user.getUsername).getOrElse("guest"))
                   val f = for {
                     (annotationStored, _, previousVersion) <- AnnotationService.insertOrUpdateAnnotation(annotation, true)
                     success <- if (annotationStored) 
@@ -190,11 +191,11 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
     }
   }
   
-  def deleteAnnotation(id: UUID) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>
     AnnotationService.findById(id).flatMap(_ match {
       case Some((annotation, version)) => {
         // Fetch the associated document
-        DocumentService.findById(annotation.annotates.documentId, Some(loggedIn.user.getUsername)).flatMap(_ match {
+        DocumentService.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
           case Some((document, accesslevel)) =>
             if (accesslevel.canWrite)
               AnnotationService.deleteAnnotation(id).map(success =>

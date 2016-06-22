@@ -1,4 +1,4 @@
-@(username:String,
+@(loggedInUser:Option[String],
   document: models.generated.tables.records.DocumentRecord,
   allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
@@ -20,7 +20,7 @@
     <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/document/annotation/text/app.js")"></script>
     <script>
       window.config = {
-        me: '@username',
+        @if(loggedInUser.isDefined) { me: '@loggedInUser.get', }
         documentId: '@document.getId',
         documentOwner: '@document.getOwner',
         partId: @currentPart.getId,
@@ -73,12 +73,14 @@
           </a>
         </li>
 
-        <li class="home tooltip bottom">
-          <a href="@controllers.my.routes.MyRecogitoController.index(username.toLowerCase, None)">
-            <span class="icon">&#xe8bf;</span>
-            <span class="hint">Back to your home page</span>
-          </a>
-        </li>
+        @if(loggedInUser.isDefined) {
+          <li class="home tooltip bottom">
+            <a href="@controllers.my.routes.MyRecogitoController.index(loggedInUser.get.toLowerCase, None)">
+              <span class="icon">&#xe8bf;</span>
+              <span class="hint">Back to your home page</span>
+            </a>
+          </li>
+        }
       </ul>
 
       <div class="save-msg"></div>
