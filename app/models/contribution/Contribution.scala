@@ -20,7 +20,7 @@ case class Contribution(
 
 )
 
-object Contribution extends HasDate with HasNullableSeq{
+object Contribution extends HasDate with HasNullableSeq {
   
   /** JSON conversion **/
   implicit val contributionFormat: Format[Contribution] = (

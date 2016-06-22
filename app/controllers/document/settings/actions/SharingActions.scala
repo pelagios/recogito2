@@ -13,17 +13,20 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import controllers.HasPrettyPrintJSON
 
-case class CollaboratorStub(collaborator: String, accessLevel: Option[DocumentAccessLevel])
+case class CollaboratorStub(collaborator: String, accessLevel: Option[DocumentAccessLevel], newCollaborator: Boolean)
 
 object CollaboratorStub {
   
   implicit val collaboratorStubFormat: Format[CollaboratorStub] = (
     (JsPath \ "collaborator").format[String] and
-    (JsPath \ "access_level").formatNullable[DocumentAccessLevel]
+    (JsPath \ "access_level").formatNullable[DocumentAccessLevel] and
+    (JsPath \ "new_collaborator").formatNullable[Boolean]
+      // Map between boolean and optional (with default = false)
+      .inmap[Boolean](_.getOrElse(false), Some(_))
   )(CollaboratorStub.apply, unlift(CollaboratorStub.unapply))
   
-  def fromSharingPolicy(policy: SharingPolicyRecord) = 
-    CollaboratorStub(policy.getSharedWith, DocumentAccessLevel.withName(policy.getAccessLevel))
+  def fromSharingPolicy(policy: SharingPolicyRecord, isNewCollaborator: Boolean) = 
+    CollaboratorStub(policy.getSharedWith, DocumentAccessLevel.withName(policy.getAccessLevel), isNewCollaborator)
   
 }
 
@@ -47,7 +50,7 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
         UserService.findByUsername(stub.collaborator)(self.db, self.cache).flatMap { _ match {
           case Some(userWithRoles) => 
             DocumentService.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)(self.db)
-              .map(policy => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy))))
+              .map { case (policy, isNew) => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy, isNew))) }
             
           case None => 
             Future.successful(NotFound)

@@ -10,16 +10,38 @@ import storage.DB
 trait SharingPolicies {
   
   def addDocumentCollaborator(documentId: String, sharedBy: String, sharedWith: String, accessLevel: DocumentAccessLevel)(implicit db: DB) = db.query { sql =>
-    val sharingPolicy = new SharingPolicyRecord(null, null,
-      documentId, 
-      sharedBy,
-      sharedWith,
-      new Timestamp(new Date().getTime),
-      accessLevel.toString)
+    val (sharingPolicy, isNewCollaborator) = 
+      Option(sql.selectFrom(SHARING_POLICY)
+                .where(SHARING_POLICY.DOCUMENT_ID.equal(documentId)
+                  .and(SHARING_POLICY.SHARED_WITH.equal(sharedWith)))
+                .fetchOne()) match {
+      
+      case Some(policy) => {
+        // There's a policy for this document/user pair already - update
+        policy.setSharedBy(sharedBy)
+        policy.setSharedAt(new Timestamp(new Date().getTime))
+        policy.setAccessLevel(accessLevel.toString)
+        (policy, false)
+      }
+        
+      case None => {
+        // Create new sharing policy
+        val policy = new SharingPolicyRecord(null, null,
+          documentId, 
+          sharedBy,
+          sharedWith,
+          new Timestamp(new Date().getTime),
+          accessLevel.toString)
+   
+        policy.changed(SHARING_POLICY.ID, false)     
+        sql.attach(policy)
+        (policy, true)
+      }
+      
+    }
     
-    sharingPolicy.changed(SHARING_POLICY.ID, false)
-    sql.insertInto(SHARING_POLICY).set(sharingPolicy).execute()
-    sharingPolicy
+    sharingPolicy.store()
+    (sharingPolicy, isNewCollaborator)
   } 
   
   def removeDocumentCollaborator(documentId: String, sharedWith: String)(implicit db: DB) = db.query { sql =>
