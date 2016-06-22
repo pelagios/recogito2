@@ -155,17 +155,20 @@ require(['common/config'], function(Config) {
             if (result.new_collaborator) {
               var collabHome = jsRoutes.controllers.my.MyRecogitoController.index(result.collaborator).url,
                   row = '<tr data-username="' + result.collaborator + '" data-level="' + result.access_level + '">' +
-                          '<td><a href="' + collabHome + '">' + result.collaborator + '</a></td>' +
-                          '<td>' +
+                          '<td class="col-user">' +
+                            '<a href="' + collabHome + '">' + result.collaborator + '</a>' +
+                          '</td>' +
+                          '<td class="col-permissions">' +
                             '<button class="permissions btn small">' +
                               '<span class="label">' + result.access_level + '</span>' +
                               '<span class="icon">&#xf0dd;</span>' +
                             '</button>' +
                           '</td>' +
-                          '<td class="outline-icon remove-collaborator">&#xe897;</td>' +
+                          '<td class="col-actions outline-icon remove-collaborator">&#xe897;</td>' +
                         '</tr>';
 
               closePermissions();
+              noCollaboratorsMessage.hide();
               collaboratorsTable.append(row);
               clearCollaboratorInput();
             }
