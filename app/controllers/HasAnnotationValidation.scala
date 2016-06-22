@@ -26,14 +26,20 @@ trait HasAnnotationValidation {
     )
 
   /** Changes to bodies are either general 'edits' or status changes (confirmations or flags) **/
-  private def determineChangeAction(bodyBefore: AnnotationBody, bodyAfter: AnnotationBody) =
+  private def determineChangeAction(bodyBefore: AnnotationBody, bodyAfter: AnnotationBody) = {
+    
+    import AnnotationStatus._
+    import ContributionAction._
+    
     if (bodyAfter.uri == bodyBefore.uri && bodyAfter.status != bodyBefore.status)
       bodyAfter.status.get.value match {
-        case AnnotationStatus.VERIFIED => ContributionAction.CONFIRM_BODY
-        case AnnotationStatus.NOT_IDENTIFIABLE => ContributionAction.FLAG_BODY
+        case VERIFIED         => CONFIRM_BODY
+        case NOT_IDENTIFIABLE => FLAG_BODY
+        case UNVERIFIED       => EDIT_BODY // Something else was changed
       }
     else
-      ContributionAction.EDIT_BODY
+      EDIT_BODY
+  }
 
   private def changeBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, bodyBefore: AnnotationBody, bodyAfter: AnnotationBody) =
     Contribution(
