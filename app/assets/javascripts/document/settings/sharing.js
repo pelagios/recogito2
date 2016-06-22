@@ -153,7 +153,10 @@ require(['common/config'], function(Config) {
                   row = '<tr data-username="' + result.collaborator + '" data-level="' + result.access_level + '">' +
                           '<td><a href="' + collabHome + '">' + result.collaborator + '</a></td>' +
                           '<td>' +
-                            '<button class="permissions btn small">' + result.access_level + '<span class="icon">&#xf0dd;</span></button>' +
+                            '<button class="permissions btn small">' +
+                              '<span class="label">' + result.access_level + '</span>' +
+                              '<span class="icon">&#xf0dd;</span>' +
+                            '</button>' +
                           '</td>' +
                           '<td class="outline-icon remove-collaborator">&#xe897;</td>' +
                         '</tr>';
