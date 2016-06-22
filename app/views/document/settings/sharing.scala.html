@@ -26,12 +26,12 @@
         </p>
         <table class="collaborators">
           @for(shared <- sharingPolicies) {
-            <tr data-username="@shared.getSharedWith">
+            <tr data-username="@shared.getSharedWith" data-level="@shared.getAccessLevel">
               <td>
                 <a href="@controllers.my.routes.MyRecogitoController.index(shared.getSharedWith, None)">@shared.getSharedWith</a>
               </td>
               <td>
-                <button class="permissions btn small">@shared.getAccessLevel<span class="icon">&#xf0dd;</span></button>
+                <button class="permissions btn small"><span class="label">@shared.getAccessLevel</span><span class="icon">&#xf0dd;</span></button>
               </td>
               <td class="outline-icon remove-collaborator">&#xe897;</td>
             </tr>

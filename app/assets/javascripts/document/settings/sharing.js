@@ -18,17 +18,20 @@ require(['common/config'], function(Config) {
           '<div class="permission-selector">' +
             '<h3>Permission Level</h3>' +
             '<ul>' +
-              '<li>' +
-                '<h4>Admin</h4>' +
-                '<p>Collaborators can edit document metadata, invite other collaborators, backup and restore, and roll back the edit history.</p>' +
+              '<li class="READ">' +
+                '<div class="checked"><div class="icon"></div></div>' +
+                '<h4>Read</h4>' +
+                '<p>Collaborators can read document and annotations, but not edit.</p>' +
               '</li>' +
-              '<li>' +
+              '<li class="WRITE">' +
+                '<div class="checked"><div class="icon"></div></div>' +
                 '<h4>Write</h4>' +
                 '<p>Collaborators can read document and annotations, create new annotations, and add comments.</p>' +
               '</li>' +
-              '<li>' +
-                '<h4>Read</h4>' +
-                '<p>Collaborators can read the document and annotations.</p>' +
+              '<li class="ADMIN">' +
+                '<div class="checked"><div class="icon"></div></div>' +
+                '<h4>Admin</h4>' +
+                '<p>Admins can edit document metadata, invite other collaborators, backup and restore, and roll back the edit history.</p>' +
               '</li>' +
             '</ul>' +
           '</div>'),
@@ -40,6 +43,8 @@ require(['common/config'], function(Config) {
         collaboratorsTable = jQuery('.collaborators'),
         addCollaboratorForm = jQuery('.add-collaborators form'),
         addCollaboratorInput = addCollaboratorForm.find('input'),
+
+        currentCollaborator = false,
 
         initAutosuggest = function() {
           addCollaboratorInput.typeahead({
@@ -73,6 +78,24 @@ require(['common/config'], function(Config) {
           });
         },
 
+        getCollaboratorForRow = function(tr) {
+          return {
+            collaborator: username = tr.data('username'),
+            access_level: tr.data('level')
+          };
+        },
+
+        getRowForCollaborator = function(username) {
+          var rows = jQuery.grep(collaboratorsTable.find('tr'), function(tr) {
+            return jQuery(tr).data('username') === username;
+          });
+
+          if (rows.length > 0)
+            return jQuery(rows[0]);
+          else
+            return false;
+        },
+
         onTogglePublicAccess = function() {
           var checked = publicAccessCheckbox.is(':checked');
           publicAccessCheckbox.prop('disabled', true);
@@ -87,11 +110,20 @@ require(['common/config'], function(Config) {
 
         togglePermissions = function(e) {
           var button = jQuery(e.target).closest('button'),
+              collaborator = getCollaboratorForRow(button.closest('tr')),
               position = button.position();
 
           if (permissionSelector.is(':visible')) {
             permissionSelector.hide();
           } else {
+            // Remember collaborator for later
+            currentCollaborator = collaborator;
+
+            // Set checkmark
+            permissionSelector.find('.icon').empty();
+            permissionSelector.find('.' + collaborator.access_level + ' .icon').html('&#xf00c;');
+
+            // Set position
             permissionSelector.css({
               top: position.top + button.height() + 14,
               left: position.left + 2
@@ -118,7 +150,7 @@ require(['common/config'], function(Config) {
           }).done(function(result) {
             if (result.new_collaborator) {
               var collabHome = jsRoutes.controllers.my.MyRecogitoController.index(result.collaborator).url,
-                  row = '<tr data-username="' + result.collaborator + '">' +
+                  row = '<tr data-username="' + result.collaborator + '" data-level="' + result.access_level + '">' +
                           '<td><a href="' + collabHome + '">' + result.collaborator + '</a></td>' +
                           '<td>' +
                             '<button class="permissions btn small">' + result.access_level + '<span class="icon">&#xf0dd;</span></button>' +
@@ -151,6 +183,24 @@ require(['common/config'], function(Config) {
 
             // TODO what in case of failure?
 
+        },
+
+        changePermissionLevel = function(e) {
+          var level = jQuery(e.target).closest('li').attr('class');
+          if (currentCollaborator && currentCollaborator.access_level != level) {
+            jsRoutes.controllers.document.settings.SettingsController.addCollaborator(Config.documentId).ajax({
+              contentType: 'application/json',
+              data: JSON.stringify({ collaborator: currentCollaborator.collaborator, access_level: level })
+            }).done(function(result) {
+              var row = getRowForCollaborator(result.collaborator),
+                  button = row.find('.permissions .label');
+
+              currentCollaborator = false;
+              row.data('level', result.access_level);
+              button.html(result.access_level);
+              permissionSelector.hide();
+            });
+          }
         };
 
     // Public access panel
@@ -160,6 +210,7 @@ require(['common/config'], function(Config) {
     // Add collaborators panel
     initAutosuggest();
     permissionSelector.hide();
+    permissionSelector.on('click', 'li', changePermissionLevel);
 
     // TODO append (and re-append) to corresponding TD
     jQuery('.share-collab').append(permissionSelector);
