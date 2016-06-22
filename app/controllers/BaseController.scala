@@ -51,8 +51,9 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
 
     DocumentService.findByIdWithFileparts(docId, Some(user)).map(_ match {
       case Some((document, fileparts, accesslevel)) => {
-        // Verify if the user is allowed to access this document - TODO what about shared content?
-        if (document.getOwner == user)
+        if (accesslevel.canRead)
+          // As long as there are read rights we'll allow access here - the response
+          // method must handle more fine-grained access by itself
           response(document, fileparts, accesslevel)
         else
           Forbidden
@@ -61,27 +62,6 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
       case None =>
         // No document with that ID found in DB
         NotFound
-    }).recover { case t =>
-      t.printStackTrace()
-      InternalServerError(t.getMessage)
-    }
-  }
-  
-  protected def renderAsyncDocumentResponse(docId: String, user: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Future[Result])(implicit cache: CacheApi, db: DB) = {
-
-    DocumentService.findByIdWithFileparts(docId).flatMap(_ match {
-      case Some((document, fileparts, accesslevel)) => {
-        // Verify if the user is allowed to access this document - TODO what about shared content?
-        if (document.getOwner == user)
-          response(document, fileparts, accesslevel)
-        else
-          Future.successful(Forbidden)
-      }
-
-      case None =>
-        // No document with that ID found in DB
-        Future.successful(NotFound)
     }).recover { case t =>
       t.printStackTrace()
       InternalServerError(t.getMessage)
@@ -100,7 +80,7 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
         response(document, fileparts, selectedPart.head, accesslevel)
       else
         // More than one part with this sequence number - DB integrity broken!
-        throw new Exception("Invalid ocument part")
+        throw new Exception("Invalid document part")
     })
   }
 

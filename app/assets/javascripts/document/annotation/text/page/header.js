@@ -48,7 +48,7 @@ define(['common/config'], function(Config) {
             updatedCount = (currentCount) ? currentCount + 1 : 1;
             label = (updatedCount === 1) ? ' Other Contributor' : ' Other Contributors';
 
-            contributorEl.html(updateCount + label);
+            contributorsEl.html(updatedCount + label);
           }
         },
 

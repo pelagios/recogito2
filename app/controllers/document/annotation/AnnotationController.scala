@@ -28,7 +28,7 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB) 
           Ok(views.html.document.annotation.image(username, document, parts, thisPart))
         
         case Some(ContentType.TEXT_PLAIN) => {
-          readTextfile(username, document.getId, thisPart.getFilename) match {
+          readTextfile(document.getOwner, document.getId, thisPart.getFilename) match {
             case Some(content) =>
               Ok(views.html.document.annotation.text(username, document, parts, thisPart, content))
 

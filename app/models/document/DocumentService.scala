@@ -49,17 +49,18 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
     }
   }
   
-  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel = forUser match {      
-    case Some(user) if (document.getOwner == user) => 
-      DocumentAccessLevel.OWNER
-    case Some(user) => 
-      sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => DocumentAccessLevel.withName(p.getAccessLevel))
-        .getOrElse(DocumentAccessLevel.FORBIDDEN)
-    case _ if (document.getIsPublic) =>
-      DocumentAccessLevel.READ
-    case _ =>
-      DocumentAccessLevel.FORBIDDEN
-  }
+  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel =
+    forUser match {      
+      case Some(user) if (document.getOwner == user) => 
+        DocumentAccessLevel.OWNER
+      case Some(user) => 
+        sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => DocumentAccessLevel.withName(p.getAccessLevel))
+          .getOrElse(DocumentAccessLevel.FORBIDDEN)
+      case _ if (document.getIsPublic) =>
+        DocumentAccessLevel.READ
+      case _ =>
+        DocumentAccessLevel.FORBIDDEN
+    }
   
   /** Creates a new DocumentRecord from an UploadRecord **/
   def createDocument(upload: UploadRecord)(implicit db: DB) =
@@ -123,7 +124,7 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
           sql.selectFrom(DOCUMENT
                .leftJoin(SHARING_POLICY)
                .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
-               .and(SHARING_POLICY.SHARED_WITH.equal(SHARING_POLICY.DOCUMENT_ID)))
+               .and(SHARING_POLICY.SHARED_WITH.equal(user)))
              .where(DOCUMENT.ID.equal(id))
              .fetchArray
              
