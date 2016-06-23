@@ -24,7 +24,6 @@ object AnnotationStatus extends Enumeration with HasDate {
   
   val NOT_IDENTIFIABLE = Value("NOT_IDENTIFIABLE")
 
-  /** JSON conversion **/
   implicit val annotationStatusValueFormat: Format[AnnotationStatus.Value] =
     Format(
       JsPath.read[String].map(AnnotationStatus.withName(_)),

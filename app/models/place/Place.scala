@@ -67,8 +67,6 @@ case class Place(
   
 }
 
-/** JSON (de)serialization **/
-
 object Place extends HasGeometry {
   
   implicit val placeFormat: Format[Place] = (

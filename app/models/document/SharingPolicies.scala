@@ -9,6 +9,7 @@ import storage.DB
 
 trait SharingPolicies {
   
+  /** Upserts a document collaborator sharing policy (policies are unique by (document_id, shared_with) **/
   def addDocumentCollaborator(documentId: String, sharedBy: String, sharedWith: String, accessLevel: DocumentAccessLevel)(implicit db: DB) = db.query { sql =>
     val (sharingPolicy, isNewCollaborator) = 
       Option(sql.selectFrom(SHARING_POLICY)
@@ -44,6 +45,7 @@ trait SharingPolicies {
     (sharingPolicy, isNewCollaborator)
   } 
   
+  /** Removes a document collaborator sharing policy **/
   def removeDocumentCollaborator(documentId: String, sharedWith: String)(implicit db: DB) = db.query { sql =>
     sql.deleteFrom(SHARING_POLICY)
        .where(SHARING_POLICY.DOCUMENT_ID.equal(documentId)
@@ -51,14 +53,17 @@ trait SharingPolicies {
        .execute() == 1
   } 
   
+  /** Lists all collaborators on a specific document **/
   def listDocumentCollaborators(documentId: String)(implicit db: DB) = db.query { sql =>
     sql.selectFrom(SHARING_POLICY).where(SHARING_POLICY.DOCUMENT_ID.equal(documentId)).fetchArray().toSeq
   }
   
+  /** Returns the number of documents shared with a given user **/
   def countBySharedWith(sharedWith: String)(implicit db: DB) = db.query { sql =>
     sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
   }
   
+  /** Lists the documents shared with a given user (paged response **/
   def findBySharedWith(sharedWith: String, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
     val startTime = System.currentTimeMillis
     

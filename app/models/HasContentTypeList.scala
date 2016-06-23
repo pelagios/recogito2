@@ -14,6 +14,7 @@ trait HasContentTypeList {
       case Some(list) => list.flatMap(ContentType.withName(_)).head
       case None => typeOrList.asOpt[String] match {
         case Some(string) => ContentType.withName(string).get
+        case None => throw new Exception("Invalid JSON - malformed content type: " + typeOrList)
       }
     }
   }

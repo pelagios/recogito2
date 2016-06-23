@@ -95,9 +95,7 @@ object ContributionService extends HasDate {
 
   /** Deletes the contribution history after a given timestamp **/
   def deleteHistoryAfter(documentId: String, after: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
-    Logger.info("Purging history for " + documentId + " after " + timestamp)
-
-    // The usual 2-step process find->delete
+    
     def findContributionsAfter()= ES.client execute {
       search in ES.IDX_RECOGITO / CONTRIBUTION query filteredQuery query {
         nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))

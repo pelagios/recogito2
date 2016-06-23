@@ -33,7 +33,6 @@ case class AnnotatedObject(documentId: String, filepartId: Int, contentType: Con
 
 object AnnotatedObject extends HasContentTypeList {
 
-  /** JSON conversion **/
   implicit val annotatedObjectFormat: Format[AnnotatedObject] = (
     (JsPath \ "document_id").format[String] and
     (JsPath \ "filepart_id").format[Int] and
@@ -44,7 +43,6 @@ object AnnotatedObject extends HasContentTypeList {
 
 object Annotation extends HasDate {
 
-  /** JSON conversion **/
   implicit val annotationFormat: Format[Annotation] = (
     (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "version_id").format[UUID] and

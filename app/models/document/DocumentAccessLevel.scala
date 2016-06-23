@@ -22,8 +22,7 @@ object DocumentAccessLevel {
   
   def withName(name: String): Option[DocumentAccessLevel] =
     Seq(FORBIDDEN, READ, WRITE, ADMIN, OWNER).find(_.toString == name)
-   
-  // JSON serialization
+  
   implicit val documentAccessLevelFromat: Format[DocumentAccessLevel] = 
     Format(
       JsPath.read[String].map(DocumentAccessLevel.withName(_).get),

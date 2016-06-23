@@ -25,8 +25,6 @@ case class GeoTag(
   
 )
 
-/** JSON (de)serialization **/
-
 object GeoTag {
   
   implicit val placeLinkFormat: Format[GeoTag] = (

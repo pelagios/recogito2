@@ -38,7 +38,6 @@ object AnnotationBody extends Enumeration with HasDate {
 
   val TRANSCRIPTION = Value("TRANSCRIPTION")
 
-  /** JSON conversion **/
   implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] =
     Format(
       JsPath.read[String].map(AnnotationBody.withName(_)),

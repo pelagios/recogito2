@@ -24,7 +24,6 @@ case class ContributionStats(
 
 object ContributionStats extends HasDate {
   
-  /** JSON conversion **/
   implicit val byUserWrites = Writes[(String, Long)] { case (username, value) => 
     Json.obj("username" -> username, "value" -> value) }
   

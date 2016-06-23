@@ -36,7 +36,6 @@ object GazetteerUtils {
       r.closeMatches.map(normalizeURI(_)),
       r.exactMatches.map(normalizeURI(_)))
    
-    
   /** Generates a list of name forms (without language), sorted by frequency of appearance in gazetteer records **/
   def collectLabels(records: Seq[GazetteerRecord]): Seq[String] = {
     val titlesAndNames = 
@@ -90,5 +89,4 @@ object GazetteerUtils {
         p.exactMatches.map(normalizeURI(_)))).toSeq
   }
 
-      
 }

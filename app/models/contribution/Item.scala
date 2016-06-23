@@ -62,9 +62,7 @@ object ItemType extends Enumeration {
     case AnnotationBody.PLACE => PLACE_BODY    
     
   }
-  
-  // TODO PERSON_BODY, EVENT_BODY, FORUM_POST
-  
+    
   /** JSON conversion **/
   implicit val itemTypeFormat: Format[ItemType.Value] =
     Format(
