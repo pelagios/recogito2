@@ -1,5 +1,5 @@
 define([
-  'common/utils/formattingUtils',
+  'common/ui/formatting',
   'common/utils/placeUtils',
   'common/hasEvents'], function(Formatting, PlaceUtils, HasEvents) {
 

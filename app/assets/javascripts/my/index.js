@@ -1,9 +1,8 @@
 require.config({
-  baseUrl: "/assets/javascripts/",
-  fileExclusionRegExp: /^lib$/
+  baseUrl: "/assets/javascripts/"
 });
 
-require(['common/utils/touchUtils', 'common/config'], function(Touch, Config) {
+require(['common/ui/touch', 'common/config'], function(Touch, Config) {
 
   jQuery(document).ready(function() {
         /** Document elements **/

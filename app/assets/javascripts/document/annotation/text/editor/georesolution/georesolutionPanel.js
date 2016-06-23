@@ -1,6 +1,6 @@
 define([
   'document/annotation/text/editor/georesolution/placeResult',
-  'common/utils/formattingUtils',
+  'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
   'common/hasEvents'], function(Result, Formatting, PlaceUtils, API, HasEvents) {

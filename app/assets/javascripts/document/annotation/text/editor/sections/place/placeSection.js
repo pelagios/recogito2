@@ -1,6 +1,6 @@
 define([
   'document/annotation/text/editor/sections/section',
-  'common/utils/formattingUtils',
+  'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
   'common/config'], function(Section, Formatting, PlaceUtils, API, Config) {
