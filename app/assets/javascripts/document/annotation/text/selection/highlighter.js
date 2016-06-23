@@ -250,7 +250,7 @@ define(['common/utils/annotationUtils'], function(AnnotationUtils) {
          * Results are sorted by length, shortest first, so that the 'smallest' annotation
          * is the first in the list.
          */
-        getAnnotationsAt = function(element, annotation) {
+        getAnnotationsAt = function(element /*, annotation */) {
           // Helper to get all annotations in case of multipe nested annotation spans
           var getAnnotationsRecursive = function(element, a) {
                 var annotations = (a) ? a : [ ],

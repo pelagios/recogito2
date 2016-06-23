@@ -4,6 +4,7 @@ require.config({
 
 require([
   'document/annotation/text/editor/editor',
+  'document/annotation/text/editor/readonlyEditor',
   'document/annotation/text/page/header',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
@@ -11,7 +12,7 @@ require([
   'common/api',
   'common/config'],
 
-  function(Editor, Header, Toolbar, Highlighter, AnnotationUtils, API, Config) {
+  function(Editor, ReadOnlyEditor, Header, Toolbar, Highlighter, AnnotationUtils, API, Config) {
 
   jQuery(document).ready(function() {
 
@@ -21,7 +22,7 @@ require([
 
         contentNode = document.getElementById('content'),
 
-        editor = new Editor(contentNode),
+        editor = (Config.writeAccess) ? new Editor(contentNode) : new ReadOnlyEditor(contentNode),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
