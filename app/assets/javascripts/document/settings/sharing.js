@@ -1,17 +1,4 @@
-require.config({
-  baseUrl: "/assets/javascripts/",
-  fileExclusionRegExp: /^lib$/
-});
-
-require(['common/config'], function(Config) {
-
-  var foo = function() {
-    return function(q, cb) {
-      jQuery.getJSON('/document/foo/settings/collaborator/search?q=' + q, function(results) {
-        cb(results);
-      });
-    };
-  };
+require(['../../common/config'], function(Config) {
 
   jQuery(document).ready(function() {
     var permissionSelector = jQuery(
@@ -161,7 +148,7 @@ require(['common/config'], function(Config) {
                           '<td class="col-permissions">' +
                             '<button class="permissions btn small">' +
                               '<span class="label">' + result.access_level + '</span>' +
-                              '<span class="icon">&#xf0dd;</span>' +
+                              '<span class="icon">&#xe897;</span>' +
                             '</button>' +
                           '</td>' +
                           '<td class="col-actions outline-icon remove-collaborator">&#xe897;</td>' +
