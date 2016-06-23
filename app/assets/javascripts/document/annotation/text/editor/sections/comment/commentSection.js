@@ -4,7 +4,6 @@ define([
   'common/config'], function(Section, Formatting, Config) {
 
   var CommentSection = function(parent, commentBody, zIndex) {
-
     var self = this,
 
         // Flag indicating whether the user has switched to editing mode

@@ -3,8 +3,8 @@ require.config({
 });
 
 require([
-  'document/annotation/text/editor/editor',
-  'document/annotation/text/editor/readonlyEditor',
+  'document/annotation/text/editor/editorRead',
+  'document/annotation/text/editor/editorWrite',
   'document/annotation/text/page/header',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
@@ -12,7 +12,7 @@ require([
   'common/api',
   'common/config'],
 
-  function(Editor, ReadOnlyEditor, Header, Toolbar, Highlighter, AnnotationUtils, API, Config) {
+  function(ReadEditor, WriteEditor, Header, Toolbar, Highlighter, AnnotationUtils, API, Config) {
 
   jQuery(document).ready(function() {
 
@@ -22,7 +22,7 @@ require([
 
         contentNode = document.getElementById('content'),
 
-        editor = (Config.writeAccess) ? new Editor(contentNode) : new ReadOnlyEditor(contentNode),
+        editor = (Config.writeAccess) ? new WriteEditor(contentNode) : new ReadEditor(contentNode),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 

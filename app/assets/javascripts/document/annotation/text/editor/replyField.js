@@ -1,7 +1,6 @@
 define(['common/hasEvents'], function(HasEvents) {
 
   var ReplyField = function(parent, isReply) {
-
     var self = this,
 
         element = jQuery(

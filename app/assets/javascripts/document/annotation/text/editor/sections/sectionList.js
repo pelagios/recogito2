@@ -6,7 +6,6 @@ define([
 
   /** Represents a list of editor sections and provides utility methods **/
   var SectionList = function(containerEl) {
-
     var self = this,
 
         sections = [],
