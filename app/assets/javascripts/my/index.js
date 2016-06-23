@@ -3,7 +3,7 @@ require.config({
   fileExclusionRegExp: /^lib$/
 });
 
-require(['common/config', 'common/hasDoubleTap'], function(Config, HasDoubleTap) {
+require(['common/utils/touchUtils', 'common/config'], function(Touch, Config) {
 
   jQuery(document).ready(function() {
         /** Document elements **/
@@ -121,8 +121,10 @@ require(['common/config', 'common/hasDoubleTap'], function(Config, HasDoubleTap)
     // Double click on documents opens them
     jQuery('.document-panel').on('dblclick', '.document', openDocument);
 
-    if (Config.IS_TOUCH)
+    if (Config.IS_TOUCH) {
+      Touch.enableDoubleTap();
       jQuery('.document-panel').on('doubletap', '.document', openDocument);
+    }
   });
 
 });
