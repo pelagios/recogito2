@@ -1,4 +1,9 @@
-require(['../../common/config'], function(Config) {
+require.config({
+  baseUrl: "/assets/javascripts/",
+  fileExclusionRegExp: /^lib$/
+});
+
+require(['common/config'], function(Config) {
 
   jQuery(document).ready(function() {
     var permissionSelector = jQuery(
@@ -148,7 +153,7 @@ require(['../../common/config'], function(Config) {
                           '<td class="col-permissions">' +
                             '<button class="permissions btn small">' +
                               '<span class="label">' + result.access_level + '</span>' +
-                              '<span class="icon">&#xe897;</span>' +
+                              '<span class="icon">&#xf0dd;</span>' +
                             '</button>' +
                           '</td>' +
                           '<td class="col-actions outline-icon remove-collaborator">&#xe897;</td>' +
