@@ -57,6 +57,8 @@ libraryDependencies ++= Seq(
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
 
+pipelineStages := Seq(rjs)
+
 includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
