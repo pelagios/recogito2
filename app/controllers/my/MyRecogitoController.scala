@@ -1,5 +1,6 @@
 package controllers.my
 
+import controllers.WebJarAssets
 import controllers.{ HasCache, HasDatabase, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
@@ -15,9 +16,9 @@ import play.api.mvc.{ Controller, RequestHeader }
 import storage.DB
 import scala.concurrent.Future
 
-class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB) 
+class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB, val webjars: WebJarAssets) 
   extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security {
-  
+
   // TODO this may depend on user in the future
   private lazy val QUOTA = Play.current.configuration.getInt("recogito.upload.quota").getOrElse(200)
 

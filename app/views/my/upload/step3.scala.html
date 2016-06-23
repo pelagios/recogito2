@@ -1,7 +1,7 @@
 @(username: String,
   document: models.generated.tables.records.DocumentRecord,
   fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord],
-  tasks: Seq[controllers.my.upload.TaskType])(implicit request: RequestHeader)
+  tasks: Seq[controllers.my.upload.TaskType])(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>

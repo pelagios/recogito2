@@ -1,5 +1,6 @@
 package controllers.document.settings
 
+import controllers.WebJarAssets
 import controllers.BaseController
 import controllers.document.settings.actions._
 import javax.inject.Inject
@@ -45,7 +46,7 @@ trait HasAdminAction { self: BaseController =>
   
 }
 
-class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB)
+class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets)
   extends BaseController
     with HasAdminAction
     with MetadataActions 

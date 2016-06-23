@@ -4,7 +4,7 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 scalacOptions ++= Seq("-feature")
 
@@ -38,6 +38,9 @@ libraryDependencies ++= Seq(
 
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
 
+  "org.webjars" %% "webjars-play" % "2.5.0",
+  // "org.webjars" %% "webjars-play" % "2.5.0",
+
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
@@ -57,7 +60,7 @@ libraryDependencies ++= Seq(
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
 
-// pipelineStages := Seq(rjs, uglify, digest, gzip)
+pipelineStages := Seq(rjs, digest, gzip)
 
 includeFilter in (Assets, LessKeys.less) := "*.less"
 

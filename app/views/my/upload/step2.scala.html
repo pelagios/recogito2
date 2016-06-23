@@ -1,4 +1,5 @@
-@(username: String, fileparts: Seq[models.generated.tables.records.UploadFilepartRecord])(implicit request: RequestHeader)
+@(username: String, fileparts: Seq[models.generated.tables.records.UploadFilepartRecord])(implicit request: RequestHeader,
+  webjars: WebJarAssets)
 
 @formatSize(sizeKb: Double) = @{
   val fmt = new java.text.DecimalFormat("#.#")

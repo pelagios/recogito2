@@ -1,13 +1,13 @@
 @(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, quotaMB: Int,
-  myDocCount: Long, sharedWithMeCount: Long, activeTab: String)(content: Html)
+  myDocCount: Long, sharedWithMeCount: Long, activeTab: String, webjars: WebJarAssets)(content: Html)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito</title>
     <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,height=device-height,target-densitydpi=device-dpi,user-scalable=yes" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
-    <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
-    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/my/index.js")"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/my/index.js")"></script>
   </head>
   <body>
     <div class="page-header">

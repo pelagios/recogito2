@@ -1,4 +1,5 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord)
-@_layout("Settings - Metadata", username, document, Some("metadata")) {
+@(username: String, document: models.generated.tables.records.DocumentRecord)(implicit webjars: WebJarAssets)
+
+@_layout("Settings - Metadata", username, document, Some("metadata"), webjars) {
 
 }

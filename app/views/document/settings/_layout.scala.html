@@ -1,11 +1,11 @@
 @(title: String, username: String, document: models.generated.tables.records.DocumentRecord,
-  active: Option[String] = None)(content: Html)
+  active: Option[String], webjars: WebJarAssets)(content: Html)
 <!DOCTYPE html>
 <html>
   <head>
     <title>@title</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/settings/index.css")"/>
-    <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
   </head>
   <body>
     <div class="header-iconbar">

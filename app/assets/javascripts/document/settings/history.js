@@ -1,5 +1,6 @@
 require.config({
-  baseUrl: "/assets/javascripts/"
+  baseUrl: "/assets/javascripts/",
+  fileExclusionRegExp: /^lib$/
 });
 
 require(['common/ui/formatting', 'common/config'], function(Formatting, Config) {

@@ -3,6 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET     /webjars/*file                               controllers.WebJarAssets.at(file)
 GET     /favicon.ico                                 controllers.Assets.at(path="/public", file="/images/favicon.png")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

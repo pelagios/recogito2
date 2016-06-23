@@ -1,3 +1,4 @@
 require.config({
-  baseUrl: "/assets/javascripts"
+  baseUrl: "/assets/javascripts",
+  fileExclusionRegExp: /^lib$/
 });

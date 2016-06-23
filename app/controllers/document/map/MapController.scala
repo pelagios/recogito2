@@ -1,12 +1,13 @@
 package controllers.document.map
 
+import controllers.WebJarAssets
 import controllers.BaseController
 import javax.inject.Inject
 import models.user.Roles._
 import play.api.cache.CacheApi
 import storage.DB
 
-class MapController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
+class MapController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) extends BaseController {
 
   def showMap(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentResponse(documentId, loggedIn.user.getUsername,

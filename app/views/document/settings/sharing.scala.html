@@ -1,7 +1,8 @@
 @(username: String, document: models.generated.tables.records.DocumentRecord,
-  sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord])(implicit request: RequestHeader)
+  sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord])(implicit request: RequestHeader,
+  webjars: WebJarAssets)
 
-@_layout("Settings - Sharing", username, document, Some("sharing")) {
+@_layout("Settings - Sharing", username, document, Some("sharing"), webjars) {
   <div class="panel share-public">
     <h2>Public Access</h2>
       <div class="inner">
@@ -51,8 +52,8 @@
         documentId: '@document.getId'
       }
     </script>
-    <script src="@routes.Assets.versioned("lib/typeaheadjs/typeahead.jquery.min.js")"></script>
-    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/document/settings/sharing.js")"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("typeahead.jquery.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/sharing.js")"></script>
     @helper.javascriptRouter("jsRoutes")(
       controllers.my.routes.javascript.MyRecogitoController.index,
       controllers.document.settings.routes.javascript.SettingsController.setIsPublic,

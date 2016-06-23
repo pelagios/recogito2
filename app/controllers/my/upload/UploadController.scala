@@ -1,6 +1,7 @@
 package controllers.my.upload
 
 import akka.actor.ActorSystem
+import controllers.WebJarAssets
 import controllers.BaseController
 import controllers.my.upload.ProcessingTaskMessages._
 import controllers.my.upload.ner.NERService
@@ -31,7 +32,7 @@ case class UploadSuccess(contentType: String)
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)
 
-class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem) extends BaseController {
+class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem, webjars: WebJarAssets) extends BaseController {
 
   private val FILE_ARG = "file"
 
@@ -197,7 +198,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
   /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
   private def queryTaskProgress(username: String, docId: String, service: ProcessingService) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
-    import UploadController._ 
+    import UploadController._
 
     DocumentService.findById(docId, Some(username)).flatMap(_ match {
       // Make sure only users with read access can see the progress
