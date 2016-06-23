@@ -2,7 +2,7 @@ define([], function() {
 
   return {
 
-    /** Annotation API methods **/
+    /** Annotation API **/
 
     getAnnotationsForDocument : function(docId) {
       return jsRoutes.controllers.api.AnnotationAPIController.getAnnotationsForDocument(docId).ajax();
@@ -24,7 +24,7 @@ define([], function() {
       return jsRoutes.controllers.api.AnnotationAPIController.deleteAnnotation(id).ajax();
     },
 
-    /** Place API methods **/
+    /** Place API **/
 
     getPlacesInDocument : function(docId, offset, size) {
       var o = (offset) ? offset : 0,

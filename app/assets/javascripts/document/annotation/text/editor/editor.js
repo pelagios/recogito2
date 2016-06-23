@@ -5,19 +5,20 @@
  *
  */
 define([
+  'document/annotation/text/editor/autoPosition',
   'document/annotation/text/editor/replyField',
   'document/annotation/text/editor/georesolution/georesolutionPanel',
   'document/annotation/text/editor/sections/sectionList',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler',
-  'common/helpers/annotationUtils',
-  'common/helpers/placeUtils',
-  'common/autoPosition',
+  'common/utils/annotationUtils',
+  'common/utils/placeUtils',
+  'common/api',
   'common/config',
   'common/hasEvents'],
 
-  function(ReplyField, GeoresolutionPanel, SectionList, Highlighter, SelectionHandler,
-    AnnotationUtils, PlaceUtils, AutoPosition, Config, HasEvents) {
+  function(AutoPosition, ReplyField, GeoresolutionPanel, SectionList, Highlighter, SelectionHandler,
+    AnnotationUtils, PlaceUtils, API, Config, HasEvents) {
 
   /** The main annotation editor popup **/
   var Editor = function(container) {
@@ -148,12 +149,13 @@ define([
             currentAnnotation = selection.annotation;
 
             if (annotationMode.type === 'PLACE') {
-              PlaceUtils.createAnnotationBody(AnnotationUtils.getQuote(selection.annotation))
-                .done(function(body) {
+              API.searchPlaces(AnnotationUtils.getQuote(selection.annotation)).done(function(response) {
+                var body = { type: 'PLACE', status: { value: 'UNVERIFIED' } };
+                if (response.total > 0)
+                  body.uri = PlaceUtils.getBestMatchingRecord(response.items[0], quote).uri;
                   selection.annotation.bodies.push(body);
                   onOK();
-                });
-
+              });
             } else if (annotationMode.type === 'PERSON') {
               selection.annotation.bodies.push({ type: 'PERSON' });
               onOK();

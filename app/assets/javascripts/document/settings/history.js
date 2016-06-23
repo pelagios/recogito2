@@ -3,7 +3,7 @@ require.config({
   fileExclusionRegExp: /^lib$/
 });
 
-require(['common/helpers/formatting', 'common/config'], function(Formatting, Config) {
+require(['common/utils/formattingUtils', 'common/config'], function(Formatting, Config) {
   var formatAction = function(action) {
         if (action === 'CREATE_BODY')
           return '<span class="create">New</span>';

@@ -4,8 +4,8 @@ require.config({
 });
 
 require([
-  'common/helpers/annotationUtils',
-  'common/helpers/placeUtils',
+  'common/utils/annotationUtils',
+  'common/utils/placeUtils',
   'common/api',
   'common/config'], function(AnnotationUtils, PlaceUtils, API, Config) {
 

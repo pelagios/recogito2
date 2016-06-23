@@ -1,6 +1,6 @@
 define([
-  'common/helpers/formatting',
-  'common/helpers/placeUtils',
+  'common/utils/formattingUtils',
+  'common/utils/placeUtils',
   'common/hasEvents'], function(Formatting, PlaceUtils, HasEvents) {
 
   var PlaceResult = function(ul, place) {
@@ -23,10 +23,22 @@ define([
 
                  uris = PlaceUtils.getURIs(place),
 
-                 descriptions = PlaceUtils.getDescriptions(place);
+                 descriptions = PlaceUtils.getDescriptions(place),
+
+                 formatGazetteerURI = function(uri) {
+                   var data = PlaceUtils.parseURI(uri);
+                   if (data.shortcode)
+                     return '<a class="gazetteer-id" href="' + uri + '" target="_blank">' +
+                              data.shortcode + ':' + data.id +
+                            '</a>';
+                   else
+                     return '<a class="gazetteer-id" href="' + uri + '" target="_blank">' +
+                              uri +
+                            '</a>';
+                 };
 
                jQuery.each(uris, function(idx, uri) {
-                 gazetteersEl.append(Formatting.formatGazetteerURI(uri));
+                 gazetteersEl.append(formatGazetteerURI(uri));
                });
 
                if (descriptions.length > 0)
@@ -36,7 +48,7 @@ define([
 
                if (place.temporal_bounds)
                  dateEl.html(Formatting.yyyyMMddToYear(place.temporal_bounds.from) + ' - ' +
-                           Formatting.yyyyMMddToYear(place.temporal_bounds.to));
+                             Formatting.yyyyMMddToYear(place.temporal_bounds.to));
                else
                  dateEl.hide();
 

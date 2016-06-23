@@ -1,7 +1,7 @@
 define([
   'document/annotation/text/editor/sections/section',
-  'common/helpers/formatting',
-  'common/helpers/placeUtils',
+  'common/utils/formattingUtils',
+  'common/utils/placeUtils',
   'common/api',
   'common/config'], function(Section, Formatting, PlaceUtils, API, Config) {
 
@@ -138,6 +138,18 @@ define([
           map.panTo(centerLatLng, { animate: false});
         },
 
+        formatGazetteerURI = function(uri) {
+          var data = PlaceUtils.parseURI(uri);
+          if (data.shortcode)
+            return '<a class="gazetteer-id" href="' + uri + '" target="_blank">' +
+                     data.shortcode + ':' + data.id +
+                   '</a>';
+          else
+            return '<a class="gazetteer-id" href="' + uri + '" target="_blank">' +
+                     uri +
+                   '</a>';
+        },
+
         /** Renders the standard place card with gazetteer record **/
         renderStandardCard = function(gazetteerRecord, status, opt_coord) {
           var latLon = (opt_coord) ? [opt_coord[1], opt_coord[0]] : false;
@@ -145,7 +157,7 @@ define([
           panel.html(standardTemplate);
 
           title.html(gazetteerRecord.title);
-          gazetteerId.html(Formatting.formatGazetteerURI(gazetteerRecord.uri));
+          gazetteerId.html(formatGazetteerURI(gazetteerRecord.uri));
 
           if (gazetteerRecord.descriptions) {
             description.html(gazetteerRecord.descriptions[0].description);

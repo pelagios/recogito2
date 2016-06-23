@@ -57,7 +57,7 @@
         <li class="my-documents @if(activeTab == "my") { enabled }">
           <a href="@controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("my"))">My documents (@myDocCount)</a>
         </li><!--
-        
+
         --><li class="shared-with-me @if(activeTab == "shared") { enabled }">
           <a href="@controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("shared"))">Shared with me (@sharedWithMeCount)</a>
         </li>

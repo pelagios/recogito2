@@ -1,6 +1,6 @@
 define([
   'document/annotation/text/editor/sections/section',
-  'common/helpers/formatting',
+  'common/utils/formattingUtils',
   'common/config'], function(Section, Formatting, Config) {
 
   var CommentSection = function(parent, commentBody, zIndex) {

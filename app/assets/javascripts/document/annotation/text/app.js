@@ -8,7 +8,7 @@ require([
   'document/annotation/text/page/header',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
-  'common/helpers/annotationUtils',
+  'common/utils/annotationUtils',
   'common/api',
   'common/config'],
 
@@ -50,7 +50,7 @@ require([
                header.showStatusSaved();
 
                // Update the annotation references in the elements
-               AnnotationUtils.attachAnnotation(e.elements, annotation);
+               AnnotationUtils.bindToElements(annotation, e.elements);
              })
              .fail(function(error) {
                header.showSaveError(error);

@@ -1,4 +1,4 @@
-define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
+define(['common/utils/annotationUtils'], function(AnnotationUtils) {
 
   var TEXT = 3; // HTML DOM node type for text nodes
 
@@ -198,7 +198,7 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
 
             // Attach annotation data as payload to the SPANs and set id, if any
             updateStyles(annotation, spans);
-            AnnotationUtils.attachAnnotation(spans, annotation);
+            AnnotationUtils.bindToElements(annotation, spans);
             return bounds;
           }, false);
         },
@@ -212,7 +212,7 @@ define(['common/helpers/annotationUtils'], function(AnnotationUtils) {
               quote = AnnotationUtils.getQuote(annotation);
 
           updateStyles(annotation, spans);
-          AnnotationUtils.attachAnnotation(spans, annotation);
+          AnnotationUtils.bindToElements(annotation, spans);
         },
 
         /**

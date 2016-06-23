@@ -1,10 +1,9 @@
 define([
   'document/annotation/text/editor/georesolution/placeResult',
-  'common/helpers/formatting',
-  'common/helpers/gazetteerUtils',
-  'common/helpers/placeUtils',
+  'common/utils/formattingUtils',
+  'common/utils/placeUtils',
   'common/api',
-  'common/hasEvents'], function(Result, Formatting, GazetteerUtils, PlaceUtils, API, HasEvents) {
+  'common/hasEvents'], function(Result, Formatting, PlaceUtils, API, HasEvents) {
 
   var GeoresolutionPanel = function() {
     var self = this,
@@ -84,7 +83,7 @@ define([
                   '</div>');
 
             jQuery.each(place.is_conflation_of, function(idx, choice) {
-              var choiceProps = GazetteerUtils.parseURI(choice.uri),
+              var choiceProps = PlaceUtils.parseURI(choice.uri),
 
                   template = jQuery(
                     '<tr data-uri="' + choice.uri + '">' +
