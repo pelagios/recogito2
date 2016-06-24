@@ -6,6 +6,8 @@ define([
 
   var StandardCard = function(containerEl, record, verificationStatus, lastModified) {
 
+    // TODO cover the case of unlocated places - map overlay!
+
     var self = this,
 
         SLIDE_DURATION = 200,
@@ -92,7 +94,6 @@ define([
     Card.apply(this, [ element ]);
 
     this.setConfirmed = setConfirmed;
-
     render();
   };
   StandardCard.prototype = Object.create(Card.prototype);

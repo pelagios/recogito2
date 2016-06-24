@@ -1,3 +1,4 @@
+/** Common base functionality & markup used in different types of place cards **/
 define(['common/ui/formatting', 'common/utils/placeUtils',], function(Formatting, PlaceUtils) {
 
   var Card = function(element) {

@@ -4,6 +4,8 @@ define([
 
   var ErrorCard = function(containerEl, record, verificationStatus, lastModified) {
 
+    // TODO do we need to include the 'unverified' warning?
+
     var element = (Config.writeAccess) ? jQuery(
           '<div class="info-text">' +
             '<div class="place-details">' +
@@ -47,9 +49,8 @@ define([
         };
 
     this.render = render;
-
+    
     Card.apply(this, [ element ]);
-
     render();
   };
   ErrorCard.prototype = Object.create(Card.prototype);

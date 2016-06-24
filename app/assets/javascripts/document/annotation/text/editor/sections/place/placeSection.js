@@ -28,8 +28,6 @@ define([
 
         infoEl = element.find('.info'),
 
-        currentGazetteerRecord = false,
-
         card = false,
 
         lastModified = {
@@ -117,7 +115,6 @@ define([
             var record = PlaceUtils.getRecord(place, uri),
                 coord = place.representative_point;
 
-            currentGazetteerRecord = record;
             fillTemplate(record, status, coord);
           }).fail(function(error) {
             fillTemplate(false, status, false);
@@ -133,7 +130,6 @@ define([
                   coord = topPlace.representative_point;
 
               placeBody.uri = bestRecord.uri;
-              currentGazetteerRecord = bestRecord;
               fillTemplate(bestRecord, status, coord);
             } else {
               fillTemplate(false, status, false);

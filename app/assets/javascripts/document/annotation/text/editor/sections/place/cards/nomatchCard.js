@@ -4,6 +4,8 @@ define([
 
   var NoMatchCard = function(containerEl, verificationStatus, lastModified) {
 
+    // TODO cover the case of yellow place status'es - different message + place overlay
+
     var element = (Config.writeAccess) ? jQuery(
           '<div class="info-text">' +
             '<div class="no-match">' +
