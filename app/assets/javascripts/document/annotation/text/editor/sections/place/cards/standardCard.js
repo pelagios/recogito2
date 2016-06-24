@@ -42,19 +42,6 @@ define([
             '</div>' +
           '</div>'),
 
-        editButtons =
-          '<button class="change btn tiny">Change</button>' +
-          '<button class="delete btn tiny icon">&#xf014;</button>',
-
-        unverifiedWarningRead =
-          '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>',
-
-        unverifiedWarningWrite =
-          '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-          '<button class="btn tiny delete icon">&#xf014;</button>' +
-          '<button class="btn tiny unverified-change">Change</button>' +
-          '<button class="btn tiny unverified-confirm">Confirm</button>',
-
         titleEl       = element.find('.title'),
         urisEl        = element.find('.uris'),
         descriptionEl = element.find('.description'),
@@ -84,14 +71,14 @@ define([
           if (verificationStatus.value === 'UNVERIFIED') {
             lastModifiedEl.hide();
             if (Config.writeAccess)
-              unverifiedWarningEl.html(unverifiedWarningWrite);
+              unverifiedWarningEl.html(Card.TEMPLATES.UNVERIFIED_WARNING_WRITE);
             else
-              unverifiedWarningEl.html(unverifiedWarningRead);
+              unverifiedWarningEl.html(Card.TEMPLATES.UNVERIFIED_WARNING_READ);
           } else {
             unverifiedWarningEl.hide();
             self.setLastModified(lastModified);
             if (Config.writeAccess)
-              editButtonsEl.html(editButtons);
+              editButtonsEl.html(Card.TEMPLATES.EDIT_BUTTONS);
           }
 
           containerEl.html(element);

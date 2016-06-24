@@ -5,6 +5,23 @@ define(['common/ui/formatting', 'common/utils/placeUtils',], function(Formatting
     this.lastModifiedAtEl = element.find('.last-modified .at');
   };
 
+  Card.TEMPLATES = {
+
+    EDIT_BUTTONS :
+      '<button class="change btn tiny">Change</button>' +
+      '<button class="delete btn tiny icon">&#xf014;</button>',
+
+    UNVERIFIED_WARNING_READ :
+      '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>',
+
+    UNVERIFIED_WARNING_WRITE :
+      '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
+      '<button class="btn tiny delete icon">&#xf014;</button>' +
+      '<button class="btn tiny unverified-change">Change</button>' +
+      '<button class="btn tiny unverified-confirm">Confirm</button>'
+
+  };
+
   Card.prototype.formatURI = function(uri) {
     var parsed = PlaceUtils.parseURI(uri);
     if (parsed.shortcode)

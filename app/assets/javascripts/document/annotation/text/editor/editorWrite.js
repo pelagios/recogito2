@@ -128,7 +128,7 @@ define([
 
         /** Click on 'Place' button adds a new PLACE body **/
         onAddPlace = function() {
-          sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } });
+          self.sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } });
         },
 
         /** Click on 'Person' button adds a new PERSON body **/
