@@ -1,4 +1,4 @@
-define(['common/ui/formatting'], function(Formatting) {
+define(['common/ui/formatting', 'common/utils/placeUtils',], function(Formatting, PlaceUtils) {
 
   var Card = function(element) {
     this.lastModifiedByEl = element.find('.last-modified .by');
