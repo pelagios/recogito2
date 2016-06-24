@@ -19,7 +19,7 @@ define([
           '<div class="section comment">' + // style="z-index:' + zIndex + '">' +
             '<div class="comment-body">' + escapeHtml(commentBody.value) + '</div>' +
             '<div class="icon edit">&#xf142;</div>' +
-            '<div class="created">' +
+            '<div class="last-modified">' +
               '<a class="by" href="/' + commentBody.last_modified_by + '">' +
                 commentBody.last_modified_by +
               '</a>' +

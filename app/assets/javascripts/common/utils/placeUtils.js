@@ -52,17 +52,33 @@ define(['../api'], function(API) {
      * Returns a list of distinct names (without language) contained in this record,
      * sorted by frequency. The method also splits on separator characters (comma and /),
      * so the results can be used as screen labels.
+     *
+     * If skipTitles is set to true, the labels will *not* inlude names appearing in the title.
+     * This is to simplify the typical use case where title is shown in the UI, and all
+     * alternative names underneath (where repetition of title is not desired).
      */
-    getLabels: function(gazetteerRecord) {
-      var labels = {}, asArray = [],
+    getLabels: function(gazetteerRecord, skipTitles) {
+      var titles = (skipTitles) ? gazetteerRecord.title.split(/,|\//) : false,
+          labels = {}, asArray = [], result,
 
           add = function(name) {
-            jQuery.each(name.split(',|/'), function(idx, label) {
-              var count = labels[label];
+            jQuery.each(name.split(/,|\//), function(idx, label) {
+              var trimmed = label.trim(),
+                  count = labels[trimmed];
+
               if (count)
-                labels[label] = count + 1;
+                labels[trimmed] = count + 1;
               else
-                labels[label] = 1;
+                labels[trimmed] = 1;
+            });
+          },
+
+          // Computes the diff between two string arrays. Result is array A, minus string
+          // appearing in array B. Strings are trimmed for comparison.
+          diff = function(arrayA, arrayB) {
+            var trimmedB = jQuery.map(arrayB, function(elem) { return elem.trim(); });
+            return jQuery.grep(arrayA, function(elem) {
+              return trimmedB.indexOf(elem.trim()) < 0;
             });
           };
 
@@ -81,9 +97,14 @@ define(['../api'], function(API) {
         return b[1] - a[1];
       });
 
-      return jQuery.map(asArray, function(val) {
+      result = jQuery.map(asArray, function(val) {
         return val[0];
       });
+
+      if (skipTitles)
+        return diff(result, titles);
+      else
+        return result;
     },
 
     /** Returns the record with the given URI (or false, if none) **/

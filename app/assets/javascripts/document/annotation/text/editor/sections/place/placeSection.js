@@ -1,11 +1,12 @@
 define([
+  'document/annotation/text/editor/sections/place/cards/errorCard',
+  'document/annotation/text/editor/sections/place/cards/nomatchCard',
+  'document/annotation/text/editor/sections/place/cards/standardCard',
   'document/annotation/text/editor/sections/section',
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
-  'common/config'], function(Section, Formatting, PlaceUtils, API, Config) {
-
-  var SLIDE_DURATION = 200;
+  'common/config'], function(ErrorCard, NoMatchCard, StandardCard, Section, Formatting, PlaceUtils, API, Config) {
 
   var PlaceSection = function(parent, placeBody, quote) {
     var self = this,
@@ -14,92 +15,22 @@ define([
           var el = jQuery(
             '<div class="section place">' +
               '<div class="map"></div>' +
-              '<div class="panel-container">' +
-                '<div class="panel place-details">' +
-                '</div>' +
-                '<div class="warning-unlocated">' +
-                  '<span class="icon">&#xf29c;</span>' +
-                  '<span class="caption">NO LOCATION</span>' +
-                '</div>' +
-              '</div>' +
+              '<div class="info"></div>' +
+              // '<div class="warning-unlocated">' +
+              //   '<span class="icon">&#xf29c;</span>' +
+              //   '<span class="caption">NO LOCATION</span>' +
+              // '</div>' +
             '</div>');
 
           parent.append(el);
           return el;
         })(),
 
-        standardTemplate = (function() {
-          var el = (Config.writeAccess) ? jQuery(
-            '<div>' +
-              '<h3></h3>' +
-              '<p class="gazetteer"></p>' +
-              '<p class="description"></p>' +
-              '<p class="names"></p>' +
-              '<p class="date"></p>' +
-              '<div class="created">' +
-                '<a class="by"></a>' +
-                '<span class="at"></span>' +
-              '</div>' +
-              '<div class="edit-buttons">' +
-                '<button class="change btn tiny">Change</button>' +
-                '<button class="delete btn tiny icon">&#xf014;</button>' +
-              '</div>' +
-              '<div class="warning-unverified">' +
-                '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-                '<button class="delete icon">&#xf014;</button>' +
-                '<button class="unverified-change">Change</button>' +
-                '<button class="unverified-confirm">Confirm</button>' +
-              '</div>' +
-            '</div>') : jQuery(
-              // Simplified version for read-only mode
-              '<div>' +
-                '<h3></h3>' +
-                '<p class="gazetteer"></p>' +
-                '<p class="description"></p>' +
-                '<p class="names"></p>' +
-                '<p class="date"></p>' +
-                '<div class="created">' +
-                  '<a class="by"></a>' +
-                  '<span class="at"></span>' +
-                '</div>' +
-                '<div class="warning-unverified">' +
-                  '<span class="warning"><span class="icon">&#xf071;</span> Automatic Match</span>' +
-                '</div>' +
-              '</div>'
-            );
-
-          el.find('.created, .edit-buttons').hide();
-          return el;
-        })(),
-
-        noMatchTemplate = (Config.writeAccess) ? jQuery(
-          '<div class="no-match">' +
-            '<h3>No automatic match found</h3>' +
-            '<button class="change">Search</button> ' +
-            '<button class="delete icon">&#xf014;</button>' +
-          '</div>') : jQuery(
-          // Simplified version for read-only mode
-          '<div class="no-match">' +
-            '<h3>No automatic match found</h3>' +
-          '</div>'),
-
-        panelContainer = element.find('.panel-container'),
-        panel = element.find('.panel'),
-
-        title = standardTemplate.find('h3'),
-        gazetteerId = standardTemplate.find('.gazetteer'),
-        description = standardTemplate.find('.description'),
-        names = standardTemplate.find('.names'),
-        date = standardTemplate.find('.date'),
-
-        createdSection = standardTemplate.find('.created, .edit-buttons'),
-        createdBy = standardTemplate.find('.by'),
-        createdAt = standardTemplate.find('.at'),
-
-        warningUnverified = standardTemplate.find('.warning-unverified'),
-        warningUnlocated = standardTemplate.find('.warning-unlocated'),
+        infoEl = element.find('.info'),
 
         currentGazetteerRecord = false,
+
+        card = false,
 
         lastModified = {
           by: placeBody.last_modified_by,
@@ -138,100 +69,30 @@ define([
           map.panTo(centerLatLng, { animate: false});
         },
 
-        formatGazetteerURI = function(uri) {
-          var data = PlaceUtils.parseURI(uri);
-          if (data.shortcode)
-            return '<a class="gazetteer-id" href="' + uri + '" target="_blank">' +
-                     data.shortcode + ':' + data.id +
-                   '</a>';
-          else
-            return '<a class="gazetteer-id" href="' + uri + '" target="_blank">' +
-                     uri +
-                   '</a>';
-        },
-
         /** Renders the standard place card with gazetteer record **/
-        renderStandardCard = function(gazetteerRecord, status, opt_coord) {
+        renderStandardCard = function(record, verificationStatus, opt_coord) {
           var latLon = (opt_coord) ? [opt_coord[1], opt_coord[0]] : false;
-
-          panel.html(standardTemplate);
-
-          title.html(gazetteerRecord.title);
-          gazetteerId.html(formatGazetteerURI(gazetteerRecord.uri));
-
-          if (gazetteerRecord.descriptions) {
-            description.html(gazetteerRecord.descriptions[0].description);
-            description.show();
-          } else {
-            description.empty();
-            description.hide();
-          }
-
-          // names.htmlcreatedBy(labels.slice(1).join(', '));
-
-          if (gazetteerRecord.temporal_bounds) {
-            date.html(Formatting.yyyyMMddToYear(gazetteerRecord.temporal_bounds.from) + ' - ' +
-                      Formatting.yyyyMMddToYear(gazetteerRecord.temporal_bounds.to));
-            date.show();
-          } else {
-            date.empty();
-            date.hide();
-          }
-
-          setCreated();
-
-          if (status.value === 'UNVERIFIED') {
-            createdSection.hide();
-            warningUnverified.show();
-          } else {
-            createdSection.show();
-            warningUnverified.hide();
-          }
-
-          // Map
+          card = new StandardCard(infoEl, record, verificationStatus, lastModified);
           markerLayer.clearLayers();
           if (latLon) {
-            panelContainer.removeClass('unlocated');
+            // panelContainer.removeClass('unlocated');
             L.marker(latLon).addTo(markerLayer);
             setCenter(latLon);
           } else {
             setCenter([37.98, 23.73]);
-            panelContainer.addClass('unlocated');
+            // panelContainer.addClass('unlocated');
           }
-        },
-
-        setCreated = function() {
-          if (lastModified.by) {
-            createdBy.html(lastModified.by);
-            createdBy.attr('href', '/' + lastModified.by);
-          }
-
-          if (lastModified.at)
-            createdAt.html(Formatting.timeSince(lastModified.at));
         },
 
         /** Renders a 'no match' place card, due to yellow status or failed match **/
-        renderNoMatchCard = function(status) {
-          // TODO implement
-          panel.html(noMatchTemplate);
+        renderNoMatchCard = function(verificationStatus) {
+          card = new NoMatchCard(infoEl, verificationStatus, lastModified);
           setCenter([37.98, 23.73]);
         },
 
         /** Renders the error edge cases where the place body has a URI that can't be resolved **/
         renderResolveErrorCard = function() {
-          gazetteerId.html(Formatting.formatGazetteerURI(placeBody.uri));
-
-          if (placeBody.last_modified_by) {
-            createdBy.html(placeBody.last_modified_by);
-            createdBy.attr('href', '/' + placeBody.last_modified_by);
-          }
-
-          if (placeBody.last_modified_at)
-            createdAt.html(Formatting.timeSince(placeBody.last_modified_at));
-
-          createdSection.show();
-          warningUnverified.hide();
-
+          card = new ErrorCard(inforEl, record, verificationStatus, lastModified);
           setCenter([37.98, 23.73]);
         },
 
@@ -304,10 +165,8 @@ define([
         onConfirm = function() {
           // Apply UI changes now
           lastModified = { by: Config.me, at: new Date() };
-          setCreated();
-
-          createdSection.fadeIn(SLIDE_DURATION);
-          warningUnverified.slideUp(SLIDE_DURATION);
+          card.setLastModified(lastModified);
+          card.setConfirmed();
 
           // Queue updates to model for later
           queuedUpdates.push(function() {
