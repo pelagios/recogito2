@@ -59,7 +59,7 @@ define([
 
         render = function() {
           titleEl.html(record.title);
-          urisEl.html(self.formatURI(record.uri));
+          urisEl.html(Card.formatURI(record.uri));
 
           if (record.descriptions)
             descriptionEl.html(record.descriptions[0].description);
@@ -68,7 +68,7 @@ define([
 
           if (record.temporal_bounds)
             dateEl.html(Formatting.yyyyMMddToYear(record.temporal_bounds.from) + ' - ' +
-                      Formatting.yyyyMMddToYear(record.temporal_bounds.to));
+              Formatting.yyyyMMddToYear(record.temporal_bounds.to));
 
           if (verificationStatus.value === 'UNVERIFIED') {
             lastModifiedEl.hide();

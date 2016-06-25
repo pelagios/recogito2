@@ -41,7 +41,7 @@ define([
         editButtonsEl       = element.find('.edit-buttons'),
 
         render = function() {
-          urisEl.html(self.formatURI(record.uri));
+          urisEl.html(Card.formatURI(record.uri));
           self.setLastModified(lastModified);
 
           if (Config.writeAccess)

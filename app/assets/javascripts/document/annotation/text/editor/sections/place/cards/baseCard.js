@@ -1,5 +1,5 @@
 /** Common base functionality & markup used in different types of place cards **/
-define(['common/ui/formatting', 'common/utils/placeUtils',], function(Formatting, PlaceUtils) {
+define(['common/ui/formatting', 'common/utils/placeUtils'], function(Formatting, PlaceUtils) {
 
   var Card = function(element) {
     this.lastModifiedByEl = element.find('.last-modified .by');
@@ -23,7 +23,7 @@ define(['common/ui/formatting', 'common/utils/placeUtils',], function(Formatting
 
   };
 
-  Card.prototype.formatURI = function(uri) {
+  Card.formatURI = function(uri) {
     var parsed = PlaceUtils.parseURI(uri);
     if (parsed.shortcode)
       return '<a class="gazetteer-id" href="' + uri + '" target="_blank">' +

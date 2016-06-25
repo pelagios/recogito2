@@ -39,7 +39,6 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
 
   "org.webjars" %% "webjars-play" % "2.5.0",
-  // "org.webjars" %% "webjars-play" % "2.5.0",
 
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
