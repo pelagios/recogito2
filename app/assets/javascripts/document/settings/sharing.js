@@ -18,7 +18,7 @@ require(['common/config'], function(Config) {
               '<li class="WRITE">' +
                 '<div class="checked"><div class="icon"></div></div>' +
                 '<h4>Write</h4>' +
-                '<p>Collaborators can read document and annotations, create new annotations, and add comments.</p>' +
+                '<p>Collaborators can read document and annotations, create new annotations, add and reply to comments.</p>' +
               '</li>' +
               '<li class="ADMIN">' +
                 '<div class="checked"><div class="icon"></div></div>' +
