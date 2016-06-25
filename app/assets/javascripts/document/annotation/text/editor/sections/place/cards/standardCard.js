@@ -27,6 +27,7 @@ define([
               '<div class="edit-buttons"></div>' +
               '<div class="unverified-warning"></div>' +
             '</div>' +
+            '<div class="map-overlay"></div>' +
           '</div>') : jQuery(
           // Simplified version for read-only mode
           '<div class="info-text">' +
@@ -42,7 +43,12 @@ define([
               '</div>' +
               '<div class="unverified-warning readonly"></div>' +
             '</div>' +
+            '<div class="map-overlay"></div>' +
           '</div>'),
+          
+        overlayNoLocation = 
+          '<span class="icon">&#xf29c;</span>' +
+          '<span class="caption">NO LOCATION</span>',
 
         titleEl       = element.find('.title'),
         urisEl        = element.find('.uris'),

@@ -13,13 +13,19 @@ define([
               '<button class="btn tiny change">Search</button> ' +
               '<button class="btn tiny delete icon">&#xf014;</button>' +
             '</div>' +
+            '<div class="map-overlay"></div>' +
           '</div>') : jQuery(
           // Simplified version for read-only mode
           '<div class="info-text">' +
             '<div class="no-match readonly">' +
               '<h3>No automatic match found</h3>' +
             '</div>' +
+            '<div class="map-overlay"></div>' +
           '</div>'),
+          
+        overlayFlagged = 
+          '<span class="icon">&#xf29c;</span>' +
+          '<span class="caption">NOT IDENTIFIABLE</span>',
 
         render = function() {
           containerEl.html(element);

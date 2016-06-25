@@ -16,10 +16,6 @@ define([
             '<div class="section place">' +
               '<div class="map"></div>' +
               '<div class="info"></div>' +
-              // '<div class="warning-unlocated">' +
-              //   '<span class="icon">&#xf29c;</span>' +
-              //   '<span class="caption">NO LOCATION</span>' +
-              // '</div>' +
             '</div>');
 
           parent.append(el);
