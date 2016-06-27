@@ -88,21 +88,18 @@
 
     .map-overlay {
       position:absolute;
-      // background-color:rgba(97, 163, 224, 0.6);
-      background-color:fade(@blueish-white-hi, 20%);
+      // background-color:fade(@blueish-white-hi, 20%);
       top:0;
       right:0;
       width:165px;
       height:140px;
       text-align:center;
       box-sizing:border-box;
-      padding:10px;
+      padding:20px;
       color:#fff;
 
       .icon {
-        font-size:80px;
         display:block;
-        line-height:105px;
       }
 
       .caption {
@@ -113,17 +110,18 @@
     }
 
     .map-overlay.unlocated {
-      text-shadow:1px 1px 0 rgba(255, 255, 255, 0.2), -1px -1px 0 rgba(0, 0, 0, 0.25);
+      background-color:rgba(0, 0, 0, 0.2);
 
       .icon {
-        // width:65px;
-        // height:65px;
-        // border:3px solid #fff;
-        // .rounded-corners(50%);
+        width:65px;
+        height:65px;
+        border:3px solid #fff;
+        .rounded-corners(50%);
         margin:0 auto;
+        font-size:55px;
+        line-height:60px;
         font-family:OpenSans;
-        // font-family:OpenSans;
-        // letter-spacing:-2px;
+        letter-spacing:-2px;
       }
 
     }
@@ -133,7 +131,9 @@
       padding-top:20px;
 
       .icon {
+        font-size:80px;
         font-family:Tonicons;
+        line-height:105px;
       }
 
     }

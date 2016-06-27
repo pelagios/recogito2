@@ -47,7 +47,7 @@ define([
         overlayNoLocation =
           '<div class="map-overlay unlocated">' +
             '<span class="icon">?</span>' +
-          //   '<span class="caption">NO LOCATION</span>' +
+            '<span class="caption">NO LOCATION</span>' +
           '</div>',
 
         titleEl       = element.find('.title'),

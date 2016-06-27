@@ -27,7 +27,7 @@ define([
           '<h3>No automatic match found</h3>',
         labelFlagged =
           '<h3>Flagged as Not Identifiable</h3>' +
-          '<p>No-one was able to geo-reference this place.</p>',
+          '<p>It\'s a place. But no-one could resolve it yet.</p>',
 
         overlayFlagged =
           '<div class="map-overlay flagged">' +
