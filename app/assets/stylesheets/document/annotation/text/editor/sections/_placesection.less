@@ -57,6 +57,10 @@
 
       }
 
+      .no-match.readonly {
+        padding-top:45px;
+      }
+
       .no-match {
         text-align:center;
         padding-top:30px;
@@ -88,14 +92,14 @@
 
     .map-overlay {
       position:absolute;
-      // background-color:fade(@blueish-white-hi, 20%);
+      background-color:#f0ad4e;
       top:0;
       right:0;
       width:165px;
       height:140px;
       text-align:center;
       box-sizing:border-box;
-      padding:20px;
+      padding:25px;
       color:#fff;
 
       .icon {
@@ -110,28 +114,27 @@
     }
 
     .map-overlay.unlocated {
-      background-color:rgba(0, 0, 0, 0.2);
 
       .icon {
-        width:65px;
-        height:65px;
+        width:55px;
+        height:55px;
         border:3px solid #fff;
         .rounded-corners(50%);
         margin:0 auto;
-        font-size:55px;
-        line-height:60px;
+        font-size:50px;
+        line-height:55px;
         font-family:OpenSans;
         letter-spacing:-2px;
+        font-weight:bold;
       }
 
     }
 
     .map-overlay.flagged {
-      background-color:#f0ad4e;
       padding-top:20px;
 
       .icon {
-        font-size:80px;
+        font-size:70px;
         font-family:Tonicons;
         line-height:105px;
       }
