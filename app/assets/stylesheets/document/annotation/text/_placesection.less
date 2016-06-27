@@ -79,11 +79,43 @@
           border:none;
         }
 
-      } /** .panel .no-match **/
+      } /** .no-match **/
 
-    }
+    } /** .info-text **/
 
-    .info-mapoverlay {
+    .map-overlay {
+      position:absolute;
+      background-color:rgba(97, 163, 224, 0.6);
+      top:0;
+      right:0;
+      width:165px;
+      height:140px;
+      text-align:center;
+      box-sizing:border-box;
+      padding:18px;
+      color:#fff;
+      text-shadow:1px 1px 0 rgba(255, 255, 255, 0.2), -1px -1px 0 rgba(0, 0, 0, 0.15);
+
+      .icon {
+        width:65px;
+        height:65px;
+        border:3px solid #fff;
+        .rounded-corners(50%);
+        display:block;
+        margin:0 auto;
+        line-height:60px;
+        font-size:56px;
+        font-family:OpenSans;
+        letter-spacing:-2px;
+      }
+
+      .caption {
+        padding-top:10px;
+        display:block;
+        font-size:15px;
+        font-weight:700;
+        font-family:OpenSans;
+      }
 
     }
 

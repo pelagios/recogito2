@@ -2,11 +2,12 @@ define([
   'document/annotation/text/editor/sections/place/cards/errorCard',
   'document/annotation/text/editor/sections/place/cards/nomatchCard',
   'document/annotation/text/editor/sections/place/cards/standardCard',
+  'document/annotation/text/editor/sections/place/minimap',
   'document/annotation/text/editor/sections/section',
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
-  'common/config'], function(ErrorCard, NoMatchCard, StandardCard, Section, Formatting, PlaceUtils, API, Config) {
+  'common/config'], function(ErrorCard, NoMatchCard, StandardCard, MiniMap, Section, Formatting, PlaceUtils, API, Config) {
 
   var PlaceSection = function(parent, placeBody, quote) {
     var self = this,
@@ -22,103 +23,69 @@ define([
           return el;
         })(),
 
+        /** DOM shorthands **/
+        mapEl  = element.find('.map'),
         infoEl = element.find('.info'),
 
-        card = false,
+        /** Minimap **/
+        map   = new MiniMap(mapEl),
 
-        lastModified = {
-          by: placeBody.last_modified_by,
-          at: placeBody.last_modified_at
-        },
+        /** 'Card' showing place info (depends on body & may change on updates) **/
+        card  = false,
 
         /** Changes to be applied to the annotation when the user clicks OK **/
         queuedUpdates = [],
 
-        awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
-          attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
-                       'Data &copy; <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors, CC-BY-SA | '+
-                       'Tiles and Data &copy; 2013 <a href="http://www.awmc.unc.edu" target="_blank">AWMC</a> ' +
-                       '<a href="http://creativecommons.org/licenses/by-nc/3.0/deed.en_US" target="_blank">CC-BY-NC 3.0</a>'
-        }),
-
-        map = L.map(element.find('.map')[0], {
-          center: new L.LatLng(41.893588, 12.488022),
-          zoom: 4,
-          zoomControl: false,
-          layers: [ awmc ]
-        }),
-
-        markerLayer = L.layerGroup().addTo(map),
-
-        setCenter = function(latLon) {
-          var centerPt, centerLatLng;
-
-          // Need to set initial center before we can offset
-          map.invalidateSize();
-          map.setView(latLon, 4, { animate: false });
-
-          centerPt = L.point(82, 70);
-          centerLatLng = map.containerPointToLatLng(centerPt);
-
-          map.panTo(centerLatLng, { animate: false});
-        },
-
-        /** Renders the standard place card with gazetteer record **/
-        renderStandardCard = function(record, verificationStatus, opt_coord) {
+        /** Renders the standard place card with resolved gazetteer record **/
+        renderStandardCard = function(record, verificationStatus, lastModified, opt_coord) {
           var latLon = (opt_coord) ? [opt_coord[1], opt_coord[0]] : false;
-          card = new StandardCard(infoEl, record, verificationStatus, lastModified);
-          markerLayer.clearLayers();
-          if (latLon) {
-            // panelContainer.removeClass('unlocated');
-            L.marker(latLon).addTo(markerLayer);
-            setCenter(latLon);
-          } else {
-            setCenter([37.98, 23.73]);
-            // panelContainer.addClass('unlocated');
-          }
+          card = new StandardCard(infoEl, record, verificationStatus, lastModified, !opt_coord);
+          if (latLon)
+            map.setLocation(latLon);
+          else
+            map.clear();
         },
 
         /** Renders a 'no match' place card, due to yellow status or failed match **/
-        renderNoMatchCard = function(verificationStatus) {
+        renderNoMatchCard = function(verificationStatus, lastModified) {
           card = new NoMatchCard(infoEl, verificationStatus, lastModified);
-          setCenter([37.98, 23.73]);
+          map.clear();
         },
 
         /** Renders the error edge cases where the place body has a URI that can't be resolved **/
-        renderResolveErrorCard = function() {
-          card = new ErrorCard(inforEl, record, verificationStatus, lastModified);
-          setCenter([37.98, 23.73]);
+        renderResolveErrorCard = function(uri, verificationStatus, lastModified) {
+          card = new ErrorCard(infoEl, uri, verificationStatus, lastModified);
+          map.clear();
         },
 
-        /** Fills the template by delegating to the appropriate place card renderer **/
-        fillTemplate = function(gazetteerRecordOrURI, status, opt_coord) {
+        /** Fills the template with the appropriate place card **/
+        fillTemplate = function(gazetteerRecordOrURI, verificationStatus, lastModified, opt_coord) {
           if (gazetteerRecordOrURI) {
             if (jQuery.type(gazetteerRecordOrURI) === 'string') {
               // A URI, but no record for it!? - edge case
-              renderResolveErrorCard();
+              renderResolveErrorCard(gazetteerRecordOrURI, verificationStatus, lastModified);
             } else {
-              renderStandardCard(gazetteerRecordOrURI, status, opt_coord);
+              renderStandardCard(gazetteerRecordOrURI, verificationStatus, lastModified, opt_coord);
             }
           } else {
             // No record or URI - render the 'no match' card
-            renderNoMatchCard(status);
+            renderNoMatchCard(verificationStatus, lastModified);
           }
         },
 
         /** Fills the place card based on the URI contained in the place body **/
-        fillFromURI = function(uri, status) {
-          jQuery.getJSON('/api/places/' + encodeURIComponent(uri), function(place) {
+        fillFromURI = function(uri, verificationStatus, lastModified) {
+          API.getPlace(uri).done(function(place) {
             var record = PlaceUtils.getRecord(place, uri),
                 coord = place.representative_point;
-
-            fillTemplate(record, status, coord);
+            fillTemplate(record, verificationStatus, lastModified, coord);
           }).fail(function(error) {
-            fillTemplate(false, status, false);
+            fillTemplate(false, verificationStatus, lastModified);
           });
         },
 
         /** Fills the place card based on a search on the provided quote string **/
-        fillFromQuote = function(quote, status) {
+        fillFromQuote = function(quote, verificationStatus, lastModified) {
           API.searchPlaces(quote).done(function(response) {
             if (response.total > 0) {
               var topPlace = response.items[0],
@@ -126,54 +93,50 @@ define([
                   coord = topPlace.representative_point;
 
               placeBody.uri = bestRecord.uri;
-              fillTemplate(bestRecord, status, coord);
+              fillTemplate(bestRecord, verificationStatus, lastModified, coord);
             } else {
-              fillTemplate(false, status, false);
+              fillTemplate(false, verificationStatus, lastModified);
             }
           });
         },
 
+        /** Updates the section with a change performed by the user **/
         update = function(diff) {
-          lastModified = { by: Config.me, at: new Date() };
+          var lastModified = { by: Config.me, at: new Date() };
 
           // Diffs contain uri and status info
           if (placeBody.uri !== diff.uri && diff.uri) {
             // There's a new URI - update the place card
-            fillFromURI(diff.uri, diff.status);
-          } else if (!diff.uri){
+            fillFromURI(diff.uri, diff.status, lastModified);
+          } else if (!diff.uri) {
             // There's no URI now (but there was one before!) - change to 'No Match' card
-            renderNoMatchCard(diff.status);
+            renderNoMatchCard(diff.status, lastModified);
           }
 
-          // Queue updates to the model for later
+          // Queue these updates for deferred storage
           queuedUpdates.push(function() {
             delete placeBody.last_modified_by;
             delete placeBody.last_modified_at;
-            placeBody.uri = diff.uri;
             placeBody.status = diff.status;
+
+            if (diff.uri)
+              placeBody.uri = diff.uri;
+            else
+              delete placeBody.uri;
           });
         },
 
+        /** Handles 'confirm' click **/
         onConfirm = function() {
-          // Apply UI changes now
-          lastModified = { by: Config.me, at: new Date() };
-          card.setLastModified(lastModified);
+          // Apply changes to card immediately...
+          card.setLastModified({ by: Config.me, at: new Date() });
           card.setConfirmed();
 
-          // Queue updates to model for later
-          queuedUpdates.push(function() {
-            placeBody.status.value = 'VERIFIED';
-          });
+          // ...but queue the actual change to the model for later
+          queuedUpdates.push(function() { placeBody.status.value = 'VERIFIED'; });
         },
 
-        onChange = function() {
-          self.fireEvent('change');
-        },
-
-        onDelete = function() {
-          self.fireEvent('delete');
-        },
-
+        /** Commits queued changes **/
         commit = function() {
           jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
         },
@@ -183,17 +146,21 @@ define([
         };
 
     element.on('click', '.unverified-confirm', onConfirm);
-    element.on('click', '.unverified-change, .change', onChange);
-    element.on('click', '.delete', onDelete);
+
+    // Change and delete events are simple passed on
+    element.on('click', '.unverified-change, .change', function() { self.fireEvent('change'); });
+    element.on('click', '.delete', function() { self.fireEvent('delete'); });
 
     if (placeBody.uri)
-      fillFromURI(placeBody.uri, placeBody.status);
+      fillFromURI(placeBody.uri, placeBody.status,
+        { by: placeBody.last_modified_by, at: placeBody.last_modified_at });
     else
-      fillFromQuote(quote, placeBody.status);
-
-    this.update = update;
+      fillFromQuote(quote, placeBody.status,
+        { by: placeBody.last_modified_by, at: placeBody.last_modified_at });
 
     this.body = placeBody;
+
+    this.update = update;
     this.commit = commit;
     this.destroy = destroy;
 

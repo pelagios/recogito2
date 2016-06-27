@@ -26,6 +26,10 @@ define([], function() {
 
     /** Place API **/
 
+    getPlace : function(uri) {
+      return jsRoutes.controllers.api.PlaceAPIController.findPlaceByURI(uri).ajax();
+    },
+
     getPlacesInDocument : function(docId, offset, size) {
       var o = (offset) ? offset : 0,
           s = (size) ? size : 20;

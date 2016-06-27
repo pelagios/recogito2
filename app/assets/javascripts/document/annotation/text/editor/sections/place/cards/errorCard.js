@@ -2,7 +2,7 @@ define([
   'document/annotation/text/editor/sections/place/cards/baseCard',
   'common/config'], function(Card, Config) {
 
-  var ErrorCard = function(containerEl, record, verificationStatus, lastModified) {
+  var ErrorCard = function(containerEl, uri, verificationStatus, lastModified) {
 
     // TODO do we need to include the 'unverified' warning?
 
@@ -41,15 +41,17 @@ define([
         editButtonsEl       = element.find('.edit-buttons'),
 
         render = function() {
-          urisEl.html(Card.formatURI(record.uri));
+          urisEl.html(Card.formatURI(uri));
           self.setLastModified(lastModified);
 
           if (Config.writeAccess)
             editButtonsEl.html(editButtons);
+
+          containerEl.html(element);
         };
 
     this.render = render;
-    
+
     Card.apply(this, [ element ]);
     render();
   };

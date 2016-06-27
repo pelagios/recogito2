@@ -22,8 +22,8 @@ define([
             '</div>' +
             '<div class="map-overlay"></div>' +
           '</div>'),
-          
-        overlayFlagged = 
+
+        overlayFlagged =
           '<span class="icon">&#xf29c;</span>' +
           '<span class="caption">NOT IDENTIFIABLE</span>',
 

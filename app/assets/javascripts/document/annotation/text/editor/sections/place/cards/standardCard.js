@@ -4,7 +4,7 @@ define([
   'common/utils/placeUtils',
   'common/config'], function(Card, Formatting, PlaceUtils, Config) {
 
-  var StandardCard = function(containerEl, record, verificationStatus, lastModified) {
+  var StandardCard = function(containerEl, record, verificationStatus, lastModified, isUnlocated) {
 
     // TODO cover the case of unlocated places - map overlay!
 
@@ -27,7 +27,6 @@ define([
               '<div class="edit-buttons"></div>' +
               '<div class="unverified-warning"></div>' +
             '</div>' +
-            '<div class="map-overlay"></div>' +
           '</div>') : jQuery(
           // Simplified version for read-only mode
           '<div class="info-text">' +
@@ -43,12 +42,13 @@ define([
               '</div>' +
               '<div class="unverified-warning readonly"></div>' +
             '</div>' +
-            '<div class="map-overlay"></div>' +
           '</div>'),
-          
-        overlayNoLocation = 
-          '<span class="icon">&#xf29c;</span>' +
-          '<span class="caption">NO LOCATION</span>',
+
+        overlayNoLocation =
+          '<div class="map-overlay">' +
+            '<span class="icon">?</span>' +
+            '<span class="caption">NO LOCATION</span>' +
+          '</div>',
 
         titleEl       = element.find('.title'),
         urisEl        = element.find('.uris'),
@@ -62,6 +62,7 @@ define([
 
         editButtonsEl       = element.find('.edit-buttons'),
         unverifiedWarningEl = element.find('.unverified-warning'),
+        mapOverlayEl        = element.find('.map-overlay'),
 
         render = function() {
           titleEl.html(record.title);
@@ -90,6 +91,8 @@ define([
           }
 
           containerEl.html(element);
+          if (isUnlocated)
+            containerEl.append(overlayNoLocation);
         },
 
         setConfirmed = function() {
