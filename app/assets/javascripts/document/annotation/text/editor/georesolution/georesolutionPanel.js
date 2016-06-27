@@ -3,7 +3,8 @@ define([
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
-  'common/hasEvents'], function(ResultCard, Formatting, PlaceUtils, API, HasEvents) {
+  'common/hasEvents',
+  'common/map',], function(ResultCard, Formatting, PlaceUtils, API, HasEvents, Map) {
 
   var GeoresolutionPanel = function() {
 
@@ -49,28 +50,12 @@ define([
           btnFlag       = element.find('.flag'),
           btnCancel     = element.find('.cancel'),
 
-          resultsHeader = element.find('.results-header'),
-          resultsList   = element.find('.results-list'),
+          resultHeader  = element.find('.results-header'),
+          resultList    = element.find('.results-list'),
 
           currentBody = false,
 
-          /** TODO refactor map, so we re-use the same base for this as for document map **/
-
-          awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
-            attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
-                         'Data &copy; <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors, CC-BY-SA | '+
-                         'Tiles and Data &copy; 2013 <a href="http://www.awmc.unc.edu" target="_blank">AWMC</a> ' +
-                         '<a href="http://creativecommons.org/licenses/by-nc/3.0/deed.en_US" target="_blank">CC-BY-NC 3.0</a>'
-          }),
-
-          map = L.map(element.find('.georesolution-map')[0], {
-            center: new L.LatLng(41.893588, 12.488022),
-            zoom: 4,
-            zoomControl: false,
-            layers: [ awmc ]
-          }),
-
-          markerLayer = L.layerGroup().addTo(map),
+          map = new Map(element.find('.georesolution-map')),
 
           openPopup = function(marker, place) {
             var popup = jQuery(
@@ -81,7 +66,7 @@ define([
                     '<div class="popup-choices"><table></table></div>' +
                   '</div>');
 
-            jQuery.each(place.is_conflation_of, function(idx, record) {
+            place.is_conflation_of.reduce(function(previousShortcode, record) {
               var recordId = PlaceUtils.parseURI(record.uri),
                   template = jQuery(
                     '<tr data-uri="' + recordId.uri + '">' +
@@ -100,6 +85,9 @@ define([
                 template.find('.shortcode').html(recordId.shortcode);
                 template.find('.id').html(recordId.id);
                 template.find('.record-id').css('background-color', recordId.color);
+
+                if (previousShortcode === recordId.shortcode)
+                  template.find('.record-id').css('border-top', '1px solid rgba(255, 255, 255, 0.15)');
               }
 
               if (record.descriptions.length > 0)
@@ -115,23 +103,21 @@ define([
                 template.find('.date').hide();
 
               popup.find('.popup-choices table').append(template);
-            });
 
-            popup.find('table').on('click', 'tr', function(e) {
+              if (recordId.shortcode) return recordId.shortcode;
+            }, false);
+
+            popup.on('click', 'tr', function(e) {
               var tr = jQuery(e.target).closest('tr');
-
               self.fireEvent('change', currentBody, {
                 uri: tr.data('uri'),
                 status: { value: 'VERIFIED' }
               });
-
               close();
             });
 
             marker.bindPopup(popup[0]);
-            marker.getPopup().on('close', function() {
-              marker.unbindPopup();
-            });
+            marker.getPopup().on('close', function() { marker.unbindPopup(); });
             marker.openPopup();
           },
 
@@ -150,47 +136,39 @@ define([
           },
 
           search = function(query) {
-            resultsList.empty();
-            markerLayer.clearLayers();
+            map.clear();
+            resultList.empty();
+
             API.searchPlaces(query).done(function(response) {
-              // TODO dummy only
               if (response.total > 0) {
-                resultsHeader.html("Total: " + response.total + ", took " + response.took);
+                // TODO improve!
+                resultHeader.html("Total: " + response.total + ", took " + response.took);
 
                 jQuery.each(response.items, function(idx, place) {
                   var coord = (place.representative_point) ?
-                        [ place.representative_point[1], place.representative_point[0] ] :
-                        false,
+                        [ place.representative_point[1], place.representative_point[0] ] : false,
 
-                      result = new ResultCard(resultsList, place),
-
-                      marker = (coord) ? L.marker(coord).addTo(markerLayer) : false;
+                      result = new ResultCard(resultList, place),
+                      marker = (coord) ? map.addMarker(coord) : false;
 
                   if (marker) {
-                    result.on('click', function() {
-                      openPopup(marker, place);
-                    });
-
-                    marker.on('click', function(e) {
-                      openPopup(marker, place);
-                    });
+                    result.on('click', function() { openPopup(marker, place); });
+                    marker.on('click', function(e) { openPopup(marker, place); });
                   }
                 });
               } else {
                 // Try again with a fuzzy search (unless this is a fuzzy search already)
-                if (query.indexOf('~') < 0) {
+                if (query.indexOf('~') < 0)
                   search(query + '~');
-                }
               }
             });
           },
 
           open = function(quote, placeBody) {
             currentBody = placeBody;
-
             searchInput.val(quote);
             element.show();
-            map.invalidateSize();
+            map.refresh();
             search(quote);
           },
 
