@@ -87,7 +87,7 @@ define([
                 template.find('.record-id').css('background-color', recordId.color);
 
                 if (previousShortcode === recordId.shortcode)
-                  template.find('.record-id').css('border-top', '1px solid rgba(255, 255, 255, 0.15)');
+                  template.find('.record-id').css('border-top', '1px solid rgba(0, 0, 0, 0.05)');
               }
 
               if (record.descriptions.length > 0)
