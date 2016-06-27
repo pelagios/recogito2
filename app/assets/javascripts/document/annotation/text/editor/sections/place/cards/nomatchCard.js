@@ -9,26 +9,35 @@ define([
     var element = (Config.writeAccess) ? jQuery(
           '<div class="info-text">' +
             '<div class="no-match">' +
-              '<h3>No automatic match found</h3>' +
+              '<h3></h3>' +
               '<button class="btn tiny change">Search</button> ' +
               '<button class="btn tiny delete icon">&#xf014;</button>' +
             '</div>' +
-            '<div class="map-overlay"></div>' +
           '</div>') : jQuery(
           // Simplified version for read-only mode
           '<div class="info-text">' +
             '<div class="no-match readonly">' +
-              '<h3>No automatic match found</h3>' +
+              '<h3></h3>' +
             '</div>' +
-            '<div class="map-overlay"></div>' +
           '</div>'),
 
+        label = element.find('h3'),
+
         overlayFlagged =
-          '<span class="icon">&#xf29c;</span>' +
-          '<span class="caption">NOT IDENTIFIABLE</span>',
+          '<div class="map-overlay flagged">' +
+            '<span class="icon">&#xe842;</span>' +
+            '<span class="caption">NOT IDENTIFIABLE</span>' +
+          '</div>',
 
         render = function() {
           containerEl.html(element);
+
+          if (verificationStatus.value === 'NOT_IDENTIFIABLE') {
+            label.html('Flagged as Not Identifiable');
+            containerEl.append(overlayFlagged);
+          } else {
+            label.html('No automatic match found');
+          }
         };
 
     this.render = render;

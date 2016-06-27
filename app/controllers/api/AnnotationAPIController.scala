@@ -141,7 +141,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
           AnnotationStatus(
             s.value,
             Some(s.setBy.getOrElse(user)),
-            s.setAt.getOrElse(now))))))         
+            s.setAt.getOrElse(now))))))
   }
   
   def createAnnotation() = AsyncStack { implicit request =>    

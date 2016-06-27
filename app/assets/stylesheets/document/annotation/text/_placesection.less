@@ -94,6 +94,21 @@
       box-sizing:border-box;
       padding:18px;
       color:#fff;
+
+      .icon {
+        font-size:56px;
+        display:block;
+        line-height:60px;
+      }
+
+      .caption {
+        display:block;
+        padding-top:10px;
+      }
+
+    }
+
+    .map-overlay.unlocated {
       text-shadow:1px 1px 0 rgba(255, 255, 255, 0.2), -1px -1px 0 rgba(0, 0, 0, 0.15);
 
       .icon {
@@ -101,20 +116,20 @@
         height:65px;
         border:3px solid #fff;
         .rounded-corners(50%);
-        display:block;
         margin:0 auto;
-        line-height:60px;
-        font-size:56px;
         font-family:OpenSans;
         letter-spacing:-2px;
       }
 
-      .caption {
-        padding-top:10px;
-        display:block;
-        font-size:15px;
-        font-weight:700;
-        font-family:OpenSans;
+    }
+
+    .map-overlay.flagged {
+      text-shadow:1px 1px 0 rgba(255, 255, 255, 0.15), -1px -1px 0 rgba(0, 0, 0, 0.1);
+      background-color:#f0ad4e;
+      padding-top:20px;
+
+      .icon {
+        font-family:Tonicons;
       }
 
     }

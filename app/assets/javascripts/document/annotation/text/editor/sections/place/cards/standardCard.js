@@ -45,7 +45,7 @@ define([
           '</div>'),
 
         overlayNoLocation =
-          '<div class="map-overlay">' +
+          '<div class="map-overlay unlocated">' +
             '<span class="icon">?</span>' +
             '<span class="caption">NO LOCATION</span>' +
           '</div>',

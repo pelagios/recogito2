@@ -26,9 +26,11 @@ define([], function(Formatting, PlaceUtils) {
 
         moveTo = function(latLon) {
           // Need to set as center first, then we can offset
-          map.invalidateSize();
-          map.setView(latLon, DEFAULT_ZOOM, { animate: false });
-          map.panTo(map.containerPointToLatLng(CENTER_POINT), { animate: false});
+          window.setTimeout(function() {
+            map.invalidateSize();
+            map.setView(latLon, DEFAULT_ZOOM, { animate: false });
+            map.panTo(map.containerPointToLatLng(CENTER_POINT), { animate: false});
+          }, 1); // Make sure this happens after the map was rendered!
         },
 
         setLocation = function(latLon) {

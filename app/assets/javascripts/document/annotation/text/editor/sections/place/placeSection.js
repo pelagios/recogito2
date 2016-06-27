@@ -118,7 +118,6 @@ define([
             delete placeBody.last_modified_by;
             delete placeBody.last_modified_at;
             placeBody.status = diff.status;
-
             if (diff.uri)
               placeBody.uri = diff.uri;
             else
@@ -143,20 +142,28 @@ define([
 
         destroy = function() {
           element.remove();
+        },
+
+        init = function() {
+          var lastModified = { by: placeBody.last_modified_by, at: placeBody.last_modified_at };
+
+          if (placeBody.uri)
+            // Resolve the URI contained in the annotation body
+            fillFromURI(placeBody.uri, placeBody.status, lastModified);
+          else if (placeBody.status.value === 'UNVERIFIED')
+            // No URI - if the annotation is still UNVERIFIED, fetch a suggestion
+            fillFromQuote(quote, placeBody.status, lastModified);
+          else
+            renderNoMatchCard(placeBody.status, lastModified);
         };
+
+    init();
 
     element.on('click', '.unverified-confirm', onConfirm);
 
     // Change and delete events are simple passed on
     element.on('click', '.unverified-change, .change', function() { self.fireEvent('change'); });
     element.on('click', '.delete', function() { self.fireEvent('delete'); });
-
-    if (placeBody.uri)
-      fillFromURI(placeBody.uri, placeBody.status,
-        { by: placeBody.last_modified_by, at: placeBody.last_modified_at });
-    else
-      fillFromQuote(quote, placeBody.status,
-        { by: placeBody.last_modified_by, at: placeBody.last_modified_at });
 
     this.body = placeBody;
 
