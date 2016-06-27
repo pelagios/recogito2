@@ -28,7 +28,6 @@
       background-color:fade(@blueish-white-hi, 80%);
       width:100%;
       height:100%;
-      .box-shadow(0, 0, 18px, rgba(0, 0, 0, 0.15));
       position:relative;
 
       button {
@@ -66,10 +65,16 @@
           margin:0;
           padding:0;
           color:darken(#f0ad4e, 10%);
-          margin-bottom:10px;
           font-size:17px;
           font-weight:normal;
           line-height:21px;
+        }
+
+        p {
+          margin:0;
+          padding:0;
+          font-size:15px;
+          color:lighten(@standard-type, 20%);
         }
 
         button {
@@ -83,20 +88,21 @@
 
     .map-overlay {
       position:absolute;
-      background-color:rgba(97, 163, 224, 0.6);
+      // background-color:rgba(97, 163, 224, 0.6);
+      background-color:fade(@blueish-white-hi, 20%);
       top:0;
       right:0;
       width:165px;
       height:140px;
       text-align:center;
       box-sizing:border-box;
-      padding:18px;
+      padding:10px;
       color:#fff;
 
       .icon {
-        font-size:56px;
+        font-size:80px;
         display:block;
-        line-height:60px;
+        line-height:105px;
       }
 
       .caption {
@@ -107,22 +113,22 @@
     }
 
     .map-overlay.unlocated {
-      text-shadow:1px 1px 0 rgba(255, 255, 255, 0.2), -1px -1px 0 rgba(0, 0, 0, 0.15);
+      text-shadow:1px 1px 0 rgba(255, 255, 255, 0.2), -1px -1px 0 rgba(0, 0, 0, 0.25);
 
       .icon {
-        width:65px;
-        height:65px;
-        border:3px solid #fff;
-        .rounded-corners(50%);
+        // width:65px;
+        // height:65px;
+        // border:3px solid #fff;
+        // .rounded-corners(50%);
         margin:0 auto;
         font-family:OpenSans;
-        letter-spacing:-2px;
+        // font-family:OpenSans;
+        // letter-spacing:-2px;
       }
 
     }
 
     .map-overlay.flagged {
-      text-shadow:1px 1px 0 rgba(255, 255, 255, 0.15), -1px -1px 0 rgba(0, 0, 0, 0.1);
       background-color:#f0ad4e;
       padding-top:20px;
 
