@@ -24,27 +24,27 @@ define([], function(Formatting, PlaceUtils) {
 
         markerLayer = L.layerGroup().addTo(map),
 
-        moveTo = function(latLon) {
+        moveTo = function(latLon, opt_zoom) {
+          var zoom = (opt_zoom) ? opt_zoom : DEFAULT_ZOOM;
+
           // Need to set as center first, then we can offset
           window.setTimeout(function() {
             map.invalidateSize();
-            map.setView(latLon, DEFAULT_ZOOM, { animate: false });
+            map.setView(latLon, zoom, { animate: false });
             map.panTo(map.containerPointToLatLng(CENTER_POINT), { animate: false});
           }, 1); // Make sure this happens after the map was rendered!
         },
 
-        setGreyScale = function(enabled) {
-          console.log(element);
-          if (enabled)
-            element.addClass('gray');
-          else
-            element.removeClass('gray');
-        },
-
         setLocation = function(latLon) {
-          markerLayer.clearLayers();
-          L.marker(latLon).addTo(markerLayer);
-          moveTo(latLon);
+          if (latLon) {
+            markerLayer.clearLayers();
+            L.marker(latLon).addTo(markerLayer);
+            moveTo(latLon);
+            element.removeClass('unlocated');
+          } else {
+            element.addClass('unlocated');
+            moveTo(DEFAULT_CENTER, 1);
+          }
         },
 
         clear = function() {
@@ -54,7 +54,6 @@ define([], function(Formatting, PlaceUtils) {
         };
 
     this.clear = clear;
-    this.setGreyScale = setGreyScale;
     this.setLocation = setLocation;
   };
 

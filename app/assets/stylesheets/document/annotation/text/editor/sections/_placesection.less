@@ -10,7 +10,7 @@
     height:100%;
   }
 
-  .map.gray {
+  .map.unlocated {
     filter: grayscale(1) contrast(0.45) brightness(1.1);
     -webkit-filter: grayscale(1) contrast(0.45) brightness(1.1);
   }
@@ -103,7 +103,6 @@
       height:140px;
       text-align:center;
       box-sizing:border-box;
-      padding:24px;
       color:#fff;
 
       .icon {
@@ -113,24 +112,24 @@
     }
 
     .map-overlay.unlocated {
+      padding:30px 10px;
 
       .icon {
-        width:85px;
-        height:85px;
-        border:4px solid #fff;
+        width:70px;
+        height:70px;
+        border:3px solid #fff;
         .rounded-corners(50%);
         margin:0 auto;
-        font-size:65px;
-        line-height:85px;
+        font-size:60px;
+        line-height:68px;
         font-family:OpenSans;
         letter-spacing:-2px;
-        font-weight:bold;
       }
 
     }
 
     .map-overlay.flagged {
-      padding-top:20px;
+      padding:20px 10px;
       background-color:#f0ad4e;
 
       .icon {
