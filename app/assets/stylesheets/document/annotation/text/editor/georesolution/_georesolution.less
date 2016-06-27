@@ -8,7 +8,7 @@
   z-index:99999;
 }
 
-.geores-wrapper {
+.georesolution-wrapper {
   width:90%;
   height:100%;
   max-width:1200px;
@@ -16,7 +16,7 @@
   position:relative;
 }
 
-.geores-editor {
+.georesolution-panel {
   position:absolute;
   top:10%;
   bottom:10%;
@@ -27,14 +27,14 @@
   .box-shadow(2px, 2px, 42px, rgba(0, 0, 0, 0.4));
 }
 
-.geores-editor-header {
+.georesolution-header {
   width:100%;
   border-bottom:1px solid @lightgrey-border-darker;
   display:inline-block;
   height:42px;
   position:relative;
 
-  .geores-search {
+  .georesolution-search {
     display:inline-block;
     position:relative;
     margin:5px;
@@ -77,23 +77,23 @@
 
   button.cancel {
     color:@lightblue-type;
-    font-size:24px;
+    font-size:18px;
     cursor:pointer;
     position:absolute;
-    top:8px;
+    top:10px;
     right:4px;
   }
 
 } /** .geores-editor-header **/
 
-.geores-editor-body {
+.georesolution-body {
   position:absolute;
   top:43px;
   bottom:0;
   left:0;
   right:0;
 
-  .geores-sidebar {
+  .georesolution-sidebar {
     box-sizing:border-box;
     height:100%;
     width:326px;
@@ -131,7 +131,7 @@
 
   }
 
-  .geores-map {
+  .georesolution-map {
     position:absolute;
     top:0;
     right:0;
@@ -139,4 +139,4 @@
     left:326px;
   }
 
-} /** .geores-editor-body **/
+} /** .georesolution-body **/

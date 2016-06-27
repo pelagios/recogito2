@@ -1,59 +1,60 @@
 define([
-  'document/annotation/text/editor/georesolution/placeResult',
+  'document/annotation/text/editor/georesolution/searchresultCard',
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
-  'common/hasEvents'], function(Result, Formatting, PlaceUtils, API, HasEvents) {
+  'common/hasEvents'], function(ResultCard, Formatting, PlaceUtils, API, HasEvents) {
 
   var GeoresolutionPanel = function() {
+
     var self = this,
 
         element = (function() {
-            var el = jQuery('<div class="clicktrap">' +
-                  '<div class="geores-wrapper">' +
-                    '<div class="geores-editor">' +
-                      '<div class="geores-editor-header">' +
-                        '<div class="geores-search">' +
-                          '<input class="search inline" type="text" placeholder="Search for a Place..." />' +
-                          '<button class="search icon">&#xf002;</button>' +
-                        '</div>' +
-                        '<div class="flag-this-place">' +
-                          'Can\'t find the right match?' +
-                          '<span class="flag">' +
-                            '<button class="outline-icon nostyle">&#xe842;</button>' +
-                            '<span class="label">Flag this place</span>' +
-                          '</span>' +
-                        '</div>' +
-                        '<button class="nostyle outline-icon cancel">&#xe897;</button>' +
+            var el = jQuery(
+              '<div class="clicktrap">' +
+                '<div class="georesolution-wrapper">' +
+                  '<div class="georesolution-panel">' +
+                    '<div class="georesolution-header">' +
+                      '<div class="georesolution-search">' +
+                        '<input class="search inline" type="text" placeholder="Search for a Place..." />' +
+                        '<button class="search icon">&#xf002;</button>' +
                       '</div>' +
-                      '<div class="geores-editor-body">' +
-                        '<div class="geores-sidebar">' +
-                          '<div class="results-header"></div>' +
-                          '<ul class="results-list"></ul>' +
-                        '</div>' +
-                        '<div class="geores-map">' +
-                        '</div>' +
+                      '<div class="flag-this-place">' +
+                        'Can\'t find the right match?' +
+                        '<span class="flag">' +
+                          '<button class="outline-icon nostyle">&#xe842;</button>' +
+                          '<span class="label">Flag this place</span>' +
+                        '</span>' +
                       '</div>' +
+                      '<button class="nostyle outline-icon cancel">&#xe897;</button>' +
+                    '</div>' +
+                    '<div class="georesolution-body">' +
+                      '<div class="georesolution-sidebar">' +
+                        '<div class="results-header"></div>' +
+                        '<ul class="results-list"></ul>' +
+                      '</div>' +
+                      '<div class="georesolution-map"></div>' +
                     '</div>' +
                   '</div>' +
-                '</div>');
+                '</div>' +
+              '</div>');
 
             el.hide();
             jQuery(document.body).append(el);
             return el;
           })(),
 
-          searchInput = element.find('.search'),
+          searchInput   = element.find('.search'),
 
-          btnFlag = element.find('.flag'),
-
-          btnCancel = element.find('.cancel'),
+          btnFlag       = element.find('.flag'),
+          btnCancel     = element.find('.cancel'),
 
           resultsHeader = element.find('.results-header'),
-
-          resultsList = element.find('.results-list'),
+          resultsList   = element.find('.results-list'),
 
           currentBody = false,
+
+          /** TODO refactor map, so we re-use the same base for this as for document map **/
 
           awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
             attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
@@ -62,7 +63,7 @@ define([
                          '<a href="http://creativecommons.org/licenses/by-nc/3.0/deed.en_US" target="_blank">CC-BY-NC 3.0</a>'
           }),
 
-          map = L.map(element.find('.geores-map')[0], {
+          map = L.map(element.find('.georesolution-map')[0], {
             center: new L.LatLng(41.893588, 12.488022),
             zoom: 4,
             zoomControl: false,
@@ -77,42 +78,39 @@ define([
                     '<div class="popup-header">' +
                       '<h3>' + place.labels.join(', ') + '</h3>' +
                     '</div>' +
-                    '<div class="popup-choices">' +
-                      '<table></table>' +
-                    '</div>' +
+                    '<div class="popup-choices"><table></table></div>' +
                   '</div>');
 
-            jQuery.each(place.is_conflation_of, function(idx, choice) {
-              var choiceProps = PlaceUtils.parseURI(choice.uri),
-
+            jQuery.each(place.is_conflation_of, function(idx, record) {
+              var recordId = PlaceUtils.parseURI(record.uri),
                   template = jQuery(
-                    '<tr data-uri="' + choice.uri + '">' +
-                      '<td class="g">' +
-                        '<span class="g-shortcode"></span>' +
-                        '<span class="g-id"></span>' +
+                    '<tr data-uri="' + recordId.uri + '">' +
+                      '<td class="record-id">' +
+                        '<span class="shortcode"></span>' +
+                        '<span class="id"></span>' +
                       '</td>' +
-                      '<td class="select">' +
-                        '<h4>' + choice.title + '</h4>' +
-                        '<p class="date"></p>' +
+                      '<td class="place-details">' +
+                        '<h3>' + record.title + '</h3>' +
                         '<p class="description"></p>' +
+                        '<p class="date"></p>' +
                       '</td>' +
                     '</tr>');
 
-              if (choiceProps.shortcode) {
-                template.find('.g-shortcode').html(choiceProps.shortcode);
-                template.find('.g-id').html(choiceProps.id);
-                template.find('.g').css('background-color', choiceProps.color);
+              if (recordId.shortcode) {
+                template.find('.shortcode').html(recordId.shortcode);
+                template.find('.id').html(recordId.id);
+                template.find('.record-id').css('background-color', recordId.color);
               }
 
-              if (choice.descriptions.length > 0)
-                template.find('.description').html(choice.descriptions[0].description);
+              if (record.descriptions.length > 0)
+                template.find('.description').html(record.descriptions[0].description);
               else
                 template.find('.description').hide();
 
-              if (choice.temporal_bounds)
+              if (record.temporal_bounds)
                 template.find('.date').html(
-                  Formatting.yyyyMMddToYear(choice.temporal_bounds.from) + ' - ' +
-                  Formatting.yyyyMMddToYear(choice.temporal_bounds.to));
+                  Formatting.yyyyMMddToYear(record.temporal_bounds.from) + ' - ' +
+                  Formatting.yyyyMMddToYear(record.temporal_bounds.to));
               else
                 template.find('.date').hide();
 
@@ -164,7 +162,7 @@ define([
                         [ place.representative_point[1], place.representative_point[0] ] :
                         false,
 
-                      result = new Result(resultsList, place),
+                      result = new ResultCard(resultsList, place),
 
                       marker = (coord) ? L.marker(coord).addTo(markerLayer) : false;
 

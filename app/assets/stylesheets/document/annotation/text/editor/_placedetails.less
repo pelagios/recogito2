@@ -25,7 +25,28 @@
   }
 
   .uris {
-    a { color:@standard-type }
+
+    a {
+      color:@standard-type
+    }
+
+    a.minilink {
+      display:inline-block;
+      background-color:#9ca4b1;
+      width:16px;
+      height:16px;
+      line-height:16px;
+      margin-right:4px;
+      .rounded-corners(50%);
+      color:#fff;
+      text-align:center;
+      font-family:OpenSans;
+      font-weight:bold;
+      font-size:11px;
+      text-decoration:none;
+      margin-bottom:1px;
+    }
+
   }
 
   .last-modified {

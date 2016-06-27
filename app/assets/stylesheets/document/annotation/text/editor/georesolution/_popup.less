@@ -1,24 +1,26 @@
-.geores-map .leaflet-popup-close-button {
+.georesolution-map .leaflet-popup-close-button {
   color:transparent !important;
 }
 
-.geores-map .leaflet-popup-close-button::after {
+.georesolution-map .leaflet-popup-close-button::after {
   position:absolute;
   top:11px;
   right:10px;
   font-family:Tonicons;
   content:'\e897';
   color:@lightblue-type;
+  font-weight:normal;
+  font-size:18px;
 }
 
-.geores-map .leaflet-popup-content-wrapper {
+.georesolution-map .leaflet-popup-content-wrapper {
   .rounded-corners(4px) !important;
   overflow:hidden;
   padding:0;
   width:400px;
 }
 
-.geores-map .leaflet-popup-content {
+.georesolution-map .leaflet-popup-content {
   width:100% !important;
   margin:0;
   font-family:PTSansNarrow;
@@ -49,22 +51,25 @@
       border-collapse:collapse;
     }
 
-    td.g {
+    td p {
+      margin:0;
+    }
+
+    td.record-id {
       text-align:center;
       color:#fff;
       width:20%;
-    }
 
-    .g-prefix, .g-id {
-      display:block;
-    }
+      .shortcode {
+        display:block;
+        font-size:15px;
+      }
 
-    .g-prefix {
-      font-size:15px;
-    }
+      .id {
+        display:block;
+        font-size:17px;
+      }
 
-    .g-id {
-      font-size:17px;
     }
 
     td {
@@ -76,20 +81,6 @@
       border:none;
     }
 
-    h4 {
-      font-weight:normal;
-      font-size:17px;
-      margin:0;
-      padding:0;
-    }
-
-    p {
-      font-size:15px;
-      line-height:19px;
-      margin:0;
-      padding:0;
-    }
-
     tr {
       cursor:pointer;
     }
@@ -98,10 +89,6 @@
       background-color:@blueish-white-hi;
     }
 
-    .date {
-      color:lighten(desaturate(@nightsky-type, 100%), 20%);
-    }
-
-  }
+  } /* .popup-choices **/
 
 }
