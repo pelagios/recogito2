@@ -40,10 +40,12 @@ define([
         renderStandardCard = function(record, verificationStatus, lastModified, opt_coord) {
           var latLon = (opt_coord) ? [opt_coord[1], opt_coord[0]] : false;
           card = new StandardCard(infoEl, record, verificationStatus, lastModified, !opt_coord);
-          if (latLon)
+          if (latLon) {
             map.setLocation(latLon);
-          else
+          } else {
             map.clear();
+            map.setGreyScale(true);
+          }
         },
 
         /** Renders a 'no match' place card, due to yellow status or failed match **/

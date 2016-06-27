@@ -33,6 +33,14 @@ define([], function(Formatting, PlaceUtils) {
           }, 1); // Make sure this happens after the map was rendered!
         },
 
+        setGreyScale = function(enabled) {
+          console.log(element);
+          if (enabled)
+            element.addClass('gray');
+          else
+            element.removeClass('gray');
+        },
+
         setLocation = function(latLon) {
           markerLayer.clearLayers();
           L.marker(latLon).addTo(markerLayer);
@@ -40,11 +48,13 @@ define([], function(Formatting, PlaceUtils) {
         },
 
         clear = function() {
+          element.removeClass('gray');
           markerLayer.clearLayers();
           moveTo(DEFAULT_CENTER);
         };
 
     this.clear = clear;
+    this.setGreyScale = setGreyScale;
     this.setLocation = setLocation;
   };
 
