@@ -41,7 +41,7 @@ define([
             labelEl.html(labelFlagged);
             containerEl.append(overlayFlagged);
           } else {
-            labelEl.htmlEl(labelNoAutoMatch);
+            labelEl.html(labelNoAutoMatch);
           }
         };
 
