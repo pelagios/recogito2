@@ -41,5 +41,9 @@ trait BaseService {
       })
     }
   }
+  
+  protected def removeFromCache(prefix: String, key: String)(implicit cache: CacheApi) = {
+    cache.remove(prefix + "_" + key)
+  }
 
 }

@@ -107,16 +107,16 @@ class UserRecord extends UpdatableRecordImpl[UserRecord](User.USER) with Record9
 	}
 
 	/**
-	 * Setter for <code>public.user.full_name</code>.
+	 * Setter for <code>public.user.real_name</code>.
 	 */
-	def setFullName(value : String) : Unit = {
+	def setRealName(value : String) : Unit = {
 		setValue(5, value)
 	}
 
 	/**
-	 * Getter for <code>public.user.full_name</code>.
+	 * Getter for <code>public.user.real_name</code>.
 	 */
-	def getFullName : String = {
+	def getRealName : String = {
 		val r = getValue(5)
 		if (r == null) null else r.asInstanceOf[String]
 	}
@@ -189,7 +189,7 @@ class UserRecord extends UpdatableRecordImpl[UserRecord](User.USER) with Record9
 	override def field3 : Field[String] = User.USER.PASSWORD_HASH
 	override def field4 : Field[String] = User.USER.SALT
 	override def field5 : Field[Timestamp] = User.USER.MEMBER_SINCE
-	override def field6 : Field[String] = User.USER.FULL_NAME
+	override def field6 : Field[String] = User.USER.REAL_NAME
 	override def field7 : Field[String] = User.USER.BIO
 	override def field8 : Field[String] = User.USER.WEBSITE
 	override def field9 : Field[Boolean] = User.USER.ACTIVE
@@ -198,7 +198,7 @@ class UserRecord extends UpdatableRecordImpl[UserRecord](User.USER) with Record9
 	override def value3 : String = getPasswordHash
 	override def value4 : String = getSalt
 	override def value5 : Timestamp = getMemberSince
-	override def value6 : String = getFullName
+	override def value6 : String = getRealName
 	override def value7 : String = getBio
 	override def value8 : String = getWebsite
 	override def value9 : Boolean = getActive
@@ -229,7 +229,7 @@ class UserRecord extends UpdatableRecordImpl[UserRecord](User.USER) with Record9
 	}
 
 	override def value6(value : String) : UserRecord = {
-		setFullName(value)
+		setRealName(value)
 		this
 	}
 
@@ -264,7 +264,7 @@ class UserRecord extends UpdatableRecordImpl[UserRecord](User.USER) with Record9
 	/**
 	 * Create a detached, initialised UserRecord
 	 */
-	def this(username : String, email : String, passwordHash : String, salt : String, memberSince : Timestamp, fullName : String, bio : String, website : String, active : Boolean) = {
+	def this(username : String, email : String, passwordHash : String, salt : String, memberSince : Timestamp, realName : String, bio : String, website : String, active : Boolean) = {
 		this()
 
 		setValue(0, username)
@@ -272,7 +272,7 @@ class UserRecord extends UpdatableRecordImpl[UserRecord](User.USER) with Record9
 		setValue(2, passwordHash)
 		setValue(3, salt)
 		setValue(4, memberSince)
-		setValue(5, fullName)
+		setValue(5, realName)
 		setValue(6, bio)
 		setValue(7, website)
 		setValue(8, active)

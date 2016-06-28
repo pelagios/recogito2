@@ -2,10 +2,10 @@
 CREATE TABLE "user" (
   username TEXT NOT NULL PRIMARY KEY,
   email TEXT NOT NULL,
-  password_hash TEXT,
-  salt TEXT,
+  password_hash TEXT NOT NULL,
+  salt TEXT NOT NULL,
   member_since TIMESTAMP WITH TIME ZONE NOT NULL,
-  full_name TEXT,
+  real_name TEXT,
   bio TEXT,
   website TEXT,
   active BOOLEAN NOT NULL DEFAULT TRUE

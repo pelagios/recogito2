@@ -77,9 +77,9 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	val MEMBER_SINCE : TableField[UserRecord, Timestamp] = createField("member_since", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), "")
 
 	/**
-	 * The column <code>public.user.full_name</code>.
+	 * The column <code>public.user.real_name</code>.
 	 */
-	val FULL_NAME : TableField[UserRecord, String] = createField("full_name", org.jooq.impl.SQLDataType.CLOB, "")
+	val REAL_NAME : TableField[UserRecord, String] = createField("real_name", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>public.user.bio</code>.

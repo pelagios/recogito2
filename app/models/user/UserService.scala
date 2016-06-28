@@ -34,6 +34,21 @@ object UserService extends BaseService with FileAccess {
     sql.insertInto(USER).set(user).execute()
     user
   }
+  
+  def updateUserSettings(username: String, email: String, realname: Option[String], bio: Option[String], website: Option[String])(implicit db: DB, cache: CacheApi) = db.withTransaction { sql =>
+    val rows = 
+      sql.update(USER)
+       .set(USER.EMAIL, email)
+       .set(USER.REAL_NAME, realname.getOrElse(null))
+       .set(USER.BIO, bio.getOrElse(null))
+       .set(USER.WEBSITE, website.getOrElse(null))
+       .where(USER.USERNAME.equal(username))
+       .execute()
+       
+    removeFromCache("user", username)
+       
+    rows == 1
+  } 
 
   /** This method is cached, since it's basically called on every request **/
   def findByUsername(username: String)(implicit db: DB, cache: CacheApi) =

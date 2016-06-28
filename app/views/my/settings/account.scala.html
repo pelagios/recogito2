@@ -27,12 +27,18 @@
 
       <div class="panel account-settings">
         <h2>Account Settings</h2>
+        @flash.get("success").map { msg =>
+          <div class="success message"><span class="icon">&#xf00c;</span> @msg</div>
+        }
+        @flash.get("error").map { msg =>
+          <div class="error message"><span class="icon">&#xf00d;</span> @msg</div>
+        }
         <div class="inner">
           @helper.form(action = controllers.my.settings.routes.AccountSettingsController.updateAccountSettings(), args = 'autocomplete -> "off") {
             @helper.inputText(settingsForm("email"), args = '_label -> "E-Mail", '_help -> "", 'autocomplete -> "false")
-            @helper.inputText(settingsForm("name"), args = '_label -> "Name", '_help -> "Optional", 'autocomplete -> "false")
-            @helper.textarea(settingsForm("bio"), args = '_label -> "About Me", '_help -> "Optional", 'autocomplete -> "false")
-            @helper.inputText(settingsForm("website"), args = '_label -> "Your Website", '_help -> "Optional", 'autocomplete -> "false")
+            @helper.inputText(settingsForm("name"), args = '_label -> "Name", '_help -> "Optional", 'placeholder -> "Your name", 'autocomplete -> "false")
+            @helper.textarea(settingsForm("bio"), args = '_label -> "About You", '_help -> "Optional", 'placeholder -> "Tell other users something about yourself", 'autocomplete -> "false")
+            @helper.inputText(settingsForm("website"), args = '_label -> "Your Website", '_help -> "Optional", 'placeholder -> "A link to a page about you", 'autocomplete -> "false")
             <dt></dt>
             <dd>
               <button type="submit" class="btn"/>Save Changes</button>
