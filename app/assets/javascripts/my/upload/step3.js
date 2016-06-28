@@ -1,4 +1,9 @@
-require(['../../common/config'], function(Config) {
+require.config({
+  baseUrl: "/assets/javascripts/",
+  fileExclusionRegExp: /^lib$/
+});
+
+require(['common/config'], function(Config) {
 
   var POLL_INTERVAL = 1000, // Poll interval in milliseconds
 
