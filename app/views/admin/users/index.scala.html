@@ -1,13 +1,12 @@
-@(users: Page[models.generated.tables.records.UserRecord])(implicit request: RequestHeader)
+@(users: Page[models.generated.tables.records.UserRecord], webjars: WebJarAssets)(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito Administration - Users</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/admin/dashboard.css")"/>
-    <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")"></script>
-    <script src="@routes.Assets.versioned("lib/plotly.js/dist/plotly.min.js")"></script>
-    <script src="@routes.Assets.versioned("lib/requirejs/require.js")" data-main="@routes.Assets.versioned("javascripts/admin/statsDashboard.js")"></script>
-    <script src=""></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("plotly.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/admin/statsDashboard.js")"></script>
   </head>
   <body>
     <div class="side-navbar">
