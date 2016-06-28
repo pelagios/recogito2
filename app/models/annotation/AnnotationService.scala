@@ -116,6 +116,11 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       t.printStackTrace()
       false
     }
+    
+  def countByDocId(id: String)(implicit context: ExecutionContext): Future[Long] =
+    ES.client execute {
+      count from ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id))
+    } map { _.getCount }
 
   /** Retrieves all annotations on a given document **/
   def findByDocId(id: String, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] =

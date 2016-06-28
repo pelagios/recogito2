@@ -2,12 +2,18 @@
   document: models.generated.tables.records.DocumentRecord,
   allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
+  documentAnnotationCount: Long,
   accessLevel: models.document.DocumentAccessLevel,
   content: String)(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@@pelagiosproject" />
+    <meta name="twitter:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
+    <meta name="twitter:description" content="@content.take(256).trim..." />
+    <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png")" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text/index.css")"/>
     <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
