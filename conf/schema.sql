@@ -17,6 +17,17 @@ CREATE TABLE user_role (
   has_role TEXT NOT NULL
 );
 
+-- a default admin user with username=password=recogito
+INSERT INTO "user" (username, email, password_hash, salt, member_since) VALUES (
+  'recogito',
+  'recogito@example.com',
+  'b875551ec64627a66f707ffc9f22a5e62ebc43617fe6b55bca19436ddf4d8ae2',
+  'gazC7r/l6ztdpG39+4BWhv46YizBY32EC40V2cojhAY=',
+  '2016-06-28 16:40:50.311+02'
+);
+
+INSERT INTO user_role (username, has_role) VALUES ('recogito', 'ADMIN');
+
 -- staging area for documents during upload workflow
 CREATE TABLE upload (
   id SERIAL PRIMARY KEY,
