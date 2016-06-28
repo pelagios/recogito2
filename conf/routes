@@ -17,7 +17,7 @@ POST    /login                                       controllers.landing.LoginLo
 GET     /logout                                      controllers.landing.LoginLogoutController.logout
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Admin area
+# Administration area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
@@ -54,11 +54,14 @@ GET     /document/:id/settings/collaborator/search   controllers.document.settin
 POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Document content & settings
+# Document content
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /document/:id/part/:partNo/tiles/*path       controllers.document.DocumentController.getImageTile(id: String, partNo: Int, path: String)
 GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
+
+### TODO move this to settings ###
+
 DELETE  /document/:id                                controllers.document.DocumentController.deleteDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,7 +84,10 @@ GET     /api/contributions/document/:id              controllers.api.Contributio
 GET     /api/contributions/stats                     controllers.api.ContributionAPIController.getGlobalStats()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# User/team personal space
+# Personal space - upload
+#
+# TODO do we want to move uploads to /upload?
+#
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /:username/upload/step-1                     controllers.my.upload.UploadController.showStep1(username: String)
@@ -94,6 +100,12 @@ POST    /:username/upload/step-3                     controllers.my.upload.Uploa
 GET     /:username/upload/cancel                     controllers.my.upload.UploadController.cancelUploadWizard(username: String)
 GET     /:username/upload/ner-progress/:docId        controllers.my.upload.UploadController.queryNERProgress(username: String, docId: String)
 GET     /:username/upload/tiling-progress/:docId     controllers.my.upload.UploadController.queryTilingProgress(username: String, docId: String)
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /settings/account                            controller.my.MySettingsController.accountSettings
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

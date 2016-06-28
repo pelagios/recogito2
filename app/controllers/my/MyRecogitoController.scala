@@ -16,7 +16,7 @@ import play.api.mvc.{ Controller, RequestHeader }
 import storage.DB
 import scala.concurrent.Future
 
-class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB, val webjars: WebJarAssets) 
+class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) 
   extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security {
 
   // TODO this may depend on user in the future
