@@ -29,7 +29,8 @@ object UserService extends BaseService with FileAccess {
 
   def insertUser(username: String, email: String, password: String)(implicit db: DB) = db.withTransaction { sql =>
     val salt = randomSalt
-    val user = new UserRecord(username, email, computeHash(salt + password), salt, new Timestamp(new Date().getTime), true)
+    val user = new UserRecord(username, email, computeHash(salt + password), salt,
+      new Timestamp(new Date().getTime), null, null, null, true)
     sql.insertInto(USER).set(user).execute()
     user
   }

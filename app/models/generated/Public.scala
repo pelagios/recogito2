@@ -14,10 +14,7 @@ import models.generated.tables.Document
 import models.generated.tables.DocumentFilepart
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
-import models.generated.tables.SharingEventLog
 import models.generated.tables.SharingPolicy
-import models.generated.tables.Team
-import models.generated.tables.TeamMembership
 import models.generated.tables.Upload
 import models.generated.tables.UploadFilepart
 import models.generated.tables.User
@@ -58,7 +55,6 @@ class Public extends SchemaImpl("public") {
 		return Arrays.asList[Sequence[_]](
 			Sequences.DOCUMENT_FILEPART_ID_SEQ,
 			Sequences.FOLDER_ID_SEQ,
-			Sequences.SHARING_EVENT_LOG_ID_SEQ,
 			Sequences.SHARING_POLICY_ID_SEQ,
 			Sequences.UPLOAD_FILEPART_ID_SEQ,
 			Sequences.UPLOAD_ID_SEQ,
@@ -77,10 +73,7 @@ class Public extends SchemaImpl("public") {
 			DocumentFilepart.DOCUMENT_FILEPART,
 			Folder.FOLDER,
 			FolderAssociation.FOLDER_ASSOCIATION,
-			SharingEventLog.SHARING_EVENT_LOG,
 			SharingPolicy.SHARING_POLICY,
-			Team.TEAM,
-			TeamMembership.TEAM_MEMBERSHIP,
 			Upload.UPLOAD,
 			UploadFilepart.UPLOAD_FILEPART,
 			User.USER,

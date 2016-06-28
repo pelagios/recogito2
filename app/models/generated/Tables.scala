@@ -10,10 +10,7 @@ import models.generated.tables.Document
 import models.generated.tables.DocumentFilepart
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
-import models.generated.tables.SharingEventLog
 import models.generated.tables.SharingPolicy
-import models.generated.tables.Team
-import models.generated.tables.TeamMembership
 import models.generated.tables.Upload
 import models.generated.tables.UploadFilepart
 import models.generated.tables.User
@@ -53,24 +50,9 @@ object Tables {
 	val FOLDER_ASSOCIATION = models.generated.tables.FolderAssociation.FOLDER_ASSOCIATION
 
 	/**
-	 * The table public.sharing_event_log
-	 */
-	val SHARING_EVENT_LOG = models.generated.tables.SharingEventLog.SHARING_EVENT_LOG
-
-	/**
 	 * The table public.sharing_policy
 	 */
 	val SHARING_POLICY = models.generated.tables.SharingPolicy.SHARING_POLICY
-
-	/**
-	 * The table public.team
-	 */
-	val TEAM = models.generated.tables.Team.TEAM
-
-	/**
-	 * The table public.team_membership
-	 */
-	val TEAM_MEMBERSHIP = models.generated.tables.TeamMembership.TEAM_MEMBERSHIP
 
 	/**
 	 * The table public.upload

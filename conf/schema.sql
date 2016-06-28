@@ -5,6 +5,9 @@ CREATE TABLE "user" (
   password_hash TEXT,
   salt TEXT,
   member_since TIMESTAMP WITH TIME ZONE NOT NULL,
+  full_name TEXT,
+  bio TEXT,
+  website TEXT,
   active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -13,22 +16,6 @@ CREATE TABLE user_role (
   username TEXT NOT NULL REFERENCES "user"(username),
   has_role TEXT NOT NULL
 );
-
--- CREATE TABLE user_activity_log (
---  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
---  timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
---  username TEXT NOT NULL REFERENCES user(username),
---  TODO do some sort of structured recording of activity types in the future
---  activity TEXT NOT NULL
--- );
-
--- CREATE TABLE user_activity_per_day (
---   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
---   timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
---   username TEXT NOT NULL REFERENCES user(username),
---   TODO split up totals per activity type, once we have them defined
---   total_activities INTEGER NOT NULL
--- );
 
 -- staging area for documents during upload workflow
 CREATE TABLE upload (
@@ -97,17 +84,17 @@ CREATE TABLE folder_association (
 );
 
 -- teams are a first level entities similar to user
-CREATE TABLE team (
-  title TEXT NOT NULL PRIMARY KEY,
-  created_by TEXT NOT NULL REFERENCES "user"(username),
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL
-);
+-- CREATE TABLE team (
+--   title TEXT NOT NULL PRIMARY KEY,
+--   created_by TEXT NOT NULL REFERENCES "user"(username),
+--   created_at TIMESTAMP WITH TIME ZONE NOT NULL
+-- );
 
-CREATE TABLE team_membership (
-  username TEXT NOT NULL REFERENCES "user"(username),
-  team TEXT NOT NULL REFERENCES team(title),
-  member_since TIMESTAMP WITH TIME ZONE NOT NULL
-);
+-- CREATE TABLE team_membership (
+--   username TEXT NOT NULL REFERENCES "user"(username),
+--   team TEXT NOT NULL REFERENCES team(title),
+--   member_since TIMESTAMP WITH TIME ZONE NOT NULL
+-- );
 
 -- ledger of shared documents and folders
 CREATE TABLE sharing_policy (
@@ -124,10 +111,10 @@ CREATE TABLE sharing_policy (
 
 -- keep a log of what happened for shared elements
 -- e.g. to inform users about what happened
-CREATE TABLE sharing_event_log (
-  id SERIAL PRIMARY KEY,
-  type_of_action TEXT,
-  action_by TEXT NOT NULL REFERENCES "user"(username),
-  action_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  policy_id INTEGER NOT NULL REFERENCES sharing_policy(id)
-);
+-- CREATE TABLE sharing_event_log (
+--   id SERIAL PRIMARY KEY,
+--   type_of_action TEXT,
+--   action_by TEXT NOT NULL REFERENCES "user"(username),
+--   action_at TIMESTAMP WITH TIME ZONE NOT NULL,
+--   policy_id INTEGER NOT NULL REFERENCES sharing_policy(id)
+-- );

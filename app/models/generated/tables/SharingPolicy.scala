@@ -115,7 +115,7 @@ class SharingPolicy(alias : String, aliased : Table[SharingPolicyRecord], parame
 	}
 
 	override def getKeys : List[ UniqueKey[SharingPolicyRecord] ] = {
-		return Arrays.asList[ UniqueKey[SharingPolicyRecord] ](Keys.SHARING_POLICY_PKEY)
+		return Arrays.asList[ UniqueKey[SharingPolicyRecord] ](Keys.SHARING_POLICY_PKEY, Keys.SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY)
 	}
 
 	override def getReferences : List[ ForeignKey[SharingPolicyRecord, _] ] = {
