@@ -108,7 +108,6 @@ require(['common/ui/touch', 'common/config'], function(Touch, Config) {
 
     // TODO temporary: register dummy handlers on icons for unimplemented features
     btnCreateFolder.click(onClickUnimplemented);
-    btnAccountSettings.click(onClickUnimplemented);
     btnGridView.click(onClickUnimplemented);
     searchbox.keyup(function(e) {
       if (e.which === 13)

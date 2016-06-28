@@ -105,7 +105,10 @@ GET     /:username/upload/tiling-progress/:docId     controllers.my.upload.Uploa
 # Personal settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /settings/account                            controller.my.MySettingsController.accountSettings
+GET     /settings/account                            controllers.my.settings.AccountSettingsController.index
+POST    /settings/account                            controllers.my.settings.AccountSettingsController.updateAccountSettings
+GET     /settings/password                           controllers.my.settings.PasswordSettingsController.index
+POST    /settings/password                           controllers.my.settings.PasswordSettingsController.updatePassword
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

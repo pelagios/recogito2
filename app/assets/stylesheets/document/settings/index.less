@@ -1,7 +1,7 @@
-@import "../../_globals.less";
 @import "../../_forms.less";
+@import "../../_globals.less";
+@import "../../_sidebar.less";
 @import "../_header.less";
-@import "../_sidebar.less";
 @import "_sharing.less";
 
 .header-iconbar {
@@ -19,32 +19,11 @@
 }
 
 .panel {
-  position:relative;
-  background-color:#fff;
-  padding:0;
-  margin-bottom:15px;
-  border:1px solid @lightgrey-border-darker;
-  .rounded-corners(2px);
-  max-width:1024px;
-
-  h2 {
-    background-color:@blueish-white;
-    font-weight:normal;
-    font-size:18px;
-    padding:6px 15px;
-    border-bottom:1px solid @lightgrey-border-darker;
-  }
-
-  .inner {
-    font-size:16px;
-    line-height:22px;
-    padding:15px;
-  }
 
   .checkbox-details {
     margin:0;
     padding:0 0 0 20px;
-    color:darken(@lightgrey-type, 12%);
+    color:@grey-type;
   }
 
 }

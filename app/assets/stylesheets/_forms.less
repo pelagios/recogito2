@@ -16,14 +16,14 @@ dd.error {
   padding-bottom:5px;
 }
 
-input {
+input, textarea {
   border:0;
   outline:none;
   font-size:17px;
   -webkit-appearance:none;
 }
 
-input[type=text], input[type=password] {
+input[type=text], input[type=password], textarea {
   box-sizing:border-box;
   color:@form-type;
   background-color:#fff;
@@ -32,7 +32,7 @@ input[type=text], input[type=password] {
   border:1px solid @form-grey-border;
 }
 
-input[type=text]:focus, input[type=password]:focus {
+input[type=text]:focus, input[type=password]:focus, textarea:focus {
   border-color:@form-blue-border;
   box-shadow:0 0 4px 0 @form-blue-glow;
 }

@@ -1,9 +1,11 @@
+@sidebar-width:200px;
+
 .sidebar {
   position:fixed;
   top:0;
   bottom:0;
   width:@sidebar-width;
-  background-color:#244566;
+  background-color:@nightsky;
   font-family:OpenSans;
   box-sizing:border-box;
 
@@ -50,34 +52,5 @@
     }
 
   }
-
-  /** TODO clean up *
-
-  .sidebar-parts {
-
-    ul {
-      text-align:center;
-      margin:0;
-      padding:10px 0 0 0;
-    }
-
-    .part-title {
-      font-size:14px;
-    }
-
-    li {
-      margin:10px 0;
-      padding:15px;
-    }
-
-    li.active {
-      color:#fff;
-    }
-
-    li:hover:not(.active) {
-      background-color:fadeout(@nightsky-type, 50%);
-    }
-
-  }  .sidebar-parts **/
 
 }

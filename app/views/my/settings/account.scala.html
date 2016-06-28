@@ -1,0 +1,46 @@
+@(settingsForm: Form[controllers.my.settings.AccountSettingsData])(implicit messages: Messages, flash: Flash)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Account Settings</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/settings/index.css")"/>
+  </head>
+
+  <body>
+    <div class="sidebar">
+      <ul class="menu">
+        <li class="active">
+          <a href="#" onclick="return false;">
+            <span class="label">Account</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="@controllers.my.settings.routes.PasswordSettingsController.index">
+            <span class="label">Password</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="content">
+
+      <div class="panel account-settings">
+        <h2>Account Settings</h2>
+        <div class="inner">
+          @helper.form(action = controllers.my.settings.routes.AccountSettingsController.updateAccountSettings(), args = 'autocomplete -> "off") {
+            @helper.inputText(settingsForm("email"), args = '_label -> "E-Mail", '_help -> "", 'autocomplete -> "false")
+            @helper.inputText(settingsForm("name"), args = '_label -> "Name", '_help -> "Optional", 'autocomplete -> "false")
+            @helper.textarea(settingsForm("bio"), args = '_label -> "About Me", '_help -> "Optional", 'autocomplete -> "false")
+            @helper.inputText(settingsForm("website"), args = '_label -> "Your Website", '_help -> "Optional", 'autocomplete -> "false")
+            <dt></dt>
+            <dd>
+              <button type="submit" class="btn"/>Save Changes</button>
+            </dd>
+          }
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>
