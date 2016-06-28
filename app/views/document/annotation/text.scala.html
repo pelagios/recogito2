@@ -13,7 +13,7 @@
     <meta name="twitter:site" content="@@pelagiosproject" />
     <meta name="twitter:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
     <meta name="twitter:description" content="@content.take(256).trim..." />
-    <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png")" />
+    <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text/index.css")"/>
     <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
