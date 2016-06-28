@@ -43,8 +43,12 @@ class AccountSettingsController @Inject() (implicit val cache: CacheApi, val db:
 
       f =>
         UserService.updateUserSettings(loggedIn.user.getUsername, f.email, f.name, f.bio, f.website)
-          .map(success => Redirect(routes.AccountSettingsController.index).flashing("success" -> "Your settings have been saved."))
-          .recover { case t:Throwable => {
+          .map { success =>
+            if (success)
+              Redirect(routes.AccountSettingsController.index).flashing("success" -> "Your settings have been saved.")
+            else 
+              Redirect(routes.AccountSettingsController.index).flashing("error" -> "There was an error while saving your settings.")
+          }.recover { case t:Throwable => {
             t.printStackTrace()
             Redirect(routes.AccountSettingsController.index).flashing("error" -> "There was an error while saving your settings.")
           }}

@@ -13,6 +13,7 @@ import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
+import scala.util.{ Either, Left, Right }
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
@@ -35,15 +36,40 @@ object UserService extends BaseService with FileAccess {
     user
   }
   
+  def updatePassword(username: String, currentPassword: String, newPassword: String)(implicit db: DB): Future[Either[String, Unit]] = db.withTransaction { sql =>
+    Option(sql.selectFrom(USER).where(USER.USERNAME.equal(username)).fetchOne()) match {
+      case Some(user) => {
+        val isValid = computeHash(user.getSalt + currentPassword) == user.getPasswordHash
+        if (isValid) {
+          // User credentials OK - update password
+          val salt = randomSalt
+          val rows = 
+            sql.update(USER)
+              .set(USER.PASSWORD_HASH, computeHash(salt + newPassword))
+              .set(USER.SALT, salt)
+              .where(USER.USERNAME.equal(username))
+              .execute()
+          Right(Unit)
+        } else {
+          // User failed password validation
+          Left("Invalid Password")
+        }
+      }
+      
+      case None =>
+        throw new Exception("Attempt to update password on unknown username")
+    }
+  }
+  
   def updateUserSettings(username: String, email: String, realname: Option[String], bio: Option[String], website: Option[String])(implicit db: DB, cache: CacheApi) = db.withTransaction { sql =>
     val rows = 
       sql.update(USER)
-       .set(USER.EMAIL, email)
-       .set(USER.REAL_NAME, realname.getOrElse(null))
-       .set(USER.BIO, bio.getOrElse(null))
-       .set(USER.WEBSITE, website.getOrElse(null))
-       .where(USER.USERNAME.equal(username))
-       .execute()
+        .set(USER.EMAIL, email)
+        .set(USER.REAL_NAME, realname.getOrElse(null))
+        .set(USER.BIO, bio.getOrElse(null))
+        .set(USER.WEBSITE, website.getOrElse(null))
+        .where(USER.USERNAME.equal(username))
+        .execute()
        
     removeFromCache("user", username)
        
