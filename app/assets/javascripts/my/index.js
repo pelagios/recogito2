@@ -84,7 +84,7 @@ require(['common/ui/touch', 'common/config'], function(Touch, Config) {
             head = ids[0];
             tail = ids.slice(1);
 
-            jsRoutes.controllers.document.DocumentController.deleteDocument(head).ajax()
+            jsRoutes.controllers.document.settings.SettingsController.deleteDocument(head).ajax()
               .fail(function(error) {
                 console.log(error);
               })

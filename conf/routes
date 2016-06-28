@@ -52,6 +52,7 @@ PUT     /document/:id/settings/collaborator          controllers.document.settin
 DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
 GET     /document/:id/settings/collaborator/search   controllers.document.settings.SettingsController.searchUsers(id: String, q: String)
 POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String)
+DELETE  /document/:id/settings/delete                controllers.document.settings.SettingsController.deleteDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document content
@@ -59,10 +60,6 @@ POST    /document/:id/settings/rollback              controllers.document.settin
 
 GET     /document/:id/part/:partNo/tiles/*path       controllers.document.DocumentController.getImageTile(id: String, partNo: Int, path: String)
 GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
-
-### TODO move this to settings ###
-
-DELETE  /document/:id                                controllers.document.DocumentController.deleteDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API

@@ -48,6 +48,7 @@ trait HasAdminAction { self: BaseController =>
 
 class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets)
   extends BaseController
+    with DeleteActions
     with HasAdminAction
     with MetadataActions 
     with RollbackActions
