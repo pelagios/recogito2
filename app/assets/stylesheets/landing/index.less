@@ -5,7 +5,7 @@
 
 html, body {
   height:100%;
-  min-height:800px;
+  min-height:900px;
   position:relative;
 }
 
@@ -102,6 +102,55 @@ html, body {
     -webkit-text-fill-color:#525252 !important;
   }
 
+}
+
+.featurette {
+  margin:0 auto;
+  padding: 10px 0;
+  width:@body-width-narrow;
+  @media (min-width:1025px) { width:@body-width; }
+
+  h3 {
+    margin:0;
+    padding:0;
+    font-size:24px;
+    line-height:34px;
+    font-family:PTSansNarrow;
+    font-weight:normal;
+  }
+
+  p {
+    font-size:17px;
+    margin:0;
+    padding:0 0 8px 0;
+    color:@grey-type;
+  }
+
+  a { color:@lightgrey-type; }
+  a:hover { color:@lightgrey-type-hover; }
+
+}
+
+.column {
+  float:left;
+  box-sizing:border-box;
+  padding:20px;
+}
+
+.column:first-child {
+  padding-left:0;
+}
+
+.column:last-child {
+  padding-right:0;
+}
+
+.column.one-quarter {
+  width:25%;
+}
+
+.column.three-quarters {
+  width:75%;
 }
 
 .footer {
