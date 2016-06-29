@@ -1,4 +1,5 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader, webjars: WebJarAssets)
+@(loggedInUser: Option[String], document: models.generated.tables.records.DocumentRecord,
+  accessLevel: models.document.DocumentAccessLevel)(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
@@ -10,7 +11,7 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/map/app.js")"></script>
     <script>
       window.config = {
-        me: '@username',
+        @if(loggedInUser.isDefined) { me: '@loggedInUser.get', }
         documentId: '@document.getId',
         documentOwner: '@document.getOwner'
       }
@@ -52,19 +53,23 @@
           </a>
         </li>
 
-        <li class="tooltip bottom">
-          <a href="@controllers.document.settings.routes.SettingsController.showDocumentSettings(document.getId, None)">
-            <span class="icon">&#xe8c9;</span>
-            <span class="hint">Edit document settings and metadata</span>
-          </a>
-        </li>
+        @if(accessLevel.isAdmin) {
+          <li class="tooltip bottom">
+            <a href="@controllers.document.settings.routes.SettingsController.showDocumentSettings(document.getId, None)">
+              <span class="icon">&#xe8c9;</span>
+              <span class="hint">Edit document settings and metadata</span>
+            </a>
+          </li>
+        }
 
-        <li class="home tooltip bottom">
-          <a href="@controllers.my.routes.MyRecogitoController.index(username.toLowerCase, None)">
-            <span class="icon">&#xe8bf;</span>
-            <span class="hint">Back to your home page</span>
-          </a>
-        </li>
+        @if(loggedInUser.isDefined) {
+          <li class="home tooltip bottom">
+            <a href="@controllers.my.routes.MyRecogitoController.index(loggedInUser.get.toLowerCase, None)">
+              <span class="icon">&#xe8bf;</span>
+              <span class="hint">Back to your home page</span>
+            </a>
+          </li>
+        }
       </ul>
     </div> <!-- .header-iconbar -->
 

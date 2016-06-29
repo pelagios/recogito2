@@ -10,15 +10,17 @@ sealed trait DocumentAccessLevel {
   
   val canWrite: Boolean
   
+  val isAdmin: Boolean
+  
 }
 
 object DocumentAccessLevel {
 
-  case object FORBIDDEN extends DocumentAccessLevel { val canRead = false ; val canWrite = false }
-  case object READ      extends DocumentAccessLevel { val canRead = true  ; val canWrite = false }
-  case object WRITE     extends DocumentAccessLevel { val canRead = true  ; val canWrite = true  }
-  case object ADMIN     extends DocumentAccessLevel { val canRead = true  ; val canWrite = true  }
-  case object OWNER     extends DocumentAccessLevel { val canRead = true  ; val canWrite = true  }
+  case object FORBIDDEN extends DocumentAccessLevel { val canRead = false ; val canWrite = false ; val isAdmin = false }
+  case object READ      extends DocumentAccessLevel { val canRead = true  ; val canWrite = false ; val isAdmin = false }
+  case object WRITE     extends DocumentAccessLevel { val canRead = true  ; val canWrite = true  ; val isAdmin = false }
+  case object ADMIN     extends DocumentAccessLevel { val canRead = true  ; val canWrite = true  ; val isAdmin = true  }
+  case object OWNER     extends DocumentAccessLevel { val canRead = true  ; val canWrite = true  ; val isAdmin = true  }
   
   def withName(name: String): Option[DocumentAccessLevel] =
     Seq(FORBIDDEN, READ, WRITE, ADMIN, OWNER).find(_.toString == name)
