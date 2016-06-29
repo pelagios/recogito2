@@ -9,6 +9,10 @@ require([
   'common/api',
   'common/config'], function(AnnotationUtils, PlaceUtils, API, Config) {
 
+  var MAX_MARKER_SIZE  = 12,
+
+      MIN_MARKER_SIZE = 5;
+
   jQuery(document).ready(function() {
     var awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
           attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
@@ -26,6 +30,9 @@ require([
 
        /** Lookuptable { gazetteerUri -> [ annotation] } **/
        annotationsByGazetteerURI = {},
+
+       /** Keeping track of min/max values, so we can scale the dots accordingly **/
+       annotationsPerPlace = { min: 9007199254740991, max : 1},
 
        getAnnotationsForPlace = function(place) {
          var uris = PlaceUtils.getURIs(place),
@@ -49,17 +56,41 @@ require([
            L.popup().setLatLng(coord).setContent(quotes).openOn(map);
        },
 
+       /** Size is a linear function, defined by pre-set MIN & MAX marker sizes **/
+       getMarkerSize = function(place) {
+         var annotationsAtPlace = getAnnotationsForPlace(place).length,
+             delta = annotationsPerPlace.max - annotationsPerPlace.min,
+             k = (MAX_MARKER_SIZE - MIN_MARKER_SIZE) / delta,
+             d = ((MIN_MARKER_SIZE * annotationsPerPlace.max) - (MAX_MARKER_SIZE * annotationsPerPlace.min)) / delta;
+
+         return k * annotationsAtPlace + d;
+       },
+
        onAnnotationsLoaded = function(annotations) {
          // Loop through all place bodies of all annotations
          jQuery.each(annotations, function(i, annotation) {
            jQuery.each(AnnotationUtils.getBodiesOfType(annotation, 'PLACE'), function(j, placeBody) {
-             var annotationsAtPlace = annotationsByGazetteerURI[placeBody.uri];
-             if (annotationsAtPlace)
-               annotationsAtPlace.push(annotation);
-             else
-               annotationsByGazetteerURI[placeBody.uri] = [ annotation ];
+             if (placeBody.uri) {
+               var annotationsAtPlace = annotationsByGazetteerURI[placeBody.uri];
+               if (annotationsAtPlace)
+                 annotationsAtPlace.push(annotation);
+               else
+                 annotationsByGazetteerURI[placeBody.uri] = [ annotation ];
+             }
            });
          });
+
+         // Determine min/max annotations per place
+         jQuery.each(annotationsByGazetteerURI, function(uri, annotations) {
+           var count = annotations.length;
+           if (count < annotationsPerPlace.min)
+             annotationsPerPlace.min = count;
+           if (count > annotationsPerPlace.max)
+             annotationsPerPlace.max = count;
+         });
+
+         // After the annotations are loaded, load the places
+         return API.getPlacesInDocument(Config.documentId, 0, 2000);
        },
 
        onPlacesLoaded = function(response) {
@@ -67,8 +98,12 @@ require([
          jQuery.each(response.items, function(idx, place) {
            if (place.representative_point) {
              // The epic battle between Leaflet vs. GeoJSON
-             var coord = [ place.representative_point[1], place.representative_point[0] ];
-             L.marker(coord).addTo(map).on('click', function() {
+             var coord = [ place.representative_point[1], place.representative_point[0] ],
+                 markerSize = getMarkerSize(place);
+
+             console.log(markerSize);
+
+             L.circleMarker(coord).setRadius(markerSize).addTo(map).on('click', function() {
                renderPopup(coord, place);
              });
            }
@@ -80,10 +115,7 @@ require([
        };
 
     API.getAnnotationsForDocument(Config.documentId)
-       .done(onAnnotationsLoaded)
-       .fail(onLoadError);
-
-    API.getPlacesInDocument(Config.documentId, 0, 2000)
+       .then(onAnnotationsLoaded)
        .done(onPlacesLoaded)
        .fail(onLoadError);
   });
