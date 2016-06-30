@@ -8,12 +8,18 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>@Option(document.getAuthor).map(_ + ": ")@document.getTitle</title>
+    <meta property="og:type" content="website" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@@pelagiosproject" />
+    <meta property="og:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
     <meta name="twitter:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
-    <meta name="twitter:description" content="@content.take(256).trim..." />
+    <meta property="og:description" content="@content.take(256).replace("\"", "\\\"").trim..." />
+    <meta name="twitter:description" content="@content.take(256).replace("\"", "\\\"").trim..." />
+    <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
     <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+    <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(document.getId).absoluteURL" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text/index.css")"/>
     <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
