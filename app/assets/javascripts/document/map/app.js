@@ -38,6 +38,15 @@ require([
 
        markerScaleFn,
 
+       distinct = function(arr) {
+         var distinct = [];
+         jQuery.each(arr, function(idx, elem) {
+           if (distinct.indexOf(elem) < 0)
+             distinct.push(elem);
+         });
+         return distinct;
+       },
+
        getAnnotationsForPlace = function(place) {
          var uris = PlaceUtils.getURIs(place),
              annotations = [];
@@ -64,21 +73,24 @@ require([
        },
 
        renderPopup = function(coord, place) {
-         var popup = jQuery(
+             // TODO sort distinct quotes by frequency
+         var annotations = getAnnotationsForPlace(place),
+
+             quotes = jQuery.map(annotations, function(annotation) {
+               return AnnotationUtils.getQuote(annotation);
+             }),
+
+             distinctQuotes = distinct(quotes),
+
+             popup = jQuery(
                '<div class="popup">' +
                  '<div class="popup-header">' +
-                   '<h3>Mediolanum' + '</h3>' +
+                   '<h3>' + distinctQuotes.join(', ') + '</h3>' +
                  '</div>' +
                  '<div><table class="gazetteer-records"></table></div>' +
                 '</div>'),
 
-             annotations = getAnnotationsForPlace(place),
-
-             gazetteerURIs = getDistinctURIs(annotations),
-
-             quotes = jQuery.map(annotations, function(annotation) {
-               return AnnotationUtils.getQuote(annotation);
-             }).join(', ');
+             gazetteerURIs = getDistinctURIs(annotations);
 
          jQuery.each(gazetteerURIs, function(idx, uri) {
            var record = PlaceUtils.getRecord(place, uri),
