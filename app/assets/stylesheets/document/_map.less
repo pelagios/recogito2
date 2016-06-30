@@ -1,8 +1,8 @@
-.georesolution-map .leaflet-popup-close-button {
+.map .leaflet-popup-close-button {
   color:transparent !important;
 }
 
-.georesolution-map .leaflet-popup-close-button::after {
+.map .leaflet-popup-close-button::after {
   position:absolute;
   top:11px;
   right:10px;
@@ -13,14 +13,14 @@
   font-size:18px;
 }
 
-.georesolution-map .leaflet-popup-content-wrapper {
+.map .leaflet-popup-content-wrapper {
   .rounded-corners(4px) !important;
   overflow:hidden;
   padding:0;
   width:400px;
 }
 
-.georesolution-map .leaflet-popup-content {
+.map .leaflet-popup-content {
   width:100% !important;
   margin:0;
   font-family:PTSansNarrow;
@@ -41,15 +41,12 @@
 
   }
 
-  .popup-choices {
+  table.gazetteer-records {
+    table-layout:fixed;
     padding:0;
-
-    table {
-      padding:0;
-      margin:0;
-      width:100%;
-      border-collapse:collapse;
-    }
+    margin:0;
+    width:100%;
+    border-collapse:collapse;
 
     td p {
       margin:0;
@@ -81,14 +78,6 @@
       border:none;
     }
 
-    tr {
-      cursor:pointer;
-    }
-
-    tr:hover td {
-      background-color:@blueish-white-hi;
-    }
-
-  } /* .popup-choices **/
+  }
 
 }

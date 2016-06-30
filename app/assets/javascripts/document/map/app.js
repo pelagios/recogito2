@@ -4,14 +4,15 @@ require.config({
 });
 
 require([
+  'common/ui/formatting',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
-  'common/config'], function(AnnotationUtils, PlaceUtils, API, Config) {
+  'common/config'], function(Formatting, AnnotationUtils, PlaceUtils, API, Config) {
 
-  var MAX_MARKER_SIZE  = 12,
+  var MAX_MARKER_SIZE  = 11,
 
-      MIN_MARKER_SIZE = 5,
+      MIN_MARKER_SIZE = 4,
 
       FILL_COLOR = '#31a354',
 
@@ -25,18 +26,17 @@ require([
                        '<a href="http://creativecommons.org/licenses/by-nc/3.0/deed.en_US" target="_blank">CC-BY-NC 3.0</a>'
         }),
 
-        map = L.map(document.getElementById('map'), {
+        map = L.map(jQuery('.map')[0], {
           center: new L.LatLng(41.893588, 12.488022),
           zoom: 4,
           zoomControl: false,
           layers: [ awmc ]
        }),
 
-       /** Lookuptable { gazetteerUri -> [ annotation] } **/
+       /** Lookup table { gazetteerUri -> [ annotation] } **/
        annotationsByGazetteerURI = {},
 
-       /** Keeping track of min/max values, so we can scale the dots accordingly **/
-       annotationsPerPlace = { min: 9007199254740991, max : 1},
+       markerScaleFn,
 
        getAnnotationsForPlace = function(place) {
          var uris = PlaceUtils.getURIs(place),
@@ -50,24 +50,77 @@ require([
          return annotations;
        },
 
+       /** Extracts the list of distinct URIs referenced in the given annotations **/
+       getDistinctURIs = function(annotations) {
+         var distinctURIs = [];
+         jQuery.each(annotations, function(i, a) {
+           var placeBodies = AnnotationUtils.getBodiesOfType(a, 'PLACE');
+           jQuery.each(placeBodies, function(j, b) {
+             if (b.uri && distinctURIs.indexOf(b.uri) < 0)
+                 distinctURIs.push(b.uri);
+           });
+         });
+         return distinctURIs;
+       },
+
        renderPopup = function(coord, place) {
-         var annotations = getAnnotationsForPlace(place),
+         var popup = jQuery(
+               '<div class="popup">' +
+                 '<div class="popup-header">' +
+                   '<h3>Mediolanum' + '</h3>' +
+                 '</div>' +
+                 '<div><table class="gazetteer-records"></table></div>' +
+                '</div>'),
+
+             annotations = getAnnotationsForPlace(place),
+
+             gazetteerURIs = getDistinctURIs(annotations),
+
              quotes = jQuery.map(annotations, function(annotation) {
                return AnnotationUtils.getQuote(annotation);
              }).join(', ');
 
+         jQuery.each(gazetteerURIs, function(idx, uri) {
+           var record = PlaceUtils.getRecord(place, uri),
+
+               recordId = PlaceUtils.parseURI(record.uri),
+
+               element = jQuery(
+                 '<tr data-uri="' + record.uri + '">' +
+                   '<td class="record-id">' +
+                     '<span class="shortcode"></span>' +
+                     '<span class="id"></span>' +
+                   '</td>' +
+                   '<td class="place-details">' +
+                     '<h3>' + record.title + '</h3>' +
+                     '<p class="description"></p>' +
+                     '<p class="date"></p>' +
+                   '</td>' +
+                 '</tr>');
+
+           if (recordId.shortcode) {
+             element.find('.shortcode').html(recordId.shortcode);
+             element.find('.id').html(recordId.id);
+             element.find('.record-id').css('background-color', recordId.color);
+           }
+
+           if (record.descriptions.length > 0)
+             element.find('.description').html(record.descriptions[0].description);
+           else
+             element.find('.description').hide();
+
+           if (record.temporal_bounds)
+             element.find('.date').html(
+               Formatting.yyyyMMddToYear(record.temporal_bounds.from) + ' - ' +
+               Formatting.yyyyMMddToYear(record.temporal_bounds.to));
+           else
+             element.find('.date').hide();
+
+           popup.find('.gazetteer-records').append(element);
+         });
+
          if (annotations.length > 0)
-           L.popup().setLatLng(coord).setContent(quotes).openOn(map);
-       },
-
-       /** Size is a linear function, defined by pre-set MIN & MAX marker sizes **/
-       getMarkerSize = function(place) {
-         var annotationsAtPlace = getAnnotationsForPlace(place).length,
-             delta = annotationsPerPlace.max - annotationsPerPlace.min,
-             k = (MAX_MARKER_SIZE - MIN_MARKER_SIZE) / delta,
-             d = ((MIN_MARKER_SIZE * annotationsPerPlace.max) - (MAX_MARKER_SIZE * annotationsPerPlace.min)) / delta;
-
-         return k * annotationsAtPlace + d;
+           L.popup().setLatLng(coord).setContent(popup[0]).openOn(map);
        },
 
        onAnnotationsLoaded = function(annotations) {
@@ -84,26 +137,18 @@ require([
            });
          });
 
-         // Determine min/max annotations per place
-         jQuery.each(annotationsByGazetteerURI, function(uri, annotations) {
-           var count = annotations.length;
-           if (count < annotationsPerPlace.min)
-             annotationsPerPlace.min = count;
-           if (count > annotationsPerPlace.max)
-             annotationsPerPlace.max = count;
-         });
+         computeMarkerScaleFn();
 
          // After the annotations are loaded, load the places
          return API.getPlacesInDocument(Config.documentId, 0, 2000);
        },
 
        onPlacesLoaded = function(response) {
-         // TODO just a quick hack for now
          jQuery.each(response.items, function(idx, place) {
            if (place.representative_point) {
              // The epic battle between Leaflet vs. GeoJSON
              var coord = [ place.representative_point[1], place.representative_point[0] ],
-                 markerSize = getMarkerSize(place);
+                 markerSize = markerScaleFn(getAnnotationsForPlace(place).length);
 
              L.circleMarker(coord, {
                color       : STROKE_COLOR,
@@ -117,6 +162,26 @@ require([
              });
            }
          });
+       },
+
+       computeMarkerScaleFn = function() {
+         var min = 9007199254740991, max = 1,
+             k, d;
+
+         // Determine min/max annotations per place
+         jQuery.each(annotationsByGazetteerURI, function(uri, annotations) {
+           var count = annotations.length;
+           if (count < min)
+             min = count;
+           if (count > max)
+             max = count;
+         });
+
+         // Marker size y = fn(no_of_annotations) is linear fn according to y = k * x + d
+         k = (MAX_MARKER_SIZE - MIN_MARKER_SIZE) / (max - min);
+         d = ((MIN_MARKER_SIZE * max) - (MAX_MARKER_SIZE * min)) / (max - min);
+
+         markerScaleFn = function(noOfAnnotations) { return k * noOfAnnotations + d; };
        },
 
        onLoadError = function(error) {

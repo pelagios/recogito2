@@ -34,7 +34,7 @@ define([
                         '<div class="results-header"></div>' +
                         '<ul class="results-list"></ul>' +
                       '</div>' +
-                      '<div class="georesolution-map"></div>' +
+                      '<div class="map"></div>' +
                     '</div>' +
                   '</div>' +
                 '</div>' +
@@ -55,7 +55,7 @@ define([
 
           currentBody = false,
 
-          map = new Map(element.find('.georesolution-map')),
+          map = new Map(element.find('.map')),
 
           openPopup = function(marker, place) {
             var popup = jQuery(
@@ -63,7 +63,7 @@ define([
                     '<div class="popup-header">' +
                       '<h3>' + place.labels.join(', ') + '</h3>' +
                     '</div>' +
-                    '<div class="popup-choices"><table></table></div>' +
+                    '<div class="popup-choices"><table class="gazetteer-records"></table></div>' +
                   '</div>');
 
             place.is_conflation_of.reduce(function(previousShortcode, record) {

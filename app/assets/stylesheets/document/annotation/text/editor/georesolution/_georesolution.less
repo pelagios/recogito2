@@ -1,3 +1,5 @@
+@import "../../../../_map.less";
+
 .clicktrap {
   position:fixed;
   top:0;
@@ -131,12 +133,27 @@
 
   }
 
-  .georesolution-map {
+  .map {
     position:absolute;
     top:0;
     right:0;
     bottom:0;
     left:326px;
-  }
+
+    .popup-choices {
+      padding:0;
+
+      tr {
+        cursor:pointer;
+      }
+
+      tr:hover td {
+        background-color:@blueish-white-hi;
+      }
+
+    } /* .popup-choices **/
+
+
+  } /** .map **/
 
 } /** .georesolution-body **/
