@@ -11,7 +11,11 @@ require([
 
   var MAX_MARKER_SIZE  = 12,
 
-      MIN_MARKER_SIZE = 5;
+      MIN_MARKER_SIZE = 5,
+
+      FILL_COLOR = '#31a354',
+
+      STROKE_COLOR = '#006d2c';
 
   jQuery(document).ready(function() {
     var awmc = L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
@@ -101,9 +105,14 @@ require([
              var coord = [ place.representative_point[1], place.representative_point[0] ],
                  markerSize = getMarkerSize(place);
 
-             console.log(markerSize);
-
-             L.circleMarker(coord).setRadius(markerSize).addTo(map).on('click', function() {
+             L.circleMarker(coord, {
+               color       : STROKE_COLOR,
+               fillColor   : FILL_COLOR,
+               opacity     : 1,
+               fillOpacity : 1,
+               weight      : 1.5,
+               radius: markerSize
+             }).addTo(map).on('click', function() {
                renderPopup(coord, place);
              });
            }
