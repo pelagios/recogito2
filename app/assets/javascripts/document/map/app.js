@@ -87,6 +87,7 @@ require([
                  '<div class="popup-header">' +
                    '<h3>' + distinctQuotes.join(', ') + '</h3>' +
                  '</div>' +
+                 '<div class="snippet"></div>' +
                  '<div><table class="gazetteer-records"></table></div>' +
                 '</div>'),
 
@@ -131,6 +132,12 @@ require([
            popup.find('.gazetteer-records').append(element);
          });
 
+         // TODO clean all of this up and implement annotation switching
+         API.getAnnotation(annotations[0].annotation_id, true)
+            .done(function(annotation) {
+              console.log(annotation);
+            });
+
          if (annotations.length > 0)
            L.popup().setLatLng(coord).setContent(popup[0]).openOn(map);
        },
@@ -152,7 +159,7 @@ require([
          computeMarkerScaleFn();
 
          // After the annotations are loaded, load the places
-         return API.getPlacesInDocument(Config.documentId, 0, 2000);
+         return API.listPlacesInDocument(Config.documentId, 0, 2000);
        },
 
        onPlacesLoaded = function(response) {
@@ -200,7 +207,7 @@ require([
          // TODO implement
        };
 
-    API.getAnnotationsForDocument(Config.documentId)
+    API.listAnnotationsInDocument(Config.documentId)
        .then(onAnnotationsLoaded)
        .done(onPlacesLoaded)
        .fail(onLoadError);

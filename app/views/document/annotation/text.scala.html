@@ -174,7 +174,7 @@
     <pre id="content">@content</pre>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.api.routes.javascript.AnnotationAPIController.getAnnotationsForPart,
+      controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
       controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
       controllers.api.routes.javascript.AnnotationAPIController.deleteAnnotation,
       controllers.api.routes.javascript.PlaceAPIController.findPlaceByURI,

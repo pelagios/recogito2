@@ -4,12 +4,17 @@ define([], function() {
 
     /** Annotation API **/
 
-    getAnnotationsForDocument : function(docId) {
-      return jsRoutes.controllers.api.AnnotationAPIController.getAnnotationsForDocument(docId).ajax();
+    getAnnotation : function(uuid, opt_include_context) {
+      var context = (opt_include_context) ? opt_include_context : false;
+      return jsRoutes.controllers.api.AnnotationAPIController.getAnnotation(uuid, context).ajax();
     },
 
-    getAnnotationsForPart : function(docId, partNo) {
-      return jsRoutes.controllers.api.AnnotationAPIController.getAnnotationsForPart(docId, partNo).ajax();
+    listAnnotationsInDocument : function(docId) {
+      return jsRoutes.controllers.api.AnnotationAPIController.listAnnotationsInDocument(docId).ajax();
+    },
+
+    listAnnotationsInPart : function(docId, partNo) {
+      return jsRoutes.controllers.api.AnnotationAPIController.listAnnotationsInPart(docId, partNo).ajax();
     },
 
     storeAnnotation : function(annotation) {
@@ -30,7 +35,7 @@ define([], function() {
       return jsRoutes.controllers.api.PlaceAPIController.findPlaceByURI(uri).ajax();
     },
 
-    getPlacesInDocument : function(docId, offset, size) {
+    listPlacesInDocument : function(docId, offset, size) {
       var o = (offset) ? offset : 0,
           s = (size) ? size : 20;
 

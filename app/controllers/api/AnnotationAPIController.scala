@@ -1,6 +1,6 @@
 package controllers.api
 
-import controllers.{ HasAnnotationValidation, HasCache, HasDatabase, Security }
+import controllers._
 import java.util.UUID
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
@@ -17,7 +17,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.mvc.Controller
 import scala.concurrent.Future
-import storage.DB
+import storage.{ DB, FileAccess }
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(
@@ -91,13 +91,13 @@ object AnnotationStatusStub extends HasDate {
 }
 
 class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) 
-  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security with HasAnnotationValidation {
+  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security with HasAnnotationValidation with HasPrettyPrintJSON with FileAccess {
 
-  def getAnnotationsForDocument(docId: String) = getAnnotations(docId, None)
+  def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
     
-  def getAnnotationsForPart(docId: String, partNo: Int) = getAnnotations(docId, Some(partNo))
+  def listAnnotationsInPart(docId: String, partNo: Int) = listAnnotations(docId, Some(partNo))
 
-  def getAnnotations(docId: String, partNo: Option[Int]) = AsyncStack { implicit request =>
+  private def listAnnotations(docId: String, partNo: Option[Int]) = AsyncStack { implicit request =>
     // TODO currently annotation read access is unlimited to any logged in user - do we want that?
     (docId, partNo) match {
       case (id, Some(seqNo)) =>
@@ -107,7 +107,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
             AnnotationService.findByFilepartId(filepart.getId)
               .map{ annotations =>
                 // Join in places, if requested
-                Ok(Json.toJson(annotations.map(_._1)))
+                jsonOk(Json.toJson(annotations.map(_._1)))
               }
 
           case None =>
@@ -116,7 +116,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
 
       case (id, None) =>
         // Load annotations for entire doc
-        AnnotationService.findByDocId(id).map(annotations => Ok(Json.toJson(annotations.map(_._1))))
+        AnnotationService.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
     }
   }
 
@@ -189,6 +189,54 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
       }
 
     }
+  }
+  
+  def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request => 
+    AnnotationService.findById(id).flatMap(_ match {
+      case Some((annotation, _)) => {
+        if (includeContext) {
+          // Fetch the document, so we know the owner...
+          DocumentService.findByIdWithFileparts(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).map(_ match {
+            
+            case Some((document, parts, accesslevel)) => 
+              if (accesslevel.canRead) {
+                // ...then fetch the content
+                parts.filter(_.getId == annotation.annotates.filepartId).headOption match {
+                  case Some(filepart) => readTextfile(document.getOwner, document.getId, filepart.getFilename) match {
+                    case Some(text) => {
+                      // TODO extract snippet & attach to JSON response
+                      jsonOk(Json.toJson(annotation))
+                    }
+                    
+                    case None => {
+                      Logger.warn("No text content found for filepart " + annotation.annotates.filepartId)
+                      InternalServerError
+                    }
+                  }
+                  
+                  case None => {
+                    // Annotation referenced a part ID that's not in the database
+                    Logger.warn("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
+                    InternalServerError
+                  }
+                }
+              } else {
+                // No read permission on this document
+                Forbidden  
+              }
+              
+            case None => {
+              Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
+              NotFound
+            }
+          })
+        } else {
+          Future.successful(jsonOk(Json.toJson(annotation)))
+        }
+      }
+        
+      case None => Future.successful(NotFound)
+    })
   }
   
   def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>

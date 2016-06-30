@@ -92,7 +92,7 @@ require([
     // Init
     rangy.init();
 
-    API.getAnnotationsForPart(Config.documentId, Config.partSequenceNo)
+    API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
        .done(onAnnotationsLoaded)
        .fail(onAnnotationsLoadError);
   });

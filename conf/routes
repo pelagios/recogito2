@@ -66,10 +66,11 @@ GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.Docume
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 POST    /api/annotation                              controllers.api.AnnotationAPIController.createAnnotation
+GET     /api/annotation/:id                          controllers.api.AnnotationAPIController.getAnnotation(id: java.util.UUID, context: Boolean ?= false)
 DELETE  /api/annotation/:id                          controllers.api.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
 
-GET     /api/document/:id/annotations                controllers.api.AnnotationAPIController.getAnnotationsForDocument(id: String)
-GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationAPIController.getAnnotationsForPart(id: String, part: Int)
+GET     /api/document/:id/annotations                controllers.api.AnnotationAPIController.listAnnotationsInDocument(id: String)
+GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationAPIController.listAnnotationsInPart(id: String, part: Int)
 
 GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
 GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
