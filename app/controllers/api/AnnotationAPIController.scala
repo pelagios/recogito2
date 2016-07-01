@@ -18,6 +18,7 @@ import play.api.libs.functional.syntax._
 import play.api.mvc.Controller
 import scala.concurrent.Future
 import storage.{ DB, FileAccess }
+import play.api.libs.json.JsObject
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(
@@ -91,7 +92,8 @@ object AnnotationStatusStub extends HasDate {
 }
 
 class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) 
-  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security with HasAnnotationValidation with HasPrettyPrintJSON with FileAccess {
+  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security
+                     with HasAnnotationValidation with HasPrettyPrintJSON with FileAccess with HasTextSnippets {
 
   def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
     
@@ -190,7 +192,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
 
     }
   }
-  
+    
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request => 
     AnnotationService.findById(id).flatMap(_ match {
       case Some((annotation, _)) => {
@@ -204,8 +206,8 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                 parts.filter(_.getId == annotation.annotates.filepartId).headOption match {
                   case Some(filepart) => readTextfile(document.getOwner, document.getId, filepart.getFilename) match {
                     case Some(text) => {
-                      // TODO extract snippet & attach to JSON response
-                      jsonOk(Json.toJson(annotation))
+                      val snippet = extractTextSnippet(text, annotation)
+                      jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))
                     }
                     
                     case None => {

@@ -76,6 +76,8 @@ require([
              // TODO sort distinct quotes by frequency
          var annotations = getAnnotationsForPlace(place),
 
+             currentSnippet = 0,
+
              quotes = jQuery.map(annotations, function(annotation) {
                return AnnotationUtils.getQuote(annotation);
              }),
@@ -87,11 +89,38 @@ require([
                  '<div class="popup-header">' +
                    '<h3>' + distinctQuotes.join(', ') + '</h3>' +
                  '</div>' +
-                 '<div class="snippet"></div>' +
+                 '<div class="snippet">' +
+                   '<div class="snippet-body">' +
+                     '<div class="previous icon">&#xf104;</div>' +
+                     '<div class="snippet-text"></div>' +
+                     '<div class="next icon">&#xf105;</div>' +
+                   '</div>' +
+                   '<div class="snippet-footer">' +
+                     '<span class="label"></span>' +
+                     '<a class="jump-to-text" href="#" onclick="return false;">JUMP TO TEXT</a>' +
+                   '</div>' +
+                 '</div>' +
                  '<div><table class="gazetteer-records"></table></div>' +
                 '</div>'),
 
-             gazetteerURIs = getDistinctURIs(annotations);
+             gazetteerURIs = getDistinctURIs(annotations),
+
+             renderCurrentSnippet = function() {
+               API.getAnnotation(annotations[currentSnippet].annotation_id, true)
+                  .done(function(annotation) {
+                    // TODO attach snippet to template
+                    var offset = annotation.context.char_offset,
+                        quote = AnnotationUtils.getQuote(annotation),
+                        snippet = annotation.context.snippet,
+                        formatted =
+                          snippet.substring(0, offset) + '<em>' +
+                          snippet.substring(offset, offset + quote.length) + '</em>' +
+                          snippet.substring(offset + quote.length);
+
+                    popup.find('.snippet-text').html(formatted);
+                    popup.find('.label').html('1 OF ' + annotations.length + ' ANNOTATIONS');
+                });
+             };
 
          jQuery.each(gazetteerURIs, function(idx, uri) {
            var record = PlaceUtils.getRecord(place, uri),
@@ -132,11 +161,17 @@ require([
            popup.find('.gazetteer-records').append(element);
          });
 
-         // TODO clean all of this up and implement annotation switching
-         API.getAnnotation(annotations[0].annotation_id, true)
-            .done(function(annotation) {
-              console.log(annotation);
-            });
+         renderCurrentSnippet();
+
+         popup.on('click', '.previous', function() {
+           currentSnippet = Math.max(0, currentSnippet - 1);
+           renderCurrentSnippet();
+         });
+
+         popup.on('click', '.next', function() {
+           currentSnippet = Math.min(annotations.length - 1, currentSnippet + 1);
+           renderCurrentSnippet();
+         });
 
          if (annotations.length > 0)
            L.popup().setLatLng(coord).setContent(popup[0]).openOn(map);

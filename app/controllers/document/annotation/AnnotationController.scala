@@ -40,7 +40,8 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, 
             // More than one part with this sequence number - DB integrity broken!
             throw new Exception("Invalid document part")
         } else {
-          Future.successful(Forbidden)
+          //Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm))
+          authenticationFailed(request)
         }
 
       // No document with that ID found in DB
