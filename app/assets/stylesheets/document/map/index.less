@@ -17,22 +17,30 @@
 
 }
 
+.map .leaflet-popup-content-wrapper {
+  width:450px;
+}
+
 .snippet {
   background-color:@blueish-white;
   border-top:1px solid @lightgrey-border-darker;
 
   .snippet-body {
-    padding:7px 5px 2px 5px;
+    padding:15px 0 10px 0;
     display:table;
+    table-layout:fixed;
+
+    .previous, .next {
+      display:table-cell;
+      position:relative;
+      vertical-align:middle;
+    }
 
     .icon {
-      display:table-cell;
-      vertical-align:middle;
-      width:25px;
-      text-align:center;
-      font-size:25px;
+      font-size:35px;
       color:lighten(@lightgrey-type, 10%);
       cursor:pointer;
+      margin:0 2px;
     }
 
     .icon:hover {
@@ -46,13 +54,13 @@
       font-size:16px;
       color:@standard-type;
       font-style:italic;
-      padding:0 5px;
+      padding:0 10px;
     }
 
   }
 
   .snippet-footer {
-    padding:5px 10px;
+    padding:6px 10px;
     font-size:11px;
     font-family:OpenSans;
     display:table;

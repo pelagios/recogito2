@@ -91,9 +91,9 @@ require([
                  '</div>' +
                  '<div class="snippet">' +
                    '<div class="snippet-body">' +
-                     '<div class="previous icon">&#xf104;</div>' +
+                     '<div class="previous"><span class="icon stroke7">&#xe686;</span></div>' +
                      '<div class="snippet-text"></div>' +
-                     '<div class="next icon">&#xf105;</div>' +
+                     '<div class="next"><span class="icon stroke7">&#xe684;</span></div>' +
                    '</div>' +
                    '<div class="snippet-footer">' +
                      '<span class="label"></span>' +
