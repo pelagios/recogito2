@@ -25,15 +25,23 @@ class HasTextSnippetsSpec extends Specification {
     "voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita " +
     "kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
     
-  val annotationAtStart  = createAnnotationAt(6, 11)    // 'ipsum'
-  val annotationAtCenter = createAnnotationAt(240, 246)
-  val annotationAtEnd    = createAnnotationAt(576, 590)
+  val annotationAtStart  = createAnnotationAt(6, 11, text)
+  val annotationAtCenter = createAnnotationAt(240, 246, text)
+  val annotationAtEnd    = createAnnotationAt(576, 590, text)
   
   val snippetAtStart     = new TestHasTextSnippets().extractTextSnippet(text, annotationAtStart)
   val snippetAtCenter    = new TestHasTextSnippets().extractTextSnippet(text, annotationAtCenter)
   val snippetAtEnd       = new TestHasTextSnippets().extractTextSnippet(text, annotationAtEnd)
-     
-  def createAnnotationAt(start: Int, end: Int) = Annotation(
+  
+  val evilText = // Snippets determine bounds on whitespace - what if there is none?
+    "Loremipsumdolorsitametconsetetursadipscingelitrseddiam" + 
+    "nonumyeirmodtemporinviduntutlaboreetdoloremagnaaliquyamerat"
+    
+  val annotationOnEvilText = createAnnotationAt(18, 28, evilText)
+  
+  val snippetOnEvilText = new TestHasTextSnippets().extractTextSnippet(evilText, annotationOnEvilText)
+    
+  def createAnnotationAt(start: Int, end: Int, text: String) = Annotation(
       UUID.randomUUID,
       UUID.randomUUID,
       AnnotatedObject("ivzcpqoi7qr1uo", 1, ContentType.TEXT_PLAIN),
@@ -65,5 +73,56 @@ class HasTextSnippetsSpec extends Specification {
     }
     
   }
+
+  "The snippet for the second annotation" should {
+    
+    "start with '...eos et'" in {
+      snippetAtCenter.text.startsWith("...eos et") must equalTo(true)
+    }
+    
+    "end with 'dolor sit amet...'" in {
+      snippetAtCenter.text.endsWith("dolor sit amet...") must equalTo(true)
+    }
+    
+    "have an offset of 78" in {
+      snippetAtCenter.offset must equalTo(78)
+    }
+    
+  }
+  
+  "The snippet for the third annotation" should {
+    
+    "start with 'Loremipsumdolor'" in {
+      snippetAtEnd.text.startsWith("...ea rebum") must equalTo(true)
+    }
+    
+    "end with 'dolor sit amet.'" in {
+      snippetAtEnd.text.endsWith("dolor sit amet.") must equalTo(true)
+    }
+    
+    "have an offset of 79" in {
+      snippetAtEnd.offset must equalTo(79)
+    }
+    
+  }
+
+  "The snippet for the space-less text" should {
+    
+    play.api.Logger.info(snippetOnEvilText.toString)
+    
+    "start with 'Loremipsum'" in {
+      snippetOnEvilText.text.startsWith("Loremipsum") must equalTo(true)
+    }
+    
+    "end with 'magnaaliquya...'" in {
+      snippetOnEvilText.text.endsWith("magnaaliquya...") must equalTo(true)
+    }
+    
+    "have an offset of 18" in {
+      snippetOnEvilText.offset must equalTo(18)
+    }
+    
+  }
+
   
 }

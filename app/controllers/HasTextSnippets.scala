@@ -18,21 +18,31 @@ trait HasTextSnippets {
     val quoteLength = annotation.bodies.filter(_.hasType == AnnotationBody.QUOTE).head.value.get.size
     
     val (start, prefix) =
-      if (offset - bufferSize > 0)
+      if (offset - bufferSize > 0) {
         // Snippet starts somewhere inside the text - move cursor after first whitespace
-        (text.indexOf(' ', offset - bufferSize), "...")
-      else 
+        val firstWhitespaceIdx = text.indexOf(' ', offset - bufferSize)
+        if (firstWhitespaceIdx > -1)
+          (firstWhitespaceIdx, "...")
+        else
+          (offset - bufferSize, "...")
+      } else {
         // Snippet is at the start of the text
         (0, "")
+      }
     
     val (end, suffix) =
-      if ((offset + quoteLength + bufferSize) > text.size)
+      if ((offset + quoteLength + bufferSize) > text.size) {
         // Snippet is at the end of the text
         (text.size, "")
-      else
-        // Snippet ends somewhere inside the text - move cursor before last whitespace
-        (text.lastIndexOf(' ', offset + quoteLength + bufferSize), "...")
-        
+      } else {
+        val lastWhitespaceIdx = text.lastIndexOf(' ', offset + quoteLength + bufferSize)
+        if (lastWhitespaceIdx > -1)
+          // Snippet ends somewhere inside the text - move cursor before last whitespace
+          (lastWhitespaceIdx, "...")
+        else
+          (offset + quoteLength + bufferSize, "...")
+      }
+    
     val snippet = text.substring(start, end).replace("\n", " ") // Remove newlines in snippets    
     val leadingRemovableChars = snippet.takeWhile(c => REMOVEABLE_CHARACTERS.contains(c)).size
     val trailingRemovableChars = snippet.reverse.takeWhile(c => REMOVEABLE_CHARACTERS.contains(c)).size
