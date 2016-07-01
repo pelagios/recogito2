@@ -25,14 +25,14 @@ class HasTextSnippetsSpec extends Specification {
     "voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita " +
     "kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
     
-  val annotationAtStart  = createAnnotationAt(6, 11)
+  val annotationAtStart  = createAnnotationAt(6, 11)    // 'ipsum'
   val annotationAtCenter = createAnnotationAt(240, 246)
   val annotationAtEnd    = createAnnotationAt(576, 590)
   
   val snippetAtStart     = new TestHasTextSnippets().extractTextSnippet(text, annotationAtStart)
-  val snippetAtCenter    = new TestHasTextSnippets().extractTextSnippet(text, annotationAtStart)
-  val snippetAtEnd       = new TestHasTextSnippets().extractTextSnippet(text, annotationAtStart)
-    
+  val snippetAtCenter    = new TestHasTextSnippets().extractTextSnippet(text, annotationAtCenter)
+  val snippetAtEnd       = new TestHasTextSnippets().extractTextSnippet(text, annotationAtEnd)
+     
   def createAnnotationAt(start: Int, end: Int) = Annotation(
       UUID.randomUUID,
       UUID.randomUUID,
@@ -51,8 +51,6 @@ class HasTextSnippetsSpec extends Specification {
         None)))
         
   "The snippet for the first annotation" should {
-    
-    play.api.Logger.info(snippetAtStart.text)
     
     "start with 'Lorem'" in {
       snippetAtStart.text.startsWith("Lorem") must equalTo(true)
