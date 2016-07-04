@@ -10,9 +10,6 @@ define(['document/annotation/text/editor/editorBase'], function(EditorBase) {
                   '<div class="arrow"></div>' +
                   '<div class="text-annotation-editor-inner">' +
                     '<div class="sections"></div>' +
-                    '<div class="footer">' +
-                      '<button class="btn small close">Close</button>' +
-                    '</div>' +
                   '</div>' +
                 '</div>');
 
@@ -20,8 +17,6 @@ define(['document/annotation/text/editor/editorBase'], function(EditorBase) {
           el.hide();
           return el;
         })(),
-
-        btnClose = element.find('button.close'),
 
         /** Opens the editor on an annotation **/
         viewAnnotation = function(e) {
@@ -42,9 +37,10 @@ define(['document/annotation/text/editor/editorBase'], function(EditorBase) {
     // Click on annotation span opens the editor
     jQuery(container).on('click', '.annotation', viewAnnotation);
 
-    // Editor closes on button and ESC key
-    btnClose.click(onClose);
+
+    // Editor closes on ESC key and click on background document
     self.on('escape', onClose);
+    jQuery(document).on('click', ':not(> .text-annotation-editor)', onClose);
   };
   ReadEditor.prototype = Object.create(EditorBase.prototype);
 

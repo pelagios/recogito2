@@ -10,7 +10,7 @@ define([
   'common/hasEvents'], function(SectionList, Highlighter, HasEvents) {
 
   var EditorBase = function(container, element, opt_highlighter) {
-    var self = this;
+    var self = this,
 
         /** Handles common key events **/
         onKeyDown = function(e) {
