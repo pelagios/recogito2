@@ -228,9 +228,10 @@ define([
     this.sectionList.on('submit', onOK);
     this.sectionList.on('change', onChangeGeoresolution);
 
-    // ESC key and click on background document doubles as 'Cancel'
+    // ESC key doubles as 'Cancel'
     this.on('escape', onCancel);
-    jQuery(document).on('click', ':not(> .text-annotation-editor)', onCancel);
+
+    // TODO handle click on background document -> cancel
 
     this.setAnnotationMode = setAnnotationMode;
     this.replyField = replyField;
