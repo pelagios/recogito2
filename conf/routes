@@ -22,6 +22,7 @@ GET     /logout                                      controllers.landing.LoginLo
 
 GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
 POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
+DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 
 GET     /admin/users/:username                       controllers.admin.users.UserAdminController.showDetails(username)
 GET     /admin/users                                 controllers.admin.users.UserAdminController.index

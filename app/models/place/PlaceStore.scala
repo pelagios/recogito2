@@ -4,17 +4,24 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.source.Indexable
 import models.Page
+import org.elasticsearch.search.aggregations.bucket.nested.Nested
+import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.elasticsearch.search.sort.SortOrder
 import play.api.Logger
 import play.api.libs.json.Json
+import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.language.postfixOps
 import storage.ES
+import com.sksamuel.elastic4s.SearchType
 
 trait PlaceStore {
 
   /** Returns the total number of places in the store **/
   def totalPlaces()(implicit context: ExecutionContext): Future[Long]
+  
+  /** Lists the names of stored gazetteers **/
+  def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]]
 
   /** Inserts a place
     *
@@ -45,6 +52,8 @@ trait PlaceStore {
 private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
 
   private val PLACE = "place"
+  
+  private def MAX_RETRIES = 10 // Max number of import retires in case of failure
 
   implicit object PlaceIndexable extends Indexable[Place] {
     override def json(p: Place): String = Json.stringify(Json.toJson(p))
@@ -59,6 +68,20 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     ES.client execute {
       search in ES.IDX_RECOGITO -> PLACE limit 0
     } map { _.getHits.getTotalHits }
+    
+  override def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]] =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / PLACE aggs (
+        aggregation nested("by_source_gazetteer") path "is_conflation_of" aggs (
+          aggregation terms "source_gazetteer" field "is_conflation_of.source_gazetteer" size Int.MaxValue
+        )
+      ) limit 0
+    } map { response =>
+      response.getAggregations.get("by_source_gazetteer").asInstanceOf[Nested]
+              .getAggregations.get("source_gazetteer").asInstanceOf[Terms]
+              .getBuckets.asScala
+              .map(_.getKey)    
+    }
 
   override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
     ES.client execute {
@@ -150,5 +173,66 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
       val places = response.as[(Place, Long)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, limit, places)
     }
+    
+  private def scrollByGazetteer(gazetteer: String, fn: Place => Future[Boolean])(implicit context: ExecutionContext) = {
+    
+    // Applies the fn to a seq of places, in sequence, without blocking, handling retries
+    def applySequential(places: Seq[Place], retries: Int = MAX_RETRIES): Future[Seq[Place]] =
+      places.foldLeft(Future.successful(Seq.empty[Place])) { case (future, place) =>
+        future.flatMap { failedPlaces =>
+          fn(place).map { success =>
+            if (success) failedPlaces else failedPlaces :+ place 
+          }
+        }
+      } flatMap { failed =>
+        if (failed.size > 0 && retries > 0) {
+          Logger.warn(failed.size + " gazetteer records failed to process - retrying")
+          applySequential(failed, retries - 1)
+        } else {
+          Logger.info("Successfully processed " + (places.size - failed.size) + " records")
+          if (failed.size > 0)
+            Logger.error(failed.size + " gazetteer records failed without recovery")
+          else
+            Logger.info("None failed")
+            
+          Future.successful(failed)
+        }     
+      }
+    
+    // Fetch one scroll batch, processes the results and run next batch
+    def processOneBatch(scrollId: String, cursor: Long = 0l): Future[Unit] =
+      ES.client execute { 
+        search scroll scrollId keepAlive "1m" 
+      } flatMap { response =>
+        applySequential(response.as[(Place, Long)].map(_._1)).map { _ =>
+          val processedRecords = cursor + response.getHits.getHits.size
+          if (processedRecords < response.getHits.getTotalHits)
+            processOneBatch(response.getScrollId, processedRecords) 
+        }
+      }
+    
+    // Initial search request
+    ES.client execute {
+      search in ES.IDX_RECOGITO / PLACE query
+        nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.source_gazetteer" -> gazetteer)) searchType SearchType.Scan scroll "1m"
+    } map { response =>
+      processOneBatch(response.getScrollId)
+    }
+    
+  }
+  
+  def deleteByGazetteer(gazetteer: String)(implicit context: ExecutionContext) = {
+    scrollByGazetteer(gazetteer, { place =>
+      Logger.info(place.labels.toString)
+      
+      // TODO for each place, check if there's a geotag referencing it
+      // if so, keep it (and log a warning)
+      // if not, delete the record. That means:
+      // - delete the whole place, if the record is the only one in this place
+      // - update the record if there are any other records in this place
+      
+      Future.successful(true)
+    })
+  }
 
 }

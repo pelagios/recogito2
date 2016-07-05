@@ -1,8 +1,15 @@
-@()
+@(gazetteers: Seq[String])(implicit webjars: WebJarAssets
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito Administration - Gazetteers</title>
+    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    <script>
+      jQuery.on('click', '.gazetteer-list li', function(e) {
+        var gazetteer = jQuery(e.target).closest(li).data('gazetteer');
+        console.log(gazetteer);
+      });
+    </script>
   </head>
   <body>
     <div class="side-navbar">
@@ -14,6 +21,14 @@
     </div>
 
     <div class="content">
+      <div class="gazetteer-list">
+        <ul>
+          @for(gazetteer <- gazetteers) {
+            <li data-gazetteer="@gazetteer">@gazetteer</li>
+          }
+        </ul>
+      </div>
+
       <div class="gazetteer-search">
         <form method="GET">
           <input type="text" />
@@ -27,5 +42,8 @@
         }
       </div>
     </div>
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.admin.gazetteers.routes.javascript.GazetteerAdminController.deleteGazetteer
+    )
   </body>
 </html>

@@ -15,6 +15,9 @@ class MockPlaceStore extends PlaceStore {
       mockIndex.size
     }
 
+  def listGazetteers()(implicit context: ExecutionContext) =
+    throw new UnsupportedOperationException
+  
   def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext) = 
     Future {
       mockIndex.put(place.id, place)
