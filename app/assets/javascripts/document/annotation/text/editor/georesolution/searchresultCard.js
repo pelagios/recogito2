@@ -46,7 +46,7 @@ define([
           if (descriptions.length > 0)
             descriptionEl.html(descriptions[0].description);
           else
-            descriptionsEl.hide();
+            descriptionEl.hide();
 
           if (place.temporal_bounds)
             dateEl.html(Formatting.yyyyMMddToYear(place.temporal_bounds.from) + ' - ' +
