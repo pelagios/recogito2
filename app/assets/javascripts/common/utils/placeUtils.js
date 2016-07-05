@@ -3,7 +3,8 @@ define(['../api'], function(API) {
   // TODO fetch this information from the server, so we can feed it from the DB
   var KNOWN_GAZETTEERS = [
         { shortcode: 'pleiades', url_patterns: [ 'http://pleiades.stoa.org/places/' ], color: '#1f77b4' },
-        { shortcode: 'dare', url_patterns: [ 'http://dare.ht.lu.se/places/' ], color: '#ff7f0e' }
+        { shortcode: 'dare', url_patterns: [ 'http://dare.ht.lu.se/places/' ], color: '#ff7f0e' },
+        { shortcode: 'geonames', url_patterns: ['http://sws.geonames.org/'], color: '#2ca02c' }
       ],
 
       /**
