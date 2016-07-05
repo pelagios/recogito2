@@ -90,7 +90,7 @@ define([
                   template.find('.record-id').css('border-top', '1px solid rgba(0, 0, 0, 0.05)');
               }
 
-              if (record.descriptions.length > 0)
+              if (record.descriptions && record.descriptions.length > 0)
                 template.find('.description').html(record.descriptions[0].description);
               else
                 template.find('.description').hide();
