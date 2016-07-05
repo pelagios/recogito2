@@ -68,7 +68,7 @@ trait PlaceImporter { self: PlaceStore =>
     }
   }
 
-  private def importRecord(record: GazetteerRecord)(implicit context: ExecutionContext): Future[Boolean] = {
+  def importRecord(record: GazetteerRecord)(implicit context: ExecutionContext): Future[Boolean] = {
 
     // Fetches affected places from the store and computes the new conflation
     def conflateAffectedPlaces(normalizedRecord: GazetteerRecord): Future[(Seq[(Place, Long)], Seq[Place])] = {

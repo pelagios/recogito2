@@ -4,6 +4,10 @@ import java.io.{ File, FileInputStream, InputStream }
 import java.util.zip.GZIPInputStream
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.pelagios.Scalagios
+import org.pelagios.api.PeriodOfTime
+import scala.concurrent.{ Await, ExecutionContext }
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object GazetteerUtils {
   
@@ -35,7 +39,7 @@ object GazetteerUtils {
       r.temporalBounds,
       r.closeMatches.map(normalizeURI(_)),
       r.exactMatches.map(normalizeURI(_)))
-   
+      
   /** Generates a list of name forms (without language), sorted by frequency of appearance in gazetteer records **/
   def collectLabels(records: Seq[GazetteerRecord]): Seq[String] = {
     val titlesAndNames = 
@@ -48,45 +52,56 @@ object GazetteerUtils {
       .sortBy(- _._2.size)
       .map(_._1)
   }
+  
+  private def convertPeriodOfTime(period: PeriodOfTime): TemporalBounds = {
+    val startDate = period.start
+    val endDate = period.end.getOrElse(startDate)
+    
+    TemporalBounds(
+      new DateTime(startDate).withZone(DateTimeZone.UTC), 
+      new DateTime(endDate).withZone(DateTimeZone.UTC))          
+  } 
+  
+  private def toRecord(p: org.pelagios.api.gazetteer.Place, gazetteerName: String) = 
+    GazetteerRecord(
+      GazetteerUtils.normalizeURI(p.uri),
+      Gazetteer(gazetteerName),
+      DateTime.now().withZone(DateTimeZone.UTC),
+      p.label,
+      p.category.map(category => Seq(category.toString)).getOrElse(Seq.empty[String]),
+      p.descriptions.map(l => Description(l.chars, l.lang)),
+      p.names.map(l => Name(l.chars, l.lang)),
+      p.location.map(_.geometry),
+      p.location.map(_.pointLocation),
+      p.temporalCoverage.map(convertPeriodOfTime(_)),
+      p.closeMatches.map(normalizeURI(_)),
+      p.exactMatches.map(normalizeURI(_)))   
+      
+  private def getStream(file: File, filename: String) =
+    if (filename.endsWith(".gz"))
+      new GZIPInputStream(new FileInputStream(file))
+    else
+      new FileInputStream(file)
       
   def loadRDF(file: File, filename: String): Seq[GazetteerRecord] = {
     val gazetteerName = filename.substring(0, filename.indexOf('.'))
-    val is = if (filename.endsWith(".gz"))
-        new GZIPInputStream(new FileInputStream(file))
-      else
-        new FileInputStream(file)
-        
-    loadRDF(is, filename, gazetteerName)
+    val stream = getStream(file, filename)
+    loadRDF(stream, filename, gazetteerName)
   }
     
-  def loadRDF(is: InputStream, filename: String, gazetteerName: String): Seq[GazetteerRecord] = {
-
-    import org.pelagios.api.PeriodOfTime
+  def loadRDF(is: InputStream, filename: String, gazetteerName: String): Seq[GazetteerRecord] = 
+    Scalagios.readPlaces(is, filename).map(p => toRecord(p, gazetteerName)).toSeq
     
-    // Helper to convert between Scalagios and Recogito time format
-    def convertPeriodOfTime(period: PeriodOfTime): TemporalBounds = {
-        val startDate = period.start
-        val endDate = period.end.getOrElse(startDate)
-        
-        TemporalBounds(
-          new DateTime(startDate).withZone(DateTimeZone.UTC), 
-          new DateTime(endDate).withZone(DateTimeZone.UTC))          
+  def importRDFStream(file: File, filename: String)(implicit context: ExecutionContext): Unit = {
+    val gazetteerName = filename.substring(0, filename.indexOf('.'))
+    val stream = getStream(file, filename)
+      
+    def placeHandler(p: org.pelagios.api.gazetteer.Place) = {
+      Await.result(PlaceService.importRecord(toRecord(p, gazetteerName)), 10 seconds)
     }
-        
-    Scalagios.readPlaces(is, filename).map(p =>
-      GazetteerRecord(
-        GazetteerUtils.normalizeURI(p.uri),
-        Gazetteer(gazetteerName),
-        DateTime.now().withZone(DateTimeZone.UTC),
-        p.label,
-        p.category.map(category => Seq(category.toString)).getOrElse(Seq.empty[String]),
-        p.descriptions.map(l => Description(l.chars, l.lang)),
-        p.names.map(l => Name(l.chars, l.lang)),
-        p.location.map(_.geometry),
-        p.location.map(_.pointLocation),
-        p.temporalCoverage.map(convertPeriodOfTime(_)),
-        p.closeMatches.map(normalizeURI(_)),
-        p.exactMatches.map(normalizeURI(_)))).toSeq
+    
+    play.api.Logger.info("Importing stream")   
+    Scalagios.readPlacesFromStream(stream, Scalagios.guessFormatFromFilename(filename).get, placeHandler, true)
   }
 
 }

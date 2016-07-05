@@ -1,7 +1,6 @@
 package controllers.admin.gazetteers
 
 import controllers.BaseController
-import java.io.FileInputStream
 import javax.inject.Inject
 import models.user.Roles._
 import play.api.cache.CacheApi
@@ -20,9 +19,10 @@ class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: 
     request.body.asMultipartFormData.flatMap(_.file("gazetteer-file")) match {
       case Some(formData) => {
         Future {
-          Logger.info("Importing gazetteer from " + formData.filename)
-          val places = GazetteerUtils.loadRDF(formData.ref.file, formData.filename)
-          PlaceService.importRecords(places)
+          scala.concurrent.blocking {
+            Logger.info("Importing gazetteer from " + formData.filename)
+            GazetteerUtils.importRDFStream(formData.ref.file, formData.filename)
+          }
         }
         Ok(views.html.admin.gazetteers.index())
       }
