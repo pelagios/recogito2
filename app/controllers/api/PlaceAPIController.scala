@@ -1,6 +1,6 @@
 package controllers.api
 
-import controllers.{ BaseController, HasPrettyPrintJSON }
+import controllers.{ BaseAuthController, HasPrettyPrintJSON }
 import javax.inject.Inject
 import models.user.Roles._
 import models.place.PlaceService
@@ -9,7 +9,8 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import scala.concurrent.ExecutionContext
 import storage.DB
-class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController with HasPrettyPrintJSON {
+
+class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseAuthController with HasPrettyPrintJSON {
     
   /** This method is open to all, so it works with public documents **/
   def findPlaceByURI(uri: String) = Action.async { implicit request =>

@@ -2,7 +2,7 @@ package controllers.my.upload
 
 import akka.actor.ActorSystem
 import controllers.WebJarAssets
-import controllers.BaseController
+import controllers.BaseAuthController
 import controllers.my.upload.ProcessingTaskMessages._
 import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
@@ -32,7 +32,7 @@ case class UploadSuccess(contentType: String)
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)
 
-class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem, webjars: WebJarAssets) extends BaseController {
+class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem, webjars: WebJarAssets) extends BaseAuthController {
 
   private val FILE_ARG = "file"
 

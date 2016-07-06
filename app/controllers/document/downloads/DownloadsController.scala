@@ -1,12 +1,12 @@
 package controllers.document.downloads
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import javax.inject.Inject
 import models.user.Roles._
 import play.api.cache.CacheApi
 import storage.DB
 
-class DownloadsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
+class DownloadsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController {
 
   /** TODO this view should be available without login, if the document is set to public **/
   def showDownloadOptions(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>

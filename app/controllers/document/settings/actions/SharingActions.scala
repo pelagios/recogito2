@@ -1,6 +1,6 @@
 package controllers.document.settings.actions
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import controllers.document.settings.HasAdminAction
 import models.document.{ DocumentAccessLevel, DocumentService }
 import models.generated.tables.records.SharingPolicyRecord
@@ -30,7 +30,7 @@ object CollaboratorStub {
   
 }
 
-trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: BaseController =>
+trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: BaseAuthController =>
     
   def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { document =>

@@ -1,7 +1,7 @@
 package controllers.admin.gazetteers
 
 import controllers.WebJarAssets
-import controllers.BaseController
+import controllers.BaseAuthController
 import javax.inject.Inject
 import models.user.Roles._
 import play.api.cache.CacheApi
@@ -12,7 +12,7 @@ import models.place.{ GazetteerUtils, PlaceService }
 import controllers.HasPrettyPrintJSON
 import play.api.libs.json.Json
 
-class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext, webjars: WebJarAssets) extends BaseController {
+class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext, webjars: WebJarAssets) extends BaseAuthController {
   
   def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     PlaceService.listGazetteers().map { gazetteers => 

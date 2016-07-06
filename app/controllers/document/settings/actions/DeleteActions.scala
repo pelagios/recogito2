@@ -1,6 +1,6 @@
 package controllers.document.settings.actions
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import controllers.document.settings.HasAdminAction
 import models.annotation.AnnotationService
 import models.document.{ DocumentService, DocumentAccessLevel }
@@ -8,7 +8,7 @@ import models.user.Roles._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 
-trait DeleteActions extends HasAdminAction { self: BaseController =>
+trait DeleteActions extends HasAdminAction { self: BaseAuthController =>
   
   def deleteDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     DocumentService.findById(docId, Some(loggedIn.user.getUsername))(self.db).flatMap(_ match {

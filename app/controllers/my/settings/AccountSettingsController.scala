@@ -1,6 +1,6 @@
 package controllers.my.settings
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import javax.inject.Inject
 import models.user.Roles._
 import models.user.UserService
@@ -15,7 +15,7 @@ import storage.DB
 
 case class AccountSettingsData(email: String, name: Option[String], bio: Option[String], website: Option[String])
 
-class AccountSettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
+class AccountSettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController {
   
   val accountSettingsForm = Form(
     mapping(

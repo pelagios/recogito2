@@ -1,14 +1,8 @@
 package controllers
 
-import jp.t2v.lab.play2.auth.AuthElement
-import models.document.DocumentService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.cache.CacheApi
-import play.api.mvc.{ Request, Result, Controller, AnyContent }
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.Future
+import play.api.mvc.{ AnyContent, Controller, Request }
 import storage.DB
-import models.document.DocumentAccessLevel
 
 /** Helper trait so we can hand the injected DB into other traits **/
 trait HasDatabase { def db: DB }
@@ -16,8 +10,8 @@ trait HasDatabase { def db: DB }
 /** Helper trait so we can hand the injected Cache into other traits **/
 trait HasCache { def cache: CacheApi }
 
-/** Currently (mostly) a placeholder for future common Controller functionality **/
-abstract class BaseController extends Controller with HasCache with HasDatabase with AuthElement with Security {
+/** Common Controller functionality for convenience **/
+abstract class BaseController extends Controller {
 
   /** Returns the value of the specified query string parameter **/
   protected def getQueryParam(key: String)(implicit request: Request[AnyContent]): Option[String] =
@@ -40,48 +34,5 @@ abstract class BaseController extends Controller with HasCache with HasDatabase 
   /** Convenience function that checks if the specified (query string or form) param has the specified value **/
   protected def checkParamValue(key: String, value: String)(implicit request: Request[AnyContent]): Boolean =
     getParam(key).equals(Some(value))
-
-  /** Helper that covers the boilerplate for all document views
-    *
-    * Just hand this method a function that produces an HTTP OK result for a document, while
-    * the method handles Forbidden/Not Found error cases.
-    */
-  protected def renderDocumentResponse(docId: String, username: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Result)(implicit cache: CacheApi, db: DB) = {
-
-    DocumentService.findByIdWithFileparts(docId, Some(username)).map(_ match {
-      case Some((document, fileparts, accesslevel)) => {
-        if (accesslevel.canRead)
-          // As long as there are read rights we'll allow access here - the response
-          // method must handle more fine-grained access by itself
-          response(document, fileparts, accesslevel)
-        else
-          Forbidden
-      }
-
-      case None =>
-        // No document with that ID found in DB
-        NotFound
-    }).recover { case t =>
-      t.printStackTrace()
-      InternalServerError(t.getMessage)
-    }
-  }
-
-  /** Helper that covers the boilerplate for all document part views **/
-  protected def renderDocumentPartResponse(docId: String, partNo: Int, username: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Result)(implicit cache: CacheApi, db: DB) = {
-
-    renderDocumentResponse(docId, username, { case (document, fileparts, accesslevel) =>
-      val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
-      if (selectedPart.isEmpty)
-        NotFound
-      else if (selectedPart.size == 1)
-        response(document, fileparts, selectedPart.head, accesslevel)
-      else
-        // More than one part with this sequence number - DB integrity broken!
-        throw new Exception("Invalid document part")
-    })
-  }
 
 }

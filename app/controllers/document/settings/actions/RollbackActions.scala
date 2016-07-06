@@ -1,6 +1,6 @@
 package controllers.document.settings.actions
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import controllers.document.settings.HasAdminAction
 import java.util.UUID
 import models.annotation.AnnotationService
@@ -23,7 +23,7 @@ object RollbackData {
 
 }
 
-trait RollbackActions extends HasAdminAction { self: BaseController =>
+trait RollbackActions extends HasAdminAction { self: BaseAuthController =>
   
   def rollbackByTime(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
  

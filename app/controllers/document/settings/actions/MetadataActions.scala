@@ -1,6 +1,6 @@
 package controllers.document.settings.actions
   
-import controllers.BaseController
+import controllers.BaseAuthController
 import controllers.document.settings.HasAdminAction
 import models.document.{ DocumentService, PartOrdering }
 import models.user.Roles._
@@ -9,7 +9,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-trait MetadataActions extends HasAdminAction { self: BaseController =>
+trait MetadataActions extends HasAdminAction { self: BaseAuthController =>
   
   implicit val orderingReads: Reads[PartOrdering] = (
     (JsPath \ "id").read[Int] and

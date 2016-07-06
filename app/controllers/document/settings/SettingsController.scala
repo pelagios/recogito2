@@ -1,7 +1,6 @@
 package controllers.document.settings
 
-import controllers.WebJarAssets
-import controllers.BaseController
+import controllers.{ BaseAuthController, WebJarAssets }
 import controllers.document.settings.actions._
 import javax.inject.Inject
 import models.document.DocumentService
@@ -15,7 +14,7 @@ import storage.DB
 import play.api.libs.json.{ Json, JsSuccess, JsError, Reads }
 
 /** Holds the boilerplate needed to verify user access level is OWNER or ADMIN **/
-trait HasAdminAction { self: BaseController =>
+trait HasAdminAction { self: BaseAuthController =>
   
   import models.document.DocumentAccessLevel._
   
@@ -47,7 +46,7 @@ trait HasAdminAction { self: BaseController =>
 }
 
 class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets)
-  extends BaseController
+  extends BaseAuthController
     with DeleteActions
     with HasAdminAction
     with MetadataActions 

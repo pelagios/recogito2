@@ -1,6 +1,6 @@
 package controllers.document.downloads.writers
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import javax.inject.Inject
 import models.annotation.{ Annotation, AnnotationService }
 import models.user.Roles._
@@ -16,7 +16,7 @@ import akka.stream.scaladsl.Source
 import play.api.libs.streams.Streams
 import akka.util.ByteString
 
-class JSONLinesWriterController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
+class JSONLinesWriterController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController {
   
   private val NEWLINE = "\n"
   

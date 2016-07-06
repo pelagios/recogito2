@@ -1,6 +1,6 @@
 package controllers.api
 
-import controllers.{ BaseController, HasPrettyPrintJSON }
+import controllers.{ BaseAuthController, HasPrettyPrintJSON }
 import javax.inject.Inject
 import models.user.Roles._
 import play.api.cache.CacheApi
@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 import storage.DB
 import models.contribution.ContributionService
 
-class ContributionAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseController with HasPrettyPrintJSON {
+class ContributionAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseAuthController with HasPrettyPrintJSON {
   
   def getContributionHistory(documentId: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     ContributionService.getHistory(documentId, offset, size).map(contributions => jsonOk(Json.toJson(contributions)))

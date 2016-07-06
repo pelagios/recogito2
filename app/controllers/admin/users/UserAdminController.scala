@@ -1,6 +1,6 @@
 package controllers.admin.users
 
-import controllers.{ BaseController, WebJarAssets }
+import controllers.{ BaseAuthController, WebJarAssets }
 import javax.inject.Inject
 import models.document.DocumentService
 import models.user.Roles._
@@ -9,7 +9,7 @@ import play.api.cache.CacheApi
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.DB
 
-class UserAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext, webjars: WebJarAssets) extends BaseController {
+class UserAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext, webjars: WebJarAssets) extends BaseAuthController {
   
   def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     UserService.listUsers().map(users => 

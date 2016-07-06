@@ -1,13 +1,13 @@
 package controllers.document
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import java.io.File
 import javax.inject.Inject
 import models.user.Roles._
 import play.api.cache.CacheApi
 import storage.{ DB, FileAccess }
 
-class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with FileAccess {
+class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController with FileAccess {
     
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     renderDocumentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>

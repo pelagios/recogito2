@@ -1,24 +1,19 @@
 package controllers.document.annotation
 
-import controllers.WebJarAssets
-import controllers.{ HasCache, HasDatabase, Security }
+import controllers.{ BaseOptAuthController, WebJarAssets }
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.ContentType
-import models.document.{ DocumentAccessLevel, DocumentService }
+import models.annotation.AnnotationService
+import models.document.DocumentAccessLevel
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.Logger
 import play.api.cache.CacheApi
-import play.api.mvc.{ Controller, RequestHeader }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.Logger
+import play.api.mvc.RequestHeader
 import scala.concurrent.Future
 import storage.{ DB, FileAccess }
 
-
-import models.annotation.AnnotationService
-
-class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) 
-  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security with FileAccess {
+class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) extends BaseOptAuthController with FileAccess {
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: String) = StackAction { implicit request =>
@@ -26,26 +21,12 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, 
   }
 
   def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack { implicit request =>
-    val username = loggedIn.map(_.user.getUsername)
-    DocumentService.findByIdWithFileparts(documentId, username).flatMap(_ match {
-
-      case Some((document, fileparts, accesslevel)) =>
-        if (accesslevel.canRead) {
-          val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
-          if (selectedPart.size == 1)
-            renderResponse(username, document, fileparts, selectedPart.head, accesslevel)
-          else if (selectedPart.isEmpty)
-            Future.successful(NotFound)
-          else
-            // More than one part with this sequence number - DB integrity broken!
-            throw new Exception("Invalid document part")
-        } else {
-          //Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm))
-          authenticationFailed(request)
-        }
-
-      // No document with that ID found in DB
-      case None => Future.successful(NotFound)
+    val maybeUser = loggedIn.map(_.user.getUsername)
+    renderDocumentPartResponse(documentId, partNo, maybeUser, { case (document, fileparts, selectedPart, accesslevel) =>
+      if (accesslevel.canRead)
+        renderResponse(maybeUser, document, fileparts, selectedPart, accesslevel)
+      else
+        authenticationFailed(request)        
     })
   }
 
@@ -76,5 +57,5 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, 
         // Unknown content type in DB, or content type we don't have an annotation view for - should never happen
         Future.successful(InternalServerError)
     }
-
+  
 }

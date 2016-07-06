@@ -1,6 +1,6 @@
 package controllers.my.settings
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import javax.inject.Inject
 import models.user.UserService
 import models.user.Roles._
@@ -16,7 +16,7 @@ import storage.DB
 
 case class PasswordSettingsData(currentPassword: String, newPassword: String, verifyPassword: String)
 
-class PasswordSettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController {
+class PasswordSettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController {
 
   private val matchingPasswords: Constraint[PasswordSettingsData] = Constraint("constraints.valid"){ d =>
     if (d.newPassword == d.verifyPassword) Valid else Invalid("Passwords must match")    

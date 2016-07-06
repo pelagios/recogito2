@@ -1,4 +1,4 @@
-@(gazetteers: Seq[String])(implicit webjars: WebJarAssets
+@(gazetteers: Seq[String])(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
@@ -6,7 +6,7 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
     <script>
       jQuery.on('click', '.gazetteer-list li', function(e) {
-        var gazetteer = jQuery(e.target).closest(li).data('gazetteer');
+        var gazetteer = jQuery(e.target).closest('li').data('gazetteer');
         console.log(gazetteer);
       });
     </script>

@@ -1,6 +1,6 @@
 package controllers.landing
 
-import controllers.BaseController
+import controllers.BaseAuthController
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
 import models.user.UserService
@@ -21,7 +21,7 @@ import storage.DB
 
 case class SignupData(username: String, email: String, password: String)
 
-class SignupController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseController with Login {
+class SignupController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController with Login {
 
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
 
