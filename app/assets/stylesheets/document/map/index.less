@@ -4,12 +4,18 @@
 @import "../_map.less";
 @import "../_placedetails.less";
 
-.map {
+
+.map-container {
   position:absolute;
   top:71px;
   right:0;
   bottom:0;
   left:200px;
+}
+
+.map {
+  width:100%;
+  height:100%;
 
   td {
     border-color:@lightgrey-border-darker !important;
@@ -19,6 +25,30 @@
 
 .map .leaflet-popup-content-wrapper {
   width:450px;
+}
+
+.map-controls {
+  position:absolute;
+  top:20px;
+  right:20px;
+
+  .control {
+    margin-bottom:6px;
+    text-align:center;
+    background-color:#fff;
+    width:34px;
+    height:34px;
+    line-height:35px;
+    font-size:21px;
+    color:@lightblue-type;
+    cursor:pointer;
+    .rounded-corners(2px);
+  }
+
+  .control:hover {
+    background-color:lighten(@lightgrey-border, 7%);
+  }
+
 }
 
 .snippet {
