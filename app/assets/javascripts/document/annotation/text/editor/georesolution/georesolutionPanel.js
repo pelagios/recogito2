@@ -4,7 +4,7 @@ define([
   'common/utils/placeUtils',
   'common/api',
   'common/hasEvents',
-  'common/map',], function(ResultCard, Formatting, PlaceUtils, API, HasEvents, Map) {
+  'common/map'], function(ResultCard, Formatting, PlaceUtils, API, HasEvents, Map) {
 
   var GeoresolutionPanel = function() {
 
@@ -13,9 +13,9 @@ define([
         element = (function() {
             var el = jQuery(
               '<div class="clicktrap">' +
-                '<div class="georesolution-wrapper">' +
-                  '<div class="georesolution-panel">' +
-                    '<div class="georesolution-header">' +
+                '<div class="modal-wrapper">' +
+                  '<div class="modal georesolution-panel">' +
+                    '<div class="modal-header">' +
                       '<div class="georesolution-search">' +
                         '<input class="search inline" type="text" placeholder="Search for a Place..." />' +
                         '<button class="search icon">&#xf002;</button>' +
@@ -29,7 +29,7 @@ define([
                       '</div>' +
                       '<button class="nostyle outline-icon cancel">&#xe897;</button>' +
                     '</div>' +
-                    '<div class="georesolution-body">' +
+                    '<div class="modal-body">' +
                       '<div class="georesolution-sidebar">' +
                         '<div class="results-header"></div>' +
                         '<ul class="results-list"></ul>' +

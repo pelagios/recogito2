@@ -8,7 +8,8 @@ require([
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
-  'common/config'], function(Formatting, AnnotationUtils, PlaceUtils, API, Config) {
+  'common/config',
+  'document/map/layerswitcher'], function(Formatting, AnnotationUtils, PlaceUtils, API, Config, LayerSwitcher) {
 
   var MAX_MARKER_SIZE  = 11,
 
@@ -32,6 +33,10 @@ require([
           zoomControl: false,
           layers: [ awmc ]
        }),
+
+       layerSwitcher = new LayerSwitcher(),
+
+       btnLayers = jQuery('.layers'),
 
        /** Lookup table { gazetteerUri -> [ annotation] } **/
        annotationsByGazetteerURI = {},
@@ -241,6 +246,8 @@ require([
        onLoadError = function(error) {
          // TODO implement
        };
+
+    btnLayers.click(function() { layerSwitcher.open(); });
 
     API.listAnnotationsInDocument(Config.documentId)
        .then(onAnnotationsLoaded)
