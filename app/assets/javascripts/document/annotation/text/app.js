@@ -27,6 +27,14 @@ require([
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
+        initPagePrefs = function() {
+          var storedColorscheme = localStorage.getItem('r2.document.edit.colorscheme'),
+              colorscheme = (storedColorscheme) ? storedColorscheme : 'BY_STATUS';
+
+          setColorscheme(colorscheme);
+          toolbar.setCurrentColorscheme(colorscheme);
+        },
+
         onAnnotationsLoaded = function(annotations) {
           var highlighter = new Highlighter(contentNode),
               sorted = AnnotationUtils.sortByOffsetDesc(annotations);
@@ -71,19 +79,24 @@ require([
              });
         },
 
-        onColorModeChanged = function(mode) {
+        setColorscheme = function(mode) {
           var currentCSSPath = colorschemeStylesheet.attr('href'),
               basePath = currentCSSPath.substr(0, currentCSSPath.lastIndexOf('/'));
 
           if (mode === 'BY_TYPE')
             colorschemeStylesheet.attr('href', basePath + '/colorByType.css');
-          else if (mode === 'BY_STATUS')
+          else
             colorschemeStylesheet.attr('href', basePath + '/colorByStatus.css');
+        },
+
+        onColorschemeChanged = function(mode) {
+          setColorscheme(mode);
+          localStorage.setItem('r2.document.edit.colorscheme', mode);
         };
 
     // Toolbar events
     toolbar.on('annotationModeChanged', editor.setAnnotationMode);
-    toolbar.on('colorModeChange', onColorModeChanged);
+    toolbar.on('colorschemeChanged', onColorschemeChanged);
 
     // Editor events
     editor.on('updateAnnotation', onUpdateAnnotation);
@@ -91,6 +104,9 @@ require([
 
     // Init
     rangy.init();
+
+    // Init page preferences - e.g. color mode
+    initPagePrefs();
 
     API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
        .done(onAnnotationsLoaded)

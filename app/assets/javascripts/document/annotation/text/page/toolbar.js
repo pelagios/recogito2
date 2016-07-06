@@ -62,7 +62,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             if (!active) {
               colorSchemes.find('.active').removeClass('active');
               t.addClass('active');
-              self.fireEvent('colorModeChange', scheme);
+              self.fireEvent('colorschemeChanged', scheme);
             }
           });
         },
@@ -85,15 +85,21 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           }
         },
 
-        getCurrentMode = function() {
+        getCurrentAnnotationMode = function() {
           return currentMode;
+        },
+
+        setCurrentColorscheme = function(mode) {
+          colorSchemes.find('li.active').removeClass('active');
+          jQuery('[data-scheme="' + mode + '"]').addClass('active');
         };
 
     initQuickModeMenu();
     makeToolbarSticky();
     attachButtonHandlers();
 
-    this.getCurrentMode = getCurrentMode;
+    this.setCurrentColorscheme = setCurrentColorscheme;
+    this.getCurrentAnnotationMode = getCurrentAnnotationMode;
 
     HasEvents.apply(this);
   };
