@@ -1,17 +1,24 @@
 package controllers.document.map
 
-import controllers.{ BaseAuthController, WebJarAssets }
+import controllers.{ BaseOptAuthController, WebJarAssets }
 import javax.inject.Inject
 import models.user.Roles._
 import play.api.cache.CacheApi
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.Future
 import storage.DB
 
-class MapController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) extends BaseAuthController {
+class MapController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) extends BaseOptAuthController {
 
   /** TODO this view should be available without login, if the document is set to public **/
-  def showMap(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderDocumentResponse(documentId, loggedIn.user.getUsername,
-        { case (document, fileparts, accesslevel) =>  Ok(views.html.document.map.index(Some(loggedIn.user.getUsername), document, accesslevel)) })
+  def showMap(documentId: String) = AsyncStack { implicit request =>
+    val maybeUser = loggedIn.map(_.user.getUsername)
+    documentResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
+      if (accesslevel.canRead)
+        Future.successful(Ok(views.html.document.map.index(maybeUser, document, accesslevel)))
+      else
+        authenticationFailed(request)  
+    })
   }
 
 }

@@ -10,7 +10,7 @@ import storage.{ DB, FileAccess }
 class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController with FileAccess {
     
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderDocumentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
+    documentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
       // ownerDataDir must exist, unless DB integrity is broken - renderDocumentResponse will handle the exception if .get fails
       val documentDir = getDocumentDir(document.getOwner, document.getId).get
       
@@ -27,7 +27,7 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
   }
   
   def getThumbnail(docId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    renderDocumentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
+    documentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
       openThumbnail(loggedIn.user.getUsername, docId, filepart.getFilename) match {
         case Some(file) => Ok.sendFile(file)
         case None => NotFound

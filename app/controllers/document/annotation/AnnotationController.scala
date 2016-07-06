@@ -22,7 +22,7 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, 
 
   def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user.getUsername)
-    renderDocumentPartResponse(documentId, partNo, maybeUser, { case (document, fileparts, selectedPart, accesslevel) =>
+    documentPartResponse(documentId, partNo, maybeUser, { case (document, fileparts, selectedPart, accesslevel) =>
       if (accesslevel.canRead)
         renderResponse(maybeUser, document, fileparts, selectedPart, accesslevel)
       else

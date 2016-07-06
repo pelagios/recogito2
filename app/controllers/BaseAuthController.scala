@@ -15,7 +15,7 @@ abstract class BaseAuthController extends BaseController with HasCache with HasD
     * Just hand this method a function that produces an HTTP OK result for a document, while
     * the method handles Forbidden/Not Found error cases.
     */
-  protected def renderDocumentResponse(docId: String, username: String,
+  protected def documentResponse(docId: String, username: String,
       response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Result)(implicit cache: CacheApi, db: DB) = {
 
     DocumentService.findByIdWithFileparts(docId, Some(username)).map(_ match {
@@ -38,10 +38,10 @@ abstract class BaseAuthController extends BaseController with HasCache with HasD
   }
 
   /** Helper that covers the boilerplate for all document part views **/
-  protected def renderDocumentPartResponse(docId: String, partNo: Int, username: String,
+  protected def documentPartResponse(docId: String, partNo: Int, username: String,
       response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Result)(implicit cache: CacheApi, db: DB) = {
 
-    renderDocumentResponse(docId, username, { case (document, fileparts, accesslevel) =>
+    documentResponse(docId, username, { case (document, fileparts, accesslevel) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
       if (selectedPart.isEmpty)
         NotFound
