@@ -36,7 +36,7 @@ define([
 
         currentSnippetIdx = 0,
 
-        scrolling = false,
+        fetchingSnippet = false,
 
         quotes = jQuery.map(annotations, function(annotation) {
           return AnnotationUtils.getQuote(annotation);
@@ -72,6 +72,7 @@ define([
           if (!slideDirection) {
             // No slide - just replace
             currentCard.html(snippet);
+            fetchingSnippet = false;
           } else {
             scrolling = true;
             newCard = jQuery('<div class="card">' + snippet + '</snippet>');
@@ -90,7 +91,7 @@ define([
 
             currentCard.animate({ left: moveCurrentTo }, SLIDE_DURATION, 'linear', function() {
               currentCard.remove();
-              scrolling = false;
+              fetchingSnippet = false;
             });
           }
         },
@@ -116,20 +117,18 @@ define([
         },
 
         onNextSnippet = function() {
-          if (!scrolling) {
-            if (currentSnippetIdx < annotations.length - 1) {
-              currentSnippetIdx += 1;
-              fetchSnippet().done(function(snippet) { showCard(snippet, 'NEXT'); });
-            }
+          if (!fetchingSnippet) {
+            fetchingSnippet = true;
+            currentSnippetIdx = (currentSnippetIdx + 1) % annotations.length;
+            fetchSnippet().done(function(snippet) { showCard(snippet, 'NEXT'); });
           }
         },
 
         onPreviousSnippet = function() {
-          if (!scrolling) {
-            if (currentSnippetIdx > 0) {
-              currentSnippetIdx -= 1;
-              fetchSnippet().done(function(snippet) { showCard(snippet, 'PREV'); });
-            }
+          if (!fetchingSnippet) {
+            fetchingSnippet = true;
+            currentSnippetIdx = (annotations.length + currentSnippetIdx - 1) % annotations.length;
+            fetchSnippet().done(function(snippet) { showCard(snippet, 'PREV'); });
           }
         },
 
@@ -179,8 +178,8 @@ define([
             btnPrev.click(onPreviousSnippet);
             btnNext.click(onNextSnippet);
           } else {
-            btnPrev.hide();
             btnNext.hide();
+            btnPrev.hide();
           }
         },
 
