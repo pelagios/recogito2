@@ -9,7 +9,8 @@ require([
   'common/utils/placeUtils',
   'common/api',
   'common/config',
-  'document/map/layerswitcher'], function(Formatting, AnnotationUtils, PlaceUtils, API, Config, LayerSwitcher) {
+  'document/map/layerswitcher',
+  'document/map/mapPopup'], function(Formatting, AnnotationUtils, PlaceUtils, API, Config, LayerSwitcher, MapPopup) {
 
   var MAX_MARKER_SIZE  = 11,
 
@@ -68,15 +69,6 @@ require([
 
        markerScaleFn,
 
-       distinct = function(arr) {
-         var distinct = [];
-         jQuery.each(arr, function(idx, elem) {
-           if (distinct.indexOf(elem) < 0)
-             distinct.push(elem);
-         });
-         return distinct;
-       },
-
        getAnnotationsForPlace = function(place) {
          var uris = PlaceUtils.getURIs(place),
              annotations = [];
@@ -87,124 +79,6 @@ require([
              annotations = annotations.concat(annotationsForURI);
          });
          return annotations;
-       },
-
-       /** Extracts the list of distinct URIs referenced in the given annotations **/
-       getDistinctURIs = function(annotations) {
-         var distinctURIs = [];
-         jQuery.each(annotations, function(i, a) {
-           var placeBodies = AnnotationUtils.getBodiesOfType(a, 'PLACE');
-           jQuery.each(placeBodies, function(j, b) {
-             if (b.uri && distinctURIs.indexOf(b.uri) < 0)
-                 distinctURIs.push(b.uri);
-           });
-         });
-         return distinctURIs;
-       },
-
-       renderPopup = function(coord, place) {
-             // TODO sort distinct quotes by frequency
-         var annotations = getAnnotationsForPlace(place),
-
-             currentSnippet = 0,
-
-             quotes = jQuery.map(annotations, function(annotation) {
-               return AnnotationUtils.getQuote(annotation);
-             }),
-
-             distinctQuotes = distinct(quotes),
-
-             popup = jQuery(
-               '<div class="popup">' +
-                 '<div class="popup-header">' +
-                   '<h3>' + distinctQuotes.join(', ') + '</h3>' +
-                 '</div>' +
-                 '<div class="snippet">' +
-                   '<div class="snippet-body">' +
-                     '<div class="previous"><span class="icon stroke7">&#xe686;</span></div>' +
-                     '<div class="snippet-text"></div>' +
-                     '<div class="next"><span class="icon stroke7">&#xe684;</span></div>' +
-                   '</div>' +
-                   '<div class="snippet-footer">' +
-                     '<span class="label"></span>' +
-                     '<a class="jump-to-text" href="#" onclick="return false;">JUMP TO TEXT</a>' +
-                   '</div>' +
-                 '</div>' +
-                 '<div><table class="gazetteer-records"></table></div>' +
-                '</div>'),
-
-             gazetteerURIs = getDistinctURIs(annotations),
-
-             renderCurrentSnippet = function() {
-               API.getAnnotation(annotations[currentSnippet].annotation_id, true)
-                  .done(function(annotation) {
-                    // TODO attach snippet to template
-                    var offset = annotation.context.char_offset,
-                        quote = AnnotationUtils.getQuote(annotation),
-                        snippet = annotation.context.snippet,
-                        formatted =
-                          snippet.substring(0, offset) + '<em>' +
-                          snippet.substring(offset, offset + quote.length) + '</em>' +
-                          snippet.substring(offset + quote.length);
-
-                    popup.find('.snippet-text').html(formatted);
-                    popup.find('.label').html('1 OF ' + annotations.length + ' ANNOTATIONS');
-                });
-             };
-
-         jQuery.each(gazetteerURIs, function(idx, uri) {
-           var record = PlaceUtils.getRecord(place, uri),
-
-               recordId = PlaceUtils.parseURI(record.uri),
-
-               element = jQuery(
-                 '<tr data-uri="' + record.uri + '">' +
-                   '<td class="record-id">' +
-                     '<span class="shortcode"></span>' +
-                     '<span class="id"></span>' +
-                   '</td>' +
-                   '<td class="place-details">' +
-                     '<h3>' + record.title + '</h3>' +
-                     '<p class="description"></p>' +
-                     '<p class="date"></p>' +
-                   '</td>' +
-                 '</tr>');
-
-           if (recordId.shortcode) {
-             element.find('.shortcode').html(recordId.shortcode);
-             element.find('.id').html(recordId.id);
-             element.find('.record-id').css('background-color', recordId.color);
-           }
-
-           if (record.descriptions.length > 0)
-             element.find('.description').html(record.descriptions[0].description);
-           else
-             element.find('.description').hide();
-
-           if (record.temporal_bounds)
-             element.find('.date').html(
-               Formatting.yyyyMMddToYear(record.temporal_bounds.from) + ' - ' +
-               Formatting.yyyyMMddToYear(record.temporal_bounds.to));
-           else
-             element.find('.date').hide();
-
-           popup.find('.gazetteer-records').append(element);
-         });
-
-         renderCurrentSnippet();
-
-         popup.on('click', '.previous', function() {
-           currentSnippet = Math.max(0, currentSnippet - 1);
-           renderCurrentSnippet();
-         });
-
-         popup.on('click', '.next', function() {
-           currentSnippet = Math.min(annotations.length - 1, currentSnippet + 1);
-           renderCurrentSnippet();
-         });
-
-         if (annotations.length > 0)
-           L.popup().setLatLng(coord).setContent(popup[0]).openOn(map);
        },
 
        onAnnotationsLoaded = function(annotations) {
@@ -231,9 +105,9 @@ require([
          jQuery.each(response.items, function(idx, place) {
            if (place.representative_point) {
              // The epic battle between Leaflet vs. GeoJSON
-             var coord = [ place.representative_point[1], place.representative_point[0] ],
+             var latlng = [ place.representative_point[1], place.representative_point[0] ],
                  markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
-                 marker = L.circleMarker(coord, {
+                 marker = L.circleMarker(latlng, {
                    color       : STROKE_COLOR,
                    fillColor   : FILL_COLOR,
                    opacity     : 1,
@@ -245,7 +119,8 @@ require([
              marker.place = place; // TODO Hack! Clean this up
 
              marker.on('click', function() {
-               renderPopup(coord, place);
+               var popup = new MapPopup(latlng, place, getAnnotationsForPlace(place));
+               popup.addTo(map);
              });
            }
          });
