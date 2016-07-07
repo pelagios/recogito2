@@ -164,7 +164,9 @@ h3 {
 }
 
 .tile-block {
-  border-top:1px solid @lightgrey-border;
+  border-style:solid;
+  border-color:@lightgrey-border;
+  border-width:1px 0;
   background-color:@blueish-white-hi;
 
   .tile {
@@ -190,6 +192,54 @@ h3 {
 
   p {
     color:@grey-type;
+  }
+
+}
+
+.partner-logos {
+  padding:50px 0;
+
+  a {
+    text-decoration:none;
+    display:inline-block;
+
+    img {
+      margin:0 12px;
+      @media (min-width:1025px) { margin:22px; }
+      vertical-align:middle;
+    }
+
+    img:first-child { padding-left:0; }
+    img:last-child  { padding-right:0; }
+
+  }
+
+  .ait {
+    width:200px;
+    height:65px;
+    padding-top:10px;
+  }
+
+  .lancaster {
+    width:161px;
+    height:52px;
+    padding-top:8px;
+  }
+
+  .ou {
+    width:82px;
+    height:56px;
+  }
+
+  .iec {
+    width:150px;
+    height:60px;
+  }
+
+  .mellon {
+    width:152px;
+    height:73px;
+    padding-top:4px;
   }
 
 }
