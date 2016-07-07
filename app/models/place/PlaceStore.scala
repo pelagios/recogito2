@@ -19,7 +19,7 @@ trait PlaceStore {
 
   /** Returns the total number of places in the store **/
   def totalPlaces()(implicit context: ExecutionContext): Future[Long]
-  
+
   /** Lists the names of stored gazetteers **/
   def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]]
 
@@ -52,7 +52,7 @@ trait PlaceStore {
 private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
 
   private val PLACE = "place"
-  
+
   private def MAX_RETRIES = 10 // Max number of import retires in case of failure
 
   implicit object PlaceIndexable extends Indexable[Place] {
@@ -68,7 +68,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     ES.client execute {
       search in ES.IDX_RECOGITO -> PLACE limit 0
     } map { _.getHits.getTotalHits }
-    
+
   override def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]] =
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE aggs (
@@ -80,7 +80,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
       response.getAggregations.get("by_source_gazetteer").asInstanceOf[Nested]
               .getAggregations.get("source_gazetteer").asInstanceOf[Terms]
               .getBuckets.asScala
-              .map(_.getKey)    
+              .map(_.getKey)
     }
 
   override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
@@ -145,7 +145,6 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
               bool {
                 should (
 
-
                   // Search inside record titles...
                   matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
                   matchPhraseQuery("is_conflation_of.title", q),
@@ -173,15 +172,15 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
       val places = response.as[(Place, Long)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, limit, places)
     }
-    
+
   private def scrollByGazetteer(gazetteer: String, fn: Place => Future[Boolean])(implicit context: ExecutionContext) = {
-    
+
     // Applies the fn to a seq of places, in sequence, without blocking, handling retries
     def applySequential(places: Seq[Place], retries: Int = MAX_RETRIES): Future[Seq[Place]] =
       places.foldLeft(Future.successful(Seq.empty[Place])) { case (future, place) =>
         future.flatMap { failedPlaces =>
           fn(place).map { success =>
-            if (success) failedPlaces else failedPlaces :+ place 
+            if (success) failedPlaces else failedPlaces :+ place
           }
         }
       } flatMap { failed =>
@@ -194,23 +193,23 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
             Logger.error(failed.size + " gazetteer records failed without recovery")
           else
             Logger.info("None failed")
-            
+
           Future.successful(failed)
-        }     
+        }
       }
-    
+
     // Fetch one scroll batch, processes the results and run next batch
     def processOneBatch(scrollId: String, cursor: Long = 0l): Future[Unit] =
-      ES.client execute { 
-        search scroll scrollId keepAlive "1m" 
+      ES.client execute {
+        search scroll scrollId keepAlive "1m"
       } flatMap { response =>
         applySequential(response.as[(Place, Long)].map(_._1)).map { _ =>
           val processedRecords = cursor + response.getHits.getHits.size
           if (processedRecords < response.getHits.getTotalHits)
-            processOneBatch(response.getScrollId, processedRecords) 
+            processOneBatch(response.getScrollId, processedRecords)
         }
       }
-    
+
     // Initial search request
     ES.client execute {
       search in ES.IDX_RECOGITO / PLACE query
@@ -218,19 +217,19 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     } map { response =>
       processOneBatch(response.getScrollId)
     }
-    
+
   }
-  
+
   def deleteByGazetteer(gazetteer: String)(implicit context: ExecutionContext) = {
     scrollByGazetteer(gazetteer, { place =>
       Logger.info(place.labels.toString)
-      
+
       // TODO for each place, check if there's a geotag referencing it
       // if so, keep it (and log a warning)
       // if not, delete the record. That means:
       // - delete the whole place, if the record is the only one in this place
       // - update the record if there are any other records in this place
-      
+
       Future.successful(true)
     })
   }
