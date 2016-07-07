@@ -56,15 +56,33 @@
   border-top:1px solid @lightgrey-border-darker;
 
   .snippet-body {
-    padding:15px 0 10px 0;
-    display:table;
-    table-layout:fixed;
+    padding:15px 0 5px 0;
+    position:relative;
+    width:450px;
 
     .previous, .next {
-      display:table-cell;
-      position:relative;
-      vertical-align:middle;
+      position:absolute;
+      top:0;
+      bottom:0;
+      width:35px;
+      background-color:fade(@blueish-white, 80%);
+      z-index:1;
+      .noselect();
+
+      .icon {
+        display:block;
+        margin:auto;
+        height:35px;
+        position:absolute;
+        top:0;
+        bottom:0;
+      }
+
     }
+
+    .previous { left:0; }
+
+    .next { right:0; }
 
     .icon {
       font-size:35px;
@@ -78,13 +96,28 @@
     }
 
     .snippet-text {
-      display:table-cell;
-      line-height:150%;
-      font-family:"Times New Roman", Times, serif;
-      font-size:16px;
-      color:@standard-type;
-      font-style:italic;
-      padding:0 10px;
+      white-space:nowrap; // Keeps cards in a single row
+      width:450px;
+      position:relative;
+      height:96px;
+      z-index:0;
+
+      .card {
+        position:absolute;
+        top:0;
+        left:0;
+        width:360px;
+        margin:0 45px;
+        display:inline-block;
+        line-height:24px;
+        font-family:"Times New Roman", Times, serif;
+        font-size:16px;
+        color:@standard-type;
+        font-style:italic;
+        white-space:normal; // Restores normal text wrapping inside cards
+        vertical-align:top;
+      }
+
     }
 
   }

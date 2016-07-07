@@ -4,6 +4,8 @@ define([
   'common/utils/annotationUtils',
   'common/utils/placeUtils'], function(API, Formatting, AnnotationUtils, PlaceUtils) {
 
+  var SLIDE_DURATION = 250;
+
   var MapPopup = function(latlng, place, annotations) {
 
     var element = jQuery(
@@ -12,21 +14,29 @@ define([
             '<div class="snippet">' +
               '<div class="snippet-body">' +
                 '<div class="previous"><span class="icon stroke7">&#xe686;</span></div>' +
-                '<div class="snippet-text"></div>' +
+                '<div class="snippet-text">' +
+                  '<div class="card"></div>' +
+                '</div>' +
                 '<div class="next"><span class="icon stroke7">&#xe684;</span></div>' +
               '</div>' +
               '<div class="snippet-footer">' +
                 '<span class="label"></span>' +
-                '<a class="jump-to-text" href="#" onclick="return false;">JUMP TO TEXT</a>' +
+                '<!-- a class="jump-to-text" href="#" onclick="return false;">JUMP TO TEXT</a -->' +
               '</div>' +
             '</div>' +
             '<div><table class="gazetteer-records"></table></div>' +
           '</div>'),
 
-        titleEl       = element.find('.popup-header h3'),
-        snippetTextEl = element.find('.snippet-text'),
+        titleEl        = element.find('.popup-header h3'),
+        snippetTextEl  = element.find('.snippet-text'),
+        snippetLabelEl = element.find('.label'),
+
+        btnPrev = element.find('.snippet-body .previous .icon'),
+        btnNext = element.find('.snippet-body .next .icon'),
 
         currentSnippetIdx = 0,
+
+        scrolling = false,
 
         quotes = jQuery.map(annotations, function(annotation) {
           return AnnotationUtils.getQuote(annotation);
@@ -52,14 +62,47 @@ define([
           return distinctURIs;
         })(),
 
+        showCard = function(snippet, slideDirection) {
+          var currentCard = element.find('.snippet-text .card').first(),
+              label = (currentSnippetIdx + 1) + ' OF ' + annotations.length + ' ANNOTATIONS',
+              newCard, moveCurrentTo;
+
+          snippetLabelEl.html(label);
+
+          if (!slideDirection) {
+            // No slide - just replace
+            currentCard.html(snippet);
+          } else {
+            scrolling = true;
+            newCard = jQuery('<div class="card">' + snippet + '</snippet>');
+
+            if (slideDirection === 'NEXT') {
+              newCard.css('left', '100%');
+              moveCurrentTo = '-100%';
+            } else {
+              newCard.css('left', '-100%');
+              moveCurrentTo = '100%';
+            }
+
+            snippetTextEl.append(newCard);
+
+            newCard.animate({ left: '0' }, SLIDE_DURATION, 'linear');
+
+            currentCard.animate({ left: moveCurrentTo }, SLIDE_DURATION, 'linear', function() {
+              currentCard.remove();
+              scrolling = false;
+            });
+          }
+        },
+
         /**
          * Fetches the preview snippet for an annotation via the API
          *
          * TODO needs to be revised once we have image snippets as well.
          */
         fetchSnippet = function() {
-          API.getAnnotation(annotations[currentSnippetIdx].annotation_id, true)
-             .done(function(annotation) {
+          return API.getAnnotation(annotations[currentSnippetIdx].annotation_id, true)
+             .then(function(annotation) {
                var offset = annotation.context.char_offset,
                    quote = AnnotationUtils.getQuote(annotation),
                    snippet = annotation.context.snippet,
@@ -68,21 +111,26 @@ define([
                      snippet.substring(offset, offset + quote.length) + '</em>' +
                      snippet.substring(offset + quote.length);
 
-               snippetTextEl.html(formatted);
-
-               // TODO
-               // element.find('.label').html('1 OF ' + annotations.length + ' ANNOTATIONS');
+               return formatted;
            });
         },
 
         onNextSnippet = function() {
-          currentSnippetIdx = Math.min(annotations.length - 1, currentSnippetIdx + 1);
-          fetchSnippet();
+          if (!scrolling) {
+            if (currentSnippetIdx < annotations.length - 1) {
+              currentSnippetIdx += 1;
+              fetchSnippet().done(function(snippet) { showCard(snippet, 'NEXT'); });
+            }
+          }
         },
 
         onPreviousSnippet = function() {
-          currentSnippetIdx = Math.max(0, currentSnippetIdx - 1);
-          fetchSnippet();
+          if (!scrolling) {
+            if (currentSnippetIdx > 0) {
+              currentSnippetIdx -= 1;
+              fetchSnippet().done(function(snippet) { showCard(snippet, 'PREV'); });
+            }
+          }
         },
 
         render = function() {
@@ -125,10 +173,15 @@ define([
             element.find('.gazetteer-records').append(tr);
           });
 
-          fetchSnippet();
+          fetchSnippet().done(showCard);
 
-          element.on('click', '.previous', onPreviousSnippet);
-          element.on('click', '.next', onNextSnippet);
+          if (annotations.length > 1) {
+            btnPrev.click(onPreviousSnippet);
+            btnNext.click(onNextSnippet);
+          } else {
+            btnPrev.hide();
+            btnNext.hide();
+          }
         },
 
         addTo = function(map) {

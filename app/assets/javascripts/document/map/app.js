@@ -190,8 +190,11 @@ require([
                Math.pow((xy.x - nearestXY.x), 2) +
                Math.pow((xy.y - nearestXY.y), 2));
 
-           if (distPx < maxDistance)
-             renderPopup(nearest.latlng, nearest.marker.place);
+           if (distPx < maxDistance) {
+             // TODO clean up or eliminate need for marker.place
+             var popup = new MapPopup(nearest.latlng, nearest.marker.place, getAnnotationsForPlace(nearest.marker.place));
+             popup.addTo(map);
+           }
          }
        };
 
