@@ -148,7 +148,6 @@ require([
              max = count;
          });
 
-
          if (min === max) {
            // All places are equal (or just one place) - use min marker size
            markerScaleFn = function(noOfAnnotations) { return MIN_MARKER_SIZE; };
