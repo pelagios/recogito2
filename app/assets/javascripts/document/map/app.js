@@ -17,7 +17,9 @@ require([
 
       FILL_COLOR = '#31a354',
 
-      STROKE_COLOR = '#006d2c';
+      STROKE_COLOR = '#006d2c',
+
+      TOUCH_DISTANCE_THRESHOLD = 18;
 
   jQuery(document).ready(function() {
     var Layers =  {
@@ -54,6 +56,8 @@ require([
           zoomControl: false,
           layers: [ currentBaseLayer ]
        }),
+
+       markerLayer = L.layerGroup().addTo(map),
 
        layerSwitcher = new LayerSwitcher(),
 
@@ -228,16 +232,19 @@ require([
            if (place.representative_point) {
              // The epic battle between Leaflet vs. GeoJSON
              var coord = [ place.representative_point[1], place.representative_point[0] ],
-                 markerSize = markerScaleFn(getAnnotationsForPlace(place).length);
+                 markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
+                 marker = L.circleMarker(coord, {
+                   color       : STROKE_COLOR,
+                   fillColor   : FILL_COLOR,
+                   opacity     : 1,
+                   fillOpacity : 1,
+                   weight      : 1.5,
+                   radius: markerSize
+                 }).addTo(markerLayer);
 
-             L.circleMarker(coord, {
-               color       : STROKE_COLOR,
-               fillColor   : FILL_COLOR,
-               opacity     : 1,
-               fillOpacity : 1,
-               weight      : 1.5,
-               radius: markerSize
-             }).addTo(map).on('click', function() {
+             marker.place = place; // TODO Hack! Clean this up
+
+             marker.on('click', function() {
                renderPopup(coord, place);
              });
            }
@@ -275,9 +282,49 @@ require([
 
        onLoadError = function(error) {
          // TODO implement
+       },
+
+       /**
+        * Selects the marker nearest the given latlng. This is primarily a
+        * means to support touch devices, where touch events will usually miss
+        * the markers because they are too small for properly hitting them.
+        *
+        * TODO this could be heavily optimized by some sort of spatial indexing or bucketing,
+        * but seems to work reasonably well even for lots of markers.
+        *
+        */
+       selectNearest = function(latlng, maxDistance) {
+         var xy = map.latLngToContainerPoint(latlng),
+             nearest = { distSq: 9007199254740992 }, // Distance to nearest initialied with Integer.MAX
+             nearestXY, distPx;
+
+         jQuery.each(markerLayer.getLayers(), function(idx, marker) {
+           var markerLatLng = marker.getBounds().getCenter(),
+               distSq =
+                 Math.pow(latlng.lat - markerLatLng.lat, 2) +
+                 Math.pow(latlng.lng - markerLatLng.lng, 2);
+
+           if (distSq < nearest.distSq)
+             nearest = { marker: marker, latlng: markerLatLng, distSq: distSq };
+         });
+
+         if (nearest.marker) {
+           nearestXY = map.latLngToContainerPoint(nearest.latlng);
+           distPx =
+             Math.sqrt(
+               Math.pow((xy.x - nearestXY.x), 2) +
+               Math.pow((xy.y - nearestXY.y), 2));
+
+           if (distPx < maxDistance)
+             renderPopup(nearest.latlng, nearest.marker.place);
+         }
        };
 
     btnLayers.click(function() { layerSwitcher.open(); });
+
+    map.on('click', function(e) {
+      selectNearest(e.latlng, TOUCH_DISTANCE_THRESHOLD);
+    });
 
     layerSwitcher.on('changeLayer', onChangeLayer);
 
