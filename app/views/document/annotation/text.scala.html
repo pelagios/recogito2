@@ -158,7 +158,7 @@
         @for(part <- allParts) {
           @if(part == currentPart) {
             <li class="active">
-              <a href="#"><span class="label">@part.getTitle</span></a>
+              <a href="#" onclick="return false;"><span class="label">@part.getTitle</span></a>
             </li>
           } else {
             <li>

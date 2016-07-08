@@ -8,7 +8,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image.css")"/>
-    <link rel="stylesheet" href="@routes.Assets.versioned("lib/openlayers/ol.css")"/>
+    <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("ol.css"))"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("ol.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/image/app.js")"></script>
@@ -120,26 +120,26 @@
     <div id="image-pane"></div>
 
     <div class="sidebar">
-      <div class="sidebar-header tooltip bottom"></div>
-      <div class="sidebar-parts">
-        <ul>
-          @for(part <- allParts) {
-            @if(part == currentPart) {
-              <li class="active">
+      <div class="sidebar-header"></div>
+      <ul class="menu">
+        @for(part <- allParts) {
+          @if(part == currentPart) {
+            <li class="active">
+              <a href="#" onclick="return false;">
                 <img src="@controllers.document.routes.DocumentController.getThumbnail(document.getId, part.getSequenceNo)">
-                <span class="part-title">@part.getTitle</span>
-              </li>
-            } else {
-              <li>
-                <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">
-                  <img src="@controllers.document.routes.DocumentController.getThumbnail(document.getId, part.getSequenceNo)">
-                  <span class="part-title">@part.getTitle</span>
-                </a>
-              </li>
-            }
+                <span class="label">@part.getTitle</span>
+              </a>
+            </li>
+          } else {
+            <li>
+              <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">
+                <img src="@controllers.document.routes.DocumentController.getThumbnail(document.getId, part.getSequenceNo)">
+                <span class="label">@part.getTitle</span>
+              </a>
+            </li>
           }
-        </ul>
-      </div>
+        }
+      </ul>
     </div> <!-- .sidebar -->
   </body>
 </html>

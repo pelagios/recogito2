@@ -1,4 +1,9 @@
-require(['../../../common/config'], function(Config) {
+require.config({
+  baseUrl: "/assets/javascripts/",
+  fileExclusionRegExp: /^lib$/
+});
+
+require(['common/config'], function(Config) {
 
   jQuery(document).ready(function() {
 
