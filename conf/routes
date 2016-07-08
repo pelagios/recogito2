@@ -44,7 +44,7 @@ GET     /document/:id/stats                          controllers.document.stats.
 GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
 GET     /document/:id/downloads/annotations.jsonl    controllers.document.downloads.writers.JSONLinesWriterController.downloadAnnotations(id: String)
 
-GET     /document/:id/share                          controllers.document.share.ShareController.showShareSettings(id: String)
+GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
 
 GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
 PUT     /document/:id/settings/sortorder             controllers.document.settings.SettingsController.setSortOrder(id: String)

@@ -13,7 +13,7 @@
         <li class="tooltip bottom">
           <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">
             <span class="icon">&#xe86f;</span>
-            <span class="hint">You are now in the Text Annotation View</span>
+            <span class="hint">Annotate this Document</span>
           </a>
         </li>
 
@@ -39,15 +39,15 @@
         </li>
 
         <li class="tooltip bottom">
-          <a href="@controllers.document.share.routes.ShareController.showShareSettings(document.getId)">
-            <span class="icon">&#xe85f;</span>
-            <span class="hint">Invite other users to view or work with you on this document</span>
+          <a href="@controllers.document.discussion.routes.DiscussionController.showDiscussionBoard(document.getId)">
+            <span class="icon">&#xe862;</span>
+            <span class="hint">The discussion board for this document</span>
           </a>
         </li>
 
         <li class="active tooltip bottom">
           <span class="icon">&#xe8c9;</span>
-          <span class="hint">Edit document settings and metadata</span>
+          <span class="hint">Edit document settings and metadata here</span>
         </li>
 
         <li class="home tooltip bottom">
