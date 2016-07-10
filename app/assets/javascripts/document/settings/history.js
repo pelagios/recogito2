@@ -34,6 +34,25 @@ require(['common/ui/formatting', 'common/config'], function(Formatting, Config) 
           return '<span class="place">place ' + formatChange(item) + '</span>';
       },
 
+      /** Checks if two dates are on the same UTC day **/
+      isSameDayUTC = function(a, b) {
+//        console.log(dateA, dateB);
+
+        var dateA = new Date(a),
+            dateB = new Date(b),
+
+            yearA  = dateA.getUTCFullYear(),
+            yearB  = dateB.getUTCFullYear(),
+
+            monthA = dateA.getUTCMonth(),
+            monthB = dateB.getUTCMonth(),
+
+            dayA   = dateA.getUTCDate(),
+            dayB   = dateB.getUTCDate();
+
+        return (yearA === yearB && monthA === monthB && dayA === dayB);
+      },
+
       rollback = function(annotationId, versionId) {
         jsRoutes.controllers.document.settings.SettingsController.rollbackByTime(Config.documentId).ajax({
           contentType: 'application/json',
@@ -56,26 +75,41 @@ require(['common/ui/formatting', 'common/config'], function(Formatting, Config) 
     jsRoutes.controllers.api.ContributionAPIController.getContributionHistory(Config.documentId).ajax().done(function(history) {
       var contributions = jQuery('.edit-history');
 
-      jQuery.each(history.items, function(idx, contrib) {
-        var li = jQuery(
-          '<tr>'+
-            '<td class="contrib-info">' +
-              '<p>' +
-                formatAction(contrib.action) + ' ' +
-                formatItem(contrib.affects_item) +
-              '</p>' +
-              '<p class="made">' +
-                '<span class="by">' + contrib.made_by + '</span> ' +
-                '<span class="at">' + Formatting.timeSince(contrib.made_at) + '</span>' +
-              '</p>' +
-            '</td>' +
-            '<td class="action rollback icon" data-annotation="' +
-              contrib.affects_item.annotation_id + '" data-version="' +
-              contrib.affects_item.annotation_version_id + '">&#xf0e2;</td>' +
-          '</tr>');
+      history.items.reduce(function(previous, contribution) {
+        var row =
+              '<div class="contribution">' +
+                '<p>' +
+                  '<span>' + contribution.action + '</span> ' +
+                  '<span>' + contribution.affects_item.item_type + '</span>' +
+                '</p>' +
+              '</div>',
+              ul, li;
 
-        contributions.append(li);
-      });
+        console.log(contribution);
+
+        if (previous && previous.contribution.made_at === contribution.made_at) {
+          // Contribution is part of the same edit - add to the previous <li>
+          ul = previous.ul;
+          li = previous.li;
+          li.append(row);
+        } else if (previous && isSameDayUTC(previous.contribution.made_at, contribution.made_at)) {
+          // Different edit, but on the same day - render in new <li>
+          ul = previous.ul;
+          li = jQuery('<li></li>');
+          li.append(row);
+          ul.append(li);
+        } else {
+          // New edit on a new day - render in new <ul>
+          ul = jQuery('<ul></ul>');
+          li = jQuery('<li></li>');
+          li.append(row);
+          ul.append(li);
+          contributions.append(ul);
+        }
+
+        return { contribution: contribution, ul: ul, li: li };
+      }, false);
     });
   });
+
 });
