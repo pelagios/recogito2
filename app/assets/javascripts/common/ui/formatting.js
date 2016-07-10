@@ -1,5 +1,10 @@
 define(function() {
 
+  var MONTH_NAMES_SHORT = [
+    'Jan', 'Feb', 'Mar', 'Apr',
+    'May', 'Jun', 'Jul', 'Aug',
+    'Sept', 'Oct', 'Nov', 'Dec' ];
+
   return {
 
     /** Formats a yyyyMMddToYear to YYYY [Era] **/
@@ -15,6 +20,14 @@ define(function() {
     /** Formats absolute time into a human-readable 'relative' label (e.g. '2 minutes ago') **/
     timeSince: function(date) {
       return jQuery.timeago(date);
+    },
+
+    formatDay : function(date) {
+      var day = date.getDate(),
+          month = date.getMonth(),
+          year = date.getFullYear();
+
+      return MONTH_NAMES_SHORT[month] + ' ' + day + ', ' + year;
     }
 
   };

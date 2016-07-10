@@ -41,14 +41,14 @@ require(['common/ui/formatting', 'common/config'], function(Formatting, Config) 
         var dateA = new Date(a),
             dateB = new Date(b),
 
-            yearA  = dateA.getUTCFullYear(),
-            yearB  = dateB.getUTCFullYear(),
+            yearA  = dateA.getFullYear(),
+            yearB  = dateB.getFullYear(),
 
-            monthA = dateA.getUTCMonth(),
-            monthB = dateB.getUTCMonth(),
+            monthA = dateA.getMonth(),
+            monthB = dateB.getMonth(),
 
-            dayA   = dateA.getUTCDate(),
-            dayB   = dateB.getUTCDate();
+            dayA   = dateA.getDate(),
+            dayB   = dateB.getDate();
 
         return (yearA === yearB && monthA === monthB && dayA === dayB);
       },
@@ -99,7 +99,8 @@ require(['common/ui/formatting', 'common/config'], function(Formatting, Config) 
           li.append(row);
           ul.append(li);
         } else {
-          // New edit on a new day - render in new <ul>
+          // New edit on a new day - render in new <h3> and <ul>
+          contributions.append('<h3>Edits on ' + Formatting.formatDay(new Date(contribution.made_at)) + '</h3>');
           ul = jQuery('<ul></ul>');
           li = jQuery('<li></li>');
           li.append(row);
