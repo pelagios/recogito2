@@ -4,40 +4,28 @@ require.config({
 });
 
 require(['common/ui/formatting', 'common/config'], function(Formatting, Config) {
-  var formatAction = function(action) {
-        if (action === 'CREATE_BODY')
-          return '<span class="create">New</span>';
-      },
+  var formatAction = function(contribution) {
+        var action = contribution.action,
+            itemType = contribution.affects_item.item_type,
+            valBefore = contribution.affects_item.value_before,
+            valAfter = contribution.affects_item.value_after;
 
-      formatChange = function(item) {
-        var html = '<span class="change">';
-        if (item.value_before && item.value_after)
-          // TODO truncate changes (e.g. in case of long comments)
-          html += 'from <em>&quot;' +  item.value_before + '&quot;</em> to ' +
-            '<em>&quot;' + item.value_after + '&quot;</em>';
-        else if (item.value_before)
-          // Delete action
-          html += '<em>&quot;' + item.value_before + '&quot;</em>';
-        else if (item.value_after)
-          html += '<em>&quot;' + item.value_after + '&quot;</em>';
-
-        return html + '</span>';
-      },
-
-      formatItem = function(item) {
-        formatChange(item);
-        if (item.item_type === 'QUOTE_BODY')
-          return '<span class="annotation">annotation ' + formatChange(item) + '</span>';
-        else if (item.item_type === 'COMMENT_BODY')
-          return '<span class="comment">comment ' + formatChange(item) + '</span>';
-        else if (item.item_type === 'PLACE_BODY')
-          return '<span class="place">place ' + formatChange(item) + '</span>';
+        if (action === 'CREATE_BODY' && itemType === 'QUOTE_BODY')
+          return 'Created annotation ' + valAfter;
+        else if (action === 'CREATE_BODY' && itemType === 'COMMENT_BODY')
+          return 'Created new comment';
+        else if (action === 'CREATE_BODY' && itemType === 'PLACE_BODY')
+          return 'Tagged as place';
+        else if (action === 'CONFIRM_BODY')
+          return 'Confirmed';
+        else if (action === 'FLAG_BODY')
+          return 'Flagged';
+        else if (action === 'EDIT_BODY')
+          return 'Changed something';
       },
 
       /** Checks if two dates are on the same UTC day **/
       isSameDayUTC = function(a, b) {
-//        console.log(dateA, dateB);
-
         var dateA = new Date(a),
             dateB = new Date(b),
 
@@ -79,13 +67,10 @@ require(['common/ui/formatting', 'common/config'], function(Formatting, Config) 
         var row =
               '<div class="contribution">' +
                 '<p>' +
-                  '<span>' + contribution.action + '</span> ' +
-                  '<span>' + contribution.affects_item.item_type + '</span>' +
+                  '<span class="action">' + formatAction(contribution) + '</span> ' +
                 '</p>' +
               '</div>',
               ul, li;
-
-        console.log(contribution);
 
         if (previous && previous.contribution.made_at === contribution.made_at) {
           // Contribution is part of the same edit - add to the previous <li>
