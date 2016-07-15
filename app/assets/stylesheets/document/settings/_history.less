@@ -11,9 +11,8 @@
   }
 
   ul {
-    position:relative;
     list-style-type:none;
-    margin:0 50px 15px 0;
+    margin:0 0 15px 0;
     padding:0;
     background-color:#fff;
     border:1px solid @lightgrey-border;
@@ -21,6 +20,7 @@
   }
 
   li {
+    position:relative;
     margin:0;
     padding:7px 10px;
     border-bottom:1px solid @lightgrey-border;
@@ -32,15 +32,20 @@
 
   .rollback {
     position:absolute;
-    top:2px;
-    right:-30px;
-    width:25px;
+    top:0;
+    right:0;
+    width:30px;
     font-size:14px;
     color:@lightgrey-type;
     .nostyle();
+    padding:5px 0;
+    border-style:solid;
+    border-color:@lightgrey-border;
+    border-width:0 0 1px 1px;
   }
 
   .rollback:hover {
+    background-color:lighten(@blueish-white-hi, 2%);
     color:@grey-type;
   }
 
