@@ -53,7 +53,7 @@ require([
       },
 
       /** Checks if two dates are on the same UTC day **/
-      isSameDayUTC = function(a, b) {
+      isSameDay = function(a, b) {
         var dateA = new Date(a),
             dateB = new Date(b),
 
@@ -81,7 +81,7 @@ require([
   jQuery(document).ready(function() {
 
     jQuery('.edit-history').on('click', '.rollback', function(e) {
-      var el = jQuery(e.target),
+      var el = jQuery(e.target).closest('li'),
           annotationId = el.data('annotation'),
           versionId = el.data('version');
 
@@ -98,6 +98,8 @@ require([
                   '<span class="action">' + formatAction(contribution) + '</span> ' +
                 '</p>' +
               '</div>',
+            annotationId = contribution.affects_item.annotation_id,
+            versionId = contribution.affects_item.annotation_version_id,
             rollbackButton = '<button class="rollback icon" title="Revert document to this state">&#xf0e2;</button>',
             ul, li;
 
@@ -106,17 +108,17 @@ require([
           ul = previous.ul;
           li = previous.li;
           li.append(row);
-        } else if (previous && isSameDayUTC(previous.contribution.made_at, contribution.made_at)) {
+        } else if (previous && isSameDay(previous.contribution.made_at, contribution.made_at)) {
           // Different edit, but on the same day - render in new <li>
           ul = previous.ul;
-          li = jQuery('<li>' + rollbackButton + '</li>');
+          li = jQuery('<li data-annotation="' + annotationId + '" data-version="' + versionId + '">' + rollbackButton + '</li>');
           li.append(row);
           ul.append(li);
         } else {
           // New edit on a new day - render in new <h3> and <ul>
           contributions.append('<h3>Edits on ' + Formatting.formatDay(new Date(contribution.made_at)) + '</h3>');
           ul = jQuery('<ul></ul>');
-          li = jQuery('<li>' + rollbackButton + '</li>');
+          li = jQuery('<li data-annotation="' + annotationId + '" data-version="' + versionId + '">' + rollbackButton + '</li>');
           li.append(row);
           ul.append(li);
           contributions.append(ul);
