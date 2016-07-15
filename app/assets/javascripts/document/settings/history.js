@@ -3,25 +3,49 @@ require.config({
   fileExclusionRegExp: /^lib$/
 });
 
-require(['common/ui/formatting', 'common/config'], function(Formatting, Config) {
-  var formatAction = function(contribution) {
+require([
+  'common/ui/formatting',
+  'common/utils/placeUtils',
+  'common/config'], function(Formatting, PlaceUtils, Config) {
+
+  var uriToLink = function(uri) {
+        var parsed = PlaceUtils.parseURI(uri);
+        if (parsed.shortcode)
+          return '<a href="' + uri + '" target="_blank">' + parsed.shortcode + ':' + parsed.id + '</a>';
+        else
+          return '<a href="' + uri + '" target="_blank">' + uri + '</a>';
+      },
+
+      formatAction = function(contribution) {
         var action = contribution.action,
             itemType = contribution.affects_item.item_type,
+            itemTypeLabel = (function() {
+              if (itemType === 'PLACE_BODY')
+                return 'place';
+            })(),
             valBefore = contribution.affects_item.value_before,
-            valAfter = contribution.affects_item.value_after;
+            valBeforeShort = (valBefore && valBefore.length > 256) ? valBefore.substring(0, 256) + '...' : valBefore,
+            valAfter = contribution.affects_item.value_after,
+            valAfterShort = (valAfter && valAfter.length > 256) ? valAfter.substring(0, 256) + '...' : valAfter;
 
-        if (action === 'CREATE_BODY' && itemType === 'QUOTE_BODY')
-          return 'Created annotation ' + valAfter;
-        else if (action === 'CREATE_BODY' && itemType === 'COMMENT_BODY')
-          return 'Created new comment';
-        else if (action === 'CREATE_BODY' && itemType === 'PLACE_BODY')
+        if (action === 'CREATE_BODY' && itemType === 'QUOTE_BODY') {
+          return 'Highlighted section <em>&raquo;' + valAfterShort + '&laquo;</em>';
+        } else if (action === 'CREATE_BODY' && itemType === 'COMMENT_BODY') {
+          return 'New comment <em>&raquo;' + valAfterShort + '&laquo;</em>';
+        } else if (action === 'CREATE_BODY' && itemType === 'PLACE_BODY') {
           return 'Tagged as place';
-        else if (action === 'CONFIRM_BODY')
-          return 'Confirmed';
-        else if (action === 'FLAG_BODY')
-          return 'Flagged';
-        else if (action === 'EDIT_BODY')
+        } else if (action === 'CONFIRM_BODY') {
+          return 'Confirmed ' + itemTypeLabel + ' ' + uriToLink(valAfter);
+        } else if (action === 'FLAG_BODY') {
+          return 'Flagged ' + itemTypeLabel;
+        } else if (action === 'EDIT_BODY' && itemType === 'QUOTE_BODY') {
+          return 'Changed selection from <em>&raquo;' + valBeforeShort + '&laquo;</em> to <em>&raquo;' + valAfterShort + '&laquo;</em>';
+        } else if (action === 'EDIT_BODY' && itemType === 'PLACE_BODY') {
+          return 'Changed ' + itemTypeLabel + ' from ' + uriToLink(valBefore) + ' to ' + uriToLink(valAfter);
+        } else {
+          console.log(contribution);
           return 'Changed something';
+        }
       },
 
       /** Checks if two dates are on the same UTC day **/
