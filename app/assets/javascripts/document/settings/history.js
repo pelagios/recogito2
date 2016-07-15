@@ -26,25 +26,25 @@ require([
             valBefore = contribution.affects_item.value_before,
             valBeforeShort = (valBefore && valBefore.length > 256) ? valBefore.substring(0, 256) + '...' : valBefore,
             valAfter = contribution.affects_item.value_after,
-            valAfterShort = (valAfter && valAfter.length > 256) ? valAfter.substring(0, 256) + '...' : valAfter;
+            valAfterShort = (valAfter && valAfter.length > 256) ? valAfter.substring(0, 256) + '...' : valAfter,
+            context = contribution.context;
 
         if (action === 'CREATE_BODY' && itemType === 'QUOTE_BODY') {
           return 'Highlighted section <em>&raquo;' + valAfterShort + '&laquo;</em>';
         } else if (action === 'CREATE_BODY' && itemType === 'COMMENT_BODY') {
           return 'New comment <em>&raquo;' + valAfterShort + '&laquo;</em>';
-        } else if (action === 'CREATE_BODY' && itemType === 'PLACE_BODY') {
-          return 'Tagged as place';
+        } else if (action === 'CREATE_BODY') {
+          return 'Tagged <em>&raquo;' + context + '&laquo;</em> as ' + itemTypeLabel;
         } else if (action === 'CONFIRM_BODY') {
-          return 'Confirmed ' + itemTypeLabel + ' ' + uriToLink(valAfter);
+          return 'Confirmed <em>&raquo;' + context + '&laquo;</em> as ' + itemTypeLabel + ' ' + uriToLink(valAfter);
         } else if (action === 'FLAG_BODY') {
-          return 'Flagged ' + itemTypeLabel;
+          return 'Flagged ' + itemTypeLabel + '<em>&raquo;' + context + '&laquo;</em>';
         } else if (action === 'EDIT_BODY' && itemType === 'QUOTE_BODY') {
           return 'Changed selection from <em>&raquo;' + valBeforeShort + '&laquo;</em> to <em>&raquo;' + valAfterShort + '&laquo;</em>';
         } else if (action === 'EDIT_BODY' && itemType === 'PLACE_BODY') {
           return 'Changed ' + itemTypeLabel + ' from ' + uriToLink(valBefore) + ' to ' + uriToLink(valAfter);
         } else {
-          console.log(contribution);
-          return 'Changed something';
+          return 'An unknown change happend';
         }
       },
 

@@ -62,7 +62,8 @@ class ContributionSpec extends Specification {
           Some("just a comment"),
           None
         ),
-        Seq("rainer"))
+        Seq("rainer"),
+        None)
         
       // Convert to JSON
       val serialized = Json.prettyPrint(Json.toJson(contribution))

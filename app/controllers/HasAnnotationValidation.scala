@@ -5,6 +5,16 @@ import models.annotation.{ Annotation, AnnotationBody, AnnotationStatus }
 import models.contribution._
 
 trait HasAnnotationValidation {
+  
+  /** The context field is a hint for the user in which... context... the contribution occured.
+    *
+    * For text annotations, we'll use the annotation's quote; for image annotations, the transcription.   
+    */
+  private def getContext(annotation: Annotation) =
+    annotation.bodies
+      .filter(a =>
+        a.hasType == AnnotationBody.QUOTE || a.hasType == AnnotationBody.TRANSCRIPTION)
+      .headOption.flatMap(_.value)
 
   private def createBodyContribution(annotationAfter: Annotation, createdBody: AnnotationBody) =
     Contribution(
@@ -22,7 +32,8 @@ trait HasAnnotationValidation {
         // At least currently, bodies have either value or URI - never both
         if (createdBody.value.isDefined) createdBody.value else createdBody.uri
       ),
-      Seq.empty[String]
+      Seq.empty[String],
+      getContext(annotationAfter)
     )
 
   /** Changes to bodies are either general 'edits' or status changes (confirmations or flags) **/
@@ -57,7 +68,8 @@ trait HasAnnotationValidation {
         if (bodyBefore.value.isDefined) bodyBefore.value else bodyBefore.uri,
         if (bodyAfter.value.isDefined) bodyAfter.value else bodyAfter.uri
       ),
-      if (bodyAfter.lastModifiedBy == bodyBefore.lastModifiedBy) Seq.empty[String] else Seq(bodyBefore.lastModifiedBy).flatten
+      if (bodyAfter.lastModifiedBy == bodyBefore.lastModifiedBy) Seq.empty[String] else Seq(bodyBefore.lastModifiedBy).flatten,
+      getContext(annotationAfter)
     )
 
   private def deleteBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, deletedBody: AnnotationBody) =
@@ -76,7 +88,8 @@ trait HasAnnotationValidation {
         if (deletedBody.value.isDefined) deletedBody.value else deletedBody.uri,
         None
       ),
-      if (deletedBody.lastModifiedBy == annotationAfter.lastModifiedBy) Seq.empty[String] else Seq(deletedBody.lastModifiedBy).flatten
+      if (deletedBody.lastModifiedBy == annotationAfter.lastModifiedBy) Seq.empty[String] else Seq(deletedBody.lastModifiedBy).flatten,
+      getContext(annotationAfter)
     )
 
   /** At the moment, just checks for equal types, but may become more sophisticated in the future **/
