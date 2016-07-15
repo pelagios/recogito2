@@ -16,7 +16,7 @@ require([
           else
             return '<a href="' + uri + '" target="_blank">' + uri + '</a>';
         } else {
-          return '<em>[none]</em>';  
+          return '<em>[none]</em>';
         }
       },
 
@@ -98,7 +98,8 @@ require([
                   '<span class="action">' + formatAction(contribution) + '</span> ' +
                 '</p>' +
               '</div>',
-              ul, li;
+            rollbackButton = '<button class="rollback icon" title="Revert document to this state">&#xf0e2;</button>',
+            ul, li;
 
         if (previous && previous.contribution.made_at === contribution.made_at) {
           // Contribution is part of the same edit - add to the previous <li>
@@ -108,14 +109,14 @@ require([
         } else if (previous && isSameDayUTC(previous.contribution.made_at, contribution.made_at)) {
           // Different edit, but on the same day - render in new <li>
           ul = previous.ul;
-          li = jQuery('<li></li>');
+          li = jQuery('<li>' + rollbackButton + '</li>');
           li.append(row);
           ul.append(li);
         } else {
           // New edit on a new day - render in new <h3> and <ul>
           contributions.append('<h3>Edits on ' + Formatting.formatDay(new Date(contribution.made_at)) + '</h3>');
           ul = jQuery('<ul></ul>');
-          li = jQuery('<li></li>');
+          li = jQuery('<li>' + rollbackButton + '</li>');
           li.append(row);
           ul.append(li);
           contributions.append(ul);
