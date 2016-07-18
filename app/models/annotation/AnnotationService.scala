@@ -165,7 +165,7 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
   /** Rolls back the document to the state at the given timestamp **/ 
   def rollbackToTimestamp(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
 
-    // Rolls back one annotation, i.e. updates to the latest version in the history or deletes
+    /* Rolls back one annotation, i.e. updates to the latest version in the history or deletes
     def rollbackOne(annotation: Annotation): Future[Boolean] =
       findLatestVersion(annotation.annotationId).flatMap(_ match {
         case Some(version) =>
@@ -190,14 +190,23 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       }
 
     val numberOfFailedRollbacks = for {
-      deleteVersionsSuccess <- deleteVersionsAfter(documentId, timestamp)
-      annotationsToModify <- if (deleteVersionsSuccess) findModifiedAfter(documentId, timestamp) else Future.successful(Seq.empty[Annotation])
+      deleteSuccess <- deleteHistoryRecordsAfter(documentId, timestamp)
+      annotationsToModify <- if (deleteSuccess) findModifiedAfter(documentId, timestamp) else Future.successful(Seq.empty[Annotation])
+      annotationsToRestore <- if (deleteSuccess) 
       failedUpdates <- rollbackAnnotations(annotationsToModify)
     } yield failedUpdates.size
 
     numberOfFailedRollbacks.map { failed =>
       Logger.warn(failed + " failed rollbacks")
       failed == 0
+    }*/
+    
+    Logger.info("Rolling back")
+    
+    getChangedAfter(documentId, timestamp).map { changedAfter =>
+      changedAfter.foreach(a => Logger.info(a))
+      
+      true
     }
   }
 
