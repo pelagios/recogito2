@@ -57,17 +57,29 @@ object ES {
     implicit val timeout = 60 seconds
     val response = client.execute { index exists(IDX_RECOGITO) }.await
     
-    if (!response.isExists()) {
+    if (response.isExists()) {
+      // Index exists - create missing mappings as needed
+      val list = client.admin.indices().prepareGetMappings()
+      val existingMappings = list.execute().actionGet().getMappings().get(IDX_RECOGITO).keys.toArray.map(_.toString)
+      loadMappings(existingMappings).foreach { case (name, json) =>
+        Logger.info("Recreating mapping " + name)
+        val putMapping = client.admin.indices().preparePutMapping(IDX_RECOGITO)
+        putMapping.setType(name)
+        putMapping.setSource(json)
+        putMapping.execute().actionGet()
+      }
+    } else {
+      // No index - create index with all mappings
       Logger.info("No ES index - initializing...")
       
       val create = client.admin.indices().prepareCreate(IDX_RECOGITO) 
       create.setSettings(loadSettings())
       
-      loadMappings.foreach { case (name, json) =>  { 
+      loadMappings().foreach { case (name, json) =>  { 
         Logger.info("Create mapping - " + name)
         create.addMapping(name, json)
       }}
-      
+     
       create.execute().actionGet()
     }
   }
@@ -86,12 +98,17 @@ object ES {
     Source.fromFile("conf/elasticsearch.json").getLines().mkString("\n")
 
   /** Loads all JSON files from the mappings directory **/
-  private def loadMappings(): Seq[(String, String)] =
-    new File("conf/es-mappings").listFiles.toSeq.filter(_.getName.endsWith(".json")).map(f => {
-      val number = f.getName.substring(0, 2).toInt
-      val name = f.getName.substring(3, f.getName.lastIndexOf('.'))
-      val json = Source.fromFile(f).getLines.mkString("\n")
-      (number, (name, json))
-    }).sortBy(_._1).map(_._2)
+  private def loadMappings(existingMappings: Seq[String] = Seq.empty[String]): Seq[(String, String)] =
+    new File("conf/es-mappings").listFiles.toSeq.filter(_.getName.endsWith(".json"))
+      .foldLeft(Seq.empty[(Int, (String, String))])((mappings, file)  => {
+        val number = file.getName.substring(0, 2).toInt
+        val name = file.getName.substring(3, file.getName.lastIndexOf('.'))
+        if (existingMappings.contains(name)) {
+          mappings
+        } else {
+          val json = Source.fromFile(file).getLines.mkString("\n")
+          mappings :+ (number, (name, json))
+        }
+      }).sortBy(_._1).map(_._2)
     
 }
