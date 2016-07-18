@@ -19,9 +19,15 @@ Home of Recogito v2.0 - a Linked Data annotation tool for texts and images, deve
 * Clone this repository
 * Create a copy of the file `conf/application.conf.template` and name it `conf/application.conf`.
   Make any environment-specific changes there. (For the most part, the defaults should be fine.)
+* Create a database named 'recogito' on your Postgres DB server. (If you want a different name, adjust
+  the settings in your `conf/application.conf` accordingly.)
 * Type `activator run` to start the application in development mode.
 * Point your browser to [http://localhost:9000](http://localhost:9000)
 * To generate an Eclipse project, type `activator eclipse`.
+
+## Importing gazetteers
+
+[todo]
 
 ## Running in production
 
