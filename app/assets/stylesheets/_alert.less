@@ -1,0 +1,79 @@
+@import "_globals.less";
+
+.clicktrap {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background-color:rgba(0, 0, 0, 0.6);
+  z-index:99999;
+}
+
+.alert {
+  position:fixed;
+  bottom:50%;
+  left:50%;
+  width:520px;
+  margin-left:-200px;
+  color:@error-msg-type;
+  .rounded-corners(4px);
+  .box-shadow(2px, 2px, 42px, rgba(0, 0, 0, 0.4));
+  text-align:center;
+  overflow:hidden;
+
+  .icon {
+    font-size:14px;
+    padding-right:2px;
+  }
+
+  h1 {
+    background-color:@error-msg-type;
+    text-align:left;
+    margin:0;
+    padding:5px 10px;
+    font-size:17px;
+    font-weight:normal;
+    color:#fff;
+  }
+
+  p {
+    background-color:#fff;
+    font-size:17px;
+    margin:0;
+    padding:20px;
+  }
+
+  p.buttons {
+    padding-top:5px;
+  }
+
+  strong {
+    display:block;
+    padding-top:10px;
+    font-weight:normal;
+  }
+
+  .btn {
+    padding:5px 30px;
+    margin:0 5px;
+    border-color:@error-msg-type;
+  }
+
+  .btn.ok {
+    background-color:@error-msg-type;
+  }
+
+  .btn.cancel {
+    color:@error-msg-type;
+  }
+
+  .btn.ok:hover {
+    background-color:darken(@error-msg-type, 5%);
+  }
+
+  .btn.cancel:hover {
+    background-color:lighten(@error-msg-bg, 5%);
+  }
+
+}

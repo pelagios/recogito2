@@ -4,9 +4,10 @@ require.config({
 });
 
 require([
+  'common/ui/alert',
   'common/ui/formatting',
   'common/utils/placeUtils',
-  'common/config'], function(Formatting, PlaceUtils, Config) {
+  'common/config'], function(Alert, Formatting, PlaceUtils, Config) {
 
   var uriToLink = function(uri) {
         if (uri) {
@@ -85,9 +86,15 @@ require([
     jQuery('.edit-history').on('click', '.rollback', function(e) {
       var el = jQuery(e.target).closest('li'),
           annotationId = el.data('annotation'),
-          versionId = el.data('version');
+          versionId = el.data('version'),
+          warningTitle = '<span class="icon">&#xf071;</span> Revert Annotation History',
+          warningMsg = 'You are about to revert the annotation history. ' +
+            'This will permanently delete all edits that happend after the selected time. ' +
+            'The operation is not reversible! <strong>Are you sure you want to do this?</strong>';
 
-      rollback(annotationId, versionId);
+      new Alert('warning', warningTitle, warningMsg).on('ok', function() {
+        rollback(annotationId, versionId);
+      });
     });
 
     jsRoutes.controllers.api.ContributionAPIController.getContributionHistory(Config.documentId).ajax().done(function(history) {
