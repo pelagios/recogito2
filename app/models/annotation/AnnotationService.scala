@@ -37,15 +37,7 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
     * Returns a boolean flag indicating successful completion, the internal ElasticSearch
     * version, and the previous version of the annotation, if any.
     */
-  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = false)(implicit context: ExecutionContext): Future[(Boolean, Long, Option[Annotation])] = {
-
-    // Persists the previous version of an annotation to the history index; returns a
-    // boolean flag indicating successful completion, plus the previous annotation version if any
-    def persistPreviousVersion(annotationId: UUID): Future[(Boolean, Option[Annotation])] =
-      for {
-        maybeAnnotation <- findById(annotationId)
-        done <- if (maybeAnnotation.isDefined) insertVersion(maybeAnnotation.get._1) else Future.successful(true)
-      } yield (done, maybeAnnotation.map(_._1))
+  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = true)(implicit context: ExecutionContext): Future[(Boolean, Long, Option[Annotation])] = {
 
     // Upsert annotation in the annotation index; returns a boolean flag indicating success, plus
     // the internal ElasticSearch version number
@@ -59,13 +51,19 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
         t.printStackTrace
         (false, -1l)
       }
-
+      
     for {
-      (versioningDone, previousAnnotation) <- if (versioned) persistPreviousVersion(annotation.annotationId) else Future.successful((true, None))
-      (annotationCreated, esVersionNumber) <- upsertAnnotation(annotation)
-      linksCreated <- if (annotationCreated) insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
-    } yield (linksCreated, esVersionNumber, previousAnnotation)
-
+      // Retrieve previous version, if any
+      maybePrevious       <- findById(annotation.annotationId)
+      
+      // Store new version: 1) in the annotation index, 2) in the history index
+      (stored, esVersion) <- upsertAnnotation(annotation)
+      storedToHistory     <- if (stored) insertVersion(annotation) else Future.successful(false)
+      
+      // Upsert geotags for this annotation
+      linksCreated        <- if (stored) insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
+    } yield (linksCreated && storedToHistory, esVersion, maybePrevious.map(_._1))
+    
   }
 
   /** Upserts a list of annotations, handling non-blocking chaining & retries in case of failure **/

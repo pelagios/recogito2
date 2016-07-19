@@ -22,13 +22,13 @@ import play.api.libs.json.JsObject
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(
-    
+
   annotationId: Option[UUID],
-  
-  annotates: AnnotatedObject, 
-  
-  anchor: String, 
-  
+
+  annotates: AnnotatedObject,
+
+  anchor: String,
+
   bodies: Seq[AnnotationBodyStub])
 
 object AnnotationStub {
@@ -44,19 +44,19 @@ object AnnotationStub {
 
 /** Partial annotation body **/
 case class AnnotationBodyStub(
-    
+
   hasType: AnnotationBody.Type,
-  
+
   lastModifiedBy: Option[String],
-  
+
   lastModifiedAt: Option[DateTime],
-  
+
   value: Option[String],
-  
+
   uri: Option[String],
-  
+
   status: Option[AnnotationStatusStub])
-  
+
 object AnnotationBodyStub extends HasDate {
 
   implicit val annotationBodyStubReads: Reads[AnnotationBodyStub] = (
@@ -82,21 +82,21 @@ case class AnnotationStatusStub(
 )
 
 object AnnotationStatusStub extends HasDate {
-  
+
   implicit val annotationStatusStubReads: Reads[AnnotationStatusStub] = (
     (JsPath \ "value").read[AnnotationStatus.Value] and
     (JsPath \ "set_by").readNullable[String] and
     (JsPath \ "set_at").readNullable[DateTime]
   )(AnnotationStatusStub.apply _)
-  
+
 }
 
-class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB) 
+class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB)
   extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security
                      with HasAnnotationValidation with HasPrettyPrintJSON with FileAccess with HasTextSnippets {
 
   def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
-    
+
   def listAnnotationsInPart(docId: String, partNo: Int) = listAnnotations(docId, Some(partNo))
 
   private def listAnnotations(docId: String, partNo: Option[Int]) = AsyncStack { implicit request =>
@@ -134,10 +134,10 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
       Some(user),
       now,
       stub.bodies.map(b => AnnotationBody(
-        b.hasType, 
+        b.hasType,
         Some(b.lastModifiedBy.getOrElse(user)),
         b.lastModifiedAt.getOrElse(now),
-        b.value, 
+        b.value,
         b.uri,
         b.status.map(s =>
           AnnotationStatus(
@@ -145,35 +145,35 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
             Some(s.setBy.getOrElse(user)),
             s.setAt.getOrElse(now))))))
   }
-  
-  def createAnnotation() = AsyncStack { implicit request =>    
+
+  def createAnnotation() = AsyncStack { implicit request =>
     request.body.asJson match {
       case Some(json) => {
         Json.fromJson[AnnotationStub](json) match {
-          case s: JsSuccess[AnnotationStub] => {            
+          case s: JsSuccess[AnnotationStub] => {
             // Fetch the associated document to check access privileges
             DocumentService.findById(s.get.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
               case Some((document, accesslevel)) => {
                 if (accesslevel.canWrite) {
                   val annotation = stubToAnnotation(s.get, loggedIn.map(_.user.getUsername).getOrElse("guest"))
                   val f = for {
-                    (annotationStored, _, previousVersion) <- AnnotationService.insertOrUpdateAnnotation(annotation, true)
-                    success <- if (annotationStored) 
+                    (annotationStored, _, previousVersion) <- AnnotationService.insertOrUpdateAnnotation(annotation)
+                    success <- if (annotationStored)
                                  ContributionService.insertContributions(validateUpdate(annotation, previousVersion))
                                else
                                  Future.successful(false)
                   } yield success
-                  
+
                   f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
                 } else {
                   // No write permissions
                   Future.successful(Forbidden)
                 }
               }
-                  
+
               case None => {
                 Logger.warn("POST to /annotations but annotation points to unknown document: " + s.get.annotates.documentId)
-                Future.successful(NotFound)  
+                Future.successful(NotFound)
               }
             })
           }
@@ -192,15 +192,15 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
 
     }
   }
-    
-  def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request => 
+
+  def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
     AnnotationService.findById(id).flatMap(_ match {
       case Some((annotation, _)) => {
         if (includeContext) {
           // Fetch the document, so we know the owner...
           DocumentService.findByIdWithFileparts(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).map(_ match {
-            
-            case Some((document, parts, accesslevel)) => 
+
+            case Some((document, parts, accesslevel)) =>
               if (accesslevel.canRead) {
                 // ...then fetch the content
                 parts.filter(_.getId == annotation.annotates.filepartId).headOption match {
@@ -209,13 +209,13 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                       val snippet = extractTextSnippet(text, annotation)
                       jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))
                     }
-                    
+
                     case None => {
                       Logger.warn("No text content found for filepart " + annotation.annotates.filepartId)
                       InternalServerError
                     }
                   }
-                  
+
                   case None => {
                     // Annotation referenced a part ID that's not in the database
                     Logger.warn("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
@@ -224,9 +224,9 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                 }
               } else {
                 // No read permission on this document
-                Forbidden  
+                Forbidden
               }
-              
+
             case None => {
               Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
               NotFound
@@ -236,11 +236,11 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
           Future.successful(jsonOk(Json.toJson(annotation)))
         }
       }
-        
+
       case None => Future.successful(NotFound)
     })
   }
-  
+
   private def createDeleteContribution(annotation: Annotation, user: String) =
     Contribution(
       ContributionAction.DELETE_ANNOTATION,
@@ -257,7 +257,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
       annotation.contributors,
       getContext(annotation)
     )
-  
+
   def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>
     AnnotationService.findById(id).flatMap(_ match {
       case Some((annotation, version)) => {
@@ -269,11 +269,11 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                 // Annotation existed and was deleted - insert contribution and send response
                 ContributionService.insertContribution(createDeleteContribution(annotation, loggedIn.map(_.user.getUsername).getOrElse("guest"))).map(success =>
                   if (success) Status(200) else InternalServerError)
-                
+
               case None =>
                 Future.successful(NotFound)
             })
-            
+
           case None => {
             // Annotation on a non-existing document? Can't happen except DB integrity is broken
             Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
@@ -281,7 +281,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
           }
         })
       }
-      
+
       case None => Future.successful(NotFound)
     })
   }
