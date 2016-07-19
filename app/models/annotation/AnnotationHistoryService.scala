@@ -70,6 +70,19 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
         .getAggregations.get("by_annotation_id").asInstanceOf[Terms]
         .getBuckets.asScala.map(_.getKey)
     }
+    
+  def getAnnotationStateAt(annotationId: String, time: DateTime)(implicit context: ExecutionContext): Future[Option[AnnotationHistoryRecord]] =
+    ES.client execute {
+      search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query {
+        filteredQuery query {
+          termQuery("annotation_id" -> annotationId)
+        } filter {
+          rangeFilter("last_modified_at").lte(formatDate(time))
+        }
+      } sort {
+        field sort "last_modified_at" order SortOrder.DESC
+      } limit 1
+    } map { _.as[AnnotationHistoryRecord].toSeq.headOption }
 
   /** Deletes all history records (versions and delete markers) for a document, after a given timestamp **/
   def deleteHistoryRecordsAfter(docId: String, after: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {

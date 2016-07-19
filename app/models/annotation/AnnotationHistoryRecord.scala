@@ -28,7 +28,20 @@ case class AnnotationHistoryRecord (
   
   deleted: Boolean
       
-)
+) {
+  
+  /** This method will fail for delete markers **/
+  def asAnnotation = Annotation(
+    annotationId,
+    versionId.get,
+    annotates,
+    contributors,
+    anchor,
+    lastModifiedBy,
+    lastModifiedAt,
+    bodies)
+  
+}
 
 object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
   

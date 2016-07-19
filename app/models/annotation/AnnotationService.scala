@@ -100,6 +100,11 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
         None
       }
     }
+    
+  private def deleteById(annotationId: String)(implicit context: ExecutionContext): Future[Boolean] =
+    ES.client execute {
+      delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION 
+    } map { _.isFound }
 
   /** Deletes the annotation with the given ID **/
   def deleteAnnotation(annotationId: UUID, deletedBy: String, deletedAt: DateTime)(implicit context: ExecutionContext): Future[Option[Annotation]] =
@@ -107,8 +112,7 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
       case Some((annotation, _)) => {
         val f = for {
           markerInserted <- insertDeleteMarker(annotation, deletedBy, deletedAt)
-          deleted        <- if (markerInserted) ES.client execute { delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION } map { _.isFound }
-                            else Future.successful(false)
+          deleted        <- if (markerInserted) deleteById(annotationId.toString) else Future.successful(false)
           geotagsDeleted <- if (deleted) deleteGeoTagsByAnnotation(annotationId) else Future.successful(false)
         } yield geotagsDeleted
       
@@ -173,48 +177,48 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
   /** Rolls back the document to the state at the given timestamp **/ 
   def rollbackToTimestamp(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
 
-    /* Rolls back one annotation, i.e. updates to the latest version in the history or deletes
-    def rollbackOne(annotation: Annotation): Future[Boolean] =
-      findLatestVersion(annotation.annotationId).flatMap(_ match {
-        case Some(version) =>
-          insertOrUpdateAnnotation(version, false).map { case (success, _, _) => success }
-
+    // Rolls back one annotation, i.e. updates to the latest state recorded in the history or deletes
+    def rollbackOne(annotationId: String): Future[Boolean] =
+      getAnnotationStateAt(annotationId, timestamp).flatMap(_ match {
+        case Some(historyRecord) =>
+          if (historyRecord.deleted)
+            // The annotation was already deleted at the rollback state - do nothing
+            Future.successful(true)
+          else
+            insertOrUpdateAnnotation(historyRecord.asAnnotation, false).map(_._1)
+          
         case None =>
-          deleteAnnotation(annotation.annotationId)
+          // The annotation did not exist at the rollback time - delete
+          deleteById(annotationId)
       }).recover { case t: Throwable =>
         t.printStackTrace()
-        Logger.warn("Rollback failed for " + annotation.annotationId)
+        Logger.warn("Rollback failed for " + annotationId)
         false
       }
 
-    // Rolls back a list of annotations, i.e. updates to latest version in history or deletes
-    def rollbackAnnotations(annotations: Seq[Annotation]): Future[Seq[Annotation]] =
-      annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
-        future.flatMap { failedAnnotations =>
-          rollbackOne(annotation).map { success =>
-            if (success) failedAnnotations else failedAnnotations :+ annotation
+    // Rolls back a list of annotations, i.e. updates to latest state recorded in the history or deletes
+    def rollbackAnnotations(annotations: Seq[String]): Future[Seq[String]] =
+      annotations.foldLeft(Future.successful(Seq.empty[String])) { case (future, annotationId) =>
+        future.flatMap { failedAnnotationIds =>
+          Logger.info("Rolling back " + annotationId)
+          rollbackOne(annotationId).map { success =>
+            if (success) failedAnnotationIds else failedAnnotationIds :+ annotationId
           }
         }
       }
 
-    val numberOfFailedRollbacks = for {
-      deleteSuccess <- deleteHistoryRecordsAfter(documentId, timestamp)
-      annotationsToModify <- if (deleteSuccess) findModifiedAfter(documentId, timestamp) else Future.successful(Seq.empty[Annotation])
-      annotationsToRestore <- if (deleteSuccess) 
-      failedUpdates <- rollbackAnnotations(annotationsToModify)
-    } yield failedUpdates.size
-
-    numberOfFailedRollbacks.map { failed =>
-      Logger.warn(failed + " failed rollbacks")
-      failed == 0
-    }*/
-    
-    Logger.info("Rolling back")
-    
-    getChangedAfter(documentId, timestamp).map { changedAfter =>
-      changedAfter.foreach(a => Logger.info(a))
-      
-      true
+    // Get all annotation IDs that were changed after the rollback timestamp
+    val failedRollbacks = getChangedAfter(documentId, timestamp).flatMap(rollbackAnnotations(_))
+    failedRollbacks.flatMap { failed =>
+      if (failed.size == 0) {
+        deleteHistoryRecordsAfter(documentId, timestamp)
+      } else {
+        Logger.warn(failed.size + " failed rollbacks")
+     
+        // TODO what would be a good recovery strategy?  
+        
+        Future.successful(false)
+      }
     }
   }
 

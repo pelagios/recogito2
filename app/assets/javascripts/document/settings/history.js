@@ -76,7 +76,7 @@ require([
           contentType: 'application/json',
           data: JSON.stringify({ annotation_id: annotationId, version_id: versionId })
         }).done(function(response) {
-          window.setTimeout(function() { location.reload(); }, 500);
+          window.setTimeout(function() { location.reload(); }, 1000);
         });
       };
 
