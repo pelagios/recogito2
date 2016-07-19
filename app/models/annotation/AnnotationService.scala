@@ -104,19 +104,25 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
     }
 
   /** Deletes the annotation with the given ID **/
-  def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
-    ES.client execute {
-      delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
-    } flatMap { response =>
-      if (response.isFound)
-        deleteGeoTagsByAnnotation(annotationId)
-      else
-        Future.successful(false)
-    } recover { case t: Throwable =>
-      t.printStackTrace()
-      false
-    }
-    
+  def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
+    findById(annotationId).flatMap(_ match {
+      case Some((annotation, _)) =>
+        ES.client execute {
+          delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
+        } flatMap { response =>
+          deleteGeoTagsByAnnotation(annotationId).map { success =>
+            if (!success)
+              Logger.warn("Failed to delete GeoTags for annotation " + annotationId)
+              
+            Some(annotation)
+          }
+        }
+        
+      case None =>
+        // Annotation not found
+        Future.successful(None)
+    })
+        
   def countByDocId(id: String)(implicit context: ExecutionContext): Future[Long] =
     ES.client execute {
       count from ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id))

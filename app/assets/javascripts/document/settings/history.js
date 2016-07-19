@@ -47,6 +47,8 @@ require([
           return 'Changed selection from <em>&raquo;' + valBeforeShort + '&laquo;</em> to <em>&raquo;' + valAfterShort + '&laquo;</em>';
         } else if (action === 'EDIT_BODY' && itemType === 'PLACE_BODY') {
           return 'Changed ' + itemTypeLabel + ' from ' + uriToLink(valBefore) + ' to ' + uriToLink(valAfter);
+        } else if (action === 'DELETE_ANNOTATION') {
+          return 'Deleted annotation <em>&raquo;' + context + '&laquo;</em>';
         } else {
           return 'An unknown change happend';
         }

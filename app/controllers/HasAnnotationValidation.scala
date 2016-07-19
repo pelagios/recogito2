@@ -10,7 +10,7 @@ trait HasAnnotationValidation {
     *
     * For text annotations, we'll use the annotation's quote; for image annotations, the transcription.   
     */
-  private def getContext(annotation: Annotation) =
+  protected def getContext(annotation: Annotation) =
     annotation.bodies
       .filter(a =>
         a.hasType == AnnotationBody.QUOTE || a.hasType == AnnotationBody.TRANSCRIPTION)

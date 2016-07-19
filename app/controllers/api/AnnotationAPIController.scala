@@ -241,17 +241,38 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
     })
   }
   
+  private def createDeleteContribution(annotation: Annotation, user: String) =
+    Contribution(
+      ContributionAction.DELETE_ANNOTATION,
+      user,
+      DateTime.now(),
+      Item(
+        ItemType.ANNOTATION,
+        annotation.annotates.documentId,
+        Some(annotation.annotates.filepartId),
+        annotation.annotates.contentType,
+        Some(annotation.annotationId),
+        None, None, None
+      ),
+      annotation.contributors,
+      getContext(annotation)
+    )
+  
   def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>
     AnnotationService.findById(id).flatMap(_ match {
       case Some((annotation, version)) => {
         // Fetch the associated document
         DocumentService.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
           case Some((document, accesslevel)) =>
-            if (accesslevel.canWrite)
-              AnnotationService.deleteAnnotation(id).map(success =>
-                if (success) Status(204) else InternalServerError)
-            else
-              Future.successful(Forbidden)
+            AnnotationService.deleteAnnotation(id).flatMap(_ match {
+              case Some(annotation) =>
+                // Annotation existed and was deleted - insert contribution and send response
+                ContributionService.insertContribution(createDeleteContribution(annotation, loggedIn.map(_.user.getUsername).getOrElse("guest"))).map(success =>
+                  if (success) Status(200) else InternalServerError)
+                
+              case None =>
+                Future.successful(NotFound)
+            })
             
           case None => {
             // Annotation on a non-existing document? Can't happen except DB integrity is broken

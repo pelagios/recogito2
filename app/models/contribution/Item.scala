@@ -47,6 +47,8 @@ object ItemType extends Enumeration {
   
   val DOCUMENT = Value("DOCUMENT")
   
+  val ANNOTATION = Value("ANNOTATION")
+  
   val QUOTE_BODY = Value("QUOTE_BODY")
   
   val COMMENT_BODY = Value("COMMENT_BODY")

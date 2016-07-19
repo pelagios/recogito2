@@ -10,6 +10,8 @@ object ContributionAction extends Enumeration {
   val EDIT_DOCUMENT_METADATA = Value("EDIT_DOCUMENT_METADATA")
   val DELETE_DOCUMENT        = Value("DELETE_DOCUMENT")
   val SHARE_DOCUMENT         = Value("SHARE_DOCUMENT")
+  
+  val DELETE_ANNOTATION      = Value("DELETE_ANNOTATION")      
 
   val CREATE_BODY            = Value("CREATE_BODY")
   val EDIT_BODY              = Value("EDIT_BODY")
