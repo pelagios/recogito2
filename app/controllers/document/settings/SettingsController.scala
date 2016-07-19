@@ -73,7 +73,10 @@ class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB, we
             
         case Some(t) if t == "history" =>
           Future.successful(Ok(views.html.document.settings.history(loggedIn.user.getUsername, document)))
-            
+          
+        case Some(t) if t == "backup" =>
+          Future.successful(Ok(views.html.document.settings.backup(loggedIn.user.getUsername, document)))
+          
         case _ =>
           Future.successful(Ok(views.html.document.settings.metadata(loggedIn.user.getUsername, document))) 
       }

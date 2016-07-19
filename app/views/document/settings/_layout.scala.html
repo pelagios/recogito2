@@ -80,9 +80,15 @@
           </a>
         </li>
 
+        <li @if(active == Some("backup")) { class="active" }>
+          <a href="?tab=backup">
+            <span class="icon">&#xf0c7;</span> <span class="label">Backup &amp; Restore</span>
+          </a>
+        </li>
+
         <li>
           <a href="#">
-            <span class="icon">&#xf014;</span> <span class="label">Delete Document</span>
+            <span class="icon">&#xf014;</span> <span class="label">Delete</span>
           </a>
         </li>
       </ul>

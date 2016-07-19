@@ -200,7 +200,6 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
     def rollbackAnnotations(annotations: Seq[String]): Future[Seq[String]] =
       annotations.foldLeft(Future.successful(Seq.empty[String])) { case (future, annotationId) =>
         future.flatMap { failedAnnotationIds =>
-          Logger.info("Rolling back " + annotationId)
           rollbackOne(annotationId).map { success =>
             if (success) failedAnnotationIds else failedAnnotationIds :+ annotationId
           }
