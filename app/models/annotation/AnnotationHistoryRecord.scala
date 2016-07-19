@@ -6,22 +6,31 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import models.HasNullableSeq
 
 case class AnnotationHistoryRecord (
     
   annotationId: UUID,
+  
+  versionId: Option[UUID],
 
   annotates: AnnotatedObject,
+
+  contributors: Seq[String],
+
+  anchor: String,
   
   lastModifiedBy: Option[String],
 
   lastModifiedAt: DateTime,
   
+  bodies: Seq[AnnotationBody],
+  
   deleted: Boolean
       
 )
 
-object AnnotationHistoryRecord extends HasDate {
+object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
   
   protected def fromOptBoolean(o: Option[Boolean]) =
     o.getOrElse(false)
@@ -31,17 +40,39 @@ object AnnotationHistoryRecord extends HasDate {
  
   implicit val annotationHistoryFormat: Format[AnnotationHistoryRecord] = (
     (JsPath \ "annotation_id").format[UUID] and
+    (JsPath \ "version_id").formatNullable[UUID] and
     (JsPath \ "annotates").format[AnnotatedObject] and
+    (JsPath \ "contributors").formatNullable[Seq[String]]
+      .inmap(fromOptSeq[String], toOptSeq[String]) and
+    (JsPath \ "anchor").format[String] and
     (JsPath \ "last_modified_by").formatNullable[String] and
     (JsPath \ "last_modified_at").format[DateTime] and
+    (JsPath \ "bodies").formatNullable[Seq[AnnotationBody]]
+      .inmap(fromOptSeq[AnnotationBody], toOptSeq[AnnotationBody]) and
     (JsPath \ "deleted").formatNullable[Boolean]
       .inmap[Boolean](fromOptBoolean, toOptBoolean) 
   )(AnnotationHistoryRecord.apply, unlift(AnnotationHistoryRecord.unapply))
   
-  def forVersion(a: Annotation) =
-    AnnotationHistoryRecord(a.annotationId, a.annotates, a.lastModifiedBy, a.lastModifiedAt, false)
+  def forVersion(a: Annotation) = AnnotationHistoryRecord(
+    a.annotationId,
+    Some(a.versionId),
+    a.annotates,
+    a.contributors,
+    a.anchor,
+    a.lastModifiedBy,
+    a.lastModifiedAt,
+    a.bodies,
+    false)
     
-  def forDelete(a: Annotation, deletedBy: String, deletedAt: DateTime) =
-    AnnotationHistoryRecord(a.annotationId, a.annotates, Some(deletedBy), deletedAt, true)
+  def forDelete(a: Annotation, deletedBy: String, deletedAt: DateTime) = AnnotationHistoryRecord(
+    a.annotationId,
+    None,
+    a.annotates, 
+    a.contributors,
+    a.anchor,
+    Some(deletedBy),
+    deletedAt, 
+    a.bodies,
+    true)
   
 }

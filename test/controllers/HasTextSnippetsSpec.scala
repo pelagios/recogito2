@@ -45,7 +45,6 @@ class HasTextSnippetsSpec extends Specification {
       UUID.randomUUID,
       UUID.randomUUID,
       AnnotatedObject("ivzcpqoi7qr1uo", 1, ContentType.TEXT_PLAIN),
-      None,
       Seq("rainer"),
       "char-offset:" + start,
       Some("rainer"),

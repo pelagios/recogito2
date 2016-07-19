@@ -71,17 +71,6 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
         .getBuckets.asScala.map(_.getKey)
     }
 
-  /** Retrieves the latest version stored in the history for a given annotation ID *
-  def findLatestVersion(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
-    ES.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query (
-        termQuery("annotation_id" -> annotationId.toString)
-      ) sort (
-        field sort "last_modified_at" order SortOrder.DESC
-      ) limit 1
-    } map { _.as[(Annotation, Long)].toSeq.headOption.map(_._1) }
-    **/
-
   /** Deletes all history records (versions and delete markers) for a document, after a given timestamp **/
   def deleteHistoryRecordsAfter(docId: String, after: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
 

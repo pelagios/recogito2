@@ -102,20 +102,24 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
     }
 
   /** Deletes the annotation with the given ID **/
-  def deleteAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Option[Annotation]] =
+  def deleteAnnotation(annotationId: UUID, deletedBy: String, deletedAt: DateTime)(implicit context: ExecutionContext): Future[Option[Annotation]] =
     findById(annotationId).flatMap(_ match {
-      case Some((annotation, _)) =>
-        ES.client execute {
-          delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
-        } flatMap { response =>
-          deleteGeoTagsByAnnotation(annotationId).map { success =>
-            if (!success)
-              Logger.warn("Failed to delete GeoTags for annotation " + annotationId)
-              
-            Some(annotation)
-          }
+      case Some((annotation, _)) => {
+        val f = for {
+          markerInserted <- insertDeleteMarker(annotation, deletedBy, deletedAt)
+          deleted        <- if (markerInserted) ES.client execute { delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION } map { _.isFound }
+                            else Future.successful(false)
+          geotagsDeleted <- if (deleted) deleteGeoTagsByAnnotation(annotationId) else Future.successful(false)
+        } yield geotagsDeleted
+      
+        f.map { success =>
+          if (!success)
+            throw new Exception("Error deleting annotation")
+          
+          Some(annotation)
         }
-        
+      }
+
       case None =>
         // Annotation not found
         Future.successful(None)

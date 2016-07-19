@@ -107,7 +107,6 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       UUID.randomUUID,
       UUID.randomUUID,
       AnnotatedObject(document.getId, part.getId, ContentType.withName(part.getContentType).get),
-      None, // no previous versions
       Seq.empty[String], // No contributing users
       "char-offset:" + phrase.charOffset,
       None, // no last modifying user

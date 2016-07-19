@@ -6,7 +6,6 @@
     "filepart_id": 1,
     "content_type": [ "TEXT", "TEXT_PLAIN" ]
   },
-  "has_previous_versions": 1,
   "contributors": [ "rainer" ],
   "anchor": "char-offset:231",
   "last_modified_by": "simon",

@@ -128,7 +128,6 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
       stub.annotationId.getOrElse(UUID.randomUUID),
       UUID.randomUUID,
       stub.annotates,
-      None,
       Seq(user),
       stub.anchor,
       Some(user),
@@ -241,11 +240,11 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
     })
   }
 
-  private def createDeleteContribution(annotation: Annotation, user: String) =
+  private def createDeleteContribution(annotation: Annotation, user: String, time: DateTime) =
     Contribution(
       ContributionAction.DELETE_ANNOTATION,
       user,
-      DateTime.now(),
+      time,
       Item(
         ItemType.ANNOTATION,
         annotation.annotates.documentId,
@@ -263,16 +262,22 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
       case Some((annotation, version)) => {
         // Fetch the associated document
         DocumentService.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
-          case Some((document, accesslevel)) =>
-            AnnotationService.deleteAnnotation(id).flatMap(_ match {
-              case Some(annotation) =>
-                // Annotation existed and was deleted - insert contribution and send response
-                ContributionService.insertContribution(createDeleteContribution(annotation, loggedIn.map(_.user.getUsername).getOrElse("guest"))).map(success =>
-                  if (success) Status(200) else InternalServerError)
-
-              case None =>
-                Future.successful(NotFound)
-            })
+          case Some((document, accesslevel)) => {
+            if (accesslevel.canWrite) {
+              val user = loggedIn.map(_.user.getUsername).getOrElse("guest")
+              val now = DateTime.now
+              AnnotationService.deleteAnnotation(id, user, now).flatMap(_ match {
+                case Some(annotation) =>
+                  ContributionService.insertContribution(createDeleteContribution(annotation, user, now)).map(success =>
+                    if (success) Status(200) else InternalServerError)
+    
+                case None =>
+                  Future.successful(NotFound)
+              })
+            } else {
+              Future.successful(Forbidden)
+            }
+          }
 
           case None => {
             // Annotation on a non-existing document? Can't happen except DB integrity is broken

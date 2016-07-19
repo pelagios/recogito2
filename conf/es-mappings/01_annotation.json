@@ -11,7 +11,6 @@
           "content_type": { "type": "string", "index": "not_analyzed" }
         }
       },
-      "has_previous_versions": { "type": "integer" },
       "contributors": { "type": "string", "index": "not_analyzed" },
       "anchor": { "type": "string", "index": "not_analyzed" },
       "last_modified_by": { "type": "string", "index": "not_analyzed" },

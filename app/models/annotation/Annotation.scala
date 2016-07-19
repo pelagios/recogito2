@@ -15,8 +15,6 @@ case class Annotation(
 
   annotates: AnnotatedObject,
 
-  hasPreviousVersions: Option[Int],
-
   contributors: Seq[String],
 
   anchor: String,
@@ -47,7 +45,6 @@ object Annotation extends HasDate {
     (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "version_id").format[UUID] and
     (JsPath \ "annotates").format[AnnotatedObject] and
-    (JsPath \ "has_previous_versions").formatNullable[Int] and
     (JsPath \ "contributors").format[Seq[String]] and
     (JsPath \ "anchor").format[String] and
     (JsPath \ "last_modified_by").formatNullable[String] and
