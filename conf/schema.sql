@@ -43,7 +43,7 @@ CREATE TABLE upload (
 );
 
 CREATE TABLE upload_filepart (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   upload_id INTEGER NOT NULL REFERENCES upload(id) ON DELETE CASCADE,
   owner TEXT NOT NULL REFERENCES "user"(username),
   title TEXT NOT NULL,

@@ -10,6 +10,7 @@ import java.lang.Integer
 import java.lang.String
 import java.util.Arrays
 import java.util.List
+import java.util.UUID
 
 import javax.annotation.Generated
 
@@ -19,7 +20,6 @@ import models.generated.tables.records.UploadFilepartRecord
 
 import org.jooq.Field
 import org.jooq.ForeignKey
-import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -56,7 +56,7 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	/**
 	 * The column <code>public.upload_filepart.id</code>.
 	 */
-	val ID : TableField[UploadFilepartRecord, Integer] = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
+	val ID : TableField[UploadFilepartRecord, UUID] = createField("id", org.jooq.impl.SQLDataType.UUID.nullable(false), "")
 
 	/**
 	 * The column <code>public.upload_filepart.upload_id</code>.
@@ -104,10 +104,6 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 
 	private def this(alias : String, aliased : Table[UploadFilepartRecord]) = {
 		this(alias, aliased, null)
-	}
-
-	override def getIdentity : Identity[UploadFilepartRecord, Integer] = {
-		Keys.IDENTITY_UPLOAD_FILEPART
 	}
 
 	override def getPrimaryKey : UniqueKey[UploadFilepartRecord] = {

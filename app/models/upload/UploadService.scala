@@ -75,9 +75,7 @@ object UploadService extends FileAccess {
     ContentType.fromFile(file) match {
       case Right(contentType) => {
         filepart.ref.moveTo(file)
-        val filepartRecord = new UploadFilepartRecord(null, uploadId, owner, title, contentType.toString, file.getName, filesize)
-        filepartRecord.changed(UPLOAD_FILEPART.ID, false)
-        
+        val filepartRecord = new UploadFilepartRecord(UUID.randomUUID, uploadId, owner, title, contentType.toString, file.getName, filesize)
         sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
         Right(filepartRecord)
       }
@@ -155,25 +153,22 @@ object UploadService extends FileAccess {
   def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
     val document = DocumentService.createDocument(upload)
 
+    // Import Document and DocumentFileparts 
     sql.insertInto(DOCUMENT).set(document).execute()
 
-    // Insert filepart records - I couldn't find a way to do a batch-insert that also returns
-    // the auto-generated ID. Any hints on how this could be achieved appreciated!
-    val docFileparts = fileparts.zipWithIndex.map { case (part, idx) => {
-      val docFilepart = new DocumentFilepartRecord(null,
-            document.getId,
-            part.getTitle,
-            part.getContentType,
-            part.getFilename,
-            idx + 1)
-
-      docFilepart.changed(DOCUMENT_FILEPART.ID, false)
-      val docFilepartId =
-        sql.insertInto(DOCUMENT_FILEPART).set(docFilepart).returning(DOCUMENT_FILEPART.ID).fetchOne()
-      docFilepart.setId(docFilepartId.getId)
-      docFilepart
-    }}
-
+    val docFileparts = fileparts.zipWithIndex.map { case (part, idx) =>
+      new DocumentFilepartRecord(
+        part.getId,
+        document.getId,
+        part.getTitle,
+        part.getContentType,
+        part.getFilename,
+        idx + 1)
+    }
+        
+    val inserts = docFileparts.map(p => sql.insertInto(DOCUMENT_FILEPART).set(p))    
+    sql.batch(inserts:_*).execute()
+    
     // Move files from 'pending' to 'user-data' folder
     val filePaths = fileparts.map(filepart => {
       val source = new File(PENDING_UPLOADS_DIR, filepart.getFilename).toPath
@@ -181,7 +176,7 @@ object UploadService extends FileAccess {
       Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
     })
 
-    // Delete Upload and Filepart records from the staging area tables
+    // Delete Upload and UploadFilepart records from the staging area tables
     sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.UPLOAD_ID.equal(upload.getId)).execute()
     sql.deleteFrom(UPLOAD).where(UPLOAD.ID.equal(upload.getId)).execute()
 

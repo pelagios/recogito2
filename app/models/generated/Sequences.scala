@@ -35,11 +35,6 @@ object Sequences {
 	val SHARING_POLICY_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("sharing_policy_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))
 
 	/**
-	 * The sequence <code>public.upload_filepart_id_seq</code>
-	 */
-	val UPLOAD_FILEPART_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("upload_filepart_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))
-
-	/**
 	 * The sequence <code>public.upload_id_seq</code>
 	 */
 	val UPLOAD_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("upload_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))

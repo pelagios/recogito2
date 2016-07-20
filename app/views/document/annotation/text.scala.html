@@ -37,7 +37,7 @@
         @if(loggedInUser.isDefined) { me: '@loggedInUser.get', }
         documentId: '@document.getId',
         documentOwner: '@document.getOwner',
-        partId: @currentPart.getId,
+        partId: '@currentPart.getId',
         partSequenceNo: @currentPart.getSequenceNo,
         contentType: '@currentPart.getContentType',
         writeAccess: @accessLevel.canWrite
