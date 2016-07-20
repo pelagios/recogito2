@@ -3,6 +3,7 @@ package controllers.document.settings.actions
 import controllers.BaseAuthController
 import controllers.document.settings.HasAdminAction
 import java.io.{ BufferedInputStream, ByteArrayInputStream, File, FileInputStream, FileOutputStream, InputStream, PrintWriter }
+import java.util.UUID
 import java.util.zip.{ ZipEntry, ZipOutputStream }
 import models.annotation.{ Annotation, AnnotationService }
 import models.user.Roles._
@@ -44,10 +45,13 @@ trait BackupActions extends HasAdminAction with FileAccess { self: BaseAuthContr
   ))
   
   implicit val documentFilepartRecordWrites: Writes[DocumentFilepartRecord] = (
+    (JsPath \ "id").write[UUID] and
     (JsPath \ "title").write[String] and
     (JsPath \ "content_type").write[String] and
     (JsPath \ "filename").write[String]
   )(p => (
+    // TODO a hack to enable migration
+    UUID.fromString(p.getFilename.substring(0, p.getFilename.lastIndexOf('.'))),
     p.getTitle,
     p.getContentType,
     p.getFilename
@@ -87,12 +91,26 @@ trait BackupActions extends HasAdminAction with FileAccess { self: BaseAuthContr
     new FileInputStream(new File(dir, filename))
   }
   
-  private def exportAnnotations(documentId: String, annotations: Seq[Annotation]): InputStream = {
+  /** TODO a hack to enable migration **/
+  private def replaceDBIdWithUUID(json: String, parts: Seq[DocumentFilepartRecord]) = {
+    val startIdx = json.indexOf("\"filepart_id")
+    val endIdx   = json.indexOf(",", startIdx)
+    val dbId     = json.substring(startIdx + 14, endIdx).toInt
+    val filename = parts.filter(_.getId == dbId).head.getFilename
+    val uuid     = UUID.fromString(filename.substring(0, filename.lastIndexOf('.')))
+    
+    json.replace("\"filepart_id\":" + dbId, "\"filepart_id\":\"" + uuid + "\"")
+  }
+  
+  private def exportAnnotations(documentId: String, annotations: Seq[Annotation]/** TODO hack **/, parts: Seq[DocumentFilepartRecord]): InputStream = {
     val tmp = new TemporaryFile(new File(TMP_DIR, documentId + "_annotations.jsonl"))
     val writer = new PrintWriter(tmp.file)
     
-    annotations.foreach(annotation =>
-      writer.println(Json.stringify(Json.toJson(annotation))))
+    annotations.foreach(annotation => {
+      // TODO a hack to enable migration
+      val originalJson = Json.stringify(Json.toJson(annotation))      
+      writer.println(replaceDBIdWithUUID(originalJson, parts))
+    })
       
     writer.flush()
     writer.close()
@@ -114,7 +132,7 @@ trait BackupActions extends HasAdminAction with FileAccess { self: BaseAuthContr
           addToZip(exportFile(document.getOwner, documentId, part.getFilename), "parts" + File.separator + part.getFilename, zipStream))
           
         AnnotationService.findByDocId(documentId).map { annotations =>
-          addToZip(exportAnnotations(documentId, annotations.map(_._1)), "annotations.jsonl", zipStream)
+          addToZip(exportAnnotations(documentId, annotations.map(_._1), parts), "annotations.jsonl", zipStream)
           zipStream.close()
           Ok.sendFile(zipFile.file) 
         }
