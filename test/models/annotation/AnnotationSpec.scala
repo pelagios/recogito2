@@ -34,10 +34,7 @@ class AnnotationSpec extends Specification {
       annotation.contributors.size must equalTo(1)
       annotation.contributors.head must equalTo("rainer")
       annotation.lastModifiedAt must equalTo(DateTime.parse("2016-02-23T18:24:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC))
-      
-      // annotation.status.value must equalTo(AnnotationStatus.VERIFIED)
-      // annotation.status.setAt must equalTo(DateTime.parse("2016-02-23T18:24:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC))
-      
+
       // Bodies
       annotation.bodies.size must equalTo(3)
       annotation.bodies(0).hasType must equalTo(AnnotationBody.QUOTE)
@@ -87,7 +84,7 @@ class AnnotationSpec extends Specification {
         Annotation(
           annotationId,
           versionId,
-          AnnotatedObject("98muze1cl3saib", 1, ContentType.TEXT_PLAIN),
+          AnnotatedObject("98muze1cl3saib", UUID.randomUUID, ContentType.TEXT_PLAIN),
           Seq.empty[String],
           "char-offset:25",
           None,

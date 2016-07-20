@@ -35,7 +35,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
   val annotatesBarcelona = Annotation(
     UUID.fromString("2fabe353-d517-4f18-b6a9-c9ec368b160a"),
     UUID.fromString("74de3052-7087-41b3-84cd-cb8f4a1caa79"),
-    AnnotatedObject("hcylkmacy4xgkb", 1, ContentType.TEXT_PLAIN),
+    AnnotatedObject("hcylkmacy4xgkb", UUID.fromString("d8e2c22f-e5c0-4360-85bd-f5e921bc30dc"), ContentType.TEXT_PLAIN),
     Seq.empty[String],
     "char-offset:12",
     None,
@@ -51,7 +51,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
   val annotatesLancaster = Annotation(
     UUID.fromString("7cfa1504-26de-45ef-a590-8b60ea8a60e8"),
     UUID.fromString("e868423f-5ea9-42ed-bb7d-5e1fac9195a0"),
-    AnnotatedObject("hcylkmacy4xgkb", 1, ContentType.TEXT_PLAIN),
+    AnnotatedObject("hcylkmacy4xgkb", UUID.fromString("d8e2c22f-e5c0-4360-85bd-f5e921bc30dc"), ContentType.TEXT_PLAIN),
     Seq.empty[String],
     "char-offset:124",
     None,
@@ -208,13 +208,13 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       "contain no geotags" in {
         val success = 
           Seq(annotatesBarcelona.annotationId,
-            annotatesVindobonaAndThessaloniki.annotationId).map { annotationId => 
+            annotatesVindobonaAndThessaloniki.annotationId).flatMap { annotationId => 
               Await.result(AnnotationService.deleteAnnotation(annotationId, "rainer", DateTime.now), 10 seconds)  
           }
         
         flush()
         
-        success.filter(_ == true).size must equalTo(2)
+        success.size must equalTo(2)
         totalGeoTags() must equalTo(0)
       }
       

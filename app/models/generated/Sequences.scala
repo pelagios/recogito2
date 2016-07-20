@@ -25,11 +25,6 @@ import org.jooq.impl.SequenceImpl
 object Sequences {
 
 	/**
-	 * The sequence <code>public.document_filepart_id_seq</code>
-	 */
-	val DOCUMENT_FILEPART_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("document_filepart_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))
-
-	/**
 	 * The sequence <code>public.folder_id_seq</code>
 	 */
 	val FOLDER_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("folder_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))

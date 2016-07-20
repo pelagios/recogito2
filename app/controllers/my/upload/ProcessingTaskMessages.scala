@@ -1,5 +1,7 @@
 package controllers.my.upload
 
+import java.util.UUID
+
 private[upload] object ProcessingTaskMessages {
 
   sealed abstract trait Message
@@ -8,7 +10,7 @@ private[upload] object ProcessingTaskMessages {
 
   case object QueryProgress extends Message
 
-  case class WorkerProgress(filepartId: Int, status: ProgressStatus.Value, progress: Double)
+  case class WorkerProgress(filepartId: UUID, status: ProgressStatus.Value, progress: Double)
 
   case class DocumentProgress(documentId: String, task: TaskType, progress: Seq[WorkerProgress]) extends Message
 

@@ -159,9 +159,9 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
     }
 
   /** Retrieves all annotations on a given filepart **/
-  def findByFilepartId(id: Int, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] =
+  def findByFilepartId(id: UUID, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] =
     ES.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id)) limit limit
+      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id.toString)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
 
   /** Retrieves annotations on a document last updated after a given timestamp **/

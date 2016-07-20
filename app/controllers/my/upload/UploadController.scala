@@ -7,6 +7,7 @@ import controllers.my.upload.ProcessingTaskMessages._
 import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
 import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 import models.ContentType
 import models.ContentIdentificationFailures._
@@ -239,7 +240,7 @@ object UploadController {
     Writes[TaskType](t => JsString(t.name))
 
   implicit val workerProgressWrites: Writes[WorkerProgress] = (
-    (JsPath \ "filepart_id").write[Int] and
+    (JsPath \ "filepart_id").write[UUID] and
     (JsPath \ "status").write[ProgressStatus.Value] and
     (JsPath \ "progress").write[Double]
   )(unlift(WorkerProgress.unapply))

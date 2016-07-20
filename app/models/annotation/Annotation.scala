@@ -27,13 +27,13 @@ case class Annotation(
 
 )
 
-case class AnnotatedObject(documentId: String, filepartId: Int, contentType: ContentType)
+case class AnnotatedObject(documentId: String, filepartId: UUID, contentType: ContentType)
 
 object AnnotatedObject extends HasContentTypeList {
 
   implicit val annotatedObjectFormat: Format[AnnotatedObject] = (
     (JsPath \ "document_id").format[String] and
-    (JsPath \ "filepart_id").format[Int] and
+    (JsPath \ "filepart_id").format[UUID] and
     (JsPath \ "content_type").format[JsValue].inmap[ContentType](fromCTypeList, toCTypeList)
   )(AnnotatedObject.apply, unlift(AnnotatedObject.unapply))
 

@@ -2,6 +2,7 @@ package controllers.document.settings.actions
   
 import controllers.BaseAuthController
 import controllers.document.settings.HasAdminAction
+import java.util.UUID
 import models.document.{ DocumentService, PartOrdering }
 import models.user.Roles._
 import play.api.libs.json._
@@ -12,7 +13,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 trait MetadataActions extends HasAdminAction { self: BaseAuthController =>
   
   implicit val orderingReads: Reads[PartOrdering] = (
-    (JsPath \ "id").read[Int] and
+    (JsPath \ "id").read[UUID] and
     (JsPath \ "sequence_no").read[Int]
   )(PartOrdering.apply _)
   

@@ -1,6 +1,7 @@
 package models.document
 
 import collection.JavaConversions._
+import java.util.UUID
 import models.{ BaseService, Page }
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, SharingPolicyRecord }
@@ -13,7 +14,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.{ DB, FileAccess }
 
-case class PartOrdering(partId: Int, seqNo: Int)
+case class PartOrdering(partId: UUID, seqNo: Int)
 
 object DocumentService extends BaseService with FileAccess with SharingPolicies {
   

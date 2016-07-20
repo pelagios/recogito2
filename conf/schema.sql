@@ -71,7 +71,7 @@ CREATE TABLE document (
 );
 
 CREATE TABLE document_filepart (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   document_id TEXT NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   content_type TEXT NOT NULL,

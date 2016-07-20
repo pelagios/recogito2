@@ -9,6 +9,7 @@ import java.lang.Integer
 import java.lang.String
 import java.util.Arrays
 import java.util.List
+import java.util.UUID
 
 import javax.annotation.Generated
 
@@ -18,7 +19,6 @@ import models.generated.tables.records.DocumentFilepartRecord
 
 import org.jooq.Field
 import org.jooq.ForeignKey
-import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -55,7 +55,7 @@ class DocumentFilepart(alias : String, aliased : Table[DocumentFilepartRecord], 
 	/**
 	 * The column <code>public.document_filepart.id</code>.
 	 */
-	val ID : TableField[DocumentFilepartRecord, Integer] = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
+	val ID : TableField[DocumentFilepartRecord, UUID] = createField("id", org.jooq.impl.SQLDataType.UUID.nullable(false), "")
 
 	/**
 	 * The column <code>public.document_filepart.document_id</code>.
@@ -98,10 +98,6 @@ class DocumentFilepart(alias : String, aliased : Table[DocumentFilepartRecord], 
 
 	private def this(alias : String, aliased : Table[DocumentFilepartRecord]) = {
 		this(alias, aliased, null)
-	}
-
-	override def getIdentity : Identity[DocumentFilepartRecord, Integer] = {
-		Keys.IDENTITY_DOCUMENT_FILEPART
 	}
 
 	override def getPrimaryKey : UniqueKey[DocumentFilepartRecord] = {

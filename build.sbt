@@ -22,8 +22,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
   "com.vividsolutions" % "jts" % "1.13",
   "commons-io" % "commons-io" % "2.4",
-  "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
-  "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models",
   "jp.t2v" %% "play2-auth" % "0.14.1",
 
   "org.geotools" % "gt-geojson" % "14.3",

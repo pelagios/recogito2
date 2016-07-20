@@ -53,7 +53,6 @@ class Public extends SchemaImpl("public") {
 
 	private def getSequences0() : List[Sequence[_]] = {
 		return Arrays.asList[Sequence[_]](
-			Sequences.DOCUMENT_FILEPART_ID_SEQ,
 			Sequences.FOLDER_ID_SEQ,
 			Sequences.SHARING_POLICY_ID_SEQ,
 			Sequences.UPLOAD_FILEPART_ID_SEQ,

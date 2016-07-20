@@ -18,7 +18,7 @@ case class GeoTag(
   documentId: String,
   
   /** The ID of the filepart within the document which the annotation annotates **/
-  filepartId: Int,
+  filepartId: UUID,
   
   /** The gazetteer URI used in the annotation to point to the place **/
   gazetteerUri: String
@@ -31,7 +31,7 @@ object GeoTag {
     (JsPath \ "place_id").format[String] and
     (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "document_id").format[String] and
-    (JsPath \ "filepart_id").format[Int] and
+    (JsPath \ "filepart_id").format[UUID] and
     (JsPath \ "gazetteer_uri").format[String]
   )(GeoTag.apply, unlift(GeoTag.unapply))
   

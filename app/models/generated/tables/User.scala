@@ -64,12 +64,12 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	/**
 	 * The column <code>public.user.password_hash</code>.
 	 */
-	val PASSWORD_HASH : TableField[UserRecord, String] = createField("password_hash", org.jooq.impl.SQLDataType.CLOB, "")
+	val PASSWORD_HASH : TableField[UserRecord, String] = createField("password_hash", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>public.user.salt</code>.
 	 */
-	val SALT : TableField[UserRecord, String] = createField("salt", org.jooq.impl.SQLDataType.CLOB, "")
+	val SALT : TableField[UserRecord, String] = createField("salt", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>public.user.member_since</code>.

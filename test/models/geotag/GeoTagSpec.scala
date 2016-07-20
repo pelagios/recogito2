@@ -25,7 +25,7 @@ class GeoTagSpec extends Specification {
       geotag.placeId must equalTo("http://dare.ht.lu.se/places/10778")
       geotag.annotationId must equalTo(UUID.fromString("5c25d207-11a5-49f0-b2a7-61a6ae63d96c"))
       geotag.documentId must equalTo("qhljvnxnuuc9i0")
-      geotag.filepartId must equalTo(19)
+      geotag.filepartId must equalTo(UUID.fromString("f903b736-cae8-4fe3-9bda-01583783548b"))
       geotag.gazetteerUri must equalTo("http://pleiades.stoa.org/places/118543")
     }
     
@@ -38,7 +38,7 @@ class GeoTagSpec extends Specification {
         "http://dare.ht.lu.se/places/10778",
         UUID.randomUUID(),
         "qhljvnxnuuc9i0",
-        19,
+        UUID.fromString("841f9462-beb0-4967-ad48-64af323fc4c1"),
         "http://pleiades.stoa.org/places/118543")
         
       // Convert to JSON

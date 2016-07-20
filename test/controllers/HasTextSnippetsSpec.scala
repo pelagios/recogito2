@@ -44,7 +44,7 @@ class HasTextSnippetsSpec extends Specification {
   def createAnnotationAt(start: Int, end: Int, text: String) = Annotation(
       UUID.randomUUID,
       UUID.randomUUID,
-      AnnotatedObject("ivzcpqoi7qr1uo", 1, ContentType.TEXT_PLAIN),
+      AnnotatedObject("ivzcpqoi7qr1uo", UUID.randomUUID, ContentType.TEXT_PLAIN),
       Seq("rainer"),
       "char-offset:" + start,
       Some("rainer"),

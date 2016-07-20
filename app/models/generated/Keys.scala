@@ -50,7 +50,6 @@ object Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
-	val IDENTITY_DOCUMENT_FILEPART = Identities0.IDENTITY_DOCUMENT_FILEPART
 	val IDENTITY_FOLDER = Identities0.IDENTITY_FOLDER
 	val IDENTITY_SHARING_POLICY = Identities0.IDENTITY_SHARING_POLICY
 	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
@@ -97,7 +96,6 @@ object Keys {
 	// -------------------------------------------------------------------------
 
 	private object Identities0 extends AbstractKeys {
-		val IDENTITY_DOCUMENT_FILEPART : Identity[DocumentFilepartRecord, Integer] = AbstractKeys.createIdentity(DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.ID)
 		val IDENTITY_FOLDER : Identity[FolderRecord, Integer] = AbstractKeys.createIdentity(Folder.FOLDER, Folder.FOLDER.ID)
 		val IDENTITY_SHARING_POLICY : Identity[SharingPolicyRecord, Integer] = AbstractKeys.createIdentity(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
