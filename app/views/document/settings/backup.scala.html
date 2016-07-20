@@ -2,7 +2,22 @@
   webjars: WebJarAssets)
 
 @_layout("Settings - Backup & Restore", username, document, Some("backup"), webjars) {
-  <div class="backup-restore">
-    <a href="@controllers.document.settings.routes.SettingsController.exportAsZIP(document.getId)">Download ZIP</a>
+  <div class="backup panel">
+    <h2>Backup</h2>
+    <div class="inner">
+      <p class="description-text">
+        The backup package includes document metadata, files, and annotations. You can use
+        it to restore your work to Recogito at a later date.<br/> Back up your work regularly
+        as an added safety measure. Please note that the <u>edit history is currently not
+        included</u> in the backup package.
+      </p>
+      <a class="btn grey" href="@controllers.document.settings.routes.SettingsController.exportAsZIP(document.getId)"><span class="icon">&#xf019;</span> Download ZIP</a>
+    </div>
+  </div>
+
+  <div class="restore panel">
+    <h2>Restore</h2>
+    <div class="inner">
+    </div>
   </div>
 }
