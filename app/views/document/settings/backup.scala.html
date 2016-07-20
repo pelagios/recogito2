@@ -2,5 +2,7 @@
   webjars: WebJarAssets)
 
 @_layout("Settings - Backup & Restore", username, document, Some("backup"), webjars) {
-  <div class="backup-restore"></div>
+  <div class="backup-restore">
+    <a href="@controllers.document.settings.routes.SettingsController.exportAsZIP(document.getId)">Download ZIP</a>
+  </div>
 }

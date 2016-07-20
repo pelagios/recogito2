@@ -4,7 +4,7 @@ import controllers.{ BaseAuthController, WebJarAssets }
 import controllers.document.settings.actions._
 import javax.inject.Inject
 import models.document.DocumentService
-import models.generated.tables.records.DocumentRecord
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.user.Roles._
 import play.api.cache.CacheApi
 import play.api.mvc.{ AnyContent, Result, Request }
@@ -18,9 +18,9 @@ trait HasAdminAction { self: BaseAuthController =>
   
   import models.document.DocumentAccessLevel._
   
-  def documentAdminAction(documentId: String, username: String, action: DocumentRecord => Future[Result]) = {
-    DocumentService.findById(documentId, Some(username))(self.db).flatMap(_ match {      
-      case Some((document, accesslvl)) if (accesslvl == OWNER || accesslvl == ADMIN) => action(document)
+  def documentAdminAction(documentId: String, username: String, action: (DocumentRecord, Seq[DocumentFilepartRecord]) => Future[Result]) = {
+    DocumentService.findByIdWithFileparts(documentId, Some(username))(self.db).flatMap(_ match {      
+      case Some((document, parts, accesslvl)) if (accesslvl.isAdmin) => action(document, parts)
       case Some(_) => Future.successful(Forbidden)
       case None => Future.successful(NotFound)
     })
@@ -47,15 +47,16 @@ trait HasAdminAction { self: BaseAuthController =>
 
 class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets)
   extends BaseAuthController
-    with DeleteActions
     with HasAdminAction
-    with MetadataActions 
+    with MetadataActions
+    with SharingActions
     with RollbackActions
-    with SharingActions {
+    with BackupActions
+    with DeleteActions {
     
   def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     // Settings page is only visible to OWNER or ADMIN access levels
-    documentAdminAction(documentId, loggedIn.user.getUsername, { document =>
+    documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, parts) =>
       tab.map(_.toLowerCase) match { 
         case Some(t) if t == "sharing" => {
           val f = for {
