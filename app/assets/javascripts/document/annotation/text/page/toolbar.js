@@ -70,7 +70,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         makeToolbarSticky = function() {
           var onScroll = function() {
             var scrollTop = jQuery(window).scrollTop();
-            if (scrollTop > 147)
+            if (scrollTop > 122) // Title area minus height of icon bar
               rootNode.addClass('fixed');
             else
               rootNode.removeClass('fixed');
