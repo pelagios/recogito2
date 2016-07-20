@@ -53,7 +53,7 @@ PUT     /document/:id/settings/collaborator          controllers.document.settin
 DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
 GET     /document/:id/settings/collaborator/search   controllers.document.settings.SettingsController.searchUsers(id: String, q: String)
 POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String)
-GET     /document/:id/settings/zip-export            controllers.document.settings.SettingsController.exportAsZIP(id: String)
+GET     /document/:id/settings/zip-export            controllers.document.settings.SettingsController.exportAsZip(id: String)
 DELETE  /document/:id/settings/delete                controllers.document.settings.SettingsController.deleteDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

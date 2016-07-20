@@ -50,8 +50,7 @@ trait BackupActions extends HasAdminAction with FileAccess { self: BaseAuthContr
     (JsPath \ "content_type").write[String] and
     (JsPath \ "filename").write[String]
   )(p => (
-    // TODO a hack to enable migration
-    UUID.fromString(p.getFilename.substring(0, p.getFilename.lastIndexOf('.'))),
+    p.getId,
     p.getTitle,
     p.getContentType,
     p.getFilename
@@ -91,26 +90,12 @@ trait BackupActions extends HasAdminAction with FileAccess { self: BaseAuthContr
     new FileInputStream(new File(dir, filename))
   }
   
-  /** TODO a hack to enable migration **/
-  private def replaceDBIdWithUUID(json: String, parts: Seq[DocumentFilepartRecord]) = {
-    val startIdx = json.indexOf("\"filepart_id")
-    val endIdx   = json.indexOf(",", startIdx)
-    val dbId     = json.substring(startIdx + 14, endIdx).toInt
-    val filename = parts.filter(_.getId == dbId).head.getFilename
-    val uuid     = UUID.fromString(filename.substring(0, filename.lastIndexOf('.')))
-    
-    json.replace("\"filepart_id\":" + dbId, "\"filepart_id\":\"" + uuid + "\"")
-  }
-  
   private def exportAnnotations(documentId: String, annotations: Seq[Annotation]/** TODO hack **/, parts: Seq[DocumentFilepartRecord]): InputStream = {
     val tmp = new TemporaryFile(new File(TMP_DIR, documentId + "_annotations.jsonl"))
     val writer = new PrintWriter(tmp.file)
     
-    annotations.foreach(annotation => {
-      // TODO a hack to enable migration
-      val originalJson = Json.stringify(Json.toJson(annotation))      
-      writer.println(replaceDBIdWithUUID(originalJson, parts))
-    })
+    annotations.foreach(annotation =>
+      writer.println(Json.stringify(Json.toJson(annotation))))
       
     writer.flush()
     writer.close()
@@ -118,7 +103,7 @@ trait BackupActions extends HasAdminAction with FileAccess { self: BaseAuthContr
     new FileInputStream(tmp.file)
   }
   
-  def exportAsZIP(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def exportAsZip(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, parts) =>
       Future {
         new TemporaryFile(new File(TMP_DIR, documentId + ".zip"))
