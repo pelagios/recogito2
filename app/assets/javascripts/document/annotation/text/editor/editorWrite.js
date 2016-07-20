@@ -246,10 +246,11 @@ define([
 
   /** Extends the open method provided by EditorBase **/
   WriteEditor.prototype.open = function(annotation, bounds) {
+    EditorBase.prototype.open.call(this, annotation, bounds);
+
     if (AnnotationUtils.countComments(annotation) > 0)
       this.replyField.setPlaceHolder('Write a reply...');
 
-    EditorBase.prototype.open.call(this, annotation, bounds);
     return false;
   };
 
