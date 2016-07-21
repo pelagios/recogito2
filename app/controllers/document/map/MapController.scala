@@ -16,8 +16,10 @@ class MapController @Inject() (implicit val cache: CacheApi, val db: DB, webjars
     documentResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       if (accesslevel.canRead)
         Future.successful(Ok(views.html.document.map.index(maybeUser, document, accesslevel)))
+      else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet 
+        authenticationFailed(request)        
       else
-        authenticationFailed(request)  
+        Future.successful(Forbidden)
     })
   }
 

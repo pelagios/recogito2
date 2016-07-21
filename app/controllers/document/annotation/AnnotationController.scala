@@ -25,8 +25,10 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, 
     documentPartResponse(documentId, partNo, maybeUser, { case (document, fileparts, selectedPart, accesslevel) =>
       if (accesslevel.canRead)
         renderResponse(maybeUser, document, fileparts, selectedPart, accesslevel)
-      else
+      else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet 
         authenticationFailed(request)        
+      else
+        Future.successful(Forbidden)
     })
   }
 

@@ -66,6 +66,12 @@ GET     /document/:id/part/:partNo/tiles/*path       controllers.document.Docume
 GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document base path
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /document/:id                                controllers.document.DocumentController.initialView(id: String)
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
