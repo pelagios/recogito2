@@ -160,7 +160,7 @@ require(['common/config'], function(Config) {
             return { id: part.id, sequence_no: part.getSortPosition() + 1 };
           });
 
-          jsRoutes.controllers.document.DocumentController.setSortOrder(Config.documentId).ajax({
+          jsRoutes.controllers.document.settings.SettingsController.setSortOrder(Config.documentId).ajax({
             data: JSON.stringify(sortOrder),
             contentType: 'application/json'
           }).fail(function(error) {
