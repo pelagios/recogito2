@@ -6,10 +6,12 @@ import java.util.UUID
 import java.sql.Timestamp
 import java.util.zip.{ ZipEntry, ZipFile }
 import models.HasDate
+import models.annotation.{ Annotation, AnnotationService }
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.libs.json._
+import scala.concurrent.ExecutionContext
 import scala.io.Source
 import storage.DB
 
@@ -40,8 +42,11 @@ trait RestoreAction extends HasDate {
         (obj \ "filename").as[String],
         idx + 1)
     }
+  
+  private def parseAnnotations(lines: Iterator[String]) =
+    lines.map(line => Json.fromJson[Annotation](Json.parse(line)).get)
  
-  def restoreFromZip(file: File)(implicit db: DB) = {
+  def restoreFromZip(file: File)(implicit db: DB, context: ExecutionContext) = {
     val zipFile = new ZipFile(file)
     val entries = zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX")) // Damn you Apple!
     
@@ -57,7 +62,14 @@ trait RestoreAction extends HasDate {
       (record, inputstream)
     }
     
-    DocumentService.importDocument(documentRecord, fileparts)
+    val annotationEntry = entries.filter(_.getName == "annotations.jsonl").head
+    val annotationLines = Source.fromInputStream(zipFile.getInputStream(annotationEntry), "UTF-8").getLines
+    val annotations = parseAnnotations(annotationLines).toSeq
+    
+    for {
+     _ <- DocumentService.importDocument(documentRecord, fileparts)
+     _ <- AnnotationService.insertOrUpdateAnnotations(annotations)
+    } yield Unit
 
   }
   

@@ -98,7 +98,7 @@ trait BackupActions extends HasAdminAction with FileAccess with HasDate { self: 
   }
   
   private def exportAnnotations(documentId: String, annotations: Seq[Annotation]/** TODO hack **/, parts: Seq[DocumentFilepartRecord]): InputStream = {
-    val tmp = new TemporaryFile(new File(TMP_DIR, documentId + "_annotations.jsonl"))
+    val tmp = new TemporaryFile(new File(TMP_DIR, documentId + "annotations.jsonl"))
     val writer = new PrintWriter(tmp.file)
     
     annotations.foreach(annotation =>
