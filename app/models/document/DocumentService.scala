@@ -54,15 +54,20 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
   
   private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel =
     forUser match {      
-      case Some(user) if (document.getOwner == user) => 
+      case Some(user) if (document.getOwner == user) =>
         DocumentAccessLevel.OWNER
-      case Some(user) => 
-        sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => DocumentAccessLevel.withName(p.getAccessLevel))
-          .getOrElse(DocumentAccessLevel.FORBIDDEN)
-      case _ if (document.getIsPublic) =>
-        DocumentAccessLevel.READ
-      case _ =>
-        DocumentAccessLevel.FORBIDDEN
+      
+      case Some(user) =>
+        sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => DocumentAccessLevel.withName(p.getAccessLevel)) match {
+          // There's a sharing policy for this user
+          case Some(policy) => policy
+          
+          // No sharing policy, but document might still be public
+          case None => if (document.getIsPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
+        }
+
+      case None =>
+        if (document.getIsPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
     }
   
   /** Creates a new DocumentRecord from an UploadRecord **/
