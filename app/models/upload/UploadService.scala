@@ -125,7 +125,7 @@ object UploadService extends FileAccess {
     sql.deleteFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).execute() == 1
   }
 
-  /** Retrieves the pending upload for a user (if any) along with the filepart metadata records **/
+  /** Retrieves the pending uplotad for a user (if any) along with the filepart metadata records **/
   def findPendingUploadWithFileparts(username: String)(implicit db: DB) = db.query { sql =>
     val result =
       sql.selectFrom(UPLOAD
@@ -152,7 +152,7 @@ object UploadService extends FileAccess {
 
   /** Promotes a pending upload in the staging area to actual document **/
   def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
-    val document = DocumentService.createDocument(upload)
+    val document = DocumentService.createDocumentFromUpload(upload)
 
     // Import Document and DocumentFileparts 
     sql.insertInto(DOCUMENT).set(document).execute()

@@ -1,0 +1,26 @@
+@()(implicit request: RequestHeader, webjars: WebJarAssets)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito Administration - Backup &amp; Restore</title>
+    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+  </head>
+  <body>
+    <div class="side-navbar">
+      <ul>
+        <li><a href="#">Users</a></li>
+        <li><a href="#">Gazetteers</a></li>
+        <li><a href="#">Backup &amp; Restore</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <div class="upload-zip">
+        @helper.form(action = controllers.admin.backup.routes.BackupAdminController.restoreDocument(), 'enctype -> "multipart/form-data") {
+          <input type="file" id="backup-zip" name="backup-zip">
+          <input type="submit">
+        }
+      </div>
+    </div>
+  </body>
+</html>

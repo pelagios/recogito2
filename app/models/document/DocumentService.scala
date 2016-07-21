@@ -1,6 +1,8 @@
 package models.document
 
 import collection.JavaConversions._
+import java.io.{ File, InputStream }
+import java.nio.file.Files
 import java.util.UUID
 import models.{ BaseService, Page }
 import models.generated.Tables._
@@ -64,7 +66,7 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
     }
   
   /** Creates a new DocumentRecord from an UploadRecord **/
-  def createDocument(upload: UploadRecord)(implicit db: DB) =
+  private[models] def createDocumentFromUpload(upload: UploadRecord)(implicit db: DB) =
     new DocumentRecord(
           generateRandomID(),
           upload.getOwner,
@@ -79,6 +81,22 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
           upload.getEdition,
           false)
   
+  /** Imports document and filepart records to DB, and filepart content to user dir **/
+  def importDocument(document: DocumentRecord, fileparts: Seq[(DocumentFilepartRecord, InputStream)])(implicit db: DB) = db.withTransaction { sql =>
+    // Import DocumentRecord 
+    sql.insertInto(DOCUMENT).set(document).execute()
+    
+    // Import DocumentFilepartRecords 
+    val inserts = fileparts.map { case (part, _) => sql.insertInto(DOCUMENT_FILEPART).set(part) }    
+    sql.batch(inserts:_*).execute()
+    
+    // Import files
+    fileparts.foreach { case (part, stream) =>
+      val destination = new File(getDocumentDir(document.getOwner, document.getId, true).get, part.getFilename).toPath
+      Files.copy(stream, destination)
+    }
+  }
+    
   /** Changes the public visibility flag for the given document **/
   def setPublicVisibility(docId: String, enabled: Boolean)(implicit db: DB) = db.withTransaction { sql =>
     sql.update(DOCUMENT).set[java.lang.Boolean](DOCUMENT.IS_PUBLIC, enabled).where(DOCUMENT.ID.equal(docId)).execute()

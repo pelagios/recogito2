@@ -5,9 +5,11 @@ import controllers.document.settings.HasAdminAction
 import java.io.{ BufferedInputStream, ByteArrayInputStream, File, FileInputStream, FileOutputStream, InputStream, PrintWriter }
 import java.util.UUID
 import java.util.zip.{ ZipEntry, ZipOutputStream }
+import models.HasDate
 import models.annotation.{ Annotation, AnnotationService }
 import models.user.Roles._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import org.joda.time.DateTime
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
@@ -15,13 +17,16 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.Future
 import storage.FileAccess
+import java.sql.Timestamp
 
-trait BackupActions extends HasAdminAction with FileAccess { self: BaseAuthController =>
+trait BackupActions extends HasAdminAction with FileAccess with HasDate { self: BaseAuthController =>
 
   private val TMP_DIR = System.getProperty("java.io.tmpdir")
   
   implicit val documentRecordWrites: Writes[DocumentRecord] = (
     (JsPath \ "id").write[String] and
+    (JsPath \ "owner").write[String] and
+    (JsPath \ "uploaded_at").write[DateTime] and
     (JsPath \ "title").write[String] and
     (JsPath \ "author").writeNullable[String] and
     // TODO date_numeric
@@ -33,6 +38,8 @@ trait BackupActions extends HasAdminAction with FileAccess { self: BaseAuthContr
     (JsPath \ "is_public").write[Boolean]
   )(d => ( 
     d.getId, 
+    d.getOwner,
+    new DateTime(d.getUploadedAt.getTime),
     d.getTitle,
     Option(d.getAuthor),
     // TODO date_numeric
