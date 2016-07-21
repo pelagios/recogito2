@@ -14,6 +14,8 @@ import scala.util.{ Try, Success, Failure }
 object ES {
   
   val IDX_RECOGITO = "recogito"
+  
+  val MAX_SIZE = 2147483647
 
   lazy val client = {
     val home = Play.current.configuration.getString("recogito.index.dir") match {

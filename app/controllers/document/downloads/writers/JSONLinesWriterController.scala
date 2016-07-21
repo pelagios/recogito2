@@ -21,7 +21,7 @@ class JSONLinesWriterController @Inject() (implicit val cache: CacheApi, val db:
   private val NEWLINE = "\n"
   
   def downloadAnnotations(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    AnnotationService.findByDocId(documentId, Int.MaxValue).map { annotations =>
+    AnnotationService.findByDocId(documentId).map { annotations =>
       val enumerator = Enumerator.enumerate(annotations.map(t => Json.stringify(Json.toJson(t._1)) + NEWLINE))
       val source = Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)).map(ByteString.apply)
       Ok.sendEntity(HttpEntity.Streamed(source, None, Some("app/json")))
