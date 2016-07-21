@@ -67,15 +67,16 @@ object UploadService extends FileAccess {
   def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile])(implicit db: DB):
     Future[Either[ContentIdentificationFailure, UploadFilepartRecord]] = db.withTransaction { sql =>
 
+    val id = UUID.randomUUID
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filesize = filepart.ref.file.length.toDouble / 1024
-    val file = new File(PENDING_UPLOADS_DIR, UUID.randomUUID.toString + extension)
+    val file = new File(PENDING_UPLOADS_DIR, id.toString + extension)
 
     ContentType.fromFile(file) match {
       case Right(contentType) => {
         filepart.ref.moveTo(file)
-        val filepartRecord = new UploadFilepartRecord(UUID.randomUUID, uploadId, owner, title, contentType.toString, file.getName, filesize)
+        val filepartRecord = new UploadFilepartRecord(id, uploadId, owner, title, contentType.toString, file.getName, filesize)
         sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
         Right(filepartRecord)
       }
