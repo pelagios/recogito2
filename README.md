@@ -45,6 +45,8 @@ us. Meanwhile, you can check progress through Recogito's JSON Place API:
 
 [http://localhost:9000/api/places/search?q=*&pretty=true](http://localhost:9000/api/places/search?q=*&pretty=true)
 
+__Note #2:__ It's not possible to upload controlled vocabularies for persons, periods or events yet.
+
 ## Running in production
 
 * To test production mode before deploying, type `activator testProd`
