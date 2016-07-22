@@ -142,7 +142,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
   /** Deletes a filepart during step 2 **/
   def deleteFilepart(usernameInPath: String, filename: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     UploadService.deleteFilepartByTitleAndOwner(filename, loggedIn.user.getUsername).map(success => {
-      if (success) Ok("ok.") else NotFound
+      if (success) Ok("ok.") else NotFound(views.html.error404())
     })
   }
 
@@ -208,7 +208,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
           case Some(result) =>
             Ok(Json.toJson(result))
           case None =>
-            NotFound
+            NotFound(views.html.error404())
         })
       }
 
@@ -217,7 +217,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
         Future.successful(Forbidden)
 
       case None =>
-        Future.successful(NotFound)
+        Future.successful(NotFound(views.html.error404()))
     })
   }
 

@@ -27,7 +27,7 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
       if (file.exists)
         Ok.sendFile(file)
       else
-        NotFound
+        NotFound(views.html.error404())
     })
   }
   
@@ -35,7 +35,7 @@ class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) ex
     documentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
       openThumbnail(loggedIn.user.getUsername, docId, filepart.getFilename) match {
         case Some(file) => Ok.sendFile(file)
-        case None => NotFound
+        case None => NotFound(views.html.error404())
       }
     })
   }

@@ -46,7 +46,7 @@ class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB, 
     
     f.map { case (userWithRoles, publicDocuments) => userWithRoles match {
       case Some(u) => Ok(views.html.my.my_public(u.user, publicDocuments))
-      case None => NotFound
+      case None => NotFound(views.html.error404())
     }}  
   }
   

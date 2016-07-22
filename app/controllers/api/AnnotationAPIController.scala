@@ -113,7 +113,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
               }
 
           case None =>
-            Future.successful(NotFound)
+            Future.successful(NotFound(views.html.error404()))
         })
 
       case (id, None) =>
@@ -172,7 +172,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
 
               case None => {
                 Logger.warn("POST to /annotations but annotation points to unknown document: " + s.get.annotates.documentId)
-                Future.successful(NotFound)
+                Future.successful(NotFound(views.html.error404()))
               }
             })
           }
@@ -228,7 +228,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
 
             case None => {
               Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
-              NotFound
+              NotFound(views.html.error404())
             }
           })
         } else {
@@ -236,7 +236,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
         }
       }
 
-      case None => Future.successful(NotFound)
+      case None => Future.successful(NotFound(views.html.error404()))
     })
   }
 
@@ -272,7 +272,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                     if (success) Status(200) else InternalServerError)
     
                 case None =>
-                  Future.successful(NotFound)
+                  Future.successful(NotFound(views.html.error404()))
               })
             } else {
               Future.successful(Forbidden)
@@ -287,7 +287,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
         })
       }
 
-      case None => Future.successful(NotFound)
+      case None => Future.successful(NotFound(views.html.error404()))
     })
   }
 

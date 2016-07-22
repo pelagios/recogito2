@@ -22,7 +22,7 @@ abstract class BaseOptAuthController extends BaseController with HasCache with H
 
     DocumentService.findByIdWithFileparts(documentId, maybeUser).flatMap(_ match {
       case Some((document, fileparts, accesslevel)) => response(document, fileparts, accesslevel)
-      case None => Future.successful(NotFound)
+      case None => Future.successful(NotFound(views.html.error404()))
     }).recover { case t =>
       t.printStackTrace()
       InternalServerError(t.getMessage)    
@@ -36,7 +36,7 @@ abstract class BaseOptAuthController extends BaseController with HasCache with H
     documentResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
       if (selectedPart.isEmpty) {
-        Future.successful(NotFound)
+        Future.successful(NotFound(views.html.error404()))
       } else if (selectedPart.size == 1) {
         response(document, fileparts, selectedPart.head, accesslevel)
       } else {

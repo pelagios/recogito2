@@ -17,10 +17,12 @@ class ErrorHandler @Inject() (
     Future.successful(InternalServerError("A server error occurred: " + exception.getMessage))
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
-    if (statusCode == 413) // Request entity too large
+    if (statusCode == 413)      // Request entity too large
       Future.successful(EntityTooLarge("Could not upload the file - too large"))
-    else 
+    else if (statusCode == 404) // Not Found
+      Future.successful(NotFound(views.html.error404()))
+    else
       super.onClientError(request, statusCode, message)
   }
-  
+
 }

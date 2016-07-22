@@ -23,7 +23,7 @@ class UserAdminController @Inject() (implicit val cache: CacheApi, val db: DB, e
         DocumentService.findByOwner(username).map(documents =>
           Ok(views.html.admin.users.details(user, documents)))
 
-      case None => Future.successful(NotFound)
+      case None => Future.successful(NotFound(views.html.error404()))
 
     })
   }

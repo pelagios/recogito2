@@ -22,7 +22,7 @@ trait HasAdminAction { self: BaseAuthController =>
     DocumentService.findByIdWithFileparts(documentId, Some(username))(self.db).flatMap(_ match {      
       case Some((document, parts, accesslvl)) if (accesslvl.isAdmin) => action(document, parts)
       case Some(_) => Future.successful(Forbidden)
-      case None => Future.successful(NotFound)
+      case None => Future.successful(NotFound(views.html.error404()))
     })
   }
   
@@ -33,7 +33,7 @@ trait HasAdminAction { self: BaseAuthController =>
           DocumentService.findById(documentId, Some(username))(self.db).flatMap(_ match {
             case Some((document, accesslvl)) if (accesslvl == OWNER || accesslvl == ADMIN) => action(document, s.get)
             case Some(_) => Future.successful(Forbidden)
-            case None => Future.successful(NotFound)
+            case None => Future.successful(NotFound(views.html.error404()))
           })
         
         case e: JsError => Future.successful(BadRequest)

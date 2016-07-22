@@ -23,7 +23,7 @@ trait DeleteActions extends HasAdminAction { self: BaseAuthController =>
       }
 
       case None =>
-        Future.successful(NotFound) // No document with that ID found in DB
+        Future.successful(NotFound(views.html.error404())) // No document with that ID found in DB
     }).recover { case t =>
       t.printStackTrace()
       InternalServerError(t.getMessage)

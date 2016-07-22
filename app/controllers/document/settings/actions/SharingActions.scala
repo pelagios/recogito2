@@ -53,7 +53,7 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
               .map { case (policy, isNew) => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy, isNew))) }
             
           case None => 
-            Future.successful(NotFound)
+            Future.successful(NotFound(views.html.error404()))
         }}
       }
     })
