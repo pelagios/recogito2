@@ -30,21 +30,16 @@ Home of Recogito v2.0 - a Linked Data annotation tool for texts and images, deve
 
 ## Importing gazetteers
 
-* A gazetteer dump from the [Digital Atlas of the Roman Empire](http://dare.ht.lu.se/) (in [Pelagios
+* A gazetteer dump file from the [Digital Atlas of the Roman Empire](http://dare.ht.lu.se/) (in [Pelagios
   Gazetteer Interconnection Format](http://github.com/pelagios/pelagios-cookbook/wiki/Pelagios-Gazetteer-Interconnection-Format))
   is included in the `/gazetteers` folder.
 * You can import this gazetteer to Recogito on the Gazetteer Administration page at
-  [http://localhost:9000/admin/gazetteers](http://localhost:9000/admin/gazetteers).
-* Note that you need to be logged in with a user that has administrator privileges (e.g. the
-  default 'recogito').
-
-__Note:__ the admin pages are work in progress. Don't expect any fancy functionality or styling
-there yet! Importing gazetteers can take a while, and there is no progress display yet. Bear with
-us. Meanwhile, you can check progress through Recogito's JSON Place API:
-
-[http://localhost:9000/api/places/search?q=*&pretty=true](http://localhost:9000/api/places/search?q=*&pretty=true)
-
-__Note #2:__ It's not possible to upload controlled vocabularies for persons, periods or events yet.
+  [http://localhost:9000/admin/gazetteers](http://localhost:9000/admin/gazetteers). Note that you
+  need to be logged in with a user that has administrator privileges (e.g. the default 'recogito').
+* __WARNING__ the admin pages are work in progress. Don't expect any fancy functionality or styling
+  there yet! Importing gazetteers can take a while, and there is no progress display yet. Bear with
+  us. You can track progress through Recogito's JSON Place API at [http://localhost:9000/api/places/search?q=*&pretty=true](http://localhost:9000/api/places/search?q=*&pretty=true)
+* It's not possible to upload controlled vocabularies for persons, periods or events yet.
 
 ## Running in production
 
