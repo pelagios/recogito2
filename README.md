@@ -30,14 +30,13 @@ Home of Recogito v2.0 - a Linked Data annotation tool for texts and images, deve
 
 ## Importing gazetteers
 
-In order to use geo-tagging, you need to manually import one or several gazetteers. A dump file of
-the gazetteer from the [Digital Atlas of the Roman Empire](http://dare.ht.lu.se/) (in [Pelagios
-Gazetteer Interconnection Format](http://github.com/pelagios/pelagios-cookbook/wiki/Pelagios-Gazetteer-Interconnection-Format))
-is included in the `/gazetteers` folder.
-
-You can import the gazetteer by going to the gazetteer administration page at
-[http://localhost:9000/admin/gazetteers](http://localhost:9000/admin/gazetteers). Note that you
-need to be logged in with a user that has administrator privileges (e.g. the default 'recogito').
+* A gazetteer dump from the [Digital Atlas of the Roman Empire](http://dare.ht.lu.se/) (in [Pelagios
+  Gazetteer Interconnection Format](http://github.com/pelagios/pelagios-cookbook/wiki/Pelagios-Gazetteer-Interconnection-Format))
+  is included in the `/gazetteers` folder.
+* You can import this gazetteer to Recogito on the Gazetteer Administration page at
+  [http://localhost:9000/admin/gazetteers](http://localhost:9000/admin/gazetteers).
+* Note that you need to be logged in with a user that has administrator privileges (e.g. the
+  default 'recogito').
 
 __Note:__ the admin pages are work in progress. Don't expect any fancy functionality or styling
 there yet! Importing gazetteers can take a while, and there is no progress display yet. Bear with
