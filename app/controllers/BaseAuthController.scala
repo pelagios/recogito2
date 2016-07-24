@@ -30,7 +30,7 @@ abstract class BaseAuthController extends BaseController with HasCache with HasD
 
       case None =>
         // No document with that ID found in DB
-        NotFound(views.html.error404())
+        NotFoundPage
     }).recover { case t =>
       t.printStackTrace()
       InternalServerError(t.getMessage)
@@ -44,7 +44,7 @@ abstract class BaseAuthController extends BaseController with HasCache with HasD
     documentResponse(docId, username, { case (document, fileparts, accesslevel) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
       if (selectedPart.isEmpty)
-        NotFound(views.html.error404())
+        NotFoundPage
       else if (selectedPart.size == 1)
         response(document, fileparts, selectedPart.head, accesslevel)
       else

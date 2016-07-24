@@ -40,7 +40,7 @@ trait RollbackActions extends HasAdminAction { self: BaseAuthController =>
             f.map(success => if (success) Status(200) else InternalServerError)
           }
           
-          case None => Future.successful(NotFound(views.html.error404()))
+          case None => Future.successful(NotFoundPage)
         }
       }
       

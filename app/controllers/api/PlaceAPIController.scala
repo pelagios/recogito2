@@ -16,7 +16,7 @@ class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, co
   def findPlaceByURI(uri: String) = Action.async { implicit request =>
     PlaceService.findByURI(uri).map { _ match {
       case Some((place, _)) => jsonOk(Json.toJson(place))
-      case None => NotFound(views.html.error404())
+      case None => NotFoundPage
     }}
   }
 

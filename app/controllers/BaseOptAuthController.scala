@@ -11,7 +11,7 @@ import scala.concurrent.Future
 import storage.DB
 
 abstract class BaseOptAuthController extends BaseController with HasCache with HasDatabase with OptionalAuthElement with Security {
-
+  
   /** Helper that covers the boilerplate for all document views
     *
     * Just hand this method a function that produces an HTTP OK result for a document, while
@@ -22,7 +22,7 @@ abstract class BaseOptAuthController extends BaseController with HasCache with H
 
     DocumentService.findByIdWithFileparts(documentId, maybeUser).flatMap(_ match {
       case Some((document, fileparts, accesslevel)) => response(document, fileparts, accesslevel)
-      case None => Future.successful(NotFound(views.html.error404()))
+      case None => Future.successful(NotFoundPage)
     }).recover { case t =>
       t.printStackTrace()
       InternalServerError(t.getMessage)    
@@ -36,7 +36,7 @@ abstract class BaseOptAuthController extends BaseController with HasCache with H
     documentResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
       if (selectedPart.isEmpty) {
-        Future.successful(NotFound(views.html.error404()))
+        Future.successful(NotFoundPage)
       } else if (selectedPart.size == 1) {
         response(document, fileparts, selectedPart.head, accesslevel)
       } else {

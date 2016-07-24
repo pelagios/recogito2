@@ -1,7 +1,7 @@
 package controllers.my
 
 import controllers.WebJarAssets
-import controllers.{ HasCache, HasDatabase, Security }
+import controllers.{ BaseController, HasCache, HasDatabase, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.Page
@@ -12,12 +12,12 @@ import models.generated.tables.records.UserRecord
 import play.api.Play
 import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.mvc.{ Controller, RequestHeader }
+import play.api.mvc.RequestHeader
 import storage.DB
 import scala.concurrent.Future
 
 class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) 
-  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security {
+  extends BaseController with HasCache with HasDatabase with OptionalAuthElement with Security {
 
   // TODO this may depend on user in the future
   private lazy val QUOTA = Play.current.configuration.getInt("recogito.upload.quota").getOrElse(200)
@@ -46,7 +46,7 @@ class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB, 
     
     f.map { case (userWithRoles, publicDocuments) => userWithRoles match {
       case Some(u) => Ok(views.html.my.my_public(u.user, publicDocuments))
-      case None => NotFound(views.html.error404())
+      case None => NotFoundPage
     }}  
   }
   
