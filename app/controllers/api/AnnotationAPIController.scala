@@ -165,7 +165,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                   f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
                 } else {
                   // No write permissions
-                  Future.successful(Forbidden)
+                  Future.successful(ForbiddenPage)
                 }
               }
 
@@ -222,7 +222,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                 }
               } else {
                 // No read permission on this document
-                Forbidden
+                ForbiddenPage
               }
 
             case None => {
@@ -274,7 +274,7 @@ class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: D
                   Future.successful(NotFoundPage)
               })
             } else {
-              Future.successful(Forbidden)
+              Future.successful(ForbiddenPage)
             }
           }
 

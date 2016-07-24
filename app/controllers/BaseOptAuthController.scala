@@ -15,7 +15,7 @@ abstract class BaseOptAuthController extends BaseController with HasCache with H
   /** Helper that covers the boilerplate for all document views
     *
     * Just hand this method a function that produces an HTTP OK result for a document, while
-    * the method handles Forbidden/Not Found error cases.
+    * the method handles ForbiddenPage/Not Found error cases.
     */
   protected def documentResponse(documentId: String, maybeUser: Option[String],
       response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Future[Result])(implicit cache: CacheApi, db: DB) = {

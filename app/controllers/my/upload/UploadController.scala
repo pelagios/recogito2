@@ -214,7 +214,7 @@ class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, syst
 
       case Some(document) =>
         // Document exists, but no read permission
-        Future.successful(Forbidden)
+        Future.successful(ForbiddenPage)
 
       case None =>
         Future.successful(NotFoundPage)

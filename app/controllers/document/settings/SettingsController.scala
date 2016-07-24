@@ -21,7 +21,7 @@ trait HasAdminAction { self: BaseAuthController =>
   def documentAdminAction(documentId: String, username: String, action: (DocumentRecord, Seq[DocumentFilepartRecord]) => Future[Result]) = {
     DocumentService.findByIdWithFileparts(documentId, Some(username))(self.db).flatMap(_ match {      
       case Some((document, parts, accesslvl)) if (accesslvl.isAdmin) => action(document, parts)
-      case Some(_) => Future.successful(Forbidden)
+      case Some(_) => Future.successful(ForbiddenPage)
       case None => Future.successful(NotFoundPage)
     })
   }
@@ -32,7 +32,7 @@ trait HasAdminAction { self: BaseAuthController =>
         case s: JsSuccess[T] =>
           DocumentService.findById(documentId, Some(username))(self.db).flatMap(_ match {
             case Some((document, accesslvl)) if (accesslvl == OWNER || accesslvl == ADMIN) => action(document, s.get)
-            case Some(_) => Future.successful(Forbidden)
+            case Some(_) => Future.successful(ForbiddenPage)
             case None => Future.successful(NotFoundPage)
           })
         

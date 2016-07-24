@@ -14,6 +14,8 @@ trait HasCache { def cache: CacheApi }
 abstract class BaseController extends Controller {
   
   protected val NotFoundPage = NotFound(views.html.error404())
+  
+  protected val ForbiddenPage = Forbidden(views.html.error403())
 
   /** Returns the value of the specified query string parameter **/
   protected def getQueryParam(key: String)(implicit request: Request[AnyContent]): Option[String] =

@@ -19,7 +19,7 @@ trait DeleteActions extends HasAdminAction { self: BaseAuthController =>
             success <- AnnotationService.deleteByDocId(docId)
           } yield if (success) Status(200) else InternalServerError
         else
-          Future.successful(Forbidden)
+          Future.successful(ForbiddenPage)
       }
 
       case None =>

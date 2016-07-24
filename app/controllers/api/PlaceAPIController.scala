@@ -27,7 +27,7 @@ class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, co
         jsonOk(Json.toJson(results.map(_._1)))
       }
       
-      case None => Future.successful(Forbidden)
+      case None => Future.successful(ForbiddenPage)
     }
   }
   
@@ -37,7 +37,7 @@ class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, co
       if (accesslevel.canRead)
         PlaceService.listPlacesInDocument(docId, offset, size).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
       else
-        Future.successful(Forbidden)
+        Future.successful(ForbiddenPage)
     })
   }
   
@@ -49,7 +49,7 @@ class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, co
           jsonOk(Json.toJson(results.map(_._1)))
         }
       else
-        Future.successful(Forbidden)
+        Future.successful(ForbiddenPage)
     })
   }
  

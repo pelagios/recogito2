@@ -28,7 +28,7 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, 
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet 
         authenticationFailed(request)        
       else
-        Future.successful(Forbidden)
+        Future.successful(ForbiddenPage)
     })
   }
 
