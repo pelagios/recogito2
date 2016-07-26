@@ -1,8 +1,9 @@
 package models.place
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
+import com.sksamuel.elastic4s.{ HitAs, RichSearchHit, SearchType }
 import com.sksamuel.elastic4s.source.Indexable
+import com.vividsolutions.jts.geom.Coordinate
 import models.Page
 import org.elasticsearch.search.aggregations.bucket.nested.Nested
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
@@ -13,7 +14,6 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.language.postfixOps
 import storage.ES
-import com.sksamuel.elastic4s.SearchType
 
 trait PlaceStore {
 
@@ -45,7 +45,7 @@ trait PlaceStore {
   def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
 
   /** Place search **/
-  def searchPlaces(query: String, offset: Int = 0, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
+  def searchPlaces(query: String, offset: Int = 0, limit: Int = 20, sortFrom: Option[Coordinate] = None)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
 
 }
 
@@ -132,9 +132,9 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
       } limit 100
     } map { _.as[(Place, Long)].toSeq }
 
-  override def searchPlaces(q: String, offset: Int, limit: Int)(implicit context: ExecutionContext): Future[Page[(Place, Long)]] =
+  override def searchPlaces(q: String, offset: Int, limit: Int, sortFrom: Option[Coordinate])(implicit context: ExecutionContext): Future[Page[(Place, Long)]] = {
     ES.client execute {
-      search in ES.IDX_RECOGITO / PLACE query {
+      val query = search in ES.IDX_RECOGITO / PLACE query {
         bool {
           should (
             // Treat as standard query string query first...
@@ -168,10 +168,16 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
           )
         }
       } start offset limit limit
+      
+      sortFrom match {
+        case Some(coord) => query sort ( geoSort("representative_point") point(coord.y, coord.x) order SortOrder.ASC )
+        case None        => query
+      }
     } map { response =>
       val places = response.as[(Place, Long)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, limit, places)
-    }
+    } 
+  }
 
   private def scrollByGazetteer(gazetteer: String, fn: Place => Future[Boolean])(implicit context: ExecutionContext) = {
 

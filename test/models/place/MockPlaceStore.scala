@@ -1,6 +1,7 @@
 package models.place
 
 import collection.JavaConverters._
+import com.vividsolutions.jts.geom.Coordinate
 import java.util.concurrent.ConcurrentHashMap
 import play.api.Logger
 import scala.concurrent.{ ExecutionContext, Future }
@@ -54,7 +55,7 @@ class MockPlaceStore extends PlaceStore {
         .map((_, 0l))
     }
   
-  def searchPlaces(name: String, offset: Int, limit: Int)(implicit context: ExecutionContext) =
+  def searchPlaces(name: String, offset: Int, limit: Int, sortFrom: Option[Coordinate])(implicit context: ExecutionContext) =
     Future {
       val results = mockIndex.asScala.values.toSeq
         .filter(place => {

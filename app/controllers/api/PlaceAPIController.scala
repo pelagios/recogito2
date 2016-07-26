@@ -8,7 +8,9 @@ import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Try, Success, Failure }
 import storage.DB
+import com.vividsolutions.jts.geom.Coordinate
 
 class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseOptAuthController with HasPrettyPrintJSON {
     
@@ -21,10 +23,20 @@ class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, co
   }
 
   /** Search by query string - available to logged in users only **/
-  def searchPlaces(query: String, offset: Int, size: Int) = AsyncStack { implicit request =>
+  def searchPlaces(query: String, offset: Int, size: Int, latlng: Option[String]) = AsyncStack { implicit request =>
     loggedIn match {
-      case Some(user) => PlaceService.searchPlaces(query, offset, size).map { results => 
-        jsonOk(Json.toJson(results.map(_._1)))
+      case Some(user) => {
+        val sortFrom = latlng.flatMap { l =>
+          val arg = l.split(",")
+          Try(new Coordinate(arg(1).toDouble, arg(0).toDouble)) match {
+            case Success(coord) => Some(coord)
+            case Failure(e) => None
+          }
+        }
+
+        PlaceService.searchPlaces(query, offset, size, sortFrom).map { results => 
+          jsonOk(Json.toJson(results.map(_._1)))
+        }
       }
       
       case None => Future.successful(ForbiddenPage)
