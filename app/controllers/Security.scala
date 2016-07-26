@@ -10,7 +10,7 @@ import play.api.Play
 import play.api.cache.CacheApi
 import play.api.mvc.{ Result, Results, RequestHeader }
 
-trait Security extends AuthConfig { self: HasDatabase with HasCache =>
+trait Security extends AuthConfig { self: HasContext =>
 
   private val NO_PERMISSION = "No permission"
 
@@ -25,7 +25,7 @@ trait Security extends AuthConfig { self: HasDatabase with HasCache =>
   val sessionTimeoutInSeconds: Int = 3600
 
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] =
-    UserService.findByUsername(id)(db, cache)
+    UserService.findByUsername(id)(self.ctx.db, self.ctx.cache)
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
     val destination = request.session.get("access_uri").getOrElse(my.routes.MyRecogitoController.my.toString)
@@ -49,7 +49,7 @@ trait Security extends AuthConfig { self: HasDatabase with HasCache =>
   }
 
   override lazy val tokenAccessor = new CookieTokenAccessor(
-    cookieSecureOption = Play.current.configuration.getBoolean("auth.cookie.secure").getOrElse(false),
+    cookieSecureOption = ctx.config.getBoolean("auth.cookie.secure").getOrElse(false),
     cookieMaxAge       = Some(sessionTimeoutInSeconds)
   )
 

@@ -8,7 +8,7 @@ import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import storage.DB
 
-abstract class BaseAuthController extends BaseController with HasCache with HasDatabase with AuthElement with Security {
+abstract class BaseAuthController extends BaseController with HasContext with AuthElement with Security {
   
   /** Helper that covers the boilerplate for all document views
     *

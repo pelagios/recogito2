@@ -1,16 +1,13 @@
 package controllers.document.settings
 
-import controllers.{ BaseAuthController, WebJarAssets }
+import controllers.{ BaseAuthController, ControllerContext }
 import controllers.document.settings.actions._
 import javax.inject.Inject
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.user.Roles._
-import play.api.cache.CacheApi
 import play.api.mvc.{ AnyContent, Result, Request }
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
-import storage.DB
 import play.api.libs.json.{ Json, JsSuccess, JsError, Reads }
 
 /** Holds the boilerplate needed to verify user access level is OWNER or ADMIN **/
@@ -19,22 +16,22 @@ trait HasAdminAction { self: BaseAuthController =>
   import models.document.DocumentAccessLevel._
   
   def documentAdminAction(documentId: String, username: String, action: (DocumentRecord, Seq[DocumentFilepartRecord]) => Future[Result]) = {
-    DocumentService.findByIdWithFileparts(documentId, Some(username))(self.db).flatMap(_ match {      
+    DocumentService.findByIdWithFileparts(documentId, Some(username))(self.ctx.db).flatMap(_ match {      
       case Some((document, parts, accesslvl)) if (accesslvl.isAdmin) => action(document, parts)
       case Some(_) => Future.successful(ForbiddenPage)
       case None => Future.successful(NotFoundPage)
-    })
+    })(self.ctx.ec)
   }
   
   def jsonDocumentAdminAction[T](documentId: String, username: String, action: (DocumentRecord, T) => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]) = {
     request.body.asJson match {
       case Some(json) => Json.fromJson[T](json) match {
         case s: JsSuccess[T] =>
-          DocumentService.findById(documentId, Some(username))(self.db).flatMap(_ match {
+          DocumentService.findById(documentId, Some(username))(self.ctx.db).flatMap(_ match {
             case Some((document, accesslvl)) if (accesslvl == OWNER || accesslvl == ADMIN) => action(document, s.get)
             case Some(_) => Future.successful(ForbiddenPage)
             case None => Future.successful(NotFoundPage)
-          })
+          })(self.ctx.ec)
         
         case e: JsError => Future.successful(BadRequest)
       }
@@ -45,7 +42,7 @@ trait HasAdminAction { self: BaseAuthController =>
   
 }
 
-class SettingsController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets)
+class SettingsController @Inject() (implicit val ctx: ControllerContext)
   extends BaseAuthController
     with HasAdminAction
     with MetadataActions

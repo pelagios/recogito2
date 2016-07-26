@@ -1,26 +1,20 @@
 package controllers.my
 
-import controllers.WebJarAssets
-import controllers.{ BaseController, HasCache, HasDatabase, Security }
+import controllers.{ BaseController, ControllerContext, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.Page
 import models.user.UserService
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, UserRecord }
-import models.generated.tables.records.UserRecord
-import play.api.Play
-import play.api.cache.CacheApi
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.RequestHeader
-import storage.DB
 import scala.concurrent.Future
 
-class MyRecogitoController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) 
-  extends BaseController with HasCache with HasDatabase with OptionalAuthElement with Security {
+class MyRecogitoController @Inject() (implicit val ctx: ControllerContext) 
+  extends BaseController with OptionalAuthElement with Security {
 
   // TODO this may depend on user in the future
-  private lazy val QUOTA = Play.current.configuration.getInt("recogito.upload.quota").getOrElse(200)
+  private lazy val QUOTA = ctx.config.getInt("recogito.upload.quota").getOrElse(200)
 
   /** A convenience '/my' route that redirects to the personal index **/
   def my = StackAction { implicit request =>

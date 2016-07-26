@@ -1,18 +1,13 @@
 package controllers.admin.gazetteers
 
-import controllers.WebJarAssets
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import javax.inject.Inject
-import models.user.Roles._
-import play.api.cache.CacheApi
-import play.api.Logger
-import scala.concurrent.{ ExecutionContext, Future }
-import storage.DB
 import models.place.{ GazetteerUtils, PlaceService }
-import controllers.HasPrettyPrintJSON
-import play.api.libs.json.Json
+import models.user.Roles._
+import play.api.Logger
+import scala.concurrent.Future
 
-class GazetteerAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext, webjars: WebJarAssets) extends BaseAuthController {
+class GazetteerAdminController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController {
   
   def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     PlaceService.listGazetteers().map { gazetteers => 

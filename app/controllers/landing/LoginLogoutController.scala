@@ -1,22 +1,19 @@
 package controllers.landing
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.LoginLogout
 import models.user.UserService
-import play.api.Play.current
-import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.Messages.Implicits._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Action
-import scala.concurrent.{ ExecutionContext, Future }
-import storage.DB
+import scala.concurrent.Future
 
 case class LoginData(username: String, password: String)
 
-class LoginLogoutController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController with LoginLogout {
+class LoginLogoutController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi) 
+  extends BaseAuthController with LoginLogout with I18nSupport {
 
   private val MESSAGE = "message"
 

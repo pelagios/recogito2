@@ -1,14 +1,11 @@
 package controllers.admin.backup
 
-import controllers.WebJarAssets
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import javax.inject.Inject
 import models.user.Roles._
-import play.api.cache.CacheApi
-import scala.concurrent.{ ExecutionContext, Future }
-import storage.DB
+import scala.concurrent.Future
   
-class BackupAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext, webjars: WebJarAssets) extends BaseAuthController with RestoreAction {
+class BackupAdminController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController with RestoreAction {
   
   def index = StackAction(AuthorityKey -> Admin) { implicit request => 
     Ok(views.html.admin.backup.index())

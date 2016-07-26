@@ -1,14 +1,13 @@
 package controllers.document
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import java.io.File
 import javax.inject.Inject
 import models.user.Roles._
-import play.api.cache.CacheApi
-import storage.{ DB, FileAccess }
 import play.api.mvc.Action
+import storage.FileAccess
 
-class DocumentController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController with FileAccess {
+class DocumentController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController with FileAccess {
     
   def initialView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(docId, 1))

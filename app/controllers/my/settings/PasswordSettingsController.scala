@@ -1,22 +1,18 @@
 package controllers.my.settings
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import javax.inject.Inject
 import models.user.UserService
 import models.user.Roles._
-import play.api.Play.current
-import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation._
-import play.api.i18n.Messages.Implicits._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import scala.concurrent.Future
-import storage.DB
 
 case class PasswordSettingsData(currentPassword: String, newPassword: String, verifyPassword: String)
 
-class PasswordSettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController {
+class PasswordSettingsController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi) extends BaseAuthController with I18nSupport {
 
   private val matchingPasswords: Constraint[PasswordSettingsData] = Constraint("constraints.valid"){ d =>
     if (d.newPassword == d.verifyPassword) Valid else Invalid("Passwords must match")    

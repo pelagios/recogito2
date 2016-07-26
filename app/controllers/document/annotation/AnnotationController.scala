@@ -1,19 +1,17 @@
 package controllers.document.annotation
 
-import controllers.{ BaseOptAuthController, WebJarAssets }
+import controllers.{ BaseOptAuthController, ControllerContext }
 import javax.inject.Inject
 import models.ContentType
 import models.annotation.AnnotationService
 import models.document.DocumentAccessLevel
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.cache.CacheApi
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Logger
 import play.api.mvc.RequestHeader
 import scala.concurrent.Future
-import storage.{ DB, FileAccess }
+import storage.FileAccess
 
-class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) extends BaseOptAuthController with FileAccess {
+class AnnotationController @Inject() (implicit val ctx: ControllerContext) extends BaseOptAuthController with FileAccess {
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: String) = StackAction { implicit request =>
@@ -26,7 +24,7 @@ class AnnotationController @Inject() (implicit val cache: CacheApi, val db: DB, 
       if (accesslevel.canRead)
         renderResponse(maybeUser, document, fileparts, selectedPart, accesslevel)
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet 
-        authenticationFailed(request)        
+        authenticationFailed(request)(ctx.ec)        
       else
         Future.successful(ForbiddenPage)
     })

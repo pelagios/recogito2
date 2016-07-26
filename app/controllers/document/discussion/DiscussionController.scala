@@ -1,12 +1,10 @@
 package controllers.document.discussion
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import javax.inject.Inject
 import models.user.Roles._
-import play.api.cache.CacheApi
-import storage.DB
 
-class DiscussionController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController {
+class DiscussionController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController {
 
   def showDiscussionBoard(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentResponse(documentId, loggedIn.user.getUsername,

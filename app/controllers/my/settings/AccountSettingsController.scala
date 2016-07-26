@@ -1,21 +1,18 @@
 package controllers.my.settings
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import javax.inject.Inject
 import models.user.Roles._
 import models.user.UserService
-import play.api.Play.current
-import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.Messages.Implicits._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import scala.concurrent.Future
-import storage.DB
 
 case class AccountSettingsData(email: String, name: Option[String], bio: Option[String], website: Option[String])
 
-class AccountSettingsController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController {
+class AccountSettingsController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi)
+  extends BaseAuthController with I18nSupport {
   
   val accountSettingsForm = Form(
     mapping(

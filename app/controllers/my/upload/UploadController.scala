@@ -1,8 +1,7 @@
 package controllers.my.upload
 
 import akka.actor.ActorSystem
-import controllers.WebJarAssets
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import controllers.my.upload.ProcessingTaskMessages._
 import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
@@ -15,25 +14,21 @@ import models.document.DocumentService
 import models.upload.UploadService
 import models.generated.tables.records.UploadRecord
 import models.user.Roles._
-import play.api.Play.current
 import play.api.Logger
-import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.Messages.Implicits._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 import scala.language.implicitConversions
-import storage.DB
 
 case class UploadSuccess(contentType: String)
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)
 
-class UploadController @Inject() (implicit val cache: CacheApi, val db: DB, system: ActorSystem, webjars: WebJarAssets) extends BaseAuthController {
+class UploadController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi, system: ActorSystem) extends BaseAuthController with I18nSupport {
 
   private val FILE_ARG = "file"
 

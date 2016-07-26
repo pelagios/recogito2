@@ -11,11 +11,11 @@ import scala.concurrent.Future
 trait DeleteActions extends HasAdminAction { self: BaseAuthController =>
   
   def deleteDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    DocumentService.findById(docId, Some(loggedIn.user.getUsername))(self.db).flatMap(_ match {
+    DocumentService.findById(docId, Some(loggedIn.user.getUsername))(self.ctx.db).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel == DocumentAccessLevel.OWNER) // We allow only the owner to delete a document
           for {
-            _ <- DocumentService.delete(document)(self.db)
+            _ <- DocumentService.delete(document)(self.ctx.db)
             success <- AnnotationService.deleteByDocId(docId)
           } yield if (success) Status(200) else InternalServerError
         else

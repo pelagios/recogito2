@@ -34,7 +34,7 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
     
   def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, _) =>
-      DocumentService.setPublicVisibility(document.getId, enabled)(self.db).map(_ => Status(200))
+      DocumentService.setPublicVisibility(document.getId, enabled)(self.ctx.db).map(_ => Status(200))
     })
   }
   
@@ -47,9 +47,9 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
       } else {
         // If no access level given, use READ as minimum default
         val accessLevel = stub.accessLevel.getOrElse(DocumentAccessLevel.READ)
-        UserService.findByUsername(stub.collaborator)(self.db, self.cache).flatMap { _ match {
+        UserService.findByUsername(stub.collaborator)(self.ctx.db, self.ctx.cache).flatMap { _ match {
           case Some(userWithRoles) => 
-            DocumentService.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)(self.db)
+            DocumentService.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)(self.ctx.db)
               .map { case (policy, isNew) => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy, isNew))) }
             
           case None => 
@@ -61,13 +61,13 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
   
   def removeCollaborator(documentId: String, username: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, _) =>      
-      DocumentService.removeDocumentCollaborator(documentId, username)(self.db).map(success =>
+      DocumentService.removeDocumentCollaborator(documentId, username)(self.ctx.db).map(success =>
         if (success) Status(200) else InternalServerError)
     })
   }
   
   def searchUsers(documentId: String, query: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UserService.searchUsers(query)(self.db).map { matches =>
+    UserService.searchUsers(query)(self.ctx.db).map { matches =>
       jsonOk(Json.toJson(matches))
     }
   }

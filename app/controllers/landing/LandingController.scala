@@ -1,14 +1,12 @@
 package controllers.landing
 
-import controllers.{ HasCache, HasDatabase, Security }
+import controllers.{ ControllerContext, HasContext, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
-import play.api.cache.CacheApi
 import play.api.mvc.Controller
-import storage.DB
   
-class LandingController @Inject() (implicit val cache: CacheApi, val db: DB) 
-  extends Controller with HasCache with HasDatabase with OptionalAuthElement with Security {
+class LandingController @Inject() (implicit val ctx: ControllerContext) 
+  extends Controller with HasContext with OptionalAuthElement with Security {
 
   def index = StackAction { implicit request =>
     loggedIn match {

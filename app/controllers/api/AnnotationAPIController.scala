@@ -10,14 +10,11 @@ import models.contribution._
 import models.document.DocumentService
 import org.joda.time.DateTime
 import play.api.Logger
-import play.api.cache.CacheApi
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.Future
-import storage.{ DB, FileAccess }
-import play.api.libs.json.JsObject
+import storage.FileAccess
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(
@@ -90,9 +87,14 @@ object AnnotationStatusStub extends HasDate {
 
 }
 
-class AnnotationAPIController @Inject() (implicit val cache: CacheApi, val db: DB)
-  extends BaseController with HasCache with HasDatabase with OptionalAuthElement with Security
-                         with HasAnnotationValidation with HasPrettyPrintJSON with FileAccess with HasTextSnippets {
+class AnnotationAPIController @Inject() (implicit val ctx: ControllerContext)
+  extends BaseController 
+  with OptionalAuthElement 
+  with Security
+  with HasAnnotationValidation 
+  with HasPrettyPrintJSON
+  with FileAccess 
+  with HasTextSnippets {
 
   def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
 

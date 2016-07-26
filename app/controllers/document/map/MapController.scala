@@ -1,14 +1,11 @@
 package controllers.document.map
 
-import controllers.{ BaseOptAuthController, WebJarAssets }
+import controllers.{ BaseOptAuthController, ControllerContext }
 import javax.inject.Inject
 import models.user.Roles._
-import play.api.cache.CacheApi
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
-import storage.DB
 
-class MapController @Inject() (implicit val cache: CacheApi, val db: DB, webjars: WebJarAssets) extends BaseOptAuthController {
+class MapController @Inject() (implicit val ctx: ControllerContext) extends BaseOptAuthController {
 
   /** TODO this view should be available without login, if the document is set to public **/
   def showMap(documentId: String) = AsyncStack { implicit request =>

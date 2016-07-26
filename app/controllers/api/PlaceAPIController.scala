@@ -1,18 +1,16 @@
 package controllers.api
 
-import controllers.{ BaseOptAuthController, HasPrettyPrintJSON }
+import controllers.{ BaseOptAuthController, ControllerContext, HasPrettyPrintJSON }
 import javax.inject.Inject
 import models.user.Roles._
 import models.place.PlaceService
-import play.api.cache.CacheApi
 import play.api.libs.json.Json
 import play.api.mvc.Action
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 import scala.util.{ Try, Success, Failure }
-import storage.DB
 import com.vividsolutions.jts.geom.Coordinate
 
-class PlaceAPIController @Inject() (implicit val cache: CacheApi, val db: DB, context: ExecutionContext) extends BaseOptAuthController with HasPrettyPrintJSON {
+class PlaceAPIController @Inject() (implicit val ctx: ControllerContext) extends BaseOptAuthController with HasPrettyPrintJSON {
     
   /** Lookup by URI - open to all, so that it's available to public documents **/
   def findPlaceByURI(uri: String) = Action.async { implicit request =>

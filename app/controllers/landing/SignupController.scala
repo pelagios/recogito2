@@ -1,27 +1,21 @@
 package controllers.landing
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, ControllerContext }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.Login
 import models.user.UserService
-import play.api.Play.current
-import play.api.cache.CacheApi
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation._
-import play.api.i18n.Messages.Implicits._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Action
-import scala.concurrent.Future
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
-import play.api.Logger
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import storage.DB
 
 case class SignupData(username: String, email: String, password: String)
 
-class SignupController @Inject() (implicit val cache: CacheApi, val db: DB) extends BaseAuthController with Login {
+class SignupController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi)
+  extends BaseAuthController with Login with I18nSupport {
 
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
 

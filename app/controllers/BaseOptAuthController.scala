@@ -10,7 +10,7 @@ import play.api.Logger
 import scala.concurrent.Future
 import storage.DB
 
-abstract class BaseOptAuthController extends BaseController with HasCache with HasDatabase with OptionalAuthElement with Security {
+abstract class BaseOptAuthController extends BaseController with HasContext with OptionalAuthElement with Security {
   
   /** Helper that covers the boilerplate for all document views
     *

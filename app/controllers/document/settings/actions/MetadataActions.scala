@@ -20,7 +20,7 @@ trait MetadataActions extends HasAdminAction { self: BaseAuthController =>
   /** Sets the part sort order **/
   def setSortOrder(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request => 
     jsonDocumentAdminAction[Seq[PartOrdering]](docId, loggedIn.user.getUsername, { case (document, ordering) =>
-      DocumentService.setFilepartSortOrder(docId, ordering)(self.db).map(_ => Status(200))
+      DocumentService.setFilepartSortOrder(docId, ordering)(self.ctx.db).map(_ => Status(200))
     })
   }
   

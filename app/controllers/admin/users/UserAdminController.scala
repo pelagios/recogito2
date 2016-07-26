@@ -1,19 +1,17 @@
 package controllers.admin.users
 
-import controllers.{ BaseAuthController, WebJarAssets }
+import controllers.{ BaseAuthController, ControllerContext }
 import javax.inject.Inject
 import models.document.DocumentService
 import models.user.Roles._
 import models.user.UserService
-import play.api.cache.CacheApi
-import scala.concurrent.{ ExecutionContext, Future }
-import storage.DB
+import scala.concurrent.Future
 
-class UserAdminController @Inject() (implicit val cache: CacheApi, val db: DB, ec: ExecutionContext, webjars: WebJarAssets) extends BaseAuthController {
+class UserAdminController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController {
 
   def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     UserService.listUsers(0, 500).map(users => 
-      Ok(views.html.admin.users.index(users, webjars)))
+      Ok(views.html.admin.users.index(users)))
   }
 
   def showDetails(username: String) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
