@@ -15,7 +15,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ ExecutionContext, Future }
-import storage.FileAccess
+import storage.Uploads
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(
@@ -94,13 +94,13 @@ class AnnotationAPIController @Inject() (
     val contributions: ContributionService,
     val documents: DocumentService, 
     val users: UserService,
+    val uploads: Uploads,
     implicit val ctx: ExecutionContext
   ) extends BaseController(config, users)
       with OptionalAuthElement
       with Security
       with HasAnnotationValidation
       with HasPrettyPrintJSON
-      with FileAccess
       with HasTextSnippets {
 
   def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
@@ -211,7 +211,7 @@ class AnnotationAPIController @Inject() (
               if (accesslevel.canRead) {
                 // ...then fetch the content
                 parts.filter(_.getId == annotation.annotates.filepartId).headOption match {
-                  case Some(filepart) => readTextfile(document.getOwner, document.getId, filepart.getFilename) match {
+                  case Some(filepart) => uploads.readTextfile(document.getOwner, document.getId, filepart.getFilename) match {
                     case Some(text) => {
                       val snippet = extractTextSnippet(text, annotation)
                       jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))

@@ -17,7 +17,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import storage.FileAccess
+import storage.Uploads
 
 private[ner] case class Phrase(chars: String, entityTag: String, charOffset: Int)
 
@@ -74,7 +74,7 @@ object NERService {
 }
 
 @Singleton
-class NERService @Inject() (annotations: AnnotationService, places: PlaceService) extends ProcessingService with FileAccess {
+class NERService @Inject() (annotations: AnnotationService, places: PlaceService, uploads: Uploads) extends ProcessingService {
 
   /** Spawns a new background parse process.
     *
@@ -83,7 +83,7 @@ class NERService @Inject() (annotations: AnnotationService, places: PlaceService
     * happen. If it does, something is seriously broken with the DB integrity.
     */
   override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, getDocumentDir(document.getOwner, document.getId).get)
+    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {

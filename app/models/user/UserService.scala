@@ -15,11 +15,11 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.util.{ Either, Left, Right }
-import storage.{ DB, FileAccess }
+import storage.{ DB, Uploads }
 import sun.security.provider.SecureRandom
 
 @Singleton
-class UserService @Inject() (implicit db: DB, cache: CacheApi) extends BaseService with FileAccess {
+class UserService @Inject() (implicit db: DB, cache: CacheApi, uploads: Uploads) extends BaseService {
 
   private val SHA_256 = "SHA-256"
 
@@ -119,7 +119,7 @@ class UserService @Inject() (implicit db: DB, cache: CacheApi) extends BaseServi
   }
 
   def getUsedDiskspaceKB(username: String) =
-    getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l)
+    uploads.getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l)
 
   /** Utility function to create new random salt for password hashing **/
   private def randomSalt = {

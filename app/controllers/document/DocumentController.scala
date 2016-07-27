@@ -9,14 +9,15 @@ import models.user.Roles._
 import play.api.Configuration
 import play.api.mvc.Action
 import scala.concurrent.ExecutionContext
-import storage.FileAccess
+import storage.Uploads
 
 class DocumentController @Inject() (
     val config: Configuration,
     val documents: DocumentService,
     val users: UserService, 
+    val uploads: Uploads,
     implicit val ctx: ExecutionContext
-  ) extends BaseAuthController(config, documents, users) with FileAccess {
+  ) extends BaseAuthController(config, documents, users) {
     
   def initialView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(docId, 1))
@@ -25,7 +26,7 @@ class DocumentController @Inject() (
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
       // ownerDataDir must exist, unless DB integrity is broken - renderDocumentResponse will handle the exception if .get fails
-      val documentDir = getDocumentDir(document.getOwner, document.getId).get
+      val documentDir = uploads.getDocumentDir(document.getOwner, document.getId).get
       
       // Tileset foldername is, by convention, equal to filename minus extension
       val foldername = filepart.getFilename.substring(0, filepart.getFilename.lastIndexOf('.'))
@@ -41,7 +42,7 @@ class DocumentController @Inject() (
   
   def getThumbnail(docId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
-      openThumbnail(loggedIn.user.getUsername, docId, filepart.getFilename) match {
+      uploads.openThumbnail(loggedIn.user.getUsername, docId, filepart.getFilename) match {
         case Some(file) => Ok.sendFile(file)
         case None => NotFoundPage
       }

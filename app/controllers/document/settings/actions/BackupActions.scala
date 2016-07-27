@@ -14,11 +14,8 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.Future
-import storage.FileAccess
-import java.sql.Timestamp
 
-
-trait BackupActions extends FileAccess with HasDate { self: SettingsController =>
+trait BackupActions extends HasDate { self: SettingsController =>
 
   private val TMP_DIR = System.getProperty("java.io.tmpdir")
   
@@ -92,7 +89,7 @@ trait BackupActions extends FileAccess with HasDate { self: SettingsController =
   }
   
   private def exportFile(owner: String, documentId: String, filename: String): InputStream = {
-    val dir = getDocumentDir(owner, documentId).get // Fail hard if the dir doesn't exist
+    val dir = uploads.getDocumentDir(owner, documentId).get // Fail hard if the dir doesn't exist
     new FileInputStream(new File(dir, filename))
   }
   

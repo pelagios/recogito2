@@ -15,12 +15,12 @@ import play.api.cache.CacheApi
 import scala.concurrent.{ Await, Future, ExecutionContext }
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import storage.{ DB, FileAccess }
+import storage.{ DB, Uploads }
 
 case class PartOrdering(partId: UUID, seqNo: Int)
 
 @Singleton
-class DocumentService @Inject() (implicit val db: DB) extends BaseService with FileAccess with SharingPolicies {
+class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends BaseService with SharingPolicies {
   
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
@@ -99,7 +99,7 @@ class DocumentService @Inject() (implicit val db: DB) extends BaseService with F
     
     // Import files
     fileparts.foreach { case (part, stream) =>
-      val destination = new File(getDocumentDir(document.getOwner, document.getId, true).get, part.getFilename).toPath
+      val destination = new File(uploads.getDocumentDir(document.getOwner, document.getId, true).get, part.getFilename).toPath
       Files.copy(stream, destination)
     }
   }
@@ -252,7 +252,7 @@ class DocumentService @Inject() (implicit val db: DB) extends BaseService with F
        .execute()
 
     // Note: some documents may not have local files - e.g. IIIF  
-    val maybeDocumentDir = getDocumentDir(document.getOwner, document.getId)
+    val maybeDocumentDir = uploads.getDocumentDir(document.getOwner, document.getId)
     if (maybeDocumentDir.isDefined)
       FileUtils.deleteDirectory(maybeDocumentDir.get)
     

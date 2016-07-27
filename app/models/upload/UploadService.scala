@@ -14,12 +14,12 @@ import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
-import storage.{ DB, FileAccess }
+import storage.{ DB, Uploads }
 import models.document.DocumentService
 import models.ContentType
 
 @Singleton
-class UploadService @Inject() (documents: DocumentService, implicit val db: DB) extends FileAccess {
+class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) {
 
   /** Java-interop helper that turns empty strings to null, so they are properly inserted by JOOQ **/
   private def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
@@ -73,7 +73,7 @@ class UploadService @Inject() (documents: DocumentService, implicit val db: DB) 
     val title = filepart.filename
     val extension = title.substring(title.lastIndexOf('.'))
     val filesize = filepart.ref.file.length.toDouble / 1024
-    val file = new File(PENDING_UPLOADS_DIR, id.toString + extension)
+    val file = new File(uploads.PENDING_UPLOADS_DIR, id.toString + extension)
 
     ContentType.fromFile(file) match {
       case Right(contentType) => {
@@ -95,7 +95,7 @@ class UploadService @Inject() (documents: DocumentService, implicit val db: DB) 
               .fetchOne()) match {
 
       case Some(filepartRecord) => {
-        val file = new File(PENDING_UPLOADS_DIR, filepartRecord.getFilename)
+        val file = new File(uploads.PENDING_UPLOADS_DIR, filepartRecord.getFilename)
         file.delete()
         filepartRecord.delete() == 1
       }
@@ -119,7 +119,7 @@ class UploadService @Inject() (documents: DocumentService, implicit val db: DB) 
          .fetchArray
 
     fileparts.foreach(part => {
-      val file = new File(PENDING_UPLOADS_DIR, part.getFilename)
+      val file = new File(uploads.PENDING_UPLOADS_DIR, part.getFilename)
       file.delete()
     })
 
@@ -174,8 +174,8 @@ class UploadService @Inject() (documents: DocumentService, implicit val db: DB) 
     
     // Move files from 'pending' to 'user-data' folder
     val filePaths = fileparts.map(filepart => {
-      val source = new File(PENDING_UPLOADS_DIR, filepart.getFilename).toPath
-      val destination = new File(getDocumentDir(upload.getOwner, document.getId, true).get, filepart.getFilename).toPath
+      val source = new File(uploads.PENDING_UPLOADS_DIR, filepart.getFilename).toPath
+      val destination = new File(uploads.getDocumentDir(upload.getOwner, document.getId, true).get, filepart.getFilename).toPath
       Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
     })
 

@@ -5,12 +5,12 @@ import akka.pattern.ask
 import akka.util.Timeout
 import controllers.my.upload._
 import java.io.File
-import javax.inject.Singleton
+import javax.inject.{ Inject, Singleton }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import storage.FileAccess
+import storage.Uploads
 import sys.process._
 
 object TilingService {
@@ -31,7 +31,7 @@ object TilingService {
 }
 
 @Singleton
-class TilingService extends ProcessingService with FileAccess {
+class TilingService @Inject() (uploads: Uploads) extends ProcessingService {
 
   /** Spawns a new background tiling process.
     *
@@ -40,7 +40,7 @@ class TilingService extends ProcessingService with FileAccess {
     * happen. If it does, something is seriously broken with the DB integrity.
     */
   override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, getDocumentDir(document.getOwner, document.getId).get)
+    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[tiling] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {

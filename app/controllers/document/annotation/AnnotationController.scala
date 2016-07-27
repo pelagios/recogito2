@@ -10,16 +10,17 @@ import models.user.UserService
 import play.api.{ Configuration, Logger }
 import play.api.mvc.RequestHeader
 import scala.concurrent.{ ExecutionContext, Future }
-import storage.FileAccess
+import storage.Uploads
 
 class AnnotationController @Inject() (
     val config: Configuration,
     val annotations: AnnotationService,
     val documents: DocumentService,
     val users: UserService,
+    val uploads: Uploads,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(config, documents, users) with FileAccess {
+  ) extends BaseOptAuthController(config, documents, users) {
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: String) = StackAction { implicit request =>
@@ -47,7 +48,7 @@ class AnnotationController @Inject() (
         Future.successful(Ok(views.html.document.annotation.image(loggedInUser, document, parts, thisPart, accesslevel)))
 
       case Some(ContentType.TEXT_PLAIN) => {
-        readTextfile(document.getOwner, document.getId, thisPart.getFilename) match {
+        uploads.readTextfile(document.getOwner, document.getId, thisPart.getFilename) match {
           case Some(content) => {
             annotations.countByDocId(document.getId).map(documentAnnotationCount =>
               Ok(views.html.document.annotation.text(loggedInUser, document, parts, thisPart, documentAnnotationCount, accesslevel, content)))

@@ -1,18 +1,19 @@
 package storage
 
 import java.io.File
+import javax.inject.{ Inject, Singleton }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.{ Logger, Play }
+import play.api.{ Logger, Configuration }
 import scala.io.Source
 
-/** Base functionality for using files uploaded by users **/
-trait FileAccess {
+@Singleton
+class Uploads @Inject() (config: Configuration) {
 
   private val A_TO_Z =
     (('a' to 'z') ++ ('A' to 'Z')).toSet
 
   private lazy val UPLOAD_BASE = {
-    val dir = Play.current.configuration.getString("recogito.upload.dir") match {
+    val dir = config.getString("recogito.upload.dir") match {
       case Some(filename) => new File(filename)
       case None => new File("uploads") // Default
     }
@@ -24,21 +25,21 @@ trait FileAccess {
     dir
   }
 
-  protected lazy val USER_DATA_DIR = {
+  lazy val USER_DATA_DIR = {
     val dir = new File(UPLOAD_BASE, "user_data")
     if (!dir.exists)
       dir.mkdir()
     dir
   }
 
-  protected lazy val PENDING_UPLOADS_DIR = {
+  lazy val PENDING_UPLOADS_DIR = {
     val dir = new File(UPLOAD_BASE, "pending")
     if (!dir.exists)
       dir.mkdir()
     dir
   }
 
-  protected def getUserDir(username: String, createIfNotExists: Boolean = false): Option[File] = {
+  def getUserDir(username: String, createIfNotExists: Boolean = false): Option[File] = {
     val alphabeticCharsOnly = username.filter(A_TO_Z.contains(_))
 
     // User folders are contained in common parent folder. The name of that folder is
@@ -69,7 +70,7 @@ trait FileAccess {
     }
   }
 
-  protected def getDocumentDir(owner: String, docId: String, createIfNotExists: Boolean = false): Option[File] =
+  def getDocumentDir(owner: String, docId: String, createIfNotExists: Boolean = false): Option[File] =
     getUserDir(owner, createIfNotExists).flatMap(userDir => {
       val documentDir = new File(userDir, docId)
       if (createIfNotExists) {
@@ -84,7 +85,7 @@ trait FileAccess {
     })
     
   /** Helper to read the contents of a text filepart **/
-  protected def readTextfile(owner: String, docId: String, filename: String): Option[String] =
+  def readTextfile(owner: String, docId: String, filename: String): Option[String] =
     getDocumentDir(owner, docId).flatMap(dir => {
       val file = new File(dir, filename)
       if (file.exists) {
@@ -95,7 +96,7 @@ trait FileAccess {
     })
     
   /** Helper **/
-  protected def openThumbnail(owner: String, docId: String, filename: String): Option[File] = 
+  def openThumbnail(owner: String, docId: String, filename: String): Option[File] = 
     getDocumentDir(owner, docId).flatMap(dir => {
       val tilesetDir = new File(dir, filename.substring(0, filename.lastIndexOf('.')))
       if (tilesetDir.exists) { 

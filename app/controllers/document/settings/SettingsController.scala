@@ -13,6 +13,7 @@ import play.api.Configuration
 import play.api.mvc.{ AnyContent, Result, Request }
 import play.api.libs.json.{ Json, JsSuccess, JsError, Reads }
 import scala.concurrent.{ Future, ExecutionContext }
+import storage.Uploads
 
 class SettingsController @Inject() (
     val config: Configuration,
@@ -20,6 +21,7 @@ class SettingsController @Inject() (
     val contributions: ContributionService,
     val documents: DocumentService, 
     val annotations: AnnotationService,
+    val uploads: Uploads,
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarAssets
   ) extends BaseAuthController(config, documents, users)
