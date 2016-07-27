@@ -51,14 +51,13 @@ class DBModule extends AbstractModule {
 @Singleton
 class DBInitializer @Inject() (db: Database) {
 
-  // Crude DB initialization check - does the user table exist? Run schema generation if not.
+  // Does the user table exist? Run schema generation if not.
   db.withConnection { connection =>
     if (!DSL.using(connection, DB.CURRENT_SQLDIALECTT).meta().getTables.map(_.getName.toLowerCase).contains("user")) {
       play.api.Logger.info("Empty database - initializing...")
       initDB(connection)
     }
   }
-  
   
   /** Database setup **/
   private def initDB(connection: Connection) = {

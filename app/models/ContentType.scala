@@ -1,6 +1,5 @@
 package models
 
-import ContentIdentificationFailures._
 import java.io.File
 import play.api.Logger
 import scala.util.Try
@@ -18,6 +17,8 @@ sealed trait ContentType {
 }
 
 object ContentType {
+
+  import ContentIdentificationFailures._
   
   case object TEXT_PLAIN    extends ContentType { val media = "TEXT"  ; val subtype = "PLAIN" }
   case object TEXT_TEIXML   extends ContentType { val media = "TEXT"  ; val subtype = "TEIXML" }

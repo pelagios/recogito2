@@ -14,7 +14,6 @@ import play.api.Logger
 import play.api.cache.CacheApi
 import scala.concurrent.{ Await, Future, ExecutionContext }
 import scala.concurrent.duration._
-import scala.language.postfixOps
 import storage.{ DB, Uploads }
 
 case class PartOrdering(partId: UUID, seqNo: Int)
@@ -41,7 +40,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       (1 to 10).map(_ => RandomStringUtils.randomAlphanumeric(ID_LENGTH).toLowerCase).toSet
 
     // Match them all against the database and remove those that already exist
-    val idsAlreadyInDB = Await.result(findIDs(randomIds), 10 seconds)    
+    val idsAlreadyInDB = Await.result(findIDs(randomIds), 10.seconds)    
     val uniqueIds = randomIds.filter(id => !idsAlreadyInDB.contains(id))
     
     if (uniqueIds.size > 0) {

@@ -3,9 +3,7 @@ package models
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
 import java.io.StringWriter
 import org.geotools.geojson.geom.GeometryJSON
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
+// TODO organize imports
 
 trait HasGeometry {
 

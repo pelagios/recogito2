@@ -7,7 +7,6 @@ import org.pelagios.Scalagios
 import org.pelagios.api.PeriodOfTime
 import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._
-import scala.language.postfixOps
 
 object GazetteerUtils {
   
@@ -97,7 +96,7 @@ object GazetteerUtils {
     val stream = getStream(file, filename)
       
     def placeHandler(p: org.pelagios.api.gazetteer.Place) = {
-      Await.result(placeService.importRecord(toRecord(p, gazetteerName)), 10 seconds)
+      Await.result(placeService.importRecord(toRecord(p, gazetteerName)), 10.seconds)
     }
     
     play.api.Logger.info("Importing stream")   

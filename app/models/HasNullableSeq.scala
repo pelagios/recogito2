@@ -1,6 +1,6 @@
 package models
 
-/** Convenience helper for serizalizing fields of type Seq[A] to JSON.
+/** Convenience helper for serializing fields of type Seq[A] to JSON.
   *
   * In case the Seq is empty, the JSON can omit the field instead of requiring
   * a field with an empty array.

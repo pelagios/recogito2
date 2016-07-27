@@ -4,7 +4,6 @@ import models.place.GazetteerUtils._
 import play.api.Logger
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
-import scala.language.postfixOps
 
 trait PlaceImporter { self: PlaceStore =>
 
@@ -133,7 +132,7 @@ trait PlaceImporter { self: PlaceStore =>
     Future {
       records.map { record =>
         try {
-          (record, Await.result(importRecord(record), 5 seconds))
+          (record, Await.result(importRecord(record), 5.seconds))
         } catch { case t: Throwable =>
           t.printStackTrace()
           (record, false)

@@ -28,7 +28,8 @@ trait HasAnnotationIndexing {
 }
 
 @Singleton
-class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasAnnotationIndexing with AnnotationHistoryService with ESGeoTagStore with HasES {
+class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContext)
+  extends HasAnnotationIndexing with AnnotationHistoryService with ESGeoTagStore with HasES {
 
   /** Upserts an annotation, automatically dealing with updating version history and geotags.
     *

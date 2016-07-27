@@ -2,14 +2,10 @@ package models
 
 import org.jooq.Record
 import play.api.cache.CacheApi
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.language.postfixOps
 import scala.reflect.ClassTag
 import storage.DB
-
-import play.api.Logger
 
 /** Various helpers of general use to Service classes **/
 trait BaseService {
@@ -35,7 +31,7 @@ trait BaseService {
     } else {
       dbLookup(key).map(maybeStoredValue => {
         if (maybeStoredValue.isDefined)
-          cache.set(prefix + "_" + key, maybeStoredValue.get, 10 minutes)
+          cache.set(prefix + "_" + key, maybeStoredValue.get, 10.minutes)
 
         maybeStoredValue
       })

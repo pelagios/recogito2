@@ -6,7 +6,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
 /** GeoTag is an associative entity that creates a many-to-many relationship between places and annotations **/
-case class GeoTag(
+case class GeoTag (
   
   /** ID of the place this link is attached to via parent relationship **/ 
   placeId: String,

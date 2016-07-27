@@ -12,7 +12,6 @@ import play.api.Logger
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
-import scala.language.postfixOps
 import storage.{ ES, HasES }
 
 trait PlaceStore {

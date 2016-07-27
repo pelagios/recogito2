@@ -2,9 +2,7 @@ package models
 
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
+// TODO organize imports
 
 trait HasDate {
 

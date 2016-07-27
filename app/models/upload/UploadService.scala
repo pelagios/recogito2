@@ -6,17 +6,17 @@ import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.sql.Timestamp
 import java.util.{ Date, UUID }
 import javax.inject.{ Inject, Singleton }
+import models.ContentType
 import models.ContentIdentificationFailures._
+import models.document.DocumentService
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord }
+import play.api.libs.Files.TemporaryFile
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
-import play.api.libs.Files.TemporaryFile
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import storage.{ DB, Uploads }
-import models.document.DocumentService
-import models.ContentType
 
 @Singleton
 class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) {

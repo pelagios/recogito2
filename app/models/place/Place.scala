@@ -7,7 +7,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-case class Place(
+case class Place (
     
   /** The ID equals the URI of the gazetteer record added first **/
   id: String,

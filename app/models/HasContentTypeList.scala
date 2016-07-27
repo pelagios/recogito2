@@ -1,6 +1,6 @@
 package models
 
-import play.api.libs.json.{Json, JsValue }
+import play.api.libs.json.{ Json, JsValue }
 
 /** JSON representation converts ContentType to an array [ MediaType, ContentType ].
   *

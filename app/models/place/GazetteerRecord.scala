@@ -7,7 +7,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-case class GazetteerRecord(
+case class GazetteerRecord (
 
   uri: String,
 
@@ -35,7 +35,7 @@ case class GazetteerRecord(
 
 ) {
 
-  // For convenience
+  /** For convenience **/
   lazy val allMatches = closeMatches ++ exactMatches
 
   /** Returns true if there is a connection between the two records.

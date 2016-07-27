@@ -6,8 +6,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
 import javax.inject.{ Inject, Singleton }
 import org.elasticsearch.common.settings.ImmutableSettings
-import play.api.Logger
-import play.api.Configuration
+import play.api.{ Configuration, Logger }
 import play.api.inject.ApplicationLifecycle
 import scala.io.Source
 import scala.concurrent.Future
@@ -23,8 +22,7 @@ class ESModule extends AbstractModule {
   
 }
 
-/** Helper so we can forward injected ES dependency into traits **/  
-trait HasES { def es: ES }
+trait HasEs { def es: ES }
 
 /** Constants **/
 object ES {
