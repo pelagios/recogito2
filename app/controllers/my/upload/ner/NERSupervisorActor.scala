@@ -5,16 +5,23 @@ import controllers.my.upload.{ BaseSupervisorActor, TaskType }
 import java.io.File
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.duration.FiniteDuration
+import models.annotation.AnnotationService
+import models.place.PlaceService
 
-private[ner]
-  class NERSupervisorActor(task: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, keepalive: FiniteDuration) 
-  extends BaseSupervisorActor(task, document, parts, dir, keepalive) {
+private[ner] class NERSupervisorActor(
+    task: TaskType, 
+    document: DocumentRecord,
+    parts: Seq[DocumentFilepartRecord],
+    dir: File, keepalive: FiniteDuration,
+    annotations: AnnotationService,
+    places: PlaceService
+  ) extends BaseSupervisorActor(task, document, parts, dir, keepalive) {
   
   /** Creates workers for every content type indicated as 'supported' by the Worker class **/
   override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
     parts
       .filter(part => NERWorkerActor.SUPPORTED_CONTENT_TYPES.contains(part.getContentType))
-      .map(p => context.actorOf(Props(classOf[NERWorkerActor], document, p, dir), name="ner_doc_" + document.getId + "_part" + p.getId))
+      .map(p => context.actorOf(Props(classOf[NERWorkerActor], document, p, dir, annotations, places), name="ner_doc_" + document.getId + "_part" + p.getId))
 
 }
 

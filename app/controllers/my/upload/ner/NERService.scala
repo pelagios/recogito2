@@ -8,7 +8,10 @@ import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.{ Annotation, StanfordCoreNLP }
 import java.io.File
 import java.util.Properties
+import javax.inject.{ Inject, Singleton }
+import models.annotation.AnnotationService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.place.PlaceService
 import play.api.Logger
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -18,7 +21,7 @@ import storage.FileAccess
 
 private[ner] case class Phrase(chars: String, entityTag: String, charOffset: Int)
 
-object NERService extends ProcessingService with FileAccess {
+object NERService { 
   
   val TASK_NER = TaskType("NER")
 
@@ -67,6 +70,11 @@ object NERService extends ProcessingService with FileAccess {
       }
     }
   }
+  
+}
+
+@Singleton
+class NERService @Inject() (annotations: AnnotationService, places: PlaceService) extends ProcessingService with FileAccess {
 
   /** Spawns a new background parse process.
     *
@@ -79,13 +87,13 @@ object NERService extends ProcessingService with FileAccess {
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[NERSupervisorActor], TASK_NER, document, parts, sourceFolder, keepalive), name = "ner_doc_" + document.getId)
+    val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, keepalive, annotations, places), name = "ner_doc_" + document.getId)
     actor ! ProcessingTaskMessages.Start
   }
 
   /** Queries the progress for a specific process **/
   override def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit context: ExecutionContext, system: ActorSystem) = {
-    ProcessingTaskSupervisor.getSupervisorActor(TASK_NER, documentId) match {
+    ProcessingTaskSupervisor.getSupervisorActor(NERService.TASK_NER, documentId) match {
       case Some(actor) => {
         implicit val t = Timeout(timeout)
         (actor ? ProcessingTaskMessages.QueryProgress).mapTo[ProcessingTaskMessages.DocumentProgress].map(Some(_))

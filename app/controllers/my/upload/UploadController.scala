@@ -34,6 +34,8 @@ class UploadController @Inject() (
     val documents: DocumentService,
     val users: UserService,
     val uploads: UploadService,
+    val tilingService: TilingService,
+    val nerService: NERService,
     val messagesApi: MessagesApi,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext,
@@ -167,14 +169,14 @@ class UploadController @Inject() (
             // Apply NER if requested
             val applyNER = checkParamValue("apply-ner", "on")
             if (applyNER) {
-              NERService.spawnTask(doc, docParts)
+              nerService.spawnTask(doc, docParts)
               runningTasks.append(NERService.TASK_NER)
             }
 
             // Tile images
             val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
             if (imageParts.size > 0) {
-              TilingService.spawnTask(doc, imageParts)
+              tilingService.spawnTask(doc, imageParts)
               runningTasks.append(TilingService.TASK_TILING)
             }
 
@@ -226,9 +228,9 @@ class UploadController @Inject() (
     })
   }
 
-  def queryNERProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, NERService)
+  def queryNERProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, nerService)
 
-  def queryTilingProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, TilingService)
+  def queryTilingProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, tilingService)
 
 }
 

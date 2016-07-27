@@ -5,6 +5,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import controllers.my.upload._
 import java.io.File
+import javax.inject.Singleton
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
@@ -12,8 +13,8 @@ import scala.language.postfixOps
 import storage.FileAccess
 import sys.process._
 
-object TilingService extends ProcessingService with FileAccess {
-
+object TilingService {
+  
   val TASK_TILING = TaskType("IMAGE_TILING")
 
   private[tiling] def createZoomify(file: File, destFolder: File)(implicit context: ExecutionContext): Future[Unit] = {
@@ -26,6 +27,11 @@ object TilingService extends ProcessingService with FileAccess {
         throw new Exception("Image tiling failed for " + file.getAbsolutePath + " to " + destFolder.getAbsolutePath)
     }
   }
+  
+}
+
+@Singleton
+class TilingService extends ProcessingService with FileAccess {
 
   /** Spawns a new background tiling process.
     *
@@ -38,13 +44,13 @@ object TilingService extends ProcessingService with FileAccess {
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[tiling] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], TASK_TILING, document, parts, sourceFolder, keepalive), name = "tile_doc_" + document.getId)
+    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], TilingService.TASK_TILING, document, parts, sourceFolder, keepalive), name = "tile_doc_" + document.getId)
     actor ! ProcessingTaskMessages.Start
   }
 
   /** Queries the progress for a specific process **/
   override def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit context: ExecutionContext, system: ActorSystem) = {
-    ProcessingTaskSupervisor.getSupervisorActor(TASK_TILING, documentId) match {
+    ProcessingTaskSupervisor.getSupervisorActor(TilingService.TASK_TILING, documentId) match {
       case Some(actor) => {
         implicit val t = Timeout(timeout)
         (actor ? ProcessingTaskMessages.QueryProgress).mapTo[ProcessingTaskMessages.DocumentProgress].map(Some(_))
