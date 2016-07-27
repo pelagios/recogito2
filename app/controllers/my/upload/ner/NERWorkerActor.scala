@@ -13,8 +13,7 @@ import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import scala.io.Source
-
-import models.ContentType
+import storage.ES
 
 private[ner] object NERWorkerActor {
 
@@ -22,7 +21,7 @@ private[ner] object NERWorkerActor {
 
 }
 
-private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File) extends Actor {
+private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File, annotationService: AnnotationService, placeService: PlaceService) extends Actor {
 
   import controllers.my.upload.ProcessingTaskMessages._
 
@@ -40,7 +39,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
         // TODO temporarily disabling PERSON tags for first pre-release
         val entities = phrases.filter(p => p.entityTag == "LOCATION")
         resolve(entities).map { annotations =>
-          AnnotationService.insertOrUpdateAnnotations(annotations).map { result =>
+          annotationService.insertOrUpdateAnnotations(annotations).map { result =>
             progress = 1.0
             status = ProgressStatus.COMPLETED
             if (result.size == 0)
@@ -84,7 +83,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       future.flatMap { annotations =>
         val fAnnotation = 
           if (phrase.entityTag == "LOCATION") {
-            PlaceService.searchPlaces(phrase.chars, 0, 1).map { topHits =>
+            placeService.searchPlaces(phrase.chars, 0, 1).map { topHits =>
               if (topHits.total > 0)
                 // TODO be smarter about choosing the right URI from the place
                 toAnnotation(phrase, AnnotationBody.PLACE, Some(topHits.items(0)._1.id))

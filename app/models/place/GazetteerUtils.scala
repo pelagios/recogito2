@@ -92,12 +92,12 @@ object GazetteerUtils {
   def loadRDF(is: InputStream, filename: String, gazetteerName: String): Seq[GazetteerRecord] = 
     Scalagios.readPlaces(is, filename).map(p => toRecord(p, gazetteerName)).toSeq
     
-  def importRDFStream(file: File, filename: String)(implicit context: ExecutionContext): Unit = {
+  def importRDFStream(file: File, filename: String, placeService: PlaceService)(implicit context: ExecutionContext): Unit = {
     val gazetteerName = filename.substring(0, filename.indexOf('.'))
     val stream = getStream(file, filename)
       
     def placeHandler(p: org.pelagios.api.gazetteer.Place) = {
-      Await.result(PlaceService.importRecord(toRecord(p, gazetteerName)), 10 seconds)
+      Await.result(placeService.importRecord(toRecord(p, gazetteerName)), 10 seconds)
     }
     
     play.api.Logger.info("Importing stream")   

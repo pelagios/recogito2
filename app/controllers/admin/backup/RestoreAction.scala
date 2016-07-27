@@ -13,7 +13,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
 import scala.io.Source
-import storage.DB
+import storage.{ DB, ES }
 
 trait RestoreAction extends HasDate {
 
@@ -46,7 +46,7 @@ trait RestoreAction extends HasDate {
   private def parseAnnotations(lines: Iterator[String]) =
     lines.map(line => Json.fromJson[Annotation](Json.parse(line)).get)
  
-  def restoreFromZip(file: File)(implicit db: DB, context: ExecutionContext) = {
+  def restoreFromZip(file: File, annotationService: AnnotationService)(implicit es: ES, db: DB, context: ExecutionContext) = {
     val zipFile = new ZipFile(file)
     val entries = zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX")) // Damn you Apple!
     
@@ -65,10 +65,10 @@ trait RestoreAction extends HasDate {
     val annotationEntry = entries.filter(_.getName == "annotations.jsonl").head
     val annotationLines = Source.fromInputStream(zipFile.getInputStream(annotationEntry), "UTF-8").getLines
     val annotations = parseAnnotations(annotationLines).toSeq
-    
+
     for {
      _ <- DocumentService.importDocument(documentRecord, fileparts)
-     _ <- AnnotationService.insertOrUpdateAnnotations(annotations)
+     _ <- annotationService.insertOrUpdateAnnotations(annotations)
     } yield Unit
 
   }

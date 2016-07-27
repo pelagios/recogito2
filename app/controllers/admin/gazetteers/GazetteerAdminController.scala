@@ -7,10 +7,10 @@ import models.user.Roles._
 import play.api.Logger
 import scala.concurrent.Future
 
-class GazetteerAdminController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController {
+class GazetteerAdminController @Inject() (placeService: PlaceService, implicit val ctx: ControllerContext) extends BaseAuthController {
   
   def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    PlaceService.listGazetteers().map { gazetteers => 
+    placeService.listGazetteers().map { gazetteers => 
       Ok(views.html.admin.gazetteers.index(gazetteers))
     }
   }
@@ -21,7 +21,7 @@ class GazetteerAdminController @Inject() (implicit val ctx: ControllerContext) e
         Future {
           scala.concurrent.blocking {
             Logger.info("Importing gazetteer from " + formData.filename)
-            GazetteerUtils.importRDFStream(formData.ref.file, formData.filename)
+            GazetteerUtils.importRDFStream(formData.ref.file, formData.filename, placeService)
           }
         }
         Redirect(routes.GazetteerAdminController.index)
@@ -33,7 +33,7 @@ class GazetteerAdminController @Inject() (implicit val ctx: ControllerContext) e
   }
   
   def deleteGazetteer(name: String) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    PlaceService.deleteByGazetteer(name).map { _ =>
+    placeService.deleteByGazetteer(name).map { _ =>
       Status(200)
     }
   }

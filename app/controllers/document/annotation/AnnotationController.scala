@@ -11,7 +11,7 @@ import play.api.mvc.RequestHeader
 import scala.concurrent.Future
 import storage.FileAccess
 
-class AnnotationController @Inject() (implicit val ctx: ControllerContext) extends BaseOptAuthController with FileAccess {
+class AnnotationController @Inject() (annotationService: AnnotationService, implicit val ctx: ControllerContext) extends BaseOptAuthController with FileAccess {
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: String) = StackAction { implicit request =>
@@ -41,7 +41,7 @@ class AnnotationController @Inject() (implicit val ctx: ControllerContext) exten
       case Some(ContentType.TEXT_PLAIN) => {
         readTextfile(document.getOwner, document.getId, thisPart.getFilename) match {
           case Some(content) => {
-            AnnotationService.countByDocId(document.getId).map(documentAnnotationCount =>
+            annotationService.countByDocId(document.getId).map(documentAnnotationCount =>
               Ok(views.html.document.annotation.text(loggedInUser, document, parts, thisPart, documentAnnotationCount, accesslevel, content)))
           }
           

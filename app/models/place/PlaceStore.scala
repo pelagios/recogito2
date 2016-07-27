@@ -13,7 +13,7 @@ import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.language.postfixOps
-import storage.ES
+import storage.{ ES, HasES }
 
 trait PlaceStore {
 
@@ -49,7 +49,7 @@ trait PlaceStore {
 
 }
 
-private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
+private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self: HasES =>
 
   private val PLACE = "place"
 
@@ -65,12 +65,12 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
   }
 
   override def totalPlaces()(implicit context: ExecutionContext): Future[Long] =
-    ES.client execute {
+    self.es.client execute {
       search in ES.IDX_RECOGITO -> PLACE limit 0
     } map { _.getHits.getTotalHits }
 
   override def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]] =
-    ES.client execute {
+    self.es.client execute {
       search in ES.IDX_RECOGITO / PLACE aggs (
         aggregation nested("by_source_gazetteer") path "is_conflation_of" aggs (
           aggregation terms "source_gazetteer" field "is_conflation_of.source_gazetteer" size Int.MaxValue
@@ -84,7 +84,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     }
 
   override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
-    ES.client execute {
+    self.es.client execute {
       update id place.id in ES.IDX_RECOGITO / PLACE source place docAsUpsert
     } map { r =>
       (true, r.getVersion)
@@ -95,14 +95,14 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     }
 
   override def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =
-    ES.client execute {
+    self.es.client execute {
       delete id id from ES.IDX_RECOGITO / PLACE
     } map { response =>
       response.isFound
     }
 
   override def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]] =
-    ES.client execute {
+    self.es.client execute {
       search in ES.IDX_RECOGITO -> PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.uri" -> uri)) limit 10
     } map { response =>
       val placesAndVersions = response.as[(Place, Long)].toSeq
@@ -118,7 +118,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     }
 
   override def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =
-    ES.client execute {
+    self.es.client execute {
       search in ES.IDX_RECOGITO / PLACE query {
         nestedQuery("is_conflation_of").query {
           bool {
@@ -133,7 +133,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
     } map { _.as[(Place, Long)].toSeq }
 
   override def searchPlaces(q: String, offset: Int, limit: Int, sortFrom: Option[Coordinate])(implicit context: ExecutionContext): Future[Page[(Place, Long)]] = {
-    ES.client execute {
+    self.es.client execute {
       val query = search in ES.IDX_RECOGITO / PLACE query {
         bool {
           should (
@@ -206,7 +206,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
 
     // Fetch one scroll batch, processes the results and run next batch
     def processOneBatch(scrollId: String, cursor: Long = 0l): Future[Unit] =
-      ES.client execute {
+      self.es.client execute {
         search scroll scrollId keepAlive "1m"
       } flatMap { response =>
         applySequential(response.as[(Place, Long)].map(_._1)).map { _ =>
@@ -217,7 +217,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter {
       }
 
     // Initial search request
-    ES.client execute {
+    self.es.client execute {
       search in ES.IDX_RECOGITO / PLACE query
         nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.source_gazetteer" -> gazetteer)) searchType SearchType.Scan scroll "1m"
     } map { response =>

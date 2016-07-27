@@ -11,7 +11,6 @@ import models.user.Roles._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.libs.Files.TemporaryFile
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -22,6 +21,9 @@ import java.sql.Timestamp
 trait BackupActions extends HasAdminAction with FileAccess with HasDate { self: BaseAuthController =>
 
   private val TMP_DIR = System.getProperty("java.io.tmpdir")
+  
+  private implicit val executionContext = self.ctx.ec
+  private implicit val elasticSearch = self.ctx.es
   
   implicit val documentRecordWrites: Writes[DocumentRecord] = (
     (JsPath \ "id").write[String] and
@@ -111,6 +113,7 @@ trait BackupActions extends HasAdminAction with FileAccess with HasDate { self: 
   }
   
   def exportAsZip(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    /*
     documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, parts) =>
       Future {
         new TemporaryFile(new File(TMP_DIR, documentId + ".zip"))
@@ -123,13 +126,15 @@ trait BackupActions extends HasAdminAction with FileAccess with HasDate { self: 
         parts.foreach(part =>
           addToZip(exportFile(document.getOwner, documentId, part.getFilename), "parts" + File.separator + part.getFilename, zipStream))
           
-        AnnotationService.findByDocId(documentId).map { annotations =>
+        annotationService.findByDocId(documentId).map { annotations =>
           addToZip(exportAnnotations(documentId, annotations.map(_._1), parts), "annotations.jsonl", zipStream)
           zipStream.close()
           Ok.sendFile(zipFile.file) 
         }
       }
     })
+    */
+    null
   }
   
 }

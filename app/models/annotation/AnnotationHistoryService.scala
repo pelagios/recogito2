@@ -28,8 +28,8 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
   }
 
   /** Inserts a new version into the history index **/
-  def insertVersion(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean] =
-    ES.client execute {
+  def insertVersion(annotation: Annotation)(implicit es: ES, context: ExecutionContext): Future[Boolean] =
+    es.client execute {
       index into ES.IDX_RECOGITO / ANNOTATION_HISTORY source AnnotationHistoryRecord.forVersion(annotation)
     } map {
       _.isCreated
@@ -41,8 +41,8 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
     }
   
   /** Inserts a delete marker for the (now deleted) annotation **/
-  def insertDeleteMarker(annotation: Annotation, deletedBy: String, deletedAt: DateTime)(implicit context: ExecutionContext): Future[Boolean] =
-    ES.client execute {
+  def insertDeleteMarker(annotation: Annotation, deletedBy: String, deletedAt: DateTime)(implicit es: ES, context: ExecutionContext): Future[Boolean] =
+    es.client execute {
       index into ES.IDX_RECOGITO / ANNOTATION_HISTORY source AnnotationHistoryRecord.forDelete(annotation, deletedBy, deletedAt)
     } map {
       _.isCreated
@@ -54,8 +54,8 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
     }
     
   /** Returns the IDs of annotations that were changed after the given timestamp **/
-  def getChangedAfter(docId: String, after: DateTime)(implicit context: ExecutionContext): Future[Seq[String]] =
-    ES.client execute {
+  def getChangedAfter(docId: String, after: DateTime)(implicit es: ES, context: ExecutionContext): Future[Seq[String]] =
+    es.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query {
         filteredQuery query {
           nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
@@ -71,8 +71,8 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
         .getBuckets.asScala.map(_.getKey)
     }
     
-  def getAnnotationStateAt(annotationId: String, time: DateTime)(implicit context: ExecutionContext): Future[Option[AnnotationHistoryRecord]] =
-    ES.client execute {
+  def getAnnotationStateAt(annotationId: String, time: DateTime)(implicit es: ES, context: ExecutionContext): Future[Option[AnnotationHistoryRecord]] =
+    es.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query {
         filteredQuery query {
           termQuery("annotation_id" -> annotationId)
@@ -85,10 +85,10 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
     } map { _.as[AnnotationHistoryRecord].toSeq.headOption }
 
   /** Deletes all history records (versions and delete markers) for a document, after a given timestamp **/
-  def deleteHistoryRecordsAfter(docId: String, after: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+  def deleteHistoryRecordsAfter(docId: String, after: DateTime)(implicit es: ES, context: ExecutionContext): Future[Boolean] = {
 
     // Retrieves all versions on the document after the the given timestamp
-    def findHistoryRecordsAfter() = ES.client execute {
+    def findHistoryRecordsAfter() = es.client execute {
       search in ES.IDX_RECOGITO / ANNOTATION_HISTORY query filteredQuery query {
         nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
       } postFilter { // TODO remove postFilter!
@@ -98,7 +98,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
 
     findHistoryRecordsAfter().flatMap { hits =>
       if (hits.size > 0) {
-        ES.client execute {
+        es.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.IDX_RECOGITO / ANNOTATION_HISTORY) )
         } map {
           !_.hasFailures

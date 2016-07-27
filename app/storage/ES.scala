@@ -14,13 +14,30 @@ import scala.util.{ Try, Success, Failure }
 import javax.inject.{ Inject, Singleton }
 import play.api.inject.ApplicationLifecycle
 import scala.concurrent.Future
+import play.api.Configuration
+
+class ESModule extends AbstractModule {
+    
+  def configure = {
+    bind(classOf[ES]).asEagerSingleton
+  }
+  
+}
+
+trait HasES { def es: ES }
 
 object ES {
   
   val IDX_RECOGITO = "recogito"
   
   val MAX_SIZE = 2147483647
+  
+}
 
+class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
+  
+  play.api.Logger.info("starting ES")
+  
   lazy val client = {
     val home = Play.current.configuration.getString("recogito.index.dir") match {
       case Some(dir) => new File(dir)
@@ -61,15 +78,15 @@ object ES {
   
   def start() = {
     implicit val timeout = 60 seconds
-    val response = client.execute { index exists(IDX_RECOGITO) }.await
+    val response = client.execute { index exists(ES.IDX_RECOGITO) }.await
     
     if (response.isExists()) {
       // Index exists - create missing mappings as needed
       val list = client.admin.indices().prepareGetMappings()
-      val existingMappings = list.execute().actionGet().getMappings().get(IDX_RECOGITO).keys.toArray.map(_.toString)
+      val existingMappings = list.execute().actionGet().getMappings().get(ES.IDX_RECOGITO).keys.toArray.map(_.toString)
       loadMappings(existingMappings).foreach { case (name, json) =>
         Logger.info("Recreating mapping " + name)
-        val putMapping = client.admin.indices().preparePutMapping(IDX_RECOGITO)
+        val putMapping = client.admin.indices().preparePutMapping(ES.IDX_RECOGITO)
         putMapping.setType(name)
         putMapping.setSource(json)
         putMapping.execute().actionGet()
@@ -78,7 +95,7 @@ object ES {
       // No index - create index with all mappings
       Logger.info("No ES index - initializing...")
       
-      val create = client.admin.indices().prepareCreate(IDX_RECOGITO) 
+      val create = client.admin.indices().prepareCreate(ES.IDX_RECOGITO) 
       create.setSettings(loadSettings())
       
       loadMappings().foreach { case (name, json) =>  { 

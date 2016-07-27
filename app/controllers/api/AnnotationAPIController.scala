@@ -87,7 +87,7 @@ object AnnotationStatusStub extends HasDate {
 
 }
 
-class AnnotationAPIController @Inject() (implicit val ctx: ControllerContext)
+class AnnotationAPIController @Inject() (annotationService: AnnotationService, implicit val ctx: ControllerContext)
   extends BaseController 
   with OptionalAuthElement 
   with Security
@@ -107,7 +107,7 @@ class AnnotationAPIController @Inject() (implicit val ctx: ControllerContext)
         // Load annotations for specific doc part
         DocumentService.findPartByDocAndSeqNo(id, seqNo).flatMap(_ match {
           case Some(filepart) =>
-            AnnotationService.findByFilepartId(filepart.getId)
+            annotationService.findByFilepartId(filepart.getId)
               .map{ annotations =>
                 // Join in places, if requested
                 jsonOk(Json.toJson(annotations.map(_._1)))
@@ -119,7 +119,7 @@ class AnnotationAPIController @Inject() (implicit val ctx: ControllerContext)
 
       case (id, None) =>
         // Load annotations for entire doc
-        AnnotationService.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
+        annotationService.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
     }
   }
 
@@ -157,7 +157,7 @@ class AnnotationAPIController @Inject() (implicit val ctx: ControllerContext)
                 if (accesslevel.canWrite) {
                   val annotation = stubToAnnotation(s.get, loggedIn.map(_.user.getUsername).getOrElse("guest"))
                   val f = for {
-                    (annotationStored, _, previousVersion) <- AnnotationService.insertOrUpdateAnnotation(annotation)
+                    (annotationStored, _, previousVersion) <- annotationService.insertOrUpdateAnnotation(annotation)
                     success <- if (annotationStored)
                                  ContributionService.insertContributions(validateUpdate(annotation, previousVersion))
                                else
@@ -194,7 +194,7 @@ class AnnotationAPIController @Inject() (implicit val ctx: ControllerContext)
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
-    AnnotationService.findById(id).flatMap(_ match {
+    annotationService.findById(id).flatMap(_ match {
       case Some((annotation, _)) => {
         if (includeContext) {
           // Fetch the document, so we know the owner...
@@ -259,7 +259,7 @@ class AnnotationAPIController @Inject() (implicit val ctx: ControllerContext)
     )
 
   def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>
-    AnnotationService.findById(id).flatMap(_ match {
+    annotationService.findById(id).flatMap(_ match {
       case Some((annotation, version)) => {
         // Fetch the associated document
         DocumentService.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
@@ -267,7 +267,7 @@ class AnnotationAPIController @Inject() (implicit val ctx: ControllerContext)
             if (accesslevel.canWrite) {
               val user = loggedIn.map(_.user.getUsername).getOrElse("guest")
               val now = DateTime.now
-              AnnotationService.deleteAnnotation(id, user, now).flatMap(_ match {
+              annotationService.deleteAnnotation(id, user, now).flatMap(_ match {
                 case Some(annotation) =>
                   ContributionService.insertContribution(createDeleteContribution(annotation, user, now)).map(success =>
                     if (success) Status(200) else InternalServerError)

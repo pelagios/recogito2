@@ -5,11 +5,11 @@ import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.mvc.{ AnyContent, Controller, Request }
 import scala.concurrent.ExecutionContext
-import storage.DB
+import storage.{ DB, ES }
 
 /** Helper class to reduce Controller boilerplate **/ 
 @Singleton
-class ControllerContext @Inject() (val cache: CacheApi, val config: Configuration, val db: DB, val ec: ExecutionContext, val webjars: WebJarAssets) 
+class ControllerContext @Inject() (val cache: CacheApi, val config: Configuration, val db: DB, val ec: ExecutionContext, val es: ES, val webjars: WebJarAssets) 
 
 trait HasContext { def ctx: ControllerContext }
 
@@ -20,6 +20,7 @@ abstract class BaseController extends Controller with HasContext {
   implicit def controllerContextToConfig(implicit ctx: ControllerContext) = ctx.config
   implicit def controllerContextToDB(implicit ctx: ControllerContext) = ctx.db
   implicit def controllerContextToExecutionContext(implicit ctx: ControllerContext) = ctx.ec
+  implicit def controllerContextToES(implicit ctx: ControllerContext) = ctx.es
   implicit def controllerContextToWebJars(implicit ctx: ControllerContext) = ctx.webjars
   
   protected val NotFoundPage = NotFound(views.html.error404())
