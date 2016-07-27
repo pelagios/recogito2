@@ -1,19 +1,26 @@
 package controllers.my.settings
 
-import controllers.{ BaseAuthController, ControllerContext }
+import controllers.{ HasUserService, HasConfig, Security }
 import javax.inject.Inject
+import jp.t2v.lab.play2.auth.AuthElement
 import models.user.Roles._
 import models.user.UserService
+import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
-import scala.concurrent.Future
+import play.api.mvc.Controller
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class AccountSettingsData(email: String, name: Option[String], bio: Option[String], website: Option[String])
 
-class AccountSettingsController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi)
-  extends BaseAuthController with I18nSupport {
-  
+class AccountSettingsController @Inject() (
+    val config: Configuration,
+    val users: UserService,
+    val messagesApi: MessagesApi,
+    implicit val ctx: ExecutionContext
+  ) extends Controller with AuthElement with HasUserService with HasConfig with Security with I18nSupport {
+
   val accountSettingsForm = Form(
     mapping(
       "email" -> email,
@@ -39,7 +46,7 @@ class AccountSettingsController @Inject() (implicit val ctx: ControllerContext, 
         Future.successful(BadRequest(views.html.my.settings.account(formWithErrors))),
 
       f =>
-        UserService.updateUserSettings(loggedIn.user.getUsername, f.email, f.name, f.bio, f.website)
+        users.updateUserSettings(loggedIn.user.getUsername, f.email, f.name, f.bio, f.website)
           .map { success =>
             if (success)
               Redirect(routes.AccountSettingsController.index).flashing("success" -> "Your settings have been saved.")

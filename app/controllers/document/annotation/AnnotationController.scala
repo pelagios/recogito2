@@ -1,17 +1,25 @@
 package controllers.document.annotation
 
-import controllers.{ BaseOptAuthController, ControllerContext }
+import controllers.{ BaseOptAuthController, WebJarAssets }
 import javax.inject.Inject
 import models.ContentType
 import models.annotation.AnnotationService
-import models.document.DocumentAccessLevel
+import models.document.{ DocumentService, DocumentAccessLevel }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.Logger
+import models.user.UserService
+import play.api.{ Configuration, Logger }
 import play.api.mvc.RequestHeader
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import storage.FileAccess
 
-class AnnotationController @Inject() (annotationService: AnnotationService, implicit val ctx: ControllerContext) extends BaseOptAuthController with FileAccess {
+class AnnotationController @Inject() (
+    val config: Configuration,
+    val annotations: AnnotationService,
+    val documents: DocumentService,
+    val users: UserService,
+    implicit val webjars: WebJarAssets,
+    implicit val ctx: ExecutionContext
+  ) extends BaseOptAuthController(config, documents, users) with FileAccess {
 
   /** Just a redirect for convenience **/
   def showAnnotationViewForDoc(documentId: String) = StackAction { implicit request =>
@@ -24,7 +32,7 @@ class AnnotationController @Inject() (annotationService: AnnotationService, impl
       if (accesslevel.canRead)
         renderResponse(maybeUser, document, fileparts, selectedPart, accesslevel)
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet 
-        authenticationFailed(request)(ctx.ec)        
+        authenticationFailed(request)     
       else
         Future.successful(ForbiddenPage)
     })
@@ -41,7 +49,7 @@ class AnnotationController @Inject() (annotationService: AnnotationService, impl
       case Some(ContentType.TEXT_PLAIN) => {
         readTextfile(document.getOwner, document.getId, thisPart.getFilename) match {
           case Some(content) => {
-            annotationService.countByDocId(document.getId).map(documentAnnotationCount =>
+            annotations.countByDocId(document.getId).map(documentAnnotationCount =>
               Ok(views.html.document.annotation.text(loggedInUser, document, parts, thisPart, documentAnnotationCount, accesslevel, content)))
           }
           

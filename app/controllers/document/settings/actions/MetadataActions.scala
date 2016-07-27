@@ -1,16 +1,14 @@
 package controllers.document.settings.actions
   
-import controllers.BaseAuthController
-import controllers.document.settings.HasAdminAction
+import controllers.document.settings.SettingsController
 import java.util.UUID
-import models.document.{ DocumentService, PartOrdering }
+import models.document.PartOrdering
 import models.user.Roles._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-trait MetadataActions extends HasAdminAction { self: BaseAuthController =>
+trait MetadataActions { self: SettingsController =>
   
   implicit val orderingReads: Reads[PartOrdering] = (
     (JsPath \ "id").read[UUID] and
@@ -20,7 +18,7 @@ trait MetadataActions extends HasAdminAction { self: BaseAuthController =>
   /** Sets the part sort order **/
   def setSortOrder(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request => 
     jsonDocumentAdminAction[Seq[PartOrdering]](docId, loggedIn.user.getUsername, { case (document, ordering) =>
-      DocumentService.setFilepartSortOrder(docId, ordering)(self.ctx.db).map(_ => Status(200))
+      documents.setFilepartSortOrder(docId, ordering).map(_ => Status(200))
     })
   }
   

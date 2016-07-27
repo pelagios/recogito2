@@ -51,10 +51,6 @@ trait PlaceStore {
 
 private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self: HasES =>
 
-  private val PLACE = "place"
-
-  private def MAX_RETRIES = 10 // Max number of import retires in case of failure
-
   implicit object PlaceIndexable extends Indexable[Place] {
     override def json(p: Place): String = Json.stringify(Json.toJson(p))
   }
@@ -66,12 +62,12 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
 
   override def totalPlaces()(implicit context: ExecutionContext): Future[Long] =
     self.es.client execute {
-      search in ES.IDX_RECOGITO -> PLACE limit 0
+      search in ES.RECOGITO -> ES.PLACE limit 0
     } map { _.getHits.getTotalHits }
 
   override def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]] =
     self.es.client execute {
-      search in ES.IDX_RECOGITO / PLACE aggs (
+      search in ES.RECOGITO / ES.PLACE aggs (
         aggregation nested("by_source_gazetteer") path "is_conflation_of" aggs (
           aggregation terms "source_gazetteer" field "is_conflation_of.source_gazetteer" size Int.MaxValue
         )
@@ -85,7 +81,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
 
   override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
     self.es.client execute {
-      update id place.id in ES.IDX_RECOGITO / PLACE source place docAsUpsert
+      update id place.id in ES.RECOGITO / ES.PLACE source place docAsUpsert
     } map { r =>
       (true, r.getVersion)
     } recover { case t: Throwable =>
@@ -96,14 +92,14 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
 
   override def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =
     self.es.client execute {
-      delete id id from ES.IDX_RECOGITO / PLACE
+      delete id id from ES.RECOGITO / ES.PLACE
     } map { response =>
       response.isFound
     }
 
   override def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]] =
     self.es.client execute {
-      search in ES.IDX_RECOGITO -> PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.uri" -> uri)) limit 10
+      search in ES.RECOGITO -> ES.PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.uri" -> uri)) limit 10
     } map { response =>
       val placesAndVersions = response.as[(Place, Long)].toSeq
       if (placesAndVersions.isEmpty) {
@@ -119,7 +115,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
 
   override def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =
     self.es.client execute {
-      search in ES.IDX_RECOGITO / PLACE query {
+      search in ES.RECOGITO / ES.PLACE query {
         nestedQuery("is_conflation_of").query {
           bool {
             should {
@@ -134,7 +130,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
 
   override def searchPlaces(q: String, offset: Int, limit: Int, sortFrom: Option[Coordinate])(implicit context: ExecutionContext): Future[Page[(Place, Long)]] = {
     self.es.client execute {
-      val query = search in ES.IDX_RECOGITO / PLACE query {
+      val query = search in ES.RECOGITO / ES.PLACE query {
         bool {
           should (
             // Treat as standard query string query first...
@@ -182,7 +178,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
   private def scrollByGazetteer(gazetteer: String, fn: Place => Future[Boolean])(implicit context: ExecutionContext) = {
 
     // Applies the fn to a seq of places, in sequence, without blocking, handling retries
-    def applySequential(places: Seq[Place], retries: Int = MAX_RETRIES): Future[Seq[Place]] =
+    def applySequential(places: Seq[Place], retries: Int = ES.MAX_RETRIES): Future[Seq[Place]] =
       places.foldLeft(Future.successful(Seq.empty[Place])) { case (future, place) =>
         future.flatMap { failedPlaces =>
           fn(place).map { success =>
@@ -218,7 +214,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
 
     // Initial search request
     self.es.client execute {
-      search in ES.IDX_RECOGITO / PLACE query
+      search in ES.RECOGITO / ES.PLACE query
         nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.source_gazetteer" -> gazetteer)) searchType SearchType.Scan scroll "1m"
     } map { response =>
       processOneBatch(response.getScrollId)

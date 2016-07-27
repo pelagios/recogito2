@@ -1,28 +1,21 @@
 package controllers
 
 import javax.inject.{ Inject, Provider, Singleton }
+import models.user.UserService
 import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.mvc.{ AnyContent, Controller, Request }
 import scala.concurrent.ExecutionContext
 import storage.{ DB, ES }
 
-/** Helper class to reduce Controller boilerplate **/ 
-@Singleton
-class ControllerContext @Inject() (val cache: CacheApi, val config: Configuration, val db: DB, val ec: ExecutionContext, val es: ES, val webjars: WebJarAssets) 
+trait HasConfig { def config: Configuration }
 
-trait HasContext { def ctx: ControllerContext }
+trait HasUserService { def users: UserService }
 
 /** Common Controller functionality for convenience **/
-abstract class BaseController extends Controller with HasContext {
-  
-  implicit def controllerContextToCache(implicit ctx: ControllerContext) = ctx.cache
-  implicit def controllerContextToConfig(implicit ctx: ControllerContext) = ctx.config
-  implicit def controllerContextToDB(implicit ctx: ControllerContext) = ctx.db
-  implicit def controllerContextToExecutionContext(implicit ctx: ControllerContext) = ctx.ec
-  implicit def controllerContextToES(implicit ctx: ControllerContext) = ctx.es
-  implicit def controllerContextToWebJars(implicit ctx: ControllerContext) = ctx.webjars
-  
+abstract class BaseController(config: Configuration, users: UserService)
+  extends Controller with HasConfig with HasUserService {
+
   protected val NotFoundPage = NotFound(views.html.error404())
   
   protected val ForbiddenPage = Forbidden(views.html.error403())

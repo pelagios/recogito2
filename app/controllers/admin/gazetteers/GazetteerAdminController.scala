@@ -1,16 +1,25 @@
 package controllers.admin.gazetteers
 
-import controllers.{ BaseAuthController, ControllerContext }
+import controllers.{ BaseAuthController, WebJarAssets }
 import javax.inject.Inject
+import models.document.DocumentService
 import models.place.{ GazetteerUtils, PlaceService }
+import models.user.UserService
 import models.user.Roles._
-import play.api.Logger
-import scala.concurrent.Future
+import play.api.{ Configuration, Logger }
+import scala.concurrent.{ ExecutionContext, Future }
 
-class GazetteerAdminController @Inject() (placeService: PlaceService, implicit val ctx: ControllerContext) extends BaseAuthController {
+class GazetteerAdminController @Inject() (
+    val config: Configuration,
+    val documents: DocumentService,
+    val places: PlaceService,
+    val users: UserService,
+    implicit val ctx: ExecutionContext,
+    implicit val webjars: WebJarAssets
+  ) extends BaseAuthController(config, documents, users) {
   
   def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    placeService.listGazetteers().map { gazetteers => 
+    places.listGazetteers().map { gazetteers => 
       Ok(views.html.admin.gazetteers.index(gazetteers))
     }
   }
@@ -21,7 +30,7 @@ class GazetteerAdminController @Inject() (placeService: PlaceService, implicit v
         Future {
           scala.concurrent.blocking {
             Logger.info("Importing gazetteer from " + formData.filename)
-            GazetteerUtils.importRDFStream(formData.ref.file, formData.filename, placeService)
+            GazetteerUtils.importRDFStream(formData.ref.file, formData.filename, places)
           }
         }
         Redirect(routes.GazetteerAdminController.index)
@@ -33,7 +42,7 @@ class GazetteerAdminController @Inject() (placeService: PlaceService, implicit v
   }
   
   def deleteGazetteer(name: String) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    placeService.deleteByGazetteer(name).map { _ =>
+    places.deleteByGazetteer(name).map { _ =>
       Status(200)
     }
   }

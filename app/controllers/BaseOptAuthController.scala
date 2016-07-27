@@ -3,6 +3,8 @@ package controllers
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.document.{ DocumentAccessLevel, DocumentService }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.user.UserService
+import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.mvc.Result
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -10,7 +12,11 @@ import play.api.Logger
 import scala.concurrent.Future
 import storage.DB
 
-abstract class BaseOptAuthController extends BaseController with HasContext with OptionalAuthElement with Security {
+abstract class BaseOptAuthController(
+    config: Configuration,
+    documents: DocumentService,
+    users: UserService
+  ) extends BaseController(config, users) with OptionalAuthElement with Security {
   
   /** Helper that covers the boilerplate for all document views
     *
@@ -18,9 +24,9 @@ abstract class BaseOptAuthController extends BaseController with HasContext with
     * the method handles ForbiddenPage/Not Found error cases.
     */
   protected def documentResponse(documentId: String, maybeUser: Option[String],
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Future[Result])(implicit cache: CacheApi, db: DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Future[Result]) = {
 
-    DocumentService.findByIdWithFileparts(documentId, maybeUser).flatMap(_ match {
+    documents.findByIdWithFileparts(documentId, maybeUser).flatMap(_ match {
       case Some((document, fileparts, accesslevel)) => response(document, fileparts, accesslevel)
       case None => Future.successful(NotFoundPage)
     }).recover { case t =>
@@ -31,7 +37,7 @@ abstract class BaseOptAuthController extends BaseController with HasContext with
   
   /** Helper that covers the boilerplate for all document part views **/
   protected def documentPartResponse(documentId: String, partNo: Int, maybeUser: Option[String],
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Future[Result])(implicit cache: CacheApi, db: DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Future[Result]) = {
     
     documentResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)

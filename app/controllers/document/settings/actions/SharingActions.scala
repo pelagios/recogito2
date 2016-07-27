@@ -1,17 +1,14 @@
 package controllers.document.settings.actions
 
-import controllers.BaseAuthController
-import controllers.document.settings.HasAdminAction
-import models.document.{ DocumentAccessLevel, DocumentService }
+import controllers.HasPrettyPrintJSON
+import controllers.document.settings.SettingsController
+import models.document.DocumentAccessLevel
 import models.generated.tables.records.SharingPolicyRecord
 import models.user.Roles._
-import models.user.UserService
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
-import controllers.HasPrettyPrintJSON
 
 case class CollaboratorStub(collaborator: String, accessLevel: Option[DocumentAccessLevel], newCollaborator: Boolean)
 
@@ -30,11 +27,11 @@ object CollaboratorStub {
   
 }
 
-trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: BaseAuthController =>
+trait SharingActions extends HasPrettyPrintJSON { self: SettingsController =>
     
   def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, _) =>
-      DocumentService.setPublicVisibility(document.getId, enabled)(self.ctx.db).map(_ => Status(200))
+      documents.setPublicVisibility(document.getId, enabled).map(_ => Status(200))
     })
   }
   
@@ -47,9 +44,9 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
       } else {
         // If no access level given, use READ as minimum default
         val accessLevel = stub.accessLevel.getOrElse(DocumentAccessLevel.READ)
-        UserService.findByUsername(stub.collaborator)(self.ctx.db, self.ctx.cache).flatMap { _ match {
+        users.findByUsername(stub.collaborator).flatMap { _ match {
           case Some(userWithRoles) => 
-            DocumentService.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)(self.ctx.db)
+            documents.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)
               .map { case (policy, isNew) => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy, isNew))) }
             
           case None => 
@@ -61,13 +58,13 @@ trait SharingActions extends HasAdminAction with HasPrettyPrintJSON { self: Base
   
   def removeCollaborator(documentId: String, username: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, _) =>      
-      DocumentService.removeDocumentCollaborator(documentId, username)(self.ctx.db).map(success =>
+      documents.removeDocumentCollaborator(documentId, username).map(success =>
         if (success) Status(200) else InternalServerError)
     })
   }
   
   def searchUsers(documentId: String, query: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UserService.searchUsers(query)(self.ctx.db).map { matches =>
+    users.searchUsers(query).map { matches =>
       jsonOk(Json.toJson(matches))
     }
   }

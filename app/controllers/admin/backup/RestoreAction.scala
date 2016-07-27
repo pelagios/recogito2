@@ -46,7 +46,7 @@ trait RestoreAction extends HasDate {
   private def parseAnnotations(lines: Iterator[String]) =
     lines.map(line => Json.fromJson[Annotation](Json.parse(line)).get)
  
-  def restoreFromZip(file: File, annotationService: AnnotationService)(implicit es: ES, db: DB, context: ExecutionContext) = {
+  def restoreFromZip(file: File, annotationService: AnnotationService, documentService: DocumentService)(implicit ctx: ExecutionContext) = {
     val zipFile = new ZipFile(file)
     val entries = zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX")) // Damn you Apple!
     
@@ -67,7 +67,7 @@ trait RestoreAction extends HasDate {
     val annotations = parseAnnotations(annotationLines).toSeq
 
     for {
-     _ <- DocumentService.importDocument(documentRecord, fileparts)
+     _ <- documentService.importDocument(documentRecord, fileparts)
      _ <- annotationService.insertOrUpdateAnnotations(annotations)
     } yield Unit
 

@@ -1,25 +1,19 @@
 package controllers.document.settings.actions
 
-import controllers.BaseAuthController
-import controllers.document.settings.HasAdminAction
-import models.annotation.AnnotationService
+import controllers.document.settings.SettingsController
 import models.document.{ DocumentService, DocumentAccessLevel }
 import models.user.Roles._
 import scala.concurrent.Future
 
-trait DeleteActions extends HasAdminAction { self: BaseAuthController =>
-  
-  private implicit val executionContext = self.ctx.ec
-  private implicit val elasticSearch = self.ctx.es
+trait DeleteActions { self: SettingsController =>
   
   def deleteDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    /*
-    DocumentService.findById(docId, Some(loggedIn.user.getUsername))(self.ctx.db).flatMap(_ match {
+    documents.findById(docId, Some(loggedIn.user.getUsername)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel == DocumentAccessLevel.OWNER) // We allow only the owner to delete a document
           for {
-            _ <- DocumentService.delete(document)(self.ctx.db)
-            success <- annotationService.deleteByDocId(docId)
+            _ <- documents.delete(document)
+            success <- annotations.deleteByDocId(docId)
           } yield if (success) Status(200) else InternalServerError
         else
           Future.successful(ForbiddenPage)
@@ -31,8 +25,6 @@ trait DeleteActions extends HasAdminAction { self: BaseAuthController =>
       t.printStackTrace()
       InternalServerError(t.getMessage)
     }
-    */
-    null
   }
   
 }

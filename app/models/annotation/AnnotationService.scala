@@ -28,24 +28,20 @@ trait HasAnnotationIndexing {
 }
 
 @Singleton
-class AnnotationService @Inject() (implicit val es: ES) extends HasAnnotationIndexing with AnnotationHistoryService with ESGeoTagStore with HasES {
-
-  private val ANNOTATION = "annotation"
-
-  private def MAX_RETRIES = 10 // Max number of import retires in case of failure
+class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasAnnotationIndexing with AnnotationHistoryService with ESGeoTagStore with HasES {
 
   /** Upserts an annotation, automatically dealing with updating version history and geotags.
     *
     * Returns a boolean flag indicating successful completion, the internal ElasticSearch
     * version, and the previous version of the annotation, if any.
     */
-  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = true)(implicit context: ExecutionContext): Future[(Boolean, Long, Option[Annotation])] = {
+  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = true): Future[(Boolean, Long, Option[Annotation])] = {
 
     // Upsert annotation in the annotation index; returns a boolean flag indicating success, plus
     // the internal ElasticSearch version number
     def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] =
       es.client execute {
-        update id a.annotationId in ES.IDX_RECOGITO / ANNOTATION source a docAsUpsert
+        update id a.annotationId in ES.RECOGITO / ES.ANNOTATION source a docAsUpsert
       } map { r =>
         (true, r.getVersion)
       } recover { case t: Throwable =>
@@ -69,7 +65,7 @@ class AnnotationService @Inject() (implicit val es: ES) extends HasAnnotationInd
   }
 
   /** Upserts a list of annotations, handling non-blocking chaining & retries in case of failure **/
-  def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = MAX_RETRIES)(implicit context: ExecutionContext): Future[Seq[Annotation]] =
+  def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = ES.MAX_RETRIES): Future[Seq[Annotation]] =
     annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
       future.flatMap { failedAnnotations =>
         insertOrUpdateAnnotation(annotation).map { case (success, _, _) =>
@@ -91,9 +87,9 @@ class AnnotationService @Inject() (implicit val es: ES) extends HasAnnotationInd
     }
 
   /** Retrieves an annotation by ID **/
-  def findById(annotationId: UUID)(implicit es: ES, context: ExecutionContext): Future[Option[(Annotation, Long)]] =
+  def findById(annotationId: UUID): Future[Option[(Annotation, Long)]] =
     es.client execute {
-      get id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION
+      get id annotationId.toString from ES.RECOGITO / ES.ANNOTATION
     } map { response =>
       if (response.isExists) {
         val source = Json.parse(response.getSourceAsString)
@@ -103,13 +99,13 @@ class AnnotationService @Inject() (implicit val es: ES) extends HasAnnotationInd
       }
     }
     
-  private def deleteById(annotationId: String)(implicit es: ES, context: ExecutionContext): Future[Boolean] =
+  private def deleteById(annotationId: String): Future[Boolean] =
     es.client execute {
-      delete id annotationId.toString from ES.IDX_RECOGITO / ANNOTATION 
+      delete id annotationId.toString from ES.RECOGITO / ES.ANNOTATION 
     } map { _.isFound }
 
   /** Deletes the annotation with the given ID **/
-  def deleteAnnotation(annotationId: UUID, deletedBy: String, deletedAt: DateTime)(implicit context: ExecutionContext): Future[Option[Annotation]] =
+  def deleteAnnotation(annotationId: UUID, deletedBy: String, deletedAt: DateTime): Future[Option[Annotation]] =
     findById(annotationId).flatMap(_ match {
       case Some((annotation, _)) => {
         val f = for {
@@ -131,23 +127,23 @@ class AnnotationService @Inject() (implicit val es: ES) extends HasAnnotationInd
         Future.successful(None)
     })
         
-  def countByDocId(id: String)(implicit context: ExecutionContext): Future[Long] =
+  def countByDocId(id: String): Future[Long] =
     es.client execute {
-      count from ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id))
+      count from ES.RECOGITO / ES.ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id))
     } map { _.getCount }
 
   /** Retrieves all annotations on a given document **/
-  def findByDocId(id: String, offset: Int= 0, limit: Int = ES.MAX_SIZE)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] =
+  def findByDocId(id: String, offset: Int= 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) start offset limit limit
+      search in ES.RECOGITO / ES.ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) start offset limit limit
     } map(_.as[(Annotation, Long)].toSeq)
 
   /** Deletes all annotations on a given document **/
-  def deleteByDocId(docId: String)(implicit context: ExecutionContext): Future[Boolean] =
+  def deleteByDocId(docId: String): Future[Boolean] =
     findByDocId(docId).flatMap { annotationsAndVersions =>
       if (annotationsAndVersions.size > 0) {
         es.client execute {
-          bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId from ES.IDX_RECOGITO / ANNOTATION } )
+          bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId from ES.RECOGITO / ES.ANNOTATION } )
         } map {
           !_.hasFailures
         } recover { case t: Throwable =>
@@ -161,15 +157,15 @@ class AnnotationService @Inject() (implicit val es: ES) extends HasAnnotationInd
     }
 
   /** Retrieves all annotations on a given filepart **/
-  def findByFilepartId(id: UUID, limit: Int = Int.MaxValue)(implicit context: ExecutionContext): Future[Seq[(Annotation, Long)]] =
+  def findByFilepartId(id: UUID, limit: Int = Int.MaxValue): Future[Seq[(Annotation, Long)]] =
     es.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id.toString)) limit limit
+      search in ES.RECOGITO / ES.ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id.toString)) limit limit
     } map(_.as[(Annotation, Long)].toSeq)
 
   /** Retrieves annotations on a document last updated after a given timestamp **/
-  def findModifiedAfter(documentId: String, after: DateTime)(implicit es: ES, context: ExecutionContext): Future[Seq[Annotation]] =
+  def findModifiedAfter(documentId: String, after: DateTime): Future[Seq[Annotation]] =
     es.client execute {
-      search in ES.IDX_RECOGITO / ANNOTATION query filteredQuery query {
+      search in ES.RECOGITO / ES.ANNOTATION query filteredQuery query {
         nestedQuery("annotates").query(termQuery("annotates.document_id" -> documentId))
       } postFilter {
         rangeFilter("last_modified_at").gt(formatDate(after))
@@ -177,7 +173,7 @@ class AnnotationService @Inject() (implicit val es: ES) extends HasAnnotationInd
     } map { _.as[(Annotation, Long)].toSeq.map(_._1) }
 
   /** Rolls back the document to the state at the given timestamp **/ 
-  def rollbackToTimestamp(documentId: String, timestamp: DateTime)(implicit context: ExecutionContext): Future[Boolean] = {
+  def rollbackToTimestamp(documentId: String, timestamp: DateTime): Future[Boolean] = {
 
     // Rolls back one annotation, i.e. updates to the latest state recorded in the history or deletes
     def rollbackOne(annotationId: String): Future[Boolean] =

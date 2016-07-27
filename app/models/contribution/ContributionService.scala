@@ -4,6 +4,7 @@ import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
+import javax.inject.{ Inject, Singleton }
 import models.{ HasDate, Page }
 import org.elasticsearch.search.aggregations.bucket.filter.Filter
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram
@@ -17,11 +18,8 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
 import storage.ES
 
-object ContributionService extends HasDate {
-
-  private val CONTRIBUTION = "contribution"
-
-  private def MAX_RETRIES = 10 // Max number of retries in case of failure
+@Singleton
+class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasDate {
 
   implicit object ContributionIndexable extends Indexable[Contribution] {
     override def json(c: Contribution): String = Json.stringify(Json.toJson(c))
@@ -33,9 +31,9 @@ object ContributionService extends HasDate {
   }
 
   /** Inserts a contribution record into the index **/
-  def insertContribution(contribution: Contribution)(implicit es: ES, context: ExecutionContext): Future[Boolean] =
+  def insertContribution(contribution: Contribution): Future[Boolean] =
     es.client execute {
-      index into ES.IDX_RECOGITO / CONTRIBUTION source contribution
+      index into ES.RECOGITO / ES.CONTRIBUTION source contribution
     } map {
       _.isCreated
     } recover { case t: Throwable =>
@@ -46,7 +44,7 @@ object ContributionService extends HasDate {
     }
 
   /** Inserts a list of contributions, automatically dealing with retries. **/
-  def insertContributions(contributions: Seq[Contribution], retries: Int = MAX_RETRIES)(implicit es: ES, context: ExecutionContext): Future[Boolean] =
+  def insertContributions(contributions: Seq[Contribution], retries: Int = ES.MAX_RETRIES): Future[Boolean] =
     contributions.foldLeft(Future.successful(Seq.empty[Contribution])) { case (future, contribution) =>
       future.flatMap { failed =>
         insertContribution(contribution).map { success =>
@@ -68,9 +66,9 @@ object ContributionService extends HasDate {
     }
 
   /** Returns the contribution history on a given document, as a paged result **/
-  def getHistory(documentId: String, offset: Int = 0, limit: Int = 20)(implicit es: ES, context: ExecutionContext): Future[Page[(Contribution)]] =
+  def getHistory(documentId: String, offset: Int = 0, limit: Int = 20): Future[Page[(Contribution)]] =
     es.client execute {
-      search in ES.IDX_RECOGITO / CONTRIBUTION query nestedQuery("affects_item").query (
+      search in ES.RECOGITO / ES.CONTRIBUTION query nestedQuery("affects_item").query (
         termQuery("affects_item.document_id" -> documentId)
       ) sort (
         field sort "made_at" order SortOrder.DESC
@@ -81,9 +79,9 @@ object ContributionService extends HasDate {
     }
 
   /** Returns the contributions associated with a specific annotation version **/
-  def getContributions(annotationId: UUID, versionId: UUID)(implicit es: ES, context: ExecutionContext): Future[Seq[Contribution]] =
+  def getContributions(annotationId: UUID, versionId: UUID): Future[Seq[Contribution]] =
     es.client execute {
-      search in ES.IDX_RECOGITO / CONTRIBUTION query nestedQuery("affects_item").query {
+      search in ES.RECOGITO / ES.CONTRIBUTION query nestedQuery("affects_item").query {
         bool {
           must (
             termQuery("affects_item.annotation_id" -> annotationId.toString),
@@ -94,10 +92,10 @@ object ContributionService extends HasDate {
     } map { _.as[Contribution] }
 
   /** Deletes the contribution history after a given timestamp **/
-  def deleteHistoryAfter(documentId: String, after: DateTime)(implicit es: ES, context: ExecutionContext): Future[Boolean] = {
+  def deleteHistoryAfter(documentId: String, after: DateTime): Future[Boolean] = {
     
     def findContributionsAfter()= es.client execute {
-      search in ES.IDX_RECOGITO / CONTRIBUTION query filteredQuery query {
+      search in ES.RECOGITO / ES.CONTRIBUTION query filteredQuery query {
         nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
       } postFilter {
         rangeFilter("made_at").gt(formatDate(after))
@@ -107,7 +105,7 @@ object ContributionService extends HasDate {
     findContributionsAfter().flatMap { hits =>
       if (hits.size > 0) {
         es.client execute {
-          bulk ( hits.map(h => delete id h.getId from ES.IDX_RECOGITO / CONTRIBUTION) )
+          bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
         } map {
           !_.hasFailures
         } recover { case t: Throwable =>
@@ -122,9 +120,9 @@ object ContributionService extends HasDate {
   }
 
   /** Returns the system-wide contribution stats **/
-  def getGlobalStats()(implicit es: ES, context: ExecutionContext) =
+  def getGlobalStats() =
     es.client execute {
-      search in ES.IDX_RECOGITO / CONTRIBUTION aggs (
+      search in ES.RECOGITO / ES.CONTRIBUTION aggs (
         aggregation terms "by_user" field "made_by",
         aggregation terms "by_action" field "action",
         aggregation nested("by_item_type") path "affects_item" aggs (

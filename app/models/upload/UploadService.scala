@@ -5,6 +5,7 @@ import java.io.File
 import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.sql.Timestamp
 import java.util.{ Date, UUID }
+import javax.inject.{ Inject, Singleton }
 import models.ContentIdentificationFailures._
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord }
@@ -17,13 +18,14 @@ import storage.{ DB, FileAccess }
 import models.document.DocumentService
 import models.ContentType
 
-object UploadService extends FileAccess {
+@Singleton
+class UploadService @Inject() (documents: DocumentService, implicit val db: DB) extends FileAccess {
 
   /** Java-interop helper that turns empty strings to null, so they are properly inserted by JOOQ **/
   private def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
 
   /** Inserts a new upload, or updates an existing one if it already exists **/
-  def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)(implicit db: DB) =
+  def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String) =
     db.withTransaction { sql =>
       val upload =
         Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(owner)).fetchOne()) match {
@@ -64,7 +66,7 @@ object UploadService extends FileAccess {
   }
 
   /** Inserts a new filepart - metadata goes to the DB, content to the pending-uploads dir **/
-  def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile])(implicit db: DB):
+  def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile]):
     Future[Either[ContentIdentificationFailure, UploadFilepartRecord]] = db.withTransaction { sql =>
 
     val id = UUID.randomUUID
@@ -86,7 +88,7 @@ object UploadService extends FileAccess {
   }
 
   /** Deletes a filepart - record is removed from the DB, file from the data directory **/
-  def deleteFilepartByTitleAndOwner(title: String, owner: String)(implicit db: DB) = db.withTransaction { sql =>
+  def deleteFilepartByTitleAndOwner(title: String, owner: String) = db.withTransaction { sql =>
     Option(sql.selectFrom(UPLOAD_FILEPART)
               .where(UPLOAD_FILEPART.TITLE.equal(title))
               .and(UPLOAD_FILEPART.OWNER.equal(owner))
@@ -105,12 +107,12 @@ object UploadService extends FileAccess {
   }
 
   /** Retrieves the pending upload for a user (if any) **/
-  def findPendingUpload(username: String)(implicit db: DB) = db.query { sql =>
+  def findPendingUpload(username: String) = db.query { sql =>
     Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).fetchOne())
   }
 
   /** Deletes a user's pending upload **/
-  def deletePendingUpload(username: String)(implicit db: DB) = db.query { sql =>
+  def deletePendingUpload(username: String) = db.query { sql =>
     val fileparts =
       sql.selectFrom(UPLOAD_FILEPART)
          .where(UPLOAD_FILEPART.OWNER.equal(username))
@@ -126,7 +128,7 @@ object UploadService extends FileAccess {
   }
 
   /** Retrieves the pending uplotad for a user (if any) along with the filepart metadata records **/
-  def findPendingUploadWithFileparts(username: String)(implicit db: DB) = db.query { sql =>
+  def findPendingUploadWithFileparts(username: String) = db.query { sql =>
     val result =
       sql.selectFrom(UPLOAD
         .leftJoin(UPLOAD_FILEPART)
@@ -151,8 +153,8 @@ object UploadService extends FileAccess {
   }
 
   /** Promotes a pending upload in the staging area to actual document **/
-  def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord])(implicit db: DB) = db.withTransaction { sql =>
-    val document = DocumentService.createDocumentFromUpload(upload)
+  def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord]) = db.withTransaction { sql =>
+    val document = documents.createDocumentFromUpload(upload)
 
     // Import Document and DocumentFileparts 
     sql.insertInto(DOCUMENT).set(document).execute()

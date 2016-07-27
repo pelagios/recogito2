@@ -3,12 +3,17 @@ package controllers
 import jp.t2v.lab.play2.auth.AuthElement
 import models.document.{ DocumentAccessLevel, DocumentService }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.user.UserService
+import play.api.Configuration
 import play.api.mvc.Result
 import play.api.cache.CacheApi
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import storage.DB
+import scala.concurrent.ExecutionContext
 
-abstract class BaseAuthController extends BaseController with HasContext with AuthElement with Security {
+abstract class BaseAuthController(
+    config: Configuration,
+    documents: DocumentService,
+    users: UserService
+  ) extends BaseController(config, users) with AuthElement with Security {
   
   /** Helper that covers the boilerplate for all document views
     *
@@ -16,9 +21,9 @@ abstract class BaseAuthController extends BaseController with HasContext with Au
     * the method handles ForbiddenPage/Not Found error cases.
     */
   protected def documentResponse(docId: String, username: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Result)(implicit cache: CacheApi, db: DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Result)(implicit ctx: ExecutionContext) = {
 
-    DocumentService.findByIdWithFileparts(docId, Some(username)).map(_ match {
+    documents.findByIdWithFileparts(docId, Some(username)).map(_ match {
       case Some((document, fileparts, accesslevel)) => {
         if (accesslevel.canRead)
           // As long as there are read rights we'll allow access here - the response
@@ -39,7 +44,7 @@ abstract class BaseAuthController extends BaseController with HasContext with Au
 
   /** Helper that covers the boilerplate for all document part views **/
   protected def documentPartResponse(docId: String, partNo: Int, username: String,
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Result)(implicit cache: CacheApi, db: DB) = {
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Result)(implicit ctx: ExecutionContext) = {
 
     documentResponse(docId, username, { case (document, fileparts, accesslevel) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)

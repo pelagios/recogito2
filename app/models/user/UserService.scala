@@ -4,6 +4,7 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.sql.Timestamp
 import java.util.Date
+import javax.inject.{ Inject, Singleton }
 import models.{ BaseService, Page }
 import models.generated.Tables._
 import models.generated.tables.records.{ UserRecord, UserRoleRecord }
@@ -17,18 +18,19 @@ import scala.util.{ Either, Left, Right }
 import storage.{ DB, FileAccess }
 import sun.security.provider.SecureRandom
 
-object UserService extends BaseService with FileAccess {
+@Singleton
+class UserService @Inject() (implicit db: DB, cache: CacheApi) extends BaseService with FileAccess {
 
   private val SHA_256 = "SHA-256"
 
-  def listUsers(offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
+  def listUsers(offset: Int = 0, limit: Int = 20) = db.query { sql =>
     val startTime = System.currentTimeMillis
     val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])
     val users = sql.selectFrom(USER).limit(limit).offset(offset).fetch().into(classOf[UserRecord])
     Page(System.currentTimeMillis - startTime, total, offset, limit, users.toSeq)
   }
 
-  def insertUser(username: String, email: String, password: String)(implicit db: DB) = db.withTransaction { sql =>
+  def insertUser(username: String, email: String, password: String) = db.withTransaction { sql =>
     val salt = randomSalt
     val user = new UserRecord(username, email, computeHash(salt + password), salt,
       new Timestamp(new Date().getTime), null, null, null, true)
@@ -36,7 +38,7 @@ object UserService extends BaseService with FileAccess {
     user
   }
   
-  def updatePassword(username: String, currentPassword: String, newPassword: String)(implicit db: DB): Future[Either[String, Unit]] = db.withTransaction { sql =>
+  def updatePassword(username: String, currentPassword: String, newPassword: String): Future[Either[String, Unit]] = db.withTransaction { sql =>
     Option(sql.selectFrom(USER).where(USER.USERNAME.equal(username)).fetchOne()) match {
       case Some(user) => {
         val isValid = computeHash(user.getSalt + currentPassword) == user.getPasswordHash
@@ -61,7 +63,7 @@ object UserService extends BaseService with FileAccess {
     }
   }
   
-  def updateUserSettings(username: String, email: String, realname: Option[String], bio: Option[String], website: Option[String])(implicit db: DB, cache: CacheApi) = db.withTransaction { sql =>
+  def updateUserSettings(username: String, email: String, realname: Option[String], bio: Option[String], website: Option[String]) = db.withTransaction { sql =>
     val rows = 
       sql.update(USER)
         .set(USER.EMAIL, email)
@@ -77,7 +79,7 @@ object UserService extends BaseService with FileAccess {
   } 
 
   /** This method is cached, since it's basically called on every request **/
-  def findByUsername(username: String)(implicit db: DB, cache: CacheApi) =
+  def findByUsername(username: String) =
     cachedLookup("user", username, findByUsernameNoCache)
 
   def findByUsernameNoCache(username: String)(implicit db: DB) = db.query { sql =>
@@ -90,11 +92,11 @@ object UserService extends BaseService with FileAccess {
       .map { case (user, roles) => UserWithRoles(user, roles) }
   }
 
-  def findByUsernameIgnoreCase(username: String)(implicit db: DB) = db.query { sql =>
+  def findByUsernameIgnoreCase(username: String) = db.query { sql =>
     Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
 
-  def validateUser(username: String, password: String)(implicit db: DB, cache: CacheApi) =
+  def validateUser(username: String, password: String) =
     findByUsername(username).map(_ match {
       case Some(userWithRoles) => computeHash(userWithRoles.user.getSalt + password) == userWithRoles.user.getPasswordHash
       case None => false
@@ -105,7 +107,7 @@ object UserService extends BaseService with FileAccess {
     * To keep result size low (and add some extra 'privacy') the method only matches on
     * usernames that are at most 2 characters longer than the query.
     */
-  def searchUsers(query: String)(implicit db: DB): Future[Seq[String]] = db.query { sql =>
+  def searchUsers(query: String): Future[Seq[String]] = db.query { sql =>
     if (query.size > 2)
       sql.selectFrom(USER)
          .where(USER.USERNAME.like(query + "%")

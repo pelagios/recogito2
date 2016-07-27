@@ -7,10 +7,10 @@ import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, SharingPolicyRecord }
 import storage.DB
 
-trait SharingPolicies {
+trait SharingPolicies { self: DocumentService =>
   
   /** Upserts a document collaborator sharing policy (policies are unique by (document_id, shared_with) **/
-  def addDocumentCollaborator(documentId: String, sharedBy: String, sharedWith: String, accessLevel: DocumentAccessLevel)(implicit db: DB) = db.query { sql =>
+  def addDocumentCollaborator(documentId: String, sharedBy: String, sharedWith: String, accessLevel: DocumentAccessLevel) = db.query { sql =>
     val (sharingPolicy, isNewCollaborator) = 
       Option(sql.selectFrom(SHARING_POLICY)
                 .where(SHARING_POLICY.DOCUMENT_ID.equal(documentId)
@@ -46,7 +46,7 @@ trait SharingPolicies {
   } 
   
   /** Removes a document collaborator sharing policy **/
-  def removeDocumentCollaborator(documentId: String, sharedWith: String)(implicit db: DB) = db.query { sql =>
+  def removeDocumentCollaborator(documentId: String, sharedWith: String) = db.query { sql =>
     sql.deleteFrom(SHARING_POLICY)
        .where(SHARING_POLICY.DOCUMENT_ID.equal(documentId)
          .and(SHARING_POLICY.SHARED_WITH.equal(sharedWith)))
@@ -54,17 +54,17 @@ trait SharingPolicies {
   } 
   
   /** Lists all collaborators on a specific document **/
-  def listDocumentCollaborators(documentId: String)(implicit db: DB) = db.query { sql =>
+  def listDocumentCollaborators(documentId: String) = db.query { sql =>
     sql.selectFrom(SHARING_POLICY).where(SHARING_POLICY.DOCUMENT_ID.equal(documentId)).fetchArray().toSeq
   }
   
   /** Returns the number of documents shared with a given user **/
-  def countBySharedWith(sharedWith: String)(implicit db: DB) = db.query { sql =>
+  def countBySharedWith(sharedWith: String) = db.query { sql =>
     sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
   }
   
   /** Lists the documents shared with a given user (paged response **/
-  def findBySharedWith(sharedWith: String, offset: Int = 0, limit: Int = 20)(implicit db: DB) = db.query { sql =>
+  def findBySharedWith(sharedWith: String, offset: Int = 0, limit: Int = 20) = db.query { sql =>
     val startTime = System.currentTimeMillis
     
     val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])

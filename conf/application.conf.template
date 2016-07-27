@@ -56,6 +56,7 @@ db.default.password="postgres-password-goes-here"
 # You can disable evolutions for a specific datasource if necessary
 # play.evolutions.db.default.enabled=false
 
+play.modules.enabled += "storage.DBModule"
 play.modules.enabled += "storage.ESModule"
 
 contexts {

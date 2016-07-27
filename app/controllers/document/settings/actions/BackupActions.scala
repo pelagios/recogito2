@@ -1,12 +1,11 @@
 package controllers.document.settings.actions
 
-import controllers.BaseAuthController
-import controllers.document.settings.HasAdminAction
+import controllers.document.settings.SettingsController
 import java.io.{ BufferedInputStream, ByteArrayInputStream, File, FileInputStream, FileOutputStream, InputStream, PrintWriter }
 import java.util.UUID
 import java.util.zip.{ ZipEntry, ZipOutputStream }
 import models.HasDate
-import models.annotation.{ Annotation, AnnotationService }
+import models.annotation.Annotation
 import models.user.Roles._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
@@ -18,12 +17,10 @@ import scala.concurrent.Future
 import storage.FileAccess
 import java.sql.Timestamp
 
-trait BackupActions extends HasAdminAction with FileAccess with HasDate { self: BaseAuthController =>
+
+trait BackupActions extends FileAccess with HasDate { self: SettingsController =>
 
   private val TMP_DIR = System.getProperty("java.io.tmpdir")
-  
-  private implicit val executionContext = self.ctx.ec
-  private implicit val elasticSearch = self.ctx.es
   
   implicit val documentRecordWrites: Writes[DocumentRecord] = (
     (JsPath \ "id").write[String] and
@@ -113,7 +110,6 @@ trait BackupActions extends HasAdminAction with FileAccess with HasDate { self: 
   }
   
   def exportAsZip(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    /*
     documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, parts) =>
       Future {
         new TemporaryFile(new File(TMP_DIR, documentId + ".zip"))
@@ -126,15 +122,13 @@ trait BackupActions extends HasAdminAction with FileAccess with HasDate { self: 
         parts.foreach(part =>
           addToZip(exportFile(document.getOwner, documentId, part.getFilename), "parts" + File.separator + part.getFilename, zipStream))
           
-        annotationService.findByDocId(documentId).map { annotations =>
+        annotations.findByDocId(documentId).map { annotations =>
           addToZip(exportAnnotations(documentId, annotations.map(_._1), parts), "annotations.jsonl", zipStream)
           zipStream.close()
           Ok.sendFile(zipFile.file) 
         }
       }
     })
-    */
-    null
   }
   
 }

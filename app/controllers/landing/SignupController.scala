@@ -1,21 +1,26 @@
 package controllers.landing
 
-import controllers.{ BaseAuthController, ControllerContext }
+import controllers.{ HasConfig, HasUserService, Security }
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.Login
+import jp.t2v.lab.play2.auth.{ AuthElement, Login }
 import models.user.UserService
+import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.Action
-import scala.concurrent.{ Await, Future }
+import play.api.mvc.{ Action, Controller }
+import scala.concurrent.{ Await, Future, ExecutionContext }
 import scala.concurrent.duration._
 
 case class SignupData(username: String, email: String, password: String)
 
-class SignupController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi)
-  extends BaseAuthController with Login with I18nSupport {
+class SignupController @Inject() (
+    val config: Configuration,
+    val users: UserService,
+    val messagesApi: MessagesApi,
+    implicit val ctx: ExecutionContext
+  ) extends Controller with AuthElement with HasUserService with HasConfig with Security with Login with I18nSupport {
 
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
 
@@ -40,7 +45,7 @@ class SignupController @Inject() (implicit val ctx: ControllerContext, val messa
     val invalidChars = username.filter(!VALID_CHARACTERS.contains(_)).toSeq
     if (invalidChars.size == 0) {
       try {
-        Await.result(UserService.findByUsernameIgnoreCase(username), 10.second) match {
+        Await.result(users.findByUsernameIgnoreCase(username), 10.second) match {
           case Some(user) =>
             Invalid("This username is no longer available")
           case None =>
@@ -76,7 +81,7 @@ class SignupController @Inject() (implicit val ctx: ControllerContext, val messa
         Future.successful(BadRequest(views.html.landing.signup(formWithErrors))),
 
       signupData =>
-        UserService.insertUser(signupData.username, signupData.email, signupData.password)
+        users.insertUser(signupData.username, signupData.email, signupData.password)
           .flatMap(user => gotoLoginSucceeded(user.getUsername))
           .recover { case t:Throwable => {
             t.printStackTrace()

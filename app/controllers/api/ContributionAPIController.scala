@@ -1,20 +1,30 @@
 package controllers.api
 
-import controllers.{ BaseAuthController, ControllerContext, HasPrettyPrintJSON }
+import controllers.{ BaseAuthController, HasPrettyPrintJSON }
 import javax.inject.Inject
-import models.user.Roles._
-import play.api.libs.json.Json
 import models.contribution.ContributionService
+import models.document.DocumentService
+import models.user.UserService
+import models.user.Roles._
+import play.api.Configuration
+import play.api.libs.json.Json
+import scala.concurrent.ExecutionContext
 
-class ContributionAPIController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController with HasPrettyPrintJSON {
+class ContributionAPIController @Inject() (
+    val config: Configuration,
+    val contributions: ContributionService,
+    val documents: DocumentService,
+    val users: UserService,
+    implicit val ctx: ExecutionContext
+  ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON {
   
   def getContributionHistory(documentId: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    ContributionService.getHistory(documentId, offset, size).map(contributions => jsonOk(Json.toJson(contributions)))
+    contributions.getHistory(documentId, offset, size).map(contributions => jsonOk(Json.toJson(contributions)))
   }
   
   /** Currently only available to admins **/
   def getGlobalStats() = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    ContributionService.getGlobalStats().map(stats => jsonOk(Json.toJson(stats)))
+    contributions.getGlobalStats().map(stats => jsonOk(Json.toJson(stats)))
   }
  
 }

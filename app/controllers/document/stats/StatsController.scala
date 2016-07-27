@@ -1,10 +1,19 @@
 package controllers.document.stats
 
-import controllers.{ ControllerContext, BaseAuthController }
+import controllers.BaseAuthController
 import javax.inject.Inject
+import models.document.DocumentService
+import models.user.UserService
 import models.user.Roles._
+import play.api.Configuration
+import scala.concurrent.ExecutionContext
 
-class StatsController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController {
+class StatsController @Inject() (
+    val config: Configuration,
+    val documents: DocumentService,
+    val users: UserService,
+    implicit val ctx: ExecutionContext
+  ) extends BaseAuthController(config, documents, users) {
   
   /** TODO this view should be available without login, if the document is set to public **/
   def showDocumentStats(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>

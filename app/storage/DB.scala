@@ -1,8 +1,9 @@
 package storage
 
 import akka.actor.ActorSystem
+import com.google.inject.AbstractModule
 import java.sql.Connection
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import org.jooq.impl.DSL
 import org.jooq.{ SQLDialect, DSLContext }
 import play.api.db.Database
@@ -10,20 +11,54 @@ import scala.collection.JavaConversions._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
 
+object DB {
+  
+  val CURRENT_SQLDIALECTT = SQLDialect.POSTGRES_9_4
+
+}
+
 /** cf. http://blog.jooq.org/2016/01/14/reactive-database-access-part-3-using-jooq-with-scala-futures-and-actors/ **/
 class DB @Inject() (db: Database, system: ActorSystem) {
 
   private val databaseContext: ExecutionContext = system.dispatchers.lookup("contexts.database")
   
-  private val CURRENT_SQLDIALECTT = SQLDialect.POSTGRES_9_4
+  /** Connection helpers **/
   
+  def query[A](block: DSLContext => A): Future[A] = Future {
+    db.withConnection { connection =>
+      val sql = DSL.using(connection, DB.CURRENT_SQLDIALECTT)
+      block(sql)
+    }
+  }(databaseContext)
+  
+  def withTransaction[A](block: DSLContext => A): Future[A] = Future {
+    db.withTransaction { connection =>
+      val sql = DSL.using(connection, DB.CURRENT_SQLDIALECTT)
+      block(sql)
+    }
+  }(databaseContext)
+
+}
+
+class DBModule extends AbstractModule {
+
+  def configure = {
+    bind(classOf[DBInitializer]).asEagerSingleton
+  }
+  
+}
+
+@Singleton
+class DBInitializer @Inject() (db: Database) {
+
   // Crude DB initialization check - does the user table exist? Run schema generation if not.
   db.withConnection { connection =>
-    if (!DSL.using(connection, CURRENT_SQLDIALECTT).meta().getTables.map(_.getName.toLowerCase).contains("user")) {
+    if (!DSL.using(connection, DB.CURRENT_SQLDIALECTT).meta().getTables.map(_.getName.toLowerCase).contains("user")) {
       play.api.Logger.info("Empty database - initializing...")
       initDB(connection)
     }
   }
+  
   
   /** Database setup **/
   private def initDB(connection: Connection) = {
@@ -40,23 +75,6 @@ class DB @Inject() (db: Database, system: ActorSystem) {
 
     statement.executeBatch()
     statement.close()    
-  }
+  }  
   
-  /** Connection helpers **/
-  
-  def query[A](block: DSLContext => A): Future[A] = Future {
-    db.withConnection { connection =>
-      val sql = DSL.using(connection, CURRENT_SQLDIALECTT)
-      block(sql)
-    }
-  }(databaseContext)
-  
-  def withTransaction[A](block: DSLContext => A): Future[A] = Future {
-    db.withTransaction { connection =>
-      val sql = DSL.using(connection, CURRENT_SQLDIALECTT)
-      block(sql)
-    }
-  }(databaseContext)
-
-
 }

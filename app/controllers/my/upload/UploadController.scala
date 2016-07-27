@@ -1,7 +1,7 @@
 package controllers.my.upload
 
 import akka.actor.ActorSystem
-import controllers.{ BaseAuthController, ControllerContext }
+import controllers.{ BaseAuthController, WebJarAssets }
 import controllers.my.upload.ProcessingTaskMessages._
 import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
@@ -13,22 +13,32 @@ import models.ContentIdentificationFailures._
 import models.document.DocumentService
 import models.upload.UploadService
 import models.generated.tables.records.UploadRecord
+import models.user.UserService
 import models.user.Roles._
-import play.api.Logger
+import play.api.{ Configuration, Logger }
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.implicitConversions
 
 case class UploadSuccess(contentType: String)
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)
 
-class UploadController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi, system: ActorSystem) extends BaseAuthController with I18nSupport {
+class UploadController @Inject() (
+    val config: Configuration,
+    val documents: DocumentService,
+    val users: UserService,
+    val uploads: UploadService,
+    val messagesApi: MessagesApi,
+    implicit val webjars: WebJarAssets,
+    implicit val ctx: ExecutionContext,
+    implicit val system: ActorSystem
+  ) extends BaseAuthController(config, documents, users) with I18nSupport {
 
   private val FILE_ARG = "file"
 
@@ -51,7 +61,7 @@ class UploadController @Inject() (implicit val ctx: ControllerContext, val messa
 
 
   def showStep1(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUpload(loggedIn.user.getUsername).map(_ match {
+    uploads.findPendingUpload(loggedIn.user.getUsername).map(_ match {
       case Some(pendingUpload) =>
         Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm.fill(pendingUpload)))
 
@@ -67,7 +77,7 @@ class UploadController @Inject() (implicit val ctx: ControllerContext, val messa
         Future.successful(BadRequest(views.html.my.upload.step1(usernameInPath, formWithErrors))),
 
       docData =>
-        UploadService.storePendingUpload(loggedIn.user.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.language, docData.source, docData.edition)
+        uploads.storePendingUpload(loggedIn.user.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.language, docData.source, docData.edition)
           .flatMap(user => Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath))))
           .recover { case t: Throwable => {
             t.printStackTrace()
@@ -78,7 +88,7 @@ class UploadController @Inject() (implicit val ctx: ControllerContext, val messa
 
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
   def showStep2(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUploadWithFileparts(loggedIn.user.getUsername).map(_ match {
+    uploads.findPendingUploadWithFileparts(loggedIn.user.getUsername).map(_ match {
       case Some((pendingUpload, fileparts)) =>
         Ok(views.html.my.upload.step2(usernameInPath, fileparts))
 
@@ -94,12 +104,12 @@ class UploadController @Inject() (implicit val ctx: ControllerContext, val messa
 
     // First, we need to get the pending upload this filepart belongs to
     val username = loggedIn.user.getUsername
-    UploadService.findPendingUpload(username)
+    uploads.findPendingUpload(username)
       .flatMap(_ match {
         case Some(pendingUpload) =>
           request.body.asMultipartFormData.map(tempfile => {
             tempfile.file(FILE_ARG).map(f => {
-              UploadService.insertFilepart(pendingUpload.getId, username, f).map(_ match {
+              uploads.insertFilepart(pendingUpload.getId, username, f).map(_ match {
                 case Right(filepart) =>
                   // Upload was properly identified and stored
                   Ok(Json.toJson(UploadSuccess(filepart.getContentType)))
@@ -136,21 +146,21 @@ class UploadController @Inject() (implicit val ctx: ControllerContext, val messa
 
   /** Deletes a filepart during step 2 **/
   def deleteFilepart(usernameInPath: String, filename: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.deleteFilepartByTitleAndOwner(filename, loggedIn.user.getUsername).map(success => {
+    uploads.deleteFilepartByTitleAndOwner(filename, loggedIn.user.getUsername).map(success => {
       if (success) Ok("ok.") else NotFoundPage
     })
   }
 
   /** Step 3 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
   def showStep3(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService.findPendingUploadWithFileparts(loggedIn.user.getUsername).flatMap(_ match {
+    uploads.findPendingUploadWithFileparts(loggedIn.user.getUsername).flatMap(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
           // No fileparts - force user to step 2
           Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath)))
         } else {
           // Pending upload + fileparts available - proceed
-          UploadService.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
+          uploads.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
             // We'll forward a list of the running processing tasks to the view, so it can show progress
             val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]
 
@@ -179,7 +189,7 @@ class UploadController @Inject() (implicit val ctx: ControllerContext, val messa
   }
 
   def cancelUploadWizard(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    UploadService
+    uploads
       .deletePendingUpload(loggedIn.user.getUsername)
       .map(success => {
         // TODO add error message if success == false
@@ -196,7 +206,7 @@ class UploadController @Inject() (implicit val ctx: ControllerContext, val messa
 
     import UploadController._
 
-    DocumentService.findById(docId, Some(username)).flatMap(_ match {
+    documents.findById(docId, Some(username)).flatMap(_ match {
       // Make sure only users with read access can see the progress
       case Some((document, accesslevel)) if accesslevel.canRead => {
         service.queryProgress(docId).map(_ match {

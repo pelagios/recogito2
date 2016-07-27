@@ -1,10 +1,7 @@
 package controllers.document.settings.actions
 
-import controllers.BaseAuthController
-import controllers.document.settings.HasAdminAction
+import controllers.document.settings.SettingsController
 import java.util.UUID
-import models.annotation.AnnotationService
-import models.contribution.ContributionService
 import models.user.Roles._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -22,21 +19,17 @@ object RollbackData {
 
 }
 
-trait RollbackActions extends HasAdminAction { self: BaseAuthController =>
-  
-  private implicit val executionContext = self.ctx.ec
-  private implicit val elasticSearch = self.ctx.es
-  
+trait RollbackActions { self: SettingsController =>
+
   def rollbackByTime(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    /*
     jsonDocumentAdminAction[RollbackData](documentId, loggedIn.user.getUsername, { case (document, rollbackData) =>
       // Fetch the latest contribution for this annotation version, so we get the timestamp to roll back to
-      ContributionService.getContributions(rollbackData.annotationId, rollbackData.versionId).flatMap {
+      contributions.getContributions(rollbackData.annotationId, rollbackData.versionId).flatMap {
         _.headOption match {
           case Some(contribution) => { 
             val f = for {
-              rollbackSuccess <- annotationService.rollbackToTimestamp(documentId, contribution.madeAt)
-              purgeHistorySuccess <- if (rollbackSuccess) ContributionService.deleteHistoryAfter(documentId, contribution.madeAt) else Future.successful(false)
+              rollbackSuccess <- annotations.rollbackToTimestamp(documentId, contribution.madeAt)
+              purgeHistorySuccess <- if (rollbackSuccess) contributions.deleteHistoryAfter(documentId, contribution.madeAt) else Future.successful(false)
             } yield purgeHistorySuccess
             
             f.map(success => if (success) Status(200) else InternalServerError)
@@ -46,8 +39,7 @@ trait RollbackActions extends HasAdminAction { self: BaseAuthController =>
         }
       }
       
-    })*/
-    null
+    })
   }
   
 }

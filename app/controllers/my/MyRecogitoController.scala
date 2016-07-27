@@ -1,20 +1,26 @@
 package controllers.my
 
-import controllers.{ BaseController, ControllerContext, Security }
+import controllers.{ BaseController, Security, WebJarAssets }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.Page
 import models.user.UserService
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, UserRecord }
+import play.api.Configuration
 import play.api.mvc.RequestHeader
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
-class MyRecogitoController @Inject() (implicit val ctx: ControllerContext) 
-  extends BaseController with OptionalAuthElement with Security {
+class MyRecogitoController @Inject() (
+    val documents: DocumentService,
+    val users: UserService,
+    val config: Configuration,
+    implicit val ctx: ExecutionContext,
+    implicit val webjars: WebJarAssets
+  ) extends BaseController(config, users) with OptionalAuthElement with Security {
 
   // TODO this may depend on user in the future
-  private lazy val QUOTA = ctx.config.getInt("recogito.upload.quota").getOrElse(200)
+  private lazy val QUOTA = config.getInt("recogito.upload.quota").getOrElse(200)
 
   /** A convenience '/my' route that redirects to the personal index **/
   def my = StackAction { implicit request =>
@@ -31,9 +37,9 @@ class MyRecogitoController @Inject() (implicit val ctx: ControllerContext)
   
   private def renderPublicProfile(username: String) = {
     val f = for {
-      userWithRoles   <- UserService.findByUsername(username)
+      userWithRoles   <- users.findByUsername(username)
       publicDocuments <- if (userWithRoles.isDefined)
-                           DocumentService.findByOwner(userWithRoles.get.user.getUsername, true)
+                           documents.findByOwner(userWithRoles.get.user.getUsername, true)
                          else
                            Future.successful(Page.empty[DocumentRecord])
     } yield (userWithRoles, publicDocuments)
@@ -46,8 +52,8 @@ class MyRecogitoController @Inject() (implicit val ctx: ControllerContext)
   
   private def renderMyDocuments(user: UserRecord, usedSpace: Long)(implicit request: RequestHeader) = {
     val f = for {
-      myDocuments <- DocumentService.findByOwner(user.getUsername, false)
-      sharedCount <- DocumentService.countBySharedWith(user.getUsername)
+      myDocuments <- documents.findByOwner(user.getUsername, false)
+      sharedCount <- documents.countBySharedWith(user.getUsername)
     } yield (myDocuments, sharedCount)
     
     f.map { case (myDocuments, sharedCount) =>
@@ -57,8 +63,8 @@ class MyRecogitoController @Inject() (implicit val ctx: ControllerContext)
   
   private def renderSharedWithMe(user: UserRecord, usedSpace: Long)(implicit request: RequestHeader) = {
     val f = for {
-      myDocsCount <- DocumentService.countByOwner(user.getUsername, false)
-      docsSharedWithMe <- DocumentService.findBySharedWith(user.getUsername)
+      myDocsCount <- documents.countByOwner(user.getUsername, false)
+      docsSharedWithMe <- documents.findBySharedWith(user.getUsername)
     } yield (myDocsCount, docsSharedWithMe)
     
     f.map { case (myDocsCount, docsSharedWithMe) =>
@@ -75,7 +81,7 @@ class MyRecogitoController @Inject() (implicit val ctx: ControllerContext)
     
     if (isProfileOwner) {
       val user = loggedIn.get.user
-      val usedSpace = UserService.getUsedDiskspaceKB(user.getUsername)
+      val usedSpace = users.getUsedDiskspaceKB(user.getUsername)
       
       tab match {
         case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace)

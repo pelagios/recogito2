@@ -4,6 +4,7 @@ import collection.JavaConversions._
 import java.io.{ File, InputStream }
 import java.nio.file.Files
 import java.util.UUID
+import javax.inject.{ Inject, Singleton }
 import models.{ BaseService, Page }
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, SharingPolicyRecord }
@@ -18,12 +19,13 @@ import storage.{ DB, FileAccess }
 
 case class PartOrdering(partId: UUID, seqNo: Int)
 
-object DocumentService extends BaseService with FileAccess with SharingPolicies {
+@Singleton
+class DocumentService @Inject() (implicit val db: DB) extends BaseService with FileAccess with SharingPolicies {
   
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
   
-  private def generateRandomID(retriesLeft: Int = 10)(implicit db: DB): String = {
+  private def generateRandomID(retriesLeft: Int = 10): String = {
     
     // Takes a set of strings and returns those that already exist in the DB as doc IDs
     def findIDs(ids: Set[String])(implicit db: DB) = db.query { sql =>
@@ -71,7 +73,7 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
     }
   
   /** Creates a new DocumentRecord from an UploadRecord **/
-  private[models] def createDocumentFromUpload(upload: UploadRecord)(implicit db: DB) =
+  private[models] def createDocumentFromUpload(upload: UploadRecord) =
     new DocumentRecord(
           generateRandomID(),
           upload.getOwner,
@@ -87,7 +89,7 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
           false)
   
   /** Imports document and filepart records to DB, and filepart content to user dir **/
-  def importDocument(document: DocumentRecord, fileparts: Seq[(DocumentFilepartRecord, InputStream)])(implicit db: DB) = db.withTransaction { sql =>
+  def importDocument(document: DocumentRecord, fileparts: Seq[(DocumentFilepartRecord, InputStream)]) = db.withTransaction { sql =>
     // Import DocumentRecord 
     sql.insertInto(DOCUMENT).set(document).execute()
     
@@ -103,12 +105,12 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
   }
     
   /** Changes the public visibility flag for the given document **/
-  def setPublicVisibility(docId: String, enabled: Boolean)(implicit db: DB) = db.withTransaction { sql =>
+  def setPublicVisibility(docId: String, enabled: Boolean) = db.withTransaction { sql =>
     sql.update(DOCUMENT).set[java.lang.Boolean](DOCUMENT.IS_PUBLIC, enabled).where(DOCUMENT.ID.equal(docId)).execute()
   }
   
   /** Changes the sequence numbers of fileparts for a specific document **/
-  def setFilepartSortOrder(docId: String, sortOrder: Seq[PartOrdering])(implicit db: DB) = db.withTransaction { sql =>
+  def setFilepartSortOrder(docId: String, sortOrder: Seq[PartOrdering]) = db.withTransaction { sql =>
     // To verify validaty of the request, load the fileparts from the DB first...
     val fileparts = 
       sql.selectFrom(DOCUMENT_FILEPART).where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId)).fetchArray()
@@ -141,7 +143,7 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
   }
   
   /** Retrieves a document by its ID, along with access permissions for the given user **/
-  def findById(id: String, loggedInUser: Option[String] = None)(implicit db: DB) = db.query { sql =>
+  def findById(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
     loggedInUser match {
       case Some(user) => {
         val records = 
@@ -168,7 +170,7 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
   }
   
   /** Retrieves a document by ID, along with fileparts **/
-  def findByIdWithFileparts(id: String, loggedInUser: Option[String] = None)(implicit db: DB) = db.query { sql =>
+  def findByIdWithFileparts(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
     val records = loggedInUser match {
       case Some(user) =>
         // Retrieve with sharing policies that may apply
@@ -205,14 +207,14 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
   }
 
   /** Retrieves a filepart by document ID and sequence number **/
-  def findPartByDocAndSeqNo(docId: String, seqNo: Int)(implicit db: DB) = db.query { sql =>
+  def findPartByDocAndSeqNo(docId: String, seqNo: Int) = db.query { sql =>
     Option(sql.selectFrom(DOCUMENT_FILEPART)
               .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId))
               .and(DOCUMENT_FILEPART.SEQUENCE_NO.equal(seqNo))
               .fetchOne())
   }
   
-  def countByOwner(owner: String, publicOnly: Boolean = false)(implicit db: DB) = db.query { sql =>
+  def countByOwner(owner: String, publicOnly: Boolean = false) = db.query { sql =>
     if (publicOnly)
       sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true))).fetchOne(0, classOf[Int])
     else
@@ -220,7 +222,7 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
   }
   
   /** Retrieves documents by their owner **/
-  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20)(implicit db: DB, context: ExecutionContext) = db.query { sql =>
+  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20) = db.query { sql =>
     val startTime = System.currentTimeMillis
     
     val total = if (publicOnly)
@@ -238,7 +240,7 @@ object DocumentService extends BaseService with FileAccess with SharingPolicies 
   }
   
   /** Deletes a document by its ID, along with filepart records and files **/
-  def delete(document: DocumentRecord)(implicit db: DB): Future[Unit] = db.withTransaction { sql =>
+  def delete(document: DocumentRecord): Future[Unit] = db.withTransaction { sql =>
     // Delete sharing policies
     sql.deleteFrom(SHARING_POLICY)
        .where(SHARING_POLICY.DOCUMENT_ID.equal(document.getId))

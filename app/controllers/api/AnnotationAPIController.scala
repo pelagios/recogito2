@@ -8,12 +8,13 @@ import models.HasDate
 import models.annotation._
 import models.contribution._
 import models.document.DocumentService
+import models.user.UserService
 import org.joda.time.DateTime
-import play.api.Logger
+import play.api.{ Configuration, Logger }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import storage.FileAccess
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
@@ -87,14 +88,20 @@ object AnnotationStatusStub extends HasDate {
 
 }
 
-class AnnotationAPIController @Inject() (annotationService: AnnotationService, implicit val ctx: ControllerContext)
-  extends BaseController 
-  with OptionalAuthElement 
-  with Security
-  with HasAnnotationValidation 
-  with HasPrettyPrintJSON
-  with FileAccess 
-  with HasTextSnippets {
+class AnnotationAPIController @Inject() (
+    val config: Configuration,
+    val annotations: AnnotationService,
+    val contributions: ContributionService,
+    val documents: DocumentService, 
+    val users: UserService,
+    implicit val ctx: ExecutionContext
+  ) extends BaseController(config, users)
+      with OptionalAuthElement
+      with Security
+      with HasAnnotationValidation
+      with HasPrettyPrintJSON
+      with FileAccess
+      with HasTextSnippets {
 
   def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
 
@@ -105,9 +112,9 @@ class AnnotationAPIController @Inject() (annotationService: AnnotationService, i
     (docId, partNo) match {
       case (id, Some(seqNo)) =>
         // Load annotations for specific doc part
-        DocumentService.findPartByDocAndSeqNo(id, seqNo).flatMap(_ match {
+        documents.findPartByDocAndSeqNo(id, seqNo).flatMap(_ match {
           case Some(filepart) =>
-            annotationService.findByFilepartId(filepart.getId)
+            annotations.findByFilepartId(filepart.getId)
               .map{ annotations =>
                 // Join in places, if requested
                 jsonOk(Json.toJson(annotations.map(_._1)))
@@ -119,7 +126,7 @@ class AnnotationAPIController @Inject() (annotationService: AnnotationService, i
 
       case (id, None) =>
         // Load annotations for entire doc
-        annotationService.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
+        annotations.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
     }
   }
 
@@ -152,14 +159,14 @@ class AnnotationAPIController @Inject() (annotationService: AnnotationService, i
         Json.fromJson[AnnotationStub](json) match {
           case s: JsSuccess[AnnotationStub] => {
             // Fetch the associated document to check access privileges
-            DocumentService.findById(s.get.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
+            documents.findById(s.get.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
               case Some((document, accesslevel)) => {
                 if (accesslevel.canWrite) {
                   val annotation = stubToAnnotation(s.get, loggedIn.map(_.user.getUsername).getOrElse("guest"))
                   val f = for {
-                    (annotationStored, _, previousVersion) <- annotationService.insertOrUpdateAnnotation(annotation)
+                    (annotationStored, _, previousVersion) <- annotations.insertOrUpdateAnnotation(annotation)
                     success <- if (annotationStored)
-                                 ContributionService.insertContributions(validateUpdate(annotation, previousVersion))
+                                 contributions.insertContributions(validateUpdate(annotation, previousVersion))
                                else
                                  Future.successful(false)
                   } yield success
@@ -194,11 +201,11 @@ class AnnotationAPIController @Inject() (annotationService: AnnotationService, i
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
-    annotationService.findById(id).flatMap(_ match {
+    annotations.findById(id).flatMap(_ match {
       case Some((annotation, _)) => {
         if (includeContext) {
           // Fetch the document, so we know the owner...
-          DocumentService.findByIdWithFileparts(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).map(_ match {
+          documents.findByIdWithFileparts(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).map(_ match {
 
             case Some((document, parts, accesslevel)) =>
               if (accesslevel.canRead) {
@@ -259,17 +266,17 @@ class AnnotationAPIController @Inject() (annotationService: AnnotationService, i
     )
 
   def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>
-    annotationService.findById(id).flatMap(_ match {
+    annotations.findById(id).flatMap(_ match {
       case Some((annotation, version)) => {
         // Fetch the associated document
-        DocumentService.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
+        documents.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
           case Some((document, accesslevel)) => {
             if (accesslevel.canWrite) {
               val user = loggedIn.map(_.user.getUsername).getOrElse("guest")
               val now = DateTime.now
-              annotationService.deleteAnnotation(id, user, now).flatMap(_ match {
+              annotations.deleteAnnotation(id, user, now).flatMap(_ match {
                 case Some(annotation) =>
-                  ContributionService.insertContribution(createDeleteContribution(annotation, user, now)).map(success =>
+                  contributions.insertContribution(createDeleteContribution(annotation, user, now)).map(success =>
                     if (success) Status(200) else InternalServerError)
     
                 case None =>

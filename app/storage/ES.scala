@@ -4,18 +4,17 @@ import com.google.inject.AbstractModule
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
-import org.elasticsearch.common.settings.ImmutableSettings
-import play.api.{ Logger, Play }
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.io.Source
-import scala.concurrent.duration._
-import scala.language.postfixOps
-import scala.util.{ Try, Success, Failure }
 import javax.inject.{ Inject, Singleton }
-import play.api.inject.ApplicationLifecycle
-import scala.concurrent.Future
+import org.elasticsearch.common.settings.ImmutableSettings
+import play.api.Logger
 import play.api.Configuration
+import play.api.inject.ApplicationLifecycle
+import scala.io.Source
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{ Try, Success, Failure }
 
+/** Binding ES as eager singleton, so we can start & stop properly **/
 class ESModule extends AbstractModule {
     
   def configure = {
@@ -24,22 +23,40 @@ class ESModule extends AbstractModule {
   
 }
 
+/** Helper so we can forward injected ES dependency into traits **/  
 trait HasES { def es: ES }
 
+/** Constants **/
 object ES {
   
-  val IDX_RECOGITO = "recogito"
+  // Index name
+  val RECOGITO = "recogito"
+      
+  // Mapping type names
+  val ANNOTATION         = "annotation"
+  val ANNOTATION_HISTORY = "annotation_history"
+  val CONTRIBUTION       = "contribution"
+  val GEOTAG             = "geotag"
+  val PLACE              = "place"
   
-  val MAX_SIZE = 2147483647
+  // Maximum response size in ES
+  val MAX_SIZE           = 2147483647
+
+  // Max. number of retries to do in case of failed imports
+  val MAX_RETRIES        = 10
   
 }
 
+/** ElasticSearch client + start & stop helpers **/
+@Singleton
 class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
   
-  play.api.Logger.info("starting ES")
+  start()
   
-  lazy val client = {
-    val home = Play.current.configuration.getString("recogito.index.dir") match {
+  lifecycle.addStopHook { () => Future.successful(stop()) }
+    
+  lazy val client = {    
+    val home = config.getString("recogito.index.dir") match {
       case Some(dir) => new File(dir)
       case None => new File("index")
     }
@@ -77,16 +94,16 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
   }
   
   def start() = {
-    implicit val timeout = 60 seconds
-    val response = client.execute { index exists(ES.IDX_RECOGITO) }.await
+    implicit val timeout = 60.seconds
+    val response = client.execute { index exists(ES.RECOGITO) }.await
     
     if (response.isExists()) {
       // Index exists - create missing mappings as needed
       val list = client.admin.indices().prepareGetMappings()
-      val existingMappings = list.execute().actionGet().getMappings().get(ES.IDX_RECOGITO).keys.toArray.map(_.toString)
+      val existingMappings = list.execute().actionGet().getMappings().get(ES.RECOGITO).keys.toArray.map(_.toString)
       loadMappings(existingMappings).foreach { case (name, json) =>
         Logger.info("Recreating mapping " + name)
-        val putMapping = client.admin.indices().preparePutMapping(ES.IDX_RECOGITO)
+        val putMapping = client.admin.indices().preparePutMapping(ES.RECOGITO)
         putMapping.setType(name)
         putMapping.setSource(json)
         putMapping.execute().actionGet()
@@ -95,7 +112,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
       // No index - create index with all mappings
       Logger.info("No ES index - initializing...")
       
-      val create = client.admin.indices().prepareCreate(ES.IDX_RECOGITO) 
+      val create = client.admin.indices().prepareCreate(ES.RECOGITO) 
       create.setSettings(loadSettings())
       
       loadMappings().foreach { case (name, json) =>  { 
@@ -106,11 +123,6 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
       create.execute().actionGet()
     }
   }
-  
-  def flushIndex =
-    client execute {
-      flush index ES.IDX_RECOGITO
-    }
   
   def stop() = {
     Logger.info("Stopping ElasticSearch local node")

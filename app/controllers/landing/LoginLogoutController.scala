@@ -1,19 +1,25 @@
 package controllers.landing
 
-import controllers.{ BaseAuthController, ControllerContext }
+import controllers.{ HasConfig, HasUserService, Security }
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.LoginLogout
+import jp.t2v.lab.play2.auth.{ AuthElement, LoginLogout }
+import models.document.DocumentService
 import models.user.UserService
+import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.Action
-import scala.concurrent.Future
+import play.api.mvc.{ Action, Controller }
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class LoginData(username: String, password: String)
 
-class LoginLogoutController @Inject() (implicit val ctx: ControllerContext, val messagesApi: MessagesApi) 
-  extends BaseAuthController with LoginLogout with I18nSupport {
+class LoginLogoutController @Inject() (
+    val config: Configuration,
+    val users: UserService,
+    implicit val ctx: ExecutionContext,
+    val messagesApi: MessagesApi
+  ) extends Controller with AuthElement with HasConfig with HasUserService with Security with LoginLogout with I18nSupport {
 
   private val MESSAGE = "message"
 
@@ -36,7 +42,7 @@ class LoginLogoutController @Inject() (implicit val ctx: ControllerContext, val 
         Future(BadRequest(views.html.landing.login(formWithErrors))),
 
       loginData =>
-        UserService.validateUser(loginData.username, loginData.password).flatMap(isValid => {
+        users.validateUser(loginData.username, loginData.password).flatMap(isValid => {
           if (isValid)
             gotoLoginSucceeded(loginData.username)
           else

@@ -35,8 +35,6 @@ trait GeoTagStore extends PlaceStore {
 
 private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self: HasES =>
 
-  private val GEOTAG = "geotag"
-
   implicit object GeoTagIndexable extends Indexable[GeoTag] {
     override def json(link: GeoTag): String = Json.stringify(Json.toJson(link))
   }
@@ -48,7 +46,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
   override def totalGeoTags()(implicit context: ExecutionContext): Future[Long] =
     es.client execute {
-      search in ES.IDX_RECOGITO -> GEOTAG limit 0
+      search in ES.RECOGITO -> ES.GEOTAG limit 0
     } map { _.getHits.getTotalHits }
 
   /** Helper used by insertOrUpdate method to build the geotags from the annotation bodies **/
@@ -84,7 +82,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     def insertGeoTags(tags: Seq[GeoTag]): Future[Boolean] = {
       es.client execute {
-        bulk ( tags.map(tag => index into ES.IDX_RECOGITO / GEOTAG source tag parent tag.placeId) )
+        bulk ( tags.map(tag => index into ES.RECOGITO / ES.GEOTAG source tag parent tag.placeId) )
       } map {
         !_.hasFailures
       } recover { case t: Throwable =>
@@ -107,7 +105,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     findGeoTagsByAnnotationWithId(annotationId.toString).flatMap { idsAndLinks =>
       if (idsAndLinks.size > 0) {
         es.client execute {
-          bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.IDX_RECOGITO / GEOTAG } )
+          bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.RECOGITO / ES.GEOTAG } )
         } map {
           !_.hasFailures
         } recover { case t: Throwable =>
@@ -123,7 +121,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   /** Helper method that retrieves geotags along with their internal _id field **/
   private def findGeoTagsByAnnotationWithId(annotationId: String)(implicit context: ExecutionContext): Future[Seq[(String, GeoTag)]] =
     es.client execute {
-      search in ES.IDX_RECOGITO / GEOTAG query {
+      search in ES.RECOGITO / ES.GEOTAG query {
         termQuery("annotation_id", annotationId)
       }
     } map { _.as[(String, GeoTag)].toSeq }
@@ -133,8 +131,8 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
   override def listPlacesInDocument(docId: String, offset: Int = 0, limit: Int = 20)(implicit context: ExecutionContext) =
     es.client execute {
-      search in ES.IDX_RECOGITO / "place" query {
-        hasChildQuery(GEOTAG).query {
+      search in ES.RECOGITO / ES.PLACE query {
+        hasChildQuery(ES.GEOTAG).query {
           termQuery("document_id", docId)
         }
       } start offset limit limit
@@ -145,7 +143,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
   override def searchPlacesInDocument(q: String, docId: String, offset: Int, limit: Int)(implicit context: ExecutionContext) =
     es.client execute {
-      search in ES.IDX_RECOGITO / "place" query {
+      search in ES.RECOGITO / ES.PLACE query {
         bool {
 
           must(
@@ -173,7 +171,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
               }
             },
 
-            hasChildQuery(GEOTAG).query {
+            hasChildQuery(ES.GEOTAG).query {
               termQuery("document_id", docId)
             }
           )

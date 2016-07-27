@@ -1,20 +1,29 @@
 package controllers.api
 
 import com.vividsolutions.jts.geom.Coordinate
-import controllers.{ BaseOptAuthController, ControllerContext, HasPrettyPrintJSON }
+import controllers.{ BaseOptAuthController, HasPrettyPrintJSON }
 import javax.inject.Inject
-import models.user.Roles._
+import models.document.DocumentService
 import models.place.PlaceService
+import models.user.UserService
+import models.user.Roles._
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.Action
-import scala.concurrent.Future
+import scala.concurrent.{ Future, ExecutionContext }
 import scala.util.{ Try, Success, Failure }
 
-class PlaceAPIController @Inject() (placeService: PlaceService, implicit val ctx: ControllerContext) extends BaseOptAuthController with HasPrettyPrintJSON {
+class PlaceAPIController @Inject() (
+    val config: Configuration,
+    val documents: DocumentService,
+    val users: UserService,
+    val places: PlaceService,
+    implicit val ctx: ExecutionContext
+  ) extends BaseOptAuthController(config, documents, users) with HasPrettyPrintJSON {
     
   /** Lookup by URI - open to all, so that it's available to public documents **/
   def findPlaceByURI(uri: String) = Action.async { implicit request =>
-    placeService.findByURI(uri).map { _ match {
+    places.findByURI(uri).map { _ match {
       case Some((place, _)) => jsonOk(Json.toJson(place))
       case None => NotFoundPage
     }}
@@ -32,7 +41,7 @@ class PlaceAPIController @Inject() (placeService: PlaceService, implicit val ctx
           }
         }
 
-        placeService.searchPlaces(query, offset, size, sortFrom).map { results => 
+        places.searchPlaces(query, offset, size, sortFrom).map { results => 
           jsonOk(Json.toJson(results.map(_._1)))
         }
       }
@@ -45,7 +54,7 @@ class PlaceAPIController @Inject() (placeService: PlaceService, implicit val ctx
   def listPlacesInDocument(docId: String, offset: Int, size: Int) = AsyncStack { implicit request =>
     documentResponse(docId, loggedIn.map(_.user.getUsername), { case (document, fileparts, accesslevel) =>
       if (accesslevel.canRead)
-        placeService.listPlacesInDocument(docId, offset, size).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
+        places.listPlacesInDocument(docId, offset, size).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
       else
         Future.successful(ForbiddenPage)
     })
@@ -55,7 +64,7 @@ class PlaceAPIController @Inject() (placeService: PlaceService, implicit val ctx
   def searchPlacesInDocument(query: String, docId: String, offset: Int, size: Int) = AsyncStack { implicit request =>
     documentResponse(docId, loggedIn.map(_.user.getUsername), { case (document, fileparts, accesslevel) =>
       if (accesslevel.canRead)
-        placeService.searchPlacesInDocument(query, docId, offset, size).map { results =>
+        places.searchPlacesInDocument(query, docId, offset, size).map { results =>
           jsonOk(Json.toJson(results.map(_._1)))
         }
       else

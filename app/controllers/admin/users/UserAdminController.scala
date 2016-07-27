@@ -1,24 +1,33 @@
 package controllers.admin.users
 
-import controllers.{ BaseAuthController, ControllerContext }
+import controllers.BaseAuthController
 import javax.inject.Inject
 import models.document.DocumentService
 import models.user.Roles._
 import models.user.UserService
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
+import controllers.WebJarAssets
+import play.api.Configuration
 
-class UserAdminController @Inject() (implicit val ctx: ControllerContext) extends BaseAuthController {
+class UserAdminController @Inject() (
+    val config: Configuration,
+    val documents: DocumentService,
+    val users: UserService,
+    implicit val ctx: ExecutionContext,
+    implicit val webjars: WebJarAssets
+  ) extends BaseAuthController(config, documents, users) {
 
   def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    UserService.listUsers(0, 500).map(users => 
+    users.listUsers(0, 500).map(users => 
       Ok(views.html.admin.users.index(users)))
   }
 
   def showDetails(username: String) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    UserService.findByUsername(username).flatMap(_ match {
+    users.findByUsername(username).flatMap(_ match {
 
       case Some(user) =>
-        DocumentService.findByOwner(username).map(documents =>
+        documents.findByOwner(username).map(documents =>
           Ok(views.html.admin.users.details(user, documents)))
 
       case None => Future.successful(NotFoundPage)

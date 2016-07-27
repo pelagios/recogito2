@@ -9,8 +9,9 @@ import scala.reflect.{ ClassTag, classTag }
 import play.api.Play
 import play.api.cache.CacheApi
 import play.api.mvc.{ Result, Results, RequestHeader }
+import javax.inject.Inject
 
-trait Security extends AuthConfig { self: HasContext =>
+trait Security extends AuthConfig { self: HasConfig with HasUserService =>
 
   private val NO_PERMISSION = "No permission"
 
@@ -23,9 +24,9 @@ trait Security extends AuthConfig { self: HasContext =>
   val idTag: ClassTag[Id] = classTag[Id]
 
   val sessionTimeoutInSeconds: Int = 3600
-
+    
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] =
-    UserService.findByUsername(id)(self.ctx.db, self.ctx.cache)
+    self.users.findByUsername(id)
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
     val destination = request.session.get("access_uri").getOrElse(my.routes.MyRecogitoController.my.toString)
@@ -49,7 +50,7 @@ trait Security extends AuthConfig { self: HasContext =>
   }
 
   override lazy val tokenAccessor = new CookieTokenAccessor(
-    cookieSecureOption = ctx.config.getBoolean("auth.cookie.secure").getOrElse(false),
+    cookieSecureOption = config.getBoolean("auth.cookie.secure").getOrElse(false),
     cookieMaxAge       = Some(sessionTimeoutInSeconds)
   )
 
