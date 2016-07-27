@@ -51,7 +51,7 @@ object AnnotationService extends HasAnnotationIndexing with AnnotationHistorySer
         t.printStackTrace
         (false, -1l)
       }
-      
+
     for {
       // Retrieve previous version, if any
       maybePrevious       <- findById(annotation.annotationId)

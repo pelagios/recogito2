@@ -8,15 +8,8 @@ import scala.concurrent.ExecutionContext
 import storage.DB
 
 /** Helper class to reduce Controller boilerplate **/ 
-class ControllerContext(val cache: CacheApi, val config: Configuration, val db: DB, val ec: ExecutionContext, val webjars: WebJarAssets) 
-
 @Singleton
-class ControllerContextProvider @Inject() (val cache: CacheApi, val config: Configuration, val db: DB, val ec: ExecutionContext, val webjars: WebJarAssets) 
-  extends Provider[ControllerContext] {
-  
-  def get = new ControllerContext(cache, config, db, ec, webjars)
-  
-}
+class ControllerContext @Inject() (val cache: CacheApi, val config: Configuration, val db: DB, val ec: ExecutionContext, val webjars: WebJarAssets) 
 
 trait HasContext { def ctx: ControllerContext }
 

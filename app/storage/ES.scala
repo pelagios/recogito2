@@ -1,5 +1,6 @@
 package storage
 
+import com.google.inject.AbstractModule
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
@@ -10,6 +11,9 @@ import scala.io.Source
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.{ Try, Success, Failure }
+import javax.inject.{ Inject, Singleton }
+import play.api.inject.ApplicationLifecycle
+import scala.concurrent.Future
 
 object ES {
   
