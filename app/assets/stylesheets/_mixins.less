@@ -5,15 +5,15 @@
   border-radius: @radius;
 }
 
-.rounded-corners-left(@radius) {
+.rounded-corners-top(@radius) {
   -webkit-border-top-left-radius: @radius;
-  -webkit-border-bottom-left-radius: @radius;
+  -webkit-border-top-right-radius: @radius;
   -khtml-border-radius-topleft: @radius;
-  -khtml-border-radius-bottomleft: @radius;
+  -khtml-border-radius-topright: @radius;
   -moz-border-radius-topleft: @radius;
-  -moz-border-radius-bottomleft: @radius;
+  -moz-border-radius-topright: @radius;
   border-top-left-radius: @radius;
-  border-bottom-left-radius: @radius;
+  border-top-right-radius: @radius;
 }
 
 .rounded-corners-right(@radius) {
@@ -25,6 +25,28 @@
   -moz-border-radius-bottomright: @radius;
   border-top-right-radius: @radius;
   border-bottom-right-radius: @radius;
+}
+
+.rounded-corners-bottom(@radius) {
+  -webkit-border-bottom-right-radius: @radius;
+  -webkit-border-bottom-left-radius: @radius;
+  -khtml-border-radius-bottomright: @radius;
+  -khtml-border-radius-bottomleft: @radius;
+  -moz-border-radius-bottomright: @radius;
+  -moz-border-radius-bottomleft: @radius;
+  border-bottom-right-radius: @radius;
+  border-bottom-left-radius: @radius;
+}
+
+.rounded-corners-left(@radius) {
+  -webkit-border-top-left-radius: @radius;
+  -webkit-border-bottom-left-radius: @radius;
+  -khtml-border-radius-topleft: @radius;
+  -khtml-border-radius-bottomleft: @radius;
+  -moz-border-radius-topleft: @radius;
+  -moz-border-radius-bottomleft: @radius;
+  border-top-left-radius: @radius;
+  border-bottom-left-radius: @radius;
 }
 
 .outline(@fill, @stroke) {

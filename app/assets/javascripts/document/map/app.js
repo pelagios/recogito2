@@ -63,6 +63,8 @@ require([
        layerSwitcher = new LayerSwitcher(),
 
        btnLayers = jQuery('.layers'),
+       btnZoomIn = jQuery('.zoom-in'),
+       btnZoomOut = jQuery('.zoom-out'),
 
        /** Lookup table { gazetteerUri -> [ annotation] } **/
        annotationsByGazetteerURI = {},
@@ -203,6 +205,8 @@ require([
        };
 
     btnLayers.click(function() { layerSwitcher.open(); });
+    btnZoomIn.click(function() { map.zoomIn(); });
+    btnZoomOut.click(function() { map.zoomOut(); });
 
     map.on('click', function(e) {
       selectNearest(e.latlng, TOUCH_DISTANCE_THRESHOLD);
