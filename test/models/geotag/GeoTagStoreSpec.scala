@@ -17,15 +17,18 @@ import play.api.test.Helpers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import storage.ES
+import storage.HasES
+import models.place.PlaceService
+import play.api.Play
 
 // So we can instantiate an ES Place + GeoTagStore
-class TestGeoTagStore extends ESPlaceStore with ESGeoTagStore  
+class TestGeoTagStore(val es: ES) extends ESPlaceStore with ESGeoTagStore with HasES
 
 @RunWith(classOf[JUnitRunner])
 class GeoTagStoreSpec extends Specification with AfterAll {
   
-  sequential 
-
+  sequential
+  
   override def afterAll = FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
   
   private val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
@@ -90,6 +93,10 @@ class GeoTagStoreSpec extends Specification with AfterAll {
   
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     
+    val es = Play.current.injector.instanceOf(classOf[ES])
+    val annotations = Play.current.injector.instanceOf(classOf[AnnotationService])
+    val places = Play.current.injector.instanceOf(classOf[PlaceService])
+    
     val linkToBarcelona = GeoTag(
       "http://dare.ht.lu.se/places/6534",
       annotatesBarcelona.annotationId,
@@ -118,10 +125,10 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         annotatesVindobonaAndThessaloniki.annotates.filepartId,
         "http://pleiades.stoa.org/places/491741")
         
-    val testStore = new TestGeoTagStore() // Store extends GeoTagServiceLike
+    val testStore = new TestGeoTagStore(es) // Store extends GeoTagServiceLike
               
-    def flush() = Await.result(ES.flushIndex, 10 seconds)
-    def insertAnnotation(a: Annotation) = Await.result(AnnotationService.insertOrUpdateAnnotation(a), 10 seconds)
+    def flush() = Await.result(es.flushIndex, 10 seconds)
+    def insertAnnotation(a: Annotation) = Await.result(annotations.insertOrUpdateAnnotation(a), 10 seconds)
     def totalGeoTags() = Await.result(testStore.totalGeoTags(), 10 seconds)
     def findByAnnotationId(id: UUID) = Await.result(testStore.findGeoTagsByAnnotation(id), 10 seconds)
     def searchPlacesInDocument(query: String, documentId: String) = Await.result(testStore.searchPlacesInDocument(query, documentId), 10 seconds)
@@ -129,10 +136,10 @@ class GeoTagStoreSpec extends Specification with AfterAll {
     "After creating 2 annotations with 1 geotag each, the GeoTagService" should {
       
       "contain 2 correct geotags" in {  
-        Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File("test/resources/models/place/gazetteer_sample_dare.ttl"), "gazetteer_sample_dare.ttl")), 10 seconds)
+        Await.result(places.importRecords(GazetteerUtils.loadRDF(new File("test/resources/models/place/gazetteer_sample_dare.ttl"), "gazetteer_sample_dare.ttl")), 10 seconds)
         flush()
       
-        Await.result(PlaceService.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/models/place/gazetteer_sample_pleiades.ttl"), "gazetteer_sample_pleiades.ttl")), 10 seconds)
+        Await.result(places.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/models/place/gazetteer_sample_pleiades.ttl"), "gazetteer_sample_pleiades.ttl")), 10 seconds)
         flush()
       
         val (successInsertBarcelona, _, _) = insertAnnotation(annotatesBarcelona)
@@ -196,7 +203,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         
         totalGeoTags() must equalTo(3)
         
-        val totalPlaces = Await.result(PlaceService.totalPlaces(), 10 seconds)
+        val totalPlaces = Await.result(places.totalPlaces(), 10 seconds)
         totalPlaces must equalTo(4)
         
       }
@@ -209,7 +216,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         val success = 
           Seq(annotatesBarcelona.annotationId,
             annotatesVindobonaAndThessaloniki.annotationId).flatMap { annotationId => 
-              Await.result(AnnotationService.deleteAnnotation(annotationId, "rainer", DateTime.now), 10 seconds)  
+              Await.result(annotations.deleteAnnotation(annotationId, "rainer", DateTime.now), 10 seconds)  
           }
         
         flush()

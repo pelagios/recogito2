@@ -55,7 +55,7 @@ class PlaceServiceSpec extends Specification {
         Seq("http://www.example.com/place/a"),
         Seq("http://www.example.com/place/b"))
         
-      val conflated = PlaceService.conflate(Seq(recordA, recordB, recordC))
+      val conflated = testPlaceService.conflate(Seq(recordA, recordB, recordC))
       conflated.size must equalTo(1)
       conflated.head.id must equalTo(recordA.uri)
       conflated.head.isConflationOf.size must equalTo(3)
@@ -76,7 +76,7 @@ class PlaceServiceSpec extends Specification {
         Seq("http://www.example.com/place/e"),
         Seq("http://www.example.com/place/f"))
         
-      val conflated = PlaceService.conflate(Seq(recordA, recordB, recordC))
+      val conflated = testPlaceService.conflate(Seq(recordA, recordB, recordC))
       conflated.size must equalTo(3)
       conflated.map(_.id) must containAllOf(Seq(recordA.uri, recordB.uri, recordC.uri))
       conflated.map(_.isConflationOf.size) must equalTo(Seq(1, 1, 1))
@@ -97,7 +97,7 @@ class PlaceServiceSpec extends Specification {
         Seq("http://www.example.com/place/e"),
         Seq("http://www.example.com/place/a"))
         
-      val conflated = PlaceService.conflate(Seq(recordA, recordB, recordC))
+      val conflated = testPlaceService.conflate(Seq(recordA, recordB, recordC))
       
       conflated.size must equalTo(2)
       conflated.map(_.id) must containAllOf(Seq(recordA.uri, recordB.uri))

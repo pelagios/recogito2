@@ -13,11 +13,12 @@ import play.api.test._
 import play.api.test.Helpers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import storage.ES
+import storage.{ ES, HasES }
 import scala.util.Random
+import play.api.Play
 
 // So we can instantiate an ElasticSearch place store
-class TestPlaceStore extends ESPlaceStore
+class TestPlaceStore(val es: ES) extends ESPlaceStore with HasES
 
 @RunWith(classOf[JUnitRunner])
 class PlaceStoreSpec extends Specification with AfterAll {
@@ -48,24 +49,26 @@ class PlaceStoreSpec extends Specification with AfterAll {
     Place(record.uri, GazetteerUtils.collectLabels(Seq(record)), None, None, None, Seq(record))
   }
   
-  val testStore = new TestPlaceStore()
-  
-  val initialPlace = createNewTestPlace()
-  
-  def flush() = Await.result(ES.flushIndex, 10 seconds)
-  
-  def totalPlaces() = Await.result(testStore.totalPlaces(), 10 seconds)
-  
-  def updatePlace(place: Place) = Await.result(testStore.insertOrUpdatePlace(place), 10 seconds)
-    
-  def findByURI(uri: String) = Await.result(testStore.findByURI(uri), 10 seconds)
-  
-  def findByPlaceOrMatchURIs(uris: Seq[String]) = Await.result(testStore.findByPlaceOrMatchURIs(uris), 10 seconds)
-  
-  def findByName(name: String) = Await.result(testStore.searchPlaces(name), 10 seconds)
-  
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     
+    val es = Play.current.injector.instanceOf(classOf[ES])
+   
+    val testStore = new TestPlaceStore(es)
+    
+    val initialPlace = createNewTestPlace()
+    
+    def flush() = Await.result(es.flushIndex, 10 seconds)
+    
+    def totalPlaces() = Await.result(testStore.totalPlaces(), 10 seconds)
+    
+    def updatePlace(place: Place) = Await.result(testStore.insertOrUpdatePlace(place), 10 seconds)
+      
+    def findByURI(uri: String) = Await.result(testStore.findByURI(uri), 10 seconds)
+    
+    def findByPlaceOrMatchURIs(uris: Seq[String]) = Await.result(testStore.findByPlaceOrMatchURIs(uris), 10 seconds)
+    
+    def findByName(name: String) = Await.result(testStore.searchPlaces(name), 10 seconds)
+  
     "The ESPlaceStore" should {
       
       "properly import the test record" in {

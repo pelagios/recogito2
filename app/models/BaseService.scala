@@ -2,7 +2,7 @@ package models
 
 import org.jooq.Record
 import play.api.cache.CacheApi
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
 import storage.DB
@@ -24,7 +24,9 @@ trait BaseService {
       .mapValues(_.map(_._2).filter(record => isNotNull(record)))
 
   /** Boilerplate code for conducting a cache lookup, followed by DB lookup if nothing in cache **/
-  protected def cachedLookup[T: ClassTag](prefix: String, key: String, dbLookup: String => Future[Option[T]])(implicit db: DB, cache: CacheApi): Future[Option[T]] = {
+  protected def cachedLookup[T: ClassTag](prefix: String, key: String, 
+      dbLookup: String => Future[Option[T]])(implicit db: DB, cache: CacheApi, ctx: ExecutionContext): Future[Option[T]] = {
+    
     val maybeCachedValue = cache.get[T](prefix + "_" + key)
     if (maybeCachedValue.isDefined) {
       Future.successful(maybeCachedValue)

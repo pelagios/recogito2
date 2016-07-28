@@ -22,7 +22,7 @@ class ESModule extends AbstractModule {
   
 }
 
-trait HasEs { def es: ES }
+trait HasES { def es: ES }
 
 /** Constants **/
 object ES {
@@ -121,6 +121,11 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
       create.execute().actionGet()
     }
   }
+  
+  def flushIndex =
+    client execute {
+      flush index ES.RECOGITO
+    }
   
   def stop() = {
     Logger.info("Stopping ElasticSearch local node")

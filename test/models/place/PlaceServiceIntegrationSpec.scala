@@ -15,6 +15,7 @@ import play.api.test.Helpers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import storage.ES
+import play.api.Play
 
 @RunWith(classOf[JUnitRunner])
 class PlaceServiceIntegrationSpec extends Specification with AfterAll {
@@ -28,23 +29,26 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
   
   private val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
   
-  /** Async Await shorthands **/
-  private def flush() = 
-    Await.result(ES.flushIndex, 10 seconds)
-    
-  private def importRecords(records: Seq[GazetteerRecord]): Seq[GazetteerRecord] =
-    Await.result(PlaceService.importRecords(records), 10 seconds)
-  
-  private def findByURI(uri: String): Place =
-    Await.result(PlaceService.findByURI(uri), 10 seconds).get._1
-    
-  private def getTotalPlaces(): Long =
-    Await.result(PlaceService.totalPlaces(), 10 seconds)
-    
   override def afterAll =
     FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
-    
+  
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
+    
+    val es = Play.current.injector.instanceOf(classOf[ES])
+    val places = Play.current.injector.instanceOf(classOf[PlaceService])
+  
+    /** Async Await shorthands **/
+    def flush() = 
+      Await.result(es.flushIndex, 10 seconds)
+      
+    def importRecords(records: Seq[GazetteerRecord]): Seq[GazetteerRecord] =
+      Await.result(places.importRecords(records), 10 seconds)
+    
+    def findByURI(uri: String): Place =
+      Await.result(places.findByURI(uri), 10 seconds).get._1
+      
+    def getTotalPlaces(): Long =
+      Await.result(places.totalPlaces(), 10 seconds)
     
     "After importing the DARE sample, the PlaceService" should {
       

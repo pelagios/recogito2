@@ -18,6 +18,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.test.Helpers._
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import play.api.Play
     
 @RunWith(classOf[JUnitRunner])
 class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSender with SpecificationLike with AfterAll {
@@ -27,8 +28,7 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
   
   private val TMP_IDX_DIR = "test/resources/tmp-idx"
   
-  override def afterAll =
-    FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
+  override def afterAll = FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
   
   "The NER service" should {
     
@@ -46,18 +46,21 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
       
     val dir = new File("test/resources/controllers/my/upload/ner")
     
-    Logger.info("[NERServiceIntegrationSpec] Submitting 2 documents to NER service")
-      
-    val processStartTime = System.currentTimeMillis
-    NERService.spawnTask(document1, parts1, dir, KEEP_ALIVE)
-    NERService.spawnTask(document2, parts2, dir, KEEP_ALIVE)
+    running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     
-    "start NER on the 2 test documents without blocking" in { 
-      (System.currentTimeMillis - processStartTime).toInt must be <(1000)
-    }
+      val nerService = Play.current.injector.instanceOf(classOf[NERService])
       
-    "report progress until complete" in {
-      running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
+      Logger.info("[NERServiceIntegrationSpec] Submitting 2 documents to NER service")
+        
+      val processStartTime = System.currentTimeMillis
+      nerService.spawnTask(document1, parts1, dir, KEEP_ALIVE)
+      nerService.spawnTask(document2, parts2, dir, KEEP_ALIVE)
+      
+      "start NER on the 2 test documents without blocking" in { 
+        (System.currentTimeMillis - processStartTime).toInt must be <(1000)
+      }
+        
+      "report progress until complete" in {
         var ctr = 50
         var isComplete = false
         
@@ -66,8 +69,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
           
           val queryStartTime = System.currentTimeMillis
           
-          val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
-          val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
+          val result1 = Await.result(nerService.queryProgress(document1.getId), 10 seconds)
+          val result2 = Await.result(nerService.queryProgress(document2.getId), 10 seconds)
           
           result1.isDefined must equalTo(true) 
           result2.isDefined must equalTo(true) 
@@ -86,38 +89,39 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
         
         success
       }
-    }
-          
-    "accept progress queries after completion" in {
-      val queryStartTime = System.currentTimeMillis
-      
-      val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
-      val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
-      
-      (System.currentTimeMillis - queryStartTime).toInt must be <(500)
-      
-      result1.isDefined must equalTo(true) 
-      result2.isDefined must equalTo(true) 
-      
-      val totalProgress1 = result1.get.progress.map(_.progress).sum / result1.get.progress.size
-      val totalProgress2 = result2.get.progress.map(_.progress).sum / result2.get.progress.size
-      
-      Logger.info("[NERServiceIntegrationSpec] Progress for doc 1 after completion is " + totalProgress1)
-      Logger.info("[NERServiceIntegrationSpec] Progress for doc 2 after completion is " + totalProgress2)
+            
+      "accept progress queries after completion" in {
+        val queryStartTime = System.currentTimeMillis
         
-      totalProgress1 must equalTo(1.0)
-      totalProgress2 must equalTo(1.0)
-    }
-    
-    "reject progress queries after the KEEPALIVE time has expired" in {
-      Thread.sleep(KEEP_ALIVE.toMillis)
-      Logger.info("[NERServiceIntegrationSpec] KEEPALIVE expired")
+        val result1 = Await.result(nerService.queryProgress(document1.getId), 10 seconds)
+        val result2 = Await.result(nerService.queryProgress(document2.getId), 10 seconds)
+        
+        (System.currentTimeMillis - queryStartTime).toInt must be <(500)
+        
+        result1.isDefined must equalTo(true) 
+        result2.isDefined must equalTo(true) 
+        
+        val totalProgress1 = result1.get.progress.map(_.progress).sum / result1.get.progress.size
+        val totalProgress2 = result2.get.progress.map(_.progress).sum / result2.get.progress.size
+        
+        Logger.info("[NERServiceIntegrationSpec] Progress for doc 1 after completion is " + totalProgress1)
+        Logger.info("[NERServiceIntegrationSpec] Progress for doc 2 after completion is " + totalProgress2)
+          
+        totalProgress1 must equalTo(1.0)
+        totalProgress2 must equalTo(1.0)
+      }
       
-      val result1 = Await.result(NERService.queryProgress(document1.getId), 10 seconds)
-      val result2 = Await.result(NERService.queryProgress(document2.getId), 10 seconds)
+      "reject progress queries after the KEEPALIVE time has expired" in {
+        Thread.sleep(KEEP_ALIVE.toMillis)
+        Logger.info("[NERServiceIntegrationSpec] KEEPALIVE expired")
+        
+        val result1 = Await.result(nerService.queryProgress(document1.getId), 10 seconds)
+        val result2 = Await.result(nerService.queryProgress(document2.getId), 10 seconds)
+        
+        result1.isDefined must equalTo(false)
+        result2.isDefined must equalTo(false)
+      }
       
-      result1.isDefined must equalTo(false)
-      result2.isDefined must equalTo(false)
     }
     
   }
