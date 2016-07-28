@@ -125,6 +125,14 @@ define([
           jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
         },
 
+        /** Returns true if any of the sections was changed **/
+        hasChanged = function() {
+          var sectionsChanged = !sections.every(function(section) {
+            return !section.hasChanged();
+          });
+          return sectionsChanged || queuedUpdates.length > 0;
+        },
+
         /** Destroys all sections **/
         clear = function() {
           currentAnnotation = false;
@@ -140,6 +148,7 @@ define([
     this.setAnnotation = setAnnotation;
     this.createNewSection = createNewSection;
     this.updateSection = updateSection;
+    this.hasChanged = hasChanged;
     this.commitChanges = commitChanges;
     this.clear = clear;
 

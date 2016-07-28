@@ -132,6 +132,10 @@ define([
           queuedUpdates.push(function() { placeBody.status.value = 'VERIFIED'; });
         },
 
+        hasChanged = function() {
+          return queuedUpdates.length > 0;
+        },
+
         /** Commits queued changes **/
         commit = function() {
           jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
@@ -165,6 +169,7 @@ define([
     this.body = placeBody;
 
     this.update = update;
+    this.hasChanged = hasChanged;
     this.commit = commit;
     this.destroy = destroy;
 

@@ -6,9 +6,6 @@ define([
   var CommentSection = function(parent, commentBody, zIndex) {
     var self = this,
 
-        // Flag indicating whether the user has switched to editing mode
-        contentEdited = false,
-
         /** TODO we may want to allow HTML later - but then need to sanitize **/
         escapeHtml = function(text) {
           return jQuery('<div/>').text(text).html();
@@ -71,11 +68,10 @@ define([
             // Make menu items clickable
             dropdownMenu.on('click', 'li', function(e) {
               var fn = jQuery(e.target).data('fn');
-              if (fn === 'delete') {
+              if (fn === 'delete')
                 self.fireEvent('delete');
-              } else {
+              else
                 makeEditable();
-              }
             });
           },
 
@@ -92,7 +88,6 @@ define([
           },
 
           makeEditable = function() {
-            contentEdited = true;
             element.addClass('editable');
             commentDiv.prop('contenteditable', true);
             placeCaretAtEnd(commentDiv);
@@ -104,8 +99,15 @@ define([
             });
           },
 
+          hasChanged = function() {
+            var initialContent = commentBody.value,
+                currentContent = commentDiv.text().trim();
+
+            return initialContent !== currentContent;
+          },
+
           commit = function() {
-            if (contentEdited) {
+            if (hasChanged()) {
               delete commentBody.last_modified_at;
               delete commentBody.last_modified_by;
               commentBody.value = commentDiv.text().trim();
@@ -125,6 +127,7 @@ define([
     parent.append(element);
 
     this.body = commentBody;
+    this.hasChanged = hasChanged;
     this.commit = commit;
     this.destroy = destroy;
 

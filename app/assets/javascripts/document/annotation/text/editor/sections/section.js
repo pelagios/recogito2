@@ -7,6 +7,9 @@ define(['common/hasEvents'], function(HasEvents) {
 
   var Section = function() {
 
+    if (!this.hasChanged)
+      throw 'Section needs to implement .hasChanged() method';
+
     if (!this.commit)
       throw 'Section needs to implement .commit() method';
 

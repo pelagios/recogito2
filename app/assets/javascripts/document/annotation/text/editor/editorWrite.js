@@ -150,35 +150,38 @@ define([
 
         /** 'OK' updates the annotation & highlight spans and closes the editor **/
         onOK = function() {
-          var reply = replyField.getComment(), annotationSpans;
+          var reply = replyField.getComment(), annotationSpans,
+              hasChanged = reply || self.sectionList.hasChanged();
 
-          self.sectionList.commitChanges();
+          if (hasChanged) {
+            self.sectionList.commitChanges();
 
-          // Push the current reply body, if any
-          if (reply)
-            self.currentAnnotation.bodies.push(reply);
+            // Push the current reply body, if any
+            if (reply)
+              self.currentAnnotation.bodies.push(reply);
 
-          // Determine which CRUD action to perform
-          if (self.currentAnnotation.annotation_id) {
-            // There's an ID - annotation already stored on the server
-            if (AnnotationUtils.isEmpty(self.currentAnnotation)) {
-              // Annotation empty - DELETE
-              highlighter.removeAnnotation(self.currentAnnotation);
-              self.fireEvent('deleteAnnotation', self.currentAnnotation);
+            // Determine which CRUD action to perform
+            if (self.currentAnnotation.annotation_id) {
+              // There's an ID - annotation already stored on the server
+              if (AnnotationUtils.isEmpty(self.currentAnnotation)) {
+                // Annotation empty - DELETE
+                highlighter.removeAnnotation(self.currentAnnotation);
+                self.fireEvent('deleteAnnotation', self.currentAnnotation);
+              } else {
+                // UPDATE
+                annotationSpans = highlighter.refreshAnnotation(self.currentAnnotation);
+                self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: annotationSpans });
+              }
             } else {
-              // UPDATE
-              annotationSpans = highlighter.refreshAnnotation(self.currentAnnotation);
-              self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: annotationSpans });
-            }
-          } else {
-            // No ID? New annotation from fresh selection - CREATE if not empty
-            if (AnnotationUtils.isEmpty(self.currentAnnotation)) {
-              selectionHandler.clearSelection();
-            } else {
-              annotationSpans = selectionHandler.getSelection().spans;
-              highlighter.convertSpansToAnnotation(annotationSpans, self.currentAnnotation);
-              selectionHandler.clearSelection();
-              self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: annotationSpans });
+              // No ID? New annotation from fresh selection - CREATE if not empty
+              if (AnnotationUtils.isEmpty(self.currentAnnotation)) {
+                selectionHandler.clearSelection();
+              } else {
+                annotationSpans = selectionHandler.getSelection().spans;
+                highlighter.convertSpansToAnnotation(annotationSpans, self.currentAnnotation);
+                selectionHandler.clearSelection();
+                self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: annotationSpans });
+              }
             }
           }
 
