@@ -31,8 +31,13 @@ define([
                     '</div>' +
                     '<div class="modal-body">' +
                       '<div class="georesolution-sidebar">' +
-                        '<div class="results-header"></div>' +
-                        '<ul class="results-list"></ul>' +
+                        '<div class="result-header"></div>' +
+                        '<div class="result-list">' +
+                          '<ul></ul>' +
+                          '<div class="wait-for-next">' +
+                            '<img src="/assets/images/wait-circle.gif">' +
+                          '</div>' +
+                        '</div>' +
                       '</div>' +
                       '<div class="map"></div>' +
                     '</div>' +
@@ -40,20 +45,26 @@ define([
                 '</div>' +
               '</div>');
 
+            el.find('.wait-for-next').hide();
             el.hide();
             jQuery(document.body).append(el);
             return el;
           })(),
 
-          searchInput   = element.find('.search'),
+          searchInput     = element.find('.search'),
 
-          btnFlag       = element.find('.flag'),
-          btnCancel     = element.find('.cancel'),
+          btnFlag         = element.find('.flag'),
+          btnCancel       = element.find('.cancel'),
 
-          resultHeader  = element.find('.results-header'),
-          resultList    = element.find('.results-list'),
+          resultHeader    = element.find('.result-header'),
+          resultContainer = element.find('.result-list'),
+          resultList      = element.find('.result-list ul'),
+          waitForNext     = element.find('.wait-for-next'),
 
-          currentBody = false,
+          placeBody = false,
+
+          currentSearchResults = [],
+          currentSearchResultsTotal,
 
           map = new Map(element.find('.map')),
 
@@ -109,7 +120,7 @@ define([
 
             popup.on('click', 'tr', function(e) {
               var tr = jQuery(e.target).closest('tr');
-              self.fireEvent('change', currentBody, {
+              self.fireEvent('change', placeBody, {
                 uri: tr.data('uri'),
                 status: { value: 'VERIFIED' }
               });
@@ -121,65 +132,91 @@ define([
             marker.openPopup();
           },
 
-          onSearch = function() {
-            var query = searchInput.val().trim();
-            if (query.length > 0)
-              search(query);
-          },
-
           onFlag = function() {
-            self.fireEvent('change', currentBody, {
+            self.fireEvent('change', placeBody, {
               uri: false,
               status: { value: 'NOT_IDENTIFIABLE' }
             });
             close();
           },
 
-          search = function(query) {
-            map.clear();
-            resultList.empty();
+          onNextPage = function(response) {
+            var moreAvailable =
+              response.total > currentSearchResults.length + response.items.length;
 
-            API.searchPlaces(query).done(function(response) {
-              if (response.total > 0) {
-                // TODO improve!
-                resultHeader.html("Total: " + response.total + ", took " + response.took);
+            // Switch wait icon on/off
+            if (moreAvailable)
+              waitForNext.show();
+            else
+              waitForNext.hide();
 
-                jQuery.each(response.items, function(idx, place) {
-                  var coord = (place.representative_point) ?
-                        [ place.representative_point[1], place.representative_point[0] ] : false,
+            currentSearchResults = currentSearchResults.concat(response.items);
+            currentSearchResultsTotal = response.total;
 
-                      result = new ResultCard(resultList, place),
-                      marker = (coord) ? map.addMarker(coord) : false;
+            resultHeader.html("Total: " + response.total + ", took " + response.took);
 
-                  if (marker) {
-                    result.on('click', function() { openPopup(marker, place); });
-                    marker.on('click', function(e) { openPopup(marker, place); });
-                  }
-                });
-              } else {
-                // Try again with a fuzzy search (unless this is a fuzzy search already)
-                if (query.indexOf('~') < 0)
-                  search(query + '~');
+            jQuery.each(response.items, function(idx, place) {
+              var coord = (place.representative_point) ?
+                    [ place.representative_point[1], place.representative_point[0] ] : false,
+
+                  result = new ResultCard(resultList, place),
+                  marker = (coord) ? map.addMarker(coord) : false;
+
+              if (marker) {
+                result.on('click', function() { openPopup(marker, place); });
+                marker.on('click', function(e) { openPopup(marker, place); });
               }
             });
           },
 
-          open = function(quote, placeBody) {
-            currentBody = placeBody;
+          /** If scrolled to bottom, we load the next result page if needed **/
+          onScroll = function() {
+            var scrollPos = resultContainer.scrollTop() + resultContainer.innerHeight(),
+                scrollBottom = resultContainer[0].scrollHeight;
+
+            if (scrollPos >= scrollBottom)
+              if (currentSearchResultsTotal > currentSearchResults.length)
+                search(currentSearchResults.length);
+          },
+
+          search = function(opt_offset) {
+            var offset = (opt_offset) ? opt_offset : 0,
+                query = searchInput.val().trim();
+
+            if (query.length > 0)
+              API.searchPlaces(query, offset).done(onNextPage);
+          },
+
+          clear = function() {
+            map.clear();
+            resultList.empty();
+            currentSearchResults = [];
+            currentSearchResultsTotal = 0;
+          },
+
+          open = function(quote, body) {
+            placeBody = body;
+
             searchInput.val(quote);
             element.show();
             map.refresh();
-            search(quote);
+
+            clear();
+
+            search();
           },
 
           close = function() {
-            currentBody = false;
+            placeBody = false;
+            waitForNext.hide();
             element.hide();
           };
 
+    resultContainer.scroll(onScroll);
+
     btnFlag.click(onFlag);
     btnCancel.click(close);
-    searchInput.keyup(function(e) { if (e.which === 13) onSearch(); });
+    searchInput.keyup(function(e) { if (e.which === 13) { clear(); search(); } });
 
     this.open = open;
     HasEvents.apply(this);
