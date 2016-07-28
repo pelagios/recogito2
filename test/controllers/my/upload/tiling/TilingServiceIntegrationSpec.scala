@@ -31,7 +31,10 @@ class TilingServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitS
   
   private val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
   
-  override def afterAll = FileUtils.deleteDirectory(DEST_DIR)
+  override def afterAll = {
+    FileUtils.deleteDirectory(DEST_DIR)
+    FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
+  }
   
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     
