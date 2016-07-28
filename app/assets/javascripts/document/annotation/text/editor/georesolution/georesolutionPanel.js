@@ -170,7 +170,7 @@ define([
           },
 
           /** If scrolled to bottom, we load the next result page if needed **/
-          onScroll = function() {
+          onScroll = function(e) {
             var scrollPos = resultContainer.scrollTop() + resultContainer.innerHeight(),
                 scrollBottom = resultContainer[0].scrollHeight;
 
@@ -210,6 +210,24 @@ define([
             placeBody = false;
             waitForNext.hide();
             element.hide();
+          },
+
+          /**
+           * This prevents the background text from scrolling once the bottom of the
+           * search result list is reached.
+           */
+          blockMouseWheelBubbling = function() {
+            element.bind('mousewheel', function(e) {
+              if (e.originalEvent.wheelDelta) {
+                var scrollTop = resultContainer.scrollTop(),
+                    scrollPos = scrollTop + resultContainer.innerHeight(),
+                    scrollBottom = resultContainer[0].scrollHeight,
+                    d = e.originalEvent.wheelDelta;
+
+                if ((scrollPos === scrollBottom && d < 0) || (scrollTop === 0 && d > 0))
+                  e.preventDefault();
+              }
+            });
           };
 
     resultContainer.scroll(onScroll);
@@ -217,6 +235,8 @@ define([
     btnFlag.click(onFlag);
     btnCancel.click(close);
     searchInput.keyup(function(e) { if (e.which === 13) { clear(); search(); } });
+
+    blockMouseWheelBubbling();
 
     this.open = open;
     HasEvents.apply(this);
