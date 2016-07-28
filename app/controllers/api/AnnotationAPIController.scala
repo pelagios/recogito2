@@ -98,7 +98,6 @@ class AnnotationAPIController @Inject() (
     implicit val ctx: ExecutionContext
   ) extends BaseController(config, users)
       with OptionalAuthElement
-      with Security
       with HasAnnotationValidation
       with HasPrettyPrintJSON
       with HasTextSnippets {

@@ -14,7 +14,7 @@ trait HasUserService { def users: UserService }
 
 /** Common Controller functionality for convenience **/
 abstract class BaseController(config: Configuration, users: UserService)
-  extends Controller with HasConfig with HasUserService {
+  extends Controller with HasConfig with HasUserService with Security {
 
   protected val NotFoundPage = NotFound(views.html.error404())
   

@@ -25,7 +25,11 @@ class SettingsController @Inject() (
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarAssets
   ) extends BaseAuthController(config, documents, users)
-      with MetadataActions with SharingActions with RollbackActions with BackupActions with DeleteActions {
+      with MetadataActions
+      with SharingActions
+      with RollbackActions
+      with BackupActions
+      with DeleteActions {
     
   def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     // Settings page is only visible to OWNER or ADMIN access levels
@@ -81,6 +85,5 @@ class SettingsController @Inject() (
       case None => Future.successful(BadRequest)
     }    
   }
-  
 
 }

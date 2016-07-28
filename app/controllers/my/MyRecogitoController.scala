@@ -17,7 +17,7 @@ class MyRecogitoController @Inject() (
     val config: Configuration,
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarAssets
-  ) extends BaseController(config, users) with OptionalAuthElement with Security {
+  ) extends BaseController(config, users) with OptionalAuthElement {
 
   // TODO this may depend on user in the future
   private lazy val QUOTA = config.getInt("recogito.upload.quota").getOrElse(200)

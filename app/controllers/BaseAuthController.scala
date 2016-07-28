@@ -13,7 +13,7 @@ abstract class BaseAuthController(
     config: Configuration,
     documents: DocumentService,
     users: UserService
-  ) extends BaseController(config, users) with AuthElement with Security {
+  ) extends BaseController(config, users) with AuthElement {
   
   /** Helper that covers the boilerplate for all document views
     *

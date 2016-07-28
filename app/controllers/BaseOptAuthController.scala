@@ -16,7 +16,7 @@ abstract class BaseOptAuthController(
     config: Configuration,
     documents: DocumentService,
     users: UserService
-  ) extends BaseController(config, users) with OptionalAuthElement with Security {
+  ) extends BaseController(config, users) with OptionalAuthElement {
   
   /** Helper that covers the boilerplate for all document views
     *

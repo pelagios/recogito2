@@ -11,8 +11,8 @@ import scala.language.postfixOps
 case class TaskType(name: String)
 
 /** A base class that encapsulates most of the functionality needed by task supervisor actors **/
-abstract class BaseSupervisorActor(taskType: TaskType, document: DocumentRecord, parts: Seq[DocumentFilepartRecord],
-    documentDir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
+abstract class BaseSupervisorActor(taskType: TaskType, document: DocumentRecord,
+    parts: Seq[DocumentFilepartRecord], documentDir: File, keepalive: FiniteDuration) extends Actor with Aggregator  {
   
   import ProcessingTaskMessages._
   
