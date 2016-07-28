@@ -161,7 +161,7 @@ define([
               tr.find('.record-id').css('background-color', recordId.color);
             }
 
-            if (record.descriptions.length > 0)
+            if (record.descriptions && record.descriptions.length > 0)
               tr.find('.description').html(record.descriptions[0].description);
             else
               tr.find('.description').hide();

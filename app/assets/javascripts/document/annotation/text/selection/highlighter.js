@@ -250,7 +250,7 @@ define(['common/utils/annotationUtils'], function(AnnotationUtils) {
          * Results are sorted by length, shortest first, so that the 'smallest' annotation
          * is the first in the list.
          */
-        getAnnotationsAt = function(element /*, annotation */) {
+        getAnnotationsAt = function(element) {
           // Helper to get all annotations in case of multipe nested annotation spans
           var getAnnotationsRecursive = function(element, a) {
                 var annotations = (a) ? a : [ ],
@@ -271,10 +271,21 @@ define(['common/utils/annotationUtils'], function(AnnotationUtils) {
               };
 
           return sortByQuoteLength(getAnnotationsRecursive(element));
+        },
+
+        findById = function(id) {
+          console.log(id);
+          var spans = jQuery('[data-id="' + id + '"]'),
+              annotation = (spans.length > 0) ? spans[0].annotation : false;
+
+          console.log(spans);
+          if (annotation)
+            return { annotation: annotation, elements: spans };
         };
 
     this.convertSpansToAnnotation = convertSpansToAnnotation;
     this.getAnnotationsAt = getAnnotationsAt;
+    this.findById = findById;
     this.initPage = initPage;
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;

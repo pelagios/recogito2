@@ -37,12 +37,21 @@ require([
 
         onAnnotationsLoaded = function(annotations) {
           var highlighter = new Highlighter(contentNode),
-              sorted = AnnotationUtils.sortByOffsetDesc(annotations);
+              sorted = AnnotationUtils.sortByOffsetDesc(annotations),
+              hash = (window.location.hash) ? window.location.hash.substring(1) : false,
+              preselected;
 
           header.incrementAnnotationCount(annotations.length);
           // var startTime = new Date().getTime();
           highlighter.initPage(sorted);
           // console.log('took ' + (new Date().getTime() - startTime) + 'ms');
+
+          if (hash) {
+            // An annotation was pre-selected via URL hash
+            preselected = highlighter.findById(hash);
+            if (preselected)
+              editor.open(preselected.annotation, preselected.elements[0].getBoundingClientRect());
+          }
         },
 
         onAnnotationsLoadError = function(annotations) {
