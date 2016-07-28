@@ -14,7 +14,13 @@ case class AnnotationStatus(
 
   setAt: DateTime
 
-)
+) {
+  
+  /** Shorthand that returns true if the status value are equal **/
+  def equalsIgnoreModified(other: AnnotationStatus) =
+    value == other.value
+  
+}
 
 object AnnotationStatus extends Enumeration with HasDate {
 

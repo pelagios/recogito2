@@ -20,7 +20,35 @@ case class AnnotationBody (
   
   status: Option[AnnotationStatus]
 
-)
+) {
+  
+  /** Returns true if the bodies are equal in terms of content.
+    *
+    * Instead of the standard .equals method, this will only check
+    * hasType, value, uri and status fields, but not modifiedBy and
+    * modifiedAt. This way we can ignore empty edits that didn't 
+    * actually change anything.
+    */
+  def equalsIgnoreModified(other: AnnotationBody) = {
+    val isStatusEqual = (status, other.status) match {
+      case (Some(a), Some(b)) => a.equalsIgnoreModified(b)
+      case (None, None) => true
+      case _ => false
+    }
+    
+    if (!isStatusEqual)
+      false
+    else if (hasType != other.hasType)
+      false
+    else if (value != other.value)
+      false
+    else if (uri != other.uri)
+      false
+    else
+      true
+  }
+  
+}
 
 object AnnotationBody extends Enumeration with HasDate {
 

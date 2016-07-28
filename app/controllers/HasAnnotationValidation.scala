@@ -122,18 +122,19 @@ trait HasAnnotationValidation {
 
         // Once we're through detecting deletions, we continue with the remaining before-bodies
         val remainingReferenceBodies = referenceBodies.drop(deletions.size)
-        if (remainingReferenceBodies.isEmpty)
+        if (remainingReferenceBodies.isEmpty) {
           // None left? Then this new body is an addition
           (contributions ++ deletions :+ createBodyContribution(annotation, nextBodyAfter),
             remainingReferenceBodies)
-        else if (remainingReferenceBodies.head == nextBodyAfter)
+        } else if (remainingReferenceBodies.head.equalsIgnoreModified(nextBodyAfter)) {
           // This body is unchanged - continue with next
           (contributions ++ deletions,
             remainingReferenceBodies.tail)
-        else
+        } else {
           // This body was updated
           (contributions ++ deletions :+ changeBodyContribution(before, annotation, remainingReferenceBodies.head, nextBodyAfter),
             remainingReferenceBodies.tail)
+        }
       }._1 // We're not interested in the empty list of 'remaining reference bodies'
     }
 

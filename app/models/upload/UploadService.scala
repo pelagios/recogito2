@@ -5,7 +5,7 @@ import java.io.File
 import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.sql.Timestamp
 import java.util.{ Date, UUID }
-import javax.inject.{ Inject, Singleton }
+import javax.inject.Inject
 import models.ContentType
 import models.ContentIdentificationFailures._
 import models.document.DocumentService
@@ -18,7 +18,6 @@ import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import storage.{ DB, Uploads }
 
-@Singleton
 class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) {
 
   /** Java-interop helper that turns empty strings to null, so they are properly inserted by JOOQ **/
