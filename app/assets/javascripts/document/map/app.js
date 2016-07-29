@@ -4,13 +4,13 @@ require.config({
 });
 
 require([
+  'common/map/map',
   'common/ui/formatting',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
   'common/config',
-  'document/map/layerswitcher',
-  'document/map/mapPopup'], function(Formatting, AnnotationUtils, PlaceUtils, API, Config, LayerSwitcher, MapPopup) {
+  'document/map/mapPopup'], function(Map, Formatting, AnnotationUtils, PlaceUtils, API, Config, MapPopup) {
 
   var MAX_MARKER_SIZE  = 11,
 
@@ -23,196 +23,145 @@ require([
       TOUCH_DISTANCE_THRESHOLD = 18;
 
   jQuery(document).ready(function() {
-    var Layers =  {
 
-          DARE   : L.tileLayer('http://pelagios.org/tilesets/imperium/{z}/{x}/{y}.png', {
-                     attribution: 'Tiles: <a href="http://imperium.ahlfeldt.se/">DARE 2014</a>',
-                     minZoom:3,
-                     maxZoom:11
-                   }),
+    var map = new Map(jQuery('.map')),
 
-          AWMC   : L.tileLayer('http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/{z}/{x}/{y}.png', {
-                     attribution: 'Tiles &copy; <a href="http://mapbox.com/" target="_blank">MapBox</a> | ' +
-                       'Data &copy; <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors, CC-BY-SA | '+
-                       'Tiles and Data &copy; 2013 <a href="http://www.awmc.unc.edu" target="_blank">AWMC</a> ' +
-                       '<a href="http://creativecommons.org/licenses/by-nc/3.0/deed.en_US" target="_blank">CC-BY-NC 3.0</a>'
-                   }),
+        markerLayer = L.layerGroup(),
 
-          OSM    : L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                     attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-                   }),
+        /** Lookup table { gazetteerUri -> [ annotation] } **/
+        annotationsByGazetteerURI = {},
 
-          AERIAL : L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicGVsYWdpb3MiLCJhIjoiMWRlODMzM2NkZWU3YzkxOGJkMDFiMmFiYjk3NWZkMmUifQ.cyqpSZvhsvBGEBwRfniVrg', {
-                     attribution: '<a href="https://www.mapbox.com/about/maps/">&copy; Mapbox</a> <a href="http://www.openstreetmap.org/about/">&copy; OpenStreetMap</a>',
-                     maxZoom:22
-                   })
+        markerScaleFn,
 
+        getAnnotationsForPlace = function(place) {
+          var uris = PlaceUtils.getURIs(place),
+              annotations = [];
+
+          jQuery.each(uris, function(idx, uri) {
+            var annotationsForURI = annotationsByGazetteerURI[uri];
+            if (annotationsForURI)
+              annotations = annotations.concat(annotationsForURI);
+          });
+          return annotations;
         },
 
-        currentBaseLayer = Layers.AWMC,
+        onAnnotationsLoaded = function(annotations) {
+          // Loop through all place bodies of all annotations
+          jQuery.each(annotations, function(i, annotation) {
+            jQuery.each(AnnotationUtils.getBodiesOfType(annotation, 'PLACE'), function(j, placeBody) {
+              if (placeBody.uri) {
+                var annotationsAtPlace = annotationsByGazetteerURI[placeBody.uri];
+                if (annotationsAtPlace)
+                  annotationsAtPlace.push(annotation);
+                else
+                  annotationsByGazetteerURI[placeBody.uri] = [ annotation ];
+              }
+            });
+          });
 
-        map = L.map(jQuery('.map')[0], {
-          center: new L.LatLng(41.893588, 12.488022),
-          zoom: 4,
-          zoomControl: false,
-          layers: [ currentBaseLayer ]
-       }),
+          computeMarkerScaleFn();
 
-       markerLayer = L.layerGroup().addTo(map),
+          // After the annotations are loaded, load the places
+          return API.listPlacesInDocument(Config.documentId, 0, 2000);
+        },
 
-       layerSwitcher = new LayerSwitcher(),
+        onPlacesLoaded = function(response) {
+          jQuery.each(response.items, function(idx, place) {
+            if (place.representative_point) {
+              // The epic battle between Leaflet vs. GeoJSON
+              var latlng = [ place.representative_point[1], place.representative_point[0] ],
+                  markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
+                  marker = L.circleMarker(latlng, {
+                    color       : STROKE_COLOR,
+                    fillColor   : FILL_COLOR,
+                    opacity     : 1,
+                    fillOpacity : 1,
+                    weight      : 1.5,
+                    radius: markerSize
+                  }).addTo(markerLayer);
 
-       btnLayers = jQuery('.layers'),
-       btnZoomIn = jQuery('.zoom-in'),
-       btnZoomOut = jQuery('.zoom-out'),
+              marker.place = place; // TODO Hack! Clean this up
 
-       /** Lookup table { gazetteerUri -> [ annotation] } **/
-       annotationsByGazetteerURI = {},
+              marker.on('click', function() {
+                var popup = new MapPopup(latlng, place, getAnnotationsForPlace(place));
+                map.add(popup);
+              });
+            }
+          });
+        },
 
-       markerScaleFn,
+        computeMarkerScaleFn = function() {
+          var min = 9007199254740991, max = 1,
+              k, d, avg;
 
-       getAnnotationsForPlace = function(place) {
-         var uris = PlaceUtils.getURIs(place),
-             annotations = [];
+          // Determine min/max annotations per place
+          jQuery.each(annotationsByGazetteerURI, function(uri, annotations) {
+            var count = annotations.length;
+            if (count < min)
+              min = count;
+            if (count > max)
+              max = count;
+          });
 
-         jQuery.each(uris, function(idx, uri) {
-           var annotationsForURI = annotationsByGazetteerURI[uri];
-           if (annotationsForURI)
-             annotations = annotations.concat(annotationsForURI);
-         });
-         return annotations;
-       },
-
-       onAnnotationsLoaded = function(annotations) {
-         // Loop through all place bodies of all annotations
-         jQuery.each(annotations, function(i, annotation) {
-           jQuery.each(AnnotationUtils.getBodiesOfType(annotation, 'PLACE'), function(j, placeBody) {
-             if (placeBody.uri) {
-               var annotationsAtPlace = annotationsByGazetteerURI[placeBody.uri];
-               if (annotationsAtPlace)
-                 annotationsAtPlace.push(annotation);
-               else
-                 annotationsByGazetteerURI[placeBody.uri] = [ annotation ];
-             }
-           });
-         });
-
-         computeMarkerScaleFn();
-
-         // After the annotations are loaded, load the places
-         return API.listPlacesInDocument(Config.documentId, 0, 2000);
-       },
-
-       onPlacesLoaded = function(response) {
-         jQuery.each(response.items, function(idx, place) {
-           if (place.representative_point) {
-             // The epic battle between Leaflet vs. GeoJSON
-             var latlng = [ place.representative_point[1], place.representative_point[0] ],
-                 markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
-                 marker = L.circleMarker(latlng, {
-                   color       : STROKE_COLOR,
-                   fillColor   : FILL_COLOR,
-                   opacity     : 1,
-                   fillOpacity : 1,
-                   weight      : 1.5,
-                   radius: markerSize
-                 }).addTo(markerLayer);
-
-             marker.place = place; // TODO Hack! Clean this up
-
-             marker.on('click', function() {
-               var popup = new MapPopup(latlng, place, getAnnotationsForPlace(place));
-               popup.addTo(map);
-             });
-           }
-         });
-       },
-
-       onChangeLayer = function(name) {
-         var layer = Layers[name];
-         if (layer && layer !== currentBaseLayer) {
-           map.addLayer(layer);
-           map.removeLayer(currentBaseLayer);
-           currentBaseLayer = layer;
+          if (min === max) {
+            // All places are equal (or just one place) - use min marker size
+            markerScaleFn = function(noOfAnnotations) { return MIN_MARKER_SIZE; };
+          } else {
+            // Marker size y = fn(no_of_annotations) is linear fn according to y = k * x + d
+            k = (MAX_MARKER_SIZE - MIN_MARKER_SIZE) / (max - min);
+            d = ((MIN_MARKER_SIZE * max) - (MAX_MARKER_SIZE * min)) / (max - min);
+            markerScaleFn = function(noOfAnnotations) { return k * noOfAnnotations + d; };
          }
-       },
+        },
 
-       computeMarkerScaleFn = function() {
-         var min = 9007199254740991, max = 1,
-             k, d, avg;
+        onLoadError = function(error) {
+          // TODO implement
+        },
 
-         // Determine min/max annotations per place
-         jQuery.each(annotationsByGazetteerURI, function(uri, annotations) {
-           var count = annotations.length;
-           if (count < min)
-             min = count;
-           if (count > max)
-             max = count;
-         });
+        /**
+         * Selects the marker nearest the given latlng. This is primarily a
+         * means to support touch devices, where touch events will usually miss
+         * the markers because they are too small for properly hitting them.
+         *
+         * TODO this could be heavily optimized by some sort of spatial indexing or bucketing,
+         * but seems to work reasonably well even for lots of markers.
+         *
+         */
+        selectNearest = function(latlng, maxDistance) {
+          var xy = map.leafletMap.latLngToContainerPoint(latlng),
+              nearest = { distSq: 9007199254740992 }, // Distance to nearest initialied with Integer.MAX
+              nearestXY, distPx;
 
-         if (min === max) {
-           // All places are equal (or just one place) - use min marker size
-           markerScaleFn = function(noOfAnnotations) { return MIN_MARKER_SIZE; };
-         } else {
-           // Marker size y = fn(no_of_annotations) is linear fn according to y = k * x + d
-           k = (MAX_MARKER_SIZE - MIN_MARKER_SIZE) / (max - min);
-           d = ((MIN_MARKER_SIZE * max) - (MAX_MARKER_SIZE * min)) / (max - min);
-           markerScaleFn = function(noOfAnnotations) { return k * noOfAnnotations + d; };
-        }
-       },
+          jQuery.each(markerLayer.getLayers(), function(idx, marker) {
+            var markerLatLng = marker.getBounds().getCenter(),
+                distSq =
+                  Math.pow(latlng.lat - markerLatLng.lat, 2) +
+                  Math.pow(latlng.lng - markerLatLng.lng, 2);
 
-       onLoadError = function(error) {
-         // TODO implement
-       },
+            if (distSq < nearest.distSq)
+              nearest = { marker: marker, latlng: markerLatLng, distSq: distSq };
+          });
 
-       /**
-        * Selects the marker nearest the given latlng. This is primarily a
-        * means to support touch devices, where touch events will usually miss
-        * the markers because they are too small for properly hitting them.
-        *
-        * TODO this could be heavily optimized by some sort of spatial indexing or bucketing,
-        * but seems to work reasonably well even for lots of markers.
-        *
-        */
-       selectNearest = function(latlng, maxDistance) {
-         var xy = map.latLngToContainerPoint(latlng),
-             nearest = { distSq: 9007199254740992 }, // Distance to nearest initialied with Integer.MAX
-             nearestXY, distPx;
+          if (nearest.marker) {
+            nearestXY = map.leafletMap.latLngToContainerPoint(nearest.latlng);
+            distPx =
+              Math.sqrt(
+                Math.pow((xy.x - nearestXY.x), 2) +
+                Math.pow((xy.y - nearestXY.y), 2));
 
-         jQuery.each(markerLayer.getLayers(), function(idx, marker) {
-           var markerLatLng = marker.getBounds().getCenter(),
-               distSq =
-                 Math.pow(latlng.lat - markerLatLng.lat, 2) +
-                 Math.pow(latlng.lng - markerLatLng.lng, 2);
+            if (distPx < maxDistance) {
+              // TODO clean up or eliminate need for marker.place
+              var popup = new MapPopup(nearest.latlng, nearest.marker.place, getAnnotationsForPlace(nearest.marker.place));
+              map.add(popup);
+            }
+          }
+        };
 
-           if (distSq < nearest.distSq)
-             nearest = { marker: marker, latlng: markerLatLng, distSq: distSq };
-         });
+    map.add(markerLayer);
 
-         if (nearest.marker) {
-           nearestXY = map.latLngToContainerPoint(nearest.latlng);
-           distPx =
-             Math.sqrt(
-               Math.pow((xy.x - nearestXY.x), 2) +
-               Math.pow((xy.y - nearestXY.y), 2));
-
-           if (distPx < maxDistance) {
-             // TODO clean up or eliminate need for marker.place
-             var popup = new MapPopup(nearest.latlng, nearest.marker.place, getAnnotationsForPlace(nearest.marker.place));
-             popup.addTo(map);
-           }
-         }
-       };
-
-    btnLayers.click(function() { layerSwitcher.open(); });
-    btnZoomIn.click(function() { map.zoomIn(); });
-    btnZoomOut.click(function() { map.zoomOut(); });
-
-    map.on('click', function(e) {
+    map.leafletMap.on('click', function(e) {
       selectNearest(e.latlng, TOUCH_DISTANCE_THRESHOLD);
     });
-
-    layerSwitcher.on('changeLayer', onChangeLayer);
 
     API.listAnnotationsInDocument(Config.documentId)
        .then(onAnnotationsLoaded)

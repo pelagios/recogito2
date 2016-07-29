@@ -1,10 +1,10 @@
 define([
   'document/annotation/text/editor/georesolution/searchresultCard',
+  'common/map/map',
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
-  'common/hasEvents',
-  'common/map'], function(ResultCard, Formatting, PlaceUtils, API, HasEvents, Map) {
+  'common/hasEvents'], function(ResultCard, Map, Formatting, PlaceUtils, API, HasEvents) {
 
   var GeoresolutionPanel = function() {
 
@@ -13,7 +13,7 @@ define([
         element = (function() {
             var el = jQuery(
               '<div class="clicktrap">' +
-                '<div class="modal-wrapper">' +
+                '<div class="modal-wrapper georesolution-wrapper">' +
                   '<div class="modal georesolution-panel">' +
                     '<div class="modal-header">' +
                       '<div class="georesolution-search">' +
@@ -39,7 +39,16 @@ define([
                           '</div>' +
                         '</div>' +
                       '</div>' +
-                      '<div class="map"></div>' +
+                      '<div class="map-container">' +
+                        '<div class="map"></div>' +
+                        '<div class="map-controls">' +
+                          '<div class="layers control icon" title="Change base layer">&#xf0c9;</div>' +
+                          '<div class="zoom">' +
+                            '<div class="zoom-in control" title="Zoom in">+</div>' +
+                            '<div class="zoom-out control" title="Zoom out">&ndash;</div>' +
+                          '</div>' +
+                        '</div>' +
+                      '</div>' +
                     '</div>' +
                   '</div>' +
                 '</div>' +
@@ -67,6 +76,8 @@ define([
           currentSearchResultsTotal,
 
           map = new Map(element.find('.map')),
+
+          markerLayer = L.layerGroup(),
 
           openPopup = function(marker, place) {
             var popup = jQuery(
@@ -160,7 +171,7 @@ define([
                     [ place.representative_point[1], place.representative_point[0] ] : false,
 
                   result = new ResultCard(resultList, place),
-                  marker = (coord) ? map.addMarker(coord) : false;
+                  marker = (coord) ? L.marker(coord).addTo(markerLayer) : false;
 
               if (marker) {
                 result.on('click', function() { openPopup(marker, place); });
@@ -188,7 +199,7 @@ define([
           },
 
           clear = function() {
-            map.clear();
+            markerLayer.clearLayers();
             resultList.empty();
             currentSearchResults = [];
             currentSearchResultsTotal = 0;
@@ -229,6 +240,8 @@ define([
               }
             });
           };
+
+    map.add(markerLayer);
 
     resultContainer.scroll(onScroll);
 

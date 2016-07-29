@@ -1,4 +1,4 @@
-define(['../api'], function(API) {
+define([], function() {
 
   // TODO fetch this information from the server, so we can feed it from the DB
   var KNOWN_GAZETTEERS = [

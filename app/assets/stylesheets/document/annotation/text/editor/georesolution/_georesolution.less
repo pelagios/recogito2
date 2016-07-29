@@ -1,139 +1,151 @@
 @import "../../../../_modal.less";
 @import "../../../../_map.less";
 
-.modal-wrapper {
+.georesolution-wrapper {
   max-width:1400px;
-}
 
-.georesolution-panel {
-  perspective:1px;
-  overflow:hidden;
-}
 
-.modal-header {
-
-  .georesolution-search {
-    display:inline-block;
-    position:relative;
-    margin:5px;
-
-    input {
-      width:320px;
-    }
-
-    button.search.icon {
-      position:absolute;
-      right:2px;
-      top:6px;
-    }
-
+  .georesolution-panel {
+    perspective:1px;
+    overflow:hidden;
   }
 
-  .flag-this-place {
-    padding:0 15px;
-    display:inline-block;
-    color:@lightblue-type;
+  .modal-header {
 
-    .flag {
-      cursor:pointer;
+    .georesolution-search {
+      display:inline-block;
+      position:relative;
+      margin:5px;
 
-      button {
-        position:relative;
+      input {
+        width:320px;
+      }
+
+      button.search.icon {
+        position:absolute;
+        right:2px;
         top:6px;
-        color:@lightblue-type;
-        font-size:28px;
-        padding-left:10px;
       }
 
     }
 
-    .flag:hover > .label {
-      text-decoration:underline;
-    }
+    .flag-this-place {
+      padding:0 15px;
+      display:inline-block;
+      color:@lightblue-type;
 
-  } /** .flag-this-place **/
-
-} /** .geores-editor-header **/
-
-.modal-body {
-
-  .georesolution-sidebar {
-    box-sizing:border-box;
-    height:100%;
-    width:326px;
-    background-color:@blueish-white;
-    position:relative;
-
-    .result-header {
-      padding:10px;
-      border-bottom:1px solid @lightgrey-border;
-      height:46px;
-    }
-
-    .result-list {
-      position:absolute;
-      top:46px;
-      bottom:0px;
-      overflow-y:scroll;
-      width:100%;
-      margin:0;
-      padding:0;
-      list-style-type:none;
-
-      ul {
-        padding:0;
-        margin:0;
-      }
-
-      li {
-        background-color:#fff;
-        border-bottom:1px solid @lightgrey-border;
-        padding:10px;
+      .flag {
         cursor:pointer;
+
+        button {
+          position:relative;
+          top:6px;
+          color:@lightblue-type;
+          font-size:28px;
+          padding-left:10px;
+        }
+
       }
 
-      li:hover {
-        background-color:@blueish-white-hi;
+      .flag:hover > .label {
+        text-decoration:underline;
       }
 
-      .wait-for-next {
+    } /** .flag-this-place **/
+
+    button.cancel {
+      right:22px;
+    }
+
+  } /** .modal-header **/
+
+  .modal-body {
+
+    .georesolution-sidebar {
+      box-sizing:border-box;
+      height:100%;
+      width:326px;
+      background-color:@blueish-white;
+      position:relative;
+
+      .result-header {
+        padding:10px;
+        border-bottom:1px solid @lightgrey-border;
+        height:46px;
+      }
+
+      .result-list {
+        position:absolute;
+        top:46px;
+        bottom:0px;
+        overflow-y:scroll;
         width:100%;
-        text-align:center;
-        padding:20px 0;
-        height:26px;
+        margin:0;
+        padding:0;
+        list-style-type:none;
 
-        img {
-          width:26px;
+        ul {
+          padding:0;
+          margin:0;
+        }
+
+        li {
+          background-color:#fff;
+          border-bottom:1px solid @lightgrey-border;
+          padding:10px;
+          cursor:pointer;
+        }
+
+        li:hover {
+          background-color:@blueish-white-hi;
+        }
+
+        .wait-for-next {
+          width:100%;
+          text-align:center;
+          padding:20px 0;
           height:26px;
+
+          img {
+            width:26px;
+            height:26px;
+          }
+
         }
 
       }
 
     }
 
-  }
+    .map-container {
+      position:absolute;
+      top:0;
+      right:0;
+      bottom:0;
+      left:326px;
 
-  .map {
-    position:absolute;
-    top:0;
-    right:0;
-    bottom:0;
-    left:326px;
-
-    .popup-choices {
-      padding:0;
-
-      tr {
-        cursor:pointer;
+      .map-controls {
+        position:absolute;
+        top:12px;
+        right:12px;
       }
 
-      tr:hover td {
-        background-color:@blueish-white-hi;
-      }
+      .popup-choices {
+        padding:0;
 
-    } /* .popup-choices **/
+        tr {
+          cursor:pointer;
+        }
+
+        tr:hover td {
+          background-color:@blueish-white-hi;
+        }
+
+      } /* .popup-choices **/
 
 
-  } /** .map **/
+    } /** .map-container **/
 
-} /** .georesolution-body **/
+  } /** .modal-body **/
+
+} /** .geo-resolution-wrapper **/
