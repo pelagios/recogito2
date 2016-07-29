@@ -50,10 +50,9 @@
           <span class="hint">Edit document settings and metadata here</span>
         </li>
 
-        <li class="home tooltip bottom">
+        <li class="home">
           <a href="@controllers.my.routes.MyRecogitoController.index(username.toLowerCase, None)">
             <span class="icon">&#xe8bf;</span>
-            <span class="hint">Back to your home page</span>
           </a>
         </li>
       </ul>
@@ -97,7 +96,7 @@
     <div class="content">
       @content
     </div>
-    
+
     @views.html.document.initTooltips()
   </body>
 </html>

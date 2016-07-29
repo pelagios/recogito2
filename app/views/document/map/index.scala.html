@@ -64,10 +64,9 @@
         }
 
         @if(loggedInUser.isDefined) {
-          <li class="home tooltip bottom">
+          <li class="home">
             <a href="@controllers.my.routes.MyRecogitoController.index(loggedInUser.get.toLowerCase, None)">
               <span class="icon">&#xe8bf;</span>
-              <span class="hint">Back to your home page</span>
             </a>
           </li>
         }
@@ -88,7 +87,7 @@
         </div>
       </div>
     </div>
-    
+
     @views.html.document.initTooltips()
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.getAnnotation,
