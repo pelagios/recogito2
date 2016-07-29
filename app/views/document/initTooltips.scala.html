@@ -1,5 +1,4 @@
-@() {
-  <script>
-    if('ontouchstart' in window || navigator.MaxTouchPoints > 0) jQuery('.hint').switchClass('hint', 'hint-disabled');
-  </script>
-}
+@()
+<script>
+  (function() { if('ontouchstart' in window || navigator.MaxTouchPoints > 0) jQuery('.hint').addClass('hint-disabled').removeClass('hint'); })();
+</script>
