@@ -38,6 +38,10 @@ define(function() {
           }
         }
       };
+    },
+
+    disableTooltips : function() {
+      jQuery('.hint').switchClass('hint', 'hint-disabled');
     }
 
   };

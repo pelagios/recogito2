@@ -41,7 +41,7 @@ h2 {
   position:relative;
 }
 
-.tooltip .hint {
+.tooltip .hint, .tooltip .hint-disabled {
   font-family:PTSansNarrow;
   z-index:999;
   background-color:#000;
@@ -55,7 +55,7 @@ h2 {
   .rounded-corners(4px);
 }
 
-.tooltip:hover span {
+.tooltip:hover .hint {
   display:inline;
 }
 
