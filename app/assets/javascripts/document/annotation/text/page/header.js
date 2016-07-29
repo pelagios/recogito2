@@ -1,4 +1,4 @@
-define(['common/ui/touch', 'common/config'], function(Touch, Config) {
+define(['common/config'], function(Config) {
 
       // Duration for showing the 'Save OK' status info
   var SHOW_STATUS_SAVED_FOR_MS = 5000;
@@ -77,9 +77,6 @@ define(['common/ui/touch', 'common/config'], function(Touch, Config) {
         showSaveError = function(error) {
           // TODO implement
         };
-
-    if (Config.IS_TOUCH)
-      Touch.disableTooltips();
 
     this.incrementAnnotationCount = incrementAnnotationCount;
     this.updateContributorInfo = updateContributorInfo;

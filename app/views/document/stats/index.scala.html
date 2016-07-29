@@ -1,8 +1,10 @@
-@(loggedInUser: Option[String], document: models.generated.tables.records.DocumentRecord, accessLevel: models.document.DocumentAccessLevel)
+@(loggedInUser: Option[String], document: models.generated.tables.records.DocumentRecord,
+  accessLevel: models.document.DocumentAccessLevel)(implicit webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/stats/index.css")"/>
+    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
   </head>
   <body>
     <div class="header-iconbar">
@@ -59,5 +61,7 @@
         }
       </ul>
     </div> <!-- .header-iconbar -->
+
+    @views.html.document.initTooltips()
   </body>
 </html>

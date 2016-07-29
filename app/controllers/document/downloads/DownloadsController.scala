@@ -2,7 +2,7 @@ package controllers.document.downloads
 
 import akka.util.ByteString
 import akka.stream.scaladsl.Source
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, WebJarAssets }
 import javax.inject.Inject
 import models.annotation.AnnotationService
 import models.document.DocumentService
@@ -17,9 +17,10 @@ import scala.concurrent.ExecutionContext
 
 class DownloadsController @Inject() (
     val config: Configuration,
-    val annotations: AnnotationService, 
+    val annotations: AnnotationService,
     val documents: DocumentService,
     val users: UserService,
+    implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(config, documents, users) {
 
@@ -28,7 +29,7 @@ class DownloadsController @Inject() (
     documentResponse(documentId, loggedIn.user.getUsername,
         { case (document, fileparts, accesslevel) =>  Ok(views.html.document.downloads.index(Some(loggedIn.user.getUsername), document, accesslevel)) })
   }
-  
+
   def downloadAnnotations(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     annotations.findByDocId(documentId).map { annotations =>
       val enumerator = Enumerator.enumerate(annotations.map(t => Json.stringify(Json.toJson(t._1)) + "\n"))
@@ -36,5 +37,5 @@ class DownloadsController @Inject() (
       Ok.sendEntity(HttpEntity.Streamed(source, None, Some("app/json")))
     }
   }
-  
+
 }

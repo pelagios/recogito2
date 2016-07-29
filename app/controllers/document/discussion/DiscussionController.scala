@@ -1,6 +1,6 @@
 package controllers.document.discussion
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, WebJarAssets }
 import javax.inject.Inject
 import models.document.DocumentService
 import models.user.UserService
@@ -12,6 +12,7 @@ class DiscussionController @Inject() (
     val config: Configuration,
     documents: DocumentService,
     val users: UserService,
+    implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(config, documents, users) {
 

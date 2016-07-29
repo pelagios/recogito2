@@ -173,6 +173,7 @@
 
     <div id="content">@content</div>
 
+    @views.html.document.initTooltips()    
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
       controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,

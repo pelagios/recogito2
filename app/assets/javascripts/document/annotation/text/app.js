@@ -34,10 +34,8 @@ require([
           setColorscheme(colorscheme);
           toolbar.setCurrentColorscheme(colorscheme);
 
-          if (Config.IS_TOUCH) {
-            console.log('touch!');
+          if (Config.IS_TOUCH)
             contentNode.className = 'touch';
-          }
         },
 
         onAnnotationsLoaded = function(annotations) {

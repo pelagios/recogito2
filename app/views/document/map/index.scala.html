@@ -88,7 +88,8 @@
         </div>
       </div>
     </div>
-
+    
+    @views.html.document.initTooltips()
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.getAnnotation,
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInDocument,
