@@ -27,10 +27,10 @@ class SignupController @Inject() (
   // Only alphanumeric + a small set of special characters are valid in usernames
   private val VALID_CHARACTERS =
     (('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9') ++ Seq('_', '-', '.')).toSet
-    
+
   // We use usernames as first-level URL elements, therefore some are prohibited (cf. routes file)
-  private val RESERVED_NAMES =  
-    Set("admin", "api", "assets", "document", "favicon.ico", "guest", "login", "logout", "signup", "settings", "webjars")
+  private val RESERVED_NAMES =
+    Set("admin", "api", "assets", "document", "favicon.ico", "guest", "login", "logout", "pelagios", "recogito", "signup", "settings", "webjars")
 
   private val isNotReserved: Constraint[String] = Constraint("constraints.notreserved")({username =>
     if (RESERVED_NAMES.contains(username.toLowerCase))
@@ -38,7 +38,7 @@ class SignupController @Inject() (
     else
       Valid
   })
-    
+
   /** Username must be unique in DB, and may not contain special characters **/
   private val validAndAvailable: Constraint[String] = Constraint("constraints.valid")({ username =>
     // Check if username contains only valid characters

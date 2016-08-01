@@ -86,7 +86,17 @@ define([
 
           markerLayer = L.layerGroup(),
 
-          openPopup = function(marker, place) {
+          openUnlocatedPopup = function(popup) {
+            console.log('open unlocated popup');
+          },
+
+          openMapPopup = function(popup, marker) {
+            marker.bindPopup(popup[0]);
+            marker.getPopup().on('close', function() { marker.unbindPopup(); });
+            marker.openPopup();
+          },
+
+          openPopup = function(place, opt_marker) {
             var popup = jQuery(
                   '<div class="popup">' +
                     '<div class="popup-header">' +
@@ -145,9 +155,10 @@ define([
               close();
             });
 
-            marker.bindPopup(popup[0]);
-            marker.getPopup().on('close', function() { marker.unbindPopup(); });
-            marker.openPopup();
+            if (opt_marker)
+              openMapPopup(popup, opt_marker);
+            else
+              openUnlocatedPopup(popup);
           },
 
           onFlag = function() {
@@ -181,10 +192,12 @@ define([
                   result = new ResultCard(resultList, place),
                   marker = (coord) ? L.marker(coord).addTo(markerLayer) : false;
 
-              if (marker) {
-                result.on('click', function() { openPopup(marker, place); });
-                marker.on('click', function(e) { openPopup(marker, place); });
-              }
+              // Click on the list item opens popup (on marker, if any)
+              result.on('click', function() { openPopup(place, marker); });
+
+              // If there's a marker, click on the marker opens popup
+              if (marker)
+                marker.on('click', function(e) { openPopup(place, marker); });
             });
           },
 
@@ -221,7 +234,6 @@ define([
             map.refresh();
 
             clear();
-
             search();
           },
 
