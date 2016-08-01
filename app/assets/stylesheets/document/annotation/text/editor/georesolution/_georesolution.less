@@ -69,9 +69,23 @@
       position:relative;
 
       .result-header {
+        background-color:#fff;
+        color:@lightblue-type;
         padding:10px;
         border-bottom:1px solid @lightgrey-border;
         height:46px;
+        box-sizing:border-box;
+        font-size:15px;
+
+        div { display:inline-block; }
+
+        .icon { font-size:14px;  }
+
+        .result-took {
+          position:absolute;
+          right:15px;
+        }
+
       }
 
       .result-list {

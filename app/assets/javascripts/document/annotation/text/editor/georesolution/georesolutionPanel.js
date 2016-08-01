@@ -31,7 +31,12 @@ define([
                     '</div>' +
                     '<div class="modal-body">' +
                       '<div class="georesolution-sidebar">' +
-                        '<div class="result-header"></div>' +
+                        '<div class="result-header">'+
+                          '<div class="result-total">' +
+                            '<span class="icon">&#xf03a;</span> <span class="label"></span>' +
+                          '</div>' +
+                          '<div class="result-took"></div>' +
+                        '</div>' +
                         '<div class="result-list">' +
                           '<ul></ul>' +
                           '<div class="wait-for-next">' +
@@ -65,7 +70,9 @@ define([
           btnFlag         = element.find('.flag'),
           btnCancel       = element.find('.cancel'),
 
-          resultHeader    = element.find('.result-header'),
+          resultTotal     = element.find('.result-total .label'),
+          resultTook      = element.find('.result-took'),
+
           resultContainer = element.find('.result-list'),
           resultList      = element.find('.result-list ul'),
           waitForNext     = element.find('.wait-for-next'),
@@ -164,7 +171,8 @@ define([
             currentSearchResults = currentSearchResults.concat(response.items);
             currentSearchResultsTotal = response.total;
 
-            resultHeader.html("Total: " + response.total + ", took " + response.took);
+            resultTotal.html(response.total + ' Total');
+            resultTook.html('Took ' + response.took + 'ms');
 
             jQuery.each(response.items, function(idx, place) {
               var coord = (place.representative_point) ?

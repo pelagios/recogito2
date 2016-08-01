@@ -9,12 +9,11 @@ define([
 
         element = jQuery(
           '<li class="place-details">' +
-
             '<h3 class="title"></h3>' +
             '<p class="uris"></p>' +
-
             '<p class="description"></p>' +
-            '<p class="date"></p>' +'<p class="unlocated"></p>' +
+            '<p class="date"></p>' +
+            '<p class="unlocated"></p>' +
           '</li>'),
 
         titleEl       = element.find('.title'),
@@ -60,8 +59,7 @@ define([
           if (!place.representative_point)
             unlocatedEl.html('<span><span class="icon">&#xf071;</span> Unlocated Place</span>');
           else
-            unlocated.hide();
-
+            unlocatedEl.hide();
 
           ul.append(element);
         };
