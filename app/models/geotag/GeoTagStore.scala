@@ -7,6 +7,7 @@ import java.util.UUID
 import models.Page
 import models.annotation.{ Annotation, AnnotationBody }
 import models.place.{ ESPlaceStore, Place, PlaceStore }
+import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ Future, ExecutionContext }
 import storage.{ ES, HasES }
@@ -93,11 +94,16 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     // Since checking for changes would require an extra request cycle (and application-side comparison) anyway,
     // we just delete existing links and create the new ones
-    for {
+    val f = for {
       tagsToInsert <- buildGeoTags(annotation)
       deleteSuccess <- deleteGeoTagsByAnnotation(annotation.annotationId)
       insertSuccess <- if (deleteSuccess && tagsToInsert.size > 0) insertGeoTags(tagsToInsert) else Future.successful(deleteSuccess)
     } yield insertSuccess
+    
+    f.recover { case t: Throwable => 
+      Logger.error(t.getMessage)
+      false
+    }
   }
 
   /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/

@@ -10,6 +10,7 @@ import models.annotation.{ Annotation, AnnotationService }
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
 import scala.io.Source
@@ -43,8 +44,15 @@ trait RestoreAction extends HasDate {
         idx + 1)
     }
   
+  // TODO instead of just logging error, forward them to the UI
   private def parseAnnotations(lines: Iterator[String]) =
-    lines.map(line => Json.fromJson[Annotation](Json.parse(line)).get)
+    lines.map { line => 
+      val result = Json.fromJson[Annotation](Json.parse(line))
+      if (result.isError)
+        Logger.error(result.toString)
+      
+      result.get
+    }
  
   def restoreFromZip(file: File, annotationService: AnnotationService, documentService: DocumentService)(implicit ctx: ExecutionContext) = {
     val zipFile = new ZipFile(file)
