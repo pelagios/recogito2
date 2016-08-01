@@ -9,16 +9,19 @@ define([
 
         element = jQuery(
           '<li class="place-details">' +
+
             '<h3 class="title"></h3>' +
             '<p class="uris"></p>' +
+
             '<p class="description"></p>' +
-            '<p class="date"></p>' +
+            '<p class="date"></p>' +'<p class="unlocated"></p>' +
           '</li>'),
 
         titleEl       = element.find('.title'),
         urisEl        = element.find('.uris'),
         descriptionEl = element.find('.description'),
         dateEl        = element.find('.date'),
+        unlocatedEl   = element.find('.unlocated'),
 
         formatURI = function(uri) {
           var data = PlaceUtils.parseURI(uri),
@@ -53,6 +56,12 @@ define([
                         Formatting.yyyyMMddToYear(place.temporal_bounds.to));
           else
             dateEl.hide();
+
+          if (!place.representative_point)
+            unlocatedEl.html('<span><span class="icon">&#xf071;</span> Unlocated Place</span>');
+          else
+            unlocated.hide();
+
 
           ul.append(element);
         };
