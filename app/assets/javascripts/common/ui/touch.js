@@ -72,6 +72,11 @@ define(function() {
           }
         }
       };
+    },
+
+    enableTouchEvents : function() {
+      this.enableTap();
+      this.enableDoubleTap();
     }
 
   };

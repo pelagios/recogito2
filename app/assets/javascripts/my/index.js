@@ -120,10 +120,10 @@ require(['common/ui/touch', 'common/config'], function(Touch, Config) {
     // Double click on documents opens them
     jQuery('.document-panel').on('dblclick', '.document', openDocument);
 
+    // If mobile, explicitely enable tap events alongside normal click events
     if (Config.IS_TOUCH) {
-      Touch.enableTap();
-      Touch.enableDoubleTap();
-            jQuery('.document-panel').on('tap', '.document', onClick);
+      Touch.enableTouchEvents();
+      jQuery(document).on('tap', onClick);
       jQuery('.document-panel').on('doubletap', '.document', openDocument);
     }
   });
