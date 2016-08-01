@@ -77,17 +77,42 @@ define([
           resultList      = element.find('.result-list ul'),
           waitForNext     = element.find('.wait-for-next'),
 
+          mapContainer    = element.find('.map-container'),
+
           placeBody = false,
 
           currentSearchResults = [],
           currentSearchResultsTotal,
 
+          /**
+           * The map popup is handled by Leaflet, but we need keep track
+           * of the 'unlocated place' popup ourselves
+           */
+          unlocatedPopup = false,
+
           map = new Map(element.find('.map')),
 
           markerLayer = L.layerGroup(),
 
+          closeUnlocatedPopup = function() {
+            if (unlocatedPopup)
+              unlocatedPopup.remove();
+            unlocatedPopup = false;
+          },
+
           openUnlocatedPopup = function(popup) {
-            console.log('open unlocated popup');
+            var wrapper = jQuery(
+                  '<div class="unlocated popup-wrapper">' +
+                    '<div class="place-popup-content"></div>' +
+                  '</div>');
+
+            closeUnlocatedPopup();
+
+            unlocatedPopup = wrapper;
+            popup.prepend('<button class="nostyle outline-icon close">&#xe897;</button>');
+            wrapper.find('.place-popup-content').append(popup);
+            popup.on('click', '.close', closeUnlocatedPopup);
+            mapContainer.append(wrapper);
           },
 
           openMapPopup = function(popup, marker) {
