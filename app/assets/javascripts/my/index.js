@@ -121,7 +121,9 @@ require(['common/ui/touch', 'common/config'], function(Touch, Config) {
     jQuery('.document-panel').on('dblclick', '.document', openDocument);
 
     if (Config.IS_TOUCH) {
+      Touch.enableTap();
       Touch.enableDoubleTap();
+            jQuery('.document-panel').on('tap', '.document', onClick);
       jQuery('.document-panel').on('doubletap', '.document', openDocument);
     }
   });
