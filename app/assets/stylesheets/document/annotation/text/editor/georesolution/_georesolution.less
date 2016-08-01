@@ -141,6 +141,11 @@
 
     } /** .georesolution-sidebar **/
 
+    .map-container.unlocated .map {
+      filter: grayscale(1) contrast(0.6) brightness(1.1);
+      -webkit-filter: grayscale(1) contrast(0.45) brightness(1.1);
+    }
+
     .map-container {
       position:absolute;
       top:0;
@@ -174,6 +179,7 @@
         width:100%;
         height:100%;
         display:table;
+        pointer-events:none;
 
         .place-popup-content {
           display:table-cell;
@@ -187,6 +193,7 @@
             .rounded-corners(4px);
             .box-shadow(0, 3px, 14px, rgba(0, 0, 0, 0.4));
             overflow:hidden;
+            pointer-events:auto;
 
             button.close {
               position:absolute;

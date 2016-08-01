@@ -95,9 +95,11 @@ define([
           markerLayer = L.layerGroup(),
 
           closeUnlocatedPopup = function() {
-            if (unlocatedPopup)
+            if (unlocatedPopup) {
               unlocatedPopup.remove();
-            unlocatedPopup = false;
+              unlocatedPopup = false;
+              mapContainer.removeClass('unlocated');
+            }
           },
 
           openUnlocatedPopup = function(popup) {
@@ -107,6 +109,8 @@ define([
                   '</div>');
 
             closeUnlocatedPopup();
+            map.leafletMap.closePopup();
+            mapContainer.addClass('unlocated');
 
             unlocatedPopup = wrapper;
             popup.prepend('<button class="nostyle outline-icon close">&#xe897;</button>');
@@ -265,6 +269,7 @@ define([
 
           close = function() {
             placeBody = false;
+            closeUnlocatedPopup();
             waitForNext.hide();
             element.hide();
           },
