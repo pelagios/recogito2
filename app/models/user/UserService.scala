@@ -13,9 +13,8 @@ import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import play.api.Configuration
 import play.api.cache.CacheApi
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConversions._
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Either, Left, Right }
 import storage.{ DB, Uploads }
 import sun.security.provider.SecureRandom
@@ -25,6 +24,7 @@ class UserService @Inject() (
     val config: Configuration,
     val uploads: Uploads,
     implicit val cache: CacheApi,
+    implicit val ctx: ExecutionContext,
     implicit val db: DB
   ) extends BaseService with HasConfig with HasEncryption {
 
@@ -89,7 +89,7 @@ class UserService @Inject() (
   def findByUsername(username: String) =
     cachedLookup("user", username, findByUsernameNoCache)
 
-  def findByUsernameNoCache(username: String)(implicit db: DB) = db.query { sql =>
+  def findByUsernameNoCache(username: String) = db.query { sql =>
     val records =
       sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
          .where(USER.USERNAME.equal(username))
@@ -125,7 +125,7 @@ class UserService @Inject() (
       Seq.empty[String]
   }
   
-  def decryptEmail(user: UserRecord) = decrypt(user.getEmail)
+  def decryptEmail(email: String) = decrypt(email)
 
   def getUsedDiskspaceKB(username: String) =
     uploads.getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l)

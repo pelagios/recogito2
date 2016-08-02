@@ -32,7 +32,7 @@ class AccountSettingsController @Inject() (
 
   def index() = StackAction(AuthorityKey -> Normal) { implicit request =>
     val form = accountSettingsForm.fill(AccountSettingsData(
-      loggedIn.user.getEmail,
+      users.decryptEmail(loggedIn.user.getEmail),
       Option(loggedIn.user.getRealName),
       Option(loggedIn.user.getBio),
       Option(loggedIn.user.getWebsite)))
