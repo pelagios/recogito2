@@ -38,6 +38,9 @@ recogito.upload.dir = uploads
 # Max. disk space per user in MB
 recogito.upload.quota = 200
 
+# E-Mail encryption key (optional) 
+recogito.email.key = "my secret key"
+
 # Database configuration
 # ~~~~~
 # You can declare as many datasources as you want.

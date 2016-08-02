@@ -1,5 +1,6 @@
 package models.user
 
+import controllers.HasConfig
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.sql.Timestamp
@@ -10,6 +11,7 @@ import models.generated.Tables._
 import models.generated.tables.records.{ UserRecord, UserRoleRecord }
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
+import play.api.Configuration
 import play.api.cache.CacheApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.collection.JavaConversions._
@@ -19,7 +21,12 @@ import storage.{ DB, Uploads }
 import sun.security.provider.SecureRandom
 
 @Singleton
-class UserService @Inject() (implicit db: DB, cache: CacheApi, uploads: Uploads) extends BaseService {
+class UserService @Inject() (
+    val config: Configuration,
+    val uploads: Uploads,
+    implicit val cache: CacheApi,
+    implicit val db: DB
+  ) extends BaseService with HasConfig with HasEncryption {
 
   private val SHA_256 = "SHA-256"
 
@@ -32,7 +39,7 @@ class UserService @Inject() (implicit db: DB, cache: CacheApi, uploads: Uploads)
 
   def insertUser(username: String, email: String, password: String) = db.withTransaction { sql =>
     val salt = randomSalt
-    val user = new UserRecord(username, email, computeHash(salt + password), salt,
+    val user = new UserRecord(username, encrypt(email), computeHash(salt + password), salt,
       new Timestamp(new Date().getTime), null, null, null, true)
     sql.insertInto(USER).set(user).execute()
     user
@@ -66,7 +73,7 @@ class UserService @Inject() (implicit db: DB, cache: CacheApi, uploads: Uploads)
   def updateUserSettings(username: String, email: String, realname: Option[String], bio: Option[String], website: Option[String]) = db.withTransaction { sql =>
     val rows = 
       sql.update(USER)
-        .set(USER.EMAIL, email)
+        .set(USER.EMAIL, encrypt(email))
         .set(USER.REAL_NAME, realname.getOrElse(null))
         .set(USER.BIO, bio.getOrElse(null))
         .set(USER.WEBSITE, website.getOrElse(null))
@@ -117,6 +124,8 @@ class UserService @Inject() (implicit db: DB, cache: CacheApi, uploads: Uploads)
     else
       Seq.empty[String]
   }
+  
+  def decryptEmail(user: UserRecord) = decrypt(user.getEmail)
 
   def getUsedDiskspaceKB(username: String) =
     uploads.getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l)
