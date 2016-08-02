@@ -41,10 +41,8 @@ class DownloadsController @Inject() (
   
   def downloadCSV(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     annotations.findByDocId(documentId).map { annotations =>
-      Ok(toCSV(annotations.map(_._1))).withHeaders(
-        CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" },
-        CONTENT_TYPE -> "text/csv"
-      )
+      Ok(toCSV(annotations.map(_._1)))
+        .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
     }
   }
 

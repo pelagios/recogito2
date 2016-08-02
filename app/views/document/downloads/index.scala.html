@@ -74,7 +74,8 @@
             <li>
               <div class="description">
                 <h3>CSV</h3>
-                <p>Download annotations as a table, to open in a spreadsheet or GIS. Semicolon is used as separation character.</p>
+                <p>Download annotations as a data table for import into spreadsheet software or
+                  a GIS.</p>
               </div>
               <div class="button-container">
                 <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(document.getId)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
@@ -84,7 +85,8 @@
             <li>
               <div class="description">
                 <h3>RDF</h3>
-                <p>Download annotations and document metadata as RDF (Open Annotation model and Dublin Core).</p>
+                <p>Download annotations and document metadata as RDF. Annotations are encoded in the Open Annotation
+                  model. Metadata is Dublin Core.</p>
               </div>
               <div class="button-container">
                 <a class="btn small disabled"><span class="icon">&#xf019;</span> RDF/Turtle</a>
@@ -101,7 +103,7 @@
           <li>
             <div class="description">
               <h3>GeoJSON</h3>
-              <p>Places as a GeoJSON FeatureCollection.</p>
+              <p>The confirmed geo-located places in the document as a GeoJSON FeatureCollection.</p>
             </div>
             <div class="button-container">
               <a class="btn small disabled"><span class="icon">&#xf019;</span> GeoJSON</a>
