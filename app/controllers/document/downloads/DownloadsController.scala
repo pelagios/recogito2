@@ -3,6 +3,7 @@ package controllers.document.downloads
 import akka.util.ByteString
 import akka.stream.scaladsl.Source
 import controllers.{ BaseAuthController, WebJarAssets }
+import controllers.document.downloads.serializers._
 import javax.inject.Inject
 import models.annotation.AnnotationService
 import models.document.DocumentService
@@ -22,7 +23,7 @@ class DownloadsController @Inject() (
     val users: UserService,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
-  ) extends BaseAuthController(config, documents, users) {
+  ) extends BaseAuthController(config, documents, users) with CSVSerializer {
 
   /** TODO this view should be available without login, if the document is set to public **/
   def showDownloadOptions(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
@@ -35,6 +36,15 @@ class DownloadsController @Inject() (
       val enumerator = Enumerator.enumerate(annotations.map(t => Json.stringify(Json.toJson(t._1)) + "\n"))
       val source = Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)).map(ByteString.apply)
       Ok.sendEntity(HttpEntity.Streamed(source, None, Some("app/json")))
+    }
+  }
+  
+  def downloadCSV(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    annotations.findByDocId(documentId).map { annotations =>
+      Ok(toCSV(annotations.map(_._1))).withHeaders(
+        CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" },
+        CONTENT_TYPE -> "text/csv"
+      )
     }
   }
 

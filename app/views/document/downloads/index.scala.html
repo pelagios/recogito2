@@ -77,7 +77,7 @@
                 <p>Download annotations as a table, to open in a spreadsheet or GIS. Semicolon is used as separation character.</p>
               </div>
               <div class="button-container">
-                <button class="btn small disabled"><span class="icon">&#xf019;</span> CSV</button>
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(document.getId)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
               </div>
             </li>
 
@@ -87,8 +87,8 @@
                 <p>Download annotations and document metadata as RDF (Open Annotation model and Dublin Core).</p>
               </div>
               <div class="button-container">
-                <button class="btn small disabled"><span class="icon">&#xf019;</span> RDF/Turtle</button>
-                <button class="btn small disabled"><span class="icon">&#xf019;</span> RDF/XML</button>
+                <a class="btn small disabled"><span class="icon">&#xf019;</span> RDF/Turtle</a>
+                <a class="btn small disabled"><span class="icon">&#xf019;</span> RDF/XML</a>
               </div>
             </li>
           </ul>
@@ -104,7 +104,7 @@
               <p>Places as a GeoJSON FeatureCollection.</p>
             </div>
             <div class="button-container">
-              <button class="btn small disabled"><span class="icon">&#xf019;</span> GeoJSON</button>
+              <a class="btn small disabled"><span class="icon">&#xf019;</span> GeoJSON</a>
             </div>
           </li>
         </div>
