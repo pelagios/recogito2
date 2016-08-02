@@ -66,18 +66,57 @@
     </div> <!-- .sidebar -->
 
     <div class="content">
-      <h2>Download Options</h2>
-      <table>
-        <tbody>
-          <tr>
-            <td class="download-type">Annotations</td>
-            <td class="download-format">
-              <a href="@controllers.document.downloads.routes.DownloadsController.downloadAnnotations(document.getId)">newline-delimited JSON</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="panel">
+        <h2>Annotations</h2>
+        <div class="inner">
+          <ul>
+            <li>
+              <div class="description">
+                <h3>CSV</h3>
+                <p>Download annotations as a table, to open in a spreadsheet or GIS. Semicolon is used as separation character.</p>
+              </div>
+              <div class="button-container">
+                <button class="btn small disabled"><span class="icon">&#xf019;</span> CSV</button>
+              </div>
+            </li>
+
+            <li>
+              <div class="description">
+                <h3>RDF</h3>
+                <p>Download annotations and document metadata as RDF (Open Annotation model and Dublin Core).</p>
+              </div>
+              <div class="button-container">
+                <button class="btn small disabled"><span class="icon">&#xf019;</span> RDF/Turtle</button>
+                <button class="btn small disabled"><span class="icon">&#xf019;</span> RDF/XML</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Download Places</h2>
+        <div class="inner">
+          <li>
+            <div class="description">
+              <h3>GeoJSON</h3>
+              <p>Places as a GeoJSON FeatureCollection.</p>
+            </div>
+            <div class="button-container">
+              <button class="btn small disabled"><span class="icon">&#xf019;</span> GeoJSON</button>
+            </div>
+          </li>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Annotated Document</h2>
+        <div class="inner">
+          <p class="no-options">No download options available yet.</p>
+        </div>
+      </div>
     </div>
+
     @views.html.document.initTooltips()
   </body>
 </html>

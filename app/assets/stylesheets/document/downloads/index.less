@@ -4,28 +4,75 @@
 
 .content {
   position:absolute;
-  top:70px;
-  right:0;
-  bottom:0;
+  top:71px;
   left:200px;
+  right:0;
   padding:20px 30px;
-  color:@standard-type;
 
-  h2 {
-    font-weight:normal;
-    padding:10px 0;
+  .inner {
+    padding:0;
   }
 
-  table {
-    width:400px;
+  ul {
+    list-style-type:none;
+    margin:0;
+    padding:0;
   }
 
-  td {
-    background-color:@blueish-white-hi;
-    padding:2px 8px;
+  li {
+    position:relative;
+    display:block;
+    padding:15px;
+    border-bottom:1px solid @lightgrey-border-darker;
+
+    h3, p {
+      margin:0;
+    }
+
+    h3 {
+      font-weight:normal;
+      font-size:18px;
+      padding:0;
+    }
+
+    p {
+      color:@grey-type;
+    }
+
+    .description {
+      padding-right:300px;
+    }
+
+    .button-container {
+      position:absolute;
+      top:0;
+      right:15px;
+      height:100%;
+      width:400px;
+      text-align:right;
+
+      button {
+        position:relative;
+        top:30%;
+        padding:4px 10px;
+        width:102px;
+
+        .icon { padding-right: 5px; }
+
+      }
+
+    }
+
+  } /** li **/
+
+  li:last-child {
+    border-bottom:none;
   }
 
-  a { color:@lightgrey-type; }
-  a:hover { color:@lightgrey-type-hover; }
+  .no-options {
+    margin:0;
+    padding:15px;
+    color:@grey-type;
+  }
 
 }
