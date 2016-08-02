@@ -6,7 +6,7 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import models.user.UserService
 import play.api.Configuration
 import play.api.cache.CacheApi
-import play.api.mvc.Result
+import play.api.mvc.{ AnyContent, Result, Request }
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Logger
 import scala.concurrent.Future
@@ -17,6 +17,7 @@ abstract class BaseOptAuthController(
     documents: DocumentService,
     users: UserService
   ) extends BaseController(config, users) with OptionalAuthElement {
+  
   
   /** Helper that covers the boilerplate for all document views
     *
@@ -33,6 +34,20 @@ abstract class BaseOptAuthController(
       t.printStackTrace()
       InternalServerError(t.getMessage)    
     }
+  }
+  
+  /** Helper that covers the boilerplate for document views requiring read access **/
+  protected def documentReadResponse(documentId: String, maybeUser: Option[String],
+      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Future[Result])(implicit request: Request[AnyContent])  = {
+    
+    documentResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
+      if (accesslevel.canRead)
+        response(document, fileparts, accesslevel)
+      else if (maybeUser.isEmpty) // No read rights - but user is not logged in yet 
+        authenticationFailed(request)        
+      else
+        Future.successful(ForbiddenPage)
+    })
   }
   
   /** Helper that covers the boilerplate for all document part views **/
