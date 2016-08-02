@@ -11,18 +11,21 @@ trait CSVSerializer extends BaseSerializer {
   def toCSV(annotations: Seq[Annotation]) = {
     
     def serializeOne(a: Annotation) = {
-      getFirstQuote(a).getOrElse(EMPTY) + SEPARATOR + 
-      EMPTY + SEPARATOR + // TODO type
-      EMPTY + SEPARATOR + // TODO uri
-      EMPTY + SEPARATOR + // TODO vocab label
-      EMPTY + SEPARATOR + // TODO lat
-      EMPTY + SEPARATOR + // TODO lng
-      EMPTY + SEPARATOR // TODO status
+      val firstEntity = getFirstEntityBody(a)
+      a.annotationId + SEPARATOR +
+      getFirstQuote(a).getOrElse(EMPTY) + SEPARATOR +
+      a.anchor + SEPARATOR +
+      firstEntity.map(_.hasType.toString).getOrElse(EMPTY) + SEPARATOR +
+      firstEntity.flatMap(_.uri).getOrElse(EMPTY) + SEPARATOR +
+      EMPTY + SEPARATOR + // TODO resolve vocab label
+      EMPTY + SEPARATOR + // TODO resolve lat
+      EMPTY + SEPARATOR + // TODO resolve lng
+      firstEntity.flatMap(_.status.map(_.value)).getOrElse(EMPTY) + SEPARATOR
     }
     
-    val header = Seq("quote", "type", "uri", "vocab_label", "lat", "lng", "verification_status")
+    val header = Seq("UUID", "QUOTE", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "VERIFICATION_STATUS")
     header.mkString(SEPARATOR) + NEWLINE +
-    annotations.map(serializeOne(_)).mkString(NEWLINE)
+    sortByCharOffset(annotations).map(serializeOne).mkString(NEWLINE)
   }
   
 }
