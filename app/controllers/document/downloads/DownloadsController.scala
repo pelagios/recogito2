@@ -24,7 +24,9 @@ class DownloadsController @Inject() (
     implicit val places: PlaceService,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(config, documents, users) with CSVSerializer {
+  ) extends BaseOptAuthController(config, documents, users)
+      with CSVSerializer
+      with GeoJSONSerializer {
 
   def showDownloadOptions(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user.getUsername)
@@ -49,6 +51,16 @@ class DownloadsController @Inject() (
     documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       annotationsToCSV(documentId).map { csv =>
         Ok(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
+      }
+    })
+  }
+
+  def downloadGeoJSON(documentId: String) = AsyncStack { implicit request =>
+    val maybeUser = loggedIn.map(_.user.getUsername)
+    documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
+      placesToGeoJSON(documentId).map { featureCollection =>
+        Ok(Json.prettyPrint(Json.toJson(featureCollection)))
+          .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
       }
     })
   }
