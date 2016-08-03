@@ -9,11 +9,13 @@ require([
   'document/annotation/text/page/header',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
+  'document/annotation/text/selection/selectionHandler',
   'common/utils/annotationUtils',
   'common/api',
   'common/config'],
 
-  function(ReadEditor, WriteEditor, Header, Toolbar, Highlighter, AnnotationUtils, API, Config) {
+  function(ReadEditor, WriteEditor, Header, Toolbar, Highlighter, SelectionHandler,
+    AnnotationUtils, API, Config) {
 
   jQuery(document).ready(function() {
 
@@ -23,7 +25,11 @@ require([
 
         contentNode = document.getElementById('content'),
 
-        editor = (Config.writeAccess) ? new WriteEditor(contentNode) : new ReadEditor(contentNode),
+        highlighter = new Highlighter(contentNode),
+
+        editor = (Config.writeAccess) ?
+          new WriteEditor(contentNode, highlighter, new SelectionHandler(contentNode, highlighter)) :
+          new ReadEditor(contentNode, highlighter),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
@@ -39,8 +45,7 @@ require([
         },
 
         onAnnotationsLoaded = function(annotations) {
-          var highlighter = new Highlighter(contentNode),
-              sorted = AnnotationUtils.sortByOffsetDesc(annotations),
+          var sorted = AnnotationUtils.sortByOffsetDesc(annotations),
               hash = (window.location.hash) ? window.location.hash.substring(1) : false,
               preselected;
 

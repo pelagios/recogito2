@@ -10,14 +10,11 @@ define([
   'common/api',
   'document/annotation/common/editor/editorBase',
   'document/annotation/common/editor/replyField',
-  'document/annotation/common/editor/georesolution/georesolutionPanel',
-  'document/annotation/text/selection/highlighter',
-  'document/annotation/text/selection/selectionHandler'],
+  'document/annotation/common/editor/georesolution/georesolutionPanel'],
 
-  function(AnnotationUtils, PlaceUtils, API, EditorBase, ReplyField, GeoresolutionPanel,
-    Highlighter, SelectionHandler) {
+  function(AnnotationUtils, PlaceUtils, API, EditorBase, ReplyField, GeoresolutionPanel) {
 
-  var WriteEditor = function(container) {
+  var WriteEditor = function(container, highlighter, selectionHandler) {
     var self = this,
 
         element = (function() {
@@ -69,9 +66,9 @@ define([
 
         replyField = new ReplyField(replyContainer),
 
-        highlighter = new Highlighter(container),
+        // highlighter = new Highlighter(container),
 
-        selectionHandler = new SelectionHandler(container, highlighter),
+        // selectionHandler = new SelectionHandler(container, highlighter),
 
         georesolutionPanel = new GeoresolutionPanel(),
 

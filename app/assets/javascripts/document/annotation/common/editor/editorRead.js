@@ -1,7 +1,7 @@
 
 define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
-  var ReadEditor = function(container) {
+  var ReadEditor = function(container, highlighter) {
     var self = this,
 
         element = (function() {
@@ -32,10 +32,11 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
           element.hide();
         };
 
-    EditorBase.apply(this, [ container, element ]);
+    EditorBase.apply(this, [ container, element, highlighter ]);
 
     // Click on annotation span opens the editor
     jQuery(container).on('click', '.annotation', viewAnnotation);
+
 
     // Editor closes on ESC key and click on background document
     self.on('escape', onClose);

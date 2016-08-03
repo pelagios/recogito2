@@ -6,10 +6,9 @@
  */
 define([
   'document/annotation/common/editor/sections/sectionList',
-  'document/annotation/text/selection/highlighter',
-  'common/hasEvents'], function(SectionList, Highlighter, HasEvents) {
+  'common/hasEvents'], function(SectionList, HasEvents) {
 
-  var EditorBase = function(container, element, opt_highlighter) {
+  var EditorBase = function(container, element, highlighter) {
     var self = this,
 
         /** Handles common key events **/
@@ -30,8 +29,9 @@ define([
     // Fields accessible to prototype methods
     this.container = container;
     this.element = element;
+    // this.highlighter = (opt_highlighter) ? opt_highlighter : new Highlighter(container);
+    this.highlighter = highlighter;
     this.sectionList = new SectionList(element.find('.sections'));
-    this.highlighter = (opt_highlighter) ? opt_highlighter : new Highlighter(container);
     this.currentAnnotation = false;
 
     // Monitor key events
