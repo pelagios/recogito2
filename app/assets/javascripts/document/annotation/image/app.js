@@ -5,9 +5,10 @@ require.config({
 
 require([
   'common/config',
-  'document/annotation/image/selection/pointSelector'],
+  'document/annotation/common/editor/editorWrite',
+  'document/annotation/image/selection/pointSelectionHandler'],
 
-  function(Config, PointSelector) {
+  function(Config, WriteEditor, PointSelectionHandler) {
 
   jQuery(document).ready(function() {
 
@@ -16,6 +17,8 @@ require([
         BASE_URL = '/document/' + Config.documentId + '/part/' + Config.partSequenceNo + '/tiles/',
 
         selector,
+
+        editor,
 
         initDropdown = function(element) {
           element.hide();
@@ -49,7 +52,8 @@ require([
                 })
               });
 
-          selector = new PointSelector(olMap);
+          selector = new PointSelectionHandler(contentDiv, olMap);
+          editor = new WriteEditor(contentDiv, false, selector);
         },
 
         loadManifest = function() {

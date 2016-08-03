@@ -66,10 +66,6 @@ define([
 
         replyField = new ReplyField(replyContainer),
 
-        // highlighter = new Highlighter(container),
-
-        // selectionHandler = new SelectionHandler(container, highlighter),
-
         georesolutionPanel = new GeoresolutionPanel(),
 
         annotationMode = { mode: 'NORMAL' },

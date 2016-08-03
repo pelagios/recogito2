@@ -29,7 +29,6 @@ define([
     // Fields accessible to prototype methods
     this.container = container;
     this.element = element;
-    // this.highlighter = (opt_highlighter) ? opt_highlighter : new Highlighter(container);
     this.highlighter = highlighter;
     this.sectionList = new SectionList(element.find('.sections'));
     this.currentAnnotation = false;
@@ -104,7 +103,11 @@ define([
     this.currentAnnotation = false;
   };
 
-  /** Moves the editor to the previous annotation **/
+  /**
+   * Moves the editor to the previous annotation
+   *
+   * TODO this is a hard-wired dependency to the text annotation UI - REFACTOR!
+   */
   EditorBase.prototype.toPreviousAnnotation = function() {
     var currentSpan = jQuery('*[data-id="' + this.currentAnnotation.annotation_id + '"]'),
         firstSpan = currentSpan[0],
@@ -117,7 +120,11 @@ define([
     }
   };
 
-  /** Moves the editor to the next annotation **/
+  /**
+   * Moves the editor to the next annotation
+   *
+   * TODO this is a hard-wired dependency to the text annotation UI - REFACTOR!
+   */
   EditorBase.prototype.toNextAnnotation = function() {
     var currentSpan = jQuery('*[data-id="' + this.currentAnnotation.annotation_id + '"]'),
         lastSpan = currentSpan[currentSpan.length - 1],

@@ -37,7 +37,6 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
     // Click on annotation span opens the editor
     jQuery(container).on('click', '.annotation', viewAnnotation);
 
-
     // Editor closes on ESC key and click on background document
     self.on('escape', onClose);
     jQuery(document).on('click', ':not(> .text-annotation-editor)', onClose);
