@@ -27,10 +27,10 @@ trait GeoTagStore extends PlaceStore {
   def findGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Seq[GeoTag]]
 
   /** Lists all places in a document **/
-  def listPlacesInDocument(docId: String, offset: Int = 0, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
+  def listPlacesInDocument(docId: String, offset: Int = 0, limit: Int = ES.MAX_SIZE)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
 
   /** Search places in a document **/
-  def searchPlacesInDocument(query: String, docId: String, offset: Int = 0, limit: Int = 20)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
+  def searchPlacesInDocument(query: String, docId: String, offset: Int = 0, limit: Int = ES.MAX_SIZE)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
 
 }
 
@@ -99,8 +99,8 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       deleteSuccess <- deleteGeoTagsByAnnotation(annotation.annotationId)
       insertSuccess <- if (deleteSuccess && tagsToInsert.size > 0) insertGeoTags(tagsToInsert) else Future.successful(deleteSuccess)
     } yield insertSuccess
-    
-    f.recover { case t: Throwable => 
+
+    f.recover { case t: Throwable =>
       Logger.error(t.getMessage)
       false
     }

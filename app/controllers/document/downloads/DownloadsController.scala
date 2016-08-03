@@ -7,6 +7,7 @@ import controllers.document.downloads.serializers._
 import javax.inject.Inject
 import models.annotation.AnnotationService
 import models.document.DocumentService
+import models.place.PlaceService
 import models.user.UserService
 import play.api.Configuration
 import play.api.libs.json.Json
@@ -17,9 +18,10 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 class DownloadsController @Inject() (
     val config: Configuration,
-    val annotations: AnnotationService,
-    val documents: DocumentService,
     val users: UserService,
+    implicit val annotations: AnnotationService,
+    implicit val documents: DocumentService,
+    implicit val places: PlaceService,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
   ) extends BaseOptAuthController(config, documents, users) with CSVSerializer {
@@ -41,13 +43,12 @@ class DownloadsController @Inject() (
       }
     })
   }
-  
+
   def downloadCSV(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user.getUsername)
     documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
-      annotations.findByDocId(documentId).map { annotations =>
-        Ok(toCSV(annotations.map(_._1)))
-          .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
+      annotationsToCSV(documentId).map { csv =>
+        Ok(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
       }
     })
   }

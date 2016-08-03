@@ -45,7 +45,7 @@ trait PlaceStore {
   def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]]
 
   /** Place search **/
-  def searchPlaces(query: String, offset: Int = 0, limit: Int = 20, sortFrom: Option[Coordinate] = None)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
+  def searchPlaces(query: String, offset: Int = 0, limit: Int = ES.MAX_SIZE, sortFrom: Option[Coordinate] = None)(implicit context: ExecutionContext): Future[Page[(Place, Long)]]
 
 }
 
@@ -164,7 +164,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
           )
         }
       } start offset limit limit
-      
+
       sortFrom match {
         case Some(coord) => query sort ( geoSort("representative_point") point(coord.y, coord.x) order SortOrder.ASC )
         case None        => query
@@ -172,7 +172,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
     } map { response =>
       val places = response.as[(Place, Long)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, limit, places)
-    } 
+    }
   }
 
   private def scrollByGazetteer(gazetteer: String, fn: Place => Future[Boolean])(implicit context: ExecutionContext) = {

@@ -111,17 +111,17 @@ class AnnotationAPIController @Inject() (
     (docId, partNo) match {
       case (id, Some(seqNo)) =>
         // Load annotations for specific doc part
-        documents.findPartByDocAndSeqNo(id, seqNo).flatMap(_ match {
+        documents.findPartByDocAndSeqNo(id, seqNo).flatMap {
           case Some(filepart) =>
             annotations.findByFilepartId(filepart.getId)
-              .map{ annotations =>
+              .map { annotations =>
                 // Join in places, if requested
                 jsonOk(Json.toJson(annotations.map(_._1)))
               }
 
           case None =>
             Future.successful(NotFoundPage)
-        })
+        }
 
       case (id, None) =>
         // Load annotations for entire doc
@@ -154,7 +154,7 @@ class AnnotationAPIController @Inject() (
 
   def createAnnotation() = AsyncStack { implicit request =>
     request.body.asJson match {
-      case Some(json) => {
+      case Some(json) =>
         Json.fromJson[AnnotationStub](json) match {
           case s: JsSuccess[AnnotationStub] => {
             // Fetch the associated document to check access privileges
@@ -177,30 +177,26 @@ class AnnotationAPIController @Inject() (
                 }
               }
 
-              case None => {
+              case None =>
                 Logger.warn("POST to /annotations but annotation points to unknown document: " + s.get.annotates.documentId)
                 Future.successful(NotFoundPage)
-              }
             })
           }
 
-          case e: JsError => {
+          case e: JsError =>
             Logger.warn("POST to /annotations but invalid JSON: " + e.toString)
             Future.successful(BadRequest)
-          }
         }
-      }
 
-      case None => {
+      case None =>
         Logger.warn("POST to /annotations but no JSON payload")
         Future.successful(BadRequest)
-      }
 
     }
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
-    annotations.findById(id).flatMap(_ match {
+    annotations.findById(id).flatMap {
       case Some((annotation, _)) => {
         if (includeContext) {
           // Fetch the document, so we know the owner...
@@ -209,34 +205,30 @@ class AnnotationAPIController @Inject() (
             case Some((document, parts, accesslevel)) =>
               if (accesslevel.canRead) {
                 // ...then fetch the content
-                parts.filter(_.getId == annotation.annotates.filepartId).headOption match {
+                parts.find(_.getId == annotation.annotates.filepartId) match {
                   case Some(filepart) => uploads.readTextfile(document.getOwner, document.getId, filepart.getFilename) match {
-                    case Some(text) => {
+                    case Some(text) =>
                       val snippet = extractTextSnippet(text, annotation)
                       jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))
-                    }
 
-                    case None => {
+                    case None =>
                       Logger.warn("No text content found for filepart " + annotation.annotates.filepartId)
                       InternalServerError
-                    }
                   }
 
-                  case None => {
+                  case None =>
                     // Annotation referenced a part ID that's not in the database
                     Logger.warn("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
                     InternalServerError
-                  }
                 }
               } else {
                 // No read permission on this document
                 ForbiddenPage
               }
 
-            case None => {
+            case None =>
               Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
               NotFoundPage
-            }
           })
         } else {
           Future.successful(jsonOk(Json.toJson(annotation)))
@@ -244,7 +236,7 @@ class AnnotationAPIController @Inject() (
       }
 
       case None => Future.successful(NotFoundPage)
-    })
+    }
   }
 
   private def createDeleteContribution(annotation: Annotation, user: String, time: DateTime) =
@@ -265,22 +257,22 @@ class AnnotationAPIController @Inject() (
     )
 
   def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>
-    annotations.findById(id).flatMap(_ match {
-      case Some((annotation, version)) => {
+    annotations.findById(id).flatMap {
+      case Some((annotation, version)) =>
         // Fetch the associated document
-        documents.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
+        documents.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
           case Some((document, accesslevel)) => {
             if (accesslevel.canWrite) {
               val user = loggedIn.map(_.user.getUsername).getOrElse("guest")
               val now = DateTime.now
-              annotations.deleteAnnotation(id, user, now).flatMap(_ match {
+              annotations.deleteAnnotation(id, user, now).flatMap {
                 case Some(annotation) =>
                   contributions.insertContribution(createDeleteContribution(annotation, user, now)).map(success =>
                     if (success) Status(200) else InternalServerError)
-    
+
                 case None =>
                   Future.successful(NotFoundPage)
-              })
+              }
             } else {
               Future.successful(ForbiddenPage)
             }
@@ -291,11 +283,10 @@ class AnnotationAPIController @Inject() (
             Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
             Future.successful(InternalServerError)
           }
-        })
-      }
+        }
 
       case None => Future.successful(NotFoundPage)
-    })
+    }
   }
 
 }
