@@ -69,13 +69,13 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     else
       Future.sequence(placeBodies.map(body =>
-        findByURI(body.uri.get).map(_ match {
+        findByURI(body.uri.get).map {
           case Some((place, version)) => createGeoTag(annotation, body, place.id)
 
           case None =>
             // Annotation links to a place not found in the gazetteer - can never happen unless something's broken
             throw new Exception("Annotation " + annotation.annotationId + " links to " + body.uri.get + " - but not found in gazetteer")
-        })
+        }
       ))
   }
 
@@ -97,7 +97,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     val f = for {
       tagsToInsert <- buildGeoTags(annotation)
       deleteSuccess <- deleteGeoTagsByAnnotation(annotation.annotationId)
-      insertSuccess <- if (deleteSuccess && tagsToInsert.size > 0) insertGeoTags(tagsToInsert) else Future.successful(deleteSuccess)
+      insertSuccess <- if (deleteSuccess && tagsToInsert.nonEmpty) insertGeoTags(tagsToInsert) else Future.successful(deleteSuccess)
     } yield insertSuccess
 
     f.recover { case t: Throwable =>
@@ -109,7 +109,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
   override def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
     findGeoTagsByAnnotationWithId(annotationId.toString).flatMap { idsAndLinks =>
-      if (idsAndLinks.size > 0) {
+      if (idsAndLinks.nonEmpty) {
         es.client execute {
           bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.RECOGITO / ES.GEOTAG } )
         } map {
@@ -135,7 +135,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   override def findGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Seq[GeoTag]] =
     findGeoTagsByAnnotationWithId(annotationId.toString).map(_.map(_._2))
 
-  override def listPlacesInDocument(docId: String, offset: Int = 0, limit: Int = 20)(implicit context: ExecutionContext) =
+  override def listPlacesInDocument(docId: String, offset: Int, limit: Int)(implicit context: ExecutionContext) =
     es.client execute {
       search in ES.RECOGITO / ES.PLACE query {
         hasChildQuery(ES.GEOTAG).query {
