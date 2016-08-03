@@ -15,7 +15,7 @@ class AdminController @Inject() (
         
   /** TODO placeholder **/
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>
-    Redirect(controllers.admin.gazetteers.routes.GazetteerAdminController.index)
+    Redirect(controllers.admin.gazetteers.routes.GazetteerAdminController.index())
   }
   
 }

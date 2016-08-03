@@ -47,20 +47,17 @@ class AnnotationController @Inject() (
       case Some(ContentType.IMAGE_UPLOAD) =>
         Future.successful(Ok(views.html.document.annotation.image(loggedInUser, document, parts, thisPart, accesslevel)))
 
-      case Some(ContentType.TEXT_PLAIN) => {
+      case Some(ContentType.TEXT_PLAIN) =>
         uploads.readTextfile(document.getOwner, document.getId, thisPart.getFilename) match {
-          case Some(content) => {
+          case Some(content) =>
             annotations.countByDocId(document.getId).map(documentAnnotationCount =>
               Ok(views.html.document.annotation.text(loggedInUser, document, parts, thisPart, documentAnnotationCount, accesslevel, content)))
-          }
-          
-          case None => {
+
+          case None =>
             // Filepart found in DB, but not file on filesystem
             Logger.error("Filepart recorded in the DB is missing on the filesystem: " + document.getOwner + ", " + document.getId)
             Future.successful(InternalServerError)
-          }
         }
-      }
 
       case _ =>
         // Unknown content type in DB, or content type we don't have an annotation view for - should never happen

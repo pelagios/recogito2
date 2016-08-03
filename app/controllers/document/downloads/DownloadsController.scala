@@ -14,7 +14,7 @@ import play.api.libs.json.Json
 import play.api.libs.iteratee.Enumerator
 import play.api.http.HttpEntity
 import play.api.libs.streams.Streams
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 
 class DownloadsController @Inject() (
     val config: Configuration,
