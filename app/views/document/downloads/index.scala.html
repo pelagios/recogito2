@@ -1,9 +1,23 @@
 @(loggedInUser: Option[String], document: models.generated.tables.records.DocumentRecord,
-  accessLevel: models.document.DocumentAccessLevel)(implicit webjars: WebJarAssets)
+  accessLevel: models.document.DocumentAccessLevel,
+  documentAnnotationCount: Long)(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Downloads | @Option(document.getAuthor).map(_ + ": ")@document.getTitle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"> @if(document.getIsPublic) {
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@@pelagiosproject" />
+    <meta property="og:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
+    <meta name="twitter:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
+    <meta property="og:description" content="Download CSV | GeoJSON" />
+    <meta name="twitter:description" content="Download CSV | GeoJSON" />
+    <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+    <meta property="og:image:width" content="240" />
+    <meta property="og:image:height" content="240" />
+    <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+    <meta property="og:url" content="@controllers.document.downloads.routes.DownloadsController.showDownloadOptions(document.getId).absoluteURL" /> }
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/downloads/index.css")"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
   </head>

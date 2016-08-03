@@ -31,7 +31,9 @@ class DownloadsController @Inject() (
   def showDownloadOptions(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user.getUsername)
     documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
-      Future.successful(Ok(views.html.document.downloads.index(maybeUser, document, accesslevel)))
+      annotations.countByDocId(documentId).map { documentAnnotationCount =>
+        Ok(views.html.document.downloads.index(maybeUser, document, accesslevel, documentAnnotationCount))
+      }
     })
   }
 

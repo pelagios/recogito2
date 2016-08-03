@@ -34,7 +34,6 @@ object GeoJSONFeature extends HasGeometry {
     (JsPath \ "type").write[String] and
     (JsPath \ "geometry").write[Geometry] and
     (JsPath \ "properties").write[JsObject]
-    // TODO properties
   )(f => ("Feature", f.geometry, f.propertiesAsJSON))
   
 }
