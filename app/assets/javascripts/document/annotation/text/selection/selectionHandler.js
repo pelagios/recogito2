@@ -1,4 +1,8 @@
-define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
+define([
+  'common/config',
+  'document/annotation/common/selection/abstractSelectionHandler'],
+
+  function(Config, AbstractSelectionHandler) {
 
   var SelectionHandler = function(rootNode, highlighter) {
 
@@ -109,9 +113,9 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
     this.clearSelection = clearSelection;
     this.getSelection = getSelection;
 
-    HasEvents.apply(this);
+    AbstractSelectionHandler.apply(this);
   };
-  SelectionHandler.prototype = Object.create(HasEvents.prototype);
+  SelectionHandler.prototype = Object.create(AbstractSelectionHandler.prototype);
 
   return SelectionHandler;
 

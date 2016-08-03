@@ -1,4 +1,8 @@
-define(['common/utils/annotationUtils'], function(AnnotationUtils) {
+define([
+  'common/utils/annotationUtils',
+  'document/annotation/common/selection/abstractHighlighter'],
+
+  function(AnnotationUtils, AbstractHighlighter) {
 
   var TEXT = 3; // HTML DOM node type for text nodes
 
@@ -204,10 +208,10 @@ define(['common/utils/annotationUtils'], function(AnnotationUtils) {
         },
 
         /**
-         *'Mounts' an annotation to the given spans, by applying the according
+         * 'Mounts' an annotation to the given spans, by applying the according
          * CSS classes, and attaching the annotation object to the elements.
          */
-        convertSpansToAnnotation = function(spans, annotation) {
+        convertSelectionToAnnotation = function(spans, annotation) {
           var anchor = annotation.anchor.substr(12),
               quote = AnnotationUtils.getQuote(annotation);
 
@@ -274,16 +278,14 @@ define(['common/utils/annotationUtils'], function(AnnotationUtils) {
         },
 
         findById = function(id) {
-          console.log(id);
           var spans = jQuery('[data-id="' + id + '"]'),
               annotation = (spans.length > 0) ? spans[0].annotation : false;
 
-          console.log(spans);
           if (annotation)
             return { annotation: annotation, elements: spans };
         };
 
-    this.convertSpansToAnnotation = convertSpansToAnnotation;
+    this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.getAnnotationsAt = getAnnotationsAt;
     this.findById = findById;
     this.initPage = initPage;
@@ -291,7 +293,10 @@ define(['common/utils/annotationUtils'], function(AnnotationUtils) {
     this.removeAnnotation = removeAnnotation;
     this.renderAnnotation = renderAnnotation;
     this.wrapRange = wrapRange;
+
+    AbstractHighlighter.apply(this);
   };
+  Highlighter.prototype = Object.create(AbstractHighlighter.prototype);
 
   return Highlighter;
 
