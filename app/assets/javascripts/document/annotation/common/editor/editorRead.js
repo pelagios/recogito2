@@ -1,5 +1,5 @@
 
-define(['document/annotation/text/editor/editorBase'], function(EditorBase) {
+define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
   var ReadEditor = function(container) {
     var self = this,

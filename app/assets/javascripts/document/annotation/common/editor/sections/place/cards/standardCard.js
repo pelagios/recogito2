@@ -1,5 +1,5 @@
 define([
-  'document/annotation/text/editor/sections/place/cards/baseCard',
+  'document/annotation/common/editor/sections/place/cards/baseCard',
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/config'], function(Card, Formatting, PlaceUtils, Config) {

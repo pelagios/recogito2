@@ -4,8 +4,8 @@ require.config({
 });
 
 require([
-  'document/annotation/text/editor/editorRead',
-  'document/annotation/text/editor/editorWrite',
+  'document/annotation/common/editor/editorRead',
+  'document/annotation/common/editor/editorWrite',
   'document/annotation/text/page/header',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',

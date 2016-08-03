@@ -3,13 +3,19 @@ require.config({
   fileExclusionRegExp: /^lib$/
 });
 
-require(['common/config'], function(Config) {
+require([
+  'common/config',
+  'document/annotation/image/selection/pointSelector'],
+
+  function(Config, PointSelector) {
 
   jQuery(document).ready(function() {
 
     var contentDiv = jQuery('#image-pane'),
 
         BASE_URL = '/document/' + Config.documentId + '/part/' + Config.partSequenceNo + '/tiles/',
+
+        selector,
 
         initDropdown = function(element) {
           element.hide();
@@ -42,6 +48,8 @@ require(['common/config'], function(Config) {
                   minResolution: 0.125
                 })
               });
+
+          selector = new PointSelector(olMap);
         },
 
         loadManifest = function() {

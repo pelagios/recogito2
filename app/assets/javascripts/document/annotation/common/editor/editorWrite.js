@@ -8,9 +8,9 @@ define([
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
-  'document/annotation/text/editor/editorBase',
-  'document/annotation/text/editor/replyField',
-  'document/annotation/text/editor/georesolution/georesolutionPanel',
+  'document/annotation/common/editor/editorBase',
+  'document/annotation/common/editor/replyField',
+  'document/annotation/common/editor/georesolution/georesolutionPanel',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler'],
 

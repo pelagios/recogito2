@@ -1,5 +1,5 @@
 define([
-  'document/annotation/text/editor/sections/place/cards/baseCard',
+  'document/annotation/common/editor/sections/place/cards/baseCard',
   'common/config'], function(Card, Config) {
 
   var ErrorCard = function(containerEl, uri, verificationStatus, lastModified) {

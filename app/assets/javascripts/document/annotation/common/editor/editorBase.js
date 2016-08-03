@@ -5,7 +5,7 @@
  *
  */
 define([
-  'document/annotation/text/editor/sections/sectionList',
+  'document/annotation/common/editor/sections/sectionList',
   'document/annotation/text/selection/highlighter',
   'common/hasEvents'], function(SectionList, Highlighter, HasEvents) {
 

@@ -1,5 +1,5 @@
 define([
-  'document/annotation/text/editor/sections/section',
+  'document/annotation/common/editor/sections/section',
   'common/ui/formatting',
   'common/config'], function(Section, Formatting, Config) {
 
