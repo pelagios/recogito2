@@ -4,11 +4,11 @@ define([
 
   function(Config, AbstractHighlighter) {
 
-    var POINT_LAYER_STYLE = new ol.style.Style({
+    var POINT_STYLE = new ol.style.Style({
           image: new ol.style.Circle({
             radius : 6,
-            fill   : new ol.style.Fill({ color: '#4483C4', opacity: 0.35 }),
-            stroke : new ol.style.Stroke({ color: '#366696', width: 1.5 })
+            fill   : new ol.style.Fill({ color: '#4c4c4c', opacity: 0.6 }),
+            stroke : new ol.style.Stroke({ color: '#262626', width: 1.5 })
           })
         });
 
@@ -34,14 +34,18 @@ define([
             console.log('refreshAnnotation', annotation);
           },
 
-          convertSelectionToAnnotation = function(selection) {
-            // TODO implement
-            console.log('convertSelectionToAnnotation', selection);
+          convertSelectionToAnnotation = function(selection, annotationStub) {
+            var pointFeature = new ol.Feature({
+                  'geometry': new ol.geom.Point(coordinate)
+                });
+
+            pointVectorSource.addFeature(pointFeature);
+            console.log('convertSelectionToAnnotation', selection, annotationStub);
           };
 
       olMap.addLayer(new ol.layer.Vector({
         source: pointVectorSource,
-        style: POINT_LAYER_STYLE
+        style: POINT_STYLE
       }));
 
       this.getAnnotationsAt = getAnnotationsAt;

@@ -156,7 +156,6 @@ require(['common/config'], function(Config) {
 
         onOrderChanged = function() {
           var sortOrder = jQuery.map(fileparts, function(part) {
-            // console.log("ID: " + part.id + ", Position: " + part.getSortPosition());
             return { id: part.id, sequence_no: part.getSortPosition() + 1 };
           });
 

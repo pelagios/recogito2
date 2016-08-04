@@ -2,20 +2,6 @@ define(function() {
 
   return {
 
-    /** Attaches an annotation as payload to a DOM element **/
-    bindToElements : function(annotation, elements) {
-      var attach = function(element) {
-            element.annotation = annotation;
-            if (annotation.annotation_id)
-              element.dataset.id = annotation.annotation_id;
-          };
-
-      if (jQuery.isArray(elements))
-        jQuery.each(elements, function(idx, el) { attach(el); });
-      else
-        attach(elements);
-    },
-
     /** Returns the number of comments on this annotation **/
     countComments : function(annotation) {
       return this.getBodiesOfType(annotation, 'COMMENT').length;

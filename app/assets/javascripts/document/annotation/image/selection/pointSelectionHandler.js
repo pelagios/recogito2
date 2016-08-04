@@ -68,7 +68,9 @@ define([
 
                 screenBounds = mapBoundsToScreenBounds(mapBounds);
 
+            pointVectorSource.clear(true);
             drawPoint(e.coordinate);
+
             currentSelection = { annotation: annotation, bounds: screenBounds, mapBounds : mapBounds };
             self.fireEvent('select', currentSelection);
           },
@@ -82,6 +84,7 @@ define([
 
           clearSelection = function(selection) {
             pointVectorSource.clear(true);
+            currentSelection = false;
           };
 
       olMap.addLayer(new ol.layer.Vector({

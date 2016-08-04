@@ -75,8 +75,9 @@ require([
                header.updateContributorInfo(Config.me);
                header.showStatusSaved();
 
-               // Update the annotation references in the elements
-               AnnotationUtils.bindToElements(annotation, e.elements);
+               // Merge server-provided properties (id, timestamps, etc.) into the annotation
+               jQuery.extend(e.annotation, annotation);
+               highlighter.refreshAnnotation(e.annotation);
              })
              .fail(function(error) {
                header.showSaveError(error);

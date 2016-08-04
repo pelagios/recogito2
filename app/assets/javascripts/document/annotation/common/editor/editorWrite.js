@@ -170,10 +170,13 @@ define([
               if (AnnotationUtils.isEmpty(self.currentAnnotation)) {
                 selectionHandler.clearSelection();
               } else {
-                annotationSpans = selectionHandler.getSelection().spans;
-                highlighter.convertSelectionToAnnotation(annotationSpans, self.currentAnnotation);
+                selection = selectionHandler.getSelection();
+                highlighter.convertSelectionToAnnotation(selection, self.currentAnnotation);
                 selectionHandler.clearSelection();
-                self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: annotationSpans });
+
+                // TODO this interface should work across content types - it shouldn't access selection.spans
+                // TODO instead (perhaps) handle updating of the spans through some sort of callback...
+                self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: selection.spans });
               }
             }
           } else {

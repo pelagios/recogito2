@@ -144,6 +144,14 @@ define([
           });
         },
 
+        bindToElements = function(annotation, elements) {
+          jQuery.each(elements, function(idx, el) {
+            el.annotation = annotation;
+            if (annotation.annotation_id)
+              el.dataset.id = annotation.annotation_id;
+          });
+        },
+
         initPage = function(annotations) {
           var textNodes = (function() {
                 var start = 0;
@@ -202,7 +210,7 @@ define([
 
             // Attach annotation data as payload to the SPANs and set id, if any
             updateStyles(annotation, spans);
-            AnnotationUtils.bindToElements(annotation, spans);
+            bindToElements(annotation, spans);
             return bounds;
           }, false);
         },
@@ -211,12 +219,17 @@ define([
          * 'Mounts' an annotation to the given spans, by applying the according
          * CSS classes, and attaching the annotation object to the elements.
          */
-        convertSelectionToAnnotation = function(spans, annotation) {
+        convertSelectionToAnnotation = function(selection, annotation) {
           var anchor = annotation.anchor.substr(12),
               quote = AnnotationUtils.getQuote(annotation);
 
-          updateStyles(annotation, spans);
-          AnnotationUtils.bindToElements(annotation, spans);
+          updateStyles(annotation, selection.spans);
+
+          // Add a marker class, so we can quickly retrieve all SPANs linked
+          // to pending annotations (which are currently stored on the server)
+          jQuery(selection.spans).addClass('pending');
+
+          bindToElements(annotation, selection.spans);
         },
 
         /**
@@ -243,6 +256,14 @@ define([
 
         refreshAnnotation = function(annotation) {
           var spans = jQuery('[data-id=' + annotation.annotation_id + ']');
+          if (spans.length === 0) {
+            // No spans with that ID? Could be a post-store refresh of a pending annotation
+            spans = jQuery.grep(jQuery('.annotation.pending'), function(span) {
+              return span.annotation.annotation_id === annotation.annotation_id;
+            });
+            spans = jQuery(spans);
+          }
+
           spans.removeClass();
           updateStyles(annotation, spans);
           return spans.toArray();
