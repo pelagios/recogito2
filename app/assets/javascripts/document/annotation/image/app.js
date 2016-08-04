@@ -14,7 +14,7 @@ require([
 
   jQuery(document).ready(function() {
 
-    var contentDiv = jQuery('#image-pane'),
+    var contentNode = document.getElementById('image-pane'),
 
         toolbar = new Toolbar(),
 
@@ -74,9 +74,9 @@ require([
 
               highlighter = new PointHighlighter(olMap),
 
-              selector = new PointSelectionHandler(contentDiv, olMap, highlighter),
+              selector = new PointSelectionHandler(contentNode, olMap, highlighter),
 
-              editor = new WriteEditor(contentDiv, false, selector),
+              editor = new WriteEditor(contentNode, highlighter, selector),
 
               onMapMove = function() {
                 var selection = selector.getSelection();

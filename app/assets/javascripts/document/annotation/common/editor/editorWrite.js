@@ -171,11 +171,13 @@ define([
                 selectionHandler.clearSelection();
               } else {
                 annotationSpans = selectionHandler.getSelection().spans;
-                highlighter.convertSpansToAnnotation(annotationSpans, self.currentAnnotation);
+                highlighter.convertSelectionToAnnotation(annotationSpans, self.currentAnnotation);
                 selectionHandler.clearSelection();
                 self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: annotationSpans });
               }
             }
+          } else {
+            selectionHandler.clearSelection();
           }
 
           element.hide();

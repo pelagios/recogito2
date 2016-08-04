@@ -4,12 +4,23 @@ define([
 
   function(Config, AbstractSelectionHandler) {
 
+    var POINT_SELECTION_STYLE = new ol.style.Style({
+          image: new ol.style.Circle({
+            radius : 6,
+            fill   : new ol.style.Fill({ color: '#4483C4', opacity: 0.35 }),
+            stroke : new ol.style.Stroke({ color: '#366696', width: 1.5 })
+          })
+        });
+
     var PointSelectionHandler = function(containerEl, olMap, highlighter) {
 
       var self = this,
 
+          pointVectorSource = new ol.source.Vector({}),
+
           currentSelection = false,
 
+          /** Converts the given map-coordinate bounds to viewport bounds **/
           mapBoundsToScreenBounds = function(mapBounds) {
             var offset = jQuery(containerEl).offset(),
                 topLeft = olMap.getPixelFromCoordinate([mapBounds.left, mapBounds.top]),
@@ -25,6 +36,16 @@ define([
             };
           },
 
+          /** Draws the point selection on the map **/
+          drawPoint = function(coordinate) {
+            var pointFeature = new ol.Feature({
+                  'geometry': new ol.geom.Point(coordinate)
+                });
+
+            pointVectorSource.addFeature(pointFeature);
+          },
+
+          /** Click compiles an annotation stub and draws the selected point **/
           onClick = function(e) {
             var annotation = {
                   annotates: {
@@ -47,6 +68,7 @@ define([
 
                 screenBounds = mapBoundsToScreenBounds(mapBounds);
 
+            drawPoint(e.coordinate);
             currentSelection = { annotation: annotation, bounds: screenBounds, mapBounds : mapBounds };
             self.fireEvent('select', currentSelection);
           },
@@ -58,10 +80,14 @@ define([
             return currentSelection;
           },
 
-          clearSelection = function() {
-
+          clearSelection = function(selection) {
+            pointVectorSource.clear(true);
           };
 
+      olMap.addLayer(new ol.layer.Vector({
+        source: pointVectorSource,
+        style: POINT_SELECTION_STYLE
+      }));
       olMap.on('click', onClick);
 
       this.getSelection = getSelection;

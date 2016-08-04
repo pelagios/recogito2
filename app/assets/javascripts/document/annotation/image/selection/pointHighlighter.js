@@ -16,9 +16,9 @@ define([
 
       var pointVectorSource = new ol.source.Vector({}),
 
-          drawPoint = function(xy) {
+          selectPoint = function(coordinate) {
             var pointFeature = new ol.Feature({
-                  'geometry': new ol.geom.Point(xy)
+                  'geometry': new ol.geom.Point(coordinate)
                 });
 
             pointVectorSource.addFeature(pointFeature);
