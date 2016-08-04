@@ -45,8 +45,18 @@ define([
             pointVectorSource.addFeature(pointFeature);
           },
 
-          /** Click compiles an annotation stub and draws the selected point **/
           onClick = function(e) {
+            var currentHighlight = highlighter.getCurrentHighlight();
+            if (currentHighlight)
+              // Select existing annotation
+              console.log(currentHighlight);
+            else
+              // Create new selection
+              createPointSelection(e);
+          },
+
+          /** Compiles an annotation stub and draws the selected point **/
+          createPointSelection = function(e) {
             var x = Math.round(e.coordinate[0]),
 
                 y = Math.abs(Math.round(e.coordinate[1])),

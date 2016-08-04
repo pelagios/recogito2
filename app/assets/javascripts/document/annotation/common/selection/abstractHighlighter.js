@@ -7,9 +7,6 @@ define([], function() {
 
   var AbstractHighlighter = function() {
 
-    if (!this.getAnnotationsAt)
-      throw 'Highlighter needs to implement .getAnnotationsAt() method';
-
     if (!this.refreshAnnotation)
       throw 'Highlighter needs to implement .refreshAnnotation() method';
 

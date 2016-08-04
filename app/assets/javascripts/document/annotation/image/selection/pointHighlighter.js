@@ -72,9 +72,9 @@ define([
             }
           },
 
-          getAnnotationsAt = function() {
-            // TODO implement
-            console.log('getAnnotationsAt');
+          getCurrentHighlight = function() {
+            if (currentHighlight)
+              return currentHighlight.getGeometry().getCoordinates();
           },
 
           refreshAnnotation = function(annotation) {
@@ -102,7 +102,7 @@ define([
 
       olMap.on('pointermove', onMousemove);
 
-      this.getAnnotationsAt = getAnnotationsAt;
+      this.getCurrentHighlight = getCurrentHighlight;
       this.refreshAnnotation = refreshAnnotation;
       this.convertSelectionToAnnotation = convertSelectionToAnnotation;
 
