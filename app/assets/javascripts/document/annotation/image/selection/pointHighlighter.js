@@ -35,12 +35,16 @@ define([
           },
 
           convertSelectionToAnnotation = function(selection, annotationStub) {
+            // TODO this currently assumes 'point:' anchors only!
+            var anchor = annotationStub.anchor,
+                x = parseInt(anchor.substring(anchor.indexOf(':') + 1, anchor.indexOf(','))),
+                y = - parseInt(anchor.substring(anchor.indexOf(',') + 1));
+
             var pointFeature = new ol.Feature({
-                  'geometry': new ol.geom.Point(coordinate)
+                  'geometry': new ol.geom.Point([ x, y ])
                 });
 
             pointVectorSource.addFeature(pointFeature);
-            console.log('convertSelectionToAnnotation', selection, annotationStub);
           };
 
       olMap.addLayer(new ol.layer.Vector({

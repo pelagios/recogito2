@@ -23,8 +23,8 @@ define([
           /** Converts the given map-coordinate bounds to viewport bounds **/
           mapBoundsToScreenBounds = function(mapBounds) {
             var offset = jQuery(containerEl).offset(),
-                topLeft = olMap.getPixelFromCoordinate([mapBounds.left, mapBounds.top]),
-                bottomRight = olMap.getPixelFromCoordinate([mapBounds.right, mapBounds.bottom]);
+                topLeft = olMap.getPixelFromCoordinate([ mapBounds.left, mapBounds.top ]),
+                bottomRight = olMap.getPixelFromCoordinate([ mapBounds.right, mapBounds.bottom ]);
 
             return {
               top    : topLeft[1] + offset.top,
@@ -47,13 +47,17 @@ define([
 
           /** Click compiles an annotation stub and draws the selected point **/
           onClick = function(e) {
-            var annotation = {
+            var x = Math.round(e.coordinate[0]),
+
+                y = Math.abs(Math.round(e.coordinate[1])),
+
+                annotation = {
                   annotates: {
                     document_id: Config.documentId,
                     filepart_id: Config.partId,
                     content_type: Config.contentType
                   },
-                  // TODO anchor
+                  anchor: 'point:' + x + ',' + y,
                   bodies: []
                 },
 
@@ -71,7 +75,7 @@ define([
             pointVectorSource.clear(true);
             drawPoint(e.coordinate);
 
-            currentSelection = { annotation: annotation, bounds: screenBounds, mapBounds : mapBounds };
+            currentSelection = { annotation: annotation, bounds: screenBounds, mapBounds: mapBounds };
             self.fireEvent('select', currentSelection);
           },
 

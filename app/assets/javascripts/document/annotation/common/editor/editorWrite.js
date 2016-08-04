@@ -173,10 +173,7 @@ define([
                 selection = selectionHandler.getSelection();
                 highlighter.convertSelectionToAnnotation(selection, self.currentAnnotation);
                 selectionHandler.clearSelection();
-
-                // TODO this interface should work across content types - it shouldn't access selection.spans
-                // TODO instead (perhaps) handle updating of the spans through some sort of callback...
-                self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: selection.spans });
+                self.fireEvent('updateAnnotation', self.currentAnnotation);
               }
             }
           } else {

@@ -31,9 +31,12 @@ require([
               // jQuery handles the XML parsing
               var props = jQuery(response).find('IMAGE_PROPERTIES'),
                   width = parseInt(props.attr('WIDTH')),
-                  height = parseInt(props.attr('HEIGHT'));
+                  height = parseInt(props.attr('HEIGHT')),
+                  imageProperties = { width: width, height: height };
 
-              return { width: width, height: height };
+              // Store image properties in global Config as well
+              Config.imageProperties = imageProperties;
+              return imageProperties;
             });
         },
 

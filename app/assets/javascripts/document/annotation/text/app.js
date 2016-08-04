@@ -66,9 +66,9 @@ require([
           // TODO visual notification
         },
 
-        onUpdateAnnotation = function(e) {
+        onUpdateAnnotation = function(annotationStub) {
           header.showStatusSaving();
-          API.storeAnnotation(e.annotation)
+          API.storeAnnotation(annotationStub)
              .done(function(annotation) {
                // Update header info
                header.incrementAnnotationCount();
@@ -76,8 +76,8 @@ require([
                header.showStatusSaved();
 
                // Merge server-provided properties (id, timestamps, etc.) into the annotation
-               jQuery.extend(e.annotation, annotation);
-               highlighter.refreshAnnotation(e.annotation);
+               jQuery.extend(annotationStub, annotation);
+               highlighter.refreshAnnotation(annotationStub);
              })
              .fail(function(error) {
                header.showSaveError(error);
