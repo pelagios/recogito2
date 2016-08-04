@@ -6,37 +6,57 @@ require.config({
 require([
   'common/config',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/image/page/toolbar',
+  'document/annotation/image/selection/pointHighlighter',
   'document/annotation/image/selection/pointSelectionHandler'],
 
-  function(Config, WriteEditor, PointSelectionHandler) {
+  function(Config, WriteEditor, Toolbar, PointHighlighter, PointSelectionHandler) {
 
   jQuery(document).ready(function() {
 
     var contentDiv = jQuery('#image-pane'),
 
-        BASE_URL = '/document/' + Config.documentId + '/part/' + Config.partSequenceNo + '/tiles/',
+        toolbar = new Toolbar(),
 
-        selector,
+        BASE_URL = jsRoutes.controllers.document.DocumentController
+          .getImageTile(Config.documentId, Config.partSequenceNo, '').absoluteURL(),
 
-        editor,
+        loadManifest = function() {
+          return jsRoutes.controllers.document.DocumentController
+            .getImageManifest(Config.documentId, Config.partSequenceNo)
+            .ajax()
+            .then(function(response) {
+              // TODO handle difference between Zoomify and IIIF, based on Config.contentType
 
-        initDropdown = function(element) {
-          element.hide();
-          element.parent().hover(
-            function() { element.show(); },
-            function() { element.hide(); });
+              // jQuery handles the XML parsing
+              var props = jQuery(response).find('IMAGE_PROPERTIES'),
+                  width = parseInt(props.attr('WIDTH')),
+                  height = parseInt(props.attr('HEIGHT'));
+
+              return { width: width, height: height };
+            });
         },
 
-        initImage = function(width, height) {
-          var projection = new ol.proj.Projection({
+        onLoadError = function(error) {
+          // TODO error indication to user
+          console.log(error);
+        },
+
+        init = function(imageProperties) {
+          // TODO handle difference between Zoomify and IIIF, based on Config.contentType
+          var w = imageProperties.width,
+
+              h = imageProperties.height,
+
+              projection = new ol.proj.Projection({
                 code: 'ZOOMIFY',
                 units: 'pixels',
-                extent: [0, 0, width, height]
+                extent: [0, 0, w, h]
               }),
 
               tileSource = new ol.source.Zoomify({
                 url: BASE_URL,
-                size: [ width, height ]
+                size: [ w, h ]
               }),
 
               tileLayer = new ol.layer.Tile({ source: tileSource }),
@@ -46,36 +66,30 @@ require([
                 layers: [ tileLayer ],
                 view: new ol.View({
                   projection: projection,
-                  center: [width / 2, - (height / 2)],
+                  center: [w / 2, - (h / 2)],
                   zoom: 0,
                   minResolution: 0.125
                 })
-              });
+              }),
 
-          selector = new PointSelectionHandler(contentDiv, olMap);
-          editor = new WriteEditor(contentDiv, false, selector);
-        },
+              highlighter = new PointHighlighter(olMap),
 
-        loadManifest = function() {
-          jQuery.ajax({
-            type: 'GET',
-            url: BASE_URL + 'ImageProperties.xml',
-            success: function(response) {
-              // jQuery handles XML parsing for us automagically
-              var props = jQuery(response).find('IMAGE_PROPERTIES'),
-                  width = parseInt(props.attr('WIDTH')),
-                  height = parseInt(props.attr('HEIGHT'));
+              selector = new PointSelectionHandler(contentDiv, olMap, highlighter),
 
-              initImage(width, height);
-            },
-            error: function(error) {
-              console.log(error);
-            }
-          });
+              editor = new WriteEditor(contentDiv, false, selector),
+
+              onMapMove = function() {
+                var selection = selector.getSelection();
+                if (selection)
+                  editor.setPosition(selection.bounds);
+              };
+
+          olMap.on('postrender', onMapMove);
         };
 
-    initDropdown(jQuery('.dropdown'));
-    loadManifest();
+    loadManifest()
+      .done(init)
+      .fail(onLoadError);
   });
 
 });

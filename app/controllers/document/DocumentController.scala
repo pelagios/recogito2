@@ -4,42 +4,74 @@ import controllers.BaseAuthController
 import java.io.File
 import javax.inject.Inject
 import models.document.DocumentService
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.user.UserService
 import models.user.Roles._
 import play.api.Configuration
 import play.api.mvc.Action
+
 import scala.concurrent.ExecutionContext
 import storage.Uploads
 
 class DocumentController @Inject() (
     val config: Configuration,
     val documents: DocumentService,
-    val users: UserService, 
+    val users: UserService,
     val uploads: Uploads,
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(config, documents, users) {
-    
+
   def initialView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(docId, 1))
   }
-  
-  def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+
+  def getImageManifest(docId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    import models.ContentType._
     documentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
-      // ownerDataDir must exist, unless DB integrity is broken - renderDocumentResponse will handle the exception if .get fails
-      val documentDir = uploads.getDocumentDir(document.getOwner, document.getId).get
-      
-      // Tileset foldername is, by convention, equal to filename minus extension
-      val foldername = filepart.getFilename.substring(0, filepart.getFilename.lastIndexOf('.'))
-      val tileFolder = new File(documentDir, foldername)
-      
-      val file = new File(tileFolder, tilepath)
-      if (file.exists)
-        Ok.sendFile(file)
-      else
-        NotFoundPage
+      val contentType = filepart.getContentType
+      val maybeManifestName =
+        if (contentType == IMAGE_UPLOAD.toString)
+          // All uploads are Zoomify format
+          Some("ImageProperties.xml")
+        else if (contentType == IMAGE_IIIF.toString)
+          None // TODO future feature
+        else
+          None
+
+      maybeManifestName.flatMap { filename =>
+        getTilesetFile(document, filepart, filename)
+      } match {
+        case Some(file) => Ok.sendFile(file)
+        case None => BadRequest
+      }
     })
   }
-  
+
+  def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    documentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
+      getTilesetFile(document, filepart, tilepath) match {
+        case Some(file) => Ok.sendFile(file)
+        case None => NotFound
+      }
+    })
+  }
+
+  /** Common retrieval code for tiles and manifests **/
+  private def getTilesetFile(document: DocumentRecord, part: DocumentFilepartRecord, filepath: String) = {
+    // ownerDataDir must exist unless DB integrity broken - outer documentPartResponse will handle failure
+    val documentDir = uploads.getDocumentDir(document.getOwner, document.getId).get
+
+    // Tileset foldername is, by convention, equal to filename minus extension
+    val foldername = part.getFilename.substring(0, part.getFilename.lastIndexOf('.'))
+    val tileFolder = new File(documentDir, foldername)
+
+    val file = new File(tileFolder, filepath)
+    if (file.exists)
+      Some(file)
+    else
+      None
+  }
+
   def getThumbnail(docId: String, partNo: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentPartResponse(docId, partNo, loggedIn.user.getUsername, { case (document, fileparts, filepart, accesslevel) =>
       uploads.openThumbnail(loggedIn.user.getUsername, docId, filepart.getFilename) match {
@@ -48,5 +80,5 @@ class DocumentController @Inject() (
       }
     })
   }
-  
+
 }

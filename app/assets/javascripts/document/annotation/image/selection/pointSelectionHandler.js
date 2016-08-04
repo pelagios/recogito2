@@ -4,85 +4,73 @@ define([
 
   function(Config, AbstractSelectionHandler) {
 
-  var CLICK_DURATION_THRESHOLD_MS = 100,
+    var PointSelectionHandler = function(containerEl, olMap, highlighter) {
 
-      POINT_LAYER_STYLE = new ol.style.Style({
-        image: new ol.style.Circle({
-          radius : 8,
-          fill   : new ol.style.Fill({ color: '#ff0000' }),
-          stroke : new ol.style.Stroke({ color: '#bada55', width: 1 })
-        })
-      });
+      var self = this,
 
-  var PointSelectionHandler = function(containerEl, olMap) {
+          currentSelection = false,
 
-    var self = this,
+          mapBoundsToScreenBounds = function(mapBounds) {
+            var offset = jQuery(containerEl).offset(),
+                topLeft = olMap.getPixelFromCoordinate([mapBounds.left, mapBounds.top]),
+                bottomRight = olMap.getPixelFromCoordinate([mapBounds.right, mapBounds.bottom]);
 
-        currentSelection = false,
+            return {
+              top    : topLeft[1] + offset.top,
+              right  : bottomRight[0] + offset.left,
+              bottom : bottomRight[1] + offset.top,
+              left   : topLeft[0] + offset.left,
+              width  : 0,
+              height : 0
+            };
+          },
 
-        pointVectorSource = new ol.source.Vector({}),
-
-        drawPoint = function(xy) {
-          var pointFeature = new ol.Feature({
-            'geometry': new ol.geom.Point(xy)
-          });
-
-          // pointVectorSource.addFeature(pointFeature);
-        },
-
-        onClick = function(e) {
-          var offset = jQuery(containerEl).offset(),
-
-              annotation = {
-                annotates: {
-                  document_id: Config.documentId,
-                  filepart_id: Config.partId,
-                  content_type: Config.contentType
+          onClick = function(e) {
+            var annotation = {
+                  annotates: {
+                    document_id: Config.documentId,
+                    filepart_id: Config.partId,
+                    content_type: Config.contentType
+                  },
+                  // TODO anchor
+                  bodies: []
                 },
-                // TODO anchor
-                bodies: []
-              },
 
-              xy = olMap.getPixelFromCoordinate(e.coordinate),
+                mapBounds = {
+                  top    : e.coordinate[1],
+                  right  : e.coordinate[0],
+                  bottom : e.coordinate[1],
+                  left   : e.coordinate[0],
+                  width  : 0,
+                  height : 0
+                },
 
-              bounds = {
-                top    : xy[1] + offset.top,
-                right  : xy[0] + offset.left,
-                bottom : xy[1] + offset.top,
-                left   : xy[0] + offset.left,
-                width  : 0,
-                height : 0
-              };
+                screenBounds = mapBoundsToScreenBounds(mapBounds);
 
-          // TODO dummy, so we can see something
-          drawPoint(e.coordinate);
+            currentSelection = { annotation: annotation, bounds: screenBounds, mapBounds : mapBounds };
+            self.fireEvent('select', currentSelection);
+          },
 
-          currentSelection = { annotation: annotation, bounds: bounds };
-          self.fireEvent('select', currentSelection);
-        },
+          getSelection = function() {
+            // Update screenbounds, since the map may have moved
+            if (currentSelection)
+              currentSelection.bounds = mapBoundsToScreenBounds(currentSelection.mapBounds);
+            return currentSelection;
+          },
 
-        getSelection = function() {
-          return currentSelection;
-        },
+          clearSelection = function() {
 
-        clearSelection = function() {
+          };
 
-        };
+      olMap.on('click', onClick);
 
-    olMap.addLayer(new ol.layer.Vector({
-      source: pointVectorSource,
-      style: POINT_LAYER_STYLE
-    }));
+      this.getSelection = getSelection;
+      this.clearSelection = clearSelection;
 
-    olMap.on('click', onClick);
+      AbstractSelectionHandler.apply(this);
+    };
+    PointSelectionHandler.prototype = Object.create(AbstractSelectionHandler.prototype);
 
-    this.getSelection = getSelection;
-    this.clearSelection = clearSelection;
-
-    AbstractSelectionHandler.apply(this);
-  };
-  PointSelectionHandler.prototype = Object.create(AbstractSelectionHandler.prototype);
-
-  return PointSelectionHandler;
+    return PointSelectionHandler;
 
 });

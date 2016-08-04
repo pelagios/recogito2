@@ -147,5 +147,9 @@
       </ul>
     </div> <!-- .sidebar -->
     @views.html.document.initTooltips()
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.document.routes.javascript.DocumentController.getImageManifest,
+      controllers.document.routes.javascript.DocumentController.getImageTile
+    )
   </body>
 </html>
