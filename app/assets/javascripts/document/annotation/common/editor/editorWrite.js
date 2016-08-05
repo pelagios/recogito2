@@ -154,7 +154,7 @@ define([
               } else {
                 // UPDATE
                 annotationSpans = highlighter.refreshAnnotation(self.currentAnnotation);
-                self.fireEvent('updateAnnotation', { annotation: self.currentAnnotation, elements: annotationSpans });
+                self.fireEvent('updateAnnotation', self.currentAnnotation);
               }
             } else {
               // No ID? New annotation from fresh selection - CREATE if not empty

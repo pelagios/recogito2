@@ -4,13 +4,14 @@ require.config({
 });
 
 require([
+  'common/api',
   'common/config',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/image/page/toolbar',
   'document/annotation/image/selection/pointHighlighter',
   'document/annotation/image/selection/pointSelectionHandler'],
 
-  function(Config, WriteEditor, Toolbar, PointHighlighter, PointSelectionHandler) {
+  function(API, Config, WriteEditor, Toolbar, PointHighlighter, PointSelectionHandler) {
 
   jQuery(document).ready(function() {
 
@@ -81,13 +82,56 @@ require([
 
               editor = new WriteEditor(contentNode, highlighter, selector),
 
+              onAnnotationsLoaded = function(annotations) {
+                highlighter.initPage(annotations);
+              },
+
+              onAnnotationsLoadError = function(annotations) {
+                // TODO visual notification
+              },
+
+              onUpdateAnnotation = function(annotationStub) {
+                API.storeAnnotation(annotationStub)
+                   .done(function(annotation) {
+                     // Merge server-provided properties (id, timestamps, etc.) into the annotation
+                     jQuery.extend(annotationStub, annotation);
+                     highlighter.refreshAnnotation(annotationStub);
+                   })
+                   .fail(function(error) {
+                     // TODO show save error in UI
+                     // TODO re-use 'header' class from text annotation UI
+                     console.log(error);
+                   });
+              },
+
+              onDeleteAnnotation = function(annotation) {
+                API.deleteAnnotation(annotation.annotation_id)
+                   .done(function() {
+                     /*
+                     header.incrementAnnotationCount(-1);
+                     header.showStatusSaved();
+                     */
+                   })
+                   .fail(function(error) {
+                     // header.showSaveError(error);
+                   });
+              },
+
               onMapMove = function() {
                 var selection = selector.getSelection();
                 if (selection)
                   editor.setPosition(selection.bounds);
               };
 
+          // TODO refactor, so we have one common 'annotation app' base class
+          editor.on('updateAnnotation', onUpdateAnnotation);
+          editor.on('deleteAnnotation', onDeleteAnnotation);
+
           olMap.on('postrender', onMapMove);
+
+          API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
+             .done(onAnnotationsLoaded)
+             .fail(onAnnotationsLoadError);
         };
 
     loadManifest()

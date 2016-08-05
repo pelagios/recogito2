@@ -7,8 +7,14 @@ define([], function() {
 
   var AbstractHighlighter = function() {
 
+    if (!this.initPage)
+      throw 'Highlighter needs to implement .initPage() method';
+
     if (!this.refreshAnnotation)
       throw 'Highlighter needs to implement .refreshAnnotation() method';
+
+    if (!this.removeAnnotation)
+      throw 'Highlighter needs to implement .removeAnnotation() method';
 
     if (!this.convertSelectionToAnnotation)
       throw 'Highlighter needs to implement .convertSelectionToAnnotation() method';

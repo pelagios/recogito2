@@ -150,7 +150,10 @@
     @views.html.document.initTooltips()
     @helper.javascriptRouter("jsRoutes")(
       controllers.document.routes.javascript.DocumentController.getImageManifest,
-      controllers.document.routes.javascript.DocumentController.getImageTile
+      controllers.document.routes.javascript.DocumentController.getImageTile,
+      controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
+      controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
+      controllers.api.routes.javascript.AnnotationAPIController.deleteAnnotation
     )
   </body>
 </html>
