@@ -162,7 +162,8 @@ define([
                 selectionHandler.clearSelection();
               } else {
                 selection = selectionHandler.getSelection();
-                highlighter.convertSelectionToAnnotation(selection, self.currentAnnotation);
+                if (selection.isNew)
+                  highlighter.convertSelectionToAnnotation(selection, self.currentAnnotation);
                 selectionHandler.clearSelection();
                 self.fireEvent('updateAnnotation', self.currentAnnotation);
               }

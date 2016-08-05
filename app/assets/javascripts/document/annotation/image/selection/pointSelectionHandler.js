@@ -36,6 +36,17 @@ define([
             };
           },
 
+          pointToBounds = function(coordinate) {
+            return {
+              top    : coordinate[1],
+              right  : coordinate[0],
+              bottom : coordinate[1],
+              left   : coordinate[0],
+              width  : 0,
+              height : 0
+            };
+          },
+
           /** Draws the point selection on the map **/
           drawPoint = function(coordinate) {
             var pointFeature = new ol.Feature({
@@ -45,18 +56,26 @@ define([
             pointVectorSource.addFeature(pointFeature);
           },
 
-          onClick = function(e) {
-            var currentHighlight = highlighter.getCurrentHighlight();
-            if (currentHighlight)
-              // Select existing annotation
-              console.log(currentHighlight);
-            else
-              // Create new selection
-              createPointSelection(e);
+          selectExisting = function(feature) {
+            var annotation = feature.get('annotation'),
+                mapBounds = pointToBounds(feature.getGeometry().getCoordinates()),
+                screenBounds = mapBoundsToScreenBounds(mapBounds);
+
+            currentSelection = {
+              isNew      : false,
+              annotation : annotation,
+              bounds     : screenBounds,
+
+              // Image-UI specific field - needed to provide up-to-date
+              // screenbounds in .getSelection
+              mapBounds  : mapBounds
+            };
+
+            self.fireEvent('select', currentSelection);
           },
 
           /** Compiles an annotation stub and draws the selected point **/
-          createPointSelection = function(e) {
+          selectNewPoint = function(e) {
             var x = Math.round(e.coordinate[0]),
 
                 y = Math.abs(Math.round(e.coordinate[1])),
@@ -71,22 +90,34 @@ define([
                   bodies: []
                 },
 
-                mapBounds = {
-                  top    : e.coordinate[1],
-                  right  : e.coordinate[0],
-                  bottom : e.coordinate[1],
-                  left   : e.coordinate[0],
-                  width  : 0,
-                  height : 0
-                },
+                mapBounds = pointToBounds(e.coordinate),
 
                 screenBounds = mapBoundsToScreenBounds(mapBounds);
 
             pointVectorSource.clear(true);
             drawPoint(e.coordinate);
 
-            currentSelection = { annotation: annotation, bounds: screenBounds, mapBounds: mapBounds };
+            currentSelection = {
+              isNew      : true,
+              annotation : annotation,
+              bounds     : screenBounds,
+
+              // Image-UI specific field - needed to provide up-to-date
+              // screenbounds in .getSelection
+              mapBounds  : mapBounds
+            };
+
             self.fireEvent('select', currentSelection);
+          },
+
+          onClick = function(e) {
+            var currentHighlight = highlighter.getCurrentHighlight();
+            if (currentHighlight)
+              // Select existing annotation
+              selectExisting(currentHighlight);
+            else
+              // Create new selection
+              selectNewPoint(e);
           },
 
           getSelection = function() {
@@ -97,7 +128,9 @@ define([
           },
 
           clearSelection = function(selection) {
-            pointVectorSource.clear(true);
+            if (currentSelection.isNew)
+              pointVectorSource.clear(true);
+
             currentSelection = false;
           };
 

@@ -19,7 +19,10 @@ define(function() {
 
     /** Formats absolute time into a human-readable 'relative' label (e.g. '2 minutes ago') **/
     timeSince: function(date) {
-      return jQuery.timeago(date);
+      if (date)
+        return jQuery.timeago(date);
+      else
+        return '';
     },
 
     formatDay : function(date) {

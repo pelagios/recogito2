@@ -73,8 +73,7 @@ define([
           },
 
           getCurrentHighlight = function() {
-            if (currentHighlight)
-              return currentHighlight.getGeometry().getCoordinates();
+            return currentHighlight;
           },
 
           refreshAnnotation = function(annotation) {
@@ -92,6 +91,7 @@ define([
                   'geometry': new ol.geom.Point([ x, y ])
                 });
 
+            pointFeature.set('annotation', annotationStub, true);
             pointVectorSource.addFeature(pointFeature);
           };
 
