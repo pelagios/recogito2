@@ -79,7 +79,8 @@ class SettingsController @Inject() (
             case None => Future.successful(NotFoundPage)
           })
         
-        case e: JsError => Future.successful(BadRequest)
+        case e: JsError =>
+          Future.successful(BadRequest)
       }
         
       case None => Future.successful(BadRequest)

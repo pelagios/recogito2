@@ -252,6 +252,8 @@ define([
           clear = function() {
             markerLayer.clearLayers();
             resultList.empty();
+            resultTotal.empty();
+            resultTook.empty();
             currentSearchResults = [];
             currentSearchResultsTotal = 0;
           },

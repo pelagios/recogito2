@@ -26,7 +26,7 @@ trait RollbackActions { self: SettingsController =>
       // Fetch the latest contribution for this annotation version, so we get the timestamp to roll back to
       contributions.getContributions(rollbackData.annotationId, rollbackData.versionId).flatMap {
         _.headOption match {
-          case Some(contribution) => { 
+          case Some(contribution) => {
             val f = for {
               rollbackSuccess <- annotations.rollbackToTimestamp(documentId, contribution.madeAt)
               purgeHistorySuccess <- if (rollbackSuccess) contributions.deleteHistoryAfter(documentId, contribution.madeAt) else Future.successful(false)

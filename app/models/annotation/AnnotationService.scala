@@ -103,7 +103,12 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   private def deleteById(annotationId: String): Future[Boolean] =
     es.client execute {
       delete id annotationId.toString from ES.RECOGITO / ES.ANNOTATION 
-    } map { _.isFound }
+    } map { _ => 
+      true 
+    } recover { case t: Throwable =>
+      t.printStackTrace()
+      false
+    }
 
   /** Deletes the annotation with the given ID **/
   def deleteAnnotation(annotationId: UUID, deletedBy: String, deletedAt: DateTime): Future[Option[Annotation]] =
@@ -177,7 +182,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   def rollbackToTimestamp(documentId: String, timestamp: DateTime): Future[Boolean] = {
 
     // Rolls back one annotation, i.e. updates to the latest state recorded in the history or deletes
-    def rollbackOne(annotationId: String): Future[Boolean] =
+    def rollbackOne(annotationId: String): Future[Boolean] = {
       getAnnotationStateAt(annotationId, timestamp).flatMap(_ match {
         case Some(historyRecord) =>
           if (historyRecord.deleted)
@@ -185,7 +190,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
             Future.successful(true)
           else
             insertOrUpdateAnnotation(historyRecord.asAnnotation, false).map(_._1)
-          
+
         case None =>
           // The annotation did not exist at the rollback time - delete
           deleteById(annotationId)
@@ -194,6 +199,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         Logger.warn("Rollback failed for " + annotationId)
         false
       }
+    }
 
     // Rolls back a list of annotations, i.e. updates to latest state recorded in the history or deletes
     def rollbackAnnotations(annotations: Seq[String]): Future[Seq[String]] =
@@ -205,8 +211,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         }
       }
 
-    // Get all annotation IDs that were changed after the rollback timestamp
-    val failedRollbacks = getChangedAfter(documentId, timestamp).flatMap(rollbackAnnotations(_))
+    val failedRollbacks = getChangedAfter(documentId, timestamp).flatMap(rollbackAnnotations)    
     failedRollbacks.flatMap { failed =>
       if (failed.size == 0) {
         deleteHistoryRecordsAfter(documentId, timestamp)

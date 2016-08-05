@@ -12,7 +12,7 @@ case class AnnotationHistoryRecord (
     
   annotationId: UUID,
   
-  versionId: Option[UUID],
+  versionId: UUID,
 
   annotates: AnnotatedObject,
 
@@ -33,7 +33,7 @@ case class AnnotationHistoryRecord (
   /** This method will fail for delete markers **/
   def asAnnotation = Annotation(
     annotationId,
-    versionId.get,
+    versionId,
     annotates,
     contributors,
     anchor,
@@ -53,7 +53,7 @@ object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
  
   implicit val annotationHistoryFormat: Format[AnnotationHistoryRecord] = (
     (JsPath \ "annotation_id").format[UUID] and
-    (JsPath \ "version_id").formatNullable[UUID] and
+    (JsPath \ "version_id").format[UUID] and
     (JsPath \ "annotates").format[AnnotatedObject] and
     (JsPath \ "contributors").formatNullable[Seq[String]]
       .inmap(fromOptSeq[String], toOptSeq[String]) and
@@ -68,7 +68,7 @@ object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
   
   def forVersion(a: Annotation) = AnnotationHistoryRecord(
     a.annotationId,
-    Some(a.versionId),
+    a.versionId,
     a.annotates,
     a.contributors,
     a.anchor,
@@ -79,7 +79,7 @@ object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
     
   def forDelete(a: Annotation, deletedBy: String, deletedAt: DateTime) = AnnotationHistoryRecord(
     a.annotationId,
-    None,
+    UUID.randomUUID, // Delete markers get their own version ID
     a.annotates, 
     a.contributors,
     a.anchor,

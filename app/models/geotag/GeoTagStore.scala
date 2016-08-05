@@ -101,7 +101,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     } yield insertSuccess
 
     f.recover { case t: Throwable =>
-      Logger.error(t.getMessage)
+      t.printStackTrace()
       false
     }
   }
