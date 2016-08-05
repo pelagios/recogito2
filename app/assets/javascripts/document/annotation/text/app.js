@@ -63,7 +63,7 @@ function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, Header, BaseApp,
     toolbar.on('annotationModeChanged', editor.setAnnotationMode);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
-    BaseApp.apply(this, [ highlighter, new Header() ]);
+    BaseApp.apply(this, [ highlighter, new Header(), editor ]);
 
     // Editor events
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));

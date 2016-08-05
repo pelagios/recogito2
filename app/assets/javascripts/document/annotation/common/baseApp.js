@@ -1,9 +1,10 @@
 /** Contains common high-level functionality needed for text and image 'app' entrypoints **/
 define(['common/api', 'common/config'], function(API, Config) {
 
-  var BaseApp = function(highlighter, pageHeader) {
+  var BaseApp = function(highlighter, pageHeader, editor) {
     this.highlighter = highlighter;
     this.header = pageHeader;
+    this.editor = editor;
   };
 
   BaseApp.prototype.onAnnotationsLoaded = function(annotations) {
@@ -17,9 +18,9 @@ define(['common/api', 'common/config'], function(API, Config) {
 
     // TODO needs refactoring to make it work cross-media
     if (urlHash) {
-      preselected = highlighter.findById(hash);
+      preselected = this.highlighter.findById(urlHash);
       if (preselected)
-        editor.open(preselected.annotation, preselected.elements[0].getBoundingClientRect());
+        this.editor.open(preselected.annotation, preselected.elements[0].getBoundingClientRect());
     }
   };
 
