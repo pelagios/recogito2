@@ -10,7 +10,7 @@ define([
   'common/api',
   'document/annotation/common/editor/editorBase',
   'document/annotation/common/editor/replyField',
-  'document/annotation/common/editor/georesolution/georesolutionPanel'],
+  'document/annotation/common/georesolution/georesolutionPanel'],
 
   function(AnnotationUtils, PlaceUtils, API, EditorBase, ReplyField, GeoresolutionPanel) {
 

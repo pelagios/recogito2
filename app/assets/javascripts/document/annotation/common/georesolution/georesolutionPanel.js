@@ -1,5 +1,5 @@
 define([
-  'document/annotation/common/editor/georesolution/searchresultCard',
+  'document/annotation/common/georesolution/searchresultCard',
   'common/map/map',
   'common/ui/formatting',
   'common/utils/placeUtils',
