@@ -1,4 +1,4 @@
-define(['common/hasEvents'], function(HasEvents) {
+define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
   var ReplyField = function(parent, isReply) {
     var self = this,
@@ -25,7 +25,7 @@ define(['common/hasEvents'], function(HasEvents) {
         getComment = function() {
           var val = textarea.text().trim();
           if (val)
-            return { type: 'COMMENT', value: val };
+            return { type: 'COMMENT', last_modified_by: Config.me, value: val };
           else
             return false;
         },

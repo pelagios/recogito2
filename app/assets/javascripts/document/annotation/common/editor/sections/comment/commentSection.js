@@ -109,7 +109,7 @@ define([
           commit = function() {
             if (hasChanged()) {
               delete commentBody.last_modified_at;
-              delete commentBody.last_modified_by;
+              commentBody.last_modified_by = Config.me;
               commentBody.value = commentDiv.text().trim();
             }
           },
