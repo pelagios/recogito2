@@ -80,15 +80,25 @@ define([
           return currentSelection;
         },
 
-        onSelect = function(e) {
-          var isSelectionOnEditor = jQuery(e.target).closest('.text-annotation-editor').length > 0,
-              selection = rangy.getSelection(),
-              selectedRange, annotationStub, bounds, spans;
+        onMouseup = function(e) {
 
-          // If the selection happened on the editor, we'll ignore
-          if (isSelectionOnEditor)
+          // Monitor select of existing annotations via DOM
+          // jQuery(container).on('click', '.annotation', editAnnotation);
+
+          var isEventOnEditor = jQuery(e.target).closest('.text-annotation-editor').length > 0,
+
+              // Click happend on an existing annotation span?
+              annotationSpan = jQuery(e.target).closest('.annotation'),
+
+              // Or click was part of a new text selection ?
+              selection = rangy.getSelection(),
+              selectedRange, annotation, bounds, spans;
+
+          // If the mouseup happened on the editor, we'll ignore
+          if (isEventOnEditor)
             return;
 
+          // Check for new text selection first - takes precedence over clicked annotation span
           if (!selection.isCollapsed &&
                selection.rangeCount == 1 &&
                selection.getRangeAt(0).toString().trim().length > 0) {
@@ -101,14 +111,30 @@ define([
 
              clearNativeSelection();
 
-             currentSelection = { annotation: annotation, bounds: bounds, spans: spans };
+             currentSelection = {
+               isNew      : true,
+               annotation : annotation,
+               bounds     : bounds
+             };
+
              self.fireEvent('select', currentSelection);
+          } else if (annotationSpan.length > 0) {
+            // Top-most annotation at this span
+            annotation = highlighter.getAnnotationsAt(annotationSpan[0])[0];
+
+            currentSelection = {
+              isNew      : false,
+              annotation : annotation,
+              bounds     : annotationSpan[0].getBoundingClientRect()
+            };
+
+            self.fireEvent('select', currentSelection);
           }
 
           return false;
         };
 
-    jQuery(rootNode).mouseup(onSelect);
+    jQuery(rootNode).mouseup(onMouseup);
 
     this.clearSelection = clearSelection;
     this.getSelection = getSelection;

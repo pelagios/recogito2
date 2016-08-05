@@ -202,12 +202,6 @@ define([
     // Monitor text selections through the selectionHandler
     selectionHandler.on('select', editSelection);
 
-    // Monitor select of existing annotations via DOM
-
-    // TODO that's a fixed dependency to the text UI - RESOLVE!
-
-    jQuery(container).on('click', '.annotation', editAnnotation);
-
     // Georesolution change
     georesolutionPanel.on('change', onGeoresolutionChanged);
 
