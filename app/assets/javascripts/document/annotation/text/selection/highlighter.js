@@ -248,9 +248,13 @@ define([
             spans = jQuery.grep(jQuery('.annotation.pending'), function(span) {
               return span.annotation.annotation_id === annotation.annotation_id;
             });
+
+            // Add ID to spans
+            bindToElements(annotation, spans);
             spans = jQuery(spans);
           }
 
+          // Refresh styles
           spans.removeClass();
           updateStyles(annotation, spans);
           return spans.toArray();
