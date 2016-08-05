@@ -4,26 +4,26 @@ require.config({
 });
 
 require([
+  'common/utils/annotationUtils',
+  'common/api',
+  'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
-  'document/annotation/text/page/header',
+  'document/annotation/common/page/header',
+  'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler',
-  'common/utils/annotationUtils',
-  'common/api',
-  'common/config'],
+],
 
-  function(ReadEditor, WriteEditor, Header, Toolbar, Highlighter, SelectionHandler,
-    AnnotationUtils, API, Config) {
+function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, Header, BaseApp, Toolbar,
+  Highlighter, SelectionHandler) {
 
-  jQuery(document).ready(function() {
+  var App = function() {
 
-    var header = new Header(),
+    var contentNode = document.getElementById('content'),
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
-
-        contentNode = document.getElementById('content'),
 
         highlighter = new Highlighter(contentNode),
 
@@ -42,59 +42,6 @@ require([
 
           if (Config.IS_TOUCH)
             contentNode.className = 'touch';
-        },
-
-        onAnnotationsLoaded = function(annotations) {
-          var sorted = AnnotationUtils.sortByOffsetDesc(annotations),
-              hash = (window.location.hash) ? window.location.hash.substring(1) : false,
-              preselected;
-
-          header.incrementAnnotationCount(annotations.length);
-          // var startTime = new Date().getTime();
-          highlighter.initPage(sorted);
-          // console.log('took ' + (new Date().getTime() - startTime) + 'ms');
-
-          if (hash) {
-            // An annotation was pre-selected via URL hash
-            preselected = highlighter.findById(hash);
-            if (preselected)
-              editor.open(preselected.annotation, preselected.elements[0].getBoundingClientRect());
-          }
-        },
-
-        onAnnotationsLoadError = function(annotations) {
-          // TODO visual notification
-        },
-
-        onUpdateAnnotation = function(annotationStub) {
-          header.showStatusSaving();
-          API.storeAnnotation(annotationStub)
-             .done(function(annotation) {
-               // Update header info
-               header.incrementAnnotationCount();
-               header.updateContributorInfo(Config.me);
-               header.showStatusSaved();
-
-               // Merge server-provided properties (id, timestamps, etc.) into the annotation
-               jQuery.extend(annotationStub, annotation);
-               highlighter.refreshAnnotation(annotationStub);
-             })
-             .fail(function(error) {
-               header.showSaveError(error);
-             });
-        },
-
-        onDeleteAnnotation = function(annotation) {
-          header.showStatusSaving();
-
-          API.deleteAnnotation(annotation.annotation_id)
-             .done(function() {
-               header.incrementAnnotationCount(-1);
-               header.showStatusSaved();
-             })
-             .fail(function(error) {
-               header.showSaveError(error);
-             });
         },
 
         setColorscheme = function(mode) {
@@ -116,19 +63,29 @@ require([
     toolbar.on('annotationModeChanged', editor.setAnnotationMode);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
-    // Editor events
-    editor.on('updateAnnotation', onUpdateAnnotation);
-    editor.on('deleteAnnotation', onDeleteAnnotation);
+    BaseApp.apply(this, [ highlighter, new Header() ]);
 
-    // Init
+    // Editor events
+    editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
+    editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
+
     rangy.init();
 
-    // Init page preferences - e.g. color mode
     initPagePrefs();
 
     API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-       .done(onAnnotationsLoaded)
-       .fail(onAnnotationsLoadError);
-  });
+       .done(this.onAnnotationsLoaded.bind(this))
+       .fail(this.onAnnotationsLoadError.bind(this));
+  };
+  App.prototype = Object.create(BaseApp.prototype);
+
+  /** override - the tex UI needs annotations sorted by char offset, descending **/
+  App.prototype.onAnnotationsLoaded = function(annotations) {
+    var sorted = AnnotationUtils.sortByOffsetDesc(annotations);
+    BaseApp.prototype.onAnnotationsLoaded.call(this, sorted);
+  };
+
+  /** Start on page load **/
+  jQuery(document).ready(function() { new App(); });
 
 });

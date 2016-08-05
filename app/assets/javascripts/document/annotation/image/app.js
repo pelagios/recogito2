@@ -7,136 +7,113 @@ require([
   'common/api',
   'common/config',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/common/page/header',
+  'document/annotation/common/baseApp',
   'document/annotation/image/page/toolbar',
   'document/annotation/image/selection/pointHighlighter',
   'document/annotation/image/selection/pointSelectionHandler'],
 
-  function(API, Config, WriteEditor, Toolbar, PointHighlighter, PointSelectionHandler) {
+  function(API, Config, WriteEditor, Header, BaseApp, Toolbar, PointHighlighter, PointSelectionHandler) {
 
-  jQuery(document).ready(function() {
+    /** The app is instantiated after the image manifest was loaded **/
+    var App = function(imageProperties) {
 
-    var contentNode = document.getElementById('image-pane'),
+      // TODO handle difference between Zoomify and IIIF, based on Config.contentType
+      var contentNode = document.getElementById('image-pane'),
 
-        toolbar = new Toolbar(),
+          toolbar = new Toolbar(),
 
-        BASE_URL = jsRoutes.controllers.document.DocumentController
-          .getImageTile(Config.documentId, Config.partSequenceNo, '').absoluteURL(),
+          BASE_URL = jsRoutes.controllers.document.DocumentController
+            .getImageTile(Config.documentId, Config.partSequenceNo, '').absoluteURL(),
 
-        loadManifest = function() {
-          return jsRoutes.controllers.document.DocumentController
-            .getImageManifest(Config.documentId, Config.partSequenceNo)
-            .ajax()
-            .then(function(response) {
-              // TODO handle difference between Zoomify and IIIF, based on Config.contentType
+          w = imageProperties.width,
 
-              // jQuery handles the XML parsing
-              var props = jQuery(response).find('IMAGE_PROPERTIES'),
-                  width = parseInt(props.attr('WIDTH')),
-                  height = parseInt(props.attr('HEIGHT')),
-                  imageProperties = { width: width, height: height };
+          h = imageProperties.height,
 
-              // Store image properties in global Config as well
-              Config.imageProperties = imageProperties;
-              return imageProperties;
-            });
-        },
+          projection = new ol.proj.Projection({
+            code: 'ZOOMIFY',
+            units: 'pixels',
+            extent: [0, 0, w, h]
+          }),
 
-        onLoadError = function(error) {
-          // TODO error indication to user
-          console.log(error);
-        },
+          tileSource = new ol.source.Zoomify({
+            url: BASE_URL,
+            size: [ w, h ]
+          }),
 
-        init = function(imageProperties) {
-          // TODO handle difference between Zoomify and IIIF, based on Config.contentType
-          var w = imageProperties.width,
+          tileLayer = new ol.layer.Tile({ source: tileSource }),
 
-              h = imageProperties.height,
+          olMap = new ol.Map({
+            target: 'image-pane',
+            layers: [ tileLayer ],
+            view: new ol.View({
+              projection: projection,
+              center: [w / 2, - (h / 2)],
+              zoom: 0,
+              minResolution: 0.125
+            })
+          }),
 
-              projection = new ol.proj.Projection({
-                code: 'ZOOMIFY',
-                units: 'pixels',
-                extent: [0, 0, w, h]
-              }),
+          highlighter = new PointHighlighter(olMap),
 
-              tileSource = new ol.source.Zoomify({
-                url: BASE_URL,
-                size: [ w, h ]
-              }),
+          selector = new PointSelectionHandler(contentNode, olMap, highlighter),
 
-              tileLayer = new ol.layer.Tile({ source: tileSource }),
+          editor = new WriteEditor(contentNode, highlighter, selector),
 
-              olMap = new ol.Map({
-                target: 'image-pane',
-                layers: [ tileLayer ],
-                view: new ol.View({
-                  projection: projection,
-                  center: [w / 2, - (h / 2)],
-                  zoom: 0,
-                  minResolution: 0.125
-                })
-              }),
+          onMapMove = function() {
+            var selection = selector.getSelection();
+            if (selection)
+              editor.setPosition(selection.bounds);
+          };
 
-              highlighter = new PointHighlighter(olMap),
+      BaseApp.apply(this, [ highlighter, new Header() ]);
 
-              selector = new PointSelectionHandler(contentNode, olMap, highlighter),
+      // TODO refactor, so we have one common 'annotation app' base class
+      editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
+      editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 
-              editor = new WriteEditor(contentNode, highlighter, selector),
+      olMap.on('postrender', onMapMove);
 
-              onAnnotationsLoaded = function(annotations) {
-                highlighter.initPage(annotations);
-              },
+      API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
+         .done(this.onAnnotationsLoaded.bind(this))
+         .fail(this.onAnnotationsLoadError.bind(this));
+    };
+    App.prototype = Object.create(BaseApp.prototype);
 
-              onAnnotationsLoadError = function(annotations) {
-                // TODO visual notification
-              },
+    /** On page load, fetch the manifest and instantiate the app **/
+    jQuery(document).ready(function() {
 
-              onUpdateAnnotation = function(annotationStub) {
-                API.storeAnnotation(annotationStub)
-                   .done(function(annotation) {
-                     // Merge server-provided properties (id, timestamps, etc.) into the annotation
-                     jQuery.extend(annotationStub, annotation);
-                     highlighter.refreshAnnotation(annotationStub);
-                   })
-                   .fail(function(error) {
-                     // TODO show save error in UI
-                     // TODO re-use 'header' class from text annotation UI
-                     console.log(error);
-                   });
-              },
+      var loadManifest = function() {
+            return jsRoutes.controllers.document.DocumentController
+              .getImageManifest(Config.documentId, Config.partSequenceNo)
+              .ajax()
+              .then(function(response) {
+                // TODO handle difference between Zoomify and IIIF, based on Config.contentType
 
-              onDeleteAnnotation = function(annotation) {
-                API.deleteAnnotation(annotation.annotation_id)
-                   .done(function() {
-                     /*
-                     header.incrementAnnotationCount(-1);
-                     header.showStatusSaved();
-                     */
-                   })
-                   .fail(function(error) {
-                     // header.showSaveError(error);
-                   });
-              },
+                // jQuery handles the XML parsing
+                var props = jQuery(response).find('IMAGE_PROPERTIES'),
+                    width = parseInt(props.attr('WIDTH')),
+                    height = parseInt(props.attr('HEIGHT')),
+                    imageProperties = { width: width, height: height };
 
-              onMapMove = function() {
-                var selection = selector.getSelection();
-                if (selection)
-                  editor.setPosition(selection.bounds);
-              };
+                // Store image properties in global Config as well
+                Config.imageProperties = imageProperties;
+                return imageProperties;
+              });
+          },
 
-          // TODO refactor, so we have one common 'annotation app' base class
-          editor.on('updateAnnotation', onUpdateAnnotation);
-          editor.on('deleteAnnotation', onDeleteAnnotation);
+          onLoadError = function(error) {
+            // TODO error indication to user
+            console.log(error);
+          },
 
-          olMap.on('postrender', onMapMove);
+          init = function(imageProperties) {
+            new App(imageProperties);
+          };
 
-          API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-             .done(onAnnotationsLoaded)
-             .fail(onAnnotationsLoadError);
-        };
-
-    loadManifest()
-      .done(init)
-      .fail(onLoadError);
-  });
+      loadManifest()
+        .done(init)
+        .fail(onLoadError);
+    });
 
 });

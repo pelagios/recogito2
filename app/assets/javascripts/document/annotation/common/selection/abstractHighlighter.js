@@ -7,6 +7,9 @@ define([], function() {
 
   var AbstractHighlighter = function() {
 
+    if (!this.findById)
+      throw 'Highlighter needs to implement .findById() method';
+
     if (!this.initPage)
       throw 'Highlighter needs to implement .initPage() method';
 

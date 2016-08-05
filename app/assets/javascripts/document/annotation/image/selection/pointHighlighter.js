@@ -81,6 +81,10 @@ define([
             pointVectorSource.addFeature(pointFeature);
           },
 
+          findById = function(id) {
+            // TODO implement
+          },
+
           initPage = function(annotations) {
             jQuery.each(annotations, function(idx, a) {
               renderPointAnnotation(a);
@@ -119,6 +123,7 @@ define([
       olMap.on('pointermove', onMousemove);
 
       this.getCurrentHighlight = getCurrentHighlight;
+      this.findById = findById;
       this.initPage = initPage;
       this.refreshAnnotation = refreshAnnotation;
       this.removeAnnotation = removeAnnotation;
