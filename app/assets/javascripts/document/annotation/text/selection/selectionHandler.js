@@ -111,10 +111,15 @@ define([
 
              clearNativeSelection();
 
+             // A new selection
              currentSelection = {
                isNew      : true,
                annotation : annotation,
-               bounds     : bounds
+               bounds     : bounds,
+
+               // Text-UI specific field - speeds things up a bit
+               // in highlighter.convertSelectionToAnnotation
+               spans      : spans
              };
 
              self.fireEvent('select', currentSelection);
@@ -122,6 +127,7 @@ define([
             // Top-most annotation at this span
             annotation = highlighter.getAnnotationsAt(annotationSpan[0])[0];
 
+            // A selection on an existing annotation
             currentSelection = {
               isNew      : false,
               annotation : annotation,

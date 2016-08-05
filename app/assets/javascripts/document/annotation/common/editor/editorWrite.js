@@ -76,44 +76,35 @@ define([
 
         /** Opens the editor on a newly created text selection **/
         editSelection = function(selection) {
-          var quote, record, body;
+          if (selection.isNew) {
+            // Branch based on annotation mode
+            // TODO can we move dependency on mode outside the editor?
+            if (annotationMode.mode === 'NORMAL') {
+              self.open(selection.annotation, selection.bounds);
+            } else if (annotationMode.mode === 'QUICK') {
+              // Quick modes just add an annotation body and trigger instant OK
+              self.currentAnnotation = selection.annotation;
 
-          if (annotationMode.mode === 'NORMAL') {
-            self.open(selection.annotation, selection.bounds);
-          } else if (annotationMode.mode === 'QUICK') {
-            // Quick modes just add an annotation body and trigger instant OK
-            currentAnnotation = selection.annotation;
+              if (annotationMode.type === 'PLACE') {
+                API.searchPlaces(AnnotationUtils.getQuote(selection.annotation)).done(function(response) {
+                  var quote = AnnotationUtils.getQuote(selection.annotation),
+                      body = { type: 'PLACE', status: { value: 'UNVERIFIED' } };
 
-            if (annotationMode.type === 'PLACE') {
-              API.searchPlaces(AnnotationUtils.getQuote(selection.annotation)).done(function(response) {
-                var body = { type: 'PLACE', status: { value: 'UNVERIFIED' } };
-                if (response.total > 0)
-                  body.uri = PlaceUtils.getBestMatchingRecord(response.items[0], quote).uri;
+                  if (response.total > 0)
+                    body.uri = PlaceUtils.getBestMatchingRecord(response.items[0], quote).uri;
+
                   selection.annotation.bodies.push(body);
                   onOK();
-              });
-            } else if (annotationMode.type === 'PERSON') {
-              selection.annotation.bodies.push({ type: 'PERSON' });
-              onOK();
+                });
+              } else if (annotationMode.type === 'PERSON') {
+                selection.annotation.bodies.push({ type: 'PERSON' });
+                onOK();
+              }
+            } else if (annotationMode.mode === 'BULK') {
+              // TODO implement
             }
-          } else if (annnotationMode.mode === 'BULK') {
-            // TODO implement
-
-          }
-
-          return false;
-        },
-
-        /** Opens the editor on an existing annotation **/
-        editAnnotation = function(e) {
-          var selection = selectionHandler.getSelection(),
-              element = e.target, allAnnotations;
-
-          if (selection) {
-            editSelection(selection);
           } else {
-            allAnnotations = highlighter.getAnnotationsAt(element);
-            self.open(allAnnotations[0], element.getBoundingClientRect());
+            self.open(selection.annotation, selection.bounds);
           }
 
           return false;
@@ -146,7 +137,7 @@ define([
           var reply = replyField.getComment(), annotationSpans,
               hasChanged = reply || self.sectionList.hasChanged();
 
-          if (hasChanged) {
+          if (hasChanged || annotationMode.mode === 'QUICK') {
             self.sectionList.commitChanges();
 
             // Push the current reply body, if any

@@ -232,19 +232,6 @@ define([
           bindToElements(annotation, selection.spans);
         },
 
-        /**
-         * Creates highlight spans for an annotation and mounts it.
-         * Returns the created spans for convenience.
-         */
-        renderAnnotation = function(annotation) {
-          var range = rangy.createRange(), spans;
-
-          range.selectCharacters(rootNode.childNodes[0], parseInt(anchor), parseInt(anchor) + quote.length);
-          spans = wrapRange(range);
-          convertSpansToAnnotation(spans, annotation);
-          return spans;
-        },
-
         removeAnnotation = function(annotation) {
           var spans = jQuery('[data-id="' + annotation.annotation_id + '"]');
           jQuery.each(spans, function(idx, span) {
@@ -312,7 +299,6 @@ define([
     this.initPage = initPage;
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
-    this.renderAnnotation = renderAnnotation;
     this.wrapRange = wrapRange;
 
     AbstractHighlighter.apply(this);
