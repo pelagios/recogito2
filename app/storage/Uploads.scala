@@ -1,9 +1,9 @@
 package storage
 
 import java.io.File
-import javax.inject.{ Inject, Singleton }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.{ Logger, Configuration }
+import javax.inject.{Inject, Singleton}
+import play.api.{Configuration, Logger}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
 
 @Singleton
@@ -96,18 +96,21 @@ class Uploads @Inject() (config: Configuration) {
     })
     
   /** Helper **/
-  def openThumbnail(owner: String, docId: String, filename: String): Option[File] = 
-    getDocumentDir(owner, docId).flatMap(dir => {
-      val tilesetDir = new File(dir, filename.substring(0, filename.lastIndexOf('.')))
-      if (tilesetDir.exists) { 
-        val thumbnail = new File(tilesetDir, "TileGroup0/0-0-0.jpg")
-        if (thumbnail.exists)
-          Some(thumbnail)
-        else
+  def openThumbnail(owner: String, docId: String, filename: String)(implicit ctx: ExecutionContext): Future[Option[File]] = Future {
+    scala.concurrent.blocking {
+      getDocumentDir(owner, docId).flatMap(dir => {
+        val tilesetDir = new File(dir, filename.substring(0, filename.lastIndexOf('.')))
+        if (tilesetDir.exists) {
+          val thumbnail = new File(tilesetDir, "TileGroup0/0-0-0.jpg")
+          if (thumbnail.exists)
+            Some(thumbnail)
+          else
+            None
+        } else {
           None
-      } else {
-        None        
-      }
-    })
+        }
+      })
+    }
+  }
 
 }

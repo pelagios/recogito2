@@ -17,7 +17,6 @@ class MapController @Inject() (
     implicit val webjars: WebJarAssets
   ) extends BaseOptAuthController(config, document, users) {
 
-  /** TODO this view should be available without login, if the document is set to public **/
   def showMap(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user.getUsername)
     

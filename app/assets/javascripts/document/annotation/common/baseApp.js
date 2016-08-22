@@ -19,7 +19,6 @@ define([
     this.highlighter.initPage(annotations);
     // console.log('took ' + (new Date().getTime() - startTime) + 'ms');
 
-    // TODO needs refactoring to make it work cross-media
     if (urlHash) {
       preselected = this.highlighter.findById(urlHash);
       if (preselected)
