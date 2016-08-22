@@ -18,7 +18,7 @@ class MapController @Inject() (
   ) extends BaseOptAuthController(config, document, users) {
 
   def showMap(documentId: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     
     documentReadResponse(documentId, maybeUser,  { case (document, fileparts, accesslevel) =>
       Future.successful(Ok(views.html.document.map.index(maybeUser, document, accesslevel)))

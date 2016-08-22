@@ -2,11 +2,12 @@ package controllers
 
 import jp.t2v.lab.play2.auth.AuthElement
 import models.document.{ DocumentAccessLevel, DocumentService }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
 import models.user.UserService
 import play.api.Configuration
 import play.api.mvc.Result
 import play.api.cache.CacheApi
+
 import scala.concurrent.ExecutionContext
 
 abstract class BaseAuthController(
@@ -20,10 +21,10 @@ abstract class BaseAuthController(
     * Just hand this method a function that produces an HTTP OK result for a document, while
     * the method handles ForbiddenPage/Not Found error cases.
     */
-  protected def documentResponse(docId: String, username: String,
+  protected def documentResponse(docId: String, user: UserRecord,
       response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Result)(implicit ctx: ExecutionContext) = {
 
-    documents.findByIdWithFileparts(docId, Some(username)).map(_ match {
+    documents.findByIdWithFileparts(docId, Some(user.getUsername)).map(_ match {
       case Some((document, fileparts, accesslevel)) => {
         if (accesslevel.canRead)
           // As long as there are read rights we'll allow access here - the response
@@ -43,10 +44,10 @@ abstract class BaseAuthController(
   }
 
   /** Helper that covers the boilerplate for all document part views **/
-  protected def documentPartResponse(docId: String, partNo: Int, username: String,
+  protected def documentPartResponse(docId: String, partNo: Int, user: UserRecord,
       response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Result)(implicit ctx: ExecutionContext) = {
 
-    documentResponse(docId, username, { case (document, fileparts, accesslevel) =>
+    documentResponse(docId, user, { case (document, fileparts, accesslevel) =>
       val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
       if (selectedPart.isEmpty)
         NotFoundPage

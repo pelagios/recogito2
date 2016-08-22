@@ -42,7 +42,7 @@ class SettingsController @Inject() (
            
           f.map(t => 
             // Make sure this page isn't cached, since stuff gets added via AJAX
-            Ok(views.html.document.settings.sharing(loggedIn.user.getUsername, document, t))
+            Ok(views.html.document.settings.sharing(loggedIn.user, document, t))
               .withHeaders(
                 CACHE_CONTROL -> "no-cache, no-store, must-revalidate",
                 PRAGMA -> "no-cache",
@@ -50,13 +50,13 @@ class SettingsController @Inject() (
         }
             
         case Some(t) if t == "history" =>
-          Future.successful(Ok(views.html.document.settings.history(loggedIn.user.getUsername, document)))
+          Future.successful(Ok(views.html.document.settings.history(loggedIn.user, document)))
           
         case Some(t) if t == "backup" =>
-          Future.successful(Ok(views.html.document.settings.backup(loggedIn.user.getUsername, document)))
+          Future.successful(Ok(views.html.document.settings.backup(loggedIn.user, document)))
           
         case _ =>
-          Future.successful(Ok(views.html.document.settings.metadata(loggedIn.user.getUsername, document))) 
+          Future.successful(Ok(views.html.document.settings.metadata(loggedIn.user, document))) 
       }
     })
   }

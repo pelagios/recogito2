@@ -1,4 +1,6 @@
-@(title: String, username: String, document: models.generated.tables.records.DocumentRecord,
+@(title: String,
+  user: models.generated.tables.records.UserRecord,
+  document: models.generated.tables.records.DocumentRecord,
   active: Option[String], webjars: WebJarAssets)(content: Html)
 <!DOCTYPE html>
 <html>
@@ -8,7 +10,7 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
   </head>
   <body>
-    @views.html.document.iconbar(Some(username), document, models.document.DocumentAccessLevel.ADMIN, "settings")
+    @views.html.document.iconbar(Some(user), document, models.document.DocumentAccessLevel.ADMIN, "settings")
 
     <div class="sidebar">
       <div class="sidebar-header"></div>

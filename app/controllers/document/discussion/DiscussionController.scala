@@ -17,8 +17,8 @@ class DiscussionController @Inject() (
   ) extends BaseAuthController(config, documents, users) {
 
   def showDiscussionBoard(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentResponse(documentId, loggedIn.user.getUsername,
-        { case (document, fileparts, accesslevel) =>  Ok(views.html.document.discussion.index(loggedIn.user.getUsername, document, accesslevel)) })
+    documentResponse(documentId, loggedIn.user,
+        { case (document, fileparts, accesslevel) =>  Ok(views.html.document.discussion.index(loggedIn.user, document, accesslevel)) })
   }
 
 }

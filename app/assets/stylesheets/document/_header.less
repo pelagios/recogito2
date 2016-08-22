@@ -43,13 +43,6 @@
     .rounded-corners(50%);
   }
 
-  li.home {
-    position:absolute;
-    top:0;
-    right:25px;
-    margin-right:0;
-  }
-
   .tooltip .hint {
     position:absolute;
     top:67px;
@@ -73,12 +66,24 @@
     left:-21px;
   }
 
-  .not-logged-in {
+  .logged-in {
     position:absolute;
     top:22px;
-    right:25px;
+    right:28px;
+    font-size:15px;
     color:@lightblue-type;
-    font-size:14.5px;
+
+    a {
+      color: @ocean;
+    }
+
+  }
+
+  .not.logged-in {
+
+    a {
+      color:@lightblue-type;
+    }
 
     a:hover {
       color: @ocean;

@@ -1,15 +1,16 @@
 package controllers.document.annotation
 
-import controllers.{ BaseOptAuthController, WebJarAssets }
+import controllers.{BaseOptAuthController, WebJarAssets}
 import javax.inject.Inject
 import models.ContentType
 import models.annotation.AnnotationService
-import models.document.{ DocumentService, DocumentAccessLevel }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.document.{ DocumentAccessLevel, DocumentService }
+import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
 import models.user.UserService
 import play.api.{ Configuration, Logger }
 import play.api.mvc.RequestHeader
-import scala.concurrent.{ ExecutionContext, Future }
+
+import scala.concurrent.{ExecutionContext, Future}
 import storage.Uploads
 
 class AnnotationController @Inject() (
@@ -28,7 +29,7 @@ class AnnotationController @Inject() (
   }
 
   def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     documentPartResponse(documentId, partNo, maybeUser, { case (document, fileparts, selectedPart, accesslevel) =>
       if (accesslevel.canRead)
         renderResponse(maybeUser, document, fileparts, selectedPart, accesslevel)
@@ -39,8 +40,9 @@ class AnnotationController @Inject() (
     })
   }
 
-  private def renderResponse(loggedInUser: Option[String], document: DocumentRecord, parts: Seq[DocumentFilepartRecord],
-      thisPart: DocumentFilepartRecord, accesslevel: DocumentAccessLevel)(implicit request: RequestHeader) =
+  private def renderResponse(loggedInUser: Option[UserRecord], document: DocumentRecord,
+    parts: Seq[DocumentFilepartRecord], thisPart: DocumentFilepartRecord,
+    accesslevel: DocumentAccessLevel)(implicit request: RequestHeader) =
 
     ContentType.withName(thisPart.getContentType) match {
 

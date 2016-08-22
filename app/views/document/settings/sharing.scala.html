@@ -1,8 +1,8 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord,
-  sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord])(implicit request: RequestHeader,
-  webjars: WebJarAssets)
+@(user: models.generated.tables.records.UserRecord,
+  document: models.generated.tables.records.DocumentRecord,
+  sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord])(implicit request: RequestHeader, webjars: WebJarAssets)
 
-@_layout("Recogito | Settings - Sharing", username, document, Some("sharing"), webjars) {
+@_layout("Recogito | Settings - Sharing", user, document, Some("sharing"), webjars) {
   <div class="panel share-public">
     <h2>Public Access</h2>
       <div class="inner">
@@ -48,7 +48,7 @@
 
     <script>
       window.config = {
-        me: '@username',
+        me: '@user.getUsername',
         documentId: '@document.getId'
       }
     </script>

@@ -27,7 +27,7 @@ class DocumentController @Inject() (
 
     import models.ContentType._
 
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (document, fileparts, filepart, accesslevel) =>
       val contentType = filepart.getContentType
       val maybeManifestName =
@@ -70,7 +70,7 @@ class DocumentController @Inject() (
   }
 
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (document, fileparts, filepart, accesslevel) =>
       getTilesetFile(document, filepart, tilepath).map {
         case Some(file) => Ok.sendFile(file)
@@ -80,7 +80,7 @@ class DocumentController @Inject() (
   }
 
   def getThumbnail(docId: String, partNo: Int) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (document, fileparts, filepart, accesslevel) =>
       uploads.openThumbnail(document.getOwner, docId, filepart.getFilename).map {
         case Some(file) => Ok.sendFile(file)

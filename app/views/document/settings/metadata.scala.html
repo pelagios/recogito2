@@ -1,5 +1,6 @@
-@(username: String, document: models.generated.tables.records.DocumentRecord)(implicit webjars: WebJarAssets)
+@(user: models.generated.tables.records.UserRecord,
+  document: models.generated.tables.records.DocumentRecord)(implicit webjars: WebJarAssets)
 
-@_layout("Recogito | Settings - Metadata", username, document, Some("metadata"), webjars) {
+@_layout("Recogito | Settings - Metadata", user, document, Some("metadata"), webjars) {
 
 }

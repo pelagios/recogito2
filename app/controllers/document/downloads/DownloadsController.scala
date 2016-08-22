@@ -29,7 +29,7 @@ class DownloadsController @Inject() (
       with GeoJSONSerializer {
 
   def showDownloadOptions(documentId: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       annotations.countByDocId(documentId).map { documentAnnotationCount =>
         Ok(views.html.document.downloads.index(maybeUser, document, accesslevel, documentAnnotationCount))
@@ -38,7 +38,7 @@ class DownloadsController @Inject() (
   }
 
   def downloadAnnotations(documentId: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       annotations.findByDocId(documentId).map { annotations =>
         val enumerator = Enumerator.enumerate(annotations.map(t => Json.stringify(Json.toJson(t._1)) + "\n"))
@@ -49,7 +49,7 @@ class DownloadsController @Inject() (
   }
 
   def downloadCSV(documentId: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       annotationsToCSV(documentId).map { csv =>
         Ok(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
@@ -58,7 +58,7 @@ class DownloadsController @Inject() (
   }
 
   def downloadGeoJSON(documentId: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user.getUsername)
+    val maybeUser = loggedIn.map(_.user)
     documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
       placesToGeoJSON(documentId).map { featureCollection =>
         Ok(Json.prettyPrint(Json.toJson(featureCollection)))
