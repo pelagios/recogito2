@@ -1,21 +1,20 @@
 package models.contribution
 
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
+import com.sksamuel.elastic4s.{HitAs, RichSearchHit}
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
-import java.util.UUID
-import javax.inject.{ Inject, Singleton }
-import models.{ HasDate, Page }
+import javax.inject.{Inject, Singleton}
+import models.{HasDate, Page}
 import org.elasticsearch.search.aggregations.bucket.filter.Filter
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.elasticsearch.search.aggregations.bucket.nested.Nested
 import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.{ DateTime, DateTimeZone }
+import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{JsSuccess, Json}
 import scala.collection.JavaConverters._
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.{ExecutionContext, Future}
 import storage.ES
 
 @Singleton
@@ -25,9 +24,9 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     override def json(c: Contribution): String = Json.stringify(Json.toJson(c))
   }
 
-  implicit object ContributionHitAs extends HitAs[Contribution] {
-    override def as(hit: RichSearchHit): Contribution =
-      Json.fromJson[Contribution](Json.parse(hit.sourceAsString)).get
+  implicit object ContributionHitAs extends HitAs[(Contribution, String)] {
+    override def as(hit: RichSearchHit): (Contribution, String) =
+      (Json.fromJson[Contribution](Json.parse(hit.sourceAsString)).get, hit.id)
   }
 
   /** Inserts a contribution record into the index **/
@@ -66,7 +65,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     }
 
   /** Returns the contribution history on a given document, as a paged result **/
-  def getHistory(documentId: String, offset: Int = 0, limit: Int = 20): Future[Page[(Contribution)]] =
+  def getHistory(documentId: String, offset: Int = 0, limit: Int = 20): Future[Page[(Contribution, String)]] =
     es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query nestedQuery("affects_item").query (
         termQuery("affects_item.document_id" -> documentId)
@@ -74,22 +73,27 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         field sort "made_at" order SortOrder.DESC
       ) start offset limit limit
     } map { response =>
-      val contributions = response.as[Contribution].toSeq
-      Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, contributions)
+      val contributionsWithId = response.as[(Contribution, String)].toSeq
+      Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, contributionsWithId)
     }
 
-  /** Returns the contributions associated with a specific annotation version **/
-  def getContributions(annotationId: UUID, versionId: UUID): Future[Seq[Contribution]] =
+  /** Retrieves a contribution by its ElasticSearch ID **/
+  def findById(id: String): Future[Option[(Contribution, String)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION query nestedQuery("affects_item").query {
-        bool {
-          must (
-            termQuery("affects_item.annotation_id" -> annotationId.toString),
-            termQuery("affects_item.annotation_version_id" -> versionId.toString)
-          )
+      get id id from ES.RECOGITO / ES.CONTRIBUTION
+    } map { response =>
+      if (response.isExists) {
+        Json.fromJson[Contribution](Json.parse(response.getSourceAsString)) match {
+          case JsSuccess(contribution, _) =>
+            Some(contribution, response.getId)
+          case _ =>
+            // Should never happen
+            throw new RuntimeException("Malformed contribution in index")
         }
+      } else {
+        None
       }
-    } map { _.as[Contribution] }
+    }
 
   /** Deletes the contribution history after a given timestamp **/
   def deleteHistoryAfter(documentId: String, after: DateTime): Future[Boolean] = {

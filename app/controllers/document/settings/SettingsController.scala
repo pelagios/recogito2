@@ -68,7 +68,7 @@ class SettingsController @Inject() (
       case None => Future.successful(NotFoundPage)
     })
   }
-  
+
   protected def jsonDocumentAdminAction[T](documentId: String, username: String, action: (DocumentRecord, T) => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]) = {
     request.body.asJson match {
       case Some(json) => Json.fromJson[T](json) match {

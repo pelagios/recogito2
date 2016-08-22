@@ -72,11 +72,9 @@ require([
         return (yearA === yearB && monthA === monthB && dayA === dayB);
       },
 
-      rollback = function(annotationId, versionId) {
-        jsRoutes.controllers.document.settings.SettingsController.rollbackByTime(Config.documentId).ajax({
-          contentType: 'application/json',
-          data: JSON.stringify({ annotation_id: annotationId, version_id: versionId })
-        }).done(function(response) {
+      rollback = function(contributionId) {
+        jsRoutes.controllers.document.settings.SettingsController.rollbackByTime(Config.documentId, contributionId).ajax()
+        .done(function(response) {
           window.setTimeout(function() { location.reload(); }, 1000);
         });
       };
@@ -85,15 +83,14 @@ require([
 
     jQuery('.edit-history').on('click', '.rollback', function(e) {
       var el = jQuery(e.target).closest('li'),
-          annotationId = el.data('annotation'),
-          versionId = el.data('version'),
+          contributionId = el.data('id'),
           warningTitle = '<span class="icon">&#xf071;</span> Revert Annotation History',
           warningMsg = 'You are about to revert the annotation history. ' +
-            'This will permanently delete all edits that happend after the selected time. ' +
+            'This will permanently delete all edits that happened after the selected time. ' +
             'The operation is not reversible! <strong>Are you sure you want to do this?</strong>';
 
       new Alert('warning', warningTitle, warningMsg).on('ok', function() {
-        rollback(annotationId, versionId);
+        rollback(contributionId);
       });
     });
 
@@ -107,8 +104,6 @@ require([
                   '<span class="action">' + formatAction(contribution) + '</span> ' +
                 '</p>' +
               '</div>',
-            annotationId = contribution.affects_item.annotation_id,
-            versionId = contribution.affects_item.annotation_version_id,
             rollbackButton = '<button class="rollback icon" title="Revert document to this state">&#xf0e2;</button>',
             ul, li;
 
@@ -120,14 +115,14 @@ require([
         } else if (previous && isSameDay(previous.contribution.made_at, contribution.made_at)) {
           // Different edit, but on the same day - render in new <li>
           ul = previous.ul;
-          li = jQuery('<li data-annotation="' + annotationId + '" data-version="' + versionId + '">' + rollbackButton + '</li>');
+          li = jQuery('<li data-id="' + contribution.id + '">' + rollbackButton + '</li>');
           li.append(row);
           ul.append(li);
         } else {
           // New edit on a new day - render in new <h3> and <ul>
           contributions.append('<h3>Edits on ' + Formatting.formatDay(new Date(contribution.made_at)) + '</h3>');
           ul = jQuery('<ul></ul>');
-          li = jQuery('<li data-annotation="' + annotationId + '" data-version="' + versionId + '">' + rollbackButton + '</li>');
+          li = jQuery('<li data-id="' + contribution.id + '">' + rollbackButton + '</li>');
           li.append(row);
           ul.append(li);
           contributions.append(ul);

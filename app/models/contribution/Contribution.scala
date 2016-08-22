@@ -34,5 +34,10 @@ object Contribution extends HasDate with HasNullableSeq {
       .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
     (JsPath \ "context").formatNullable[String]
   )(Contribution.apply, unlift(Contribution.unapply))
+
+  implicit val contributionWithIdWrites: Writes[(Contribution, String)] = (
+    (JsPath \ "id").write[String] and
+    (JsPath).write[Contribution]
+  )(t => (t._2, t._1))
   
 }
