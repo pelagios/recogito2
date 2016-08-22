@@ -1,0 +1,60 @@
+@(loggedInUser: Option[String],
+  document: models.generated.tables.records.DocumentRecord,
+  accessLevel: models.document.DocumentAccessLevel,
+  activeView: String)
+
+  <div class="header-iconbar">
+    <ul>
+      <li class="tooltip bottom@if(activeView == "edit") { active}">
+        <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, 1)">
+          <span class="icon">&#xe86f;</span>
+          <span class="hint">Document view</span>
+        </a>
+      </li>
+
+      <li class="tooltip narrow bottom@if(activeView == "map") { active}">
+        <a href="@controllers.document.map.routes.MapController.showMap(document.getId)">
+          <span class="icon">&#xe846;</span>
+          <span class="hint">Map view</span>
+        </a>
+      </li>
+
+      <li class="tooltip bottom@if(activeView == "stats") { active}">
+        <a href="@controllers.document.stats.routes.StatsController.showDocumentStats(document.getId)">
+          <span class="icon">&#xe8ae;</span>
+          <span class="hint">Annotation statistics</span>
+        </a>
+      </li>
+
+      <li class="tooltip bottom@if(activeView == "downloads") { active}">
+        <a href="@controllers.document.downloads.routes.DownloadsController.showDownloadOptions(document.getId)">
+          <span class="icon">&#xe875;</span>
+          <span class="hint">Download options</span>
+        </a>
+      </li>
+
+      <li class="tooltip bottom@if(activeView == "discussion") { active}">
+        <a href="@controllers.document.discussion.routes.DiscussionController.showDiscussionBoard(document.getId)">
+          <span class="icon">&#xe862;</span>
+          <span class="hint">Discuss this document</span>
+        </a>
+      </li>
+
+      @if(accessLevel.isAdmin) {
+        <li class="tooltip bottom@if(activeView == "settings") { active}">
+          <a href="@controllers.document.settings.routes.SettingsController.showDocumentSettings(document.getId, None)">
+            <span class="icon">&#xe8c9;</span>
+            <span class="hint">Document settings</span>
+          </a>
+        </li>
+      }
+
+      @if(loggedInUser.isDefined) {
+        <li class="home">
+          <a href="@controllers.my.routes.MyRecogitoController.index(loggedInUser.get.toLowerCase, None)">
+            <span class="icon">&#xe8bf;</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </div>

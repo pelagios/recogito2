@@ -3,6 +3,8 @@
   allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
   accessLevel: models.document.DocumentAccessLevel)(implicit request: RequestHeader, webjars: WebJarAssets)
+
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -28,62 +30,7 @@
     </script>
   </head>
   <body>
-    <div class="header-iconbar">
-      <ul>
-        <li class="active tooltip bottom">
-          <span class="icon">&#xe86f;</span>
-          <span class="hint">Document view</span>
-        </li>
-
-        <li class="tooltip narrow bottom">
-          <a href="@controllers.document.map.routes.MapController.showMap(document.getId)">
-            <span class="icon">&#xe846;</span>
-            <span class="hint">Map view</span>
-          </a>
-        </li>
-
-        <li class="tooltip bottom">
-          <a href="@controllers.document.stats.routes.StatsController.showDocumentStats(document.getId)">
-            <span class="icon">&#xe8ae;</span>
-            <span class="hint">Annotation statistics</span>
-          </a>
-        </li>
-
-        <li class="tooltip bottom">
-          <a href="@controllers.document.downloads.routes.DownloadsController.showDownloadOptions(document.getId)">
-            <span class="icon">&#xe875;</span>
-            <span class="hint">Download options</span>
-          </a>
-        </li>
-
-        <li class="tooltip bottom">
-          <a href="@controllers.document.discussion.routes.DiscussionController.showDiscussionBoard(document.getId)">
-            <span class="icon">&#xe862;</span>
-            <span class="hint">Discussion this document</span>
-          </a>
-        </li>
-
-        @if(accessLevel.isAdmin) {
-          <li class="tooltip bottom">
-            <a href="@controllers.document.settings.routes.SettingsController.showDocumentSettings(document.getId, None)">
-              <span class="icon">&#xe8c9;</span>
-              <span class="hint">Document settings</span>
-            </a>
-          </li>
-        }
-
-        @if(loggedInUser.isDefined) {
-          <li class="home">
-            <a href="@controllers.my.routes.MyRecogitoController.index(loggedInUser.get.toLowerCase, None)">
-              <span class="icon">&#xe8bf;</span>
-            </a>
-          </li>
-        }
-      </ul>
-
-      <div class="save-msg"></div>
-
-    </div> <!-- .header-iconbar -->
+    @views.html.document.iconbar(loggedInUser, document, accessLevel, "edit")
 
     <div class="header-infobox">
       <h1>
@@ -150,6 +97,7 @@
         }
       </ul>
     </div> <!-- .sidebar -->
+
     @views.html.document.initTooltips()
     @helper.javascriptRouter("jsRoutes")(
       controllers.document.routes.javascript.DocumentController.getImageManifest,
