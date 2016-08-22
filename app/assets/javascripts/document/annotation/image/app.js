@@ -7,13 +7,12 @@ require([
   'common/api',
   'common/config',
   'document/annotation/common/editor/editorWrite',
-  'document/annotation/common/page/header',
   'document/annotation/common/baseApp',
   'document/annotation/image/page/toolbar',
   'document/annotation/image/selection/pointHighlighter',
   'document/annotation/image/selection/pointSelectionHandler'],
 
-  function(API, Config, WriteEditor, Header, BaseApp, Toolbar, PointHighlighter, PointSelectionHandler) {
+  function(API, Config, WriteEditor, BaseApp, Toolbar, PointHighlighter, PointSelectionHandler) {
 
     /** The app is instantiated after the image manifest was loaded **/
     var App = function(imageProperties) {
@@ -66,7 +65,7 @@ require([
               editor.setPosition(selection.bounds);
           };
 
-      BaseApp.apply(this, [ highlighter, new Header() ]);
+      BaseApp.apply(this, [ editor, highlighter ]);
 
       // TODO refactor, so we have one common 'annotation app' base class
       editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));

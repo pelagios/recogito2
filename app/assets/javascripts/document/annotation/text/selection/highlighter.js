@@ -294,7 +294,7 @@ define([
               annotation = (spans.length > 0) ? spans[0].annotation : false;
 
           if (annotation)
-            return { annotation: annotation, elements: spans };
+            return { annotation: annotation, bounds: spans[0].getBoundingClientRect() };
         };
 
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;

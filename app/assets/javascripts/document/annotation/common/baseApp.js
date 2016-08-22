@@ -1,10 +1,13 @@
 /** Contains common high-level functionality needed for text and image 'app' entrypoints **/
-define(['common/api', 'common/config'], function(API, Config) {
+define([
+  'common/api',
+  'common/config',
+  'document/annotation/common/page/header'], function(API, Config, Header) {
 
-  var BaseApp = function(highlighter, pageHeader, editor) {
-    this.highlighter = highlighter;
-    this.header = pageHeader;
+  var BaseApp = function(editor, highlighter) {
     this.editor = editor;
+    this.highlighter = highlighter;
+    this.header = new Header();
   };
 
   BaseApp.prototype.onAnnotationsLoaded = function(annotations) {
@@ -20,7 +23,7 @@ define(['common/api', 'common/config'], function(API, Config) {
     if (urlHash) {
       preselected = this.highlighter.findById(urlHash);
       if (preselected)
-        this.editor.open(preselected.annotation, preselected.elements[0].getBoundingClientRect());
+        this.editor.open(preselected.annotation, preselected.bounds);
     }
   };
 

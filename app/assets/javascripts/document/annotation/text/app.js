@@ -9,14 +9,13 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
-  'document/annotation/common/page/header',
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler',
 ],
 
-function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, Header, BaseApp, Toolbar,
+function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar,
   Highlighter, SelectionHandler) {
 
   var App = function() {
@@ -63,7 +62,7 @@ function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, Header, BaseApp,
     toolbar.on('annotationModeChanged', editor.setAnnotationMode);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
-    BaseApp.apply(this, [ highlighter, new Header(), editor ]);
+    BaseApp.apply(this, [ editor, highlighter ]);
 
     // Editor events
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));

@@ -83,6 +83,7 @@ define([
 
           findById = function(id) {
             // TODO implement
+            // TODO must return { annotation: ..., bounds: }
           },
 
           initPage = function(annotations) {
