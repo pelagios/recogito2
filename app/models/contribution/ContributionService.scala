@@ -1,20 +1,20 @@
 package models.contribution
 
-import com.sksamuel.elastic4s.{HitAs, RichSearchHit}
+import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
-import javax.inject.{Inject, Singleton}
-import models.{HasDate, Page}
+import javax.inject.{ Inject, Singleton }
+import models.{ HasDate, Page }
 import org.elasticsearch.search.aggregations.bucket.filter.Filter
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.elasticsearch.search.aggregations.bucket.nested.Nested
 import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.{ DateTime, DateTimeZone }
 import play.api.Logger
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{ JsSuccess, Json }
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import storage.ES
 
 @Singleton
