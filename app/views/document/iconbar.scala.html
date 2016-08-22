@@ -55,6 +55,12 @@
             <span class="icon">&#xe8bf;</span>
           </a>
         </li>
+      } else {
+        <div class="not-logged-in">
+          <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm">Log in</a>
+          &nbsp;&centerdot;&nbsp;
+          New to Recogito? <a href="@controllers.landing.routes.LandingController.index()">Learn more</a>
+        </div>
       }
     </ul>
   </div>
