@@ -15,7 +15,8 @@
     @views.html.document.iconbar(doc.document, Some(currentUser), models.document.DocumentAccessLevel.ADMIN, "settings")
 
     <div class="sidebar">
-      <div class="sidebar-header"></div>
+      @views.html.document.sidebarHeader(doc.owner)
+      
       <ul class="menu">
         <li @if(activeTab == Some("metadata")) { class="active" }>
           <a href="?tab=metadata">

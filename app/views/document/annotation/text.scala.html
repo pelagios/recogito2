@@ -96,9 +96,7 @@
     </div> <!-- .header-toolbar -->
 
     <div class="sidebar">
-      <div class="sidebar-header">
-        <!-- @doc.ownerName -->
-      </div>
+      @views.html.document.sidebarHeader(doc.owner)
 
       <ul class="menu">
         @for(part <- doc.fileparts) {

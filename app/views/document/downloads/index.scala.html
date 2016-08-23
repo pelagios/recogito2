@@ -28,7 +28,7 @@
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "downloads")
 
     <div class="sidebar">
-      <div class="sidebar-header"></div>
+      @views.html.document.sidebarHeader(doc.owner)
     </div> <!-- .sidebar -->
 
     <div class="content">

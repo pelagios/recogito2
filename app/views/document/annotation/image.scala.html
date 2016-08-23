@@ -74,7 +74,8 @@
     <div id="image-pane"></div>
 
     <div class="sidebar">
-      <div class="sidebar-header"></div>
+      @views.html.document.sidebarHeader(doc.owner)
+      
       <ul class="menu">
         @for(part <- doc.fileparts) {
           @if(part == currentPart) {
