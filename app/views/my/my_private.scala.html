@@ -1,8 +1,11 @@
-@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, quotaMB: Int,
+@(
+  user: models.generated.tables.records.UserRecord,
+  usedDiskspace: Long,
+  quotaMB: Int,
   documents: models.Page[models.generated.tables.records.DocumentRecord],
-  sharedWithMeCount: Int)(implicit request: RequestHeader, webjars: WebJarAssets)
-
-@_layout(user, usedDiskspace, quotaMB, documents.total, sharedWithMeCount, "my", webjars) {
+  sharedWithMeCount: Int
+ )(implicit request: RequestHeader, webjars: WebJarAssets)
+@_layout(user, usedDiskspace, quotaMB, documents.total, sharedWithMeCount, "my") {
   <table class="document-list">
     <thead>
       <tr>

@@ -1,6 +1,6 @@
 @(username: models.generated.tables.records.UserRecord,
   document: models.generated.tables.records.DocumentRecord,
-  accessLevel: models.document.DocumentAccessLevel)(implicit webjars: WebJarAssets)
+  accessLevel: models.document.DocumentAccessLevel)(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>

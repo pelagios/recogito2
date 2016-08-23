@@ -1,6 +1,10 @@
-@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, quotaMB: Int, myDocCount: Int,
-  sharedDocuments: models.Page[(models.generated.tables.records.DocumentRecord,
-  models.generated.tables.records.SharingPolicyRecord)])(implicit request: RequestHeader, webjars: WebJarAssets)
+@(
+  user: models.generated.tables.records.UserRecord,
+  usedDiskspace: Long,
+  quotaMB: Int,
+  myDocCount: Int,
+  sharedDocuments: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord)]
+ )(implicit request: RequestHeader, webjars: WebJarAssets)
 
 @accessLevel(lvl: String) = {
   @if(lvl == "READ") {
@@ -12,7 +16,7 @@
   }}}
 }
 
-@_layout(user, usedDiskspace, quotaMB, myDocCount, sharedDocuments.total, "shared", webjars) {
+@_layout(user, usedDiskspace, quotaMB, myDocCount, sharedDocuments.total, "shared") {
   <table class="document-list">
     <thead>
       <tr>

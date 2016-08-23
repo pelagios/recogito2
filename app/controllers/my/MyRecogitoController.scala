@@ -27,14 +27,14 @@ class MyRecogitoController @Inject() (
     loggedIn match {
       case Some(userWithRoles) =>
         Redirect(routes.MyRecogitoController.index(userWithRoles.user.getUsername, None))
-        
+
       case None =>
         // Not logged in - go to log in and then come back here
-        Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm)
+        Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None))
           .withSession("access_uri" -> routes.MyRecogitoController.my.url)
     }
   }
-  
+
   private def renderPublicProfile(username: String) = {
     val f = for {
       userWithRoles   <- users.findByUsername(username)
@@ -43,46 +43,46 @@ class MyRecogitoController @Inject() (
                          else
                            Future.successful(Page.empty[DocumentRecord])
     } yield (userWithRoles, publicDocuments)
-    
+
     f.map { case (userWithRoles, publicDocuments) => userWithRoles match {
       case Some(u) => Ok(views.html.my.my_public(u.user, publicDocuments))
       case None => NotFoundPage
-    }}  
+    }}
   }
-  
+
   private def renderMyDocuments(user: UserRecord, usedSpace: Long)(implicit request: RequestHeader) = {
     val f = for {
       myDocuments <- documents.findByOwner(user.getUsername, false)
       sharedCount <- documents.countBySharedWith(user.getUsername)
     } yield (myDocuments, sharedCount)
-    
+
     f.map { case (myDocuments, sharedCount) =>
       Ok(views.html.my.my_private(user, usedSpace, QUOTA, myDocuments, sharedCount))
     }
   }
-  
+
   private def renderSharedWithMe(user: UserRecord, usedSpace: Long)(implicit request: RequestHeader) = {
     val f = for {
       myDocsCount <- documents.countByOwner(user.getUsername, false)
       docsSharedWithMe <- documents.findBySharedWith(user.getUsername)
     } yield (myDocsCount, docsSharedWithMe)
-    
+
     f.map { case (myDocsCount, docsSharedWithMe) =>
       Ok(views.html.my.my_shared(user, usedSpace, QUOTA, myDocsCount, docsSharedWithMe))
-    }  
+    }
   }
-  
-  def index(usernameInPath: String, tab: Option[String]) = AsyncStack { implicit request =>    
+
+  def index(usernameInPath: String, tab: Option[String]) = AsyncStack { implicit request =>
     // If the user is logged in & the name in the path == username it's the profile owner
     val isProfileOwner = loggedIn match {
       case Some(userWithRoles) => userWithRoles.user.getUsername.equalsIgnoreCase(usernameInPath)
       case None => false
     }
-    
+
     if (isProfileOwner) {
       val user = loggedIn.get.user
       val usedSpace = users.getUsedDiskspaceKB(user.getUsername)
-      
+
       tab match {
         case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace)
         case _ => renderMyDocuments(user, usedSpace)

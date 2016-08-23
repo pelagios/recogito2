@@ -1,7 +1,7 @@
 @(maybeUser: Option[models.generated.tables.records.UserRecord],
   document: models.generated.tables.records.DocumentRecord,
   accessLevel: models.document.DocumentAccessLevel,
-  activeView: String)
+  activeView: String)(implicit request: RequestHeader)
 
   <div class="header-iconbar">
     <ul>
@@ -61,8 +61,8 @@
         </div>
       } else {
         <div class="not logged-in">
-          <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm">Log in</a>
-          &nbsp;&centerdot;&nbsp;
+          <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm(Some(request.uri))">Log in</a>
+          &nbsp;|&nbsp;
           New to Recogito? <a href="@controllers.landing.routes.LandingController.index()">Learn more</a>
         </div>
       }

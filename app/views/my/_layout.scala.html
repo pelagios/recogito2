@@ -1,5 +1,11 @@
-@(user: models.generated.tables.records.UserRecord, usedDiskspace: Long, quotaMB: Int,
-  myDocCount: Long, sharedWithMeCount: Long, activeTab: String, webjars: WebJarAssets)(content: Html)
+@(
+  user: models.generated.tables.records.UserRecord,
+  usedDiskspace: Long,
+  quotaMB: Int,
+  myDocCount: Long,
+  sharedWithMeCount: Long,
+  activeTab: String
+)(content: Html)(implicit webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
@@ -40,7 +46,7 @@
           <p>
             <a href="@controllers.landing.routes.LoginLogoutController.logout">
               <span class="icon">&#xf011;</span>
-              <span class="label">logout</span>
+              <span class="label">Logout</span>
             </a>
           </p>
         </div>

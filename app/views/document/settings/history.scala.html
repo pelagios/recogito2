@@ -1,7 +1,9 @@
-@(user: models.generated.tables.records.UserRecord, document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader,
-  webjars: WebJarAssets)
-
-@_layout("Recogito | Settings - Edit History", user, document, Some("history"), webjars) {
+@(
+  user: models.generated.tables.records.UserRecord,
+  document: models.generated.tables.records.DocumentRecord
+ )(implicit request: RequestHeader, webjars: WebJarAssets)
+ 
+@_layout("Recogito | Settings - Edit History", user, document, Some("history")) {
   <div class="edit-history"></div>
 
   <script>

@@ -32,8 +32,11 @@ class LoginLogoutController @Inject() (
     )(LoginData.apply)(LoginData.unapply)
   )
 
-  def showLoginForm = Action { implicit request =>
-    Ok(views.html.landing.login(loginForm))
+  def showLoginForm(destination: Option[String]) = Action { implicit request =>
+    destination match {
+      case None => Ok(views.html.landing.login(loginForm))
+      case Some(dest) => Ok(views.html.landing.login(loginForm)).withSession("access_uri" -> dest)
+    }
   }
 
   def processLogin = Action.async { implicit request =>

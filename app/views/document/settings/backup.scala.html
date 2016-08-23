@@ -1,7 +1,9 @@
-@(user: models.generated.tables.records.UserRecord,
-  document: models.generated.tables.records.DocumentRecord)(implicit request: RequestHeader, webjars: WebJarAssets)
+@(
+  user: models.generated.tables.records.UserRecord,
+  document: models.generated.tables.records.DocumentRecord
+ )(implicit request: RequestHeader, webjars: WebJarAssets)
 
-@_layout("Recogito | Settings - Backup & Restore", user, document, Some("backup"), webjars) {
+@_layout("Recogito | Settings - Backup & Restore", user, document, Some("backup")) {
   <div class="backup panel">
     <h2>Backup</h2>
     <div class="inner">

@@ -34,7 +34,7 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/text/app.js")"></script>
     <script>
       window.config = {
-        @if(loggedInUser.isDefined) { me: '@loggedInUser.get', }
+        @if(loggedInUser.isDefined) { me: '@loggedInUser.get.getUsername', }
         documentId: '@document.getId',
         documentOwner: '@document.getOwner',
         partId: '@currentPart.getId',

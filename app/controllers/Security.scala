@@ -24,7 +24,7 @@ trait Security extends AuthConfig { self: HasConfig with HasUserService =>
   val idTag: ClassTag[Id] = classTag[Id]
 
   val sessionTimeoutInSeconds: Int = 3600
-    
+
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] =
     self.users.findByUsername(id)
 
@@ -37,7 +37,7 @@ trait Security extends AuthConfig { self: HasConfig with HasUserService =>
     Future.successful(Results.Redirect(landing.routes.LandingController.index))
 
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Results.Redirect(landing.routes.LoginLogoutController.showLoginForm).withSession("access_uri" -> request.uri))
+    Future.successful(Results.Redirect(landing.routes.LoginLogoutController.showLoginForm(None)).withSession("access_uri" -> request.uri))
 
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit context: ExecutionContext): Future[Result] =
     Future.successful(Results.Forbidden(NO_PERMISSION))
