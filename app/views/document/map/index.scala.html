@@ -1,10 +1,12 @@
-@(loggedInUser: Option[models.generated.tables.records.UserRecord],
-  document: models.generated.tables.records.DocumentRecord,
-  accessLevel: models.document.DocumentAccessLevel)(implicit request: RequestHeader, webjars: WebJarAssets)
+@(
+  doc: models.document.DocumentInfo,
+  currentUser: Option[models.generated.tables.records.UserRecord],
+  accessLevel: models.document.DocumentAccessLevel
+ )(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Recogito | @Option(document.getAuthor).map(_ + ": ")@document.getTitle</title>
+    <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/map/index.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
@@ -13,14 +15,14 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/map/app.js")"></script>
     <script>
       window.config = {
-        @if(loggedInUser.isDefined) { me: '@loggedInUser.get.getUsername', }
-        documentId: '@document.getId',
-        documentOwner: '@document.getOwner'
+        @if(currentUser.isDefined) { me: '@currentUser.get.getUsername', }
+        documentId: '@doc.id',
+        documentOwner: '@doc.ownerName'
       }
     </script>
   </head>
   <body>
-    @views.html.document.iconbar(loggedInUser, document, accessLevel, "map")
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "map")
 
     <div class="sidebar">
       <div class="sidebar-header"></div>
@@ -37,7 +39,6 @@
       </div>
     </div>
 
-    @views.html.document.initTooltips()
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.getAnnotation,
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInDocument,

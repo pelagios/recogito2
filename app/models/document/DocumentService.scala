@@ -7,12 +7,11 @@ import java.util.UUID
 import javax.inject.{ Inject, Singleton }
 import models.{ BaseService, Page }
 import models.generated.Tables._
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, SharingPolicyRecord }
+import models.generated.tables.records._
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import play.api.Logger
-import play.api.cache.CacheApi
-import scala.concurrent.{ Await, Future, ExecutionContext }
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import storage.{ DB, Uploads }
 
@@ -141,8 +140,8 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     sql.batch(updates:_*).execute()
   }
   
-  /** Retrieves a document by its ID, along with access permissions for the given user **/
-  def findById(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
+  /** Retrieves a document record by its ID, along with access permissions for the given user **/
+  def getDocumentRecord(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
     loggedInUser match {
       case Some(user) => {
         val records = 
@@ -167,42 +166,42 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
           (document, determineAccessLevel(document, Seq.empty[SharingPolicyRecord], loggedInUser)))
     }
   }
-  
-  /** Retrieves a document by ID, along with fileparts **/
-  def findByIdWithFileparts(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
+
+  /** Retrieves the document record, filepart metadata and owner information, along with access permissions **/
+  def getExtendedInfo(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
     val records = loggedInUser match {
-      case Some(user) =>
+      case Some(username) =>
         // Retrieve with sharing policies that may apply
         sql.selectFrom(DOCUMENT
-             .join(DOCUMENT_FILEPART)
-             .on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+             .join(DOCUMENT_FILEPART).on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+             .join(USER).on(DOCUMENT.OWNER.equal(USER.USERNAME))
              .leftJoin(SHARING_POLICY)
-             .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
-             .and(SHARING_POLICY.SHARED_WITH.equal(loggedInUser.get)))
-           .where(DOCUMENT.ID.equal(id))
-           .fetchArray
-        
+               .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
+               .and(SHARING_POLICY.SHARED_WITH.equal(username)))
+          .where(DOCUMENT.ID.equal(id))
+          .fetchArray()
+
       case None =>
-        // Anonymous request - just retrieve document and fileparts
+        // Anyonymous request - just retrieve parts and owner
         sql.selectFrom(DOCUMENT
-             .join(DOCUMENT_FILEPART)
-             .on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID)))
+             .join(DOCUMENT_FILEPART).on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+             .join(USER).on(DOCUMENT.OWNER.equal(USER.USERNAME)))
            .where(DOCUMENT.ID.equal(id))
            .fetchArray()
+
     }
-    
-    // Convert to (DocumentRecord, Seq[DocumentFilepartRecord) tuple
+
     val grouped = groupLeftJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
     if (grouped.size > 1)
       throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
-    
-    val sharingPolicies = records.map(_.into(classOf[SharingPolicyRecord])).filter(record => isNotNull(record)).distinct
+
+    val sharingPolicies = records.map(_.into(classOf[SharingPolicyRecord])).filter(isNotNull(_)).distinct
+    val owner = records.head.into(classOf[UserRecord])
 
     // Return with parts sorted by sequence number
-    grouped
-      .headOption
-      .map { case (document, parts) =>
-        (document, parts.sortBy(_.getSequenceNo), determineAccessLevel(document, sharingPolicies, loggedInUser)) }
+    grouped.headOption.map { case (document, parts) =>
+      (DocumentInfo(document, parts.sortBy(_.getSequenceNo), owner), determineAccessLevel(document, sharingPolicies, loggedInUser))
+    }
   }
 
   /** Retrieves a filepart by document ID and sequence number **/

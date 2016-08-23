@@ -1,14 +1,13 @@
 package controllers
 
 import jp.t2v.lab.play2.auth.OptionalAuthElement
-import models.document.{ DocumentAccessLevel, DocumentService }
+import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
 import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
 import models.user.UserService
 import play.api.Configuration
 import play.api.mvc.{AnyContent, Request, Result}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.Logger
-import scala.concurrent.Future
+import scala.concurrent.{ ExecutionContext, Future }
 
 abstract class BaseOptAuthController(
     config: Configuration,
@@ -22,11 +21,14 @@ abstract class BaseOptAuthController(
     * Just hand this method a function that produces an HTTP OK result for a document, while
     * the method handles ForbiddenPage/Not Found error cases.
     */
-  protected def documentResponse(documentId: String, maybeUser: Option[UserRecord],
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Future[Result]) = {
+  protected def documentResponse(
+      documentId: String,
+      maybeUser: Option[UserRecord],
+      response: (DocumentInfo, DocumentAccessLevel) => Future[Result]
+    )(implicit ctx: ExecutionContext) = {
 
-    documents.findByIdWithFileparts(documentId, maybeUser.map(_.getUsername)).flatMap(_ match {
-      case Some((document, fileparts, accesslevel)) => response(document, fileparts, accesslevel)
+    documents.getExtendedInfo(documentId, maybeUser.map(_.getUsername)).flatMap(_ match {
+      case Some((doc, accesslevel)) => response(doc, accesslevel)
       case None => Future.successful(NotFoundPage)
     }).recover { case t =>
       t.printStackTrace()
@@ -35,12 +37,15 @@ abstract class BaseOptAuthController(
   }
   
   /** Helper that covers the boilerplate for document views requiring read access **/
-  protected def documentReadResponse(documentId: String, maybeUser: Option[UserRecord],
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentAccessLevel) => Future[Result])(implicit request: Request[AnyContent])  = {
+  protected def documentReadResponse(
+      documentId: String,
+      maybeUser: Option[UserRecord],
+      response: (DocumentInfo, DocumentAccessLevel) => Future[Result]
+    )(implicit ctx: ExecutionContext, request: Request[AnyContent])  = {
     
-    documentResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
+    documentResponse(documentId, maybeUser, { case (doc, accesslevel) =>
       if (accesslevel.canRead)
-        response(document, fileparts, accesslevel)
+        response(doc, accesslevel)
       else if (maybeUser.isEmpty) // No read rights - but user is not logged in yet 
         authenticationFailed(request)        
       else
@@ -49,19 +54,17 @@ abstract class BaseOptAuthController(
   }
   
   /** Helper that covers the boilerplate for all document part views **/
-  protected def documentPartResponse(documentId: String, partNo: Int, maybeUser: Option[UserRecord],
-      response: (DocumentRecord, Seq[DocumentFilepartRecord], DocumentFilepartRecord, DocumentAccessLevel) => Future[Result]) = {
+  protected def documentPartResponse(
+      documentId: String,
+      partNo: Int,
+      maybeUser: Option[UserRecord],
+      response: (DocumentInfo, DocumentFilepartRecord, DocumentAccessLevel) => Future[Result]
+    )(implicit ctx: ExecutionContext) = {
     
-    documentResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
-      val selectedPart = fileparts.filter(_.getSequenceNo == partNo)
-      if (selectedPart.isEmpty) {
-        Future.successful(NotFoundPage)
-      } else if (selectedPart.size == 1) {
-        response(document, fileparts, selectedPart.head, accesslevel)
-      } else {
-        // More than one part with this sequence number - DB integrity broken!
-        Logger.warn("Invalid document part:" + documentId + "/" + partNo) 
-        Future.successful(InternalServerError)
+    documentResponse(documentId, maybeUser, { case (doc, accesslevel) =>
+      doc.fileparts.find(_.getSequenceNo == partNo) match {
+        case None => Future.successful(NotFoundPage)
+        case Some(part) => response(doc, part, accesslevel)
       }
     })
   }

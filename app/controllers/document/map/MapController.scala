@@ -20,8 +20,8 @@ class MapController @Inject() (
   def showMap(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
     
-    documentReadResponse(documentId, maybeUser,  { case (document, fileparts, accesslevel) =>
-      Future.successful(Ok(views.html.document.map.index(maybeUser, document, accesslevel)))
+    documentReadResponse(documentId, maybeUser,  { case (doc, accesslevel) =>
+      Future.successful(Ok(views.html.document.map.index(doc, maybeUser, accesslevel)))
     })
   }
 

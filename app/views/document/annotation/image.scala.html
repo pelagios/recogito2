@@ -1,10 +1,9 @@
-@(loggedInUser: Option[models.generated.tables.records.UserRecord],
-  document: models.generated.tables.records.DocumentRecord,
-  allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
+@(
+  doc: models.document.DocumentInfo,
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
-  accessLevel: models.document.DocumentAccessLevel)(implicit request: RequestHeader, webjars: WebJarAssets)
-
-
+  currentUser: Option[models.generated.tables.records.UserRecord],
+  accessLevel: models.document.DocumentAccessLevel
+ )(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
@@ -19,9 +18,9 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/image/app.js")"></script>
     <script>
       window.config = {
-        @if(loggedInUser.isDefined) { me: '@loggedInUser.get.getUsername', }
-        documentId: '@document.getId',
-        documentOwner: '@document.getOwner',
+        @if(currentUser.isDefined) { me: '@currentUser.get.getUsername', }
+        documentId: '@doc.id',
+        documentOwner: '@doc.ownerName',
         partId: '@currentPart.getId',
         partSequenceNo: @currentPart.getSequenceNo,
         contentType: '@currentPart.getContentType',
@@ -30,14 +29,13 @@
     </script>
   </head>
   <body>
-    @views.html.document.iconbar(loggedInUser, document, accessLevel, "edit")
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit")
 
     <div class="header-infobox">
       <h1>
-        @Option(document.getAuthor).map(_ + ": ")
-        @document.getTitle
+        @doc.author.map(_ + ": ")@doc.title
       </h1>
-      <h2 class="date">@Option(document.getDateFreeform)</h2>
+      <h2 class="date">@doc.dateFreeform</h2>
       <p class="quick-stats">
         <span class="icon comment">&#xf0e5;</span>
         <span class="annotations">0</span> Annotations
@@ -78,18 +76,18 @@
     <div class="sidebar">
       <div class="sidebar-header"></div>
       <ul class="menu">
-        @for(part <- allParts) {
+        @for(part <- doc.fileparts) {
           @if(part == currentPart) {
             <li class="active">
               <a href="#" onclick="return false;">
-                <img src="@controllers.document.routes.DocumentController.getThumbnail(document.getId, part.getSequenceNo)">
+                <img src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
           } else {
             <li>
-              <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">
-                <img src="@controllers.document.routes.DocumentController.getThumbnail(document.getId, part.getSequenceNo)">
+              <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(doc.id, part.getSequenceNo)">
+                <img src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
@@ -98,7 +96,6 @@
       </ul>
     </div> <!-- .sidebar -->
 
-    @views.html.document.initTooltips()
     @helper.javascriptRouter("jsRoutes")(
       controllers.document.routes.javascript.DocumentController.getImageManifest,
       controllers.document.routes.javascript.DocumentController.getImageTile,

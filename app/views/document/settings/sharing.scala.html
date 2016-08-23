@@ -1,21 +1,21 @@
 @(
-  user: models.generated.tables.records.UserRecord,
-  document: models.generated.tables.records.DocumentRecord,
+  doc: models.document.DocumentInfo,
+  currentUser: models.generated.tables.records.UserRecord,
   sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
-@_layout("Recogito | Settings - Sharing", user, document, Some("sharing")) {
+@_layout("Recogito | Settings - Sharing", doc, currentUser, Some("sharing")) {
   <div class="panel share-public">
     <h2>Public Access</h2>
       <div class="inner">
-        <input type="checkbox" id="public-access" name="public-access" @if(document.getIsPublic) { checked="checked" } />
+        <input type="checkbox" id="public-access" name="public-access" @if(doc.isPublic) { checked="checked" } />
         <label for="public-access">Visible to all</label>
         <p class="checkbox-details">
           This document will be visible to the public. Visitors can see your annotations, but
           not edit. Visitors can also download the annotation data from the download page. Link to share:
         </p>
         <p class="checkbox-details">
-          <input type="text" id="public-link" value="@controllers.document.routes.DocumentController.initialView(document.getId).absoluteURL"/>
+          <input type="text" id="public-link" value="@controllers.document.routes.DocumentController.initialView(doc.id).absoluteURL"/>
         </p>
       </div>
     </div>
@@ -50,8 +50,8 @@
 
     <script>
       window.config = {
-        me: '@user.getUsername',
-        documentId: '@document.getId'
+        me: '@currentUser.getUsername',
+        documentId: '@doc.id'
       }
     </script>
     <script src="@routes.WebJarAssets.at(webjars.locate("typeahead.jquery.min.js"))"></script>

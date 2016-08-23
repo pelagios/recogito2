@@ -92,7 +92,7 @@ class AnnotationAPIController @Inject() (
     val config: Configuration,
     val annotations: AnnotationService,
     val contributions: ContributionService,
-    val documents: DocumentService, 
+    val documents: DocumentService,
     val users: UserService,
     val uploads: Uploads,
     implicit val ctx: ExecutionContext
@@ -158,7 +158,7 @@ class AnnotationAPIController @Inject() (
         Json.fromJson[AnnotationStub](json) match {
           case s: JsSuccess[AnnotationStub] => {
             // Fetch the associated document to check access privileges
-            documents.findById(s.get.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
+            documents.getDocumentRecord(s.get.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
               case Some((document, accesslevel)) => {
                 if (accesslevel.canWrite) {
                   val annotation = stubToAnnotation(s.get, loggedIn.map(_.user.getUsername).getOrElse("guest"))
@@ -200,13 +200,13 @@ class AnnotationAPIController @Inject() (
       case Some((annotation, _)) => {
         if (includeContext) {
           // Fetch the document, so we know the owner...
-          documents.findByIdWithFileparts(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).map(_ match {
+          documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).map(_ match {
 
-            case Some((document, parts, accesslevel)) =>
+            case Some((doc, accesslevel)) =>
               if (accesslevel.canRead) {
                 // ...then fetch the content
-                parts.find(_.getId == annotation.annotates.filepartId) match {
-                  case Some(filepart) => uploads.readTextfile(document.getOwner, document.getId, filepart.getFilename) match {
+                doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
+                  case Some(part) => uploads.readTextfile(doc.ownerName, doc.id, part.getFilename) match {
                     case Some(text) =>
                       val snippet = extractTextSnippet(text, annotation)
                       jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))
@@ -260,7 +260,7 @@ class AnnotationAPIController @Inject() (
     annotations.findById(id).flatMap {
       case Some((annotation, version)) =>
         // Fetch the associated document
-        documents.findById(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
+        documents.getDocumentRecord(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
           case Some((document, accesslevel)) => {
             if (accesslevel.canWrite) {
               val user = loggedIn.map(_.user.getUsername).getOrElse("guest")

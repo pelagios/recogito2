@@ -5,7 +5,7 @@ import controllers.document.settings.actions._
 import javax.inject.Inject
 import models.annotation.AnnotationService
 import models.contribution.ContributionService
-import models.document.{ DocumentService, DocumentAccessLevel }
+import models.document.{ DocumentService, DocumentInfo, DocumentAccessLevel }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.user.UserService
 import models.user.Roles._
@@ -32,17 +32,16 @@ class SettingsController @Inject() (
       with DeleteActions {
     
   def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    // Settings page is only visible to OWNER or ADMIN access levels
-    documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, parts) =>
+    documentAdminAction(documentId, loggedIn.user.getUsername, { doc =>
       tab.map(_.toLowerCase) match { 
         case Some(t) if t == "sharing" => {
           val f = for {
             collaborators <- documents.listDocumentCollaborators(documentId)
           } yield collaborators
            
-          f.map(t => 
+          f.map(sharingPolicies => 
             // Make sure this page isn't cached, since stuff gets added via AJAX
-            Ok(views.html.document.settings.sharing(loggedIn.user, document, t))
+            Ok(views.html.document.settings.sharing(doc, loggedIn.user, sharingPolicies))
               .withHeaders(
                 CACHE_CONTROL -> "no-cache, no-store, must-revalidate",
                 PRAGMA -> "no-cache",
@@ -50,31 +49,44 @@ class SettingsController @Inject() (
         }
             
         case Some(t) if t == "history" =>
-          Future.successful(Ok(views.html.document.settings.history(loggedIn.user, document)))
+          Future.successful(Ok(views.html.document.settings.history(doc, loggedIn.user)))
           
         case Some(t) if t == "backup" =>
-          Future.successful(Ok(views.html.document.settings.backup(loggedIn.user, document)))
+          Future.successful(Ok(views.html.document.settings.backup(doc, loggedIn.user)))
           
         case _ =>
-          Future.successful(Ok(views.html.document.settings.metadata(loggedIn.user, document))) 
+          Future.successful(Ok(views.html.document.settings.metadata(doc, loggedIn.user))) 
       }
     })
   }
   
-  protected def documentAdminAction(documentId: String, username: String, action: (DocumentRecord, Seq[DocumentFilepartRecord]) => Future[Result]) = {
-    documents.findByIdWithFileparts(documentId, Some(username)).flatMap(_ match {      
-      case Some((document, parts, accesslvl)) if (accesslvl.isAdmin) => action(document, parts)
+  protected def documentAdminAction(
+      documentId: String,
+      username: String,
+      action: DocumentInfo => Future[Result]
+    ) = {
+    
+    documents.getExtendedInfo(documentId, Some(username)).flatMap(_ match {      
+      case Some((doc, accesslevel)) if (accesslevel.isAdmin) => action(doc)
       case Some(_) => Future.successful(ForbiddenPage)
       case None => Future.successful(NotFoundPage)
     })
   }
 
-  protected def jsonDocumentAdminAction[T](documentId: String, username: String, action: (DocumentRecord, T) => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]) = {
+  protected def jsonDocumentAdminAction[T](
+      documentId: String,
+      username: String,
+      action: (DocumentRecord, T) => Future[Result]
+    )(implicit request: Request[AnyContent], reads: Reads[T]) = {
+    
     request.body.asJson match {
       case Some(json) => Json.fromJson[T](json) match {
         case s: JsSuccess[T] =>
-          documents.findById(documentId, Some(username)).flatMap(_ match {
-            case Some((document, accesslvl)) if (accesslvl == DocumentAccessLevel.OWNER || accesslvl == DocumentAccessLevel.ADMIN) => action(document, s.get)
+          documents.getDocumentRecord(documentId, Some(username)).flatMap(_ match {
+            case Some((document, accesslevel))
+              if (accesslevel == DocumentAccessLevel.OWNER || accesslevel == DocumentAccessLevel.ADMIN) => 
+                action(document, s.get)
+                
             case Some(_) => Future.successful(ForbiddenPage)
             case None => Future.successful(NotFoundPage)
           })

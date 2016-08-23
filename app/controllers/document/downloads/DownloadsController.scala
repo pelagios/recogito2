@@ -30,16 +30,16 @@ class DownloadsController @Inject() (
 
   def showDownloadOptions(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
-    documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
+    documentReadResponse(documentId, maybeUser, { case (doc, accesslevel) =>
       annotations.countByDocId(documentId).map { documentAnnotationCount =>
-        Ok(views.html.document.downloads.index(maybeUser, document, accesslevel, documentAnnotationCount))
+        Ok(views.html.document.downloads.index(doc, maybeUser, accesslevel, documentAnnotationCount))
       }
     })
   }
 
   def downloadAnnotations(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
-    documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
+    documentReadResponse(documentId, maybeUser, { case (_, _) => // Used just for the access permission check
       annotations.findByDocId(documentId).map { annotations =>
         val enumerator = Enumerator.enumerate(annotations.map(t => Json.stringify(Json.toJson(t._1)) + "\n"))
         val source = Source.fromPublisher(Streams.enumeratorToPublisher(enumerator)).map(ByteString.apply)
@@ -50,7 +50,7 @@ class DownloadsController @Inject() (
 
   def downloadCSV(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
-    documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
+    documentReadResponse(documentId, maybeUser, { case (_, _) => // Used just for the access permission check
       annotationsToCSV(documentId).map { csv =>
         Ok(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
       }
@@ -59,7 +59,7 @@ class DownloadsController @Inject() (
 
   def downloadGeoJSON(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
-    documentReadResponse(documentId, maybeUser, { case (document, fileparts, accesslevel) =>
+    documentReadResponse(documentId, maybeUser, { case (_, _) => // Used just for the access permission check
       placesToGeoJSON(documentId).map { featureCollection =>
         Ok(Json.prettyPrint(Json.toJson(featureCollection)))
           .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })

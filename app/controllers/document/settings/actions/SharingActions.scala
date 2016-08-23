@@ -30,8 +30,8 @@ object CollaboratorStub {
 trait SharingActions extends HasPrettyPrintJSON { self: SettingsController =>
     
   def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, _) =>
-      documents.setPublicVisibility(document.getId, enabled).map(_ => Status(200))
+    documentAdminAction(documentId, loggedIn.user.getUsername, { _ =>
+      documents.setPublicVisibility(documentId, enabled).map(_ => Status(200))
     })
   }
   
@@ -57,7 +57,7 @@ trait SharingActions extends HasPrettyPrintJSON { self: SettingsController =>
   }
   
   def removeCollaborator(documentId: String, username: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, _) =>      
+    documentAdminAction(documentId, loggedIn.user.getUsername, { _ =>      
       documents.removeDocumentCollaborator(documentId, username).map(success =>
         if (success) Status(200) else InternalServerError)
     })

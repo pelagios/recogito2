@@ -7,7 +7,7 @@ import scala.concurrent.Future
 trait RollbackActions { self: SettingsController =>
 
   def rollbackByTime(documentId: String, contributionId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { case (document, _) =>
+    documentAdminAction(documentId, loggedIn.user.getUsername, { _ =>
       contributions.findById(contributionId).flatMap {
         case Some((contribution, _)) => {
           val f = for {

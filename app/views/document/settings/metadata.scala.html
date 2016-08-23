@@ -1,8 +1,8 @@
 @(
-  user: models.generated.tables.records.UserRecord,
-  document: models.generated.tables.records.DocumentRecord
+  doc: models.document.DocumentInfo,
+  currentUser: models.generated.tables.records.UserRecord
  )(implicit header: RequestHeader, webjars: WebJarAssets)
 
-@_layout("Recogito | Settings - Metadata", user, document, Some("metadata")) {
+@_layout("Recogito | Settings - Metadata", doc, currentUser, Some("metadata")) {
 
 }

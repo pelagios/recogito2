@@ -28,8 +28,8 @@ class DocumentController @Inject() (
     import models.ContentType._
 
     val maybeUser = loggedIn.map(_.user)
-    documentPartResponse(docId, partNo, maybeUser, { case (document, fileparts, filepart, accesslevel) =>
-      val contentType = filepart.getContentType
+    documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
+      val contentType = currentPart.getContentType
       val maybeManifestName =
         if (contentType == IMAGE_UPLOAD.toString)
           // All uploads are Zoomify format
@@ -41,7 +41,7 @@ class DocumentController @Inject() (
 
       maybeManifestName match {
         case Some(filename) =>
-          getTilesetFile(document, filepart, filename).map {
+          getTilesetFile(doc.document, currentPart, filename).map {
             case Some(file) => Ok.sendFile(file)
             case None => InternalServerError // Document folder doesn't contain a manifset file
           }
@@ -71,8 +71,8 @@ class DocumentController @Inject() (
 
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
-    documentPartResponse(docId, partNo, maybeUser, { case (document, fileparts, filepart, accesslevel) =>
-      getTilesetFile(document, filepart, tilepath).map {
+    documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
+      getTilesetFile(doc.document, currentPart, tilepath).map {
         case Some(file) => Ok.sendFile(file)
         case None => NotFound
       }
@@ -81,8 +81,8 @@ class DocumentController @Inject() (
 
   def getThumbnail(docId: String, partNo: Int) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
-    documentPartResponse(docId, partNo, maybeUser, { case (document, fileparts, filepart, accesslevel) =>
-      uploads.openThumbnail(document.getOwner, docId, filepart.getFilename).map {
+    documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
+      uploads.openThumbnail(doc.ownerName, docId, currentPart.getFilename).map {
         case Some(file) => Ok.sendFile(file)
         case None => NotFoundPage
       }

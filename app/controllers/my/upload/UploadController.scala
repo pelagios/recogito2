@@ -208,7 +208,7 @@ class UploadController @Inject() (
 
     import UploadController._
 
-    documents.findById(docId, Some(username)).flatMap(_ match {
+    documents.getDocumentRecord(docId, Some(username)).flatMap(_ match {
       // Make sure only users with read access can see the progress
       case Some((document, accesslevel)) if accesslevel.canRead => {
         service.queryProgress(docId).map(_ match {

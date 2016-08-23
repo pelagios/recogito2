@@ -1,27 +1,28 @@
-@(loggedInUser: Option[models.generated.tables.records.UserRecord],
-  document: models.generated.tables.records.DocumentRecord,
-  allParts: Seq[models.generated.tables.records.DocumentFilepartRecord],
+@(
+  doc: models.document.DocumentInfo,
+  currentUser: Option[models.generated.tables.records.UserRecord],
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
-  documentAnnotationCount: Long,
   accessLevel: models.document.DocumentAccessLevel,
-  content: String)(implicit request: RequestHeader, webjars: WebJarAssets)
+  documentAnnotationCount: Long,
+  content: String
+ )(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Recogito | @Option(document.getAuthor).map(_ + ": ")@document.getTitle</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"> @if(document.getIsPublic) {
+    <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"> @if(doc.isPublic) {
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@@pelagiosproject" />
-    <meta property="og:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
-    <meta name="twitter:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
+    <meta property="og:title" content="@doc.author.map(_ + ":")@doc.title | @documentAnnotationCount annotations" />
+    <meta name="twitter:title" content="@doc.author).map(_ + ":")@doc.title | @documentAnnotationCount annotations" />
     <meta property="og:description" content="@content.take(256).replace("\"", "\\\"").trim..." />
     <meta name="twitter:description" content="@content.take(256).replace("\"", "\\\"").trim..." />
     <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
     <meta property="og:image:width" content="240" />
     <meta property="og:image:height" content="240" />
     <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
-    <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(document.getId).absoluteURL" /> }
+    <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(doc.id).absoluteURL" /> }
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text/index.css")"/>
     <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
@@ -34,9 +35,9 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/text/app.js")"></script>
     <script>
       window.config = {
-        @if(loggedInUser.isDefined) { me: '@loggedInUser.get.getUsername', }
-        documentId: '@document.getId',
-        documentOwner: '@document.getOwner',
+        @if(currentUser.isDefined) { me: '@currentUser.get.getUsername', }
+        documentId: '@doc.id',
+        documentOwner: '@doc.ownerName',
         partId: '@currentPart.getId',
         partSequenceNo: @currentPart.getSequenceNo,
         contentType: '@currentPart.getContentType',
@@ -45,14 +46,12 @@
     </script>
   </head>
   <body>
-    @views.html.document.iconbar(loggedInUser, document, accessLevel, "edit")
-
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit")
     <div class="header-infobox">
       <h1>
-        @Option(document.getAuthor).map(_ + ": ")
-        @document.getTitle
+        @doc.author.map(_ + ": ")@doc.title
       </h1>
-      <h2 class="date">@Option(document.getDateFreeform)</h2>
+      <h2 class="date">@doc.dateFreeform</h2>
       <p class="quick-stats">
         <span class="icon comment">&#xf0e5;</span>
         <span class="annotations">-</span> Annotations
@@ -97,16 +96,19 @@
     </div> <!-- .header-toolbar -->
 
     <div class="sidebar">
-      <div class="sidebar-header"></div>
+      <div class="sidebar-header">
+        <!-- @doc.ownerName -->
+      </div>
+
       <ul class="menu">
-        @for(part <- allParts) {
+        @for(part <- doc.fileparts) {
           @if(part == currentPart) {
             <li class="active">
               <a href="#" onclick="return false;"><span class="label">@part.getTitle</span></a>
             </li>
           } else {
             <li>
-              <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(document.getId, part.getSequenceNo)">
+              <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDocPart(doc.id, part.getSequenceNo)">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
@@ -117,7 +119,6 @@
 
     <div id="content">@content</div>
 
-    @views.html.document.initTooltips()
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
       controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,

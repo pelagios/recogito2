@@ -1,8 +1,8 @@
 @(
   title: String,
-  user: models.generated.tables.records.UserRecord,
-  document: models.generated.tables.records.DocumentRecord,
-  active: Option[String]
+  doc: models.document.DocumentInfo,
+  currentUser: models.generated.tables.records.UserRecord,
+  activeTab: Option[String]
 )(content: Html)(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
@@ -12,30 +12,30 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
   </head>
   <body>
-    @views.html.document.iconbar(Some(user), document, models.document.DocumentAccessLevel.ADMIN, "settings")
+    @views.html.document.iconbar(doc.document, Some(currentUser), models.document.DocumentAccessLevel.ADMIN, "settings")
 
     <div class="sidebar">
       <div class="sidebar-header"></div>
       <ul class="menu">
-        <li @if(active == Some("metadata")) { class="active" }>
+        <li @if(activeTab == Some("metadata")) { class="active" }>
           <a href="?tab=metadata">
             <span class="icon">&#xf02d;</span> <span class="label">Metadata</span>
           </a>
         </li>
 
-        <li @if(active == Some("sharing")) { class="active" }>
+        <li @if(activeTab == Some("sharing")) { class="active" }>
           <a href="?tab=sharing">
             <span class="icon">&#xf234;</span> <span class="label">Sharing</span>
           </a>
         </li>
 
-        <li @if(active == Some("history")) { class="active" }>
+        <li @if(activeTab == Some("history")) { class="active" }>
           <a href="?tab=history">
             <span class="icon">&#xf1da;</span> <span class="label">Edit History</span>
           </a>
         </li>
 
-        <li @if(active == Some("backup")) { class="active" }>
+        <li @if(activeTab == Some("backup")) { class="active" }>
           <a href="?tab=backup">
             <span class="icon">&#xf0c7;</span> <span class="label">Backup</span>
           </a>
@@ -52,7 +52,5 @@
     <div class="content">
       @content
     </div>
-
-    @views.html.document.initTooltips()
   </body>
 </html>

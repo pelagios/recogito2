@@ -8,7 +8,7 @@ import scala.concurrent.Future
 trait DeleteActions { self: SettingsController =>
   
   def deleteDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documents.findById(docId, Some(loggedIn.user.getUsername)).flatMap(_ match {
+    documents.getDocumentRecord(docId, Some(loggedIn.user.getUsername)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel == DocumentAccessLevel.OWNER) // We allow only the owner to delete a document
           for {

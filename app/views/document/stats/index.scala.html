@@ -1,6 +1,6 @@
 @(
-  loggedInUser: Option[models.generated.tables.records.UserRecord],
-  document: models.generated.tables.records.DocumentRecord,
+  doc: models.document.DocumentInfo,
+  currentUser: Option[models.generated.tables.records.UserRecord],
   accessLevel: models.document.DocumentAccessLevel
  )(implicit header: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
@@ -10,7 +10,6 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
   </head>
   <body>
-    @views.html.document.iconbar(loggedInUser, document, accessLevel, "stats")
-    @views.html.document.initTooltips()
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "stats")
   </body>
 </html>

@@ -1,29 +1,31 @@
-@(loggedInUser: Option[models.generated.tables.records.UserRecord],
-  document: models.generated.tables.records.DocumentRecord,
+@(
+  doc: models.document.DocumentInfo,
+  currentUser: Option[models.generated.tables.records.UserRecord],
   accessLevel: models.document.DocumentAccessLevel,
-  documentAnnotationCount: Long)(implicit request: RequestHeader, webjars: WebJarAssets)
+  documentAnnotationCount: Long
+ )(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Downloads | @Option(document.getAuthor).map(_ + ": ")@document.getTitle</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"> @if(document.getIsPublic) {
+    <title>Downloads | @doc.author.map(_ + ": ")@doc.title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"> @if(doc.isPublic) {
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@@pelagiosproject" />
-    <meta property="og:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
-    <meta name="twitter:title" content="@Option(document.getAuthor).map(_ + ":") @document.getTitle | @documentAnnotationCount annotations" />
+    <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title | @documentAnnotationCount annotations" />
+    <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title | @documentAnnotationCount annotations" />
     <meta property="og:description" content="Download CSV | GeoJSON" />
     <meta name="twitter:description" content="Download CSV | GeoJSON" />
     <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
     <meta property="og:image:width" content="240" />
     <meta property="og:image:height" content="240" />
     <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
-    <meta property="og:url" content="@controllers.document.downloads.routes.DownloadsController.showDownloadOptions(document.getId).absoluteURL" /> }
+    <meta property="og:url" content="@controllers.document.downloads.routes.DownloadsController.showDownloadOptions(doc.id).absoluteURL" /> }
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/downloads/index.css")"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
   </head>
   <body>
-    @views.html.document.iconbar(loggedInUser, document, accessLevel, "downloads")
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "downloads")
 
     <div class="sidebar">
       <div class="sidebar-header"></div>
@@ -41,7 +43,7 @@
                   a GIS.</p>
               </div>
               <div class="button-container">
-                <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(document.getId)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
               </div>
             </li>
 
@@ -69,7 +71,7 @@
               <p>Confirmed geo-located places in the document as a GeoJSON FeatureCollection.</p>
             </div>
             <div class="button-container">
-              <a href="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(document.getId)" class="btn small"><span class="icon">&#xf019;</span> GeoJSON</a>
+              <a href="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id)" class="btn small"><span class="icon">&#xf019;</span> GeoJSON</a>
             </div>
           </li>
 
@@ -92,7 +94,5 @@
         </div>
       </div>
     </div>
-
-    @views.html.document.initTooltips()
   </body>
 </html>

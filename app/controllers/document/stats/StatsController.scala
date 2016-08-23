@@ -18,8 +18,8 @@ class StatsController @Inject() (
 
   /** TODO this view should be available without login, if the document is set to public **/
   def showDocumentStats(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentResponse(documentId, loggedIn.user,
-        { case (document, fileparts, accesslevel) =>  Ok(views.html.document.stats.index(Some(loggedIn.user), document, accesslevel)) })
+    documentResponse(documentId, loggedIn.user,{ case (doc, accesslevel) => 
+      Ok(views.html.document.stats.index(doc, Some(loggedIn.user), accesslevel)) })
   }
 
 }
