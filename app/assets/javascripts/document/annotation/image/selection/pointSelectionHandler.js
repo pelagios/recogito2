@@ -6,9 +6,9 @@ define([
 
     var POINT_SELECTION_STYLE = new ol.style.Style({
           image: new ol.style.Circle({
-            radius : 6,
-            fill   : new ol.style.Fill({ color: '#4483C4', opacity: 0.35 }),
-            stroke : new ol.style.Stroke({ color: '#366696', width: 1.5 })
+            radius : 8,
+            fill   : new ol.style.Fill({ color: [ 68, 131, 196, 1 ] }),
+            stroke : new ol.style.Stroke({ color: '#1d5b9b', width: 1.5  })
           })
         });
 
