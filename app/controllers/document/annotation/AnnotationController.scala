@@ -49,13 +49,14 @@ class AnnotationController @Inject() (
     ContentType.withName(currentPart.getContentType) match {
 
       case Some(ContentType.IMAGE_UPLOAD) =>
-        Future.successful(Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel)))
-
+        annotations.countByDocId(doc.id).map(annotationCount =>
+          Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, annotationCount)))
+        
       case Some(ContentType.TEXT_PLAIN) =>
         uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFilename) match {
           case Some(content) =>
-            annotations.countByDocId(doc.id).map(documentAnnotationCount =>
-              Ok(views.html.document.annotation.text(doc, loggedInUser, currentPart, accesslevel, documentAnnotationCount, content)))
+            annotations.countByDocId(doc.id).map(annotationCount =>
+              Ok(views.html.document.annotation.text(doc, loggedInUser, currentPart, accesslevel, annotationCount, content)))
 
           case None =>
             // Filepart found in DB, but not file on filesystem

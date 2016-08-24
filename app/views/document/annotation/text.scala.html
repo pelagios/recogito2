@@ -3,7 +3,7 @@
   currentUser: Option[models.generated.tables.records.UserRecord],
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
   accessLevel: models.document.DocumentAccessLevel,
-  documentAnnotationCount: Long,
+  annotationCount: Long,
   content: String
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
@@ -14,8 +14,8 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@@pelagiosproject" />
-    <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title | @documentAnnotationCount annotations" />
-    <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title | @documentAnnotationCount annotations" />
+    <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title | @annotationCount annotations" />
+    <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title | @annotationCount annotations" />
     <meta property="og:description" content="@content.take(256).replace("\"", "\\\"").trim..." />
     <meta name="twitter:description" content="@content.take(256).replace("\"", "\\\"").trim..." />
     <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
