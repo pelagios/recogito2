@@ -113,15 +113,13 @@ define([
           },
 
           onClick = function(e) {
-            if (isEnabled) {
-              var currentHighlight = highlighter.getCurrentHighlight();
-              if (currentHighlight)
-                // Select existing annotation
-                selectExisting(currentHighlight);
-              else
-                // Create new selection
-                selectNewPoint(e);
-            }
+            var currentHighlight = highlighter.getCurrentHighlight();
+            if (currentHighlight)
+              // Select existing annotation
+              selectExisting(currentHighlight);
+            else if (isEnabled)
+              // Create new selection if selector enabled
+              selectNewPoint(e);
           },
 
           getSelection = function() {
