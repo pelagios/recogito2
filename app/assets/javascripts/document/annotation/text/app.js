@@ -28,7 +28,7 @@ function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar
 
         editor = (Config.writeAccess) ?
           new WriteEditor(contentNode, highlighter, new SelectionHandler(contentNode, highlighter)) :
-          new ReadEditor(contentNode, highlighter),
+          new ReadEditor(contentNode, highlighter, new SelectionHandler(contentNode, highlighter)),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 

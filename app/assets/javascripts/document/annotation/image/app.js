@@ -6,13 +6,14 @@ require.config({
 require([
   'common/api',
   'common/config',
+  'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/baseApp',
   'document/annotation/image/page/toolbar',
   'document/annotation/image/selection/pointHighlighter',
   'document/annotation/image/selection/pointSelectionHandler'],
 
-  function(API, Config, WriteEditor, BaseApp, Toolbar, PointHighlighter, PointSelectionHandler) {
+  function(API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar, PointHighlighter, PointSelectionHandler) {
 
     /** The app is instantiated after the image manifest was loaded **/
     var App = function(imageProperties) {
@@ -57,7 +58,9 @@ require([
 
           selector = new PointSelectionHandler(contentNode, olMap, highlighter),
 
-          editor = new WriteEditor(contentNode, highlighter, selector),
+          editor = (Config.writeAccess) ?
+            new WriteEditor(contentNode, highlighter, selector) :
+            new ReadEditor(contentNode, highlighter, selector),
 
           onMapMove = function() {
             var selection = selector.getSelection();

@@ -1,7 +1,7 @@
 
 define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
-  var ReadEditor = function(container, highlighter) {
+  var ReadEditor = function(container, highlighter, selectionHandler) {
     var self = this,
 
         element = (function() {
@@ -19,11 +19,8 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
         })(),
 
         /** Opens the editor on an annotation **/
-        viewAnnotation = function(e) {
-          var element = e.target,
-              allAnnotations = self.highlighter.getAnnotationsAt(element);
-
-          self.open(allAnnotations[0], element.getBoundingClientRect());
+        viewSelection = function(selection) {
+          self.open(selection.annotation, selection.bounds);
           return false;
         },
 
@@ -35,11 +32,15 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
     EditorBase.apply(this, [ container, element, highlighter ]);
 
     // Click on annotation span opens the editor
-    jQuery(container).on('click', '.annotation', viewAnnotation);
+    // jQuery(container).on('click', '.annotation', viewSelection);
+
+    // Monitor text selections through the selectionHandler
+    selectionHandler.on('select', viewSelection);
 
     // Editor closes on ESC key and click on background document
     self.on('escape', onClose);
-    jQuery(document).on('click', ':not(> .text-annotation-editor)', onClose);
+
+    // jQuery(document).on('click', ':not(> .text-annotation-editor)', onClose);
   };
   ReadEditor.prototype = Object.create(EditorBase.prototype);
 
