@@ -1,23 +1,29 @@
-define(['common/hasEvents'], function(HasEvents) {
+define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
   var Toolbar = function() {
     var self = this,
 
         tools = jQuery('.tools'),
 
-        toolDropdown = tools.find('.submenu'),
-        toolDropdownIcon = tools.find('.has-submenu .icon'),
-        toolDropdownLabel = tools.find('.has-submenu .label'),
+        toolMenu = tools.find('.has-submenu'),
+        toolMenuIcon = toolMenu.find('.icon'),
+        toolMenuLabel = toolMenu.find('.label'),
+        toolMenuDropdown = toolMenu.find('.submenu'),
 
         currentTool = 'MOVE',
 
         imagePane = jQuery('#image-pane'),
 
         initToolDropdown = function() {
-          toolDropdown.hide();
-          toolDropdown.parent().hover(
-            function() { toolDropdown.show(); },
-            function() { toolDropdown.hide(); });
+          if (Config.writeAccess) {
+              toolMenuDropdown.hide();
+              toolMenu.hover(
+                function() { toolMenuDropdown.show(); },
+                function() { toolMenuDropdown.hide(); });
+          } else {
+            // Read-only mode
+            toolMenu.addClass('disabled');
+          }
         },
 
         setTool = function(toolName) {
@@ -28,7 +34,7 @@ define(['common/hasEvents'], function(HasEvents) {
           } else {
             // Submenu selection
             tools.find('.has-submenu').addClass('active');
-            toolDropdownLabel.html(toolName);
+            toolMenuLabel.html(toolName);
           }
 
           imagePane.attr('class', toolName);
