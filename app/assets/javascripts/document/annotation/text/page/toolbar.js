@@ -43,7 +43,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
               annotationModes.find('.active').removeClass('active');
               menuItemQuick.removeClass(currentMode.type);
               if (type) {
-                // Sub-menu selection
+                // Submenu selection
                 menuItemQuick.addClass('active ' + type);
                 quickModeMenu.hide();
               } else {

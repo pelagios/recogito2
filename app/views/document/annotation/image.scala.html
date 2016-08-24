@@ -47,36 +47,36 @@
 
     <div class="header-toolbar">
       <ul class="menu">
-        <li class="group">
+        <li class="group tools">
           <h3>TOOLS:</h3>
           <ul>
-            <li>
+            <li data-tool="MOVE" class="active">
               <span class="icon">&#xf256;</span>
               <span class="label">MOVE</span>
             </li>
-            <li class="has-submenu active">
+            <li class="has-submenu">
               <span class="icon">&#xf05b;</span>
               <span class="label">POINT</span>
               <div class="submenu" style="display:none;">
                 <ul>
-                  <li><span class="icon">&#xf05b;</span> POINT</li>
-                  <li><span class="icon"><span class="rect"></span></span> RECTANGLE</li>
-                  <li><span class="icon"><span class="toponym"></span></span> TOPONYM</li>
+                  <li data-tool="POINT"><span class="icon">&#xf05b;</span> POINT</li>
+                  <li class="disabled" data-tool="RECTANGLE"><span class="icon"><span class="rect"></span></span> RECTANGLE</li>
+                  <li class="disabled" data-tool="TOPONYM"><span class="icon"><span class="toponym"></span></span> TOPONYM</li>
                 </ul>
               </div>
             </li>
           </ul>
         </li> <!-- TOOLS group -->
 
-        <li class="group has-submenu">
+        <li class="group has-submenu disabled">
           <h3><span class="label">IMAGE</span></h3>
         </li>
 
-        <li class="group has-submenu">
+        <li class="group has-submenu disabled">
           <h3><span class="label">LAYERS</span></h3>
         </li>
 
-        <li class="group has-submenu">
+        <li class="group disabled">
           <h3><span class="label">HELP</span></h3>
         </li>
       </ul> <!-- .menu -->
@@ -87,7 +87,7 @@
       </span -->
     </div> <!-- .header-toolbar -->
 
-    <div id="image-pane"></div>
+    <div id="image-pane" class="MOVE"></div>
 
     <div class="sidebar">
       @views.html.document.sidebarHeader(doc.owner)

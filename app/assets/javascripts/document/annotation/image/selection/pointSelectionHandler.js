@@ -20,6 +20,8 @@ define([
 
           currentSelection = false,
 
+          isEnabled = false,
+
           /** Converts the given map-coordinate bounds to viewport bounds **/
           mapBoundsToScreenBounds = function(mapBounds) {
             var offset = jQuery(containerEl).offset(),
@@ -111,13 +113,15 @@ define([
           },
 
           onClick = function(e) {
-            var currentHighlight = highlighter.getCurrentHighlight();
-            if (currentHighlight)
-              // Select existing annotation
-              selectExisting(currentHighlight);
-            else
-              // Create new selection
-              selectNewPoint(e);
+            if (isEnabled) {
+              var currentHighlight = highlighter.getCurrentHighlight();
+              if (currentHighlight)
+                // Select existing annotation
+                selectExisting(currentHighlight);
+              else
+                // Create new selection
+                selectNewPoint(e);
+            }
           },
 
           getSelection = function() {
@@ -132,6 +136,10 @@ define([
               pointVectorSource.clear(true);
 
             currentSelection = false;
+          },
+
+          setEnabled = function(enabled) {
+            isEnabled = enabled;
           };
 
       olMap.addLayer(new ol.layer.Vector({
@@ -142,6 +150,7 @@ define([
 
       this.getSelection = getSelection;
       this.clearSelection = clearSelection;
+      this.setEnabled = setEnabled;
 
       AbstractSelectionHandler.apply(this);
     };

@@ -209,6 +209,10 @@
     border-bottom:5px solid transparent; // makes the hover/cursor area extend to the bottom
   }
 
+  .disabled {
+    color:@lightblue-type;
+  }
+
   .submenu {
     position:absolute;
     top:29px;
@@ -218,7 +222,6 @@
 
     ul {
       background-color:#fff;
-      // width:100px;
       padding:5px 0px;
       border-style:solid;
       border-color:#d6d7d9;
@@ -258,14 +261,18 @@
 
     } /** li **/
 
+    li.disabled {
+
+      .icon .rect, .icon .toponym {
+        border-color:@lightblue-type;
+      }
+
+    }
+
     li:hover {
       background-color:@blueish-white;
     }
 
-    .disabled {
-      color:@lightblue-type;
-    }
-
-  }
+  } /** .submenu **/
 
 }
