@@ -7,7 +7,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"> @if(doc.isPublic) {
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@@pelagiosproject" />
+    <meta property="og:title" content="@doc.author.map(_ + ":")@doc.title" />
+    <meta name="twitter:title" content="@doc.author).map(_ + ":")@doc.title" />
+    <meta property="og:description" content="documentAnnotationCount annotations" />
+    <meta name="twitter:description" content="documentAnnotationCount annotations" />
+    <meta property="og:image" content="@controllers.document.routes.DocumentController.getImageTile(doc.id, currentPart.getSequenceNo, "3-1-1.jpg").absoluteURL" />
+    <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(doc.id).absoluteURL" /> }
+    <meta property="og:image:width" content="256" />
+    <meta property="og:image:height" content="256" />
+    <meta name="twitter:image" content="@controllers.document.routes.DocumentController.getImageTile(doc.id, currentPart.getSequenceNo, "3-1-1.jpg").absoluteURL" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("ol.css"))"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
