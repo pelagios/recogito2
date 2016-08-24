@@ -20,97 +20,9 @@ html, body {
 
 .header-toolbar {
   .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.15));
-  position:absolute;
-  left:0;
-  right:0;
-  height:33px;
-  box-sizing:border-box;
-  padding-top:3px;
 
-  .tool-label {
-    padding-bottom:4px;
-    border-bottom:4px solid transparent;
-  }
 
-  ul {
-    display:inline-block;
-    list-style-type:none;
-    margin:0;
-    padding:4px 90px 0 0;
-  }
-
-  .dropdown {
-    padding:0 16px;
-
-    ul {
-      width:110px;
-    }
-  }
-
-  .active .tool-label {
-    border-color:@ocean;
-  }
-
-  span.tools {
-    margin-left:8px;
-
-    .tool-label {
-      margin:0 0 0 18px;
-    }
-
-  }
-
-  span.tools::before {
-    display:inline-block;
-    width:7px;
-    content:'';
-    position:absolute;
-    top:1px;
-    font-family:FontAwesome;
-  }
-
-  span.tools.MOVE::before {
-    content:'\f256';
-    left:0;
-  }
-
-  span.tools.POINT::before {
-    content:'\f05b';
-    left:2px;
-  }
-
-  span.tools.RECT::before {
-    content:'';
-    left:0;
-    top:8px;
-  }
-
-  span.tools.TOPONYM::before {
-    content:'';
-    left:0;
-    top:10px;
-  }
-
-  .icon {
-    display:inline-block;
-  }
-
-  .icon.rect, span.tools.RECT::before {
-    border:1px dotted @nightsky-type;
-    width:11px;
-    height:7px;
-  }
-
-  .icon.toponym, span.tools.TOPONYM::before {
-    margin-left:1px;
-    border-width:1px;
-    border-color:@nightsky-type;
-    border-style:dotted dotted solid dotted;
-    width:11px;
-    height:5px;
-    .rotate(-19deg);
-  }
-
+  /*
   .search {
     position:relative;
     float:right;
@@ -139,7 +51,7 @@ html, body {
       right:5px;
     }
 
-  }
+  } */
 
 }
 

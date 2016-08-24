@@ -17,69 +17,19 @@ body {
 }
 
 .header-toolbar {
-  position:absolute;
-  left:0;
-  right:0;
-  height:33px;
 
-  ul {
-    display:inline-block;
-    list-style-type:none;
-    margin:0;
-    padding:4px 90px 0 0;
-  }
+  .color-scheme {
 
-  li {
-    position:relative;
-    margin:0 10px;
-    padding:0;
-    display:inline-block;
-    font-weight:normal;
-    cursor:pointer;
-  }
-
-  li > .tool-label {
-    padding-bottom:4px;
-    border-bottom:4px solid transparent;
-  }
-
-  .has-sub-options:hover {
-    border-color:transparent !important;
-  }
-
-  ul.annotation-mode {
-
-    li.active > .tool-label, li:not(.quick):hover > .tool-label {
-      border-color:@ocean;
-    }
-
-  }
-
-  ul.color-scheme {
-
-    li.active > .tool-label, li:hover > .tool-label {
+    li.active .label, li:hover .label {
       border-color:@shore;
     }
 
-  }
-
-  li.quick .tool-label {
-    margin:0 0 0 15px;
-  }
-
-  /***
-   * TEMPORARY
-   **/
-  li.disabled {
-    color:@lightblue-type;
   }
 
   li.quick::before {
     display:inline-block;
     width:7px;
     content:'';
-    position:absolute;
-    top:1px;
     font-family:FontAwesome;
   }
 

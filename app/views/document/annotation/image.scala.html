@@ -46,36 +46,52 @@
     </div> <!-- .header-infobox -->
 
     <div class="header-toolbar">
-      <h3>TOOLS:</h3>
-      <span class="active tools has-sub-options MOVE">
-        <span class="tool-label">MOVE</span>
-        <div class="dropdown" style="display:none;">
+      <ul class="menu">
+        <li class="group">
+          <h3>TOOLS:</h3>
           <ul>
-            <li data-tool="MOVE"><span class="icon">&#xf256;</span> Move</li>
-            <li data-tool="POINT"><span class="icon">&#xf05b;</span> Point</li>
-            <li data-tool="RECT"><span class="icon rect"></span> Rectangle</li>
-            <li data-tool="TOPONYM"><span class="icon toponym"></span> Toponym</li>
+            <li>
+              <span class="icon">&#xf256;</span>
+              <span class="label">MOVE</span>
+            </li>
+            <li class="has-submenu active">
+              <span class="icon">&#xf05b;</span>
+              <span class="label">POINT</span>
+              <div class="submenu" style="display:none;">
+                <ul>
+                  <li><span class="icon">&#xf05b;</span> POINT</li>
+                  <li><span class="icon"><span class="rect"></span></span> RECTANGLE</li>
+                  <li><span class="icon"><span class="toponym"></span></span> TOPONYM</li>
+                </ul>
+              </div>
+            </li>
           </ul>
-        </div>
-      </span>
+        </li> <!-- TOOLS group -->
 
-      <h3 class="layers has-sub-options">LAYERS</h3>
+        <li class="group has-submenu">
+          <h3><span class="label">IMAGE</span></h3>
+        </li>
 
-      <h3 class="image has-sub-options">IMAGE</h3>
+        <li class="group has-submenu">
+          <h3><span class="label">LAYERS</span></h3>
+        </li>
 
-      <h3 class="help">HELP</h3>
+        <li class="group has-submenu">
+          <h3><span class="label">HELP</span></h3>
+        </li>
+      </ul> <!-- .menu -->
 
-      <span class="search">
+      <!-- span class="search">
         <input class="search" type="text" placeholder="Search..."/>
         <span class="icon">&#xf002;</span>
-      </span>
+      </span -->
     </div> <!-- .header-toolbar -->
 
     <div id="image-pane"></div>
 
     <div class="sidebar">
       @views.html.document.sidebarHeader(doc.owner)
-      
+
       <ul class="menu">
         @for(part <- doc.fileparts) {
           @if(part == currentPart) {

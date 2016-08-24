@@ -136,54 +136,90 @@
 } /** .header-infobox **/
 
 .header-toolbar {
+  position:absolute;
+  left:0;
+  right:0;
+  height:33px;
+  box-sizing:border-box;
   margin-left:@sidebar-width;
   border-bottom:1px solid @lightgrey-border-darker;
   font-family:OpenSans;
   font-size:12px;
-  padding:0 30px;
+  padding:3px 30px 0 30px;
   color:@nightsky-type;
   background-color:#fff;
   white-space:nowrap;
   z-index:99996;
 
-  h3 {
+  ul.menu {
+    height:100%;
+  }
+
+  ul, li {
     display:inline-block;
     margin:0;
-    padding:0 0 0 0;
+    padding:0;
+  }
+
+  li {
+    padding:0 15px 0 0;
+
+    .icon {
+      padding:0 2px;
+      cursor:pointer;
+    }
+
+    .label {
+      cursor:pointer;
+      padding-bottom:4px;
+      border-bottom:4px solid transparent;
+    }
+
+    .active .label, .label:hover {
+      border-color:@ocean;
+    }
+
+  }
+
+  .group {
+    padding-right:30px;
+  }
+
+  h3 {
+    display:inline;
+    margin:0;
+    padding:0 10px 0 0;
     font-size:12px;
-    font-weight:bold;
   }
 
-  .has-sub-options {
+  .has-submenu {
     position:relative;
-    display:inline-block;
-    padding:0 12px 0 0;
-    margin:0 20px 0 3px;
-    cursor:pointer;
   }
 
-  .has-sub-options:after {
+  .has-submenu .label::after {
     content:'\f0dd';
-    color:lighten(@nightsky-type, 5%);
-    font-size:10.5px;
     font-family:FontAwesome;
+    font-size:10.5px;
     font-weight:normal;
-    position:absolute;
-    top:-1px;
-    right:0;
+    position:relative;
+    bottom:2px;
+    padding:0 3px;
+    cursor:pointer;
+    display:inline-block;
+    border-bottom:5px solid transparent; // makes the hover/cursor area extend to the bottom
   }
 
-  .dropdown {
+  .submenu {
     position:absolute;
     top:29px;
-    left:-30px;
-    padding:0 20px;
+    left:-25px;
+    padding:0 15px 15px 15px;
     overflow:hidden;
 
     ul {
       background-color:#fff;
-      width:100px;
-      padding:5px 0;
+      // width:100px;
+      padding:5px 0px;
       border-style:solid;
       border-color:#d6d7d9;
       border-width:0 1px 1px 1px;
@@ -192,20 +228,42 @@
 
     li {
       display:block;
-      margin:0;
-      padding:0 20px 0 15px;
-      border:none;
-    }
+      padding:0 15px 0 5px;
+      cursor:pointer;
+
+      .icon {
+        text-align:center;
+        display:inline-block;
+        width:14px;
+        padding-right:3px;
+      }
+
+      .icon .rect {
+        display:inline-block;
+        border:1px dotted @nightsky-type;
+        width:11px;
+        height:7px;
+      }
+
+      .icon .toponym {
+        display:inline-block;
+        margin-left:1px;
+        border-width:1px;
+        border-color:@nightsky-type;
+        border-style:dotted dotted solid dotted;
+        width:11px;
+        height:5px;
+        .rotate(-19deg);
+      }
+
+    } /** li **/
 
     li:hover {
       background-color:@blueish-white;
     }
 
-    .icon {
-      display:inline-block;
-      text-align:center;
-      width:8px;
-      margin-right:10px;
+    .disabled {
+      color:@lightblue-type;
     }
 
   }

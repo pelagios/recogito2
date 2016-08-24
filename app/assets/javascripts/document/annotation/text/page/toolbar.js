@@ -5,7 +5,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
         annotationModes = jQuery('.annotation-mode'),
 
-        quickModeMenu = annotationModes.find('.quick .dropdown'),
+        quickModeMenu = annotationModes.find('.submenu'),
 
         colorSchemes = jQuery('.color-scheme'),
 
@@ -28,8 +28,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             return false;
         },
 
-        attachButtonHandlers = function() {
-          annotationModes.on('click', '>li', function(e) {
+        attachClickHandlers = function() {
+          annotationModes.on('click', 'li', function(e) {
             var menuItemQuick = annotationModes.find('.quick'),
                 t = jQuery(e.target).closest('li'),
                 mode = t.data('mode'),
@@ -54,7 +54,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             }
           });
 
-          colorSchemes.on('click', '>li', function(e) {
+          colorSchemes.on('click', 'li', function(e) {
             var t = jQuery(e.target).closest('li'),
                 active = t.hasClass('active'),
                 scheme = t.data('scheme');
@@ -96,7 +96,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
     initQuickModeMenu();
     makeToolbarSticky();
-    attachButtonHandlers();
+    attachClickHandlers();
 
     this.setCurrentColorscheme = setCurrentColorscheme;
     this.getCurrentAnnotationMode = getCurrentAnnotationMode;

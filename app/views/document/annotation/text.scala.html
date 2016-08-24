@@ -62,7 +62,34 @@
     </div> <!-- .header-infobox -->
 
     <div class="header-toolbar">
-      <h3>ANNOTATION MODE:</h3>
+      <ul class="menu">
+        <li class="group annotation-mode">
+          <h3>ANNOTATION MODE:</h3>
+          <ul>
+            <li data-mode="NORMAL" class="active"><span class="label">NORMAL</span></li>
+            <li class="quick has-submenu">
+              <span class="label">QUICK</span>
+              <div class="submenu" style="display:none;">
+                <ul>
+                  <li data-mode="QUICK" data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
+                  <li data-mode="QUICK" data-type="PERSON" class="disabled"><span class="icon">&#xf007;</span> Persons</li>
+                  <li data-mode="QUICK" data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+
+        <li class="group color-scheme">
+          <h3>COLOR:</h3>
+          <ul>
+            <li data-scheme="BY_TYPE" class="active"><span class="label">BY ENTITY TYPE</span></li>
+            <li data-scheme="BY_STATUS"><span class="label">BY VERIFICATION STATUS</span></li>
+          </ul>
+        </li>
+      </ul> <!-- .menu -->
+
+      <!-- h3>ANNOTATION MODE:</h3>
       <ul class="annotation-mode">
         <li data-mode="NORMAL" class="active">
           <span class="tool-label">NORMAL</span>
@@ -76,12 +103,11 @@
               <li data-mode="QUICK" data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
             </ul>
           </div>
-        </li>
+        </li -->
         <!--
         <li data-mode="BULK">
           <span class="tool-label">BULK</span>
         </li>
-        -->
       </ul>
 
       <h3>COLOR:</h3>
@@ -92,7 +118,7 @@
         <li data-scheme="BY_STATUS">
           <span class="tool-label">BY VERIFICATION STATUS</span>
         </li>
-      </ul>
+      </ul> -->
     </div> <!-- .header-toolbar -->
 
     <div class="sidebar">

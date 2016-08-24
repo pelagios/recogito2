@@ -3,7 +3,7 @@ define(['common/hasEvents'], function(HasEvents) {
   var Toolbar = function() {
     var self = this,
 
-        toolDropdown = jQuery('.dropdown'),
+        toolDropdown = jQuery('.submenu'),
 
         initToolDropdown = function() {
           toolDropdown.hide();
