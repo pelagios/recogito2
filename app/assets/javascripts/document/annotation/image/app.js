@@ -10,10 +10,10 @@ require([
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/baseApp',
   'document/annotation/image/page/toolbar',
-  'document/annotation/image/selection/pointHighlighter',
-  'document/annotation/image/selection/pointSelectionHandler'],
+  'document/annotation/image/selection/multiHighlighter',
+  'document/annotation/image/selection/multiSelectionHandler'],
 
-  function(API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar, PointHighlighter, PointSelectionHandler) {
+  function(API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar, Highlighter, SelectionHandler) {
 
     /** The app is instantiated after the image manifest was loaded **/
     var App = function(imageProperties) {
@@ -54,9 +54,9 @@ require([
             })
           }),
 
-          highlighter = new PointHighlighter(olMap),
+          highlighter = new Highlighter(olMap),
 
-          selector = new PointSelectionHandler(contentNode, olMap, highlighter),
+          selector = new SelectionHandler(contentNode, olMap, highlighter),
 
           editor = (Config.writeAccess) ?
             new WriteEditor(contentNode, highlighter, selector) :
