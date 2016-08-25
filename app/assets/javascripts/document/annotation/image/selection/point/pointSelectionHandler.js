@@ -22,22 +22,6 @@ define([
 
           isEnabled = false,
 
-          /** Converts the given map-coordinate bounds to viewport bounds **/
-          mapBoundsToScreenBounds = function(mapBounds) {
-            var offset = jQuery(containerEl).offset(),
-                topLeft = olMap.getPixelFromCoordinate([ mapBounds.left, mapBounds.top ]),
-                bottomRight = olMap.getPixelFromCoordinate([ mapBounds.right, mapBounds.bottom ]);
-
-            return {
-              top    : topLeft[1] + offset.top,
-              right  : bottomRight[0] + offset.left,
-              bottom : bottomRight[1] + offset.top,
-              left   : topLeft[0] + offset.left,
-              width  : 0,
-              height : 0
-            };
-          },
-
           pointToBounds = function(coordinate) {
             return {
               top    : coordinate[1],
@@ -60,16 +44,12 @@ define([
 
           selectExisting = function(feature) {
             var annotation = feature.get('annotation'),
-                mapBounds = pointToBounds(feature.getGeometry().getCoordinates()),
-                screenBounds = mapBoundsToScreenBounds(mapBounds);
+                mapBounds = pointToBounds(feature.getGeometry().getCoordinates());
 
+            // Map bounds get centrally transformed to screenbounds by the MultiSelector - DRY
             currentSelection = {
               isNew      : false,
               annotation : annotation,
-              bounds     : screenBounds,
-
-              // Image-UI specific field - needed to provide up-to-date
-              // screenbounds in .getSelection
               mapBounds  : mapBounds
             };
 
@@ -92,20 +72,15 @@ define([
                   bodies: []
                 },
 
-                mapBounds = pointToBounds(e.coordinate),
-
-                screenBounds = mapBoundsToScreenBounds(mapBounds);
+                mapBounds = pointToBounds(e.coordinate);
 
             pointVectorSource.clear(true);
             drawPoint(e.coordinate);
 
+            // Map bounds get centrally transformed to screenbounds by the MultiSelector - DRY
             currentSelection = {
               isNew      : true,
               annotation : annotation,
-              bounds     : screenBounds,
-
-              // Image-UI specific field - needed to provide up-to-date
-              // screenbounds in .getSelection
               mapBounds  : mapBounds
             };
 
@@ -123,9 +98,6 @@ define([
           },
 
           getSelection = function() {
-            // Update screenbounds, since the map may have moved
-            if (currentSelection)
-              currentSelection.bounds = mapBoundsToScreenBounds(currentSelection.mapBounds);
             return currentSelection;
           },
 

@@ -23,6 +23,20 @@ define([
 
       var self = this,
 
+          currentSelection = false,
+
+          /** For testing only! **/
+          pointToBounds = function(coordinate) {
+            return {
+              top    : coordinate[1],
+              right  : coordinate[0],
+              bottom : coordinate[1],
+              left   : coordinate[0],
+              width  : 0,
+              height : 0
+            };
+          },
+
           canvas = (function() {
             var canvas = jQuery('<canvas class="toponym-drawing"></canvas>');
             canvas.hide();
@@ -187,21 +201,21 @@ define([
             // Reset state
             extrude = false;
             painting = false;
-            clearCanvas();
 
             annotationStub.anchor ='toponym:' +
               'x=' + Math.round(imageAnchorCoords[0]) + ',' +
-              'y=' + Math.round(Math.abs(imageAnchorCoords[0])) + ',' +
+              'y=' + Math.round(Math.abs(imageAnchorCoords[1])) + ',' +
               'a=' + baselineAngle + ',' +
               'l=' + Math.round(baselineLength) + ',' +
               'h=' + Math.round(height);
 
-            self.fireEvent('select', {
+            currentSelection = {
               isNew      : true,
               annotation : annotationStub,
-              bounds     : false, // TODO
-              mapBounds  : false // TODO
-            });
+              mapBounds  : pointToBounds(imageAnchorCoords)
+            };
+
+            self.fireEvent('select', currentSelection);
           },
 
           onMouseDown = function(e) {
@@ -238,11 +252,12 @@ define([
           },
 
           getSelection = function() {
-
+            return currentSelection;
           },
 
           clearSelection = function(selection) {
-
+            // clearCanvas();
+            currentSelection = false;
           },
 
           setEnabled = function(enabled) {

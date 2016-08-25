@@ -1,14 +1,16 @@
 define([
   'common/config',
   'document/annotation/common/selection/abstractHighlighter',
-  'document/annotation/image/selection/point/pointHighlighter'],
+  'document/annotation/image/selection/point/pointHighlighter',
+  'document/annotation/image/selection/toponym/toponymHighlighter'],
 
-  function(Config, AbstractHighlighter, PointHighlighter) {
+  function(Config, AbstractHighlighter, PointHighlighter, ToponymHighlighter) {
 
     var MultiHighlighter = function(olMap) {
 
       var highlighters = {
-            point : new PointHighlighter(olMap)
+            point : new PointHighlighter(olMap),
+            toponym : new ToponymHighlighter(olMap)
           },
 
           /**
