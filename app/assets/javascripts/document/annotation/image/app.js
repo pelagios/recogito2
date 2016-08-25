@@ -68,12 +68,11 @@ require([
               editor.setPosition(selection.bounds);
           },
 
-          /** TODO so far, dummy implementation **/
           onToolChanged = function(toolName) {
-            if (toolName === 'POINT')
-              selector.setEnabled(true);
-            else
+            if (toolName === 'MOVE')
               selector.setEnabled(false);
+            else
+              selector.setEnabled(toolName);
           };
 
       toolbar.on('toolChanged', onToolChanged);

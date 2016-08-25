@@ -1,24 +1,29 @@
 define([
   'common/config',
   'document/annotation/common/selection/abstractSelectionHandler',
-  'document/annotation/image/selection/point/pointSelectionHandler'],
-
-  function(Config, AbstractSelectionHandler, PointSelectionHandler) {
+  'document/annotation/image/selection/point/pointSelectionHandler',
+  'document/annotation/image/selection/toponym/toponymSelectionHandler'
+], function(
+    Config,
+    AbstractSelectionHandler,
+    PointSelectionHandler,
+    ToponymSelectionHandler) {
 
     var MultiSelectionHandler = function(containerEl, olMap, highlighter) {
 
       var self = this,
 
           selectionHandlers = {
-            point : new PointSelectionHandler(containerEl, olMap, highlighter)
+            point   : new PointSelectionHandler(containerEl, olMap, highlighter),
+            toponym : new ToponymSelectionHandler(containerEl, olMap, highlighter)
           },
 
           /** Calls the function on all selection handlers returning an array of results **/
-          applyToAllHandlers = function(fnName) {
+          applyToAllHandlers = function(fnName, arg1) {
             var results = [];
 
             jQuery.each(selectionHandlers, function(key, selector) {
-              var result = selector[fnName]();
+              var result = selector[fnName](arg1);
               if (result)
                 results.push(result);
             });
@@ -41,12 +46,24 @@ define([
 
           clearSelection = function() {
             applyToAllHandlers('clearSelection');
+          },
+
+          setEnabled = function(toolName) {
+            // Disable all
+            applyToAllHandlers('setEnabled', false);
+
+            if (toolName) {
+              var handler = selectionHandlers[toolName.toLowerCase()];
+              if (handler)
+                handler.setEnabled(true);
+            }
           };
 
       registerEventHandlers();
 
       this.getSelection = getSelection;
       this.clearSelection = clearSelection;
+      this.setEnabled = setEnabled;
 
       AbstractSelectionHandler.apply(this);
     };

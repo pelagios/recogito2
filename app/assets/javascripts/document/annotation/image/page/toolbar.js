@@ -46,8 +46,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             var item = jQuery(e.target).closest('li'),
                 tool = item.data('tool');
 
-            // TODO temporary: disable RECTANGLE & TOPONYM tools
-            if (tool === 'RECTANGLE' || tool === 'TOPONYM')
+            if (item.hasClass('disabled'))
               return;
 
             if (tool && tool !== currentTool) {
