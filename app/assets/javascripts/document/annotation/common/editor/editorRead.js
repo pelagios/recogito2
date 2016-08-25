@@ -1,7 +1,7 @@
 
 define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
-  var ReadEditor = function(container, highlighter, selectionHandler) {
+  var ReadEditor = function(container, highlighter) {
     var self = this,
 
         element = (function() {
@@ -18,8 +18,7 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
           return el;
         })(),
 
-        /** Opens the editor on an annotation **/
-        viewSelection = function(selection) {
+        openSelection = function(selection) {
           self.open(selection.annotation, selection.bounds);
           return false;
         },
@@ -29,13 +28,9 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
           element.hide();
         };
 
+    this.openSelection = openSelection;
+
     EditorBase.apply(this, [ container, element, highlighter ]);
-
-    // Click on annotation span opens the editor
-    // jQuery(container).on('click', '.annotation', viewSelection);
-
-    // Monitor text selections through the selectionHandler
-    selectionHandler.on('select', viewSelection);
 
     // Editor closes on ESC key and click on background document
     self.on('escape', onClose);

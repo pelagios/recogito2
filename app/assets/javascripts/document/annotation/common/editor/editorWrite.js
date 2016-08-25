@@ -74,8 +74,7 @@ define([
           annotationMode = mode;
         },
 
-        /** Opens the editor on a newly created text selection **/
-        editSelection = function(selection) {
+        openSelection = function(selection) {
           if (selection.isNew) {
             // Branch based on annotation mode
             // TODO can we move dependency on mode outside the editor?
@@ -191,9 +190,6 @@ define([
           self.sectionList.updateSection(placeBody, diff);
         };
 
-    // Monitor text selections through the selectionHandler
-    selectionHandler.on('select', editSelection);
-
     // Georesolution change
     georesolutionPanel.on('change', onGeoresolutionChanged);
 
@@ -209,6 +205,10 @@ define([
     btnOk.click(onOK);
     btnOkAndNext.click(onOKAndNext);
 
+    this.openSelection = openSelection;
+    this.setAnnotationMode = setAnnotationMode;
+    this.replyField = replyField;
+
     EditorBase.apply(this, [ container, element, highlighter ]);
 
     // Events from the section List
@@ -219,9 +219,6 @@ define([
     this.on('escape', onCancel);
 
     // TODO handle click on background document -> cancel
-
-    this.setAnnotationMode = setAnnotationMode;
-    this.replyField = replyField;
   };
   WriteEditor.prototype = Object.create(EditorBase.prototype);
 

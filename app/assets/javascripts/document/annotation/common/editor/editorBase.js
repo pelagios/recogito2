@@ -26,6 +26,9 @@ define([
             self.toNextAnnotation();
         };
 
+    if (!this.openSelection)
+      throw 'Editor needs to implement .openSelection() method';
+
     // Fields accessible to prototype methods
     this.container = container;
     this.element = element;

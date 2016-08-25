@@ -60,7 +60,7 @@ require([
 
           editor = (Config.writeAccess) ?
             new WriteEditor(contentNode, highlighter, selector) :
-            new ReadEditor(contentNode, highlighter, selector),
+            new ReadEditor(contentNode, highlighter),
 
           onMapMove = function() {
             var selection = selector.getSelection();
@@ -79,7 +79,8 @@ require([
 
       BaseApp.apply(this, [ editor, highlighter ]);
 
-      // TODO refactor, so we have one common 'annotation app' base class
+      selector.on('select', editor.openSelection);
+
       editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
       editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 
