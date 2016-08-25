@@ -21,7 +21,9 @@ define([
 
     var ToponymSelectionHandler = function(containerEl, olMap, highlighter) {
 
-      var canvas = (function() {
+      var self = this,
+
+          canvas = (function() {
             var canvas = jQuery('<canvas class="toponym-drawing"></canvas>');
             canvas.hide();
             jQuery(containerEl).append(canvas);
@@ -149,56 +151,57 @@ define([
           },
 
           finalizeAnnotation = function(e) {
-            /*
-            var imageAnchorCoords = viewer.getCoordinateFromPixel([anchorX, anchorY]);
-            var imageEndCoords = viewer.getCoordinateFromPixel([baseEndX, baseEndY]);
-            var imageOppositeCoords = viewer.getCoordinateFromPixel([oppositeX, oppositeY]);
-            */
+            var annotationStub = {
+                  annotates: {
+                    document_id: Config.documentId,
+                    filepart_id: Config.partId,
+                    content_type: Config.contentType
+                  },
+                  bodies: []
+                },
 
+                imageAnchorCoords = olMap.getCoordinateFromPixel([ anchorX, anchorY ]),
+                imageEndCoords = olMap.getCoordinateFromPixel([baseEndX, baseEndY]),
+                imageOppositeCoords = olMap.getCoordinateFromPixel([oppositeX, oppositeY]),
+
+                dx = imageEndCoords[0] - imageAnchorCoords[0],
+                dy = imageEndCoords[1] - imageAnchorCoords[1],
+                dh = [
+                  imageOppositeCoords[0] - imageEndCoords[0],
+                  imageOppositeCoords[1] - imageEndCoords[1]
+                ],
+
+                corr = (dx < 0 && dy >= 0) ? Math.PI : ((dx < 0 && dy <0) ? - Math.PI : 0),
+
+                baselineAngle = Math.atan(dy / dx) + corr,
+                baselineLength = Math.sqrt(dx * dx + dy * dy),
+                height = Math.sqrt(dh[0]*dh[0] + dh[1]*dh[1]);
+
+            if (corr === 0 && dh[1] < 0)
+              height = -1 * height;
+            else if (corr < 0 && dh[0] < 0)
+              height = -1 * height;
+            else if (corr > 0 && dh[0] > 0)
+              height = -1 * height;
+
+            // Reset state
             extrude = false;
             painting = false;
-
             clearCanvas();
 
-            /*
-            var dx = imageEndCoords[0] - imageAnchorCoords[0];
-            var dy = imageEndCoords[1] - imageAnchorCoords[1];
-            var dh = [
-              imageOppositeCoords[0] - imageEndCoords[0],
-              imageOppositeCoords[1] - imageEndCoords[1]
-            ];
+            annotationStub.anchor ='toponym:' +
+              'x=' + Math.round(imageAnchorCoords[0]) + ',' +
+              'y=' + Math.round(Math.abs(imageAnchorCoords[0])) + ',' +
+              'a=' + baselineAngle + ',' +
+              'l=' + Math.round(baselineLength) + ',' +
+              'h=' + Math.round(height);
 
-            var corr = 0;
-            if (dx < 0 && dy >= 0)
-              corr = Math.PI;
-            else if (dx < 0 && dy < 0)
-              corr = - Math.PI;
-
-            var baselineAngle = Math.atan(dy / dx) + corr;
-            var baselineLength = Math.sqrt(dx * dx + dy * dy);
-            var height = Math.sqrt(dh[0]*dh[0] + dh[1]*dh[1]);
-            if (corr == 0 && dh[1] < 0) {
-              height = -1 * height;
-            } else if (corr < 0 && dh[0] < 0) {
-              height = -1 * height;
-            } else if (corr > 0 && dh[0] > 0) {
-              height = -1 * height;
-            }
-
-            var annotation = {
-              shapes: [{
-                type: 'toponym',
-                geometry: {
-                  x: imageAnchorCoords[0],
-                  y: - imageAnchorCoords[1],
-                  a: baselineAngle,
-                  l: baselineLength,
-                  h: height
-                }
-              }]
-            };
-            */
-
+            self.fireEvent('select', {
+              isNew      : true,
+              annotation : annotationStub,
+              bounds     : false, // TODO
+              mapBounds  : false // TODO
+            });
           },
 
           onMouseDown = function(e) {
@@ -248,6 +251,8 @@ define([
 
       attachMouseHandlers();
       setCanvasSize();
+
+      jQuery(window).on('resize', setCanvasSize);
 
       this.getSelection = getSelection;
       this.clearSelection = clearSelection;
