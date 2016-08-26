@@ -1,13 +1,19 @@
 define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
+  var ICONS = {
+    POINT     : '&#xf05b',
+    RECTANGLE : '<span class="rect"></span>',
+    TOPONYM   : '<span class="toponym"></span>'
+  };
+
   var Toolbar = function() {
     var self = this,
 
         tools = jQuery('.tools'),
 
         toolMenu = tools.find('.has-submenu'),
-        toolMenuIcon = toolMenu.find('.icon'),
-        toolMenuLabel = toolMenu.find('.label'),
+        toolMenuIcon = tools.find('.has-submenu > .icon'),
+        toolMenuLabel = tools.find('.has-submenu > .label'),
         toolMenuDropdown = toolMenu.find('.submenu'),
 
         currentTool = 'MOVE',
@@ -33,7 +39,9 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             tools.find('[data-tool="MOVE"]').addClass('active');
           } else {
             // Submenu selection
-            tools.find('.has-submenu').addClass('active');
+            toolMenu.addClass('active');
+            toolMenu.data('tool', toolName);
+            toolMenuIcon.html(ICONS[toolName]);
             toolMenuLabel.html(toolName);
           }
 
@@ -49,7 +57,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             if (item.hasClass('disabled'))
               return;
 
-            if (tool && tool !== currentTool) {
+            if (tool !== currentTool) {
               setTool(tool);
               self.fireEvent('toolChanged', tool);
             }

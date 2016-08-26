@@ -26,6 +26,39 @@ html, body {
     width:80px;
   }
 
+  .icon {
+    text-align:center;
+    display:inline-block;
+    width:14px;
+    padding-right:3px;
+  }
+
+  .icon .rect {
+    display:inline-block;
+    border:1px dotted @nightsky-type;
+    width:11px;
+    height:7px;
+  }
+
+  .icon .toponym {
+    display:inline-block;
+    margin-left:1px;
+    border-width:1px;
+    border-color:@nightsky-type;
+    border-style:dotted dotted solid dotted;
+    width:11px;
+    height:5px;
+    .rotate(-19deg);
+  }
+
+  li.disabled {
+
+    .icon .rect, .icon .toponym {
+      border-color:@lightblue-type;
+    }
+
+  }
+
   /*
   .search {
     position:relative;
