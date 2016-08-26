@@ -25,13 +25,21 @@ class BackupAdminController @Inject() (
   def restoreDocument = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     request.body.asMultipartFormData.flatMap(_.file("backup-zip")) match {
       case Some(formData) =>
-          scala.concurrent.blocking {
-            restoreFromZip(formData.ref.file, annotations, documents).map(_ => Redirect(routes.BackupAdminController.index)) 
-          }
+          restoreFromZip(formData.ref.file, annotations, documents).map(_ => Redirect(routes.BackupAdminController.index)) 
         
       case None => 
         Future.successful(BadRequest)
     }   
+  }
+  
+  def restoreAnnotations = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+    request.body.asMultipartFormData.flatMap(_.file("backup-jsonl")) match {
+      case Some(formData) =>
+        restoreFromJSONL(formData.ref.file, annotations).map(_ => Redirect(routes.BackupAdminController.index))
+        
+      case None =>
+        Future.successful(BadRequest)
+    }
   }
   
 }

@@ -1,7 +1,7 @@
 package controllers.admin.backup
 
 import collection.JavaConverters._
-import java.io.File
+import java.io.{ File, FileInputStream }
 import java.util.UUID
 import java.sql.Timestamp
 import java.util.zip.{ ZipEntry, ZipFile }
@@ -45,14 +45,13 @@ trait RestoreAction extends HasDate {
     }
   
   // TODO instead of just logging error, forward them to the UI
-  private def parseAnnotations(lines: Iterator[String]) =
-    lines.map { line => 
-      val result = Json.fromJson[Annotation](Json.parse(line))
-      if (result.isError)
-        Logger.error(result.toString)
-      
-      result.get
-    }
+  private def parseAnnotation(json: String) = {
+    val result = Json.fromJson[Annotation](Json.parse(json))
+    if (result.isError)
+      Logger.error(result.toString)
+    
+    result.get
+  }
  
   def restoreFromZip(file: File, annotationService: AnnotationService, documentService: DocumentService)(implicit ctx: ExecutionContext) = {
     val zipFile = new ZipFile(file)
@@ -72,13 +71,18 @@ trait RestoreAction extends HasDate {
     
     val annotationEntry = entries.filter(_.getName == "annotations.jsonl").head
     val annotationLines = Source.fromInputStream(zipFile.getInputStream(annotationEntry), "UTF-8").getLines
-    val annotations = parseAnnotations(annotationLines).toSeq
+    val annotations = annotationLines.map(parseAnnotation).toSeq
 
     for {
      _ <- documentService.importDocument(documentRecord, fileparts)
      _ <- annotationService.insertOrUpdateAnnotations(annotations)
     } yield Unit
 
+  }
+  
+  def restoreFromJSONL(file: File, annotationService: AnnotationService)(implicit ctx: ExecutionContext) = {
+    val annotations = Source.fromInputStream(new FileInputStream(file)).getLines.map(parseAnnotation)
+    annotationService.insertOrUpdateAnnotations(annotations.toSeq).map(_.size == 0)
   }
   
 }
