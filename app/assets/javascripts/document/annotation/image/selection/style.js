@@ -4,7 +4,7 @@ define([], function() {
   return {
 
     /** Colors **/
-    COLOR_RED : '#aa0000',
+    COLOR_RED : '#323232', // '#aa0000',
 
     /** Openlayers-ready point styles **/
     POINT : new ol.style.Style({
