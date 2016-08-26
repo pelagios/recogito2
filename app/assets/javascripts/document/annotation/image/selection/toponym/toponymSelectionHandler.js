@@ -1,23 +1,17 @@
 define([
   'common/config',
   'document/annotation/common/selection/abstractSelectionHandler',
-  'document/annotation/image/selection/toponym/vector'],
+  'document/annotation/image/selection/toponym/geom2D',
+  'document/annotation/image/selection/style'],
 
-  function(Config, AbstractSelectionHandler, Vec) {
+  function(Config, AbstractSelectionHandler, Geom2D, Style) {
 
         /** Shorthand **/
     var TWO_PI = 2 * Math.PI,
 
         /** Constants **/
         MIN_DRAG_TIME = 300,   // Minimum duration of an annotation drag (milliseconds)
-        MIN_LINE_LENGTH = 10,  // Minimum length of a baseline
-
-        /** Drawing styles **/
-        RED = '#aa0000',
-
-        CIRCLE_RADIUS = 3,
-        LINE_WIDTH = 2,
-        BOX_OPACITY = 0.3;
+        MIN_LINE_LENGTH = 10;  // Minimum length of a baseline
 
     var ToponymSelectionHandler = function(containerEl, olMap, highlighter) {
 
@@ -60,18 +54,22 @@ define([
           lastClickTime, // Time of last mousedown event
 
           attachMouseHandlers = function() {
+            // Handlers on the drawing canvas
             var c = jQuery(canvas);
             c.mousedown(onMouseDown);
             c.mousemove(onMouseMove);
             c.mouseup(onMouseUp);
+
+            // Handlers on the map
+            olMap.on('click', onMapClicked);
           },
 
           setCanvasSize = function() {
             var c = jQuery(canvas);
             canvas.width = c.width();
             canvas.height = c.height();
-            ctx.strokeStyle = RED;
-            ctx.lineWidth = LINE_WIDTH;
+            ctx.strokeStyle = Style.COLOR_RED;
+            ctx.lineWidth = Style.BOX_BASELINE_WIDTH;
           },
 
           clearCanvas = function() {
@@ -91,9 +89,9 @@ define([
             var offsetX = (e.offsetX) ? e.offsetX : e.originalEvent.layerX,
                 offsetY = (e.offsetY) ? e.offsetY : e.originalEvent.layerY;
 
-            ctx.fillStyle = RED;
+            ctx.fillStyle = Style.COLOR_RED;
             ctx.beginPath();
-            ctx.arc(anchorX, anchorY, CIRCLE_RADIUS, 0, TWO_PI);
+            ctx.arc(anchorX, anchorY, Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
             ctx.fill();
             ctx.closePath();
 
@@ -108,7 +106,7 @@ define([
             baseEndX = (e.offsetX) ? e.offsetX : e.originalEvent.layerX;
             baseEndY = (e.offsetY) ? e.offsetY : e.originalEvent.layerY;
 
-            if (Vec.len(anchorX, anchorY, baseEndX, baseEndY) > MIN_LINE_LENGTH) {
+            if (Geom2D.len(anchorX, anchorY, baseEndX, baseEndY) > MIN_LINE_LENGTH) {
               extrude = true;
             } else {
               // Reject lines that are too short
@@ -122,7 +120,7 @@ define([
             var delta = [ (baseEndX - anchorX), (baseEndY - anchorY) ],
 
                 // Slope of the baseline normal
-                normal = Vec.normalize([-1 * delta[1], delta[0]]),
+                normal = Geom2D.normalize([-1 * delta[1], delta[0]]),
 
                 // Vector baseline->mouse
                 offsetX = (e.offsetX) ? e.offsetX : e.originalEvent.layerX,
@@ -131,17 +129,17 @@ define([
 
                 // Projection of toMouse onto normal
                 f = [
-                  normal[0] * Vec.len(toMouse) *
-                    Math.cos(Vec.angleBetween(normal, Vec.normalize(toMouse))),
-                  normal[1] * Vec.len(toMouse) *
-                    Math.cos(Vec.angleBetween(normal, Vec.normalize(toMouse)))
+                  normal[0] * Geom2D.len(toMouse) *
+                    Math.cos(Geom2D.angleBetween(normal, Geom2D.normalize(toMouse))),
+                  normal[1] * Geom2D.len(toMouse) *
+                    Math.cos(Geom2D.angleBetween(normal, Geom2D.normalize(toMouse)))
                 ];
 
             oppositeX = baseEndX + f[0];
             oppositeY = baseEndY + f[1];
 
-            ctx.globalAlpha = BOX_OPACITY;
-            ctx.fillStyle = RED;
+            ctx.globalAlpha = Style.BOX_OPACITY;
+            ctx.fillStyle = Style.COLOR_RED;
             ctx.beginPath();
             ctx.moveTo(anchorX, anchorY);
             ctx.lineTo(anchorX + f[0], anchorY + f[1]);
@@ -153,7 +151,7 @@ define([
 
             // Finished baseline
             ctx.beginPath();
-            ctx.arc(anchorX, anchorY, CIRCLE_RADIUS, 0, TWO_PI);
+            ctx.arc(anchorX, anchorY, Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
             ctx.fill();
             ctx.closePath();
 
@@ -175,8 +173,8 @@ define([
                 },
 
                 imageAnchorCoords = olMap.getCoordinateFromPixel([ anchorX, anchorY ]),
-                imageEndCoords = olMap.getCoordinateFromPixel([baseEndX, baseEndY]),
-                imageOppositeCoords = olMap.getCoordinateFromPixel([oppositeX, oppositeY]),
+                imageEndCoords = olMap.getCoordinateFromPixel([ baseEndX, baseEndY ]),
+                imageOppositeCoords = olMap.getCoordinateFromPixel([ oppositeX, oppositeY ]),
 
                 dx = imageEndCoords[0] - imageAnchorCoords[0],
                 dy = imageEndCoords[1] - imageAnchorCoords[1],
@@ -256,12 +254,35 @@ define([
           },
 
           clearSelection = function(selection) {
-            // clearCanvas();
+            clearCanvas();
             currentSelection = false;
           },
 
           setEnabled = function(enabled) {
             if (enabled) jQuery(canvas).show(); else jQuery(canvas).hide();
+          },
+
+          onMapClicked = function(e) {
+            var currentHighlight = highlighter.getCurrentHighlight(),
+
+                getAnchorCoord = function(anchor) {
+                  var args = anchor.substring(anchor.indexOf(':') + 1).split(','),
+                      x = parseInt(args[0].substring(2)),
+                      y = parseInt(args[1].substring(2));
+
+                  return [x, - y];
+                };
+
+            // TODO Bit of a necessary intermediate hack to check if the highlight is an
+            // TODO annotation (and not a feature)
+            if (currentHighlight && currentHighlight.anchor) {
+              currentSelection = {
+                isNew      : false,
+                annotation : currentHighlight,
+                mapBounds  : pointToBounds(getAnchorCoord(currentHighlight.anchor))
+              };
+              self.fireEvent('select', currentSelection);
+            }
           };
 
       attachMouseHandlers();

@@ -1,6 +1,7 @@
 define([
   'common/config',
-  'document/annotation/image/selection/style'], function(Config, Style) {
+  'document/annotation/image/selection/toponym/geom2D',
+  'document/annotation/image/selection/style'], function(Config, Geom2D, Style) {
 
       /** Shorthand **/
   var TWO_PI = 2 * Math.PI,
@@ -32,6 +33,8 @@ define([
   var ToponymHighlighter = function(olMap) {
 
     var annotations = [],
+
+        currentHighlight = false,
 
         addAnnotation = function(annotation, renderImmediately) {
           annotations.push(annotation);
@@ -126,15 +129,55 @@ define([
           })
         }),
 
+        getAnnotationsAt = function(coord) {
+          // TODO optimize with a spatial tree
+          var found = [];
+          jQuery.each(annotations, function(idx, annotation) {
+            var rect = anchorToRect(annotation.anchor, 5);
+            if(Geom2D.intersects(coord[0], - coord[1], rect))
+              found.push(annotation);
+          });
+          return found;
+        },
+
+        highlightAnnotation = function(annotation) {
+          currentHighlight = annotation;
+          if (annotation)
+            document.body.style.cursor = 'pointer';
+          else
+            document.body.style.cursor = 'auto';
+        },
+
+        onMouseMove = function(e) {
+          // TODO select the smallest hovered annotation, not hovered[0]
+          var all = getAnnotationsAt(e.coordinate),
+              hovered = (all.length > 0) ? all[0] : false;
+
+          if (hovered) {
+            if (currentHighlight) {
+              // Highlight changed to another annotation
+              if  (currentHighlight.annotation_id !== hovered.annotation_id)
+                highlightAnnotation(hovered);
+            } else {
+              // No previous highlight - just highlight the hovered box
+              highlightAnnotation(hovered);
+            }
+          } else if (currentHighlight) {
+            highlightAnnotation(false);
+          }
+        },
+
         refreshAnnotation = function(annotation) {
           // TODO implement
         },
 
         getCurrentHighlight = function() {
-          // TODO implement
+          return currentHighlight;
         };
 
     olMap.addLayer(layer);
+
+    olMap.on('pointermove', onMouseMove);
 
     this.addAnnotation = addAnnotation;
     this.render = render;

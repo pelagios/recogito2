@@ -17,13 +17,13 @@ define([
            * Calls the function with the given name on the appropriate highlighter, with
            * the annotation as function argument.
            */
-          applyToAppropriateHighlighter = function(annotation, fnName) {
+          applyToAppropriateHighlighter = function(annotation, fnName, arg) {
             var anchor = annotation.anchor,
                 shapeType = anchor.substring(0, anchor.indexOf(':')).toLowerCase(),
                 highlighter = highlighters[shapeType];
 
             if (highlighter)
-              highlighter[fnName](annotation);
+              highlighter[fnName](annotation, arg);
           },
 
           /** Calls the function on all highlighters, expecting 0 or one responses **/
@@ -73,7 +73,7 @@ define([
             // an annoation SPAN (change of CSS classes, adding data attribute etc.)
             // Image mode is much simpler - we just need to draw the annotation stub
             // and can ignore the selection
-            applyToAppropriateHighlighter(annotationStub, 'renderAnnotation');
+            applyToAppropriateHighlighter(annotationStub, 'addAnnotation', true);
           };
 
       this.getCurrentHighlight = getCurrentHighlight;

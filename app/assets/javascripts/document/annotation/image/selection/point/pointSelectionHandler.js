@@ -82,7 +82,9 @@ define([
 
           onClick = function(e) {
             var currentHighlight = highlighter.getCurrentHighlight();
-            if (currentHighlight)
+            // TODO bit of a necessary intermediate hack to check if the highlight
+            // TODO is a feature (not an annotation)
+            if (currentHighlight && currentHighlight.getGeometry)
               // Select existing annotation
               selectExisting(currentHighlight);
             else if (isEnabled)

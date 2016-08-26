@@ -37,11 +37,13 @@ define([
 
                   currentHighlight = closestFeature;
                   closestFeature.setStyle(Style.POINT_HI);
+                  document.body.style.cursor = 'pointer';
                 }
               } else if (currentHighlight) {
                 // Clear the previous highlight, if any
                 currentHighlight.setStyle(Style.POINT);
                 currentHighlight = false;
+                document.body.style.cursor = 'auto';
               }
             }
           },
