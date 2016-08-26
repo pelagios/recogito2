@@ -33,10 +33,14 @@ define([
 
     var annotations = [],
 
-        renderAnnotation = function(annotation) {
-          // Due to the way OL works, annotations are not actually rendered until OL
-          // triggers the drawing loop. We just store the annotation in the list.
+        addAnnotation = function(annotation, renderImmediately) {
           annotations.push(annotation);
+          if (renderImmediately)
+            layer.getSource().changed();
+        },
+
+        render = function() {
+          layer.getSource().changed();
         },
 
         drawOne = function(annotation, extent, scale, ctx, color) {
@@ -132,8 +136,9 @@ define([
 
     olMap.addLayer(layer);
 
+    this.addAnnotation = addAnnotation;
+    this.render = render;
     this.getCurrentHighlight = getCurrentHighlight;
-    this.renderAnnotation = renderAnnotation;
     this.refreshAnnotation = refreshAnnotation;
   };
 

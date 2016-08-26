@@ -17,7 +17,7 @@ define([
            * Calls the function with the given name on the appropriate highlighter, with
            * the annotation as function argument.
            */
-          applyForAnnotation = function(annotation, fnName) {
+          applyToAppropriateHighlighter = function(annotation, fnName) {
             var anchor = annotation.anchor,
                 shapeType = anchor.substring(0, anchor.indexOf(':')).toLowerCase(),
                 highlighter = highlighters[shapeType];
@@ -49,17 +49,23 @@ define([
           },
 
           initPage = function(annotations) {
+            // Add annotations to appropriate highlighter
             jQuery.each(annotations, function(idx, a) {
-              applyForAnnotation(a, 'renderAnnotation');
+              applyToAppropriateHighlighter(a, 'addAnnotation');
+            });
+
+            // Render all highlighters
+            jQuery.each(highlighters, function(key, highlighter) {
+              highlighter.render();
             });
           },
 
           refreshAnnotation = function(annotation) {
-            applyForAnnotation(annotation, 'refreshAnnotation');
+            applyToAppropriateHighlighter(annotation, 'refreshAnnotation');
           },
 
           removeAnnotation = function() {
-            applyForAnnotation(annotation, 'removeAnnotation');
+            applyToAppropriateHighlighter(annotation, 'removeAnnotation');
           },
 
           convertSelectionToAnnotation = function(selection, annotationStub) {
@@ -67,7 +73,7 @@ define([
             // an annoation SPAN (change of CSS classes, adding data attribute etc.)
             // Image mode is much simpler - we just need to draw the annotation stub
             // and can ignore the selection
-            applyForAnnotation(annotationStub, 'renderAnnotation');
+            applyToAppropriateHighlighter(annotationStub, 'renderAnnotation');
           };
 
       this.getCurrentHighlight = getCurrentHighlight;

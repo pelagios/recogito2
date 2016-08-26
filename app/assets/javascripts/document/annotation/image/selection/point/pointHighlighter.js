@@ -50,7 +50,7 @@ define([
             return currentHighlight;
           },
 
-          renderAnnotation = function(annotation) {
+          addAnnotation = function(annotation, renderImmediately) {
             // TODO this currently assumes 'point:' anchors only!
             var anchor = annotation.anchor,
                 x = parseInt(anchor.substring(anchor.indexOf(':') + 1, anchor.indexOf(','))),
@@ -61,6 +61,10 @@ define([
 
             pointFeature.set('annotation', annotation, true);
             pointVectorSource.addFeature(pointFeature);
+          },
+
+          render = function() {
+            // Do nothing - the point highlighter renders immediately, in addAnnotation, anyway
           },
 
           findById = function(id) {
@@ -95,11 +99,12 @@ define([
 
       olMap.on('pointermove', onMousemove);
 
+      this.addAnnotation = addAnnotation;
+      this.render = render;
       this.getCurrentHighlight = getCurrentHighlight;
       this.findById = findById;
       this.refreshAnnotation = refreshAnnotation;
       this.removeAnnotation = removeAnnotation;
-      this.renderAnnotation = renderAnnotation;
     };
 
     return PointHighlighter;
