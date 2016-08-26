@@ -1,16 +1,9 @@
 define([
   'common/config',
-  'document/annotation/common/selection/abstractSelectionHandler'],
+  'document/annotation/common/selection/abstractSelectionHandler',
+  'document/annotation/image/selection/style'],
 
-  function(Config, AbstractSelectionHandler) {
-
-    var POINT_SELECTION_STYLE = new ol.style.Style({
-          image: new ol.style.Circle({
-            radius : 8,
-            fill   : new ol.style.Fill({ color: [ 68, 131, 196, 1 ] }),
-            stroke : new ol.style.Stroke({ color: '#1d5b9b', width: 1.5  })
-          })
-        });
+  function(Config, AbstractSelectionHandler, Style) {
 
     var PointSelectionHandler = function(containerEl, olMap, highlighter) {
 
@@ -114,7 +107,7 @@ define([
 
       olMap.addLayer(new ol.layer.Vector({
         source: pointVectorSource,
-        style: POINT_SELECTION_STYLE
+        style: Style.POINT_HI
       }));
       olMap.on('click', onClick);
 

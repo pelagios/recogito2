@@ -1,14 +1,12 @@
-define(['common/config'], function(Config) {
+define([
+  'common/config',
+  'document/annotation/image/selection/style'], function(Config, Style) {
 
-  /** Drawing styles **/
-  var RED = '#aa0000',
-TWO_PI = 2 * Math.PI,
-  CIRCLE_RADIUS = 3,
-  LINE_WIDTH = 2,
-  BOX_OPACITY = 0.3;
+      /** Shorthand **/
+  var TWO_PI = 2 * Math.PI,
 
-  /** Helper to compute the rectangle from an annotation geometry **/
-  var getRect = function(anchor, opt_minheight) {
+      /** Helper to compute the rectangle from an annotation geometry **/
+      anchorToRect = function(anchor, opt_minheight) {
         var minheight = (opt_minheight) ? opt_minheight : 0,
 
             args = anchor.substring(anchor.indexOf(':') + 1).split(','),
@@ -41,57 +39,64 @@ TWO_PI = 2 * Math.PI,
           annotations.push(annotation);
         },
 
-        drawOne = function(annotation, extent, scale, ctx) {
-          var rect = jQuery.map(getRect(annotation.anchor), function(pt) {
-            return { x: scale * (pt.x - extent[0]), y: scale * (pt.y + extent[3]) };
-          });
-          rect.push(rect[0]); // Close path
-
-          // Helper function to trace the rectangle path
+        drawOne = function(annotation, extent, scale, ctx, color) {
+              // Helper function to trace a rectangle path
           var traceRect = function() {
-            ctx.moveTo(rect[0].x, rect[0].y);
-            ctx.lineTo(rect[1].x, rect[1].y);
-            ctx.lineTo(rect[2].x, rect[2].y);
-            ctx.lineTo(rect[3].x, rect[3].y);
-            ctx.lineTo(rect[0].x, rect[0].y);
-          };
+                ctx.moveTo(rect[0].x, rect[0].y);
+                ctx.lineTo(rect[1].x, rect[1].y);
+                ctx.lineTo(rect[2].x, rect[2].y);
+                ctx.lineTo(rect[3].x, rect[3].y);
+                ctx.lineTo(rect[0].x, rect[0].y);
+              },
 
-          // Draw rectangle
-          ctx.fillStyle = RED;
-          ctx.strokeStyle = RED;
-          ctx.lineWidth = 1;
-          ctx.globalAlpha = 1;
+              setStyles = function() {
+                ctx.fillStyle = color;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+              },
 
-          // if (!annotation.id || annotation.id != currentEdit.id) {
-            ctx.beginPath();
-            traceRect();
-            ctx.stroke();
-            ctx.fill();
-            ctx.closePath();
-          // }
+              drawBox = function() {
+                // Fill
+                ctx.globalAlpha = Style.BOX_OPACITY;
+                ctx.beginPath();
+                traceRect();
+                ctx.fill();
+                ctx.closePath();
 
-          // Draw rectangle outline
-          ctx.globalAlpha = 1;
-          ctx.beginPath();
-          traceRect();
-          ctx.stroke();
-          ctx.closePath();
-          ctx.globalAlpha = 1;
+                // Outline
+                ctx.globalAlpha = 1;
+                ctx.beginPath();
+                traceRect();
+                ctx.stroke();
+                ctx.closePath();
+              },
 
-          // Draw anchor dot
-          ctx.beginPath();
-          ctx.arc(rect[0].x, rect[0].y, 10, 0, TWO_PI);
-          ctx.fill();
-          ctx.closePath();
+              drawBaseLine = function() {
+                ctx.lineWidth = Style.BOX_BASELINE_WIDTH;
+                ctx.beginPath();
+                ctx.moveTo(rect[0].x, rect[0].y);
+                ctx.lineTo(rect[1].x, rect[1].y);
+                ctx.stroke();
+                ctx.closePath();
+              },
 
-          // Draw baseline
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = RED;
-          ctx.beginPath();
-          ctx.moveTo(rect[0].x, rect[0].y);
-          ctx.lineTo(rect[1].x, rect[1].y);
-          ctx.stroke();
-          ctx.closePath();
+              drawAnchorDot = function() {
+                ctx.beginPath();
+                ctx.arc(rect[0].x, rect[0].y, Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
+                ctx.fill();
+                ctx.closePath();
+              },
+
+              rect = jQuery.map(anchorToRect(annotation.anchor), function(pt) {
+                return { x: scale * (pt.x - extent[0]), y: scale * (pt.y + extent[3]) };
+              });
+
+          rect.push(rect[0]); // Close the rect path
+
+          setStyles();
+          drawBox();
+          drawBaseLine();
+          drawAnchorDot();
         },
 
         /** Drawing loop that renders all annotations to the drawing area **/
@@ -104,7 +109,7 @@ TWO_PI = 2 * Math.PI,
 
           // TODO optimize so that stuff outside the visible area isn't drawn
           jQuery.each(annotations, function(idx, annotation) {
-            drawOne(annotation, extent, pixelRatio / resolution, ctx);
+            drawOne(annotation, extent, pixelRatio / resolution, ctx, Style.COLOR_RED);
           });
 
           return canvas;

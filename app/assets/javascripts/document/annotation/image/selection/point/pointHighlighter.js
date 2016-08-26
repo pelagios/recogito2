@@ -1,22 +1,8 @@
-define(['common/config'], function(Config) {
+define([
+  'common/config',
+  'document/annotation/image/selection/style'], function(Config, Style) {
 
-    var POINT_STYLE = new ol.style.Style({
-          image: new ol.style.Circle({
-            radius : 6,
-            fill   : new ol.style.Fill({ color: [ 68, 131, 196, 1 ] }),
-            stroke : new ol.style.Stroke({ color: '#1d5b9b', width: 1.5 })
-          })
-        }),
-
-        POINT_STYLE_HI = new ol.style.Style({
-          image: new ol.style.Circle({
-            radius : 8,
-            fill   : new ol.style.Fill({ color: [ 68, 131, 196, 1 ] }),
-            stroke : new ol.style.Stroke({ color: '#1d5b9b', width: 1.5  })
-          })
-        }),
-
-        MIN_SELECTION_DISTANCE = 10;
+    var MIN_SELECTION_DISTANCE = 10;
 
     var PointHighlighter = function(olMap) {
 
@@ -47,14 +33,14 @@ define(['common/config'], function(Config) {
 
                   // Un-highlight the previous highlight, if needed
                   if (currentHighlight)
-                    currentHighlight.setStyle(POINT_STYLE);
+                    currentHighlight.setStyle(Style.POINT);
 
                   currentHighlight = closestFeature;
-                  closestFeature.setStyle(POINT_STYLE_HI);
+                  closestFeature.setStyle(Style.POINT_HI);
                 }
               } else if (currentHighlight) {
                 // Clear the previous highlight, if any
-                currentHighlight.setStyle(POINT_STYLE);
+                currentHighlight.setStyle(Style.POINT);
                 currentHighlight = false;
               }
             }
@@ -104,7 +90,7 @@ define(['common/config'], function(Config) {
 
       olMap.addLayer(new ol.layer.Vector({
         source: pointVectorSource,
-        style: POINT_STYLE
+        style: Style.POINT
       }));
 
       olMap.on('pointermove', onMousemove);
