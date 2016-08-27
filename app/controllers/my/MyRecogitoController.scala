@@ -35,7 +35,7 @@ class MyRecogitoController @Inject() (
     }
   }
 
-  private def renderPublicProfile(username: String) = {
+  private def renderPublicProfile(username: String)(implicit request: RequestHeader) = {
     val f = for {
       userWithRoles   <- users.findByUsername(username)
       publicDocuments <- if (userWithRoles.isDefined)
