@@ -8,7 +8,7 @@ define([
 
         // TODO replace hard-wired z-index with number derived from sibling count
         element = jQuery(
-          '<div class="section comment">' + // style="z-index:' + zIndex + '">' +
+          '<div class="section comment">' +
             '<div class="text"></div>' +
             '<div class="icon edit">&#xf142;</div>' +
             '<div class="last-modified">' +
@@ -32,6 +32,15 @@ define([
               '<li data-fn="edit">Edit</li>' +
               '<li data-fn="delete">Delete</li>' +
             '</ul>'),
+
+          /**
+           * To place the drop-down menu on top of the comment fields, we need to apply
+           * a z-index in the inverse order: the first comment gets z-index 9999, second
+           * 9998 a.s.o.
+           */
+          setZIndex = function() {
+            element.css('z-index', 10000 - element.index());
+          },
 
           toggleEditDropdown = function(e) {
             if (e.target === btnOpenDropdown[0]) {
@@ -78,6 +87,7 @@ define([
       element.find('.edit').hide();
 
     parent.append(element);
+    setZIndex();
 
     this.toggleEditDropdown = toggleEditDropdown;
   };
