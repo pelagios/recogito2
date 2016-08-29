@@ -1,20 +1,15 @@
 define([
-  'document/annotation/common/editor/sections/section',
+  'document/annotation/common/editor/sections/editableTextSection',
   'common/ui/formatting',
-  'common/config'], function(Section, Formatting, Config) {
+  'common/config'], function(EditableTextSection, Formatting, Config) {
 
-  var CommentSection = function(parent, commentBody, zIndex) {
+  var CommentSection = function(parent, commentBody) {
     var self = this,
-
-        /** TODO we may want to allow HTML later - but then need to sanitize **/
-        escapeHtml = function(text) {
-          return jQuery('<div/>').text(text).html();
-        },
 
         // TODO replace hard-wired z-index with number derived from sibling count
         element = jQuery(
           '<div class="section comment">' + // style="z-index:' + zIndex + '">' +
-            '<div class="comment-body">' + escapeHtml(commentBody.value) + '</div>' +
+            '<div class="text"></div>' +
             '<div class="icon edit">&#xf142;</div>' +
             '<div class="last-modified">' +
               '<a class="by" href="/' + commentBody.last_modified_by + '">' +
@@ -28,7 +23,7 @@ define([
 
           commentDiv = element.find('.comment-body'),
 
-          created = element.find('.created'),
+          lastModified = element.find('.last-modified'),
 
           btnOpenDropdown = element.find('.edit'),
 
@@ -71,53 +66,11 @@ define([
               if (fn === 'delete')
                 self.fireEvent('delete');
               else
-                makeEditable();
+                self.makeEditable();
             });
-          },
-
-          // Cf. http://stackoverflow.com/questions/13513329/set-cursor-to-the-end-of-contenteditable-div
-          placeCaretAtEnd = function(element) {
-            var range = document.createRange(),
-                selection = window.getSelection();
-
-            range.setStart(element[0], 1);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            element.focus();
-          },
-
-          makeEditable = function() {
-            element.addClass('editable');
-            commentDiv.prop('contenteditable', true);
-            placeCaretAtEnd(commentDiv);
-            created.remove();
-
-            commentDiv.keyup(function(e) {
-              if (e.ctrlKey && e.keyCode == 13)
-                self.fireEvent('submit');
-            });
-          },
-
-          hasChanged = function() {
-            var initialContent = commentBody.value,
-                currentContent = commentDiv.text().trim();
-
-            return initialContent !== currentContent;
-          },
-
-          commit = function() {
-            if (hasChanged()) {
-              delete commentBody.last_modified_at;
-              commentBody.last_modified_by = Config.me;
-              commentBody.value = commentDiv.text().trim();
-            }
-          },
-
-          destroy = function() {
-            jQuery(document).off('click', toggleEditDropdown);
-            element.remove();
           };
+
+    EditableTextSection.apply(this, [ element, commentBody ]);
 
     if (Config.writeAccess && commentBody.last_modified_by === Config.me)
       enableEditDropdown();
@@ -126,14 +79,15 @@ define([
 
     parent.append(element);
 
-    this.body = commentBody;
-    this.hasChanged = hasChanged;
-    this.commit = commit;
-    this.destroy = destroy;
-
-    Section.apply(this);
+    this.toggleEditDropdown = toggleEditDropdown;
   };
-  CommentSection.prototype = Object.create(Section.prototype);
+  CommentSection.prototype = Object.create(EditableTextSection.prototype);
+
+  /** Extends the base destroy method **/
+  CommentSection.prototype.destroy = function() {
+    jQuery(document).off('click', this.toggleEditDropdown);
+    EditableTextSection.prototype.destroy.call(this);
+  };
 
   return CommentSection;
 

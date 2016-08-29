@@ -33,7 +33,7 @@ define([
     this.container = container;
     this.element = element;
     this.highlighter = highlighter;
-    this.sectionList = new SectionList(element.find('.sections'));
+    this.sectionList = new SectionList(element);
     this.currentAnnotation = false;
 
     // Monitor key events

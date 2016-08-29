@@ -23,7 +23,7 @@ define([
                 '<div class="text-annotation-editor">' +
                   '<div class="arrow"></div>' +
                   '<div class="text-annotation-editor-inner">' +
-                    '<div class="transcription-container"></div>' +
+                    '<div class="transcription-sections"></div>' +
                     '<div class="category-buttons">' +
                       '<div class="category-container">' +
                         '<div class="category place">' +
@@ -41,8 +41,8 @@ define([
                         '</div>' +
                       '</div>' +
                     '</div>' +
-                    '<div class="sections"></div>' +
-                    '<div class="reply-container"></div>' +
+                    '<div class="center-sections"></div>' +
+                    '<div class="reply-field"></div>' +
                     '<div class="footer">' +
                       '<button class="btn small outline cancel">Cancel</button>' +
                       '<button class="btn small outline ok-next">OK &amp Next</button>' +
@@ -66,13 +66,13 @@ define([
 
         // Create 'transcribe' field only for image content
         transcribeField = (Config.contentType.startsWith('IMAGE')) ?
-          new TextEntryField(element.find('.transcription-container'), {
+          new TextEntryField(element.find('.transcription-sections'), {
             placeholder : 'Transcribe...',
             cssClass    : 'new-transcription',
             bodyType    : 'TRANSCRIPTION'
           }) : false,
 
-        replyField = new TextEntryField(element.find('.reply-container'), {
+        replyField = new TextEntryField(element.find('.reply-field'), {
           placeholder : 'Add a comment...',
           cssClass    : 'reply',
           bodyType    : 'COMMENT'

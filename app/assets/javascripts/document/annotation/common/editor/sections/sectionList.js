@@ -5,8 +5,12 @@ define([
   'common/hasEvents'], function(CommentSection, PlaceSection, AnnotationUtils, HasEvents) {
 
   /** Represents a list of editor sections and provides utility methods **/
-  var SectionList = function(containerEl) {
+  var SectionList = function(editorEl) {
     var self = this,
+
+        transcriptionSectionEl = editorEl.find('.transcription-sections'),
+
+        centerSectionEl = editorEl.find('.center-sections'),
 
         sections = [],
 
@@ -24,17 +28,18 @@ define([
               commentBodies = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT');
 
           jQuery.each(placeBodies, function(idx, placeBody) {
+            // TODO what about toponym arg?
             initPlaceSection(placeBody);
           });
 
           jQuery.each(commentBodies, function(idx, commentBody) {
-            initCommentSection(containerEl, commentBody);
+            initCommentSection(commentBody);
           });
         },
 
         /** Common code for initializing a place section **/
         initPlaceSection = function(placeBody, toponym) {
-          var placeSection = new PlaceSection(containerEl, placeBody, toponym);
+          var placeSection = new PlaceSection(centerSectionEl, placeBody, toponym);
 
           // Georesolution change needs to be handled by editor
           placeSection.on('change', function() {
@@ -46,9 +51,9 @@ define([
         },
 
         /** Common code for initializing a comment section **/
-        initCommentSection = function(containerEl, commentBody) {
+        initCommentSection = function(commentBody) {
           // TODO fix z-indexing
-          var commentSection = new CommentSection(containerEl, commentBody);
+          var commentSection = new CommentSection(centerSectionEl, commentBody);
           sections.push(commentSection);
 
           // Submit event needs to be handled by editor
