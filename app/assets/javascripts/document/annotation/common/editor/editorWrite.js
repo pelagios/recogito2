@@ -8,11 +8,12 @@ define([
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
+  'common/config',
   'document/annotation/common/editor/editorBase',
-  'document/annotation/common/editor/replyField',
+  'document/annotation/common/editor/textEntryField',
   'document/annotation/common/georesolution/georesolutionPanel'],
 
-  function(AnnotationUtils, PlaceUtils, API, EditorBase, ReplyField, GeoresolutionPanel) {
+  function(AnnotationUtils, PlaceUtils, API, Config, EditorBase, TextEntryField, GeoresolutionPanel) {
 
   var WriteEditor = function(container, highlighter, selectionHandler) {
     var self = this,
@@ -22,6 +23,7 @@ define([
                 '<div class="text-annotation-editor">' +
                   '<div class="arrow"></div>' +
                   '<div class="text-annotation-editor-inner">' +
+                    '<div class="transcription-container"></div>' +
                     '<div class="category-buttons">' +
                       '<div class="category-container">' +
                         '<div class="category place">' +
@@ -62,9 +64,19 @@ define([
         btnOkAndNext = element.find('button.ok-next'),
         btnOk = element.find('button.ok'),
 
-        replyContainer = element.find('.reply-container'),
+        // Create 'transcribe' field only for image content
+        transcribeField = (Config.contentType.startsWith('IMAGE')) ?
+          new TextEntryField(element.find('.transcription-container'), {
+            placeholder : 'Transcribe...',
+            cssClass    : 'new-transcription',
+            bodyType    : 'TRANSCRIPTION'
+          }) : false,
 
-        replyField = new ReplyField(replyContainer),
+        replyField = new TextEntryField(element.find('.reply-container'), {
+          placeholder : 'Add a comment...',
+          cssClass    : 'reply',
+          bodyType    : 'COMMENT'
+        }),
 
         georesolutionPanel = new GeoresolutionPanel(),
 
@@ -111,7 +123,12 @@ define([
 
         /** Click on 'Place' button adds a new PLACE body **/
         onAddPlace = function() {
-          self.sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } });
+          // Depending on content type (text, image) we'll use either quote or transcription
+          var quote = AnnotationUtils.getQuote(self.currentAnnotation),
+              transcription = (transcribeField) ? transcribeField.getBody().value : false,
+              toponym = (quote) ? quote : transcription;
+
+          self.sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } }, toponym);
         },
 
         /** Click on 'Person' button adds a new PERSON body **/
@@ -133,10 +150,16 @@ define([
 
         /** 'OK' updates the annotation & highlight spans and closes the editor **/
         onOK = function() {
-          var reply = replyField.getComment(), annotationSpans,
-              hasChanged = reply || self.sectionList.hasChanged();
+          var newTranscription = (transcribeField) ? transcribeField.getBody() : false,
+              reply = replyField.getBody(), annotationSpans,
+              hasChanged = reply || newTranscription || self.sectionList.hasChanged();
 
           if (hasChanged || annotationMode.mode === 'QUICK') {
+            // Push the new transcription, if any
+            if (newTranscription)
+              self.currentAnnotation.bodies.push(newTranscription);
+
+            // Commit changes in sections
             self.sectionList.commitChanges();
 
             // Push the current reply body, if any
@@ -207,6 +230,8 @@ define([
 
     this.openSelection = openSelection;
     this.setAnnotationMode = setAnnotationMode;
+
+    this.transcribeField = transcribeField;
     this.replyField = replyField;
 
     EditorBase.apply(this, [ container, element, highlighter ]);
@@ -224,6 +249,9 @@ define([
 
   /** Extends the clear method provided by EditorBase **/
   WriteEditor.prototype.clear = function() {
+    if (this.transcribeField)
+      this.transcribeField.clear();
+
     this.replyField.clear();
     EditorBase.prototype.clear.call(this);
   };

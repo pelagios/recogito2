@@ -82,7 +82,7 @@ define([
         },
 
         /** Fills the place card based on a search on the provided quote string **/
-        fillFromQuote = function(quote, verificationStatus, lastModified) {
+        fillFromToponym = function(quote, verificationStatus, lastModified) {
           API.searchPlaces(quote).done(function(response) {
             if (response.total > 0) {
               var topPlace = response.items[0],
@@ -153,7 +153,7 @@ define([
             fillFromURI(placeBody.uri, placeBody.status, lastModified);
           else if (placeBody.status.value === 'UNVERIFIED')
             // No URI - if the annotation is still UNVERIFIED, fetch a suggestion
-            fillFromQuote(quote, placeBody.status, lastModified);
+            fillFromToponym(quote, placeBody.status, lastModified);
           else
             renderNoMatchCard(placeBody.status, lastModified);
         };

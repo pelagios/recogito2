@@ -2,7 +2,7 @@
 @import "georesolution/_georesolution.less";
 @import "sections/_commentsection.less";
 @import "sections/_placesection.less";
-@import "_replyfield.less";
+@import "_textentryfield.less";
 
 .text-annotation-editor {
   position:absolute;
@@ -96,6 +96,10 @@
         color:lighten(desaturate(@nightsky-type, 100%), 30%);
       }
 
+    }
+
+    .field.reply .textarea {
+      min-height:3em;
     }
 
     .footer {

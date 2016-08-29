@@ -44,24 +44,28 @@ object Item extends HasContentTypeList {
 }
   
 object ItemType extends Enumeration {
-  
-  val DOCUMENT = Value("DOCUMENT")
-  
+
   val ANNOTATION = Value("ANNOTATION")
-  
-  val QUOTE_BODY = Value("QUOTE_BODY")
-  
+
   val COMMENT_BODY = Value("COMMENT_BODY")
-  
+
+  val DOCUMENT = Value("DOCUMENT")
+
   val PLACE_BODY = Value("PLACE_BODY")
-  
+
+  val QUOTE_BODY = Value("QUOTE_BODY")
+
+  val TRANSCRIPTION_BODY = Value("TRANSCRIPTION")
+
   def fromBodyType(bodyType: AnnotationBody.Value) = bodyType match {
 
-    case AnnotationBody.QUOTE => QUOTE_BODY
-      
     case AnnotationBody.COMMENT => COMMENT_BODY
 
-    case AnnotationBody.PLACE => PLACE_BODY    
+    case AnnotationBody.PLACE => PLACE_BODY
+
+    case AnnotationBody.QUOTE => QUOTE_BODY
+
+    case AnnotationBody.TRANSCRIPTION => TRANSCRIPTION_BODY
     
   }
     

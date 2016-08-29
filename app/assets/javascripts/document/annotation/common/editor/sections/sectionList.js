@@ -33,9 +33,8 @@ define([
         },
 
         /** Common code for initializing a place section **/
-        initPlaceSection = function(placeBody) {
-          var quote = AnnotationUtils.getQuote(currentAnnotation),
-              placeSection = new PlaceSection(containerEl, placeBody, quote);
+        initPlaceSection = function(placeBody, toponym) {
+          var placeSection = new PlaceSection(containerEl, placeBody, toponym);
 
           // Georesolution change needs to be handled by editor
           placeSection.on('change', function() {
@@ -61,9 +60,9 @@ define([
         },
 
         /** Creates a new section and queues creating in the annotation for later **/
-        createNewSection = function(body) {
+        createNewSection = function(body, quote) {
           if (body.type === 'PLACE') {
-            initPlaceSection(body);
+            initPlaceSection(body, quote);
           }
 
           // TODO implement additional body types
