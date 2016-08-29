@@ -11,7 +11,19 @@ define([
 
         /** Constants **/
         MIN_DRAG_TIME = 300,   // Minimum duration of an annotation drag (milliseconds)
-        MIN_LINE_LENGTH = 10;  // Minimum length of a baseline
+        MIN_LINE_LENGTH = 10,  // Minimum length of a baseline
+
+        /** For testing only! **/
+        pointToBounds = function(coordinate) {
+          return {
+            top    : coordinate[1],
+            right  : coordinate[0],
+            bottom : coordinate[1],
+            left   : coordinate[0],
+            width  : 0,
+            height : 0
+          };
+        };
 
     var ToponymSelectionHandler = function(containerEl, olMap, highlighter) {
 
@@ -126,7 +138,7 @@ define([
             oppositeX = baseEndX + f[0];
             oppositeY = baseEndY + f[1];
 
-            ctx.globalAlpha = Style.BOX_OPACITY;
+            ctx.globalAlpha = Style.BOX_FILL_OPACITY;
             ctx.fillStyle = Style.COLOR_RED;
             ctx.beginPath();
             ctx.moveTo(anchorX, anchorY);
