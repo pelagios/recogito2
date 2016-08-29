@@ -15,6 +15,10 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           setPlaceHolder();
         },
 
+        isEmpty = function() {
+          return textarea.text().trim().length === 0;
+        },
+
         setPlaceHolder = function(placeholder) {
           if (placeholder)
             textarea.attr('data-placeholder', placeholder);
@@ -25,20 +29,21 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         getBody = function() {
           var val = textarea.text().trim();
           if (val)
-            return { type: options.bodyType, last_modified_by: Config.me, value: val };
+            return  { type: options.bodyType, last_modified_by: Config.me, value: val };
           else
             return false;
         },
 
         onKeyUp = function(e) {
           if (e.ctrlKey && e.keyCode == 13)
-            self.fireEvent('submit', getBody());
+            self.fireEvent('submit');
         };
 
     textarea.keyup(onKeyUp);
     parent.append(element);
 
     this.clear = clear;
+    this.isEmpty = isEmpty;
     this.getBody = getBody;
     this.setPlaceHolder = setPlaceHolder;
 

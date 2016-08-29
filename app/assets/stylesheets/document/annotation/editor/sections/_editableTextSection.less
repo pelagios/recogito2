@@ -1,13 +1,29 @@
-.section.comment {
+.section.editable-text.transcription {
+
+  .text {
+    display:inline-block;
+    line-height:40px;
+    font-family:"Times New Roman", Times, serif;
+    font-size:18px;
+    font-style:italic;
+  }
+
+  /** Enclose transcriptions with angle quotes for style **/
+  .text::before { content:'\00ab'; }
+  .text::after { content:'\00bb'; }
+
+}
+
+.section.editable-text {
   position:relative;
   padding:0;
   margin:0;
   font-size:16px;
-  background-color:@blueish-white-hi;
   border-bottom:1px solid @lightgrey-border;
   padding:5px 15px 35px 15px;
+  background-color:@blueish-white-hi;
 
-  .comment-body {
+  .text {
     padding:0;
     outline:none;
   }

@@ -7,8 +7,8 @@ define([
     var self = this,
 
         element = jQuery(
-          '<div class="section transcription">' +
-            '<div class="text">' + escapeHtml(transcriptionBody.value) + '</div>' +
+          '<div class="section editable-text transcription">' +
+            '<div class="text"></div>' +
             '<div class="icon delete">&#xf142;</div>' +
             '<div class="icon edit">&#xf142;</div>' +
             '<div class="icon add">&#xf142;</div>' +
@@ -24,7 +24,16 @@ define([
 
           btnDelete = element.find('.delete'),
           btnEdit = element.find('.edit'),
-          btnAdd = element.find('.add');
+          btnAdd = element.find('.add'),
+
+          hideButtons = function() {
+            btnDelete.hide();
+            btnEdit.hide();
+            btnAdd.hide();
+          };
+
+    hideButtons();
+    parent.append(element);
 
     EditableTextSection.apply(this, [ element, transcriptionBody ]);
   };

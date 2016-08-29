@@ -8,12 +8,11 @@ define([
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
-  'common/config',
   'document/annotation/common/editor/editorBase',
   'document/annotation/common/editor/textEntryField',
   'document/annotation/common/georesolution/georesolutionPanel'],
 
-  function(AnnotationUtils, PlaceUtils, API, Config, EditorBase, TextEntryField, GeoresolutionPanel) {
+  function(AnnotationUtils, PlaceUtils, API, EditorBase, TextEntryField, GeoresolutionPanel) {
 
   var WriteEditor = function(container, highlighter, selectionHandler) {
     var self = this,
@@ -63,14 +62,6 @@ define([
         btnCancel = element.find('button.cancel'),
         btnOkAndNext = element.find('button.ok-next'),
         btnOk = element.find('button.ok'),
-
-        // Create 'transcribe' field only for image content
-        transcribeField = (Config.contentType.startsWith('IMAGE')) ?
-          new TextEntryField(element.find('.transcription-sections'), {
-            placeholder : 'Transcribe...',
-            cssClass    : 'new-transcription',
-            bodyType    : 'TRANSCRIPTION'
-          }) : false,
 
         replyField = new TextEntryField(element.find('.reply-field'), {
           placeholder : 'Add a comment...',
@@ -125,8 +116,7 @@ define([
         onAddPlace = function() {
           // Depending on content type (text, image) we'll use either quote or transcription
           var quote = AnnotationUtils.getQuote(self.currentAnnotation),
-              transcription = (transcribeField) ? transcribeField.getBody().value : false,
-              toponym = (quote) ? quote : transcription;
+              toponym = quote; // TODO get transcription from sectionList
 
           self.sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } }, toponym);
         },
@@ -150,14 +140,10 @@ define([
 
         /** 'OK' updates the annotation & highlight spans and closes the editor **/
         onOK = function() {
-          var newTranscription = (transcribeField) ? transcribeField.getBody() : false,
-              reply = replyField.getBody(), annotationSpans,
-              hasChanged = reply || newTranscription || self.sectionList.hasChanged();
+          var reply = replyField.getBody(), annotationSpans,
+              hasChanged = reply || self.sectionList.hasChanged();
 
           if (hasChanged || annotationMode.mode === 'QUICK') {
-            // Push the new transcription, if any
-            if (newTranscription)
-              self.currentAnnotation.bodies.push(newTranscription);
 
             // Commit changes in sections
             self.sectionList.commitChanges();
@@ -231,7 +217,6 @@ define([
     this.openSelection = openSelection;
     this.setAnnotationMode = setAnnotationMode;
 
-    this.transcribeField = transcribeField;
     this.replyField = replyField;
 
     EditorBase.apply(this, [ container, element, highlighter ]);
@@ -249,9 +234,6 @@ define([
 
   /** Extends the clear method provided by EditorBase **/
   WriteEditor.prototype.clear = function() {
-    if (this.transcribeField)
-      this.transcribeField.clear();
-
     this.replyField.clear();
     EditorBase.prototype.clear.call(this);
   };

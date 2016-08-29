@@ -1,8 +1,20 @@
 define([
   'document/annotation/common/editor/sections/comment/commentSection',
   'document/annotation/common/editor/sections/place/placeSection',
+  'document/annotation/common/editor/sections/transcription/transcriptionSection',
+  'document/annotation/common/editor/textEntryField',
   'common/utils/annotationUtils',
-  'common/hasEvents'], function(CommentSection, PlaceSection, AnnotationUtils, HasEvents) {
+  'common/config',
+  'common/hasEvents'],
+
+function(
+  CommentSection,
+  PlaceSection,
+  TranscriptionSection,
+  TextEntryField,
+  AnnotationUtils,
+  Config,
+  HasEvents) {
 
   /** Represents a list of editor sections and provides utility methods **/
   var SectionList = function(editorEl) {
@@ -20,12 +32,17 @@ define([
 
         /** Initializes the section list from the annotation **/
         setAnnotation = function(annotation) {
+          var transcriptionBodies = AnnotationUtils.getBodiesOfType(annotation, 'TRANSCRIPTION'),
+              placeBodies = AnnotationUtils.getBodiesOfType(annotation, 'PLACE'),
+              commentBodies = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT');
+
           clear();
 
           currentAnnotation = annotation;
 
-          var placeBodies = AnnotationUtils.getBodiesOfType(annotation, 'PLACE'),
-              commentBodies = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT');
+          // Transcriptions exist only on image content
+          if (Config.contentType.indexOf('IMAGE') === 0)
+            initTranscriptionSections(transcriptionBodies);
 
           jQuery.each(placeBodies, function(idx, placeBody) {
             // TODO what about toponym arg?
@@ -37,31 +54,66 @@ define([
           });
         },
 
+        /** Shorthand for attaching the standard section delete handler **/
+        handleDelete = function(section) {
+          section.on('delete', function() { removeSection(section); });
+        },
+
+        /** Shorthand for forwarding an event to the editor **/
+        forwardEvent = function(eventSource, eventName) {
+          eventSource.on(eventName, function() { self.fireEvent(eventName, eventSource); });
+        },
+
+        initTranscriptionSections = function(transcriptionBodies) {
+
+          var addEmptyField = function() {
+                // Create empty transcription field
+                var field = new TextEntryField(transcriptionSectionEl, {
+                  placeholder: 'Transcribe...',
+                  cssClass: 'new-transcription',
+                  bodyType: 'TRANSCRIPTION'
+                });
+
+                forwardEvent(field, 'submit'); // Submit event needs to be handled by editor
+
+                // If the user added a transcription, add it on commit
+                queuedUpdates.push(function() {
+                  if (!field.isEmpty())
+                    currentAnnotation.bodies.push(field.getBody());
+                });
+              },
+
+              addExisting = function() {
+                jQuery.each(transcriptionBodies, function(idx, body) {
+                  var transcriptionSection = new TranscriptionSection(transcriptionSectionEl, body);
+                  handleDelete(transcriptionSection);
+                  forwardEvent(transcriptionSection, 'submit'); // Submit event needs to be handled by editor
+                  sections.push(transcriptionSection);
+                });
+              };
+
+          if (transcriptionBodies.length === 0)
+            // No transcription - adds empty field
+            addEmptyField();
+          else
+            // Existing transcriptions - add list
+            addExisting();
+        },
+
         /** Common code for initializing a place section **/
         initPlaceSection = function(placeBody, toponym) {
           var placeSection = new PlaceSection(centerSectionEl, placeBody, toponym);
-
-          // Georesolution change needs to be handled by editor
-          placeSection.on('change', function() {
-            self.fireEvent('change', placeSection);
-          });
-
-          placeSection.on('delete', function() { removeSection(placeSection); });
+          forwardEvent(placeSection, 'change'); // Georesolution change needs to be handled by editor
+          handleDelete(placeSection);
           sections.push(placeSection);
         },
 
         /** Common code for initializing a comment section **/
         initCommentSection = function(commentBody) {
-          // TODO fix z-indexing
           var commentSection = new CommentSection(centerSectionEl, commentBody);
+          forwardEvent(commentSection, 'submit'); // Submit event needs to be handled by editor
+          handleDelete(commentSection);
           sections.push(commentSection);
-
-          // Submit event needs to be handled by editor
-          commentSection.on('submit', function() {
-            self.fireEvent('submit');
-          });
-
-          commentSection.on('delete', function() { removeSection(commentSection); });
         },
 
         /** Creates a new section and queues creating in the annotation for later **/
@@ -144,6 +196,8 @@ define([
           jQuery.each(sections, function(idx, section) {
             section.destroy();
           });
+
+          transcriptionSectionEl.empty();
 
           sections = [];
           queuedUpdates = [];

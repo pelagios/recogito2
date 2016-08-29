@@ -8,7 +8,7 @@ define([
 
         // TODO replace hard-wired z-index with number derived from sibling count
         element = jQuery(
-          '<div class="section comment">' +
+          '<div class="section editable-text comment">' +
             '<div class="text"></div>' +
             '<div class="icon edit">&#xf142;</div>' +
             '<div class="last-modified">' +
@@ -79,8 +79,6 @@ define([
             });
           };
 
-    EditableTextSection.apply(this, [ element, commentBody ]);
-
     if (Config.writeAccess && commentBody.last_modified_by === Config.me)
       enableEditDropdown();
     else
@@ -88,6 +86,8 @@ define([
 
     parent.append(element);
     setZIndex();
+
+    EditableTextSection.apply(this, [ element, commentBody ]);
 
     this.toggleEditDropdown = toggleEditDropdown;
   };
