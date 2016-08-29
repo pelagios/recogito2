@@ -9,7 +9,8 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
                 '<div class="text-annotation-editor">' +
                   '<div class="arrow"></div>' +
                   '<div class="text-annotation-editor-inner">' +
-                    '<div class="sections"></div>' +
+                    '<div class="transcription-sections"></div>' +
+                    '<div class="center-sections"></div>' +
                   '</div>' +
                 '</div>');
 
@@ -19,6 +20,7 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
         })(),
 
         openSelection = function(selection) {
+          console.log(selection);
           self.open(selection.annotation, selection.bounds);
           return false;
         },
