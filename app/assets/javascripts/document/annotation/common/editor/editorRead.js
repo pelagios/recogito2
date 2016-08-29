@@ -20,7 +20,6 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
         })(),
 
         openSelection = function(selection) {
-          console.log(selection);
           self.open(selection.annotation, selection.bounds);
           return false;
         },

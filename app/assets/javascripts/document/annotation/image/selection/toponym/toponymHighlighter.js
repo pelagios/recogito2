@@ -28,6 +28,23 @@ define([
             p4 = { x: x - height * Math.sin(a), y: y - height * Math.cos(a) };
 
         return [ p1, p2, p3, p4 ];
+      },
+
+      anchorToBounds = function(anchor) {
+        var rect = anchorToRect(anchor);
+        var minX = Math.min(rect[0].x, rect[1].x, rect[2].x, rect[3].x),
+            minY = Math.min(rect[0].y, rect[1].y, rect[2].y, rect[3].y),
+            maxX = Math.max(rect[0].x, rect[1].x, rect[2].x, rect[3].x),
+            maxY = Math.max(rect[0].y, rect[1].y, rect[2].y, rect[3].y);
+
+        return {
+          top    : -minY,
+          right  : maxX,
+          bottom : -maxY,
+          left   : minX,
+          width  : maxX - minX,
+          height : maxY - minY
+        };
       };
 
   var ToponymHighlighter = function(olMap) {
@@ -64,14 +81,14 @@ define([
 
               drawBox = function() {
                 // Fill
-                ctx.globalAlpha = Style.BOX_OPACITY;
+                ctx.globalAlpha = Style.BOX_FILL_OPACITY;
                 ctx.beginPath();
                 traceRect();
                 ctx.fill();
                 ctx.closePath();
 
                 // Outline
-                ctx.globalAlpha = 1;
+                ctx.globalAlpha = Style.BOX_STROKE_OPACITY;
                 ctx.beginPath();
                 traceRect();
                 ctx.stroke();
@@ -102,8 +119,8 @@ define([
 
           setStyles();
           drawBox();
-          drawBaseLine();
-          drawAnchorDot();
+          // drawBaseLine();
+          // drawAnchorDot();
         },
 
         /** Drawing loop that renders all annotations to the drawing area **/
@@ -172,7 +189,10 @@ define([
         },
 
         getCurrentHighlight = function() {
-          return currentHighlight;
+          return {
+            annotation: currentHighlight,
+            bounds: anchorToBounds(currentHighlight.anchor)
+          };
         };
 
     olMap.addLayer(layer);

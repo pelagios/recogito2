@@ -19,18 +19,6 @@ define([
 
           currentSelection = false,
 
-          /** For testing only! **/
-          pointToBounds = function(coordinate) {
-            return {
-              top    : coordinate[1],
-              right  : coordinate[0],
-              bottom : coordinate[1],
-              left   : coordinate[0],
-              width  : 0,
-              height : 0
-            };
-          },
-
           canvas = (function() {
             var canvas = jQuery('<canvas class="toponym-drawing"></canvas>');
             canvas.hide();
@@ -263,23 +251,15 @@ define([
           },
 
           onMapClicked = function(e) {
-            var currentHighlight = highlighter.getCurrentHighlight(),
-
-                getAnchorCoord = function(anchor) {
-                  var args = anchor.substring(anchor.indexOf(':') + 1).split(','),
-                      x = parseInt(args[0].substring(2)),
-                      y = parseInt(args[1].substring(2));
-
-                  return [x, - y];
-                };
+            var currentHighlight = highlighter.getCurrentHighlight();
 
             // TODO Bit of a necessary intermediate hack to check if the highlight is an
             // TODO annotation (and not a feature)
-            if (currentHighlight && currentHighlight.anchor) {
+            if (currentHighlight && currentHighlight.annotation) {
               currentSelection = {
                 isNew      : false,
-                annotation : currentHighlight,
-                mapBounds  : pointToBounds(getAnchorCoord(currentHighlight.anchor))
+                annotation : currentHighlight.annotation,
+                mapBounds  : currentHighlight.bounds
               };
               self.fireEvent('select', currentSelection);
             }

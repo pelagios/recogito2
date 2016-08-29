@@ -22,16 +22,40 @@ define([
           mapBoundsToScreenBounds = function(mapBounds) {
             var offset = jQuery(containerEl).offset(),
                 topLeft = olMap.getPixelFromCoordinate([ mapBounds.left, mapBounds.top ]),
-                bottomRight = olMap.getPixelFromCoordinate([ mapBounds.right, mapBounds.bottom ]);
+                bottomRight = olMap.getPixelFromCoordinate([ mapBounds.right, mapBounds.bottom ]),
+                bounds = {
+                  top    : topLeft[1] + offset.top,
+                  right  : bottomRight[0] + offset.left,
+                  bottom : bottomRight[1] + offset.top,
+                  left   : topLeft[0] + offset.left,
+                  width  : 0,
+                  height : 0
+                },
 
-            return {
-              top    : topLeft[1] + offset.top,
-              right  : bottomRight[0] + offset.left,
-              bottom : bottomRight[1] + offset.top,
-              left   : topLeft[0] + offset.left,
-              width  : 0,
-              height : 0
-            };
+                flipVertical = function() {
+                  var top = bounds.top,
+                      bottom = bounds.bottom;
+
+                  bounds.top = bottom;
+                  bounds.bottom = top;
+                },
+
+                flipHorizontal = function() {
+                  var left = bounds.left,
+                      right = bounds.right;
+
+                  bounds.left = right;
+                  bounds.right = left;
+                };
+
+            // Box might be flipped if map is rotated
+            if (bounds.top > bounds.bottom)
+              flipVertical();
+
+            if (bounds.left > bounds.right)
+              flipHorizontal();
+
+            return bounds;
           },
 
           /** Calls the function on all selection handlers returning an array of results **/
