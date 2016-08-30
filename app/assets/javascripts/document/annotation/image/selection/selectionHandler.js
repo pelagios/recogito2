@@ -48,14 +48,18 @@ define([
             return bounds;
           },
 
+          addScreenBounds = function(selection) {
+            return {
+              annotation: selection.annotation,
+              mapBounds: selection.mapBounds,
+              bounds: mapBoundsToScreenBounds(selection.mapBounds)
+            };
+          },
+
           /** @override **/
           getSelection = function() {
             if (currentSelection)
-              return {
-                annotation: currentSelection.annotation,
-                mapBounds: currentSelection.mapBounds,
-                bounds: mapBoundsToScreenBounds(currentSelection.mapBounds)
-              };
+              return addScreenBounds(currentSelection);
           },
 
           /** @override **/
@@ -80,7 +84,7 @@ define([
               // Click selected an existing annotation
               if (currentSelection !== previousSelection)
                 // Selection change
-                self.fireEvent('select', currentSelection);
+                self.fireEvent('select', addScreenBounds(currentSelection));
             } else {
               // No annotation selected - activate currently active drawing tool
               console.log('start drawing - TODO');
