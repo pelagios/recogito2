@@ -5,7 +5,7 @@ define([
 
   var MIN_SELECTION_DISTANCE = 10;
 
-  var PointLayer = function(containerEl, olMap) {
+  var PointLayer = function(olMap) {
 
     var self = this,
 
@@ -18,8 +18,8 @@ define([
 
           if (closestPoint && self.computePxDistance(e.pixel, closestPoint) < MIN_SELECTION_DISTANCE) {
             return {
-              annotation: feature.get('annotation'),
-              mapBounds: self.pointToBounds(feature.getGeometry().getCoordinates())
+              annotation: closestFeature.get('annotation'),
+              mapBounds: self.pointToBounds(closestFeature.getGeometry().getCoordinates())
             };
           }
         },
@@ -65,7 +65,7 @@ define([
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
 
-    Layer.apply(this, [ containerEl, olMap ]);
+    Layer.apply(this, [ olMap ]);
   };
   PointLayer.prototype = Object.create(Layer.prototype);
 

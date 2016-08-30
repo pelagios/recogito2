@@ -1,12 +1,21 @@
 define([
-  'document/annotation/common/selection/abstractSelectionHandler'
-], function(AbstractSelectionHandler) {
+  'document/annotation/common/selection/abstractSelectionHandler',
+  'document/annotation/image/selection/layers/point/pointDrawingTool',
+  'document/annotation/image/selection/layers/toponym/toponymDrawingTool'
+], function(AbstractSelectionHandler, PointDrawingTool, ToponymDrawingTool) {
 
     var SelectionHandler = function(containerEl, olMap, highlighter) {
 
       var self = this,
 
           currentSelection = false,
+
+          currentDrawingTool = false,
+
+          drawingTools = {
+            point : new PointDrawingTool(olMap),
+            toponym : new ToponymDrawingTool(olMap)
+          },
 
           /** Converts the given map-coordinate bounds to viewport bounds **/
           mapBoundsToScreenBounds = function(mapBounds) {
@@ -69,7 +78,12 @@ define([
 
           /** Enable the drawing tool with the given name **/
           setEnabled = function(toolName) {
-            // TODO implement
+            currentDrawingTool = (toolName) ? drawingTools[toolName.toLowerCase()] : false;
+          },
+
+          onNewSelection = function(selection) {
+            currentSelection = selection;
+            self.fireEvent('select', addScreenBounds(currentSelection));
           },
 
           onMouseMove = function(e) {
@@ -87,7 +101,8 @@ define([
                 self.fireEvent('select', addScreenBounds(currentSelection));
             } else {
               // No annotation selected - activate currently active drawing tool
-              console.log('start drawing - TODO');
+              if (currentDrawingTool)
+                currentDrawingTool.createNewSelection(e, onNewSelection);
             }
           };
 

@@ -47,7 +47,7 @@ define([
         };
       };
 
-  var ToponymLayer = function(containerEl, olMap) {
+  var ToponymLayer = function(olMap) {
 
     var self = this,
 
@@ -187,7 +187,7 @@ define([
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
 
-    Layer.apply(this, [ containerEl, olMap ]);
+    Layer.apply(this, [ olMap ]);
   };
   ToponymLayer.prototype = Object.create(Layer.prototype);
 

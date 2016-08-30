@@ -1,7 +1,6 @@
 define([], function() {
 
-  var Layer = function(containerEl, olMap) {
-    this.containerEl = containerEl;
+  var Layer = function(olMap) {
     this.olMap = olMap;
   };
 

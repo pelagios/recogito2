@@ -54,7 +54,7 @@ require([
             })
           }),
 
-          highlighter = new Highlighter(contentNode, olMap),
+          highlighter = new Highlighter(olMap),
 
           selector = new SelectionHandler(contentNode, olMap, highlighter),
 

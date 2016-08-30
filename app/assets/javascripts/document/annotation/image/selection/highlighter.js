@@ -4,12 +4,12 @@ define([
   'document/annotation/image/selection/layers/toponym/toponymLayer'
 ], function(AbstractHighlighter, PointLayer, ToponymLayer) {
 
-    var Highlighter = function(containerEl, olMap) {
+    var Highlighter = function(olMap) {
 
           /** The list of layer implementations **/
       var layers = {
-            point : new PointLayer(containerEl, olMap),
-            toponym : new ToponymLayer(containerEl, olMap)
+            point : new PointLayer(olMap),
+            toponym : new ToponymLayer(olMap)
           },
 
           /** Returns the layer appropriate to the annotation **/
