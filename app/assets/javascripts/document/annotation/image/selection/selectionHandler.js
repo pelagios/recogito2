@@ -14,7 +14,7 @@ define([
 
           drawingTools = {
             point : new PointDrawingTool(olMap),
-            toponym : new ToponymDrawingTool(olMap)
+            toponym : new ToponymDrawingTool(containerEl, olMap)
           },
 
           /** Converts the given map-coordinate bounds to viewport bounds **/
