@@ -17,6 +17,12 @@ define([
             toponym : new ToponymDrawingTool(containerEl, olMap)
           },
 
+          attachEventHandlers = function() {
+            jQuery.each(drawingTools, function(key, tool) {
+              tool.on('newSelection', onNewSelection);
+            });
+          },
+
           /** Converts the given map-coordinate bounds to viewport bounds **/
           mapBoundsToScreenBounds = function(mapBounds) {
             var offset = jQuery(containerEl).offset(),
@@ -78,7 +84,17 @@ define([
 
           /** Enable the drawing tool with the given name **/
           setEnabled = function(toolName) {
-            currentDrawingTool = (toolName) ? drawingTools[toolName.toLowerCase()] : false;
+            var tool = (toolName) ? drawingTools[toolName.toLowerCase()] : false;
+
+            if (tool != currentDrawingTool) {
+              if (currentDrawingTool)
+                currentDrawingTool.setEnabled(false);
+
+              if (tool)
+                tool.setEnabled(true);
+            }
+
+            currentDrawingTool = tool;
           },
 
           onNewSelection = function(selection) {
@@ -102,12 +118,14 @@ define([
             } else {
               // No annotation selected - activate currently active drawing tool
               if (currentDrawingTool)
-                currentDrawingTool.createNewSelection(e, onNewSelection);
+                currentDrawingTool.createNewSelection(e);
             }
           };
 
       olMap.on('pointermove', onMouseMove);
       olMap.on('click', onClick);
+
+      attachEventHandlers();
 
       this.getSelection = getSelection;
       this.clearSelection = clearSelection;

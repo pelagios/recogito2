@@ -6,7 +6,9 @@ define([
 
   var PointDrawingTool = function(olMap) {
 
-    var pointVectorSource = new ol.source.Vector({}),
+    var self = this,
+
+        pointVectorSource = new ol.source.Vector({}),
 
         drawPoint = function(coordinate) {
           var pointFeature = new ol.Feature({
@@ -18,7 +20,7 @@ define([
         },
 
         /** The simplest possible drawing case: draws a point at the given coordinate **/
-        createNewSelection = function(e, onComplete) {
+        createNewSelection = function(e) {
           var x = Math.round(e.coordinate[0]),
               y = Math.abs(Math.round(e.coordinate[1])),
 
@@ -36,11 +38,20 @@ define([
 
           drawPoint(e.coordinate);
 
-          onComplete({
+          self.fireEvent('newSelection', {
             isNew: true,
             annotation: annotation,
             mapBounds: mapBounds
           });
+        },
+
+        clearSelection = function() {
+
+        },
+
+        setEnabled = function(enabled) {
+          // Since the point drawing tool uses OL's native features,
+          // nothing is needed to specifcally enable the tool
         };
 
     olMap.addLayer(new ol.layer.Vector({
@@ -49,6 +60,8 @@ define([
     }));
 
     this.createNewSelection = createNewSelection;
+    this.clearSelection = clearSelection;
+    this.setEnabled = setEnabled;
 
     Layer.apply(this, [ olMap ]);
   };

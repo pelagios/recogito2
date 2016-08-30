@@ -1,6 +1,9 @@
 define([
+  'common/config',
+  'document/annotation/image/selection/layers/geom2D',
+  'document/annotation/image/selection/layers/layer',
   'document/annotation/image/selection/layers/style'
-], function(Style) {
+], function(Config, Geom2D, Layer, Style) {
 
       /** Shorthand **/
   var TWO_PI = 2 * Math.PI,
@@ -141,7 +144,7 @@ define([
           ctx.closePath();
         },
 
-        finalizeAnnotation = function(e) {
+        finalizeAnnotation = function(e, callback) {
           var annotationStub = {
                 annotates: {
                   document_id: Config.documentId,
@@ -186,13 +189,12 @@ define([
             'l=' + Math.round(baselineLength) + ',' +
             'h=' + Math.round(height);
 
-          currentSelection = {
+          self.fireEvent('newSelection', {
             isNew      : true,
             annotation : annotationStub,
-            mapBounds  : pointToBounds(imageAnchorCoords)
-          };
-
-          self.fireEvent('select', currentSelection);
+            // TODO change to real bounds
+            mapBounds  : self.pointToBounds(imageAnchorCoords)
+          });
         },
 
         onMouseDown = function(e) {
@@ -228,20 +230,32 @@ define([
           }
         },
 
-        createNewSelection = function(e) {
-
+        createNewSelection = function(e, callback) {
+          // The toponym drawing tool works differently - it overlays a drawing
+          // canvas on .setEnabled(true) handles it's own mouse events
         },
 
         clearSelection = function() {
 
+        },
+
+        setEnabled = function(enabled) {
+          if (enabled) jQuery(canvas).show(); else jQuery(canvas).hide();
         };
 
-    // TODO how should we enable the tool?
+    attachMouseHandlers();
+    setCanvasSize();
+
+    // Reset canvas on window resize
+    jQuery(window).on('resize', setCanvasSize);
 
     this.createNewSelection = createNewSelection;
     this.clearSelection = clearSelection;
+    this.setEnabled = setEnabled;
 
+    Layer.apply(this, [ olMap ]);
   };
+  ToponymDrawingTool.prototype = Object.create(Layer.prototype);
 
   return ToponymDrawingTool;
 

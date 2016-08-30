@@ -1,8 +1,10 @@
-define([], function() {
+define(['common/hasEvents'], function(HasEvents) {
 
   var Layer = function(olMap) {
     this.olMap = olMap;
+    HasEvents.apply(this);
   };
+  Layer.prototype = Object.create(HasEvents.prototype);
 
   /** Utility to compute pixel distance between a screen location and a map coordinate **/
   Layer.prototype.computePxDistance = function(px, coord) {
