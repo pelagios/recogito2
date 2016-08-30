@@ -81,6 +81,7 @@ require([
 
       selector.on('select', editor.openSelection);
 
+      editor.on('createAnnotation', this.onCreateAnnotation.bind(this));
       editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
       editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 

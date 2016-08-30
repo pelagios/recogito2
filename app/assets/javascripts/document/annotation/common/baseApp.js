@@ -73,8 +73,6 @@ define([
        .done(function() {
          self.header.incrementAnnotationCount(-1);
          self.header.showStatusSaved();
-
-
        })
        .fail(function(error) {
          self.header.showSaveError(error);
