@@ -13,9 +13,7 @@ require([
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler',
-],
-
-function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar,
+], function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar,
   Highlighter, SelectionHandler) {
 
   var App = function() {
@@ -29,8 +27,8 @@ function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar
         selector = new SelectionHandler(contentNode, highlighter),
 
         editor = (Config.writeAccess) ?
-          new WriteEditor(contentNode, highlighter, selector) :
-          new ReadEditor(contentNode, highlighter),
+          new WriteEditor(contentNode, selector) :
+          new ReadEditor(contentNode),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
@@ -68,6 +66,7 @@ function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar
 
     selector.on('select', editor.openSelection);
 
+    editor.on('createAnnotation', this.onCreateAnnotation.bind(this));
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
     editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 

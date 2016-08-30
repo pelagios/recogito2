@@ -10,11 +10,10 @@ define([
   'common/api',
   'document/annotation/common/editor/editorBase',
   'document/annotation/common/editor/textEntryField',
-  'document/annotation/common/georesolution/georesolutionPanel'],
+  'document/annotation/common/georesolution/georesolutionPanel'
+], function(AnnotationUtils, PlaceUtils, API, EditorBase, TextEntryField, GeoresolutionPanel) {
 
-  function(AnnotationUtils, PlaceUtils, API, EditorBase, TextEntryField, GeoresolutionPanel) {
-
-  var WriteEditor = function(container, highlighter, selectionHandler) {
+  var WriteEditor = function(container, selectionHandler) {
     var self = this,
 
         element = (function() {
@@ -82,10 +81,10 @@ define([
             // Branch based on annotation mode
             // TODO can we move dependency on mode outside the editor?
             if (annotationMode.mode === 'NORMAL') {
-              self.open(selection.annotation, selection.bounds);
+              self.open(selection);
             } else if (annotationMode.mode === 'QUICK') {
               // Quick modes just add an annotation body and trigger instant OK
-              self.currentAnnotation = selection.annotation;
+              self.currentSelection = selection;
 
               if (annotationMode.type === 'PLACE') {
                 API.searchPlaces(AnnotationUtils.getQuote(selection.annotation)).done(function(response) {
@@ -106,7 +105,7 @@ define([
               // TODO implement
             }
           } else {
-            self.open(selection.annotation, selection.bounds);
+            self.open(selection);
           }
 
           return false;
@@ -115,7 +114,7 @@ define([
         /** Click on 'Place' button adds a new PLACE body **/
         onAddPlace = function() {
           // Depending on content type (text, image) we'll use either quote or transcription
-          var quote = AnnotationUtils.getQuote(self.currentAnnotation),
+          var quote = AnnotationUtils.getQuote(self.currentSelection.annotation),
               toponym = quote; // TODO get transcription from sectionList
 
           self.sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } }, toponym);
@@ -140,40 +139,35 @@ define([
 
         /** 'OK' updates the annotation & highlight spans and closes the editor **/
         onOK = function() {
-          var reply = replyField.getBody(), annotationSpans,
+          var reply = replyField.getBody(), selection,
+              currentAnnotation = self.currentSelection.annotation,
               hasChanged = reply || self.sectionList.hasChanged();
 
           if (hasChanged || annotationMode.mode === 'QUICK') {
-
             // Commit changes in sections
             self.sectionList.commitChanges();
 
             // Push the current reply body, if any
             if (reply)
-              self.currentAnnotation.bodies.push(reply);
+              currentAnnotation.bodies.push(reply);
 
             // Determine which CRUD action to perform
-            if (self.currentAnnotation.annotation_id) {
+            if (currentAnnotation.annotation_id) {
               // There's an ID - annotation already stored on the server
-              if (AnnotationUtils.isEmpty(self.currentAnnotation)) {
+              if (AnnotationUtils.isEmpty(currentAnnotation)) {
                 // Annotation empty - DELETE
-                highlighter.removeAnnotation(self.currentAnnotation);
-                self.fireEvent('deleteAnnotation', self.currentAnnotation);
+                self.fireEvent('deleteAnnotation', currentAnnotation);
               } else {
                 // UPDATE
-                annotationSpans = highlighter.refreshAnnotation(self.currentAnnotation);
-                self.fireEvent('updateAnnotation', self.currentAnnotation);
+                self.fireEvent('updateAnnotation', currentAnnotation);
               }
             } else {
               // No ID? New annotation from fresh selection - CREATE if not empty
-              if (AnnotationUtils.isEmpty(self.currentAnnotation)) {
+              if (AnnotationUtils.isEmpty(currentAnnotation)) {
                 selectionHandler.clearSelection();
               } else {
-                selection = selectionHandler.getSelection();
-                if (selection.isNew)
-                  highlighter.convertSelectionToAnnotation(selection, self.currentAnnotation);
+                self.fireEvent('createAnnotation', self.currentSelection);
                 selectionHandler.clearSelection();
-                self.fireEvent('updateAnnotation', self.currentAnnotation);
               }
             }
           } else {
@@ -186,12 +180,12 @@ define([
         /** Shortcut: triggers OK and moves the editor to the next annotation **/
         onOKAndNext = function() {
           onOK();
-          self.toNextAnnotation();
+          // self.toNextAnnotation();
         },
 
         /** User clicked 'change georesolution' - open the panel **/
         onChangeGeoresolution = function(section) {
-          georesolutionPanel.open(AnnotationUtils.getQuote(self.currentAnnotation), section.body);
+          georesolutionPanel.open(AnnotationUtils.getQuote(self.currentSelection.annotation), section.body);
         },
 
         /** Georesolution was changed - forward changes to the section list **/
@@ -219,7 +213,7 @@ define([
 
     this.replyField = replyField;
 
-    EditorBase.apply(this, [ container, element, highlighter ]);
+    EditorBase.apply(this, [ container, element ]);
 
     // Events from the section List
     this.sectionList.on('submit', onOK);
@@ -239,10 +233,10 @@ define([
   };
 
   /** Extends the open method provided by EditorBase **/
-  WriteEditor.prototype.open = function(annotation, bounds) {
-    EditorBase.prototype.open.call(this, annotation, bounds);
+  WriteEditor.prototype.open = function(selection) {
+    EditorBase.prototype.open.call(this, selection);
 
-    if (AnnotationUtils.countComments(annotation) > 0)
+    if (AnnotationUtils.countComments(selection.annotation) > 0)
       this.replyField.setPlaceHolder('Write a reply...');
 
     return false;

@@ -19,8 +19,6 @@ define([], function() {
     if (!this.removeAnnotation)
       throw 'Highlighter needs to implement .removeAnnotation() method';
 
-    if (!this.convertSelectionToAnnotation)
-      throw 'Highlighter needs to implement .convertSelectionToAnnotation() method';
   };
 
   return AbstractHighlighter;

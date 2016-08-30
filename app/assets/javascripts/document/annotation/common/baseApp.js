@@ -2,7 +2,8 @@
 define([
   'common/api',
   'common/config',
-  'document/annotation/common/page/header'], function(API, Config, Header) {
+  'document/annotation/common/page/header'
+], function(API, Config, Header) {
 
   var BaseApp = function(editor, highlighter) {
     this.editor = editor;
@@ -30,7 +31,7 @@ define([
     // TODO visual notification
   };
 
-  BaseApp.prototype.onUpdateAnnotation = function(annotationStub) {
+  BaseApp.prototype.upsertAnnotation = function(annotationStub) {
     var self = this;
 
     self.header.showStatusSaving();
@@ -50,12 +51,30 @@ define([
        });
   };
 
+  BaseApp.prototype.onCreateAnnotation = function(selection) {
+    if (selection.isNew)
+      this.highlighter.convertSelectionToAnnotation(selection);
+    this.upsertAnnotation(selection.annotation);
+  };
+
+  BaseApp.prototype.onUpdateAnnotation = function(annotationStub) {
+    // TODO revert on fail?
+    this.highlighter.refreshAnnotation(annotationStub);
+    this.upsertAnnotation(annotationStub);
+  };
+
   BaseApp.prototype.onDeleteAnnotation = function(annotation) {
     var self = this;
+
+    // TODO restore when store fails?
+    this.highlighter.removeAnnotation(annotation);
+
     API.deleteAnnotation(annotation.annotation_id)
        .done(function() {
          self.header.incrementAnnotationCount(-1);
          self.header.showStatusSaved();
+
+
        })
        .fail(function(error) {
          self.header.showSaveError(error);

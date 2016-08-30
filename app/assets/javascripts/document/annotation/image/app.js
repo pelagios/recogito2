@@ -10,8 +10,8 @@ require([
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/baseApp',
   'document/annotation/image/page/toolbar',
-  'document/annotation/image/selection/multiHighlighter',
-  'document/annotation/image/selection/multiSelectionHandler'],
+  'document/annotation/image/selection/highlighter',
+  'document/annotation/image/selection/selectionHandler'],
 
   function(API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar, Highlighter, SelectionHandler) {
 
@@ -54,13 +54,13 @@ require([
             })
           }),
 
-          highlighter = new Highlighter(olMap),
+          highlighter = new Highlighter(contentNode, olMap),
 
           selector = new SelectionHandler(contentNode, olMap, highlighter),
 
           editor = (Config.writeAccess) ?
-            new WriteEditor(contentNode, highlighter, selector) :
-            new ReadEditor(contentNode, highlighter),
+            new WriteEditor(contentNode, selector) :
+            new ReadEditor(contentNode),
 
           onMapMove = function() {
             var selection = selector.getSelection();

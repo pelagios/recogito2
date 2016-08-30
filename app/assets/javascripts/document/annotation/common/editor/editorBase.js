@@ -8,7 +8,7 @@ define([
   'document/annotation/common/editor/sections/sectionList',
   'common/hasEvents'], function(SectionList, HasEvents) {
 
-  var EditorBase = function(container, element, highlighter) {
+  var EditorBase = function(container, element) {
     var self = this,
 
         /** Handles common key events **/
@@ -32,9 +32,8 @@ define([
     // Fields accessible to prototype methods
     this.container = container;
     this.element = element;
-    this.highlighter = highlighter;
     this.sectionList = new SectionList(element);
-    this.currentAnnotation = false;
+    this.currentSelection = false;
 
     // Monitor key events
     jQuery(document.body).keydown(onKeyDown);
@@ -88,12 +87,12 @@ define([
     }
   };
 
-  EditorBase.prototype.open = function(annotation, bounds) {
+  EditorBase.prototype.open = function(selection) {
     this.clear();
-    this.currentAnnotation = annotation;
-    this.sectionList.setAnnotation(annotation);
+    this.currentSelection = selection;
+    this.sectionList.setAnnotation(selection.annotation);
     this.element.show();
-    this.setPosition(bounds);
+    this.setPosition(selection.bounds);
   };
 
   /** Shorthand to check if the editor is currently open **/
@@ -103,14 +102,14 @@ define([
 
   EditorBase.prototype.clear = function() {
     this.sectionList.clear();
-    this.currentAnnotation = false;
+    this.currentSelection = false;
   };
 
   /**
    * Moves the editor to the previous annotation
    *
    * TODO this is a hard-wired dependency to the text annotation UI - REFACTOR!
-   */
+   *
   EditorBase.prototype.toPreviousAnnotation = function() {
     var currentSpan = jQuery('*[data-id="' + this.currentAnnotation.annotation_id + '"]'),
         firstSpan = currentSpan[0],
@@ -127,7 +126,7 @@ define([
    * Moves the editor to the next annotation
    *
    * TODO this is a hard-wired dependency to the text annotation UI - REFACTOR!
-   */
+   *
   EditorBase.prototype.toNextAnnotation = function() {
     var currentSpan = jQuery('*[data-id="' + this.currentAnnotation.annotation_id + '"]'),
         lastSpan = currentSpan[currentSpan.length - 1],
@@ -139,6 +138,7 @@ define([
       this.open(nextAnnotations[0], firstNext[0].getBoundingClientRect());
     }
   };
+  */
 
   return EditorBase;
 

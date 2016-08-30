@@ -219,17 +219,17 @@ define([
          * 'Mounts' an annotation to the given spans, by applying the according
          * CSS classes, and attaching the annotation object to the elements.
          */
-        convertSelectionToAnnotation = function(selection, annotation) {
-          var anchor = annotation.anchor.substr(12),
-              quote = AnnotationUtils.getQuote(annotation);
+        convertSelectionToAnnotation = function(selection) {
+          var anchor = selection.annotation.anchor.substr(12),
+              quote = AnnotationUtils.getQuote(selection.annotation);
 
-          updateStyles(annotation, selection.spans);
+          updateStyles(selection.annotation, selection.spans);
 
           // Add a marker class, so we can quickly retrieve all SPANs linked
           // to pending annotations (which are currently stored on the server)
           jQuery(selection.spans).addClass('pending');
 
-          bindToElements(annotation, selection.spans);
+          bindToElements(selection.annotation, selection.spans);
         },
 
         removeAnnotation = function(annotation) {

@@ -1,7 +1,7 @@
 
 define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
-  var ReadEditor = function(container, highlighter) {
+  var ReadEditor = function(container) {
     var self = this,
 
         element = (function() {
@@ -20,7 +20,7 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
         })(),
 
         openSelection = function(selection) {
-          self.open(selection.annotation, selection.bounds);
+          self.open(selection);
           return false;
         },
 
@@ -31,7 +31,7 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
     this.openSelection = openSelection;
 
-    EditorBase.apply(this, [ container, element, highlighter ]);
+    EditorBase.apply(this, [ container, element ]);
 
     // Editor closes on ESC key and click on background document
     self.on('escape', onClose);

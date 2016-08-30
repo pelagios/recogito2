@@ -1,7 +1,8 @@
 define([
-  'common/config',
-  'document/annotation/image/selection/toponym/geom2D',
-  'document/annotation/image/selection/style'], function(Config, Geom2D, Style) {
+  'document/annotation/image/selection/layers/geom2D',
+  'document/annotation/image/selection/layers/layer',
+  'document/annotation/image/selection/layers/style'
+], function(Geom2D, Layer, Style) {
 
       /** Shorthand **/
   var TWO_PI = 2 * Math.PI,
@@ -30,8 +31,7 @@ define([
         return [ p1, p2, p3, p4 ];
       },
 
-      anchorToBounds = function(anchor) {
-        var rect = anchorToRect(anchor);
+      rectToBounds =  function(rect) {
         var minX = Math.min(rect[0].x, rect[1].x, rect[2].x, rect[3].x),
             minY = Math.min(rect[0].y, rect[1].y, rect[2].y, rect[3].y),
             maxX = Math.max(rect[0].x, rect[1].x, rect[2].x, rect[3].x),
@@ -47,11 +47,35 @@ define([
         };
       };
 
-  var ToponymHighlighter = function(olMap) {
+  var ToponymLayer = function(containerEl, olMap) {
 
-    var annotations = [],
+    var self = this,
 
-        currentHighlight = false,
+        annotations = [],
+
+        getAnnotationAt = function(e) {
+          // TODO optimize with a spatial tree
+          var coord = e.coordinate,
+              found = [];
+
+          jQuery.each(annotations, function(idx, annotation) {
+            var rect = anchorToRect(annotation.anchor, 5);
+            if(Geom2D.intersects(coord[0], - coord[1], rect))
+              found.push({
+                annotation: annotation,
+                mapBounds: rectToBounds(rect)
+              });
+          });
+
+          // TODO sort by size
+
+          if (found.length > 0)
+            return found[0];
+        },
+
+        findById = function(id) {
+
+        },
 
         addAnnotation = function(annotation, renderImmediately) {
           annotations.push(annotation);
@@ -146,65 +170,27 @@ define([
           })
         }),
 
-        getAnnotationsAt = function(coord) {
-          // TODO optimize with a spatial tree
-          var found = [];
-          jQuery.each(annotations, function(idx, annotation) {
-            var rect = anchorToRect(annotation.anchor, 5);
-            if(Geom2D.intersects(coord[0], - coord[1], rect))
-              found.push(annotation);
-          });
-          return found;
-        },
-
-        highlightAnnotation = function(annotation) {
-          currentHighlight = annotation;
-          if (annotation)
-            document.body.style.cursor = 'pointer';
-          else
-            document.body.style.cursor = 'auto';
-        },
-
-        onMouseMove = function(e) {
-          // TODO select the smallest hovered annotation, not hovered[0]
-          var all = getAnnotationsAt(e.coordinate),
-              hovered = (all.length > 0) ? all[0] : false;
-
-          if (hovered) {
-            if (currentHighlight) {
-              // Highlight changed to another annotation
-              if  (currentHighlight.annotation_id !== hovered.annotation_id)
-                highlightAnnotation(hovered);
-            } else {
-              // No previous highlight - just highlight the hovered box
-              highlightAnnotation(hovered);
-            }
-          } else if (currentHighlight) {
-            highlightAnnotation(false);
-          }
-        },
-
         refreshAnnotation = function(annotation) {
-          // TODO implement
+
         },
 
-        getCurrentHighlight = function() {
-          return {
-            annotation: currentHighlight,
-            bounds: anchorToBounds(currentHighlight.anchor)
-          };
+        removeAnnotation = function(annotation) {
+
         };
 
     olMap.addLayer(layer);
 
-    olMap.on('pointermove', onMouseMove);
-
+    this.getAnnotationAt = getAnnotationAt;
+    this.findById = findById;
     this.addAnnotation = addAnnotation;
     this.render = render;
-    this.getCurrentHighlight = getCurrentHighlight;
     this.refreshAnnotation = refreshAnnotation;
-  };
+    this.removeAnnotation = removeAnnotation;
 
-  return ToponymHighlighter;
+    Layer.apply(this, [ containerEl, olMap ]);
+  };
+  ToponymLayer.prototype = Object.create(Layer.prototype);
+
+  return ToponymLayer;
 
 });
