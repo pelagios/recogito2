@@ -23,6 +23,11 @@ define([
             });
           },
 
+          onNewSelection = function(selection) {
+            currentSelection = selection;
+            self.fireEvent('select', addScreenBounds(currentSelection));
+          },
+
           /** Converts the given map-coordinate bounds to viewport bounds **/
           mapBoundsToScreenBounds = function(mapBounds) {
             var offset = jQuery(containerEl).offset(),
@@ -64,11 +69,9 @@ define([
           },
 
           addScreenBounds = function(selection) {
-            return {
-              annotation: selection.annotation,
-              mapBounds: selection.mapBounds,
-              bounds: mapBoundsToScreenBounds(selection.mapBounds)
-            };
+            var clone = jQuery.extend({}, selection);
+            clone.bounds = mapBoundsToScreenBounds(selection.mapBounds);
+            return clone;
           },
 
           /** @override **/
@@ -79,7 +82,9 @@ define([
 
           /** @override **/
           clearSelection = function() {
-            // TODO implement
+            if (currentDrawingTool)
+              currentDrawingTool.clearSelection();
+            currentSelection = false;
           },
 
           /** Enable the drawing tool with the given name **/
@@ -95,11 +100,6 @@ define([
             }
 
             currentDrawingTool = tool;
-          },
-
-          onNewSelection = function(selection) {
-            currentSelection = selection;
-            self.fireEvent('select', addScreenBounds(currentSelection));
           },
 
           onMouseMove = function(e) {

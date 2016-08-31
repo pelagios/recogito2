@@ -46,11 +46,15 @@ define([
         },
 
         refreshAnnotation = function(annotation) {
-
+          // TODO style change depending on annotation properties
         },
 
         removeAnnotation = function(annotation) {
+          console.log('TODO implement removeAnnotation');
+        },
 
+        convertSelectionToAnnotation = function(selection) {
+          addAnnotation(selection.annotation);
         };
 
     olMap.addLayer(new ol.layer.Vector({
@@ -64,6 +68,7 @@ define([
     this.render = render;
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
+    this.convertSelectionToAnnotation = convertSelectionToAnnotation;
 
     Layer.apply(this, [ olMap ]);
   };

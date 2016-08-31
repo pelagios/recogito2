@@ -192,7 +192,6 @@ define([
           self.fireEvent('newSelection', {
             isNew      : true,
             annotation : annotationStub,
-            // TODO change to real bounds
             mapBounds  : self.pointToBounds(imageAnchorCoords)
           });
         },
@@ -233,10 +232,11 @@ define([
         createNewSelection = function(e, callback) {
           // The toponym drawing tool works differently - it overlays a drawing
           // canvas on .setEnabled(true) handles it's own mouse events
+          // I.e. we can ignore calls to this method.
         },
 
         clearSelection = function() {
-
+          clearCanvas();
         },
 
         setEnabled = function(enabled) {

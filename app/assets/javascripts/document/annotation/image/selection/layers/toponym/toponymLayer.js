@@ -176,6 +176,10 @@ define([
 
         removeAnnotation = function(annotation) {
 
+        },
+
+        convertSelectionToAnnotation = function(selection) {
+
         };
 
     olMap.addLayer(layer);
@@ -186,6 +190,7 @@ define([
     this.render = render;
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
+    this.convertSelectionToAnnotation = convertSelectionToAnnotation;
 
     Layer.apply(this, [ olMap ]);
   };

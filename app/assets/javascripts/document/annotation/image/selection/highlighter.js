@@ -36,11 +36,11 @@ define([
           },
 
           /** @override **/
-          findById = function() {
+          findById = function(id) {
             var found = [];
 
             jQuery.each(layers, function(key, layer) {
-              var result = layer.findById();
+              var result = layer.findById(id);
               if (result)
                found.push(result);
             });
@@ -68,9 +68,15 @@ define([
           },
 
           /** @override **/
-          removeAnnotation = function() {
+          removeAnnotation = function(annotation) {
             var layer = getLayer(annotation);
             if (layer) layer.removeAnnotation(annotation);
+          },
+
+          /** @override **/
+          convertSelectionToAnnotation = function(selection) {
+            var layer = getLayer(selection.annotation);
+            if (layer) layer.convertSelectionToAnnotation(selection);
           };
 
       this.getAnnotationAt = getAnnotationAt;
@@ -78,6 +84,7 @@ define([
       this.initPage = initPage;
       this.refreshAnnotation = refreshAnnotation;
       this.removeAnnotation = removeAnnotation;
+      this.convertSelectionToAnnotation = convertSelectionToAnnotation;
 
       AbstractHighlighter.apply(this);
     };

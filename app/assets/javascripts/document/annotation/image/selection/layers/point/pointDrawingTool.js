@@ -46,7 +46,7 @@ define([
         },
 
         clearSelection = function() {
-
+          pointVectorSource.clear(true);
         },
 
         setEnabled = function(enabled) {
