@@ -56,6 +56,18 @@ define(function() {
       }
     },
 
+    /** Returns an array with the values of the transcription bodies **/
+    getTranscriptions : function(annotation) {
+      var transcriptions = [];
+
+      jQuery.each(annotation.bodies, function(idx, body) {
+        if (body.type === 'TRANSCRIPTION')
+          transcriptions.push(body.value);
+      });
+
+      return transcriptions;
+    },
+
     /**
      * Returns status info for this annotation.
      *

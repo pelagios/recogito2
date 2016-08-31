@@ -40,15 +40,26 @@ define([
 
         fetchingSnippet = false,
 
+        /** Helper **/
+        getDistinct = function(arr) {
+          return arr.reduce(function(distinct, elem) {
+            if (distinct.indexOf(elem) < 0)
+              distinct.push(elem);
+            return distinct;
+          }, []);
+        },
+
         quotes = jQuery.map(annotations, function(annotation) {
           return AnnotationUtils.getQuote(annotation);
         }),
 
-        distinctQuotes = quotes.reduce(function(distinctQuotes, quote) {
-          if (distinctQuotes.indexOf(quote) < 0)
-            distinctQuotes.push(quote);
-          return distinctQuotes;
-        }, []),
+        distinctQuotes = getDistinct(quotes),
+
+        transcriptions = jQuery.map(annotations, function(annotation) {
+          return AnnotationUtils.getTranscriptions(annotation);
+        }),
+
+        distinctTranscriptions = getDistinct(transcriptions),
 
         distinctURIs = (function() {
           var distinctURIs = [];
@@ -64,25 +75,39 @@ define([
           return distinctURIs;
         })(),
 
-        getTextLink = function(annotation) {
+        getContentLink = function(annotation) {
           return jsRoutes.controllers.document.annotation.AnnotationController
             .showAnnotationViewForDocPart(Config.documentId, 1).url + '#' +
             annotation.annotation_id;
         },
 
         showCard = function(annotation, slideDirection) {
-          var currentCard = element.find('.snippet-text .card').first(),
+          var createTextSnippet = function() {
+                var quote = AnnotationUtils.getQuote(annotation),
+                    offset = annotation.context.char_offset,
+                    snippet = annotation.context.snippet;
+
+                return snippet.substring(0, offset) + '<em>' +
+                  snippet.substring(offset, offset + quote.length) + '</em>' +
+                  snippet.substring(offset + quote.length);
+              },
+
+              createImageSnippet = function() {
+                // TODO in the future, we may have an image snippet (but not now)
+                return '';
+              },
+
+              currentCard = element.find('.snippet-text .card').first(),
+
               label = (currentAnnotationIdx + 1) + ' OF ' + annotations.length + ' ANNOTATIONS',
-              offset = annotation.context.char_offset,
-              quote = AnnotationUtils.getQuote(annotation),
-              snippet = annotation.context.snippet,
-              formatted = snippet.substring(0, offset) + '<em>' +
-                snippet.substring(offset, offset + quote.length) + '</em>' +
-                snippet.substring(offset + quote.length),
+
+              snippet = (annotation.annotates.content_type.indexOf('TEXT') >= 0) ?
+                createTextSnippet() : createImageSnippet(),
+
               newCard, moveCurrentTo;
 
           snippetLabelEl.html(label);
-          snippetLinkEl.attr('href', getTextLink(annotation));
+          snippetLinkEl.attr('href', getContentLink(annotation));
 
           if (!slideDirection) {
             // No slide - just replace
@@ -90,7 +115,7 @@ define([
             fetchingSnippet = false;
           } else {
             scrolling = true;
-            newCard = jQuery('<div class="card">' + formatted + '</snippet>');
+            newCard = jQuery('<div class="card">' + snippet + '</snippet>');
 
             if (slideDirection === 'NEXT') {
               newCard.css('left', '100%');
@@ -136,8 +161,20 @@ define([
           }
         },
 
+        /**
+         * Renders the title, depending on content type. For the time being,
+         * it's safe to assume there are EITHER quotes OR transcriptions, but
+         * never both.
+         */
+        renderTitle = function() {
+          if (distinctQuotes.length > 0)
+            titleEl.html(distinctQuotes.join(', '));
+          else
+            titleEl.html(distinctTranscriptions.join(', '));
+        },
+
         render = function() {
-          titleEl.html(distinctQuotes.join(', '));
+          renderTitle();
 
           jQuery.each(distinctURIs, function(idx, uri) {
             var record = PlaceUtils.getRecord(place, uri),

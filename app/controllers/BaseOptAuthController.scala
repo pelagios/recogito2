@@ -5,8 +5,7 @@ import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
 import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
 import models.user.UserService
 import play.api.Configuration
-import play.api.mvc.{AnyContent, Request, Result}
-import play.api.Logger
+import play.api.mvc.{ AnyContent, Request, Result }
 import scala.concurrent.{ ExecutionContext, Future }
 
 abstract class BaseOptAuthController(

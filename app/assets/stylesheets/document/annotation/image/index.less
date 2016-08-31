@@ -92,18 +92,29 @@ html, body {
 
 }
 
-.sidebar .menu {
-  text-align:center;
+.sidebar {
 
-  img, .label {
-    max-width:160px;
-  }
+  ul.menu {
+    position:absolute !important;
+    top:70px;
+    bottom:0;
+    width:100%;
+    overflow-y:auto;
 
-  .label {
-    display:inline-block;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
+
+    text-align:center;
+
+    img, .label {
+      max-width:160px;
+    }
+
+    .label {
+      display:inline-block;
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+
   }
 
 }

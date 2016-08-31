@@ -23,7 +23,7 @@ define([
     if (urlHash) {
       preselected = this.highlighter.findById(urlHash);
       if (preselected)
-        this.editor.open(preselected.annotation, preselected.bounds);
+        this.editor.open(preselected);
     }
   };
 

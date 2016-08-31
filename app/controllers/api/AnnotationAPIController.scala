@@ -4,13 +4,14 @@ import controllers._
 import java.util.UUID
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
-import models.HasDate
+import models.{ ContentType, HasDate }
 import models.annotation._
 import models.contribution._
-import models.document.DocumentService
+import models.document.{ DocumentService, DocumentInfo }
 import models.user.UserService
 import org.joda.time.DateTime
 import play.api.{ Configuration, Logger }
+import play.api.mvc.{ AnyContent, Request, Result }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -195,38 +196,52 @@ class AnnotationAPIController @Inject() (
     }
   }
 
+  private def getTextAnnotationWithContext(doc: DocumentInfo, annotation: Annotation)(implicit request: Request[AnyContent]) = {
+    doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
+      case Some(part) => uploads.readTextfile(doc.ownerName, doc.id, part.getFilename) match {
+          case Some(text) =>
+            val snippet = extractTextSnippet(text, annotation)
+            jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))
+
+          case None =>
+            Logger.warn("No text content found for filepart " + annotation.annotates.filepartId)
+            InternalServerError
+        }
+
+      case None =>
+        // Annotation referenced a part ID that's not in the database
+        Logger.error("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
+        InternalServerError
+      }
+  }
+
+  /** This may get more sophisticated in the future and include a URL to a clipped and rotated image snippet **/ 
+  private def getImageAnnotationWithContext(doc: DocumentInfo, annotation: Annotation)(implicit request: Request[AnyContent]) = {
+    jsonOk(Json.toJson(annotation))
+  }
+
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
     annotations.findById(id).flatMap {
       case Some((annotation, _)) => {
+        
         if (includeContext) {
-          // Fetch the document, so we know the owner...
           documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).map(_ match {
-
             case Some((doc, accesslevel)) =>
               if (accesslevel.canRead) {
-                // ...then fetch the content
-                doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
-                  case Some(part) => uploads.readTextfile(doc.ownerName, doc.id, part.getFilename) match {
-                    case Some(text) =>
-                      val snippet = extractTextSnippet(text, annotation)
-                      jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))
-
-                    case None =>
-                      Logger.warn("No text content found for filepart " + annotation.annotates.filepartId)
-                      InternalServerError
-                  }
-
-                  case None =>
-                    // Annotation referenced a part ID that's not in the database
-                    Logger.warn("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
-                    InternalServerError
+                val contentType = annotation.annotates.contentType
+                if (contentType.isText) {
+                  getTextAnnotationWithContext(doc, annotation)
+                } else if (contentType.isImage) {
+                  getImageAnnotationWithContext(doc, annotation)
+                } else {
+                  Logger.error("Annotation indicates unsupported content type " + annotation.annotates.contentType)
+                  InternalServerError
                 }
               } else {
-                // No read permission on this document
                 ForbiddenPage
               }
 
-            case None =>
+            case _ =>
               Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
               NotFoundPage
           })

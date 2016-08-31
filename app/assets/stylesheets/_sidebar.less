@@ -1,7 +1,7 @@
 @sidebar-width:200px;
 
 .sidebar {
-  position:absolute;
+  position:fixed;
   top:0;
   bottom:0;
   width:@sidebar-width;
@@ -39,14 +39,11 @@
   } /** .sidebar-header **/
 
   ul.menu {
-    position:absolute;
-    top:70px;
-    bottom:0;
-    width:100%;
+    position:relative;
     list-style-type:none;
     margin:0;
     padding:10px 0;
-    overflow-y:auto;
+
 
     li.active {
       background-color:rgba(255, 255, 255, 0.3);

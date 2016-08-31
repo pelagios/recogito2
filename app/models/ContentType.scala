@@ -13,6 +13,12 @@ sealed trait ContentType {
   val subtype: String
   
   lazy val name = media + "_" + subtype
+
+  lazy val isImage = media == "IMAGE"
+
+  lazy val isText  = media == "TEXT"
+
+  lazy val isData  = media == "DATA"
   
 }
 
