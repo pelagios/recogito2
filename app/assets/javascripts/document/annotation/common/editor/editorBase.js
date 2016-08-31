@@ -18,12 +18,6 @@ define([
           if (key === 27)
             // ESC
             self.fireEvent('escape');
-          else if (key === 37 && self.isOpen())
-            // Left arrow key
-            self.toPreviousAnnotation();
-          else if (key === 39 && self.isOpen())
-            // Right arrow key
-            self.toNextAnnotation();
         };
 
     if (!this.openSelection)
@@ -104,41 +98,6 @@ define([
     this.sectionList.clear();
     this.currentSelection = false;
   };
-
-  /**
-   * Moves the editor to the previous annotation
-   *
-   * TODO this is a hard-wired dependency to the text annotation UI - REFACTOR!
-   *
-  EditorBase.prototype.toPreviousAnnotation = function() {
-    var currentSpan = jQuery('*[data-id="' + this.currentAnnotation.annotation_id + '"]'),
-        firstSpan = currentSpan[0],
-        lastPrev = jQuery(firstSpan).prev('.annotation'),
-        previousAnnotations;
-
-    if (lastPrev.length > 0) {
-      previousAnnotations = this.highlighter.getAnnotationsAt(lastPrev[0]);
-      this.open(previousAnnotations[0], lastPrev[0].getBoundingClientRect());
-    }
-  };
-
-  /**
-   * Moves the editor to the next annotation
-   *
-   * TODO this is a hard-wired dependency to the text annotation UI - REFACTOR!
-   *
-  EditorBase.prototype.toNextAnnotation = function() {
-    var currentSpan = jQuery('*[data-id="' + this.currentAnnotation.annotation_id + '"]'),
-        lastSpan = currentSpan[currentSpan.length - 1],
-        firstNext = jQuery(lastSpan).next('.annotation'),
-        nextAnnotations;
-
-    if (firstNext.length > 0) {
-      nextAnnotations = this.highlighter.getAnnotationsAt(firstNext[0]);
-      this.open(nextAnnotations[0], firstNext[0].getBoundingClientRect());
-    }
-  };
-  */
 
   return EditorBase;
 

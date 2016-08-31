@@ -81,10 +81,6 @@ define([
         },
 
         onMouseup = function(e) {
-
-          // Monitor select of existing annotations via DOM
-          // jQuery(container).on('click', '.annotation', editAnnotation);
-
           var isEventOnEditor = jQuery(e.target).closest('.text-annotation-editor').length > 0,
 
               // Click happend on an existing annotation span?
@@ -138,9 +134,29 @@ define([
           }
 
           return false;
+        },
+
+        onKeyDown = function(e) {
+          var key = e.which,
+
+              stepSelection = function(selection) {
+                if (selection) {
+                  currentSelection = selection;
+                  self.fireEvent('select', currentSelection);
+                }
+              };
+
+          if (currentSelection)
+            if (key === 37)
+              // Left arrow key
+              stepSelection(highlighter.getAnnotationBefore(currentSelection.annotation));
+            else if (key === 39)
+              // Right arrow key
+              stepSelection(highlighter.getAnnotationAfter(currentSelection.annotation));
         };
 
     jQuery(rootNode).mouseup(onMouseup);
+    jQuery(document.body).keydown(onKeyDown);
 
     this.clearSelection = clearSelection;
     this.getSelection = getSelection;

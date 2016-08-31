@@ -289,6 +289,32 @@ define([
           return sortByQuoteLength(getAnnotationsRecursive(element));
         },
 
+        getAnnotationAfter = function(annotation) {
+          var spans = jQuery('*[data-id="' + annotation.annotation_id + '"]'),
+              lastSpan = spans[spans.length - 1],
+              firstNext = jQuery(lastSpan).next('.annotation');
+
+          if (firstNext.length > 0) {
+            return {
+              annotation: getAnnotationsAt(firstNext[0])[0],
+              bounds: firstNext[0].getBoundingClientRect()
+            };
+          }
+        },
+
+        getAnnotationBefore = function(annotation) {
+          var spans = jQuery('*[data-id="' + annotation.annotation_id + '"]'),
+              firstSpan = spans[0],
+              lastPrev = jQuery(firstSpan).prev('.annotation');
+
+          if (lastPrev.length > 0) {
+            return {
+              annotation: getAnnotationsAt(lastPrev[0])[0],
+              bounds: lastPrev[0].getBoundingClientRect()
+            };
+          }
+        },
+
         findById = function(id) {
           var spans = jQuery('[data-id="' + id + '"]'),
               annotation = (spans.length > 0) ? spans[0].annotation : false;
@@ -299,6 +325,8 @@ define([
 
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.getAnnotationsAt = getAnnotationsAt;
+    this.getAnnotationBefore = getAnnotationBefore;
+    this.getAnnotationAfter = getAnnotationAfter;
     this.findById = findById;
     this.initPage = initPage;
     this.refreshAnnotation = refreshAnnotation;
