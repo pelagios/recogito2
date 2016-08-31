@@ -2,12 +2,13 @@
   padding:0;
   margin:0;
   font-size:16px;
+  border-top:1px solid @lightgrey-border;
 
   .textarea {
     padding:10px 15px;
     max-height:120px;
     overflow:auto;
-    background-color:@blueish-white-hi;
+    background-color:#fff;
     border-bottom:1px solid @lightgrey-border;
     outline:none;
   }
@@ -19,6 +20,10 @@
 
 }
 
-.field.new-transcription .textarea {
-  background-color:#fff;
+.field.new-transcription {
+  border-top:none;
+}
+
+.field.new-transcription .textarea, .field.reply .textarea {
+  background-color:@blueish-white-hi;
 }
