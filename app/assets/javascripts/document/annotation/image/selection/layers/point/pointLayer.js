@@ -24,8 +24,25 @@ define([
           }
         },
 
-        findById = function(id) {
+        /** TODO make this more performant (indexing? tricky though, as ID is provided async...) **/
+        findFeatureByAnnotationId = function(id) {
+          var feature;
 
+          pointVectorSource.forEachFeature(function(f) {
+            var a = f.get('annotation');
+            if (a.annotation_id === id) {
+              feature = f;
+              return true; // Breaks from the loop
+            }
+          });
+
+          return feature;
+        },
+
+        findById = function(id) {
+          var feature = findFeatureByAnnotationId(id);
+          if (feature)
+            return feature.get('annotation');
         },
 
         /** Note that this method breaks for annotations that are not point annotations! **/
@@ -50,7 +67,9 @@ define([
         },
 
         removeAnnotation = function(annotation) {
-          console.log('TODO implement removeAnnotation');
+          var feature = findFeatureByAnnotationId(annotation.annotation_id);
+          if (feature)
+            pointVectorSource.removeFeature(feature);
         },
 
         convertSelectionToAnnotation = function(selection) {
