@@ -194,6 +194,10 @@ define([
 
         convertSelectionToAnnotation = function(selection) {
           addAnnotation(selection.annotation, true);
+        },
+
+        emphasiseAnnotation = function(annotation) {
+          // TODO style change?
         };
 
     olMap.addLayer(layer);
@@ -205,6 +209,7 @@ define([
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
+    this.emphasiseAnnotation = emphasiseAnnotation;
 
     Layer.apply(this, [ olMap ]);
   };

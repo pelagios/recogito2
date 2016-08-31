@@ -8,6 +8,8 @@ define([
 
       var self = this,
 
+          currentHover = false,
+
           currentSelection = false,
 
           currentDrawingTool = false,
@@ -103,7 +105,20 @@ define([
           },
 
           onMouseMove = function(e) {
-            // TODO we may want to use this to provide mouse-hover behavior later
+            var previousHover = currentHover;
+            currentHover = highlighter.getAnnotationAt(e);
+
+            if (currentHover) {
+              // Mouse is over an annotation...
+              if (!previousHover || currentHover.annotation !== previousHover.annotation) {
+                // ...and its a new one - emphasise!
+                containerEl.style.cursor = 'pointer';
+                highlighter.emphasiseAnnotation(currentHover.annotation);
+              }
+            } else if (previousHover) {
+              // Mouse changed from hover to no-hover
+              containerEl.style.cursor = '';
+            }
           },
 
           onClick = function(e) {

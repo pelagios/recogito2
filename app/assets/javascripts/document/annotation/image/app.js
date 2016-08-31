@@ -69,10 +69,13 @@ require([
           },
 
           onToolChanged = function(toolName) {
-            if (toolName === 'MOVE')
+            if (toolName === 'MOVE') {
+              jQuery(contentNode).removeClass('edit');
               selector.setEnabled(false);
-            else
+            } else {
+              jQuery(contentNode).addClass('edit');
               selector.setEnabled(toolName);
+            }
           };
 
       toolbar.on('toolChanged', onToolChanged);

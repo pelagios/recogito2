@@ -74,6 +74,10 @@ define([
 
         convertSelectionToAnnotation = function(selection) {
           addAnnotation(selection.annotation);
+        },
+
+        emphasiseAnnotation = function(annotation) {
+          // TODO style change?
         };
 
     olMap.addLayer(new ol.layer.Vector({
@@ -88,6 +92,7 @@ define([
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
+    this.emphasiseAnnotation = emphasiseAnnotation;
 
     Layer.apply(this, [ olMap ]);
   };

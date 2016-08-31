@@ -77,6 +77,11 @@ define([
           convertSelectionToAnnotation = function(selection) {
             var layer = getLayer(selection.annotation);
             if (layer) layer.convertSelectionToAnnotation(selection);
+          },
+
+          emphasiseAnnotation = function(annotation) {
+            var layer = getLayer(annotation);
+            if (layer) layer.emphasiseAnnotation(annotation);
           };
 
       this.getAnnotationAt = getAnnotationAt;
@@ -85,6 +90,7 @@ define([
       this.refreshAnnotation = refreshAnnotation;
       this.removeAnnotation = removeAnnotation;
       this.convertSelectionToAnnotation = convertSelectionToAnnotation;
+      this.emphasiseAnnotation = emphasiseAnnotation;
 
       AbstractHighlighter.apply(this);
     };
