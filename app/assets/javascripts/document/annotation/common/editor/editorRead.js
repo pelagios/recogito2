@@ -6,7 +6,7 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
         element = (function() {
           var el = jQuery(
-                '<div class="text-annotation-editor">' +
+                '<div class="text-annotation-editor readonly">' +
                   '<div class="arrow"></div>' +
                   '<div class="text-annotation-editor-inner">' +
                     '<div class="transcription-sections"></div>' +
