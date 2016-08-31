@@ -19,6 +19,12 @@
 
 }
 
+/** Remove quotes while editing **/
+.section.editable-text.transcription.editing {
+  .text::before { content:''; }
+  .text::after { content:''; }
+}
+
 .section.editable-text {
   position:relative;
   padding:0;
@@ -90,6 +96,6 @@
 
 }
 
-.section.comment.editable {
-  background-color:#fff;
+.section.editable-text.editing {
+  background-color:@blueish-white-hi;
 }

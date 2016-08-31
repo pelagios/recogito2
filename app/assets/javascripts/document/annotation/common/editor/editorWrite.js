@@ -139,8 +139,7 @@ define([
         /** 'Cancel' clears the selection and closes the editor **/
         onCancel = function() {
           selectionHandler.clearSelection();
-          self.sectionList.clear();
-          element.hide();
+          self.close();
         },
 
         /** 'OK' updates the annotation & highlight spans and closes the editor **/

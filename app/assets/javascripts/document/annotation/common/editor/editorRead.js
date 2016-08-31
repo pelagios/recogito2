@@ -25,21 +25,14 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
           else
             self.close();
           return false;
-        },
-
-        /** 'OK' updates the annotation & highlight spans and closes the editor **/
-        onClose = function() {
-          element.hide();
         };
 
     this.openSelection = openSelection;
 
     EditorBase.apply(this, [ container, element ]);
 
-    // Editor closes on ESC key and click on background document
-    self.on('escape', onClose);
-
-    // jQuery(document).on('click', ':not(> .text-annotation-editor)', onClose);
+    // Editor closes on ESC key
+    self.on('escape', self.close);
   };
   ReadEditor.prototype = Object.create(EditorBase.prototype);
 

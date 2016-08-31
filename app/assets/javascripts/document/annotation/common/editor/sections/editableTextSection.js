@@ -6,15 +6,75 @@ define([
   'document/annotation/common/editor/sections/section'], function(Config, Section) {
 
   var EditableTextSection = function(element, annotationBody) {
-    var self = this;
+    var self = this,
 
-    this.element = element;
+        textEntryDiv = element.find('.text'),
+        lastModified = element.find('.last-modified'),
+
+        btnOpenDropdown = element.find('.edit'),
+
+        dropdownMenu = jQuery(
+          '<ul class="edit-dropdown">' +
+            '<li data-fn="edit">Edit</li>' +
+            '<li data-fn="delete">Delete</li>' +
+          '</ul>'),
+
+        toggleEditDropdown = function(e) {
+          if (e.target === btnOpenDropdown[0]) {
+            // Click on this button - toggle
+            if (btnOpenDropdown.hasClass('focus')) {
+              btnOpenDropdown.removeClass('focus');
+              dropdownMenu.hide();
+            } else {
+              btnOpenDropdown.addClass('focus');
+              dropdownMenu.show();
+            }
+          } else {
+            // Click anywhere else - close
+            btnOpenDropdown.removeClass('focus');
+            dropdownMenu.hide();
+          }
+        },
+
+        enableEditDropdown = function() {
+          // Append the menu element
+          dropdownMenu.hide();
+          element.append(dropdownMenu);
+
+          // Need to handle this as global event, so we can:
+          // - close when user clicks outside
+          // - have radio-button like behaviour for multiple comments
+          jQuery(document).on('click', toggleEditDropdown);
+
+          // Make menu items clickable
+          dropdownMenu.on('click', 'li', function(e) {
+            var fn = jQuery(e.target).data('fn');
+            if (fn === 'delete')
+              self.fireEvent('delete');
+            else
+              self.makeEditable();
+          });
+
+          // To place the drop-down menu on top of the comment fields, we need to apply
+          // a z-index in the inverse order: the first comment gets z-index 9999, second
+          // 9998 a.s.o.
+          element.css('z-index', 10000 - element.index());
+        };
+
+    if (Config.writeAccess && annotationBody.last_modified_by === Config.me)
+      enableEditDropdown();
+    else
+      element.find('.edit').hide();
+
+    textEntryDiv.html(self.escapeHtml(annotationBody.value));
+
     this.body = annotationBody;
 
-    this.textEntryDiv = element.find('.text');
-    this.lastModified = element.find('.last-modified');
+    this.element = element;
+    this.textEntryDiv = textEntryDiv;
+    this.lastModified = lastModified;
 
-    this.textEntryDiv.html(self.escapeHtml(annotationBody.value));
+    this.toggleEditDropdown = toggleEditDropdown;
 
     Section.apply(this);
   };
@@ -40,7 +100,7 @@ define([
   EditableTextSection.prototype.makeEditable = function() {
     var self = this;
 
-    this.element.addClass('editable');
+    this.element.addClass('editing');
     this.textEntryDiv.prop('contenteditable', true);
     this.placeCaretAtEnd(this.textEntryDiv[0]);
     this.lastModified.remove();
@@ -67,6 +127,7 @@ define([
   };
 
   EditableTextSection.prototype.destroy = function() {
+    jQuery(document).off('click', this.toggleEditDropdown);
     this.element.remove();
   };
 
