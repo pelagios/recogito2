@@ -9,7 +9,7 @@ define([
   'common/api',
   'common/config'], function(ErrorCard, NoMatchCard, StandardCard, MiniMap, Section, Formatting, PlaceUtils, API, Config) {
 
-  var PlaceSection = function(parent, placeBody, quote) {
+  var PlaceSection = function(parent, placeBody, toponym) {
     var self = this,
 
         element = (function() {
@@ -81,9 +81,9 @@ define([
           });
         },
 
-        /** Fills the place card based on a search on the provided quote string **/
-        fillFromToponym = function(quote, verificationStatus, lastModified) {
-          API.searchPlaces(quote).done(function(response) {
+        /** Fills the place card based on a search on the provided toponym string **/
+        fillFromToponym = function(toponym, verificationStatus, lastModified) {          
+          API.searchPlaces(toponym).done(function(response) {
             if (response.total > 0) {
               var topPlace = response.items[0],
                   bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
@@ -153,7 +153,7 @@ define([
             fillFromURI(placeBody.uri, placeBody.status, lastModified);
           else if (placeBody.status.value === 'UNVERIFIED')
             // No URI - if the annotation is still UNVERIFIED, fetch a suggestion
-            fillFromToponym(quote, placeBody.status, lastModified);
+            fillFromToponym(toponym, placeBody.status, lastModified);
           else
             renderNoMatchCard(placeBody.status, lastModified);
         };

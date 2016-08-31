@@ -112,6 +112,21 @@ function(
           }
         },
 
+        /**
+         * Returns the most recent transcription, including the one in the
+         * newTranscription field (which isn't part of the annotation yet)
+         */
+        getMostRecentTranscription = function() {
+          var storedTranscriptions = AnnotationUtils.getTranscriptions(currentAnnotation),
+              newTranscription = (newTranscriptionField) ? newTranscriptionField.getBody() : false;
+
+          if (newTranscription && newTranscription.value.trim().length > 0)
+            // Field exists and contains a non-empty value
+            return newTranscription.value.trim();
+          else if (storedTranscriptions.length > 0)
+            return storedTranscriptions[storedTranscriptions.length - 1];
+        },
+
         /** Common code for initializing a place section **/
         initPlaceSection = function(placeBody, toponym) {
           var placeSection = new PlaceSection(centerSectionEl, placeBody, toponym);
@@ -225,6 +240,7 @@ function(
     this.hasChanged = hasChanged;
     this.commitChanges = commitChanges;
     this.clear = clear;
+    this.getMostRecentTranscription = getMostRecentTranscription;
 
     HasEvents.apply(this);
   };

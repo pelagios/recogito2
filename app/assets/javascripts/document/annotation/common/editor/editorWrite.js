@@ -119,11 +119,8 @@ define([
 
         /** Click on 'Place' button adds a new PLACE body **/
         onAddPlace = function() {
-          // Depending on content type (text, image) we'll use either quote or transcription
-          var quote = AnnotationUtils.getQuote(self.currentSelection.annotation),
-              toponym = quote; // TODO get transcription from sectionList
-
-          self.sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } }, toponym);
+          self.sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } },
+            self.getMostRecentToponym());
         },
 
         /** Click on 'Person' button adds a new PERSON body **/
@@ -190,7 +187,7 @@ define([
 
         /** User clicked 'change georesolution' - open the panel **/
         onChangeGeoresolution = function(section) {
-          georesolutionPanel.open(AnnotationUtils.getQuote(self.currentSelection.annotation), section.body);
+          georesolutionPanel.open(self.getMostRecentToponym(), section.body);
         },
 
         /** Georesolution was changed - forward changes to the section list **/

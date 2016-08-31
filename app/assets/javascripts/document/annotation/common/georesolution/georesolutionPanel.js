@@ -258,10 +258,10 @@ define([
             currentSearchResultsTotal = 0;
           },
 
-          open = function(quote, body) {
+          open = function(toponym, body) {
             placeBody = body;
 
-            searchInput.val(quote);
+            searchInput.val(toponym);
             element.show();
             map.refresh();
 

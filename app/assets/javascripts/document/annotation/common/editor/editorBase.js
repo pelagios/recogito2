@@ -5,8 +5,10 @@
  *
  */
 define([
-  'document/annotation/common/editor/sections/sectionList',
-  'common/hasEvents'], function(SectionList, HasEvents) {
+  'common/utils/annotationUtils',
+  'common/hasEvents',
+  'document/annotation/common/editor/sections/sectionList'
+], function(AnnotationUtils, HasEvents, SectionList) {
 
   var EditorBase = function(container, element) {
     var self = this,
@@ -97,6 +99,22 @@ define([
   /** Shorthand to check if the editor is currently open **/
   EditorBase.prototype.isOpen = function() {
     return this.element.is(':visible');
+  };
+
+  /**
+   * Helper to retrieve the most recent toponym. Since the editor fields may
+   * contain info that is not yet stored in the annotation bodies, we need to
+   * obtain this from the editor directly.
+   *
+   * It is (sensibly) assumed that annotations will either have one QUOTE (text) or
+   * multiple TRANSCRIPTION (image) bodies, never both.
+   */
+  EditorBase.prototype.getMostRecentToponym = function() {
+    var quote = AnnotationUtils.getQuote(this.currentSelection.annotation);
+    if (quote)
+      return quote;
+    else
+      return this.sectionList.getMostRecentTranscription();
   };
 
   EditorBase.prototype.close = function() {
