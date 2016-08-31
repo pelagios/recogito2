@@ -54,6 +54,7 @@
         @doc.author.map(_ + ": ")@doc.title
       </h1>
       <h2 class="date">@doc.dateFreeform</h2>
+      <p class="source">@views.html.document.sourceUrl(doc.source)</p>
       <p class="quick-stats">
         <span class="icon comment">&#xf0e5;</span>
         <span class="annotations">0</span> Annotations
