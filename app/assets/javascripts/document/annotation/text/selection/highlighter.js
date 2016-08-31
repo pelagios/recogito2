@@ -1,8 +1,7 @@
 define([
   'common/utils/annotationUtils',
-  'document/annotation/common/selection/abstractHighlighter'],
-
-  function(AnnotationUtils, AbstractHighlighter) {
+  'document/annotation/common/selection/abstractHighlighter'
+], function(AnnotationUtils, AbstractHighlighter) {
 
   var TEXT = 3; // HTML DOM node type for text nodes
 
@@ -40,14 +39,11 @@ define([
           for (i=0; i<len; i++) {
             n = allTextNodes[i];
 
-            if (n === endNode)
-              take = false;
+            if (n === endNode) take = false;
 
-            if (take)
-              nodesBetween.push(n);
+            if (take) nodesBetween.push(n);
 
-            if (n === startNode)
-              take = true;
+            if (n === startNode) take = true;
           }
 
           return nodesBetween;
@@ -94,7 +90,7 @@ define([
           return calculateDomPositionWithin(textNodeProps, charOffsets);
         },
 
-        wrapRange = function(range) { //, cssClass) {
+        wrapRange = function(range) {
           var surround = function(range) {
                 var wrapper = document.createElement('SPAN');
                 range.surroundContents(wrapper);
