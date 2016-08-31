@@ -77,6 +77,12 @@ define([
         },
 
         openSelection = function(selection) {
+          // In case of selection === undefined, close the editor
+          if (!selection) {
+            self.close();
+            return;
+          }
+
           if (selection.isNew) {
             // Branch based on annotation mode
             // TODO can we move dependency on mode outside the editor?

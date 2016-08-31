@@ -131,7 +131,10 @@ define([
                 // Selection change
                 self.fireEvent('select', addScreenBounds(currentSelection));
             } else {
-              // No annotation selected - activate currently active drawing tool
+              // No annotation selected - close popup...
+              self.fireEvent('select');
+
+              // ...and activate currently active drawing tool if any
               if (currentDrawingTool)
                 currentDrawingTool.createNewSelection(e);
             }

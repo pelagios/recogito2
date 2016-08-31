@@ -20,7 +20,10 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
         })(),
 
         openSelection = function(selection) {
-          self.open(selection);
+          if (selection)
+            self.open(selection);
+          else
+            self.close();
           return false;
         },
 

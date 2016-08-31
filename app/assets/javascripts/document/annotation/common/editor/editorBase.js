@@ -82,16 +82,28 @@ define([
   };
 
   EditorBase.prototype.open = function(selection) {
-    this.clear();
-    this.currentSelection = selection;
-    this.sectionList.setAnnotation(selection.annotation);
-    this.element.show();
-    this.setPosition(selection.bounds);
+    if (selection) {
+      this.clear();
+      this.currentSelection = selection;
+      this.sectionList.setAnnotation(selection.annotation);
+      this.element.show();
+      this.setPosition(selection.bounds);
+    } else {
+      // We allow this method to be called with no arg - in this case, close the editor
+      this.close();
+    }
   };
 
   /** Shorthand to check if the editor is currently open **/
   EditorBase.prototype.isOpen = function() {
     return this.element.is(':visible');
+  };
+
+  EditorBase.prototype.close = function() {
+    if (this.isOpen()) {
+      this.clear();
+      this.element.hide();
+    }
   };
 
   EditorBase.prototype.clear = function() {
