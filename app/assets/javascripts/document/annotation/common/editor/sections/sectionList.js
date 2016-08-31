@@ -21,12 +21,13 @@ function(
     var self = this,
 
         transcriptionSectionEl = editorEl.find('.transcription-sections'),
-
         centerSectionEl = editorEl.find('.center-sections'),
 
         sections = [],
 
         queuedUpdates = [],
+
+        newTranscriptionField = false,
 
         currentAnnotation = false,
 
@@ -65,25 +66,29 @@ function(
         },
 
         initTranscriptionSections = function(transcriptionBodies) {
-
-          var addEmptyField = function() {
-                // Create empty transcription field
-                var field = new TextEntryField(transcriptionSectionEl, {
+              // Adds an empty 'Transcribe...' text entry field
+          var initNewTranscriptionField = function() {
+                newTranscriptionField = new TextEntryField(transcriptionSectionEl, {
                   placeholder: 'Transcribe...',
                   cssClass: 'new-transcription',
                   bodyType: 'TRANSCRIPTION'
                 });
 
-                forwardEvent(field, 'submit'); // Submit event needs to be handled by editor
+                forwardEvent(newTranscriptionField, 'submit'); // Submit event needs to be handled by editor
 
                 // If the user added a transcription, add it on commit
                 queuedUpdates.push(function() {
-                  if (!field.isEmpty())
-                    currentAnnotation.bodies.push(field.getBody());
+                  if (!newTranscriptionField.isEmpty())
+                    currentAnnotation.bodies.push(newTranscriptionField.getBody());
                 });
+
+                // Field hidden by default if other transcriptions exist already
+                if (transcriptionBodies.length > 0)
+                  newTranscriptionField.hide();
               },
 
-              addExisting = function() {
+              // Adds sections for the existing transcriptions
+              addExistingTranscriptions = function() {
                 jQuery.each(transcriptionBodies, function(idx, body) {
                   var transcriptionSection = new TranscriptionSection(transcriptionSectionEl, body);
                   handleDelete(transcriptionSection);
@@ -92,12 +97,19 @@ function(
                 });
               };
 
-          if (transcriptionBodies.length === 0)
-            // No transcription - adds empty field
-            addEmptyField();
-          else
-            // Existing transcriptions - add list
-            addExisting();
+          addExistingTranscriptions();
+          initNewTranscriptionField();
+        },
+
+        updateTranscriptionSections = function() {
+          if (newTranscriptionField) {
+            var transcriptionSections = jQuery.grep(sections, function(section) {
+              return section instanceof TranscriptionSection;
+            });
+
+            if (transcriptionSections.length === 0)
+              newTranscriptionField.show();
+          }
         },
 
         /** Common code for initializing a place section **/
@@ -138,6 +150,10 @@ function(
           var idx = sections.indexOf(section);
           if (idx > -1)
             sections.splice(idx, 1);
+
+          // Special case: if the destroyed section was the last transcription section,
+          // we want to un-hide the 'new transcription' text entry field
+          updateTranscriptionSections();
 
           // Queue the delete operation for later
           queuedUpdates.push(function() {

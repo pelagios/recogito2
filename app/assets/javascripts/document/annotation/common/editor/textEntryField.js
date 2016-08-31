@@ -10,6 +10,14 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
         textarea = element.find('.textarea'),
 
+        show = function() {
+          element.show();
+        },
+
+        hide = function() {
+          element.hide();
+        },
+
         clear = function() {
           textarea.empty();
           setPlaceHolder();
@@ -42,6 +50,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
     textarea.keyup(onKeyUp);
     parent.append(element);
 
+    this.show = show;
+    this.hide = hide;
     this.clear = clear;
     this.isEmpty = isEmpty;
     this.getBody = getBody;
