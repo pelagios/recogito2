@@ -74,7 +74,16 @@ define([
         },
 
         findById = function(id) {
+          var found;
 
+          jQuery.each(annotations, function(idx, annotation) {
+            if (annotation.annotation_id === id) {
+              found = annotation;
+              return false; // Break loop
+            }
+          });
+
+          return found;
         },
 
         addAnnotation = function(annotation, renderImmediately) {
@@ -88,19 +97,20 @@ define([
         },
 
         drawOne = function(annotation, extent, scale, ctx, color) {
+
+          var setStyles = function() {
+                ctx.fillStyle = color;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+              },
+
               // Helper function to trace a rectangle path
-          var traceRect = function() {
+              traceRect = function() {
                 ctx.moveTo(rect[0].x, rect[0].y);
                 ctx.lineTo(rect[1].x, rect[1].y);
                 ctx.lineTo(rect[2].x, rect[2].y);
                 ctx.lineTo(rect[3].x, rect[3].y);
                 ctx.lineTo(rect[0].x, rect[0].y);
-              },
-
-              setStyles = function() {
-                ctx.fillStyle = color;
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 1;
               },
 
               drawBox = function() {
@@ -119,6 +129,7 @@ define([
                 ctx.closePath();
               },
 
+              // Note: currently not used, but we may change drawing style later!
               drawBaseLine = function() {
                 ctx.lineWidth = Style.BOX_BASELINE_WIDTH;
                 ctx.beginPath();
@@ -128,6 +139,7 @@ define([
                 ctx.closePath();
               },
 
+              // Note: currently not used, but we may change drawing style later!
               drawAnchorDot = function() {
                 ctx.beginPath();
                 ctx.arc(rect[0].x, rect[0].y, Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
@@ -143,8 +155,6 @@ define([
 
           setStyles();
           drawBox();
-          // drawBaseLine();
-          // drawAnchorDot();
         },
 
         /** Drawing loop that renders all annotations to the drawing area **/
@@ -171,15 +181,19 @@ define([
         }),
 
         refreshAnnotation = function(annotation) {
-
+          // TODO style change depending on annotation properties
         },
 
         removeAnnotation = function(annotation) {
-
+          var idx = annotations.indexOf(annotation);
+          if (idx >= 0) {
+            annotations.splice(idx, 1);
+            render();
+          }
         },
 
         convertSelectionToAnnotation = function(selection) {
-
+          addAnnotation(selection.annotation, true);
         };
 
     olMap.addLayer(layer);
