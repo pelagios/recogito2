@@ -9,7 +9,7 @@ define([
         element = jQuery(
           '<div class="section editable-text comment">' +
             '<div class="text"></div>' +
-            '<div class="icon edit">&#xf142;</div>' +
+            '<div class="icon edit">&#xf0dd;</div>' +
             '<div class="last-modified">' +
               '<a class="by" href="/' + commentBody.last_modified_by + '">' +
                 commentBody.last_modified_by +
