@@ -10,10 +10,20 @@ require([
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/baseApp',
   'document/annotation/image/page/toolbar',
+  'document/annotation/image/page/viewer',
   'document/annotation/image/selection/highlighter',
-  'document/annotation/image/selection/selectionHandler'],
-
-  function(API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar, Highlighter, SelectionHandler) {
+  'document/annotation/image/selection/selectionHandler'
+], function(
+  API,
+  Config,
+  ReadEditor,
+  WriteEditor,
+  BaseApp,
+  Toolbar,
+  Viewer,
+  Highlighter,
+  SelectionHandler
+) {
 
     /** The app is instantiated after the image manifest was loaded **/
     var App = function(imageProperties) {
@@ -23,37 +33,9 @@ require([
 
           toolbar = new Toolbar(),
 
-          BASE_URL = jsRoutes.controllers.document.DocumentController
-            .getImageTile(Config.documentId, Config.partSequenceNo, '').absoluteURL(),
+          viewer = new Viewer(imageProperties),
 
-          w = imageProperties.width,
-
-          h = imageProperties.height,
-
-          projection = new ol.proj.Projection({
-            code: 'ZOOMIFY',
-            units: 'pixels',
-            extent: [0, 0, w, h]
-          }),
-
-          tileSource = new ol.source.Zoomify({
-            url: BASE_URL,
-            size: [ w, h ]
-          }),
-
-          tileLayer = new ol.layer.Tile({ source: tileSource }),
-
-          olMap = new ol.Map({
-            target: 'image-pane',
-            layers: [ tileLayer ],
-            controls: [],
-            view: new ol.View({
-              projection: projection,
-              center: [w / 2, - (h / 2)],
-              zoom: 0,
-              minResolution: 0.125
-            })
-          }),
+          olMap = viewer.olMap,
 
           highlighter = new Highlighter(olMap),
 
@@ -62,10 +44,6 @@ require([
           editor = (Config.writeAccess) ?
             new WriteEditor(contentNode, selector) :
             new ReadEditor(contentNode),
-
-          zoomToExtent = function() {
-            olMap.getView().fit([ 0, 0, w, -h ], olMap.getSize());
-          },
 
           onMapMove = function() {
             var selection = selector.getSelection();
@@ -94,8 +72,6 @@ require([
       editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 
       olMap.on('postrender', onMapMove);
-
-      zoomToExtent();
 
       API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
          .done(this.onAnnotationsLoaded.bind(this))
