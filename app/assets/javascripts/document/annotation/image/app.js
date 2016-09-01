@@ -12,7 +12,8 @@ require([
   'document/annotation/image/page/toolbar',
   'document/annotation/image/page/viewer',
   'document/annotation/image/selection/highlighter',
-  'document/annotation/image/selection/selectionHandler'
+  'document/annotation/image/selection/selectionHandler',
+  'document/annotation/image/help'
 ], function(
   API,
   Config,
@@ -22,7 +23,8 @@ require([
   Toolbar,
   Viewer,
   Highlighter,
-  SelectionHandler
+  SelectionHandler,
+  Help
 ) {
 
     /** The app is instantiated after the image manifest was loaded **/
@@ -45,8 +47,10 @@ require([
             new WriteEditor(contentNode, selector) :
             new ReadEditor(contentNode),
 
+          help = new Help(),
+
           onToggleFullscreen = function(isFullscreen) {
-            selector.updateSize();  
+            selector.updateSize();
           },
 
           onMapMove = function() {
@@ -63,9 +67,17 @@ require([
               jQuery(contentNode).addClass('edit');
               selector.setEnabled(toolName);
             }
+          },
+
+          onToggleHelp = function() {
+            if (help.isVisible())
+              help.close();
+            else
+              help.open();
           };
 
       toolbar.on('toolChanged', onToolChanged);
+      toolbar.on('toggleHelp', onToggleHelp);
 
       BaseApp.apply(this, [ editor, highlighter ]);
 

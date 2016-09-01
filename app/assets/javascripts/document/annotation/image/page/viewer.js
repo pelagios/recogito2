@@ -124,7 +124,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
               fullscreen = controlsEl.find('.fullscreen');
 
           zoomIn.click(function() { changeZoom(1); });
-          zoomIn.click(function() { changeZoom(-1); });
+          zoomOut.click(function() { changeZoom(-1); });
 
           fullscreen.click(toggleFullscreen);
 

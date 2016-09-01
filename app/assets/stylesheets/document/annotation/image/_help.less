@@ -1,0 +1,55 @@
+.help-window {
+  position:absolute !important;
+  width:520px;
+  background-color:#fff;
+  border:1px solid @lightgrey-border-darker;
+  z-index:99999;
+  .rounded-corners(3px);
+  .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.12));
+
+
+  h2 {
+    cursor:move;
+
+    button {
+      color:@lightblue-type;
+      font-size:18px;
+      margin:0;
+      padding:0;
+      cursor:pointer;
+      position:absolute;
+      right:12px;
+      top:9px;
+    }
+
+  }
+
+  h3 {
+    font-weight:normal;
+    font-size:18px;
+    margin:0;
+    padding:5px 0 10px 0;
+  }
+
+  table {
+    padding-bottom:10px;
+  }
+
+  td {
+    padding-right:15px;
+  }
+
+  .key {
+    font-family:"Courier New", Courier, monospace;
+    font-weight:bold;
+    font-size:13px;
+    display:inline-block;
+    background-color:@blueish-white-hi;
+    border:1px solid @blueish-white;
+    padding:0 5px;
+    .rounded-corners(2px);
+    vertical-align:middle;
+  }
+
+
+}

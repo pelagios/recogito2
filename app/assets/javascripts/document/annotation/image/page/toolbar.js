@@ -50,20 +50,31 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         },
 
         attachClickHandlers = function() {
-          tools.on('click', 'li', function(e) {
-            var item = jQuery(e.target).closest('li'),
-                tool = item.data('tool');
+          var attachToolHandler = function() {
+                tools.on('click', 'li', function(e) {
+                  var item = jQuery(e.target).closest('li'),
+                      tool = item.data('tool');
 
-            if (item.hasClass('disabled'))
-              return;
+                  if (item.hasClass('disabled'))
+                    return;
 
-            if (tool !== currentTool) {
-              setTool(tool);
-              self.fireEvent('toolChanged', tool);
-            }
+                  if (tool !== currentTool) {
+                    setTool(tool);
+                    self.fireEvent('toolChanged', tool);
+                  }
 
-            return false; // Prevent events from parent LIs
-          });
+                  return false; // Prevent events from parent LIs
+                });
+              },
+
+              attachHelpHandler = function() {
+                jQuery('.help').click(function() {
+                  self.fireEvent('toggleHelp');
+                });
+              };
+
+          attachToolHandler();
+          attachHelpHandler();
         };
 
     initToolDropdown();
