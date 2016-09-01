@@ -104,6 +104,12 @@ define([
             currentDrawingTool = tool;
           },
 
+          updateSize = function() {
+            jQuery.each(drawingTools, function(key, tool) {
+              tool.updateSize();
+            });
+          },
+
           onMouseMove = function(e) {
             var previousHover = currentHover;
             currentHover = highlighter.getAnnotationAt(e);
@@ -148,6 +154,7 @@ define([
       this.getSelection = getSelection;
       this.clearSelection = clearSelection;
       this.setEnabled = setEnabled;
+      this.updateSize = updateSize;
 
       AbstractSelectionHandler.apply(this);
     };

@@ -1,10 +1,12 @@
-define(['common/config'], function(Config) {
+define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
   var FULLSCREEN_SLIDE_DURATION = 200;
 
   var Viewer = function(imageProperties) {
 
-    var BASE_URL = jsRoutes.controllers.document.DocumentController
+    var self = this,
+
+        BASE_URL = jsRoutes.controllers.document.DocumentController
                      .getImageTile(Config.documentId, Config.partSequenceNo, '').absoluteURL(),
 
         w = imageProperties.width,
@@ -103,7 +105,8 @@ define(['common/config'], function(Config) {
                   left: left
                 }, {
                   duration: FULLSCREEN_SLIDE_DURATION,
-                  step: function() { olMap.updateSize(); }
+                  step: function() { olMap.updateSize(); },
+                  complete: function() { self.fireEvent('fullscreen', isFullscreen); }
                 });
               };
 
@@ -133,7 +136,9 @@ define(['common/config'], function(Config) {
 
     this.olMap = olMap;
 
+    HasEvents.apply(this);
   };
+  Viewer.prototype = Object.create(HasEvents.prototype);
 
   return Viewer;
 

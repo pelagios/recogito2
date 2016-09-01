@@ -47,11 +47,6 @@ define([
 
         clearSelection = function() {
           pointVectorSource.clear(true);
-        },
-
-        setEnabled = function(enabled) {
-          // Since the point drawing tool uses OL's native features,
-          // nothing is needed to specifcally enable the tool
         };
 
     olMap.addLayer(new ol.layer.Vector({
@@ -61,7 +56,8 @@ define([
 
     this.createNewSelection = createNewSelection;
     this.clearSelection = clearSelection;
-    this.setEnabled = setEnabled;
+    this.setEnabled = function() {}; // Not needed
+    this.updateSize = function() {}; // Not needed
 
     Layer.apply(this, [ olMap ]);
   };

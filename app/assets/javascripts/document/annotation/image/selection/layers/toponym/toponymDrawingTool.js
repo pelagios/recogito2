@@ -46,7 +46,7 @@ define([
           c.mouseup(onMouseUp);
         },
 
-        setCanvasSize = function() {
+        updateSize = function() {
           var c = jQuery(canvas);
           canvas.width = c.width();
           canvas.height = c.height();
@@ -244,14 +244,15 @@ define([
         };
 
     attachMouseHandlers();
-    setCanvasSize();
+    updateSize();
 
     // Reset canvas on window resize
-    jQuery(window).on('resize', setCanvasSize);
+    jQuery(window).on('resize', updateSize);
 
     this.createNewSelection = createNewSelection;
     this.clearSelection = clearSelection;
     this.setEnabled = setEnabled;
+    this.updateSize = updateSize;
 
     Layer.apply(this, [ olMap ]);
   };

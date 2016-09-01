@@ -45,6 +45,10 @@ require([
             new WriteEditor(contentNode, selector) :
             new ReadEditor(contentNode),
 
+          onToggleFullscreen = function(isFullscreen) {
+            selector.updateSize();  
+          },
+
           onMapMove = function() {
             var selection = selector.getSelection();
             if (selection)
@@ -64,6 +68,8 @@ require([
       toolbar.on('toolChanged', onToolChanged);
 
       BaseApp.apply(this, [ editor, highlighter ]);
+
+      viewer.on('fullscreen', onToggleFullscreen);
 
       selector.on('select', editor.openSelection);
 
