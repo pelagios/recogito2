@@ -46,6 +46,7 @@ require([
           olMap = new ol.Map({
             target: 'image-pane',
             layers: [ tileLayer ],
+            controls: [],
             view: new ol.View({
               projection: projection,
               center: [w / 2, - (h / 2)],
@@ -61,6 +62,10 @@ require([
           editor = (Config.writeAccess) ?
             new WriteEditor(contentNode, selector) :
             new ReadEditor(contentNode),
+
+          zoomToExtent = function() {
+            olMap.getView().fit([ 0, 0, w, -h ], olMap.getSize());
+          },
 
           onMapMove = function() {
             var selection = selector.getSelection();
@@ -89,6 +94,8 @@ require([
       editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 
       olMap.on('postrender', onMapMove);
+
+      zoomToExtent();
 
       API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
          .done(this.onAnnotationsLoaded.bind(this))
