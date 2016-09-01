@@ -1,0 +1,14 @@
+@(maybeSource: Option[String])
+@maybeSource.map { source =>
+  @if(source.startsWith("http")) {
+    @defining(source.substring(source.indexOf(":") + 3)) { withoutProtocol =>
+      <a href="@source" target="_blank">@if(withoutProtocol.indexOf("/") > -1) {
+        @withoutProtocol.substring(0, withoutProtocol.indexOf("/"))
+      } else {
+        @withoutProtocol
+      }</a>
+    }
+  } else {
+    @source
+  }
+}
