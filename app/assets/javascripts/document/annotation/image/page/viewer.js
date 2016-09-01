@@ -1,5 +1,7 @@
 define(['common/config'], function(Config) {
 
+  var FULLSCREEN_SLIDE_DURATION = 200;
+
   var Viewer = function(imageProperties) {
 
     var BASE_URL = jsRoutes.controllers.document.DocumentController
@@ -8,6 +10,21 @@ define(['common/config'], function(Config) {
         w = imageProperties.width,
 
         h = imageProperties.height,
+
+        imagePane = jQuery('#image-pane'),
+
+        sidebar = jQuery('.sidebar'),
+
+        iconbar = jQuery('.header-iconbar'),
+        infobox = jQuery('.header-infobox'),
+        toolbar = jQuery('.header-toolbar'),
+
+        /** Heights/widths we need for fullscreen toggle animation **/
+        headerHeight = iconbar.outerHeight() + infobox.outerHeight(),
+        toolbarHeight = toolbar.outerHeight(),
+        sidebarWidth = sidebar.outerWidth(),
+
+        isFullscreen = false,
 
         controlsEl = jQuery(
           '<div class="map-controls">' +
@@ -59,7 +76,43 @@ define(['common/config'], function(Config) {
         },
 
         toggleFullscreen = function() {
+          var wasFullscreen = isFullscreen,
 
+              toggleHeader = function() {
+                var header = iconbar.add(infobox);
+                if (wasFullscreen) {
+                  header.slideDown(FULLSCREEN_SLIDE_DURATION);
+                  toolbar.animate({ 'margin-left': sidebarWidth }, FULLSCREEN_SLIDE_DURATION);
+                } else {
+                  header.slideUp(FULLSCREEN_SLIDE_DURATION);
+                  toolbar.animate({ 'margin-left': 0 }, FULLSCREEN_SLIDE_DURATION);
+                }
+              },
+
+              toggleSidebar = function() {
+                var left = (wasFullscreen) ? 0 : - sidebarWidth;
+                sidebar.animate({ left: left }, FULLSCREEN_SLIDE_DURATION);
+              },
+
+              toggleImagePane = function() {
+                var top = (wasFullscreen) ? headerHeight + toolbarHeight : toolbarHeight,
+                    left = (wasFullscreen) ? sidebarWidth : 0;
+
+                imagePane.animate({
+                  top: top,
+                  left: left
+                }, {
+                  duration: FULLSCREEN_SLIDE_DURATION,
+                  step: function() { olMap.updateSize(); }
+                });
+              };
+
+          // Change state before animation starts
+          isFullscreen = !isFullscreen;
+
+          toggleHeader();
+          toggleSidebar();
+          toggleImagePane();
         },
 
         initControls = function() {
@@ -72,7 +125,7 @@ define(['common/config'], function(Config) {
 
           fullscreen.click(toggleFullscreen);
 
-          jQuery('#image-pane').append(controlsEl);
+          imagePane.append(controlsEl);
         };
 
     zoomToExtent();
