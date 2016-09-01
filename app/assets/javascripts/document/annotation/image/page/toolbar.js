@@ -47,6 +47,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
           imagePane.attr('class', toolName);
           currentTool = toolName;
+
+          self.fireEvent('toolChanged', toolName);
         },
 
         attachClickHandlers = function() {
@@ -58,10 +60,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
                   if (item.hasClass('disabled'))
                     return;
 
-                  if (tool !== currentTool) {
+                  if (tool !== currentTool)
                     setTool(tool);
-                    self.fireEvent('toolChanged', tool);
-                  }
 
                   return false; // Prevent events from parent LIs
                 });
@@ -75,10 +75,30 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
           attachToolHandler();
           attachHelpHandler();
+        },
+
+        toggleTool = function() {
+          var activeMode = tools.find('.active').data('tool'),
+              selectedTool = toolMenu.data('tool');
+
+          if (activeMode === 'MOVE')
+            setTool(selectedTool);
+          else
+            setTool('MOVE');
+        },
+
+        onKeyDown = function(e) {
+          var key = e.which;
+          if (key === 32) {
+            // SPACE - toggle MOVE/annotation tool
+            toggleTool();
+          }
         };
 
     initToolDropdown();
     attachClickHandlers();
+
+    jQuery(window).keydown(onKeyDown);
 
     HasEvents.apply(this);
   };
