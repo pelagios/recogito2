@@ -118,6 +118,25 @@ require([
               });
           },
 
+          /**
+           * We need the image pane to extend from below the header bar to the bottom of the
+           * page. Since the header bar has a non-fixed height, this is non-trivial to do
+           * in CSS. (I guess there's a way to do it using flexbox. But then the page structure
+           * would likely have to be different for image and text views, which complicates
+           * matters. Easier to determine the offset via JS at page load.)
+           */
+          setImagePaneTop = function() {
+            var imagePane = jQuery('#image-pane'),
+
+                iconbar = jQuery('.header-iconbar'),
+                infobox = jQuery('.header-infobox'),
+                toolbar = jQuery('.header-toolbar'),
+
+                offset = iconbar.outerHeight() + infobox.outerHeight() + toolbar.outerHeight();
+
+            imagePane.css('top', offset);
+          },
+
           onLoadError = function(error) {
             // TODO error indication to user
             console.log(error);
@@ -126,6 +145,8 @@ require([
           init = function(imageProperties) {
             new App(imageProperties);
           };
+
+      setImagePaneTop();
 
       loadManifest()
         .done(init)
