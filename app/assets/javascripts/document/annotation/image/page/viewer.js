@@ -15,6 +15,7 @@ define(['common/config'], function(Config) {
               '<div class="zoom-in control" title="Zoom in">+</div>' +
               '<div class="zoom-out control" title="Zoom out">&ndash;</div>' +
             '</div>' +
+            '<div class="fullscreen control icon">&#xf065;</div>' +
           '</div>'),
 
         projection = new ol.proj.Projection({
@@ -57,9 +58,20 @@ define(['common/config'], function(Config) {
           olMap.getView().setZoom(currentZoom + increment);
         },
 
+        toggleFullscreen = function() {
+
+        },
+
         initControls = function() {
-          controlsEl.find('.zoom-in').click(function() { changeZoom(1); });
-          controlsEl.find('.zoom-out').click(function() { changeZoom(-1); });
+          var zoomIn = controlsEl.find('.zoom-in'),
+              zoomOut = controlsEl.find('.zoom-out'),
+              fullscreen = controlsEl.find('.fullscreen');
+
+          zoomIn.click(function() { changeZoom(1); });
+          zoomIn.click(function() { changeZoom(-1); });
+
+          fullscreen.click(toggleFullscreen);
+
           jQuery('#image-pane').append(controlsEl);
         };
 
