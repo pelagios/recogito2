@@ -80,27 +80,30 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         toggleFullscreen = function() {
           var wasFullscreen = isFullscreen,
 
+              duration = { duration: FULLSCREEN_SLIDE_DURATION },
+
               toggleHeader = function() {
                 var header = iconbar.add(infobox);
+
                 if (wasFullscreen) {
-                  header.slideDown(FULLSCREEN_SLIDE_DURATION);
-                  toolbar.animate({ 'margin-left': sidebarWidth }, FULLSCREEN_SLIDE_DURATION);
+                  header.velocity('slideDown', duration);
+                  toolbar.velocity({ 'margin-left': sidebarWidth }, duration);
                 } else {
-                  header.slideUp(FULLSCREEN_SLIDE_DURATION);
-                  toolbar.animate({ 'margin-left': 0 }, FULLSCREEN_SLIDE_DURATION);
+                  header.velocity('slideUp', duration);
+                  toolbar.velocity({ 'margin-left': 0 }, duration);
                 }
               },
 
               toggleSidebar = function() {
                 var left = (wasFullscreen) ? 0 : - sidebarWidth;
-                sidebar.animate({ left: left }, FULLSCREEN_SLIDE_DURATION);
+                sidebar.velocity({ left: left }, duration);
               },
 
               toggleImagePane = function() {
                 var top = (wasFullscreen) ? headerHeight + toolbarHeight : toolbarHeight,
                     left = (wasFullscreen) ? sidebarWidth : 0;
 
-                imagePane.animate({
+                imagePane.velocity({
                   top: top,
                   left: left
                 }, {
