@@ -23,7 +23,6 @@ define(function() {
                    },
 
         handler : function(event) {
-                    event.preventDefault();
                     var elem = jQuery(this);
                     elem.data(event.type, 1);
                     if (event.type === 'touchend' && !elem.data('touchmove')) {
