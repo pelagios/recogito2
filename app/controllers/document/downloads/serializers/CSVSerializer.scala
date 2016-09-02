@@ -17,9 +17,15 @@ trait CSVSerializer extends BaseSerializer {
       val maybePlace = firstEntity.flatMap(_.uri.flatMap { uri =>
         places.find(_.uris.contains(uri))
       })
+      val quoteOrTranscription =
+        if (a.annotates.contentType.isText)
+          getFirstQuote(a)
+        else if (a.annotates.contentType.isImage)
+          getFirstTranscription(a)
+        else None
 
       a.annotationId + SEPARATOR +
-      getFirstQuote(a).getOrElse(EMPTY) + SEPARATOR +
+      quoteOrTranscription.getOrElse(EMPTY) + SEPARATOR +
       a.anchor + SEPARATOR +
       firstEntity.map(_.hasType.toString).getOrElse(EMPTY) + SEPARATOR +
       firstEntity.flatMap(_.uri).getOrElse(EMPTY) + SEPARATOR +
@@ -40,7 +46,7 @@ trait CSVSerializer extends BaseSerializer {
     } yield (annotations, places.items.map(_._1))
 
     f.map { case (annotations, places) =>
-      val header = Seq("UUID", "QUOTE", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "VERIFICATION_STATUS")
+      val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "VERIFICATION_STATUS")
       val serialized = sort(annotations.map(_._1)).map(a => serializeOne(a, places))
       header.mkString(SEPARATOR) + NEWLINE +
       serialized.mkString(NEWLINE)

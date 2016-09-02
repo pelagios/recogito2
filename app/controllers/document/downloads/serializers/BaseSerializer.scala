@@ -34,10 +34,12 @@ trait BaseSerializer {
       }
     }}
   }
-
   
   protected def getFirstQuote(a: Annotation): Option[String] = 
     a.bodies.find(_.hasType == AnnotationBody.QUOTE).flatMap(_.value)
+
+  protected def getFirstTranscription(a: Annotation): Option[String] =
+    a.bodies.find(_.hasType == AnnotationBody.TRANSCRIPTION).flatMap(_.value)
 
   protected def getFirstEntityBody(a: Annotation): Option[AnnotationBody] = {
     import AnnotationBody._
