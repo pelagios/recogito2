@@ -108,7 +108,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
                   left: left
                 }, {
                   duration: FULLSCREEN_SLIDE_DURATION,
-                  step: function() { olMap.updateSize(); },
+                  progress: function() { olMap.updateSize(); },
                   complete: function() { self.fireEvent('fullscreen', isFullscreen); }
                 });
               };

@@ -68,13 +68,15 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
               },
 
               attachHelpHandler = function() {
-                jQuery('.help').click(function() {
-                  self.fireEvent('toggleHelp');
-                });
+                jQuery('.help').click(toggleHelp);
               };
 
           attachToolHandler();
           attachHelpHandler();
+        },
+
+        toggleHelp = function() {
+          self.fireEvent('toggleHelp');
         },
 
         toggleTool = function() {
@@ -89,9 +91,13 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
         onKeyDown = function(e) {
           var key = e.which;
-          if (key === 32) {
-            // SPACE - toggle MOVE/annotation tool
-            toggleTool();
+
+          if (key === 32) { // SPACE - toggle MOVE/annotation tool
+            if (Config.writeAccess)
+              toggleTool();
+          } else if (key == 112) { // F1
+              toggleHelp();
+              return false; // To prevent browser help from popping up
           }
         };
 

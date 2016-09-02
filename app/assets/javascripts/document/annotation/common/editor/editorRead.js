@@ -32,7 +32,7 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
     EditorBase.apply(this, [ container, element ]);
 
     // Editor closes on ESC key
-    self.on('escape', self.close);
+    self.on('escape', self.close.bind(self));
   };
   ReadEditor.prototype = Object.create(EditorBase.prototype);
 
