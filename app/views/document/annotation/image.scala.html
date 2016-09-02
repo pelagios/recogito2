@@ -9,26 +9,11 @@
 <html>
   <head>
     <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"> @if(doc.isPublic) {
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@@pelagiosproject" />
-    <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title" />
-    <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title" />
-    <meta property="og:description" content="@annotationCount annotations" />
-    <meta name="twitter:description" content="@annotationCount annotations" />
-    <meta property="og:image" content="@controllers.document.routes.DocumentController.getImageTile(doc.id, currentPart.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL" />
-    <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(doc.id).absoluteURL" /> }
-    <meta property="og:image:width" content="256" />
-    <meta property="og:image:height" content="256" />
-    <meta name="twitter:image" content="@controllers.document.routes.DocumentController.getImageTile(doc.id, currentPart.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    @views.html.document.standardMeta(doc, annotationCount, Some(currentPart))
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image/index.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("ol.css"))"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
-    <link rel="apple-touch-icon" sizes="57x57" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
-    <link rel="apple-touch-icon" sizes="114x114" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
-    <link rel="apple-touch-icon" sizes="72x72" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
-    <link rel="apple-touch-icon" sizes="144x144" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
     <script src="@routes.WebJarAssets.at(webjars.locate("leaflet.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>

@@ -1,0 +1,49 @@
+@(
+  doc: models.document.DocumentInfo,
+  annotationCount: Long,
+  currentPart: Option[models.generated.tables.records.DocumentFilepartRecord] = None,
+  content: Option[String] = None
+)(implicit request: RequestHeader)
+@if(doc.isPublic) {
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@@pelagiosproject" />
+  <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(doc.id).absoluteURL" />
+  @currentPart match {
+    case Some(part) if (part.getContentType.startsWith("TEXT")) => {
+      <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title | @annotationCount annotations" />
+      <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title | @annotationCount annotations" />
+      @content.map { c =>
+        <meta property="og:description" content="@c.take(256).replace("\"", "\\\"").trim..." />
+        <meta name="twitter:description" content="@c.take(256).replace("\"", "\\\"").trim..." />
+      }
+      <meta property="og:image:width" content="240" />
+      <meta property="og:image:height" content="240" />
+      <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+      <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+      <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(doc.id).absoluteURL" /> }
+    case Some(part) if (part.getContentType.startsWith("IMAGE")) => {
+      <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title" />
+      <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title" />
+      <meta property="og:description" content="@annotationCount annotations" />
+      <meta name="twitter:description" content="@annotationCount annotations" />
+      <meta property="og:image:width" content="256" />
+      <meta property="og:image:height" content="256" />
+      <meta property="og:image" content="@controllers.document.routes.DocumentController.getImageTile(doc.id, part.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL" />
+      <meta name="twitter:image" content="@controllers.document.routes.DocumentController.getImageTile(doc.id, part.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL" /> }
+    case _ => {
+      <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title" />
+      <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title" />
+      <meta property="og:description" content="@annotationCount annotations" />
+      <meta name="twitter:description" content="@annotationCount annotations" />
+      <meta property="og:image:width" content="240" />
+      <meta property="og:image:height" content="240" />
+      <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+      <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+      <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(doc.id).absoluteURL" /> }
+  }
+}
+<link rel="apple-touch-icon" sizes="57x57" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
+<link rel="apple-touch-icon" sizes="114x114" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
+<link rel="apple-touch-icon" sizes="72x72" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
+<link rel="apple-touch-icon" sizes="144x144" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
