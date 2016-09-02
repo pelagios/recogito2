@@ -11,8 +11,8 @@
   <meta property="og:url" content="@controllers.document.annotation.routes.AnnotationController.showAnnotationViewForDoc(doc.id).absoluteURL" />
   @currentPart match {
     case Some(part) if (part.getContentType.startsWith("TEXT")) => {
-      <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title | @annotationCount annotations" />
-      <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title | @annotationCount annotations" />
+      <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title@doc.dateFreeform.map(d => s" ($d)") | @annotationCount annotations" />
+      <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title@doc.dateFreeform.map(d => s" ($d)") | @annotationCount annotations" />
       @content.map { c =>
         <meta property="og:description" content="@c.take(256).replace("\"", "\\\"").trim..." />
         <meta name="twitter:description" content="@c.take(256).replace("\"", "\\\"").trim..." />
