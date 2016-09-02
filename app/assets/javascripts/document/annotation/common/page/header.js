@@ -8,7 +8,12 @@ define(['common/config'], function(Config) {
     var annotationCountEl = jQuery('.quick-stats .annotations'),
         contributorsEl = jQuery('.quick-stats .contributors'),
 
-        saveMessageEl = jQuery('.save-msg'),
+        saveMessageEl = (function() {
+          var el = jQuery('<div class="save-msg"></div>');
+          jQuery('.header-iconbar').append(el);
+          return el;
+        })(),
+        
         saveMessageTimer = false,
 
         /** Document owner username **/
