@@ -196,10 +196,10 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
 
     val sharingPolicies = records.map(_.into(classOf[SharingPolicyRecord])).filter(isNotNull(_)).distinct
-    val owner = records.head.into(classOf[UserRecord])
 
     // Return with parts sorted by sequence number
     grouped.headOption.map { case (document, parts) =>
+      val owner = records.head.into(classOf[UserRecord])
       (DocumentInfo(document, parts.sortBy(_.getSequenceNo), owner), determineAccessLevel(document, sharingPolicies, loggedInUser))
     }
   }
