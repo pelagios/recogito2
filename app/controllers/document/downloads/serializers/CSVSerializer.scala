@@ -41,7 +41,7 @@ trait CSVSerializer extends BaseSerializer {
 
     f.map { case (annotations, places) =>
       val header = Seq("UUID", "QUOTE", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "VERIFICATION_STATUS")
-      val serialized = sortByCharOffset(annotations.map(_._1)).map(a => serializeOne(a, places))
+      val serialized = sort(annotations.map(_._1)).map(a => serializeOne(a, places))
       header.mkString(SEPARATOR) + NEWLINE +
       serialized.mkString(NEWLINE)
     }
