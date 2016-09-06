@@ -7,61 +7,60 @@
 @_layout("Recogito | Settings - Sharing", doc, currentUser, Some("sharing")) {
   <div class="panel share-public">
     <h2>Public Access</h2>
-      <div class="inner">
-        <input type="checkbox" id="public-access" name="public-access" @if(doc.isPublic) { checked="checked" } />
-        <label for="public-access">Visible to all</label>
-        <p class="checkbox-details">
-          This document will be visible to the public. Visitors can see your annotations, but
-          not edit. Visitors can also download the annotation data from the download page. Link to share:
-        </p>
-        <p class="checkbox-details">
-          <input type="text" id="public-link" value="@controllers.document.routes.DocumentController.initialView(doc.id).absoluteURL"/>
-        </p>
-      </div>
+    <div class="inner">
+      <input type="checkbox" id="public-access" name="public-access" @if(doc.isPublic) { checked="checked" } />
+      <label for="public-access">Visible to all</label>
+      <p class="checkbox-details">
+        This document will be visible to the public. Visitors can see your annotations, but
+        not edit. Visitors can also download the annotation data from the download page. Link to share:
+      </p>
+      <p class="checkbox-details">
+        <input type="text" id="public-link" value="@controllers.document.routes.DocumentController.initialView(doc.id).absoluteURL"/>
+      </p>
     </div>
+  </div>
 
-    <div class="panel share-collab">
-      <h2>Collaborators</h2>
-      <div class="inner">
-        <p class="no-collaborators description-text" @if(!sharingPolicies.isEmpty) { style="display:none" }>
-          This document doesn't have any collaborators yet.
-          Use the form below to add a collaborator.
-        </p>
-        <table class="collaborators">
-          @for(shared <- sharingPolicies) {
-            <tr data-username="@shared.getSharedWith" data-level="@shared.getAccessLevel">
-              <td class="col-user">
-                <a href="@controllers.my.routes.MyRecogitoController.index(shared.getSharedWith, None)">@shared.getSharedWith</a>
-              </td>
-              <td class="col-permissions">
-                <button class="permissions btn small"><span class="label">@shared.getAccessLevel</span><span class="icon">&#xf0dd;</span></button>
-              </td>
-              <td class="col-actions outline-icon remove-collaborator">&#xe897;</td>
-            </tr>
-          }
-        </table>
-      </div>
-      <div class="add-collaborators">
-        <form>
-          <input type="text" name="collaborator" placeholder="Enter username"/>
-        <form>
-      </div>
+  <div class="panel share-collab">
+    <h2>Collaborators</h2>
+    <div class="inner">
+      <p class="no-collaborators description-text" @if(!sharingPolicies.isEmpty) { style="display:none" }>
+        This document doesn't have any collaborators yet.
+        Use the form below to add a collaborator.
+      </p>
+      <table class="collaborators">
+        @for(shared <- sharingPolicies) {
+          <tr data-username="@shared.getSharedWith" data-level="@shared.getAccessLevel">
+            <td class="col-user">
+              <a href="@controllers.my.routes.MyRecogitoController.index(shared.getSharedWith, None)">@shared.getSharedWith</a>
+            </td>
+            <td class="col-permissions">
+              <button class="permissions btn small"><span class="label">@shared.getAccessLevel</span><span class="icon">&#xf0dd;</span></button>
+            </td>
+            <td class="col-actions outline-icon remove-collaborator">&#xe897;</td>
+          </tr>
+        }
+      </table>
     </div>
+    <div class="add-collaborators">
+      <form>
+        <input type="text" name="collaborator" placeholder="Enter username"/>
+      <form>
+    </div>
+  </div>
 
-    <script>
-      window.config = {
-        me: '@currentUser.getUsername',
-        documentId: '@doc.id'
-      }
-    </script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("typeahead.jquery.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/sharing.js")"></script>
-    @helper.javascriptRouter("jsRoutes")(
-      controllers.my.routes.javascript.MyRecogitoController.index,
-      controllers.document.settings.routes.javascript.SettingsController.setIsPublic,
-      controllers.document.settings.routes.javascript.SettingsController.searchUsers,
-      controllers.document.settings.routes.javascript.SettingsController.addCollaborator,
-      controllers.document.settings.routes.javascript.SettingsController.removeCollaborator
-    )
-  </label>
+  <script>
+    window.config = {
+      me: '@currentUser.getUsername',
+      documentId: '@doc.id'
+    }
+  </script>
+  <script src="@routes.WebJarAssets.at(webjars.locate("typeahead.jquery.min.js"))"></script>
+  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/sharing.js")"></script>
+  @helper.javascriptRouter("jsRoutes")(
+    controllers.my.routes.javascript.MyRecogitoController.index,
+    controllers.document.settings.routes.javascript.SettingsController.setIsPublic,
+    controllers.document.settings.routes.javascript.SettingsController.searchUsers,
+    controllers.document.settings.routes.javascript.SettingsController.addCollaborator,
+    controllers.document.settings.routes.javascript.SettingsController.removeCollaborator
+  )
 }

@@ -16,7 +16,7 @@
 
     <div class="sidebar">
       @views.html.document.sidebarHeader(doc.owner)
-      
+
       <ul class="menu">
         <li @if(activeTab == Some("metadata")) { class="active" }>
           <a href="?tab=metadata">
@@ -42,8 +42,8 @@
           </a>
         </li>
 
-        <li>
-          <a href="#">
+        <li @if(activeTab == Some("delete")) { class="active" }>
+          <a href="?tab=delete">
             <span class="icon">&#xf014;</span> <span class="label">Delete</span>
           </a>
         </li>

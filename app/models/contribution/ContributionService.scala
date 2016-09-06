@@ -98,12 +98,12 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   /** Deletes the contribution history after a given timestamp **/
   def deleteHistoryAfter(documentId: String, after: DateTime): Future[Boolean] = {
     
-    def findContributionsAfter()= es.client execute {
+    def findContributionsAfter() = es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query filteredQuery query {
         nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
       } postFilter {
         rangeFilter("made_at").gt(formatDate(after))
-      } limit Int.MaxValue
+      } limit ES.MAX_SIZE
     } map { _.getHits.getHits }
 
     findContributionsAfter().flatMap { hits =>
@@ -116,6 +116,37 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
           t.printStackTrace()
           false
         }
+      } else {
+        // Nothing to delete
+        Future.successful(true)
+      }
+    }
+  }
+  
+  /** Deletes the complete contribution history.
+    *
+    * Note that this method will leave the annotation history index untouched. I.e.
+    * for a "client-side" delete of the history, you need to make sure that you also
+    * delete the annotations and annotation versions.
+    */
+  def deleteHistory(documentId: String): Future[Boolean] = {
+    
+    def findContributions() = es.client execute {
+      search in ES.RECOGITO / ES.CONTRIBUTION query {
+        nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
+      } limit ES.MAX_SIZE
+    } map { _.getHits.getHits }
+    
+    findContributions.flatMap { hits =>
+      if (hits.size > 0) {
+        es.client execute {
+          bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
+        } map {
+          !_.hasFailures
+        } recover { case t: Throwable =>
+          t.printStackTrace()
+          false
+        }       
       } else {
         // Nothing to delete
         Future.successful(true)

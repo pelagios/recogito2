@@ -145,8 +145,8 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
     } map(_.as[(Annotation, Long)].toSeq)
 
   /** Deletes all annotations on a given document **/
-  def deleteByDocId(docId: String): Future[Boolean] =
-    findByDocId(docId).flatMap { annotationsAndVersions =>
+  def deleteByDocId(docId: String): Future[Boolean] = {
+    val deleteAnnotations = findByDocId(docId).flatMap { annotationsAndVersions =>
       if (annotationsAndVersions.size > 0) {
         es.client execute {
           bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId from ES.RECOGITO / ES.ANNOTATION } )
@@ -161,6 +161,14 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         Future.successful(true)
       }
     }
+    
+    val deleteVersions = deleteHistoryRecordsByDocId(docId)
+    
+    for {
+      s1 <- deleteAnnotations
+      s2 <- deleteVersions
+    } yield (s1 && s2)
+  }
 
   /** Retrieves all annotations on a given filepart **/
   def findByFilepartId(id: UUID, limit: Int = Int.MaxValue): Future[Seq[(Annotation, Long)]] =

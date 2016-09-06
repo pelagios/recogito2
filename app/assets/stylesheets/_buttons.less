@@ -58,3 +58,21 @@
   border:none;
   cursor:pointer;
 }
+
+/** Red 'Warning'-style button **/
+.btn.red {
+  border-color:@error-msg-type;
+  background-color:@error-msg-type;
+}
+
+.btn.red:hover {
+  background-color:darken(@error-msg-type, 5%);
+}
+
+.btn.red.disabled,
+.btn.red:disabled,
+.btn.red.disabled:hover,
+.btn.red:disabled:hover {
+  border-color:lighten(@error-msg-type, 25%);
+  background-color:lighten(@error-msg-type, 25%);
+}

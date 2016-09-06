@@ -1,0 +1,34 @@
+require.config({
+  baseUrl: "/assets/javascripts/",
+  fileExclusionRegExp: /^lib$/
+});
+
+require([
+  'common/ui/alert',
+  'common/config'
+], function(Alert, Config) {
+
+  jQuery(document).ready(function() {
+
+    var btnDeleteAnnotations = jQuery('.delete-annotations .btn'),
+
+        deleteAnnotations = function() {
+          var warningTitle = '<span class="icon">&#xf071;</span> Delete All Annotations',
+              warningMsg = '<strong>Are you absolutely sure you want to do this?</strong>',
+
+              executeDelete = function() {
+                jsRoutes.controllers.document.settings.SettingsController.deleteAnnotations(Config.documentId).ajax()
+                  .done(function(response) {
+                    btnDeleteAnnotations.removeClass('disabled');
+                  });
+              };
+
+          btnDeleteAnnotations.addClass('disabled');
+          new Alert('warning', warningTitle, warningMsg).on('ok', executeDelete);
+        };
+
+    btnDeleteAnnotations.click(deleteAnnotations);
+
+  });
+
+});

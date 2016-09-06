@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.ES
 
-trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
+trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self: AnnotationHistoryService =>
   
   implicit object AnnotationHistoryRecordIndexable extends Indexable[AnnotationHistoryRecord] {
     override def json(a: AnnotationHistoryRecord): String = Json.stringify(Json.toJson(a))
@@ -91,13 +91,38 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
         nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
       } postFilter { // TODO remove postFilter!
         rangeFilter("last_modified_at").gt(formatDate(after))
-      } limit Int.MaxValue
+      } limit ES.MAX_SIZE
     } map { _.getHits.getHits }
 
     findHistoryRecordsAfter().flatMap { hits =>
       if (hits.size > 0) {
         es.client execute {
-          bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.ANNOTATION_HISTORY) )
+          bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.ANNOTATION_HISTORY))
+        } map {
+          !_.hasFailures
+        } recover { case t: Throwable =>
+          t.printStackTrace()
+          false
+        }
+      } else {
+        // Nothing to delete
+        Future.successful(true)
+      }
+    }
+  }
+  
+  /** Deletes all history records (versions and delete markers) for a document **/
+  def deleteHistoryRecordsByDocId(docId: String)(implicit es: ES, context: ExecutionContext): Future[Boolean] = {
+    def findRecords() = es.client execute {
+      search in ES.RECOGITO / ES.ANNOTATION_HISTORY query {
+        nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
+      } limit ES.MAX_SIZE
+    } map { _.getHits.getHits }
+    
+    findRecords.flatMap { hits =>
+      if (hits.size > 0) {
+        es.client execute {
+          bulk (hits.map(h => delete id h.getId from ES.RECOGITO / ES.ANNOTATION_HISTORY))
         } map {
           !_.hasFailures
         } recover { case t: Throwable =>
