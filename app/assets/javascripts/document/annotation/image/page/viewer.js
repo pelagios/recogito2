@@ -103,12 +103,12 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
                 var top = (wasFullscreen) ? headerHeight + toolbarHeight : toolbarHeight,
                     left = (wasFullscreen) ? sidebarWidth : 0;
 
-                imagePane.velocity({
+                imagePane.animate({
                   top: top,
                   left: left
                 }, {
                   duration: FULLSCREEN_SLIDE_DURATION,
-                  progress: function() { olMap.updateSize(); },
+                  step: function() { olMap.updateSize(); },
                   complete: function() { self.fireEvent('fullscreen', isFullscreen); }
                 });
               };

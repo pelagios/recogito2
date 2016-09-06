@@ -82,13 +82,14 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         },
 
         toggleTool = function() {
-          var activeMode = tools.find('.active').data('tool'),
-              selectedTool = toolMenu.data('tool');
+          var activeMode = tools.find('.active').data('tool-key'),
+              selectedToolLabel = toolMenu.data('tool-label'),
+              selectedToolKey = toolMenu.data('tool-key');
 
-          if (activeMode === 'MOVE')
-            setTool(selectedTool);
+          if (activeMode === 'move')
+            setTool(selectedToolLabel, selectedToolKey);
           else
-            setTool('MOVE');
+            setTool('MOVE', 'move');
         },
 
         onKeyDown = function(e) {

@@ -59,13 +59,13 @@ require([
               editor.setPosition(selection.bounds);
           },
 
-          onToolChanged = function(toolName) {
-            if (toolName === 'MOVE') {
+          onToolChanged = function(toolKey) {
+            if (toolKey === 'move') {
               jQuery(contentNode).removeClass('edit');
               selector.setEnabled(false);
             } else {
               jQuery(contentNode).addClass('edit');
-              selector.setEnabled(toolName);
+              selector.setEnabled(toolKey);
             }
           },
 
