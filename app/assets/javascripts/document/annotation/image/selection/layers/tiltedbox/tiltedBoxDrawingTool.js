@@ -12,12 +12,12 @@ define([
       MIN_DRAG_TIME = 300,   // Minimum duration of an annotation drag (milliseconds)
       MIN_LINE_LENGTH = 10;  // Minimum length of a baseline
 
-  var ToponymDrawingTool = function(containerEl, olMap) {
+  var TiltedBoxDrawingTool = function(containerEl, olMap) {
 
     var self = this,
 
         canvas = (function() {
-          var canvas = jQuery('<canvas class="toponym-drawing"></canvas>');
+          var canvas = jQuery('<canvas class="tiltedbox-drawing"></canvas>');
           canvas.hide();
           jQuery(containerEl).append(canvas);
           return canvas[0];
@@ -182,7 +182,7 @@ define([
           extrude = false;
           painting = false;
 
-          annotationStub.anchor ='toponym:' +
+          annotationStub.anchor ='tbox:' +
             'x=' + Math.round(imageAnchorCoords[0]) + ',' +
             'y=' + Math.round(Math.abs(imageAnchorCoords[1])) + ',' +
             'a=' + baselineAngle + ',' +
@@ -230,7 +230,7 @@ define([
         },
 
         createNewSelection = function(e, callback) {
-          // The toponym drawing tool works differently - it overlays a drawing
+          // The tilted-box drawing tool works differently - it overlays a drawing
           // canvas on .setEnabled(true) handles it's own mouse events
           // I.e. we can ignore calls to this method.
         },
@@ -256,8 +256,8 @@ define([
 
     Layer.apply(this, [ olMap ]);
   };
-  ToponymDrawingTool.prototype = Object.create(Layer.prototype);
+  TiltedBoxDrawingTool.prototype = Object.create(Layer.prototype);
 
-  return ToponymDrawingTool;
+  return TiltedBoxDrawingTool;
 
 });

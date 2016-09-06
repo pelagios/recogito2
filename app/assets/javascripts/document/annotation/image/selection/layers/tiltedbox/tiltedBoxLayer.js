@@ -47,7 +47,7 @@ define([
         };
       };
 
-  var ToponymLayer = function(olMap) {
+  var TiltedBoxLayer = function(olMap) {
 
     var self = this,
 
@@ -213,8 +213,8 @@ define([
 
     Layer.apply(this, [ olMap ]);
   };
-  ToponymLayer.prototype = Object.create(Layer.prototype);
+  TiltedBoxLayer.prototype = Object.create(Layer.prototype);
 
-  return ToponymLayer;
+  return TiltedBoxLayer;
 
 });

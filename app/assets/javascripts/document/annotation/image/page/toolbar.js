@@ -3,7 +3,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
   var ICONS = {
     POINT     : '&#xf05b',
     RECTANGLE : '<span class="rect"></span>',
-    TOPONYM   : '<span class="toponym"></span>'
+    TBOX   : '<span class="tilted-box"></span>'
   };
 
   var Toolbar = function() {
@@ -32,36 +32,38 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           }
         },
 
-        setTool = function(toolName) {
+        setTool = function(toolLabel, toolKey) {
           tools.find('.active').removeClass('active');
 
-          if (toolName === 'MOVE') {
-            tools.find('[data-tool="MOVE"]').addClass('active');
+          if (toolKey === 'move') {
+            tools.find('[data-tool-key="move"]').addClass('active');
           } else {
             // Submenu selection
             toolMenu.addClass('active');
-            toolMenu.data('tool', toolName);
-            toolMenuIcon.html(ICONS[toolName]);
-            toolMenuLabel.html(toolName);
+            toolMenu.data('tool-label', toolLabel);
+            toolMenu.data('tool-key', toolKey);
+            toolMenuIcon.html(ICONS[toolKey]);
+            toolMenuLabel.html(toolLabel);
           }
 
-          imagePane.attr('class', toolName);
-          currentTool = toolName;
+          imagePane.attr('class', toolKey);
+          currentTool = toolKey;
 
-          self.fireEvent('toolChanged', toolName);
+          self.fireEvent('toolChanged', toolKey);
         },
 
         attachClickHandlers = function() {
           var attachToolHandler = function() {
                 tools.on('click', 'li', function(e) {
                   var item = jQuery(e.target).closest('li'),
-                      tool = item.data('tool');
+                      toolLabel = item.data('tool-label'),
+                      toolKey = item.data('tool-key');
 
                   if (item.hasClass('disabled'))
                     return;
 
-                  if (tool !== currentTool)
-                    setTool(tool);
+                  if (toolKey !== currentTool)
+                    setTool(toolLabel, toolKey);
 
                   return false; // Prevent events from parent LIs
                 });

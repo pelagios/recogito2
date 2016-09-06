@@ -1,8 +1,8 @@
 define([
   'document/annotation/common/selection/abstractSelectionHandler',
   'document/annotation/image/selection/layers/point/pointDrawingTool',
-  'document/annotation/image/selection/layers/toponym/toponymDrawingTool'
-], function(AbstractSelectionHandler, PointDrawingTool, ToponymDrawingTool) {
+  'document/annotation/image/selection/layers/tiltedbox/tiltedBoxDrawingTool'
+], function(AbstractSelectionHandler, PointDrawingTool, TiltedBoxDrawingTool) {
 
     var SelectionHandler = function(containerEl, olMap, highlighter) {
 
@@ -16,7 +16,7 @@ define([
 
           drawingTools = {
             point : new PointDrawingTool(olMap),
-            toponym : new ToponymDrawingTool(containerEl, olMap)
+            tbox : new TiltedBoxDrawingTool(containerEl, olMap)
           },
 
           attachEventHandlers = function() {
@@ -90,8 +90,8 @@ define([
           },
 
           /** Enable the drawing tool with the given name **/
-          setEnabled = function(toolName) {
-            var tool = (toolName) ? drawingTools[toolName.toLowerCase()] : false;
+          setEnabled = function(toolKey) {
+            var tool = (toolKey) ? drawingTools[toolKey] : false;
 
             if (tool != currentDrawingTool) {
               if (currentDrawingTool)

@@ -1,15 +1,15 @@
 define([
   'document/annotation/common/selection/abstractHighlighter',
   'document/annotation/image/selection/layers/point/pointLayer',
-  'document/annotation/image/selection/layers/toponym/toponymLayer'
-], function(AbstractHighlighter, PointLayer, ToponymLayer) {
+  'document/annotation/image/selection/layers/tiltedbox/tiltedBoxLayer'
+], function(AbstractHighlighter, PointLayer, TiltedBoxLayer) {
 
     var Highlighter = function(olMap) {
 
           /** The list of layer implementations **/
       var layers = {
             point : new PointLayer(olMap),
-            toponym : new ToponymLayer(olMap)
+            tbox : new TiltedBoxLayer(olMap)
           },
 
           /** Returns the layer appropriate to the annotation **/
