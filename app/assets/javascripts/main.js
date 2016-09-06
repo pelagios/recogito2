@@ -5,6 +5,7 @@ require.config({
     { name : 'document/annotation/image/app' },
     { name : 'document/annotation/text/app' },
     { name : 'document/map/app' },
+    { name : 'document/settings/delete' },
     { name : 'document/settings/history' },
     { name : 'document/settings/sharing' },
     { name : 'my/upload/step1' },
