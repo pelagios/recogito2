@@ -82,8 +82,8 @@ function(
                     currentAnnotation.bodies.push(newTranscriptionField.getBody());
                 });
 
-                // Field hidden by default if other transcriptions exist already
-                if (transcriptionBodies.length > 0)
+                // Field hidden by default if other transcriptions exist already, or when read-only
+                if (transcriptionBodies.length > 0 || !Config.writeAccess)
                   newTranscriptionField.hide();
               },
 
