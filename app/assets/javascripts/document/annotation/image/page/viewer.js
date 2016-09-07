@@ -54,6 +54,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           target: 'image-pane',
           layers: [ tileLayer ],
           controls: [],
+          // Need to disable keyboard interactions, otherwise interferes with editor popup
+          interactions: ol.interaction.defaults({ keyboard: false }),
           view: new ol.View({
             projection: projection,
             center: [w / 2, - (h / 2)],
