@@ -3,7 +3,8 @@
  */
 define([
   'common/config',
-  'document/annotation/common/editor/sections/section'], function(Config, Section) {
+  'document/annotation/common/editor/sections/section'
+], function(Config, Section) {
 
   var EditableTextSection = function(element, annotationBody) {
     var self = this,

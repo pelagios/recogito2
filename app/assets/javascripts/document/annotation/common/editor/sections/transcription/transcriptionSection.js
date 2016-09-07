@@ -1,7 +1,8 @@
 define([
   'document/annotation/common/editor/sections/editableTextSection',
   'common/ui/formatting',
-  'common/config'], function(EditableTextSection, Formatting, Config) {
+  'common/config'
+], function(EditableTextSection, Formatting, Config) {
 
   var TranscriptionSection = function(parent, transcriptionBody) {
     var self = this,

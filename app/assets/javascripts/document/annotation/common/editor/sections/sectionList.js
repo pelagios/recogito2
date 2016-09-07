@@ -5,9 +5,8 @@ define([
   'document/annotation/common/editor/textEntryField',
   'common/utils/annotationUtils',
   'common/config',
-  'common/hasEvents'],
-
-function(
+  'common/hasEvents'
+], function(
   CommentSection,
   PlaceSection,
   TranscriptionSection,

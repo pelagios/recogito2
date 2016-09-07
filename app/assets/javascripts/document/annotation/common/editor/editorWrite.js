@@ -156,13 +156,12 @@ define([
             // Determine which CRUD action to perform
             if (currentAnnotation.annotation_id) {
               // There's an ID - annotation already stored on the server
-              if (AnnotationUtils.isEmpty(currentAnnotation)) {
+              if (AnnotationUtils.isEmpty(currentAnnotation))
                 // Annotation empty - DELETE
                 self.fireEvent('deleteAnnotation', currentAnnotation);
-              } else {
+              else
                 // UPDATE
                 self.fireEvent('updateAnnotation', currentAnnotation);
-              }
             } else {
               // No ID? New annotation from fresh selection - CREATE if not empty
               if (AnnotationUtils.isEmpty(currentAnnotation)) {

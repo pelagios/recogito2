@@ -32,6 +32,7 @@ define(['common/hasEvents'], function(HasEvents) {
     btnCancel.click(onCancel);
 
     jQuery(document.body).append(element);
+    
     HasEvents.apply(this);
   };
   Alert.prototype = Object.create(HasEvents.prototype);

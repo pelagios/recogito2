@@ -7,7 +7,8 @@ define([
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
-  'common/config'], function(ErrorCard, NoMatchCard, StandardCard, MiniMap, Section, Formatting, PlaceUtils, API, Config) {
+  'common/config'
+], function(ErrorCard, NoMatchCard, StandardCard, MiniMap, Section, Formatting, PlaceUtils, API, Config) {
 
   var PlaceSection = function(parent, placeBody, toponym) {
     var self = this,
@@ -82,7 +83,7 @@ define([
         },
 
         /** Fills the place card based on a search on the provided toponym string **/
-        fillFromToponym = function(toponym, verificationStatus, lastModified) {          
+        fillFromToponym = function(toponym, verificationStatus, lastModified) {
           API.searchPlaces(toponym).done(function(response) {
             if (response.total > 0) {
               var topPlace = response.items[0],
