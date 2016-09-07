@@ -93,14 +93,18 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         },
 
         onKeyDown = function(e) {
-          var key = e.which;
+          var key = e.which,
+              isEventFromEditor = jQuery(e.target).closest('.annotation-editor-popup').length > 0;
 
-          if (key === 32) { // SPACE - toggle MOVE/annotation tool
-            if (Config.writeAccess)
-              toggleTool();
-          } else if (key == 112) { // F1
-              toggleHelp();
-              return false; // To prevent browser help from popping up
+          // We ignore keypresses while the user is typing on the editor
+          if (!isEventFromEditor) {
+            if (key === 32) { // SPACE - toggle MOVE/annotation tool
+              if (Config.writeAccess)
+                toggleTool();
+            } else if (key == 112) { // F1
+                toggleHelp();
+                return false; // To prevent browser help from popping up
+            }
           }
         };
 

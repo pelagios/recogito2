@@ -4,7 +4,7 @@
 @import "sections/_placesection.less";
 @import "_textentryfield.less";
 
-.text-annotation-editor {
+.annotation-editor-popup {
   position:absolute;
   z-index:99999;
   margin-top:14px;
@@ -15,7 +15,7 @@
   font-family:PTSansNarrow;
   cursor:auto;
 
-  .text-annotation-editor-inner {
+  .annotation-editor-popup-inner {
     .rounded-corners(4px);
     overflow:hidden;
     perspective:1px;
@@ -111,12 +111,12 @@
 
     }
 
-  } /** .text-annotation-editor-inner **/
+  } /** .annotation-editor-popup-inner **/
 
 }
 
 /** Arrow styles **/
-.text-annotation-editor {
+.annotation-editor-popup {
 
   .arrow {
     position:absolute;
@@ -141,7 +141,7 @@
 
 }
 
-.text-annotation-editor.align-right {
+.annotation-editor-popup.align-right {
   margin-left:8px;
 
   .arrow {
@@ -151,7 +151,7 @@
 
 }
 
-.text-annotation-editor.align-bottom {
+.annotation-editor-popup.align-bottom {
   margin-bottom:14px;
 
   .arrow {

@@ -81,7 +81,7 @@ define([
         },
 
         onMouseup = function(e) {
-          var isEventOnEditor = jQuery(e.target).closest('.text-annotation-editor').length > 0,
+          var isEventOnEditor = jQuery(e.target).closest('.annotation-editor-popup').length > 0,
 
               // Click happend on an existing annotation span?
               annotationSpan = jQuery(e.target).closest('.annotation'),
