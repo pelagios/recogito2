@@ -83,10 +83,11 @@ define([
             }
           });
 
-          return {
-            annotation: foundAnnotation,
-            mapBounds: rectToBounds(anchorToRect(annotation.anchor))
-          };
+          if (foundAnnotation)
+            return {
+              annotation: foundAnnotation,
+              mapBounds: rectToBounds(anchorToRect(foundAnnotation.anchor))
+            };
         },
 
         addAnnotation = function(annotation, renderImmediately) {
