@@ -10,7 +10,7 @@ define([
   'document/annotation/common/editor/sections/sectionList'
 ], function(AnnotationUtils, HasEvents, SectionList) {
 
-  var EditorBase = function(container, element) {
+  var EditorBase = function(container, element, opts) {
     var self = this,
 
         /** Handles common key events **/
@@ -28,6 +28,9 @@ define([
     // Fields accessible to prototype methods
     this.container = container;
     this.element = element;
+
+    this.autoscroll = (opts && opts.autoscroll) ? opts.autoscroll : true;
+
     this.sectionList = new SectionList(element);
     this.currentSelection = false;
 
@@ -76,10 +79,11 @@ define([
       this.element.removeClass('align-bottom');
     }
 
-    // Still not visible? Scroll down
-    rectAfter = this.element[0].getBoundingClientRect();
-    if (rectAfter.bottom > windowHeight || rectAfter.top < 100) {
-      jQuery(document.body).scrollTop(50 + scrollTop + rectAfter.bottom - windowHeight);
+    // Still not visible? Autoscroll (if enabled)
+    if (this.autoscroll) {
+      rectAfter = this.element[0].getBoundingClientRect();
+      if (rectAfter.bottom > windowHeight || rectAfter.top < 100)
+        jQuery(document.body).scrollTop(50 + scrollTop + rectAfter.bottom - windowHeight);
     }
   };
 

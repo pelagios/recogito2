@@ -44,8 +44,8 @@ require([
           selector = new SelectionHandler(contentNode, olMap, highlighter),
 
           editor = (Config.writeAccess) ?
-            new WriteEditor(contentNode, selector) :
-            new ReadEditor(contentNode),
+            new WriteEditor(contentNode, selector, { autoscroll: false }) :
+            new ReadEditor(contentNode, { autoscroll: false }),
 
           help = new Help(),
 

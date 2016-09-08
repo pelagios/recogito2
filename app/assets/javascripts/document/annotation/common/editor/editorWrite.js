@@ -13,7 +13,7 @@ define([
   'document/annotation/common/georesolution/georesolutionPanel'
 ], function(AnnotationUtils, PlaceUtils, API, EditorBase, TextEntryField, GeoresolutionPanel) {
 
-  var WriteEditor = function(container, selectionHandler) {
+  var WriteEditor = function(container, selectionHandler, options) {
     var self = this,
 
         element = (function() {
@@ -213,7 +213,7 @@ define([
 
     this.replyField = replyField;
 
-    EditorBase.apply(this, [ container, element ]);
+    EditorBase.apply(this, [ container, element, options ]);
 
     // Events from the section List
     this.sectionList.on('submit', onOK);
