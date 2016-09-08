@@ -42,7 +42,10 @@ define([
         findById = function(id) {
           var feature = findFeatureByAnnotationId(id);
           if (feature)
-            return feature.get('annotation');
+            return {
+              annotation: feature.get('annotation'),
+              mapBounds: self.pointToBounds(feature.getGeometry().getCoordinates())
+            };
         },
 
         /** Note that this method breaks for annotations that are not point annotations! **/
