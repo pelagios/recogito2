@@ -78,61 +78,67 @@ define([], function() {
           return tierSizes;
         })();
 
-    var modulo = function(a, b) {
-      var r = a % b;
-        return r * b < 0 ? r + b : r;
-    };
-
     ol.source.TileImage.apply(this, [{
+
       tilePixelRatio: tilePixelRatio,
+
       tileGrid: new ol.tilegrid.TileGrid({
         resolutions: logicalResolutions.reverse(),
-        origin: [0, 0],
+        origin: [ 0, 0 ],
         tileSize: logicalTileSize
       }),
 
+      crossOrigin: options.crossOrigin,
+
       tileUrlFunction: function(tileCoord, pixelRatio, projection) {
-        var z = tileCoord[0];
-        if (maxZoom < z) return undefined;
+        var z = tileCoord[0],
+            x = tileCoord[1],
+            y = -tileCoord[2] - 1,
+            sizes = tierSizes[z],
 
-        var sizes = tierSizes[z];
-        if (!sizes) return undefined;
+            modulo = function(a, b) {
+              var r = a % b;
+              return r * b < 0 ? r + b : r;
+            };
 
-        var x = tileCoord[1];
-        var y = -tileCoord[2] - 1;
-        if (x < 0 || sizes[0] <= x || y < 0 || sizes[1] <= y) {
+        if (maxZoom < z)
           return undefined;
+
+        if (!sizes)
+          return undefined;
+
+        if (x < 0 || sizes[0] <= x || y < 0 || sizes[1] <= y)
+          return undefined;
+
+        var scale = Math.pow(2, maxZoom - z),
+            tileBaseSize = tileSize * scale,
+            minx = x * tileBaseSize,
+            miny = y * tileBaseSize,
+            maxx = Math.min(minx + tileBaseSize, width),
+            maxy = Math.min(miny + tileBaseSize, height),
+            query, url, hash;
+
+        maxx = scale * Math.floor(maxx / scale);
+        maxy = scale * Math.floor(maxy / scale);
+
+        query = '/' + minx + ',' + miny + ',' +
+          (maxx - minx) + ',' + (maxy - miny) +
+          '/pct:' + (100 / scale) + '/0/' + quality + '.' + extension;
+
+        if (jQuery.isArray(baseUrl)) {
+          hash = (x << z) + y;
+          url = baseUrl[modulo(hash, baseUrl.length)];
         } else {
-          var scale = Math.pow(2, maxZoom - z);
-          var tileBaseSize = tileSize * scale;
-          var minx = x * tileBaseSize;
-          var miny = y * tileBaseSize;
-          var maxx = Math.min(minx + tileBaseSize, width);
-          var maxy = Math.min(miny + tileBaseSize, height);
-
-          maxx = scale * Math.floor(maxx / scale);
-          maxy = scale * Math.floor(maxy / scale);
-
-          var query = '/' + minx + ',' + miny + ',' +
-              (maxx - minx) + ',' + (maxy - miny) +
-              '/pct:' + (100 / scale) + '/0/' + quality + '.' + extension;
-
-          var url;
-          if (jQuery.isArray(baseUrl)) {
-            var hash = (x << z) + y;
-            url = baseUrl[modulo(hash, baseUrl.length)];
-          } else {
-            url = baseUrl;
-          }
-
-          return url + query;
+          url = baseUrl;
         }
-      },
-      crossOrigin: options.crossOrigin
+
+        return url + query;
+      }
     }]);
 
-    /*
+
     if (ol.has.CANVAS) {
+      /*
       this.setTileLoadFunction(function(tile, url) {
         var img = tile.getImage();
         goog.events.listenOnce(img, goog.events.EventType.LOAD, function() {
@@ -153,7 +159,8 @@ define([], function() {
         }, true);
         img.src = url;
       });
-    }*/
+      */
+    }
 
   };
   IIIFSource.prototype = Object.create(ol.source.TileImage.prototype);
