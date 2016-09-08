@@ -36,36 +36,47 @@ define([], function() {
   var IIIFSource = function(options) {
 
     var baseUrl = options.baseUrl,
+
         extension = options.extension || 'jpg',
+
         quality = options.quality || 'native',
+
         width = options.width,
+
         height = options.height,
-        tileSize = options.tileSize || 256;
 
-    var ceil_log2 = function(x) {
-      return Math.ceil(Math.log(x) / Math.LN2);
-    };
+        tileSize = options.tileSize || 256,
 
-    var maxZoom = Math.max(ceil_log2(width / tileSize),
-                           ceil_log2(height / tileSize));
+        ceil_log2 = function(x) {
+          return Math.ceil(Math.log(x) / Math.LN2);
+        },
 
-    var tierSizes = [];
-    for (var i = 0; i <= maxZoom; i++) {
-      var scale = Math.pow(2, maxZoom - i);
-      var width_ = Math.ceil(width / scale);
-      var height_ = Math.ceil(height / scale);
-      var tilesX_ = Math.ceil(width_ / tileSize);
-      var tilesY_ = Math.ceil(height_ / tileSize);
-      tierSizes.push([tilesX_, tilesY_]);
-    }
+        maxZoom = Math.max(ceil_log2(width / tileSize), ceil_log2(height / tileSize)),
 
-    var tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4);
+        tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4),
 
-    var logicalTileSize = tileSize / tilePixelRatio;
-    var logicalResolutions = tilePixelRatio == 1 ? options.resolutions :
-        options.resolutions.map(function(el, i, arr) {
-          return el * tilePixelRatio;
-        });
+        logicalTileSize = tileSize / tilePixelRatio,
+
+        logicalResolutions = (tilePixelRatio == 1) ? options.resolutions :
+          options.resolutions.map(function(el, i, arr) {
+            return el * tilePixelRatio;
+          }),
+
+        tierSizes = (function() {
+          var tierSizes = [], i;
+
+          for (i = 0; i <= maxZoom; i++) {
+            var scale = Math.pow(2, maxZoom - i),
+                width_ = Math.ceil(width / scale),
+                height_ = Math.ceil(height / scale),
+                tilesX_ = Math.ceil(width_ / tileSize),
+                tilesY_ = Math.ceil(height_ / tileSize);
+
+            tierSizes.push([ tilesX_, tilesY_ ]);
+          }
+
+          return tierSizes;
+        })();
 
     var modulo = function(a, b) {
       var r = a % b;
