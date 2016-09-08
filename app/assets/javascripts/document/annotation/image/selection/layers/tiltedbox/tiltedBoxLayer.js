@@ -74,16 +74,19 @@ define([
         },
 
         findById = function(id) {
-          var found;
+          var foundAnnotation;
 
           jQuery.each(annotations, function(idx, annotation) {
             if (annotation.annotation_id === id) {
-              found = annotation;
+              foundAnnotation = annotation;
               return false; // Break loop
             }
           });
 
-          return found;
+          return {
+            annotation: foundAnnotation,
+            mapBounds: rectToBounds(anchorToRect(annotation.anchor))
+          };
         },
 
         addAnnotation = function(annotation, renderImmediately) {
