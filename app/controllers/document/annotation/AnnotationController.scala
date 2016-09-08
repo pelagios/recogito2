@@ -22,12 +22,12 @@ class AnnotationController @Inject() (
     implicit val ctx: ExecutionContext
   ) extends BaseOptAuthController(config, documents, users) {
 
-  /** Just a redirect for convenience **/
+  /** For convenience: redirects to /document/{id}/part/1 **/
   def showAnnotationViewForDoc(documentId: String) = StackAction { implicit request =>
-    Redirect(routes.AnnotationController.showAnnotationViewForDocPart(documentId, 1))
+    Redirect(routes.AnnotationController.showAnnotationView(documentId, 1))
   }
 
-  def showAnnotationViewForDocPart(documentId: String, partNo: Int) = AsyncStack { implicit request =>
+  def showAnnotationView(documentId: String, partNo: Int) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(documentId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
       if (accesslevel.canRead)
@@ -51,7 +51,7 @@ class AnnotationController @Inject() (
       case Some(ContentType.IMAGE_UPLOAD) =>
         annotations.countByDocId(doc.id).map(annotationCount =>
           Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, annotationCount)))
-        
+
       case Some(ContentType.TEXT_PLAIN) =>
         uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFilename) match {
           case Some(content) =>

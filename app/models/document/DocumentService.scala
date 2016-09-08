@@ -26,7 +26,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   private def generateRandomID(retriesLeft: Int = 10): String = {
     
     // Takes a set of strings and returns those that already exist in the DB as doc IDs
-    def findIDs(ids: Set[String])(implicit db: DB) = db.query { sql =>
+    def findIds(ids: Set[String])(implicit db: DB) = db.query { sql =>
       sql.select(DOCUMENT.ID)
          .from(DOCUMENT)
          .where(DOCUMENT.ID.in(ids))
@@ -39,7 +39,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       (1 to 10).map(_ => RandomStringUtils.randomAlphanumeric(ID_LENGTH).toLowerCase).toSet
 
     // Match them all against the database and remove those that already exist
-    val idsAlreadyInDB = Await.result(findIDs(randomIds), 10.seconds)    
+    val idsAlreadyInDB = Await.result(findIds(randomIds), 10.seconds)    
     val uniqueIds = randomIds.filter(id => !idsAlreadyInDB.contains(id))
     
     if (uniqueIds.size > 0) {
@@ -202,6 +202,11 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       val owner = records.head.into(classOf[UserRecord])
       (DocumentInfo(document, parts.sortBy(_.getSequenceNo), owner), determineAccessLevel(document, sharingPolicies, loggedInUser))
     }
+  }
+  
+  /** Retrieves a part record by ID **/
+  def findPartById(id: UUID) = db.query { sql => 
+    Option(sql.selectFrom(DOCUMENT_FILEPART).where(DOCUMENT_FILEPART.ID.equal(id)).fetchOne())
   }
 
   /** Retrieves a filepart by document ID and sequence number **/

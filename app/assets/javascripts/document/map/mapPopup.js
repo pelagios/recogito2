@@ -76,9 +76,8 @@ define([
         })(),
 
         getContentLink = function(annotation) {
-          return jsRoutes.controllers.document.annotation.AnnotationController
-            .showAnnotationViewForDocPart(Config.documentId, 1).url + '#' +
-            annotation.annotation_id;
+          return jsRoutes.controllers.document.DocumentController
+            .initialFilepartView(annotation.annotates.filepart_id, annotation.annotation_id).url;
         },
 
         showCard = function(annotation, slideDirection) {

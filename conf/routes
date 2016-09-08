@@ -38,7 +38,7 @@ GET     /admin                                       controllers.admin.AdminCont
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /document/:id/edit                           controllers.document.annotation.AnnotationController.showAnnotationViewForDoc(id: String)
-GET     /document/:id/part/:partNo/edit              controllers.document.annotation.AnnotationController.showAnnotationViewForDocPart(id: String, partNo: Int)
+GET     /document/:id/part/:partNo/edit              controllers.document.annotation.AnnotationController.showAnnotationView(id: String, partNo: Int)
 
 GET     /document/:id/map                            controllers.document.map.MapController.showMap(id: String)
 
@@ -62,6 +62,7 @@ GET     /document/:id/settings/zip-export            controllers.document.settin
 DELETE  /document/:id/settings/delete                controllers.document.settings.SettingsController.deleteDocument(id: String)
 DELETE  /document/:id/settings/delete-annotations    controllers.document.settings.SettingsController.deleteAnnotations(id: String)
 
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document content
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,10 +72,11 @@ GET     /document/:id/part/:partNo/tiles/*path       controllers.document.Docume
 GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Document base path
+# Document and part base paths
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id                                controllers.document.DocumentController.initialView(id: String)
+GET     /document/:id                                controllers.document.DocumentController.initialDocumentView(id: String)
+GET     /part/:id                                    controllers.document.DocumentController.initialFilepartView(id: java.util.UUID, annotation_id: Option[java.util.UUID])
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API

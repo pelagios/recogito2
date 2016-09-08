@@ -14,7 +14,7 @@
         $(".document-list tr").click(function() {
           var id = jQuery(this).data('id'),
               url = jsRoutes.controllers.document.annotation.AnnotationController
-                      .showAnnotationViewForDocPart(id, 1).absoluteURL();
+                      .showAnnotationView(id, 1).absoluteURL();
           window.location = url;
         });
       });
@@ -75,7 +75,7 @@
       }
     </div>
     @helper.javascriptRouter("jsRoutes")(
-      controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationViewForDocPart
+      controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView
     )
   </body>
 </html>

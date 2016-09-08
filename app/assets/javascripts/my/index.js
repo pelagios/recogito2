@@ -99,7 +99,7 @@ require(['common/ui/touch', 'common/config'], function(Touch, Config) {
         openDocument = function(e) {
           var id = getClickedDocument(e).data('id'),
               url = jsRoutes.controllers.document.annotation.AnnotationController
-                      .showAnnotationViewForDocPart(id, 1).absoluteURL();
+                      .showAnnotationView(id, 1).absoluteURL();
 
           window.location.href = url;
         };
