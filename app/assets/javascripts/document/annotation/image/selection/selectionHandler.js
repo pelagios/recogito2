@@ -83,6 +83,13 @@ define([
           },
 
           /** @override **/
+          setSelection = function(selection) {
+            currentSelection = selection;
+            if (selection)
+              self.fireEvent('select', addScreenBounds(currentSelection));
+          },
+
+          /** @override **/
           clearSelection = function() {
             if (currentDrawingTool)
               currentDrawingTool.clearSelection();
@@ -152,6 +159,7 @@ define([
       attachEventHandlers();
 
       this.getSelection = getSelection;
+      this.setSelection = setSelection;
       this.clearSelection = clearSelection;
       this.setEnabled = setEnabled;
       this.updateSize = updateSize;

@@ -10,6 +10,9 @@ define(['common/hasEvents'], function(HasEvents) {
     if (!this.getSelection)
       throw 'SelectionHandler needs to implement .getSelection() method';
 
+    if (!this.setSelection)
+      throw 'SelectionHandler needs to implement .setSelection() method';
+
     if (!this.clearSelection)
       throw 'SelectionHandler needs to implement .clearSelection() method';
 

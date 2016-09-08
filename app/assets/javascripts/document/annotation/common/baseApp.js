@@ -5,9 +5,9 @@ define([
   'document/annotation/common/page/header'
 ], function(API, Config, Header) {
 
-  var BaseApp = function(editor, highlighter) {
-    this.editor = editor;
+  var BaseApp = function(highlighter, selector) {
     this.highlighter = highlighter;
+    this.selector = selector;
     this.header = new Header();
   };
 
@@ -23,7 +23,7 @@ define([
     if (urlHash) {
       preselected = this.highlighter.findById(urlHash);
       if (preselected)
-        this.editor.open(preselected);
+        this.selector.setSelection(preselected);
     }
   };
 

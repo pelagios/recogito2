@@ -80,6 +80,12 @@ define([
           return currentSelection;
         },
 
+        setSelection = function(selection) {
+          currentSelection = selection;
+          if (selection)
+            self.fireEvent('select', currentSelection);
+        },
+
         onMouseup = function(e) {
           var isEventOnEditor = jQuery(e.target).closest('.annotation-editor-popup').length > 0,
 
@@ -160,6 +166,7 @@ define([
 
     this.clearSelection = clearSelection;
     this.getSelection = getSelection;
+    this.setSelection = setSelection;
 
     AbstractSelectionHandler.apply(this);
   };

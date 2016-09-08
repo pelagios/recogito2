@@ -79,7 +79,7 @@ require([
       toolbar.on('toolChanged', onToolChanged);
       toolbar.on('toggleHelp', onToggleHelp);
 
-      BaseApp.apply(this, [ editor, highlighter ]);
+      BaseApp.apply(this, [ highlighter, selector ]);
 
       viewer.on('fullscreen', onToggleFullscreen);
 

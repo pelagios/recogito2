@@ -62,7 +62,7 @@ require([
     toolbar.on('annotationModeChanged', editor.setAnnotationMode);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
-    BaseApp.apply(this, [ editor, highlighter ]);
+    BaseApp.apply(this, [ highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
 
