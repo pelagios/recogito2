@@ -9,22 +9,22 @@ require([
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/baseApp',
+  'document/annotation/image/page/help',
   'document/annotation/image/page/toolbar',
   'document/annotation/image/page/viewer',
   'document/annotation/image/selection/highlighter',
-  'document/annotation/image/selection/selectionHandler',
-  'document/annotation/image/help'
+  'document/annotation/image/selection/selectionHandler'
 ], function(
   API,
   Config,
   ReadEditor,
   WriteEditor,
   BaseApp,
+  Help,
   Toolbar,
   Viewer,
   Highlighter,
-  SelectionHandler,
-  Help
+  SelectionHandler
 ) {
 
     /** The app is instantiated after the image manifest was loaded **/
