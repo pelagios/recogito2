@@ -13,8 +13,16 @@ require([
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler',
-], function(AnnotationUtils, API, Config, ReadEditor, WriteEditor, BaseApp, Toolbar,
-  Highlighter, SelectionHandler) {
+], function(
+  AnnotationUtils,
+  API,
+  Config,
+  ReadEditor,
+  WriteEditor,
+  BaseApp,
+  Toolbar,
+  Highlighter,
+  SelectionHandler) {
 
   var App = function() {
 
