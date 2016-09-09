@@ -1,8 +1,9 @@
 define([
   'document/annotation/common/selection/abstractSelectionHandler',
   'document/annotation/image/selection/layers/point/pointDrawingTool',
+  'document/annotation/image/selection/layers/rect/rectDrawingTool',
   'document/annotation/image/selection/layers/tiltedbox/tiltedBoxDrawingTool'
-], function(AbstractSelectionHandler, PointDrawingTool, TiltedBoxDrawingTool) {
+], function(AbstractSelectionHandler, PointDrawingTool, RectDrawingTool, TiltedBoxDrawingTool) {
 
     var SelectionHandler = function(containerEl, olMap, highlighter) {
 
@@ -16,7 +17,8 @@ define([
 
           drawingTools = {
             point : new PointDrawingTool(olMap),
-            tbox : new TiltedBoxDrawingTool(containerEl, olMap)
+            rect  : new RectDrawingTool(olMap),
+            tbox  : new TiltedBoxDrawingTool(containerEl, olMap)
           },
 
           attachEventHandlers = function() {
