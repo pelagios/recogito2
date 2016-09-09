@@ -67,10 +67,19 @@ define([
               });
           });
 
-          // TODO sort by size
+          if (found.length > 0) {
+            // Sort by size, ascending
+            found.sort(function(a, b) {
+              var rectA = anchorToRect(a.annotation.anchor),
+                  rectB = anchorToRect(b.annotation.anchor),
 
-          if (found.length > 0)
+                  sizeA = Geom2D.getPolygonArea(rectA),
+                  sizeB = Geom2D.getPolygonArea(rectB);
+
+              return sizeA - sizeB;
+            });
             return found[0];
+          }
         },
 
         findById = function(id) {

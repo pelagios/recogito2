@@ -40,6 +40,17 @@ define([], function() {
     normalize : function(vector) {
       var l = this.len(vector);
       return [ vector[0] / l, vector[1] / l ];
+    },
+
+    getPolygonArea : function(coords) {
+      var limit = coords.length - 1,
+          i, sum = 0;
+
+      for (i = 0; i < limit; i++) {
+        sum += coords[i].x * coords[i + 1].y - coords[i].y * coords[i + 1].x;
+      }
+
+      return Math.abs(0.5 * sum);
     }
 
   };

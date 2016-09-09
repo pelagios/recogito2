@@ -5,7 +5,9 @@ define([
 
   var RectLayer = function(olMap) {
 
-    var getAnnotationAt = function(e) {
+    var rectVectorSource = new ol.source.Vector({}),
+
+        getAnnotationAt = function(e) {
 
         },
 
@@ -14,7 +16,7 @@ define([
         },
 
         addAnnotation = function(annotation) {
-
+          console.log(annotation);
         },
 
         render = function() {

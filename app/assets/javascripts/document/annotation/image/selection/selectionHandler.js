@@ -152,6 +152,7 @@ define([
               // ...and activate currently active drawing tool if any
               if (currentDrawingTool)
                 currentDrawingTool.createNewSelection(e);
+
             }
           };
 
