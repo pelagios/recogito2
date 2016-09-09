@@ -137,22 +137,22 @@ define([
           },
 
           onClick = function(e) {
-            var previousSelection = currentSelection;
-            currentSelection = highlighter.getAnnotationAt(e);
-
-            if (currentSelection) {
-              // Click selected an existing annotation
-              if (currentSelection !== previousSelection)
-                // Selection change
-                self.fireEvent('select', addScreenBounds(currentSelection));
+            if (currentDrawingTool) {
+              // Just forward to the drawing tool
+              currentDrawingTool.createNewSelection(e);
             } else {
-              // No annotation selected - close popup...
-              self.fireEvent('select');
+              var previousSelection = currentSelection;
+              currentSelection = highlighter.getAnnotationAt(e);
 
-              // ...and activate currently active drawing tool if any
-              if (currentDrawingTool)
-                currentDrawingTool.createNewSelection(e);
-
+              if (currentSelection) {
+                // Click selected an existing annotation
+                if (currentSelection !== previousSelection)
+                  // Selection change
+                  self.fireEvent('select', addScreenBounds(currentSelection));
+              } else {
+                // No annotation - deselect
+                self.fireEvent('select');
+              }
             }
           };
 
