@@ -35,7 +35,7 @@ class MyRecogitoController @Inject() (
     }
   }
 
-  private def renderPublicProfile(username: String)(implicit request: RequestHeader) = {
+  private def renderPublicProfile(username: String, loggedInUser: Option[UserRecord])(implicit request: RequestHeader) = {
     val f = for {
       userWithRoles   <- users.findByUsername(username)
       publicDocuments <- if (userWithRoles.isDefined)
@@ -45,7 +45,7 @@ class MyRecogitoController @Inject() (
     } yield (userWithRoles, publicDocuments)
 
     f.map { case (userWithRoles, publicDocuments) => userWithRoles match {
-      case Some(u) => Ok(views.html.my.my_public(u.user, publicDocuments))
+      case Some(u) => Ok(views.html.my.my_public(u.user, publicDocuments, loggedInUser))
       case None => NotFoundPage
     }}
   }
@@ -88,7 +88,7 @@ class MyRecogitoController @Inject() (
         case _ => renderMyDocuments(user, usedSpace)
       }
     } else {
-      renderPublicProfile(usernameInPath)
+      renderPublicProfile(usernameInPath, loggedIn.map(_.user))
     }
   }
 

@@ -1,5 +1,6 @@
 @import "../_globals.less";
 @import "../_meter.less";
+@import "../_loginInfo.less";
 @import "_documentlist.less";
 
 body, html {
@@ -57,6 +58,14 @@ body, html {
 
   a:hover .label {
     text-decoration:underline;
+  }
+
+  .logged-in {
+    top:36px;
+    right:40px;
+
+    a { color: @ocean; }
+    
   }
 
 }

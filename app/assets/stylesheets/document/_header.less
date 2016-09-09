@@ -1,3 +1,4 @@
+@import "../_loginInfo.less";
 @import "../_sidebar.less";
 
 .header-iconbar {
@@ -68,31 +69,17 @@
     left:-21px;
   }
 
-  .logged-in {
-    position:absolute;
-    top:22px;
-    right:28px;
-    font-size:15px;
-    color:@lightblue-type;
-
-    a { color: @ocean; }
-    a:hover { text-decoration:underline; }
-
-  }
-
-  .not.logged-in {
-
-    a { color:@lightblue-type; }
-    a:hover { color: @ocean; }
-
-  }
-
   .save-msg {
     position:absolute;
     top:27px;
     left:550px;
     font-size:15px;
     color:@lightgrey-type;
+  }
+
+  .logged-in {
+    top:22px;
+    right:28px;
   }
 
 } /** .header-iconbar **/

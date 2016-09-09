@@ -1,6 +1,7 @@
 @(
   owner: models.generated.tables.records.UserRecord,
-  documents: models.Page[models.generated.tables.records.DocumentRecord]
+  documents: models.Page[models.generated.tables.records.DocumentRecord],
+  currentUser: Option[models.generated.tables.records.UserRecord]
 )(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
@@ -37,7 +38,9 @@
       <div class="activity">
 
       </div> <!-- .activity -->
-      
+
+      @views.html.loginInfo(currentUser)
+
     </div> <!-- .header -->
 
     <div class="document-panel">
