@@ -1,4 +1,7 @@
-define(['common/config'], function(Config) {
+define([
+  'common/ui/touch',
+  'common/config'
+], function(Touch, Config) {
 
   var Help = function() {
 
@@ -75,6 +78,8 @@ define(['common/config'], function(Config) {
     this.close = close;
     this.isVisible = isVisible;
 
+    if (Config.IS_TOUCH)
+      Touch.makeDraggable(element);
   };
 
   return Help;

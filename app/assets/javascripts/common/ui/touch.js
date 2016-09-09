@@ -1,5 +1,29 @@
 define(function() {
 
+  // Cf. http://stackoverflow.com/questions/5186441/javascript-drag-and-drop-for-touch-devices
+  var touchTranslation = function(event) {
+        var touch = event.changedTouches[0],
+            simulatedEvent = document.createEvent('MouseEvent'),
+            type;
+            
+        // Translate event types
+        if (event.type === 'touchstart')
+          type = 'mousedown';
+        else if (event.type === 'touchmove')
+          type = 'mousemove';
+        else if ( event.type === 'touchend')
+          type = 'mouseup';
+        else
+          // break
+          return;
+
+        simulatedEvent.initMouseEvent(type, true, true, window, 1,
+          touch.screenX, touch.screenY, touch.clientX, touch.clientY,
+          false, false, false, false, 0, null);
+
+        touch.target.dispatchEvent(simulatedEvent);
+      };
+
   return {
 
     /**
@@ -76,6 +100,13 @@ define(function() {
     enableTouchEvents : function() {
       this.enableTap();
       this.enableDoubleTap();
+    },
+
+    makeDraggable : function(element) {
+      element[0].addEventListener('touchstart', touchTranslation, true);
+      element[0].addEventListener('touchmove', touchTranslation, true);
+      element[0].addEventListener('touchend', touchTranslation, true);
+      element[0].addEventListener('touchcancel', touchTranslation, true);
     }
 
   };
