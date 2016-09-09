@@ -22,7 +22,7 @@ define([
               '</div>' +
               '<div class="snippet-footer">' +
                 '<span class="label"></span>' +
-                '<a class="jump-to-text">JUMP TO TEXT</a>' +
+                '<a class="jump-to-text"></a>' +
               '</div>' +
             '</div>' +
             '<div><table class="gazetteer-records"></table></div>' +
@@ -81,6 +81,9 @@ define([
         },
 
         showCard = function(annotation, slideDirection) {
+
+          console.log(annotation);
+
           var createTextSnippet = function() {
                 var quote = AnnotationUtils.getQuote(annotation),
                     offset = annotation.context.char_offset,
@@ -100,12 +103,17 @@ define([
 
               label = (currentAnnotationIdx + 1) + ' OF ' + annotations.length + ' ANNOTATIONS',
 
+              linkText = (annotation.annotates.content_type.indexOf('IMAGE') > -1) ?
+                'JUMP TO IMAGE' :
+                'JUMP TO TEXT',
+
               snippet = (annotation.annotates.content_type.indexOf('TEXT') >= 0) ?
                 createTextSnippet() : createImageSnippet(),
 
               newCard, moveCurrentTo;
 
           snippetLabelEl.html(label);
+          snippetLinkEl.html(linkText);
           snippetLinkEl.attr('href', getContentLink(annotation));
 
           if (!slideDirection) {
