@@ -37,8 +37,8 @@ GET     /admin                                       controllers.admin.AdminCont
 # Document views
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id/edit                           controllers.document.annotation.AnnotationController.showAnnotationViewForDoc(id: String)
-GET     /document/:id/part/:partNo/edit              controllers.document.annotation.AnnotationController.showAnnotationView(id: String, partNo: Int)
+GET     /document/:id/part/:seqNo/edit               controllers.document.annotation.AnnotationController.showAnnotationView(id: String, seqNo: Int)
+GET     /document/:id/edit                           controllers.document.annotation.AnnotationController.resolveAnnotationView(id: String, part: Option[java.util.UUID] ?= None, annotation: Option[java.util.UUID] ?= None)
 
 GET     /document/:id/map                            controllers.document.map.MapController.showMap(id: String)
 
@@ -76,7 +76,6 @@ GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.Docume
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /document/:id                                controllers.document.DocumentController.initialDocumentView(id: String)
-GET     /part/:id                                    controllers.document.DocumentController.initialFilepartView(id: java.util.UUID, annotation_id: Option[java.util.UUID])
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API

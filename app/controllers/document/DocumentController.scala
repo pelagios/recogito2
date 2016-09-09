@@ -2,7 +2,6 @@ package controllers.document
 
 import controllers.BaseOptAuthController
 import java.io.File
-import java.util.UUID
 import javax.inject.Inject
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
@@ -22,25 +21,6 @@ class DocumentController @Inject() (
 
   def initialDocumentView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationView(docId, 1))
-  }
-  
-  /** For convenience: redirects to /document/{docId}/part/{seqNo} based on unique part ID **/
-  def initialFilepartView(partId: UUID, annotationId: Option[UUID]) = AsyncStack { implicit request =>
-    
-    documents.findPartById(partId).map {
-      case Some(part) => annotationId match {
-        case None =>
-          Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo))
-          
-        case Some(annotationId) =>
-          Redirect(
-            controllers.document.annotation.routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo)
-              .withFragment(annotationId.toString).toString)
-      }
-      
-      case None =>
-        NotFoundPage
-    }
   }
 
   def getImageManifest(docId: String, partNo: Int) = AsyncStack { implicit request =>
