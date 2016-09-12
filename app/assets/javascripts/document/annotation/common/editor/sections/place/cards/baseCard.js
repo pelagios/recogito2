@@ -9,7 +9,7 @@ define(['common/ui/formatting', 'common/utils/placeUtils'], function(Formatting,
   Card.TEMPLATES = {
 
     EDIT_BUTTONS :
-      '<button class="change btn tiny">Change</button>' +
+      '<button class="change btn tiny icon">&#xf040;</button>' +
       '<button class="delete btn tiny icon">&#xf014;</button>',
 
     UNVERIFIED_WARNING_READ :

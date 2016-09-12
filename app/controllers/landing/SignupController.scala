@@ -66,7 +66,7 @@ class SignupController @Inject() (
 
   val signupForm = Form(
     mapping(
-      "username" -> nonEmptyText(minLength=3).verifying(isNotReserved).verifying(validAndAvailable),
+      "username" -> nonEmptyText(minLength=3, maxLength=16).verifying(isNotReserved).verifying(validAndAvailable),
       "email" -> email,
       "password" -> nonEmptyText
     )(SignupData.apply)(SignupData.unapply)
