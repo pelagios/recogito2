@@ -3,20 +3,71 @@ define([
   'document/annotation/image/selection/layers/style'
 ], function(Layer, Style) {
 
+  /** Constants **/
+  var MIN_SELECTION_DISTANCE = 5;
+
+  /** TODO make robust against change in argument order **/
+  var parseAnchor = function(anchor) {
+        var args = anchor.substring(anchor.indexOf(':') + 1).split(','),
+            x = parseInt(args[0].substring(2)),
+            y = parseInt(args[1].substring(2)),
+            w = parseInt(args[2].substring(2)),
+            h = parseInt(args[3].substring(2));
+
+        return  { x: x,  y: y, w: w, h: h };
+      },
+
+      /** Converts xywh bounds to coordinates **/
+      boundsToCoords = function(b) {
+        return [
+          [b.x, -b.y],
+          [b.x, -(b.y + b.h)],
+          [(b.x + b.w), - (b.y + b.h)],
+          [(b.x + b.w), -b.y],
+          [b.x, -b.y]
+        ];
+      };
+
   var RectLayer = function(olMap) {
 
-    var rectVectorSource = new ol.source.Vector({}),
+    var self = this,
+
+        rectVectorSource = new ol.source.Vector({}),
+
 
         getAnnotationAt = function(e) {
+          /** TODO modify - check intersection rather than closest point distance! *
+          var closestFeature = rectVectorSource.getClosestFeatureToCoordinate(e.coordinate),
+              closestPoint = (closestFeature) ?
+                closestFeature.getGeometry().getClosestPoint(e.coordinate) : false;
 
+          if (closestPoint && self.computePxDistance(e.pixel, closestPoint) < MIN_SELECTION_DISTANCE) {
+            return {
+              annotation: closestFeature.get('annotation'),
+              mapBounds: self.pointToBounds(closestFeature.getGeometry().getCoordinates())
+            };
+          }*/
         },
 
         findById = function(id) {
-
+          var feature = self.findFeatureByAnnotationId(id, rectVectorSource);
+          if (feature)
+            return {
+              annotation: feature.get('annotation'),
+              // TODO implement map bounds computation
+              // mapBounds: self.pointToBounds(feature.getGeometry().getCoordinates())
+            };
         },
 
         addAnnotation = function(annotation) {
-          console.log(annotation);
+          var bounds = parseAnchor(annotation.anchor),
+              coords = boundsToCoords(bounds),
+              feature = new ol.Feature({
+                'geometry': new ol.geom.Polygon([ coords ])
+              });
+
+          feature.set('annotation', annotation, true);
+          rectVectorSource.addFeature(feature);
         },
 
         render = function() {
@@ -28,16 +79,22 @@ define([
         },
 
         removeAnnotation = function(annotation) {
-
+          var feature = self.findFeatureByAnnotationId(annotation.annotation_id, rectVectorSource);
+          if (feature)
+            rectVectorSource.removeFeature(feature);
         },
 
         convertSelectionToAnnotation = function(selection) {
-
+          addAnnotation(selection.annotation);
         },
 
         emphasiseAnnotation = function(annotation) {
           // TODO style change?
         };
+
+    olMap.addLayer(new ol.layer.Vector({
+      source: rectVectorSource
+    }));
 
     this.getAnnotationAt = getAnnotationAt;
     this.findById = findById;

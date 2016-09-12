@@ -24,7 +24,7 @@ define([
           }
         },
 
-        /** TODO make this more performant (indexing? tricky though, as ID is provided async...) **/
+        /** TODO make this more performant (indexing? tricky though, as ID is provided async...) **
         findFeatureByAnnotationId = function(id) {
           var feature;
 
@@ -37,10 +37,10 @@ define([
           });
 
           return feature;
-        },
+        },*/
 
         findById = function(id) {
-          var feature = findFeatureByAnnotationId(id);
+          var feature = self.findFeatureByAnnotationId(id, pointVectorSource);
           if (feature)
             return {
               annotation: feature.get('annotation'),
@@ -70,7 +70,7 @@ define([
         },
 
         removeAnnotation = function(annotation) {
-          var feature = findFeatureByAnnotationId(annotation.annotation_id);
+          var feature = self.findFeatureByAnnotationId(annotation.annotation_id, pointVectorSource);
           if (feature)
             pointVectorSource.removeFeature(feature);
         },

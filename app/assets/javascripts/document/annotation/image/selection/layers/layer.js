@@ -27,6 +27,23 @@ define(['common/hasEvents'], function(HasEvents) {
     };
   };
 
+  /**
+   * TODO make this more performant (indexing? tricky though, as ID is provided async...)
+   */
+  Layer.prototype.findFeatureByAnnotationId = function(id, vectorSource) {
+    var feature;
+
+    vectorSource.forEachFeature(function(f) {
+      var a = f.get('annotation');
+      if (a.annotation_id === id) {
+        feature = f;
+        return true; // Breaks from the loop
+      }
+    });
+
+    return feature;
+  };
+
   return Layer;
 
 });
