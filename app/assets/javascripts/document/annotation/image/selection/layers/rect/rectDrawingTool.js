@@ -29,7 +29,8 @@ define([
                 source: rectVectorSource,
                 type: 'LineString',
                 geometryFunction: geometryFunction,
-                maxPoints: 2
+                maxPoints: 2,
+                style: Style.BOX
               }),
 
               onDrawEnd = function(e) {
@@ -87,8 +88,8 @@ define([
         };
 
     olMap.addLayer(new ol.layer.Vector({
-      source: rectVectorSource
-      // style: Style.POINT_HI
+      source: rectVectorSource,
+      style: Style.BOX
     }));
 
     this.setEnabled = setEnabled;

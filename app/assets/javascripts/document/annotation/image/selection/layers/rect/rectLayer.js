@@ -99,7 +99,8 @@ define([
         };
 
     olMap.addLayer(new ol.layer.Vector({
-      source: rectVectorSource
+      source: rectVectorSource,
+      style: Style.BOX
     }));
 
     this.getAnnotationAt = getAnnotationAt;

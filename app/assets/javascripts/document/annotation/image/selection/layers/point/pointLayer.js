@@ -24,21 +24,6 @@ define([
           }
         },
 
-        /** TODO make this more performant (indexing? tricky though, as ID is provided async...) **
-        findFeatureByAnnotationId = function(id) {
-          var feature;
-
-          pointVectorSource.forEachFeature(function(f) {
-            var a = f.get('annotation');
-            if (a.annotation_id === id) {
-              feature = f;
-              return true; // Breaks from the loop
-            }
-          });
-
-          return feature;
-        },*/
-
         findById = function(id) {
           var feature = self.findFeatureByAnnotationId(id, pointVectorSource);
           if (feature)
