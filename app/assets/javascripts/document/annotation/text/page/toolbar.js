@@ -13,6 +13,27 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
         currentColorScheme = 'BY_TYPE',
 
+        maxScroll = jQuery('.header-infobox').outerHeight() -
+          jQuery('.header-iconbar').outerHeight() + 1,
+
+        makeToolbarSticky = function() {
+          var onScroll = function() {
+            var scrollTop = jQuery(window).scrollTop();
+            if (scrollTop > maxScroll) // Title area minus height of icon bar
+              rootNode.addClass('fixed');
+            else
+              rootNode.removeClass('fixed');
+          };
+
+          if (Config.IS_TOUCH) {
+            rootNode.addClass('sticky');
+          } else {
+            // In case the page is initally scrolled after load
+            onScroll();
+            jQuery(window).scroll(onScroll);
+          }
+        },
+
         initQuickModeMenu = function() {
           quickModeMenu.hide();
           quickModeMenu.parent().hover(
@@ -65,24 +86,6 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
               self.fireEvent('colorschemeChanged', scheme);
             }
           });
-        },
-
-        makeToolbarSticky = function() {
-          var onScroll = function() {
-            var scrollTop = jQuery(window).scrollTop();
-            if (scrollTop > 136) // Title area minus height of icon bar
-              rootNode.addClass('fixed');
-            else
-              rootNode.removeClass('fixed');
-          };
-
-          if (Config.IS_TOUCH) {
-            rootNode.addClass('sticky');
-          } else {
-            // In case the page is initally scrolled after load
-            onScroll();
-            jQuery(window).scroll(onScroll);
-          }
         },
 
         getCurrentAnnotationMode = function() {
