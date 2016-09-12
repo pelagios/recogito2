@@ -43,7 +43,7 @@ class Uploads @Inject() (config: Configuration) {
     val alphabeticCharsOnly = username.filter(A_TO_Z.contains(_))
 
     // User folders are contained in common parent folder. The name of that folder is
-    // the first two alphabetic characters of the user name. Example:
+    // the first two lowercase alphabetic characters of the user name. Example:
     // /user-data/ra/rainer/...
     val parentFolder =
       if (alphabeticCharsOnly.size < 2)
@@ -51,7 +51,7 @@ class Uploads @Inject() (config: Configuration) {
         // characters is kept in an extra parent folder
         new File(USER_DATA_DIR, "_anomalies")
       else
-        new File(USER_DATA_DIR, alphabeticCharsOnly.substring(0, 2))
+        new File(USER_DATA_DIR, alphabeticCharsOnly.substring(0, 2).toLowerCase)
 
     val userFolder = new File(parentFolder, username)
 
