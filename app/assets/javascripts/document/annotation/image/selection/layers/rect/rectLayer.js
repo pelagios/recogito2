@@ -1,7 +1,8 @@
 define([
+  'document/annotation/image/selection/layers/geom2D',
   'document/annotation/image/selection/layers/layer',
   'document/annotation/image/selection/layers/style'
-], function(Layer, Style) {
+], function(Geom2D, Layer, Style) {
 
   /** Constants **/
   var MIN_SELECTION_DISTANCE = 5;
@@ -34,19 +35,25 @@ define([
 
         rectVectorSource = new ol.source.Vector({}),
 
-
         getAnnotationAt = function(e) {
-          /** TODO modify - check intersection rather than closest point distance! *
-          var closestFeature = rectVectorSource.getClosestFeatureToCoordinate(e.coordinate),
-              closestPoint = (closestFeature) ?
-                closestFeature.getGeometry().getClosestPoint(e.coordinate) : false;
+          var hoveredFeatures = rectVectorSource.getFeaturesAtCoordinate(e.coordinate);
 
-          if (closestPoint && self.computePxDistance(e.pixel, closestPoint) < MIN_SELECTION_DISTANCE) {
+          if (hoveredFeatures.length > 0) {
+            hoveredFeatures.sort(function(a, b) {
+              var rectA = a.getGeometry().getCoordinates(),
+                  rectB = b.getGeometry().getCoordinates(),
+
+                  sizeA = Geom2D.getPolygonArea(rectA),
+                  sizeB = Geom2D.getPolygonArea(rectB);
+
+              return sizeA - sizeB;
+            });
+
             return {
-              annotation: closestFeature.get('annotation'),
-              mapBounds: self.pointToBounds(closestFeature.getGeometry().getCoordinates())
+              annotation: hoveredFeatures[0].get('annotation'),
+              mapBounds: self.rectToBounds(hoveredFeatures[0].getGeometry().getCoordinates()[0])
             };
-          }*/
+          }
         },
 
         findById = function(id) {
@@ -54,8 +61,7 @@ define([
           if (feature)
             return {
               annotation: feature.get('annotation'),
-              // TODO implement map bounds computation
-              // mapBounds: self.pointToBounds(feature.getGeometry().getCoordinates())
+              mapBounds: self.rectToBounds(feature.getGeometry().getCoordinates()[0])
             };
         },
 

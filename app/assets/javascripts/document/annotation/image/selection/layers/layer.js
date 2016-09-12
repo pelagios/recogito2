@@ -27,6 +27,18 @@ define(['common/hasEvents'], function(HasEvents) {
     };
   };
 
+  /** Utility to convert a rectangle (represented as OL3 coord array) to bounds **/
+  Layer.prototype.rectToBounds = function(coords) {
+    return {
+      top    : coords[0][1],
+      right  : coords[2][0],
+      bottom : coords[1][1],
+      left   : coords[0][0],
+      width  : coords[3][0] - coords[0][0],
+      height : coords[0][1] - coords[1][1]
+    };
+  };
+
   /**
    * TODO make this more performant (indexing? tricky though, as ID is provided async...)
    */
