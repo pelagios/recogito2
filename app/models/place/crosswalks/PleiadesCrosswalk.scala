@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
 import models.{ HasGeometry, HasNullableSeq }
 import models.place.{ Description, Gazetteer, GazetteerRecord, Name }
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -13,8 +14,11 @@ object PleiadesCrosswalk {
   def fromJson(record: String)(implicit sourceGazetteer: String): GazetteerRecord = {
     val result = Json.fromJson[PleiadesRecord](Json.parse(record))
     
-    if (result.isError)
-      play.api.Logger.warn(result.toString)
+    if (result.isError) {
+      Logger.warn("Error parsing place")
+      Logger.warn(record)
+      Logger.warn(result.toString)
+    }
      
     val p = result.get
     GazetteerRecord(
