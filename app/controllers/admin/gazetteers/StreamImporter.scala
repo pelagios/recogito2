@@ -12,17 +12,18 @@ class StreamImporter(implicit materializer: Materializer) {
   
   private val BATCH_SIZE = 200
   
-  def importPlaces(is: InputStream, crosswalk: String => GazetteerRecord)(implicit places: PlaceService, ctx: ExecutionContext) = {
+  def importPlaces(is: InputStream, crosswalk: String => Option[GazetteerRecord])(implicit places: PlaceService, ctx: ExecutionContext) = {
     
     val source = StreamConverters.fromInputStream(() => is, 5)
       .via(Framing.delimiter(ByteString("\n"), maximumFrameLength = Int.MaxValue, allowTruncation = false))
       .map(_.utf8String)
       
-    val parser = Flow.fromFunction[String, GazetteerRecord](crosswalk).grouped(BATCH_SIZE)
+    val parser = Flow.fromFunction[String, Option[GazetteerRecord]](crosswalk).grouped(BATCH_SIZE)
     
-    val importer = Sink.foreach[Seq[GazetteerRecord]] { records =>
-      play.api.Logger.info("Importing batch")
-      places.importRecords(records)
+    val importer = Sink.foreach[Seq[Option[GazetteerRecord]]] { records =>
+      val toImport = records.flatten
+      play.api.Logger.info("Importing " + toImport.size + " records")
+      places.importRecords(toImport)
     }
     
     val graph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>

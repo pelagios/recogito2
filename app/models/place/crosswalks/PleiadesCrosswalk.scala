@@ -11,32 +11,33 @@ import play.api.libs.functional.syntax._
 
 object PleiadesCrosswalk {
   
-  def fromJson(record: String)(implicit sourceGazetteer: String): GazetteerRecord = {
-    val result = Json.fromJson[PleiadesRecord](Json.parse(record))
+  def fromJson(record: String)(implicit sourceGazetteer: String): Option[GazetteerRecord] =
+    Json.fromJson[PleiadesRecord](Json.parse(record)) match {
     
-    if (result.isError) {
-      Logger.warn("Error parsing place")
-      Logger.warn(record)
-      Logger.warn(result.toString)
+      case s: JsSuccess[PleiadesRecord] =>
+        Some(GazetteerRecord(
+          s.get.uri,
+          Gazetteer(sourceGazetteer),
+          DateTime.now(),
+          None, // TODO lastChangedAt
+          s.get.title,
+          s.get.description.map(d => Seq(new Description(d))).getOrElse(Seq.empty[Description]),
+          s.get.names,
+          s.get.features.headOption.map(_.geometry), // TODO compute union?
+          s.get.representativePoint,
+          None, // TODO temporalBounds
+          s.get.placeTypes,
+          Seq.empty[String], // TODO closeMatches
+          Seq.empty[String]  // TODO exactMatches
+        ))
+        
+      case e: JsError =>
+        Logger.warn("Error parsing place")
+        Logger.warn(record)
+        Logger.warn(e.toString)      
+        None
+        
     }
-     
-    val p = result.get
-    GazetteerRecord(
-      p.uri,
-      Gazetteer(sourceGazetteer),
-      DateTime.now(),
-      None, // TODO lastChangedAt
-      p.title,
-      p.description.map(d => Seq(new Description(d))).getOrElse(Seq.empty[Description]),
-      p.names,
-      p.features.headOption.map(_.geometry), // TODO compute union?
-      p.representativePoint,
-      None, // TODO temporalBounds
-      p.placeTypes,
-      Seq.empty[String], // TODO closeMatches
-      Seq.empty[String]  // TODO exactMatches
-    )
-  }
   
 }
 
