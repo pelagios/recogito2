@@ -77,7 +77,7 @@ class PlaceSpec extends Specification {
       place.names.get(Name("Ad Mauros")).get must containAllOf(Seq(Gazetteer("Trismegistos"), Gazetteer("Pleiades")))
       place.names.get(Name("Ad Mauros/Marinianio, Eferding")).get must equalTo(Seq(Gazetteer("DARE")))
       place.names.get(Name("Eferding")).get must equalTo(Seq(Gazetteer("Trismegistos")))
-      place.names.get(Name("Marianianio", Some("la"))).get must equalTo(Seq(Gazetteer("Trismegistos")))      
+      place.names.get(Name("Marianianio", None, Some("la"))).get must equalTo(Seq(Gazetteer("Trismegistos")))      
     }
     
     "list the expected close- and exactMatches" in {

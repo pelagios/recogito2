@@ -42,16 +42,16 @@ class PlaceServiceSpec extends Specification {
     
     "properly merge 3 test records that should be joined" in {
       val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
-        "Record A",Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         Seq("http://www.example.com/place/b"),
         Seq.empty[String])
         
       val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
-        "Record B", Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         Seq.empty[String], Seq.empty[String])
 
       val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
-        "Record C", Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
         Seq("http://www.example.com/place/a"),
         Seq("http://www.example.com/place/b"))
         
@@ -63,16 +63,16 @@ class PlaceServiceSpec extends Specification {
     
     "properly separate 3 records that should remain speparate" in {
       val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
-        "Record A", Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         Seq("http://www.example.com/place/d"),
         Seq.empty[String])
         
       val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
-        "Record B", Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         Seq.empty[String], Seq.empty[String])
 
       val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
-        "Record C", Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         Seq("http://www.example.com/place/e"),
         Seq("http://www.example.com/place/f"))
         
@@ -84,16 +84,16 @@ class PlaceServiceSpec extends Specification {
     
     "properly conflate 3 records into 2 groups of 1 and 2 places" in {
       val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
-        "Record A", Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
         Seq("http://www.example.com/place/d"),
         Seq.empty[String])
         
       val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
-        "Record B", Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         Seq.empty[String], Seq.empty[String])
 
       val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
-        "Record C", Seq.empty[String], Seq.empty[Description], Seq.empty[Name], None, None, None,
+        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
         Seq("http://www.example.com/place/e"),
         Seq("http://www.example.com/place/a"))
         
@@ -140,13 +140,14 @@ class PlaceServiceSpec extends Specification {
         "http://www.wikidata.org/entity/Q871525/", // This will cause DARE's Vindobona to match
         Gazetteer("DummyGazetteer"),
         DateTime.now(),
+        None,
         "A fake place",
-        Seq.empty[String],
         Seq.empty[Description],
         Seq.empty[Name],
         None,
         None,
         None,
+        Seq.empty[String],
         Seq("http://dare.ht.lu.se/places/17068/"), // This will match DARE's Thessalonica
         Seq("http://www.trismegistos.org/place/15045/")) // This is a common match with DARE's Calunium
       
@@ -268,13 +269,14 @@ class PlaceServiceSpec extends Specification {
         "http://de.wikipedia.org/wiki/Meidling",
         Gazetteer("DummyGazetteer"),
         DateTime.now(),
+        None,
         "A fake briding place",
-        Seq.empty[String],
         Seq.empty[Description],
         Seq.empty[Name],
         None,
         None,
         None,
+        Seq.empty[String],
         Seq("http://pleiades.stoa.org/places/128460"), // Mun. Vindobona
         Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
       
@@ -305,15 +307,16 @@ class PlaceServiceSpec extends Specification {
         "http://de.wikipedia.org/wiki/Meidling",
         Gazetteer("DummyGazetteer"),
         DateTime.now(),
+        None,
         "A fake briding place",
-        Seq.empty[String],
         Seq.empty[Description],
         Seq.empty[Name],
         None,
         None,
         None,
-        Seq.empty[String], // Mun. Vindobona
-        Seq.empty[String]) // Vindobona
+        Seq.empty[String],
+        Seq.empty[String], 
+        Seq.empty[String])
        
       importRecords(Seq(fakeMeidling))
       getTotalPlaces() must equalTo(6)

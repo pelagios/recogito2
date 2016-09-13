@@ -186,13 +186,14 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
           "http://de.wikipedia.org/wiki/Meidling",
           Gazetteer("DummyGazetteer"),
           DateTime.now(),
+          None,
           "A fake briding place",
-          Seq.empty[String],
           Seq.empty[Description],
           Seq.empty[Name],
           None,
           None,
           None,
+          Seq.empty[String],
           Seq("http://pleiades.stoa.org/places/128460"), // Mun. Vindobona
           Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
         
@@ -224,13 +225,14 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
           "http://de.wikipedia.org/wiki/Meidling",
           Gazetteer("DummyGazetteer"),
           DateTime.now(),
+          None,
           "A fake briding place",
-          Seq.empty[String],
           Seq.empty[Description],
           Seq.empty[Name],
           None,
           None,
           None,
+          Seq.empty[String],
           Seq.empty[String], // Mun. Vindobona
           Seq.empty[String]) // Vindobona
          

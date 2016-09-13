@@ -15,6 +15,8 @@ object GazetteerRecordSpec {
   
   private val DATE_TIME_PATTERN = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
   
+  private val SYNC_TIME = DateTime.parse("2016-04-03T11:23:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC)
+  
   private val coord = new Coordinate(14.02358, 48.31058)
   private val point = new GeometryFactory().createPoint(coord)
       
@@ -24,28 +26,30 @@ object GazetteerRecordSpec {
   val pleiadesRecord = GazetteerRecord(
     "http://pleiades.stoa.org/places/118543",
     Gazetteer("Pleiades"),
-    DateTime.parse("2016-04-03T11:23:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC),
+    SYNC_TIME,
+    Some(SYNC_TIME),
     "Ad Mauros",
-    Seq("fort" , "tower"),
     Seq(Description("An ancient place, cited: BAtlas 12 H4 Ad Mauros")),
     Seq(Name("Ad Mauros")),
     Some(point),
     Some(coord),
     Some(TemporalBounds(from, to)),
+    Seq("fort" , "tower"),
     Seq.empty[String],
     Seq.empty[String])
     
   val dareRecord = GazetteerRecord(
     "http://dare.ht.lu.se/places/10778",
     Gazetteer("DARE"),
-    DateTime.parse("2016-04-03T11:23:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC),
+    SYNC_TIME,
+    Some(SYNC_TIME),
     "Ad Mauros/Marinianio, Eferding",
-    Seq("fort"),
     Seq.empty[Description],
     Seq(Name("Ad Mauros/Marinianio, Eferding")),
     Some(point),
     Some(coord),
     Some(TemporalBounds(from, to)),
+    Seq("fort"),
     Seq(
       "http://sws.geonames.org/2780394",
       "http://www.wikidata.org/entity/Q2739862",
@@ -57,18 +61,19 @@ object GazetteerRecordSpec {
   val trismegistosRecord = GazetteerRecord(
     "http://www.trismegistos.org/place/35191",
     Gazetteer("Trismegistos"),
-    DateTime.parse("2016-04-03T11:23:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC),
+    SYNC_TIME,
+    None,
     "Ad Mauros",
-    Seq.empty[String],
     Seq.empty[Description],
     Seq(
       Name("Ad Mauros"),
       Name("Eferding"),
-      Name("Marianianio", Some("la"))
+      Name("Marianianio", None, Some("la"))
     ),
     None,
     None,
     None,
+    Seq.empty[String],
     Seq.empty[String],
     Seq.empty[String])
   

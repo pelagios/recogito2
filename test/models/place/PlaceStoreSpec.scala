@@ -36,13 +36,14 @@ class PlaceStoreSpec extends Specification with AfterAll {
       "http://www.example.com/record",
       Gazetteer("DummyGazetteer"),
       DateTime.now().withMonthOfYear(1).withDayOfMonth(1).withTime(0, 0, 0, 0).withZone(DateTimeZone.UTC),
+      None,
       "Record " + Random.nextInt(),
-      Seq.empty[String],
       Seq.empty[Description],
       Seq(Name("Dummy")),
       None,
       None,
       None,
+      Seq.empty[String],
       Seq("http://www.example.com/match"),
       Seq.empty[String])
       
@@ -111,7 +112,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
       }
       
       "return the test place by name" in {
-        val result = findByName(initialPlace.names.head._1.name)
+        val result = findByName(initialPlace.names.head._1.attested)
         result.total must equalTo(1)
         result.items.size must equalTo(1)
         result.items.head._1 must equalTo(initialPlace)

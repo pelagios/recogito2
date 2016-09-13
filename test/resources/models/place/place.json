@@ -11,29 +11,14 @@
     {
       "uri": "http://pleiades.stoa.org/places/118543",
       "source_gazetteer": "Pleiades",
+      "last_sync_at": "2016-04-03T11:23:00Z",
       "last_changed_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros",
-      "place_types": [ "fort" , "tower" ],
       "descriptions": [
         { "description": "An ancient place, cited: BAtlas 12 H4 Ad Mauros" }
       ],
       "names": [
-        { "name": "Ad Mauros" }
-      ],
-      "geometry": {
-         "type": "Point",
-         "coordinates": [ 14.02358, 48.31058 ]
-       },
-      "representative_point": [ 14.02358, 48.31058 ],
-      "temporal_bounds": { "from": -30, "to": 640 }
-    }, {
-      "uri": "http://dare.ht.lu.se/places/10778",
-      "source_gazetteer": "DARE",
-      "last_changed_at": "2016-04-03T11:23:00Z",
-      "title": "Ad Mauros/Marinianio, Eferding",
-      "place_types": [ "fort" ],
-      "names": [
-        { "name": "Ad Mauros/Marinianio, Eferding" }
+        { "attested": "Ad Mauros" }
       ],
       "geometry": {
          "type": "Point",
@@ -41,6 +26,23 @@
        },
       "representative_point": [ 14.02358, 48.31058 ],
       "temporal_bounds": { "from": -30, "to": 640 },
+      "place_types": [ "fort" , "tower" ]
+    }, {
+      "uri": "http://dare.ht.lu.se/places/10778",
+      "source_gazetteer": "DARE",
+      "last_sync_at": "2016-04-03T11:23:00Z",
+      "last_changed_at": "2016-04-03T11:23:00Z",
+      "title": "Ad Mauros/Marinianio, Eferding",
+      "names": [
+        { "attested": "Ad Mauros/Marinianio, Eferding" }
+      ],
+      "geometry": {
+         "type": "Point",
+         "coordinates": [ 14.02358, 48.31058 ]
+       },
+      "representative_point": [ 14.02358, 48.31058 ],
+      "temporal_bounds": { "from": -30, "to": 640 },
+      "place_types": [ "fort" ],
       "close_matches": [
         "http://sws.geonames.org/2780394",
         "http://www.wikidata.org/entity/Q2739862",
@@ -50,12 +52,12 @@
     },{
       "uri": "http://www.trismegistos.org/place/35191",
       "source_gazetteer": "Trismegistos",
-      "last_changed_at": "2016-04-03T11:23:00Z",
+      "last_sync_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros",
       "names": [
-        { "name": "Ad Mauros" },
-        { "name": "Eferding" },
-        { "name": "Marianianio", "language": "la" }
+        { "attested": "Ad Mauros" },
+        { "attested": "Eferding" },
+        { "attested": "Marianianio", "language": "la" }
       ]
     }
   ]

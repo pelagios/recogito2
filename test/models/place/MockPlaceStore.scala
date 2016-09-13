@@ -59,7 +59,7 @@ class MockPlaceStore extends PlaceStore {
     Future {
       val results = mockIndex.asScala.values.toSeq
         .filter(place => {
-          val names = place.names.keys.toSeq.map(_.name.toLowerCase)
+          val names = place.names.keys.toSeq.map(_.attested.toLowerCase)
           names.contains(name.toLowerCase)
         }).map((_, 0l))
       
