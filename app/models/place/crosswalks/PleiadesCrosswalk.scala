@@ -1,16 +1,38 @@
 package models.place.crosswalks
 
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
-import models.place.GazetteerRecord
+import models.{ HasGeometry, HasNullableSeq }
+import models.place.{ Description, Gazetteer, GazetteerRecord, Name }
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import models.place.Name
-import models.HasGeometry
 
 object PleiadesCrosswalk {
   
-  def fromJson(record: String): GazetteerRecord = ??? // TODO implement
+  def fromJson(record: String)(implicit sourceGazetteer: String): GazetteerRecord = {
+    val result = Json.fromJson[PleiadesRecord](Json.parse(record))
+    
+    if (result.isError)
+      play.api.Logger.warn(result.toString)
+     
+    val p = result.get
+    GazetteerRecord(
+      p.uri,
+      Gazetteer(sourceGazetteer),
+      DateTime.now(),
+      None, // TODO lastChangedAt
+      p.title,
+      p.description.map(d => Seq(new Description(d))).getOrElse(Seq.empty[Description]),
+      p.names,
+      p.features.headOption.map(_.geometry), // TODO compute union?
+      p.representativePoint,
+      None, // TODO temporalBounds
+      p.placeTypes,
+      Seq.empty[String], // TODO closeMatches
+      Seq.empty[String]  // TODO exactMatches
+    )
+  }
   
 }
 
@@ -51,7 +73,7 @@ case class PleiadesRecord(
     
 )
 
-object PleiadesRecord extends HasGeometry {
+object PleiadesRecord extends HasGeometry with HasNullableSeq {
   
   implicit val pleiadesRecordReads: Reads[PleiadesRecord] = (
     (JsPath \ "uri").read[String] and
@@ -60,7 +82,7 @@ object PleiadesRecord extends HasGeometry {
     (JsPath \ "names").read[Seq[Name]] and
     (JsPath \ "features").read[Seq[Feature]] and
     (JsPath \ "reprPoint").readNullable[Coordinate] and
-    (JsPath \ "place_types").read[Seq[String]]
+    (JsPath \ "place_types").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String]))
   )(PleiadesRecord.apply _)
   
 }

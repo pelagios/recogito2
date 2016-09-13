@@ -1,5 +1,6 @@
 package controllers.admin.gazetteers
 
+import akka.stream.Materializer
 import controllers.{ BaseAuthController, WebJarAssets }
 import javax.inject.Inject
 import models.document.DocumentService
@@ -8,12 +9,15 @@ import models.user.UserService
 import models.user.Roles._
 import play.api.{ Configuration, Logger }
 import scala.concurrent.{ ExecutionContext, Future }
+import java.io.FileInputStream
+import models.place.crosswalks.PleiadesCrosswalk
 
 class GazetteerAdminController @Inject() (
     val config: Configuration,
     val documents: DocumentService,
     val places: PlaceService,
     val users: UserService,
+    implicit val materializer: Materializer,
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarAssets
   ) extends BaseAuthController(config, documents, users) {
@@ -27,12 +31,14 @@ class GazetteerAdminController @Inject() (
   def importGazetteer = StackAction(AuthorityKey -> Admin) { implicit request =>
     request.body.asMultipartFormData.flatMap(_.file("gazetteer-file")) match {
       case Some(formData) => {
-        Future {
-          scala.concurrent.blocking {
-            Logger.info("Importing gazetteer from " + formData.filename)
-            GazetteerUtils.importRDFStream(formData.ref.file, formData.filename, places)
-          }
-        }
+        Logger.info("Importing gazetteer from " + formData.filename)
+        val importer = new StreamImporter()
+        
+        import models.place.crosswalks.PleiadesCrosswalk._
+        
+        implicit val sourceGazetteer = "Pleiades"
+        importer.importPlaces(new FileInputStream(formData.ref.file), fromJson)(places, ctx)
+  
         Redirect(routes.GazetteerAdminController.index)
       }
         

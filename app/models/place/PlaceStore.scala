@@ -147,11 +147,11 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
 
                   // ...names...
                   nestedQuery("is_conflation_of.names").query {
-                    matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
+                    matchPhraseQuery("is_conflation_of.names.attested.raw", q).boost(5.0)
                   },
 
                   nestedQuery("is_conflation_of.names").query {
-                    matchPhraseQuery("is_conflation_of.names.name", q)
+                    matchPhraseQuery("is_conflation_of.names.attested", q)
                   },
 
                   // ...and descriptions (with lower boost)
