@@ -34,10 +34,9 @@ object GazetteerUtils {
   /** Generates a list of name forms (without language), sorted by frequency of appearance in gazetteer records **/
   def collectLabels(records: Seq[GazetteerRecord]): Seq[String] = {
     val titles = records.map(_.title)
-    val namesAttested = records.flatMap(_.names.map(_.attested))
-    val namesRomanized = records.flatMap(_.names.map(_.romanized)).flatten
+    val names= records.flatMap(_.names.map(_.name))
     
-    val labels = titles ++ namesAttested ++ namesRomanized
+    val labels = titles ++ names
       
     labels
       .flatMap(_.split(",|/").map(_.trim)) // Separate on commas

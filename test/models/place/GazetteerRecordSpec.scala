@@ -68,7 +68,7 @@ object GazetteerRecordSpec {
     Seq(
       Name("Ad Mauros"),
       Name("Eferding"),
-      Name("Marianianio", None, Some("la"))
+      Name("Marianianio", Some("la"))
     ),
     None,
     None,

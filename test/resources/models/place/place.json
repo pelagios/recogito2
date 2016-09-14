@@ -18,7 +18,7 @@
         { "description": "An ancient place, cited: BAtlas 12 H4 Ad Mauros" }
       ],
       "names": [
-        { "attested": "Ad Mauros" }
+        { "name": "Ad Mauros" }
       ],
       "geometry": {
          "type": "Point",
@@ -34,7 +34,7 @@
       "last_changed_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros/Marinianio, Eferding",
       "names": [
-        { "attested": "Ad Mauros/Marinianio, Eferding" }
+        { "name": "Ad Mauros/Marinianio, Eferding" }
       ],
       "geometry": {
          "type": "Point",
@@ -55,9 +55,9 @@
       "last_sync_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros",
       "names": [
-        { "attested": "Ad Mauros" },
-        { "attested": "Eferding" },
-        { "attested": "Marianianio", "language": "la" }
+        { "name": "Ad Mauros" },
+        { "name": "Eferding" },
+        { "name": "Marianianio", "language": "la" }
       ]
     }
   ]

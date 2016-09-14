@@ -112,7 +112,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
       }
       
       "return the test place by name" in {
-        val result = findByName(initialPlace.names.head._1.attested)
+        val result = findByName(initialPlace.names.head._1.name)
         result.total must equalTo(1)
         result.items.size must equalTo(1)
         result.items.head._1 must equalTo(initialPlace)

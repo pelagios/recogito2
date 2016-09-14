@@ -1,7 +1,7 @@
 package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
-import models.{ HasDate, HasGeometry, HasNullableSeq }
+import models.{ HasDate, HasGeometry, HasNullableSeq, HasNullableBoolean }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -75,7 +75,7 @@ case class Gazetteer(name: String)
 
 case class Description(description: String, language: Option[String] = None)
 
-case class Name(attested: String, romanized: Option[String] = None, language: Option[String] = None)
+case class Name(name: String, language: Option[String] = None, isTransliterated: Boolean = false, isHistoric: Boolean = false)
 
 /** JSON (de)serialization **/
 
@@ -123,12 +123,15 @@ object Description {
 
 }
 
-object Name {
+object Name extends HasNullableBoolean {
 
   implicit val literalFormat: Format[Name] = (
-    (JsPath \ "attested").format[String] and
-    (JsPath \ "romanized").formatNullable[String] and
-    (JsPath \ "language").formatNullable[String]
+    (JsPath \ "name").format[String] and
+    (JsPath \ "language").formatNullable[String] and
+    (JsPath \ "is_romanized").formatNullable[Boolean]
+      .inmap[Boolean](fromOptBool, toOptBool) and
+    (JsPath \ "is_historic").formatNullable[Boolean]
+      .inmap[Boolean](fromOptBool, toOptBool)
   )(Name.apply, unlift(Name.unapply))
 
 }
