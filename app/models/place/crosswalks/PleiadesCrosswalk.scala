@@ -78,14 +78,14 @@ case class PleiadesRecord(
     
 )
 
-object PleiadesRecord extends HasGeometry with HasNullableSeq {
+object PleiadesRecord extends HasGeometry {
   
   implicit val pleiadesRecordReads: Reads[PleiadesRecord] = (
     (JsPath \ "uri").read[String] and
     (JsPath \ "title").read[String] and
     (JsPath \ "description").readNullable[String] and
-    (JsPath \ "names").read[Seq[Name]] and
-    (JsPath \ "features").read[Seq[Feature]] and
+    (JsPath \ "names").readNullable[Seq[Name]].map(_.getOrElse(Seq.empty[Name])) and
+    (JsPath \ "features").readNullable[Seq[Feature]].map(_.getOrElse(Seq.empty[Feature])) and
     (JsPath \ "reprPoint").readNullable[Coordinate] and
     (JsPath \ "place_types").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String]))
   )(PleiadesRecord.apply _)
