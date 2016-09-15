@@ -68,6 +68,8 @@ object GazetteerUtils {
       p.location.map(_.pointLocation),
       p.temporalCoverage.map(convertPeriodOfTime(_)),
       p.category.map(category => Seq(category.toString)).getOrElse(Seq.empty[String]),
+      None, // country code
+      None, // population
       p.closeMatches.map(normalizeURI(_)),
       p.exactMatches.map(normalizeURI(_)))   
       

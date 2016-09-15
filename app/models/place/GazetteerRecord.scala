@@ -41,6 +41,12 @@ case class GazetteerRecord (
   
   /** Place types assigned by the gazetteer **/
   placeTypes: Seq[String],
+  
+  /** An optional ISO country code **/
+  countryCode: Option[CountryCode],
+  
+  /** An optional population count - potentially useful for sorting **/
+  population: Option[Long],
 
   /** closeMatch URIs **/
   closeMatches: Seq[String],
@@ -73,9 +79,59 @@ case class GazetteerRecord (
 
 case class Gazetteer(name: String)
 
+object Gazetteer {
+
+  implicit val gazetteerFormat: Format[Gazetteer] =
+    Format(
+      JsPath.read[String].map(Gazetteer(_)),
+      Writes[Gazetteer](t => JsString(t.name))
+    )
+   
+}
+
 case class Description(description: String, language: Option[String] = None)
 
+object Description {
+
+  implicit val descriptionFormat: Format[Description] = (
+    (JsPath \ "description").format[String] and
+    (JsPath \ "language").formatNullable[String]
+  )(Description.apply, unlift(Description.unapply))
+
+}
+
 case class Name(name: String, language: Option[String] = None, isTransliterated: Boolean = false, isHistoric: Boolean = false)
+
+object Name extends HasNullableBoolean {
+
+  implicit val literalFormat: Format[Name] = (
+    (JsPath \ "name").format[String] and
+    (JsPath \ "language").formatNullable[String] and
+    (JsPath \ "is_romanized").formatNullable[Boolean]
+      .inmap[Boolean](fromOptBool, toOptBool) and
+    (JsPath \ "is_historic").formatNullable[Boolean]
+      .inmap[Boolean](fromOptBool, toOptBool)
+  )(Name.apply, unlift(Name.unapply))
+
+}
+
+case class CountryCode(code: String) {
+  
+  require(code.size == 2, s"Invalid country code: $code (must be two characters)")
+  require(code.toUpperCase == code, s"Invalid country code: code (must be uppercase)")
+  
+}
+
+object CountryCode {
+
+  implicit val countryCodeFormat: Format[CountryCode] =
+    Format(
+      JsPath.read[String].map(CountryCode(_)),
+      Writes[CountryCode](c => JsString(c.code))
+    )
+   
+}
+
 
 /** JSON (de)serialization **/
 
@@ -96,6 +152,8 @@ object GazetteerRecord extends HasDate with HasGeometry with HasNullableSeq {
     (JsPath \ "temporal_bounds").formatNullable[TemporalBounds] and
     (JsPath \ "place_types").formatNullable[Seq[String]]
       .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
+    (JsPath \ "country_code").formatNullable[CountryCode] and
+    (JsPath \ "population").formatNullable[Long] and
     (JsPath \ "close_matches").formatNullable[Seq[String]]
       .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
     (JsPath \ "exact_matches").formatNullable[Seq[String]]
@@ -104,34 +162,8 @@ object GazetteerRecord extends HasDate with HasGeometry with HasNullableSeq {
 
 }
 
-object Gazetteer {
 
-  implicit val gazetteerFormat: Format[Gazetteer] =
-    Format(
-      JsPath.read[String].map(Gazetteer(_)),
-      Writes[Gazetteer](t => JsString(t.name))
-    )
-   
-}
 
-object Description {
 
-  implicit val descriptionFormat: Format[Description] = (
-    (JsPath \ "description").format[String] and
-    (JsPath \ "language").formatNullable[String]
-  )(Description.apply, unlift(Description.unapply))
 
-}
 
-object Name extends HasNullableBoolean {
-
-  implicit val literalFormat: Format[Name] = (
-    (JsPath \ "name").format[String] and
-    (JsPath \ "language").formatNullable[String] and
-    (JsPath \ "is_romanized").formatNullable[Boolean]
-      .inmap[Boolean](fromOptBool, toOptBool) and
-    (JsPath \ "is_historic").formatNullable[Boolean]
-      .inmap[Boolean](fromOptBool, toOptBool)
-  )(Name.apply, unlift(Name.unapply))
-
-}

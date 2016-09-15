@@ -37,9 +37,10 @@ define([
 
         render = function() {
           var uris = PlaceUtils.getURIs(place),
+              titles = PlaceUtils.getTitles(place),
               descriptions = PlaceUtils.getDescriptions(place);
 
-          titleEl.html(place.labels.join(', '));
+          titleEl.html(titles.join(', '));
 
           jQuery.each(uris, function(idx, uri) {
             urisEl.append(formatURI(uri));

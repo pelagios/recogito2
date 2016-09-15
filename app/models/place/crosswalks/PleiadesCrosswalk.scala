@@ -2,7 +2,7 @@ package models.place.crosswalks
 
 import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
 import models.{ HasGeometry, HasNullableSeq }
-import models.place.{ Description, Gazetteer, GazetteerRecord, Name }
+import models.place.{ CountryCode, Description, Gazetteer, GazetteerRecord, Name }
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json._
@@ -27,6 +27,8 @@ object PleiadesCrosswalk {
           s.get.representativePoint,
           None, // TODO temporalBounds
           s.get.placeTypes,
+          s.get.countryCode.map(c => CountryCode(c.toUpperCase)),
+          s.get.population,
           Seq.empty[String], // TODO closeMatches
           Seq.empty[String]  // TODO exactMatches
         ))
@@ -68,7 +70,11 @@ case class PleiadesRecord(
   
   // TODO temporal bounds
   
-  placeTypes: Seq[String]
+  placeTypes: Seq[String],
+  
+  countryCode: Option[String],
+  
+  population: Option[Long]
   
   // TODO close matches
   
@@ -87,7 +93,9 @@ object PleiadesRecord extends HasGeometry {
     (JsPath \ "names").readNullable[Seq[Name]].map(_.getOrElse(Seq.empty[Name])) and
     (JsPath \ "features").readNullable[Seq[Feature]].map(_.getOrElse(Seq.empty[Feature])) and
     (JsPath \ "reprPoint").readNullable[Coordinate] and
-    (JsPath \ "place_types").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String]))
+    (JsPath \ "place_types").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String])) and
+    (JsPath \ "country_code").readNullable[String] and
+    (JsPath \ "population").readNullable[Long]
   )(PleiadesRecord.apply _)
   
 }

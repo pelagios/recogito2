@@ -46,6 +46,9 @@ define([], function() {
       return bestMatch;
     },
 
+    /** Returns the titles from all records conflated in this place **/
+    getTitles : function(place) { return mapConflated(place, 'title'); },
+
     /** Returns the descriptions from all records conflated in this place **/
     getDescriptions : function(place) { return mapConflated(place, 'descriptions'); },
 
