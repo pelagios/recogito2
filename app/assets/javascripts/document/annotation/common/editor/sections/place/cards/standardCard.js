@@ -70,7 +70,9 @@ define([
           if (record.descriptions)
             descriptionEl.html(record.descriptions[0].description);
 
-          namesEl.html(PlaceUtils.getLabels(record, true).join(', '));
+          namesEl.html(PlaceUtils.getDistinctRecordNames(record, {
+            excludeTitles : true
+          }).join(', '));
 
           if (record.temporal_bounds)
             dateEl.html(Formatting.yyyyMMddToYear(record.temporal_bounds.from) + ' - ' +

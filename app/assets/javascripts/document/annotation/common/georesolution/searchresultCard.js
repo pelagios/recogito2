@@ -10,6 +10,7 @@ define([
         element = jQuery(
           '<li class="place-details">' +
             '<h3 class="title"></h3>' +
+            '<p class="names"></p>' +
             '<p class="uris"></p>' +
             '<p class="description"></p>' +
             '<p class="date"></p>' +
@@ -17,6 +18,7 @@ define([
           '</li>'),
 
         titleEl       = element.find('.title'),
+        namesEl       = element.find('.names'),
         urisEl        = element.find('.uris'),
         descriptionEl = element.find('.description'),
         dateEl        = element.find('.date'),
@@ -37,10 +39,12 @@ define([
 
         render = function() {
           var uris = PlaceUtils.getURIs(place),
-              titles = PlaceUtils.getTitles(place),
+              titles = PlaceUtils.getTitles(place, true),
+              names = PlaceUtils.getDistinctPlaceNames(place, { excludeTitles: true }),
               descriptions = PlaceUtils.getDescriptions(place);
 
           titleEl.html(titles.join(', '));
+          namesEl.html(names.join(', '));
 
           jQuery.each(uris, function(idx, uri) {
             urisEl.append(formatURI(uri));

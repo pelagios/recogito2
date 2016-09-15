@@ -1,4 +1,4 @@
-define([], function() {
+define(['common/ui/countries'], function(Countries) {
 
   // TODO fetch this information from the server, so we can feed it from the DB
   var KNOWN_GAZETTEERS = [
@@ -23,6 +23,75 @@ define([], function() {
         });
 
         return mapped;
+      },
+
+      /** Helper to set default options **/
+      defaultOpt = function(opts, key, defaultValue) {
+        return (opts) ? ((opts[key]) ? opts[key] : defaultValue) : defaultValue;
+      },
+
+      /** Common code for getDistinctPlaceNames and getDistinctRecordNames **/
+      getDistinctNames = function(titles, names, opts) {
+        var split = defaultOpt(opts, 'split', false),
+            excludeTitles = defaultOpt(opts, 'excludeTitles', false),
+
+            nameLabels = jQuery.map(names, function(n) { return n.name; }),
+
+            splitLabels = function(labels) {
+              var result = [];
+
+              jQuery.each(labels, function(idx, label) {
+                var split = label.split(/,|\//);
+                result = result.concat(split);
+              });
+
+              return result;
+            },
+
+            distinct = function(labels) {
+              var distinct = {},
+
+                  compareCount = function(a, b) {
+                    return b.count - a.count;
+                  };
+
+              jQuery.each(labels, function(idx, label) {
+                var trimmed = label.trim(),
+                    count = distinct[trimmed];
+
+                if (count)
+                  distinct[trimmed] = count + 1;
+                else
+                  distinct[trimmed] = 1;
+              });
+
+              return jQuery.map(distinct, function(count, label) {
+                return { label: label, count: count };
+              }).sort(compareCount).map(function(t) {
+                return t.label;
+              });
+            },
+
+            removeTitles = function(distinct, titles) {
+              var withoutTitles = [];
+
+              jQuery.each(distinct, function(idx, name) {
+                if (titles.indexOf(name) === -1)
+                  withoutTitles.push(name);
+              });
+
+              return withoutTitles;
+            },
+
+            allLabels = (split) ? splitLabels(titles.concat(nameLabels)) : titles.concat(nameLabels);
+
+        if (excludeTitles) {
+          if (split)
+            titles = splitLabels(titles);
+          return removeTitles(distinct(allLabels), titles);
+        } else {
+          return distinct(allLabels);
+        }
       };
 
   return {
@@ -46,69 +115,70 @@ define([], function() {
       return bestMatch;
     },
 
-    /** Returns the titles from all records conflated in this place **/
-    getTitles : function(place) { return mapConflated(place, 'title'); },
-
-    /** Returns the descriptions from all records conflated in this place **/
-    getDescriptions : function(place) { return mapConflated(place, 'descriptions'); },
+    /** Returns the URIs of all records conflated in this place **/
+    getURIs: function(place) { return mapConflated(place, 'uri'); },
 
     /**
-     * Returns a list of distinct names (without language) contained in this record,
-     * sorted by frequency. The method also splits on separator characters (comma and /),
-     * so the results can be used as screen labels.
+     * Returns the titles from all records conflated in this place
      *
-     * If skipTitles is set to true, the labels will *not* inlude names appearing in the title.
-     * This is to simplify the typical use case where title is shown in the UI, and all
-     * alternative names underneath (where repetition of title is not desired).
+     * If includeCountry is set to true, the country name will be appended like
+     * so: {title}, {country name}
      */
-    getLabels: function(gazetteerRecord, skipTitles) {
-      var titles = (skipTitles) ? gazetteerRecord.title.split(/,|\//) : false,
-          labels = {}, asArray = [], result,
+    getTitles: function(place, includeCountry) {
 
-          add = function(name) {
-            jQuery.each(name.split(/,|\//), function(idx, label) {
-              var trimmed = label.trim(),
-                  count = labels[trimmed];
+          // Helper to get titles and country codes
+      var getTitlesWithCountryCodes = function(place) {
+            var tuples = [];
 
-              if (count)
-                labels[trimmed] = count + 1;
+            jQuery.each(place.is_conflation_of, function(idx, record) {
+              var title = record.title,
+                  ccode = record.country_code;
+
+              if (ccode)
+                tuples.push({ title: title, country_code: ccode });
               else
-                labels[trimmed] = 1;
+                tuples.push({ title: title });
             });
-          },
 
-          // Computes the diff between two string arrays. Result is array A, minus string
-          // appearing in array B. Strings are trimmed for comparison.
-          diff = function(arrayA, arrayB) {
-            var trimmedB = jQuery.map(arrayB, function(elem) { return elem.trim(); });
-            return jQuery.grep(arrayA, function(elem) {
-              return trimmedB.indexOf(elem.trim()) < 0;
-            });
+            return tuples;
           };
 
-      // Collect title and all names, along with their frequency
-      add(gazetteerRecord.title);
-      jQuery.each(gazetteerRecord.names, function(idx, n) {
-        add(n.name);
-      });
+      if (includeCountry) {
+        return jQuery.map(getTitlesWithCountryCodes(place), function(tuple) {
+          if (tuple.country_code)
+            return tuple.title + ', ' + Countries.getName(tuple.country_code);
+          else
+            return tuple.title;
+        });
+      } else {
+        return mapConflated(place, 'title');
+      }
+    },
 
-      // Sort by frequency
-      jQuery.each(labels, function(label, count) {
-        asArray.push([label, count]);
-      });
+    /** Returns the descriptions from all records conflated in this place **/
+    getDescriptions: function(place) { return mapConflated(place, 'descriptions'); },
 
-      asArray.sort(function(a, b) {
-        return b[1] - a[1];
-      });
+    /** Returns the country codes from all records conflated in this place **/
+    getCountryCodes: function(place) { return mapConflated(place, 'country_code'); },
 
-      result = jQuery.map(asArray, function(val) {
-        return val[0];
-      });
+    /**
+     * Returns a list of distinct names (ignoring language) contained in this place,
+     * sorted by frequency.
+     *
+     * Options:
+     *   split         - if set to true, names will be split on comma and / (default = false)
+     *   excludeTitles - if set to true, names that already appear as title will be excluded
+     *                   (default = false)
+     */
+    getDistinctPlaceNames: function(place, opts) {
+      var titles = mapConflated(place, 'title'),
+          names = mapConflated(place, 'names');
+      return getDistinctNames(titles, names, opts);
+    },
 
-      if (skipTitles)
-        return diff(result, titles);
-      else
-        return result;
+    /** Same functionality as getDistinctPlaceNames, but for a single gazetteer record **/
+    getDistinctRecordNames: function(record, opts) {
+      return getDistinctNames([ record.title ], record.names, opts);
     },
 
     /** Returns the record with the given URI (or false, if none) **/
@@ -123,14 +193,11 @@ define([], function() {
       return bestMatch;
     },
 
-    /** Returns the URIs of all records conflated in this place **/
-    getURIs : function(place) { return mapConflated(place, 'uri'); },
-
     /**
      * Parses a gazetteer URI and determines the appropriate gazetteer
      * shortcode, ID, and signature color.
      */
-    parseURI : function(uri) {
+    parseURI: function(uri) {
       var parseResult = { uri: uri };
 
       jQuery.each(KNOWN_GAZETTEERS, function(i, g) {

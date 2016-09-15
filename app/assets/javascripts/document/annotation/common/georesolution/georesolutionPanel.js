@@ -1,10 +1,12 @@
 define([
   'document/annotation/common/georesolution/searchresultCard',
   'common/map/map',
+  'common/ui/countries',
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
-  'common/hasEvents'], function(ResultCard, Map, Formatting, PlaceUtils, API, HasEvents) {
+  'common/hasEvents'
+], function(ResultCard, Map, Countries, Formatting, PlaceUtils, API, HasEvents) {
 
   var GeoresolutionPanel = function() {
 
@@ -127,16 +129,25 @@ define([
           },
 
           openPopup = function(place, opt_marker) {
-            var popup = jQuery(
+            var titles = PlaceUtils.getTitles(place, true),
+
+                popup = jQuery(
                   '<div class="popup">' +
                     '<div class="popup-header">' +
-                      '<h3>' + place.labels.join(', ') + '</h3>' +
+                      '<h3>' + titles.join(', ') + '</h3>' +
                     '</div>' +
                     '<div class="popup-choices"><table class="gazetteer-records"></table></div>' +
                   '</div>');
 
             place.is_conflation_of.reduce(function(previousShortcode, record) {
               var recordId = PlaceUtils.parseURI(record.uri),
+
+                  title = (record.country_code) ?
+                    record.title + ', ' + Countries.getName(record.country_code) :
+                    record.title,
+
+                  names = PlaceUtils.getDistinctRecordNames(record, { excludeTitles: true }),
+
                   template = jQuery(
                     '<tr data-uri="' + recordId.uri + '">' +
                       '<td class="record-id">' +
@@ -144,7 +155,8 @@ define([
                         '<span class="id"></span>' +
                       '</td>' +
                       '<td class="place-details">' +
-                        '<h3>' + record.title + '</h3>' +
+                        '<h3>' + title + '</h3>' +
+                        '<p class="names">' + names.join(', ') + '</p>' +
                         '<p class="description"></p>' +
                         '<p class="date"></p>' +
                       '</td>' +
