@@ -2,10 +2,9 @@
   "place": {
     "properties": {
       "id": { "type": "string", "index": "not_analyzed" },
-      "labels": { "type": "string" },
-      "geometry": { "type": "geo_shape", "tree": "geohash", "precision": "50m" },
+      "representative_geometry": { "type": "geo_shape", "tree": "geohash", "precision": "50m" },
       "representative_point": { "type": "geo_point" },
-      "temporal_bounds": {
+      "temporal_bounds_union": {
         "type": "nested",
         "properties": {
           "from": { "type": "date", "format": "yyyy-MM-dd" },

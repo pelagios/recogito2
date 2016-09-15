@@ -64,16 +64,16 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
       "return DARE places based on their URI" in {
         // Except for URI normalization this mostly tests the mock impl - but see above
         val barcelona = findByURI("http://dare.ht.lu.se/places/6534")
-        barcelona.labels must containAllOf(Seq("Col. Barcino", "Barcelona"))
+        barcelona.titles must containAllOf(Seq("Col. Barcino, Barcelona"))
         
         val vindobona = findByURI("http://dare.ht.lu.se/places/10783")
-        vindobona.labels must containAllOf(Seq("Mun. Vindobona", "Wien"))
+        vindobona.titles must containAllOf(Seq("Mun. Vindobona, Wien"))
         
         val thessaloniki = findByURI("http://dare.ht.lu.se/places/17068")
-        thessaloniki.labels must containAllOf(Seq("Thessalonica", "Thessaloniki"))
+        thessaloniki.titles must containAllOf(Seq("Thessalonica, Thessaloniki"))
             
         val lancaster = findByURI("http://dare.ht.lu.se/places/23712")
-        lancaster.labels must containAllOf(Seq("Calunium?", "Lancaster"))      
+        lancaster.titles must containAllOf(Seq("Calunium?, Lancaster"))      
       }
       
     }
@@ -118,16 +118,16 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
       
       "retain the original title from DARE" in { 
         val barcelonaPleiades = findByURI("http://pleiades.stoa.org/places/246343")
-        barcelonaPleiades.labels must containAllOf(Seq("Col. Barcino", "Barcelona"))
+        barcelonaPleiades.titles must containAllOf(Seq("Col. Barcino, Barcelona"))
         
         val vindobonaPleiades = findByURI("http://pleiades.stoa.org/places/128460")
-        vindobonaPleiades.labels must containAllOf(Seq("Mun. Vindobona", "Wien"))
+        vindobonaPleiades.titles must containAllOf(Seq("Mun. Vindobona, Wien"))
         
         val thessalonikiPleiades = findByURI("http://pleiades.stoa.org/places/491741")
-        thessalonikiPleiades.labels must containAllOf(Seq("Thessalonica", "Thessaloniki"))
+        thessalonikiPleiades.titles must containAllOf(Seq("Thessalonica, Thessaloniki"))
             
         val lancasterPleiades = findByURI("http://pleiades.stoa.org/places/89222")
-        lancasterPleiades.labels must containAllOf(Seq("Calunium?", "Lancaster"))
+        lancasterPleiades.titles must containAllOf(Seq("Calunium?, Lancaster"))
       }
       
       "have properly conflated the sample place Vindobona (pleiades:128460)" in {
@@ -136,7 +136,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
         val coordDARE = new Coordinate(16.391128, 48.193161)
         val pointDARE = new GeometryFactory().createPoint(coordDARE)
               
-        vindobona.geometry must equalTo(Some(pointDARE))
+        vindobona.representativeGeometry must equalTo(Some(pointDARE))
         vindobona.representativePoint must equalTo(Some(coordDARE))
         
         val expectedDescriptions = Seq(
@@ -147,7 +147,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
         vindobona.descriptions.keys must containAllOf(expectedDescriptions)
         
         vindobona.placeTypes.keys must equalTo(Seq("SETTLEMENT"))      
-        vindobona.temporalBounds must equalTo(Some(TemporalBounds.fromYears(-30, 640)))
+        vindobona.temporalBoundsUnion must equalTo(Some(TemporalBounds.fromYears(-30, 640)))
         
         vindobona.names.size must equalTo(6)
               

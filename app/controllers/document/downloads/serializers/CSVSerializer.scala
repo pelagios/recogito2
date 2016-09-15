@@ -29,7 +29,7 @@ trait CSVSerializer extends BaseSerializer {
       a.anchor + SEPARATOR +
       firstEntity.map(_.hasType.toString).getOrElse(EMPTY) + SEPARATOR +
       firstEntity.flatMap(_.uri).getOrElse(EMPTY) + SEPARATOR +
-      maybePlace.map(_.labels.mkString(",")).getOrElse(EMPTY) + SEPARATOR +
+      maybePlace.map(_.titles.mkString(",")).getOrElse(EMPTY) + SEPARATOR +
       maybePlace.flatMap(_.representativePoint.map(_.y)).getOrElse(EMPTY) + SEPARATOR +
       maybePlace.flatMap(_.representativePoint.map(_.x)).getOrElse(EMPTY) + SEPARATOR +
       firstEntity.flatMap(_.status.map(_.value)).getOrElse(EMPTY) + SEPARATOR

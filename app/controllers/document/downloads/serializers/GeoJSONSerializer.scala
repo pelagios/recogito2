@@ -12,7 +12,7 @@ trait GeoJSONSerializer extends BaseSerializer {
   def placesToGeoJSON(documentId: String)(implicit placeService: PlaceService, ctx: ExecutionContext) =
     placeService.listPlacesInDocument(documentId).map { places =>
       val features = places.items.flatMap { case (place, _) =>
-        place.geometry.map(geometry => GeoJSONFeature(geometry, place.labels.mkString(", ")))
+        place.representativeGeometry.map(geometry => GeoJSONFeature(geometry, place.titles.mkString(", ")))
       }
 
       GeoJSONFeatureCollection(features)

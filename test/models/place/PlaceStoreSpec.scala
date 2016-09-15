@@ -47,7 +47,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
       Seq("http://www.example.com/match"),
       Seq.empty[String])
       
-    Place(record.uri, GazetteerUtils.collectLabels(Seq(record)), None, None, None, Seq(record))
+    Place(record.uri, None, None, None, Seq(record))
   }
   
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {

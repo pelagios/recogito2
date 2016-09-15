@@ -224,7 +224,6 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self:
 
   def deleteByGazetteer(gazetteer: String)(implicit context: ExecutionContext) = {
     scrollByGazetteer(gazetteer, { place =>
-      Logger.info(place.labels.toString)
 
       // TODO for each place, check if there's a geotag referencing it
       // if so, keep it (and log a warning)

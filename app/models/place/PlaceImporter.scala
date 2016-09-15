@@ -41,10 +41,9 @@ trait PlaceImporter { self: PlaceStore =>
 
     Place(
       definingPlace.map(_.id).getOrElse(normalizedRecord.uri),
-      GazetteerUtils.collectLabels(allRecords),
-      definingPlace.map(_.geometry).getOrElse(normalizedRecord.geometry), // TODO implement rules for preferred geometry
+      definingPlace.map(_.representativeGeometry).getOrElse(normalizedRecord.geometry), // TODO implement rules for preferred geometry
       definingPlace.map(_.representativePoint).getOrElse(normalizedRecord.representativePoint), // TODO implement rules for preferred point
-      temporalBoundsUnion((places.map(_.temporalBounds) :+ normalizedRecord.temporalBounds).flatten),
+      temporalBoundsUnion((places.map(_.temporalBoundsUnion) :+ normalizedRecord.temporalBounds).flatten),
       allRecords
     )
   }

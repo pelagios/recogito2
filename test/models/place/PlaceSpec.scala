@@ -26,12 +26,12 @@ class PlaceSpec extends Specification {
       val place = parseResult.get
       
       place.id must equalTo ("http://pleiades.stoa.org/places/118543")
-      place.labels must contain("Ad Mauros")
+      place.titles must contain("Ad Mauros")
 
       val location = new Coordinate(14.02358, 48.31058)
       place.representativePoint must equalTo(Some(location))
-      place.geometry must equalTo(Some(new GeometryFactory().createPoint(location)))
-      place.temporalBounds must equalTo(Some(TemporalBounds.fromYears(-30, 640)))
+      place.representativeGeometry must equalTo(Some(new GeometryFactory().createPoint(location)))
+      place.temporalBoundsUnion must equalTo(Some(TemporalBounds.fromYears(-30, 640)))
     }
     
     "report the expected gazetteer record URIs" in {
@@ -50,8 +50,8 @@ class PlaceSpec extends Specification {
       val expectedGazetteers = 
         Seq("Pleiades", "Trismegistos", "DARE").map(Gazetteer(_))
         
-      place.isInGazetteers.size must equalTo(3)
-      place.isInGazetteers must containAllOf(expectedGazetteers)
+      place.sourceGazetteers.size must equalTo(3)
+      place.sourceGazetteers must containAllOf(expectedGazetteers)
     }
     
     "list the expected place types per gazetteer" in {
@@ -107,7 +107,6 @@ class PlaceSpec extends Specification {
       
       val before = Place(
         "http://pleiades.stoa.org/places/118543",
-        Seq("Ad Mauros"),
         dareRecord.geometry,
         dareRecord.representativePoint,
         dareRecord.temporalBounds,

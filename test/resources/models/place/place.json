@@ -1,12 +1,11 @@
 {
   "id": "http://pleiades.stoa.org/places/118543",
-  "labels": [ "Ad Mauros" ],
-  "geometry": {
+  "representative_geometry": {
      "type": "Point",
      "coordinates": [ 14.02358, 48.31058 ]
    },
   "representative_point": [ 14.02358, 48.31058 ],
-  "temporal_bounds": { "from": -30, "to": 640 },
+  "temporal_bounds_union": { "from": -30, "to": 640 },
   "is_conflation_of": [
     {
       "uri": "http://pleiades.stoa.org/places/118543",

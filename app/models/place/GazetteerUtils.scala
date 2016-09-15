@@ -31,7 +31,7 @@ object GazetteerUtils {
      exactMatches = r.exactMatches.map(normalizeURI)
     )
       
-  /** Generates a list of name forms (without language), sorted by frequency of appearance in gazetteer records **/
+  /** Generates a list of name forms (without language), sorted by frequency of appearance in gazetteer records **
   def collectLabels(records: Seq[GazetteerRecord]): Seq[String] = {
     val titles = records.map(_.title)
     val names= records.flatMap(_.names.map(_.name))
@@ -44,6 +44,7 @@ object GazetteerUtils {
       .sortBy(- _._2.size)
       .map(_._1)
   }
+  **/
   
   private def convertPeriodOfTime(period: PeriodOfTime): TemporalBounds = {
     val startDate = period.start
