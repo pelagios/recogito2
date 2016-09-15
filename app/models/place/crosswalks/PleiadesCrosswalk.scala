@@ -9,47 +9,45 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-object PleiadesCrosswalk {
+object PleiadesCrosswalk extends BaseGeoJSONCrosswalk {
   
-  def fromJson(record: String)(implicit sourceGazetteer: String): Option[GazetteerRecord] =
-    Json.fromJson[PleiadesRecord](Json.parse(record)) match {
-    
-      case s: JsSuccess[PleiadesRecord] =>
-        Some(GazetteerRecord(
-          s.get.uri,
-          Gazetteer(sourceGazetteer),
-          DateTime.now(),
-          None, // TODO lastChangedAt
-          s.get.title,
-          s.get.description.map(d => Seq(new Description(d))).getOrElse(Seq.empty[Description]),
-          s.get.names,
-          s.get.features.headOption.map(_.geometry), // TODO compute union?
-          s.get.representativePoint,
-          None, // TODO temporalBounds
-          s.get.placeTypes,
-          s.get.countryCode.map(c => CountryCode(c.toUpperCase)),
-          s.get.population,
-          Seq.empty[String], // TODO closeMatches
-          Seq.empty[String]  // TODO exactMatches
-        ))
-        
-      case e: JsError =>
-        Logger.warn("Error parsing place")
-        Logger.warn(record)
-        Logger.warn(e.toString)      
-        None
-        
-    }
+  private val PLEIADES = Gazetteer("Pleiades")
+
+  def fromJson(record: String): Option[GazetteerRecord] = super.fromJson[PleiadesRecord](record, { pleiades =>
+    GazetteerRecord(
+      pleiades.uri,
+      PLEIADES,
+      DateTime.now(),
+      None, // TODO lastChangedAt
+      pleiades.title,
+      pleiades.description.map(d => Seq(new Description(d))).getOrElse(Seq.empty[Description]),
+      pleiades.names.flatMap(_.toNames),
+      pleiades.features.headOption.map(_.geometry), // TODO compute union?
+      pleiades.representativePoint,
+      None, // TODO temporalBounds
+      pleiades.placeTypes,
+      None, // country code
+      None, // population
+      Seq.empty[String], // TODO closeMatches
+      Seq.empty[String]  // TODO exactMatches
+    )
+  })
   
 }
 
-case class Feature(geometry: Geometry)
+case class PleiadesName(attested: Option[String], romanized: Option[String], language: Option[String]) {
+    
+  lazy val toNames = Seq(attested, romanized).flatten.filter(!_.isEmpty).map(Name(_, language))
+  
+}
 
-object Feature extends HasGeometry {
+object PleiadesName {
   
-  implicit val featureReads: Reads[Feature] =
-    (JsPath \ "geometry").read[Geometry].map(Feature(_))
-  
+   implicit val pleiadesNameReads: Reads[PleiadesName] = (
+    (JsPath \ "attested").readNullable[String] and
+    (JsPath \ "romanized").readNullable[String] and
+    (JsPath \ "language").readNullable[String]
+  )(PleiadesName.apply _) 
 }
 
 case class PleiadesRecord(
@@ -62,25 +60,17 @@ case class PleiadesRecord(
   
   description: Option[String],
   
-  names: Seq[Name],
+  names: Seq[PleiadesName],
   
   features: Seq[Feature],
   
   representativePoint: Option[Coordinate],
-  
-  // TODO temporal bounds
-  
-  placeTypes: Seq[String],
-  
-  countryCode: Option[String],
-  
-  population: Option[Long]
+    
+  placeTypes: Seq[String]
   
   // TODO close matches
   
   // TODO exact matches
-  
-  // TODO include modernCountry for "Pleiades-like" gazetteers?
     
 )
 
@@ -90,12 +80,10 @@ object PleiadesRecord extends HasGeometry {
     (JsPath \ "uri").read[String] and
     (JsPath \ "title").read[String] and
     (JsPath \ "description").readNullable[String] and
-    (JsPath \ "names").readNullable[Seq[Name]].map(_.getOrElse(Seq.empty[Name])) and
+    (JsPath \ "names").readNullable[Seq[PleiadesName]].map(_.getOrElse(Seq.empty[PleiadesName])) and
     (JsPath \ "features").readNullable[Seq[Feature]].map(_.getOrElse(Seq.empty[Feature])) and
     (JsPath \ "reprPoint").readNullable[Coordinate] and
-    (JsPath \ "place_types").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String])) and
-    (JsPath \ "country_code").readNullable[String] and
-    (JsPath \ "population").readNullable[Long]
+    (JsPath \ "place_types").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String]))
   )(PleiadesRecord.apply _)
   
 }

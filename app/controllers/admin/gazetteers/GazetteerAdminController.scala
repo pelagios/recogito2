@@ -11,6 +11,7 @@ import play.api.{ Configuration, Logger }
 import scala.concurrent.{ ExecutionContext, Future }
 import java.io.FileInputStream
 import models.place.crosswalks.PleiadesCrosswalk
+import models.place.crosswalks.GeoNamesCrosswalk
 
 class GazetteerAdminController @Inject() (
     val config: Configuration,
@@ -34,11 +35,23 @@ class GazetteerAdminController @Inject() (
         Logger.info("Importing gazetteer from " + formData.filename)
         val importer = new StreamImporter()
         
-        import models.place.crosswalks.PleiadesCrosswalk._
         
-        implicit val sourceGazetteer = "Pleiades"
-        importer.importPlaces(new FileInputStream(formData.ref.file), fromJson)(places, ctx)
-  
+        
+        /** TEMPORARY HACK **/
+        
+        if (formData.filename.toLowerCase.contains("pleiades")) {
+          Logger.info("Using Pleiades crosswalk")
+          importer.importPlaces(new FileInputStream(formData.ref.file), PleiadesCrosswalk.fromJson)(places, ctx)
+        } else if (formData.filename.toLowerCase.contains("geonames")) {
+          Logger.info("Using GeoNames crosswalk")
+          importer.importPlaces(new FileInputStream(formData.ref.file), GeoNamesCrosswalk.fromJson)(places, ctx)
+        }
+
+        /** TEMPORARY HACK **/
+        
+          
+          
+          
         Redirect(routes.GazetteerAdminController.index)
       }
         
