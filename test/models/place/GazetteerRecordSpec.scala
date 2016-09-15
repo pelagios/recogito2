@@ -35,6 +35,8 @@ object GazetteerRecordSpec {
     Some(coord),
     Some(TemporalBounds(from, to)),
     Seq("fort" , "tower"),
+    None,
+    None,
     Seq.empty[String],
     Seq.empty[String])
     
@@ -50,6 +52,8 @@ object GazetteerRecordSpec {
     Some(coord),
     Some(TemporalBounds(from, to)),
     Seq("fort"),
+    None,
+    None,
     Seq(
       "http://sws.geonames.org/2780394",
       "http://www.wikidata.org/entity/Q2739862",
@@ -74,6 +78,8 @@ object GazetteerRecordSpec {
     None,
     None,
     Seq.empty[String],
+    None,
+    None,
     Seq.empty[String],
     Seq.empty[String])
   

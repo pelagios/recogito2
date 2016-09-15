@@ -44,6 +44,8 @@ class PlaceStoreSpec extends Specification with AfterAll {
       None,
       None,
       Seq.empty[String],
+      None,
+      None,
       Seq("http://www.example.com/match"),
       Seq.empty[String])
       

@@ -194,6 +194,8 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
           None,
           None,
           Seq.empty[String],
+          None,
+          None,
           Seq("http://pleiades.stoa.org/places/128460"), // Mun. Vindobona
           Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
         
@@ -233,6 +235,8 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
           None,
           None,
           Seq.empty[String],
+          None,
+          None,
           Seq.empty[String], // Mun. Vindobona
           Seq.empty[String]) // Vindobona
          
