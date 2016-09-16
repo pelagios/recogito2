@@ -38,7 +38,7 @@ class GazetteerAdminController @Inject() (
   
         
         /** TEMPORARY HACK **/
-        if (formData.filename.endsWith(".ttl")) {
+        if (formData.filename.contains(".ttl")) {
           Logger.info("Importing Pelagios RDF/TTL dump")
           val importer = new DumpImporter()          
           importer.importDump(formData.ref.file, formData.filename, PelagiosRDFCrosswalk.fromRDF(formData.filename))(places, ctx)
