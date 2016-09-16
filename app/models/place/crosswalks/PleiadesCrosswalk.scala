@@ -20,7 +20,7 @@ object PleiadesCrosswalk extends BaseGeoJSONCrosswalk {
     if (startDate.isEmpty || endDate.isEmpty)
       None 
     else
-      Some(TemporalBounds.fromYears(startDate.head, endDate.head))
+      Some(TemporalBounds.fromYears(startDate.min, endDate.max))
   }
 
   def fromJson(record: String): Option[GazetteerRecord] = super.fromJson[PleiadesRecord](record, { pleiades =>
