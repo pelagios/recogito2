@@ -32,7 +32,7 @@ class MockPlaceStore extends PlaceStore {
     
   def findByURI(uri: String)(implicit context: ExecutionContext) =
     Future {
-      val normalizedURI = GazetteerUtils.normalizeURI(uri)
+      val normalizedURI = GazetteerRecord.normalizeURI(uri)
       
       Option(mockIndex.get(normalizedURI)) match {
         case Some(hit) => 
@@ -48,7 +48,7 @@ class MockPlaceStore extends PlaceStore {
   
   def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext) =
     Future { 
-      val normalized = uris.map(uri => GazetteerUtils.normalizeURI(uri)).toSet
+      val normalized = uris.map(uri => GazetteerRecord.normalizeURI(uri)).toSet
         mockIndex.asScala.values.filter(place =>
           (place.uris ++ place.allMatches).exists(uri => normalized.contains(uri)))
         .toSeq

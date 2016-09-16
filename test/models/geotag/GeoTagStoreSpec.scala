@@ -4,13 +4,15 @@ import java.io.File
 import java.util.UUID
 import models.ContentType
 import models.annotation._
-import models.place.{ GazetteerUtils, PlaceService, ESPlaceStore }
+import models.place.{ PlaceService, ESPlaceStore }
+import models.place.crosswalks.PelagiosRDFCrosswalk
 import org.apache.commons.io.FileUtils
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.specification.AfterAll
 import org.junit.runner._
+import play.api.Play
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.test._
 import play.api.test.Helpers._
@@ -18,8 +20,6 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import storage.ES
 import storage.HasES
-import models.place.PlaceService
-import play.api.Play
 
 // So we can instantiate an ES Place + GeoTagStore
 class TestGeoTagStore(val es: ES) extends ESPlaceStore with ESGeoTagStore with HasES
@@ -136,10 +136,10 @@ class GeoTagStoreSpec extends Specification with AfterAll {
     "After creating 2 annotations with 1 geotag each, the GeoTagService" should {
       
       "contain 2 correct geotags" in {  
-        Await.result(places.importRecords(GazetteerUtils.loadRDF(new File("test/resources/models/place/gazetteer_sample_dare.ttl"), "gazetteer_sample_dare.ttl")), 10 seconds)
+        Await.result(places.importRecords(PelagiosRDFCrosswalk.readFile(new File("test/resources/models/place/gazetteer_sample_dare.ttl"))), 10 seconds)
         flush()
       
-        Await.result(places.importRecords(GazetteerUtils.loadRDF(new File( "test/resources/models/place/gazetteer_sample_pleiades.ttl"), "gazetteer_sample_pleiades.ttl")), 10 seconds)
+        Await.result(places.importRecords(PelagiosRDFCrosswalk.readFile(new File( "test/resources/models/place/gazetteer_sample_pleiades.ttl"))), 10 seconds)
         flush()
       
         val (successInsertBarcelona, _, _) = insertAnnotation(annotatesBarcelona)

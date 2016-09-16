@@ -77,6 +77,55 @@ case class GazetteerRecord (
 
 }
 
+object GazetteerRecord extends HasDate with HasGeometry with HasNullableSeq {
+  
+  /** Utility method to normalize a URI to a standard format
+    * 
+    * Removes '#this' suffixes (used by Pleiades) and, by convention, trailing slashes. 
+    */
+  def normalizeURI(uri: String) = {
+    val noThis = if (uri.indexOf("#this") > -1) uri.substring(0, uri.indexOf("#this")) else uri
+      
+    if (noThis.endsWith("/"))
+      noThis.substring(0, noThis.size - 1)
+    else 
+      noThis
+  }
+  
+  /** Utility to create a cloned record, with all URIs normalized **/
+  def normalize(r: GazetteerRecord) = 
+    r.copy(
+     uri = normalizeURI(r.uri),
+     closeMatches = r.closeMatches.map(normalizeURI),
+     exactMatches = r.exactMatches.map(normalizeURI)
+    )
+
+  /** JSON (de)serialization **/
+  implicit val gazetteerRecordFormat: Format[GazetteerRecord] = (
+    (JsPath \ "uri").format[String] and
+    (JsPath \ "source_gazetteer").format[Gazetteer] and
+    (JsPath \ "last_sync_at").format[DateTime] and
+    (JsPath \ "last_changed_at").formatNullable[DateTime] and
+    (JsPath \ "title").format[String] and
+    (JsPath \ "descriptions").formatNullable[Seq[Description]]
+      .inmap[Seq[Description]](fromOptSeq[Description], toOptSeq[Description]) and
+    (JsPath \ "names").formatNullable[Seq[Name]]
+      .inmap[Seq[Name]](fromOptSeq[Name], toOptSeq[Name]) and
+    (JsPath \ "geometry").formatNullable[Geometry] and
+    (JsPath \ "representative_point").formatNullable[Coordinate] and
+    (JsPath \ "temporal_bounds").formatNullable[TemporalBounds] and
+    (JsPath \ "place_types").formatNullable[Seq[String]]
+      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
+    (JsPath \ "country_code").formatNullable[CountryCode] and
+    (JsPath \ "population").formatNullable[Long] and
+    (JsPath \ "close_matches").formatNullable[Seq[String]]
+      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
+    (JsPath \ "exact_matches").formatNullable[Seq[String]]
+      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String])
+  )(GazetteerRecord.apply, unlift(GazetteerRecord.unapply))
+
+}
+
 case class Gazetteer(name: String)
 
 object Gazetteer {
@@ -131,39 +180,3 @@ object CountryCode {
     )
    
 }
-
-
-/** JSON (de)serialization **/
-
-object GazetteerRecord extends HasDate with HasGeometry with HasNullableSeq {
-
-  implicit val gazetteerRecordFormat: Format[GazetteerRecord] = (
-    (JsPath \ "uri").format[String] and
-    (JsPath \ "source_gazetteer").format[Gazetteer] and
-    (JsPath \ "last_sync_at").format[DateTime] and
-    (JsPath \ "last_changed_at").formatNullable[DateTime] and
-    (JsPath \ "title").format[String] and
-    (JsPath \ "descriptions").formatNullable[Seq[Description]]
-      .inmap[Seq[Description]](fromOptSeq[Description], toOptSeq[Description]) and
-    (JsPath \ "names").formatNullable[Seq[Name]]
-      .inmap[Seq[Name]](fromOptSeq[Name], toOptSeq[Name]) and
-    (JsPath \ "geometry").formatNullable[Geometry] and
-    (JsPath \ "representative_point").formatNullable[Coordinate] and
-    (JsPath \ "temporal_bounds").formatNullable[TemporalBounds] and
-    (JsPath \ "place_types").formatNullable[Seq[String]]
-      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
-    (JsPath \ "country_code").formatNullable[CountryCode] and
-    (JsPath \ "population").formatNullable[Long] and
-    (JsPath \ "close_matches").formatNullable[Seq[String]]
-      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
-    (JsPath \ "exact_matches").formatNullable[Seq[String]]
-      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String])
-  )(GazetteerRecord.apply, unlift(GazetteerRecord.unapply))
-
-}
-
-
-
-
-
-

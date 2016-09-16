@@ -16,6 +16,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import storage.ES
 import play.api.Play
+import models.place.crosswalks.PelagiosRDFCrosswalk
 
 @RunWith(classOf[JUnitRunner])
 class PlaceServiceIntegrationSpec extends Specification with AfterAll {
@@ -52,7 +53,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
     
     "After importing the DARE sample, the PlaceService" should {
       
-      val dareRecords = GazetteerUtils.loadRDF(new FileInputStream(DARE_RDF), DARE_RDF.getName, "DARE")
+      val dareRecords = PelagiosRDFCrosswalk.readFile(DARE_RDF)
       
       "contain 4 places" in {
         val failedRecords = importRecords(dareRecords)
@@ -80,7 +81,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
     
     "After importing the Pleiades sample, the PlaceService" should {
       
-      val pleiadesRecords = GazetteerUtils.loadRDF(new FileInputStream(PLEIADES_RDF), PLEIADES_RDF.getName, "Pleiades")
+      val pleiadesRecords = PelagiosRDFCrosswalk.readFile(PLEIADES_RDF)
         
       "contain 5 places" in {
         val failedRecords = importRecords(pleiadesRecords)
@@ -151,12 +152,12 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
         
         vindobona.names.size must equalTo(6)
               
-        vindobona.names.get(Name("Mun. Vindobona")).get must equalTo(Seq(Gazetteer("Pleiades")))
-        vindobona.names.get(Name("Mun. Vindobona", Some("la"))).get must equalTo(Seq(Gazetteer("DARE")))
-        vindobona.names.get(Name("Wien")).get must containAllOf(Seq(Gazetteer("Pleiades"), Gazetteer("DARE")))
-        vindobona.names.get(Name("Wien/Vienna AUS")).get must equalTo(Seq(Gazetteer("Pleiades")))
-        vindobona.names.get(Name("Vienne", Some("fr"))).get must equalTo(Seq(Gazetteer("DARE")))
-        vindobona.names.get(Name("Vienna", Some("en"))).get must equalTo(Seq(Gazetteer("DARE")))
+        vindobona.names.get(Name("Mun. Vindobona")).get must equalTo(Seq(Gazetteer("gazetteer_sample_pleiades")))
+        vindobona.names.get(Name("Mun. Vindobona", Some("la"))).get must equalTo(Seq(Gazetteer("gazetteer_sample_dare")))
+        vindobona.names.get(Name("Wien")).get must containAllOf(Seq(Gazetteer("gazetteer_sample_pleiades"), Gazetteer("gazetteer_sample_dare")))
+        vindobona.names.get(Name("Wien/Vienna AUS")).get must equalTo(Seq(Gazetteer("gazetteer_sample_pleiades")))
+        vindobona.names.get(Name("Vienne", Some("fr"))).get must equalTo(Seq(Gazetteer("gazetteer_sample_dare")))
+        vindobona.names.get(Name("Vienna", Some("en"))).get must equalTo(Seq(Gazetteer("gazetteer_sample_dare")))
   
         val expectedCloseMatches = Seq("http://www.wikidata.org/entity/Q871525")
         val expectedExactMatches = Seq(

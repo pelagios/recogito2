@@ -1,6 +1,5 @@
 package models.place
 
-import models.place.GazetteerUtils._
 import play.api.Logger
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
@@ -112,7 +111,7 @@ trait PlaceImporter { self: PlaceStore =>
       } map { _.filter(!_._2).map(_._1) }
 
     for {
-      (placesBefore, placesAfter) <- conflateAffectedPlaces(normalizeRecord(record))
+      (placesBefore, placesAfter) <- conflateAffectedPlaces(GazetteerRecord.normalize(record))
       failedUpdates <- storeUpdatedPlaces(placesAfter)
       // Only do deletes if we know updates were stored first!
       failedDeletes <- if (failedUpdates.isEmpty) deleteMergedPlaces(placesBefore, placesAfter) else Future.successful(Seq.empty[String])

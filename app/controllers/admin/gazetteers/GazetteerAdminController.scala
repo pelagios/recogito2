@@ -4,7 +4,7 @@ import akka.stream.Materializer
 import controllers.{ BaseAuthController, WebJarAssets }
 import javax.inject.Inject
 import models.document.DocumentService
-import models.place.{ GazetteerUtils, PlaceService }
+import models.place.PlaceService
 import models.user.UserService
 import models.user.Roles._
 import play.api.{ Configuration, Logger }
@@ -12,6 +12,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import java.io.FileInputStream
 import models.place.crosswalks.PleiadesCrosswalk
 import models.place.crosswalks.GeoNamesCrosswalk
+import models.place.crosswalks.PelagiosRDFCrosswalk
 
 class GazetteerAdminController @Inject() (
     val config: Configuration,
@@ -32,18 +33,22 @@ class GazetteerAdminController @Inject() (
   def importGazetteer = StackAction(AuthorityKey -> Admin) { implicit request =>
     request.body.asMultipartFormData.flatMap(_.file("gazetteer-file")) match {
       case Some(formData) => {
+        
         Logger.info("Importing gazetteer from " + formData.filename)
-        val importer = new StreamImporter()
-        
-        
+  
         
         /** TEMPORARY HACK **/
-        
-        if (formData.filename.toLowerCase.contains("pleiades")) {
+        if (formData.filename.endsWith(".ttl")) {
+          Logger.info("Importing Pelagios RDF/TTL dump")
+          val importer = new DumpImporter()          
+          importer.importDump(formData.ref.file, formData.filename, PelagiosRDFCrosswalk.fromRDF(formData.filename))(places, ctx)
+        } else if (formData.filename.toLowerCase.contains("pleiades")) {
           Logger.info("Using Pleiades crosswalk")
+          val importer = new StreamImporter()
           importer.importPlaces(new FileInputStream(formData.ref.file), PleiadesCrosswalk.fromJson)(places, ctx)
         } else if (formData.filename.toLowerCase.contains("geonames")) {
           Logger.info("Using GeoNames crosswalk")
+          val importer = new StreamImporter()
           importer.importPlaces(new FileInputStream(formData.ref.file), GeoNamesCrosswalk.fromJson)(places, ctx)
         }
 
