@@ -8,6 +8,7 @@ CREATE TABLE "user" (
   real_name TEXT,
   bio TEXT,
   website TEXT,
+  quota_mb INT,
   active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -39,7 +40,8 @@ CREATE TABLE upload (
   description TEXT,
   language TEXT,
   source TEXT,
-  edition TEXT
+  edition TEXT,
+  license TEXT
 );
 
 CREATE TABLE upload_filepart (
@@ -67,6 +69,7 @@ CREATE TABLE document (
   language TEXT,
   source TEXT,
   edition TEXT,
+  licence TEXT,
   is_public BOOLEAN NOT NULL DEFAULT FALSE
 );
 

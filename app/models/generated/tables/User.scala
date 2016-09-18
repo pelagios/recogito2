@@ -6,6 +6,7 @@ package models.generated.tables
 
 import java.lang.Boolean
 import java.lang.Class
+import java.lang.Integer
 import java.lang.String
 import java.sql.Timestamp
 import java.util.Arrays
@@ -90,6 +91,11 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	 * The column <code>public.user.website</code>.
 	 */
 	val WEBSITE : TableField[UserRecord, String] = createField("website", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
+	 * The column <code>public.user.quota_mb</code>.
+	 */
+	val QUOTA_MB : TableField[UserRecord, Integer] = createField("quota_mb", org.jooq.impl.SQLDataType.INTEGER, "")
 
 	/**
 	 * The column <code>public.user.active</code>.

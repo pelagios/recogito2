@@ -104,6 +104,11 @@ class Upload(alias : String, aliased : Table[UploadRecord], parameters : Array[ 
 	val EDITION : TableField[UploadRecord, String] = createField("edition", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
+	 * The column <code>public.upload.license</code>.
+	 */
+	val LICENSE : TableField[UploadRecord, String] = createField("license", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * Create a <code>public.upload</code> table reference
 	 */
 	def this() = {
