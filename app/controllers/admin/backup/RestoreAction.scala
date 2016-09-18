@@ -31,6 +31,7 @@ trait RestoreAction extends HasDate {
       (json \ "language").asOpt[String].getOrElse(null),
       (json \ "source").asOpt[String].getOrElse(null),
       (json \ "edition").asOpt[String].getOrElse(null),
+      (json \ "license").asOpt[String].getOrElse(null),
       (json \ "is_public").as[Boolean])
     
   private def parseFilepartMetadata(documentId: String, json: JsValue) =

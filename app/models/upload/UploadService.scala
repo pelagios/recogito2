@@ -52,7 +52,8 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
                 nullIfEmpty(description),
                 nullIfEmpty(language),
                 nullIfEmpty(source),
-                nullIfEmpty(edition))
+                nullIfEmpty(edition),
+                null)
 
             sql.attach(upload)
             upload.changed(UPLOAD.ID, false);

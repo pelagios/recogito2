@@ -197,16 +197,16 @@ class DocumentRecord extends UpdatableRecordImpl[DocumentRecord](Document.DOCUME
 	}
 
 	/**
-	 * Setter for <code>public.document.licence</code>.
+	 * Setter for <code>public.document.license</code>.
 	 */
-	def setLicence(value : String) : Unit = {
+	def setLicense(value : String) : Unit = {
 		setValue(11, value)
 	}
 
 	/**
-	 * Getter for <code>public.document.licence</code>.
+	 * Getter for <code>public.document.license</code>.
 	 */
-	def getLicence : String = {
+	def getLicense : String = {
 		val r = getValue(11)
 		if (r == null) null else r.asInstanceOf[String]
 	}
@@ -255,7 +255,7 @@ class DocumentRecord extends UpdatableRecordImpl[DocumentRecord](Document.DOCUME
 	override def field9 : Field[String] = Document.DOCUMENT.LANGUAGE
 	override def field10 : Field[String] = Document.DOCUMENT.SOURCE
 	override def field11 : Field[String] = Document.DOCUMENT.EDITION
-	override def field12 : Field[String] = Document.DOCUMENT.LICENCE
+	override def field12 : Field[String] = Document.DOCUMENT.LICENSE
 	override def field13 : Field[Boolean] = Document.DOCUMENT.IS_PUBLIC
 	override def value1 : String = getId
 	override def value2 : String = getOwner
@@ -268,7 +268,7 @@ class DocumentRecord extends UpdatableRecordImpl[DocumentRecord](Document.DOCUME
 	override def value9 : String = getLanguage
 	override def value10 : String = getSource
 	override def value11 : String = getEdition
-	override def value12 : String = getLicence
+	override def value12 : String = getLicense
 	override def value13 : Boolean = getIsPublic
 
 	override def value1(value : String) : DocumentRecord = {
@@ -327,7 +327,7 @@ class DocumentRecord extends UpdatableRecordImpl[DocumentRecord](Document.DOCUME
 	}
 
 	override def value12(value : String) : DocumentRecord = {
-		setLicence(value)
+		setLicense(value)
 		this
 	}
 
@@ -356,7 +356,7 @@ class DocumentRecord extends UpdatableRecordImpl[DocumentRecord](Document.DOCUME
 	/**
 	 * Create a detached, initialised DocumentRecord
 	 */
-	def this(id : String, owner : String, uploadedAt : Timestamp, title : String, author : String, dateNumeric : Timestamp, dateFreeform : String, description : String, language : String, source : String, edition : String, licence : String, isPublic : Boolean) = {
+	def this(id : String, owner : String, uploadedAt : Timestamp, title : String, author : String, dateNumeric : Timestamp, dateFreeform : String, description : String, language : String, source : String, edition : String, license : String, isPublic : Boolean) = {
 		this()
 
 		setValue(0, id)
@@ -370,7 +370,7 @@ class DocumentRecord extends UpdatableRecordImpl[DocumentRecord](Document.DOCUME
 		setValue(8, language)
 		setValue(9, source)
 		setValue(10, edition)
-		setValue(11, licence)
+		setValue(11, license)
 		setValue(12, isPublic)
 	}
 }

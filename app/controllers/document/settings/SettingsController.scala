@@ -10,6 +10,7 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import models.user.UserService
 import models.user.Roles._
 import play.api.Configuration
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.{ AnyContent, Result, Request }
 import play.api.libs.json.{ Json, JsSuccess, JsError, Reads }
 import scala.concurrent.{ Future, ExecutionContext }
@@ -22,6 +23,7 @@ class SettingsController @Inject() (
     val documents: DocumentService,
     val annotations: AnnotationService,
     val uploads: Uploads,
+    val messagesApi: MessagesApi,
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarAssets
   ) extends BaseAuthController(config, documents, users)
@@ -29,7 +31,8 @@ class SettingsController @Inject() (
       with SharingActions
       with RollbackActions
       with BackupActions
-      with DeleteActions {
+      with DeleteActions
+      with I18nSupport {
 
   def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { doc =>
@@ -58,7 +61,7 @@ class SettingsController @Inject() (
           Future.successful(Ok(views.html.document.settings.delete(doc, loggedIn.user)))
 
         case _ =>
-          Future.successful(Ok(views.html.document.settings.metadata(doc, loggedIn.user)))
+          Future.successful(Ok(views.html.document.settings.metadata(metadataForm(doc.document), doc, loggedIn.user)))
       }
     })
   }

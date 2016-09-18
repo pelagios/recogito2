@@ -84,6 +84,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
           upload.getLanguage,
           upload.getSource,
           upload.getEdition,
+          upload.getLicense,
           false)
   
   /** Imports document and filepart records to DB, and filepart content to user dir **/
@@ -105,6 +106,25 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   /** Changes the public visibility flag for the given document **/
   def setPublicVisibility(docId: String, enabled: Boolean) = db.withTransaction { sql =>
     sql.update(DOCUMENT).set[java.lang.Boolean](DOCUMENT.IS_PUBLIC, enabled).where(DOCUMENT.ID.equal(docId)).execute()
+  }
+  
+  /** Updates the user-defined metadata fields **/
+  def updateMetadata(docId: String, title: String, author: Option[String], dateFreeform: Option[String], 
+    description: Option[String], language: Option[String], source: Option[String], edition: Option[String],
+    license: Option[String]): Future[Boolean] = db.withTransaction { sql =>  
+
+    val rowsAffected = sql.update(DOCUMENT)
+      .set(DOCUMENT.TITLE, title)
+      .set(DOCUMENT.AUTHOR, author.getOrElse(null))
+      .set(DOCUMENT.DATE_FREEFORM, dateFreeform.getOrElse(null))
+      .set(DOCUMENT.DESCRIPTION, description.getOrElse(null))
+      .set(DOCUMENT.LANGUAGE, language.getOrElse(null))
+      .set(DOCUMENT.SOURCE, source.getOrElse(null))
+      .set(DOCUMENT.EDITION, edition.getOrElse(null))
+      .set(DOCUMENT.LICENSE, license.getOrElse(null))
+      .where(DOCUMENT.ID.equal(docId)).execute() 
+    
+    rowsAffected == 1
   }
   
   /** Changes the sequence numbers of fileparts for a specific document **/
@@ -241,7 +261,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     val items = query.limit(limit).offset(offset).fetchArray().toSeq
     Page(System.currentTimeMillis - startTime, total, offset, limit, items)
   }
-  
+    
   /** Deletes a document by its ID, along with filepart records and files **/
   def delete(document: DocumentRecord): Future[Unit] = db.withTransaction { sql =>
     // Delete sharing policies

@@ -29,6 +29,8 @@ class UserService @Inject() (
   ) extends BaseService with HasConfig with HasEncryption {
 
   private val SHA_256 = "SHA-256"
+  
+  private val DEFAULT_QUOTA = 200 // TODO make configurable
 
   def listUsers(offset: Int = 0, limit: Int = 20) = db.query { sql =>
     val startTime = System.currentTimeMillis
@@ -40,7 +42,7 @@ class UserService @Inject() (
   def insertUser(username: String, email: String, password: String) = db.withTransaction { sql =>
     val salt = randomSalt
     val user = new UserRecord(username, encrypt(email), computeHash(salt + password), salt,
-      new Timestamp(new Date().getTime), null, null, null, true)
+      new Timestamp(new Date().getTime), null, null, null, DEFAULT_QUOTA, true)
     sql.insertInto(USER).set(user).execute()
     user
   }

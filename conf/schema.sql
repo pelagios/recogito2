@@ -69,7 +69,7 @@ CREATE TABLE document (
   language TEXT,
   source TEXT,
   edition TEXT,
-  licence TEXT,
+  license TEXT,
   is_public BOOLEAN NOT NULL DEFAULT FALSE
 );
 

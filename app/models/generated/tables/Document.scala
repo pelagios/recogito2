@@ -108,9 +108,9 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	val EDITION : TableField[DocumentRecord, String] = createField("edition", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
-	 * The column <code>public.document.licence</code>.
+	 * The column <code>public.document.license</code>.
 	 */
-	val LICENCE : TableField[DocumentRecord, String] = createField("licence", org.jooq.impl.SQLDataType.CLOB, "")
+	val LICENSE : TableField[DocumentRecord, String] = createField("license", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>public.document.is_public</code>.

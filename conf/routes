@@ -53,6 +53,7 @@ GET     /document/:id/discussion                     controllers.document.discus
 
 GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
 PUT     /document/:id/settings/sortorder             controllers.document.settings.SettingsController.setSortOrder(id: String)
+POST    /document/:id/settings/metadata              controllers.document.settings.SettingsController.updateDocumentMetadata(id: String)
 PUT     /document/:id/settings/public                controllers.document.settings.SettingsController.setIsPublic(id: String, enabled: Boolean)
 PUT     /document/:id/settings/collaborator          controllers.document.settings.SettingsController.addCollaborator(id: String)
 DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
