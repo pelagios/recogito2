@@ -1,4 +1,7 @@
-@(settingsForm: Form[controllers.my.settings.AccountSettingsData])(implicit messages: Messages, flash: Flash)
+@(
+  settingsForm: Form[controllers.my.settings.AccountSettingsData],
+  user: models.generated.tables.records.UserRecord
+)(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 <html>
   <head>
@@ -8,6 +11,8 @@
 
   <body>
     <div class="sidebar">
+      @views.html.sidebarHeader(user)
+
       <ul class="menu">
         <li class="active">
           <a href="#" onclick="return false;">

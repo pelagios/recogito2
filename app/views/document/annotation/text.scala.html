@@ -114,7 +114,7 @@
     </div> <!-- .header-toolbar -->
 
     <div class="sidebar">
-      @views.html.document.sidebarHeader(doc.owner)
+      @views.html.sidebarHeader(doc.owner)
 
       <ul class="menu">
         @for(part <- doc.fileparts) {

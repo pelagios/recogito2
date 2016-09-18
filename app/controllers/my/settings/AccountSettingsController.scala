@@ -37,13 +37,13 @@ class AccountSettingsController @Inject() (
       Option(loggedIn.user.getBio),
       Option(loggedIn.user.getWebsite)))
     
-    Ok(views.html.my.settings.account(form))
+    Ok(views.html.my.settings.account(form, loggedIn.user))
   }
 
   def updateAccountSettings() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     accountSettingsForm.bindFromRequest.fold(
       formWithErrors =>
-        Future.successful(BadRequest(views.html.my.settings.account(formWithErrors))),
+        Future.successful(BadRequest(views.html.my.settings.account(formWithErrors, loggedIn.user))),
 
       f =>
         users.updateUserSettings(loggedIn.user.getUsername, f.email, f.name, f.bio, f.website)
