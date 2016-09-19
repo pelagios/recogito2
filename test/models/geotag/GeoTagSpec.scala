@@ -43,7 +43,7 @@ class GeoTagSpec extends Specification {
         "qhljvnxnuuc9i0",
         UUID.fromString("841f9462-beb0-4967-ad48-64af323fc4c1"),
         "http://pleiades.stoa.org/places/118543",
-        None, // toponym
+        Seq.empty[String], // toponym
         Seq.empty[String], // contributors
         None, // lastModifiedBy
         DateTime.parse("2016-02-23T18:24:00Z", DATE_TIME_PATTERN).withZone(DateTimeZone.UTC))

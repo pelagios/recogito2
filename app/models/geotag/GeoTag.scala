@@ -23,7 +23,7 @@ case class GeoTag (
   gazetteerUri: String,
   
   /** The transcription or quote, if any (could be empty on untranscribed images) **/
-  toponym: Option[String],
+  toponyms: Seq[String],
   
   contributors: Seq[String],
   
@@ -40,7 +40,8 @@ object GeoTag extends HasNullableSeq with HasDate {
     (JsPath \ "document_id").format[String] and
     (JsPath \ "filepart_id").format[UUID] and
     (JsPath \ "gazetteer_uri").format[String] and
-    (JsPath \ "toponym").formatNullable[String] and
+    (JsPath \ "toponyms").formatNullable[Seq[String]]
+      .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
     (JsPath \ "contributors").formatNullable[Seq[String]]
       .inmap[Seq[String]](fromOptSeq[String], toOptSeq[String]) and
     (JsPath \ "last_modified_by").formatNullable[String] and

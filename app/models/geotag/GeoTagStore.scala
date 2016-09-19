@@ -60,7 +60,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         annotation.annotates.documentId,
         annotation.annotates.filepartId,
         placeBody.uri.get,
-        None, // TODO toponym
+        Seq.empty[String], // TODO toponyms
         Seq.empty[String], // TODO contributors
         None, // TODO lastModifiedBy
         annotation.lastModifiedAt)
