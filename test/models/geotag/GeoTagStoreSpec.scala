@@ -102,28 +102,32 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       annotatesBarcelona.annotates.documentId,
       annotatesBarcelona.annotates.filepartId,
       "http://pleiades.stoa.org/places/246343",
-      None, Seq.empty[String], None, DateTime.now)
+      None, Seq.empty[String], None,
+      annotatesBarcelona.lastModifiedAt)
     
     val linkToLancaster = GeoTag(
       annotatesLancaster.annotationId,
       annotatesLancaster.annotates.documentId,
       annotatesLancaster.annotates.filepartId,
       "http://pleiades.stoa.org/places/89222",
-      None, Seq.empty[String], None, DateTime.now)
+      None, Seq.empty[String], None,
+      annotatesLancaster.lastModifiedAt)
         
     val linkToVindobona = GeoTag(
       annotatesVindobonaAndThessaloniki.annotationId,
       annotatesVindobonaAndThessaloniki.annotates.documentId,
       annotatesVindobonaAndThessaloniki.annotates.filepartId,
       "http://pleiades.stoa.org/places/128537",
-      None, Seq.empty[String], None, DateTime.now)
+      None, Seq.empty[String], None,
+      annotatesVindobonaAndThessaloniki.lastModifiedAt)
         
     val linkToThessaloniki = GeoTag(
       annotatesVindobonaAndThessaloniki.annotationId,
       annotatesVindobonaAndThessaloniki.annotates.documentId,
       annotatesVindobonaAndThessaloniki.annotates.filepartId,
       "http://pleiades.stoa.org/places/491741",
-      None, Seq.empty[String], None, DateTime.now)
+      None, Seq.empty[String], None,
+      annotatesVindobonaAndThessaloniki.lastModifiedAt)
         
     val testStore = new TestGeoTagStore(es) // Store extends GeoTagServiceLike
               

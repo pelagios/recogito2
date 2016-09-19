@@ -63,7 +63,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         None, // TODO toponym
         Seq.empty[String], // TODO contributors
         None, // TODO lastModifiedBy
-        DateTime.now)
+        annotation.lastModifiedAt)
 
     // These are all place bodies that have a URI set
     val placeBodies = annotation.bodies.filter(body => body.hasType == AnnotationBody.PLACE && body.uri.isDefined)
