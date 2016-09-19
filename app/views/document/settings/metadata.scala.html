@@ -8,13 +8,13 @@
   <div class="edit-metadata panel centered">
     <h2>Document Metadata</h2>
     @flash.get("success").map { msg =>
-      <div class="success message"><span class="icon">&#xf00c;</span> @msg</div>
+      <div class="success flash-message"><span class="icon">&#xf00c;</span> @msg</div>
     }
     @flash.get("error").map { msg =>
-      <div class="error message"><span class="icon">&#xf00d;</span> @msg</div>
+      <div class="error flash-message"><span class="icon">&#xf00d;</span> @msg</div>
     }
     <div class="inner">
-      @helper.form(action = controllers.document.settings.routes.SettingsController.updateDocumentMetadata(doc.id), args = 'autocomplete -> "off") {
+      @helper.form(action = controllers.document.settings.routes.SettingsController.updateDocumentMetadata(doc.id), args = 'class -> "crud", 'autocomplete -> "off") {
         @helper.inputText(metadataForm("title"), args = '_label -> "Title", '_help -> "", 'autocomplete -> "false")
         @helper.inputText(metadataForm("author"), args = '_label -> "Author", '_help -> "", 'autocomplete -> "false")
         @helper.inputText(metadataForm("date_freeform"), args = '_label -> "Date", '_help -> "", 'autocomplete -> "false")

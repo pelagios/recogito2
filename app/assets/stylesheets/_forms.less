@@ -16,6 +16,10 @@ dd.error {
   padding-bottom:5px;
 }
 
+dd.info {
+  color:@lightgrey-type;
+}
+
 input, textarea {
   border:0;
   outline:none;
@@ -56,6 +60,11 @@ input[type=checkbox]:checked + label:before {
   content:'\f046';
 }
 
+input:-webkit-autofill {
+  -webkit-box-shadow:0 0 0px 1000px white inset;
+  -webkit-text-fill-color:#525252 !important;
+}
+
 /** Inline search box style **/
 
 input.inline {
@@ -80,4 +89,62 @@ button.search.icon {
   border:none;
   outline:none;
   font-size:16px;
+}
+
+.flash-message {
+  padding:8px 15px;
+  font-size:16px;
+
+  .icon {
+    font-size:14px;
+    padding-right:3px;
+  }
+
+}
+
+.flash-message.success {
+  color:@success-msg-type;
+  background-color:@success-msg-bg;
+  border-bottom:1px solid @success-msg-border;
+}
+
+.flash-message.error {
+  color:@error-msg-type;
+  background-color:@error-msg-bg;
+  border-bottom:1px solid @error-msg-border;
+}
+
+/** Typical CRUD-style forms, appearing at various areas throughout Recogito **/
+
+form.crud {
+
+  dt, dd {
+    display:inline-block;
+  }
+
+  dt {
+    width:110px;
+    text-align:right;
+  }
+
+  input[type=text], input[type=password], textarea {
+    padding:5px 6px;
+    margin:7px 10px;
+    width:320px;
+    font-size:16px;
+  }
+
+  textarea {
+    display:inline-block;
+    vertical-align:middle;
+    height:80px;
+  }
+
+  button {
+    margin:7px 10px;
+    padding:5px;
+    width:320px;
+    box-sizing:border-box;
+  }
+
 }
