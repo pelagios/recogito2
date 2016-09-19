@@ -53,6 +53,11 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
   /** Helper used by insertOrUpdate method to build the geotags from the annotation bodies **/
   private def buildGeoTags(annotation: Annotation)(implicit context: ExecutionContext): Future[Seq[(GeoTag, String)]] = {
+    
+    def getToponyms(annotation: Annotation): Seq[String] =
+      annotation.bodies
+        .withFilter(b => b.hasType == AnnotationBody.QUOTE || b.hasType == AnnotationBody.TRANSCRIPTION)
+        .flatMap(_.value)
 
     def createGeoTag(annotation: Annotation, placeBody: AnnotationBody) =
       GeoTag(
@@ -60,7 +65,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         annotation.annotates.documentId,
         annotation.annotates.filepartId,
         placeBody.uri.get,
-        Seq.empty[String], // TODO toponyms
+        getToponyms(annotation),
         Seq.empty[String], // TODO contributors
         None, // TODO lastModifiedBy
         annotation.lastModifiedAt)
