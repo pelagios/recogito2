@@ -34,6 +34,12 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           }
         },
 
+        disableAnnotationControls = function() {
+          var menuItems = annotationModes.find('li');
+          menuItems.addClass('disabled');
+          menuItems.removeClass('active');
+        },
+
         initQuickModeMenu = function() {
           quickModeMenu.hide();
           quickModeMenu.parent().hover(
@@ -97,7 +103,11 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           jQuery('[data-scheme="' + mode + '"]').addClass('active');
         };
 
-    initQuickModeMenu();
+    if (Config.writeAccess)
+      initQuickModeMenu();
+    else
+      disableAnnotationControls();
+
     makeToolbarSticky();
     attachClickHandlers();
 
