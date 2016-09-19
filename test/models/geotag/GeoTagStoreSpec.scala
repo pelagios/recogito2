@@ -98,32 +98,32 @@ class GeoTagStoreSpec extends Specification with AfterAll {
     val places = Play.current.injector.instanceOf(classOf[PlaceService])
     
     val linkToBarcelona = GeoTag(
-      "http://dare.ht.lu.se/places/6534",
       annotatesBarcelona.annotationId,
       annotatesBarcelona.annotates.documentId,
       annotatesBarcelona.annotates.filepartId,
-      "http://pleiades.stoa.org/places/246343")
+      "http://pleiades.stoa.org/places/246343",
+      None, Seq.empty[String], None, DateTime.now)
     
     val linkToLancaster = GeoTag(
-        "http://dare.ht.lu.se/places/23712",
-        annotatesLancaster.annotationId,
-        annotatesLancaster.annotates.documentId,
-        annotatesLancaster.annotates.filepartId,
-        "http://pleiades.stoa.org/places/89222")
+      annotatesLancaster.annotationId,
+      annotatesLancaster.annotates.documentId,
+      annotatesLancaster.annotates.filepartId,
+      "http://pleiades.stoa.org/places/89222",
+      None, Seq.empty[String], None, DateTime.now)
         
     val linkToVindobona = GeoTag(
-        "http://pleiades.stoa.org/places/128537",
-        annotatesVindobonaAndThessaloniki.annotationId,
-        annotatesVindobonaAndThessaloniki.annotates.documentId,
-        annotatesVindobonaAndThessaloniki.annotates.filepartId,
-        "http://pleiades.stoa.org/places/128537")
+      annotatesVindobonaAndThessaloniki.annotationId,
+      annotatesVindobonaAndThessaloniki.annotates.documentId,
+      annotatesVindobonaAndThessaloniki.annotates.filepartId,
+      "http://pleiades.stoa.org/places/128537",
+      None, Seq.empty[String], None, DateTime.now)
         
     val linkToThessaloniki = GeoTag(
-        "http://dare.ht.lu.se/places/17068",
-        annotatesVindobonaAndThessaloniki.annotationId,
-        annotatesVindobonaAndThessaloniki.annotates.documentId,
-        annotatesVindobonaAndThessaloniki.annotates.filepartId,
-        "http://pleiades.stoa.org/places/491741")
+      annotatesVindobonaAndThessaloniki.annotationId,
+      annotatesVindobonaAndThessaloniki.annotates.documentId,
+      annotatesVindobonaAndThessaloniki.annotates.filepartId,
+      "http://pleiades.stoa.org/places/491741",
+      None, Seq.empty[String], None, DateTime.now)
         
     val testStore = new TestGeoTagStore(es) // Store extends GeoTagServiceLike
               
