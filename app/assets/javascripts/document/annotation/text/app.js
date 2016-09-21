@@ -32,8 +32,7 @@ require([
 
         highlighter = new Highlighter(contentNode),
 
-        selector = (Config.writeAccess) ?
-          new SelectionHandler(contentNode, highlighter) : false,
+        selector = new SelectionHandler(contentNode, highlighter),
 
         editor = (Config.writeAccess) ?
           new WriteEditor(contentNode, selector) :
