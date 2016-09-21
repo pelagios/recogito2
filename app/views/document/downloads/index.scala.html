@@ -54,32 +54,44 @@
       <div class="panel">
         <h2>Places</h2>
         <div class="inner">
-          <li>
-            <div class="description">
-              <h3>GeoJSON</h3>
-              <p>Confirmed geo-located places in the document as a GeoJSON FeatureCollection.</p>
-            </div>
-            <div class="button-container">
-              <a href="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id)" class="btn small"><span class="icon">&#xf019;</span> GeoJSON</a>
-            </div>
-          </li>
+          <ul>
+            <li>
+              <div class="description">
+                <h3>GeoJSON</h3>
+                <p>Confirmed geo-located places in the document as a GeoJSON FeatureCollection.</p>
+              </div>
+              <div class="button-container">
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id)" class="btn small"><span class="icon">&#xf019;</span> GeoJSON</a>
+              </div>
+            </li>
 
-          <li>
-            <div class="description">
-              <h3>KML</h3>
-              <p>Confirmed geo-located places as KML file, for viewing in Google Earth.</p>
-            </div>
-            <div class="button-container">
-              <a class="btn small disabled"><span class="icon">&#xf019;</span> KML</a>
-            </div>
-          </li>
+            <li>
+              <div class="description">
+                <h3>KML</h3>
+                <p>Confirmed geo-located places as KML file, for viewing in Google Earth.</p>
+              </div>
+              <div class="button-container">
+                <a class="btn small disabled"><span class="icon">&#xf019;</span> KML</a>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
 
       <div class="panel">
         <h2>Annotated Document</h2>
         <div class="inner">
-          <p class="no-options">No download options available yet.</p>
+          <ul>
+            <li>
+              <div class="description">
+                <h3>TEI</h3>
+                <p>Text and place annotations, seralized as TEI/XML</p>
+              </div>
+              <div class="button-container">
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadTEI(doc.id)" class="btn small"><span class="icon">&#xf019;</span> TEI/XML</a>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

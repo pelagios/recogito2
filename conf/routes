@@ -48,6 +48,7 @@ GET     /document/:id/downloads                      controllers.document.downlo
 GET     /document/:id/downloads/annotations.jsonl    controllers.document.downloads.DownloadsController.downloadAnnotations(id: String)
 GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String)
 GET     /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String)
+GET     /document/:id/downloads/tei                  controllers.document.downloads.DownloadsController.downloadTEI(id: String)
 
 GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
 

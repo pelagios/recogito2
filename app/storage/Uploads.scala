@@ -85,15 +85,17 @@ class Uploads @Inject() (config: Configuration) {
     })
     
   /** Helper to read the contents of a text filepart **/
-  def readTextfile(owner: String, docId: String, filename: String): Option[String] =
-    getDocumentDir(owner, docId).flatMap(dir => {
-      val file = new File(dir, filename)
-      if (file.exists) {
-        Some(Source.fromFile(file).getLines.mkString("\n"))
-      } else {
-        None
-      }
-    })
+  def readTextfile(owner: String, docId: String, filename: String)(implicit ctx: ExecutionContext): Future[Option[String]] = Future {
+    scala.concurrent.blocking {
+      getDocumentDir(owner, docId).flatMap(dir => {
+        val file = new File(dir, filename)
+        if (file.exists)
+          Some(Source.fromFile(file).getLines.mkString("\n"))
+        else
+          None
+      })
+    }
+  }
     
   /** Helper **/
   def openThumbnail(owner: String, docId: String, filename: String)(implicit ctx: ExecutionContext): Future[Option[File]] = Future {

@@ -15,10 +15,12 @@ import play.api.libs.iteratee.Enumerator
 import play.api.http.HttpEntity
 import play.api.libs.streams.Streams
 import scala.concurrent.ExecutionContext
+import storage.Uploads
 
 class DownloadsController @Inject() (
     val config: Configuration,
     val users: UserService,
+    implicit val uploads: Uploads,
     implicit val annotations: AnnotationService,
     implicit val documents: DocumentService,
     implicit val places: PlaceService,
@@ -26,7 +28,8 @@ class DownloadsController @Inject() (
     implicit val ctx: ExecutionContext
   ) extends BaseOptAuthController(config, documents, users)
       with CSVSerializer
-      with GeoJSONSerializer {
+      with GeoJSONSerializer 
+      with TEISerializer {
 
   def showDownloadOptions(documentId: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
@@ -64,6 +67,13 @@ class DownloadsController @Inject() (
         Ok(Json.prettyPrint(Json.toJson(featureCollection)))
           .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
       }
+    })
+  }
+  
+  def downloadTEI(documentId: String) = AsyncStack { implicit request =>
+    val maybeUser = loggedIn.map(_.user)
+    documentReadResponse(documentId, maybeUser, { case (docInfo, accesslevel) =>
+      documentToTEI(docInfo).map(xml => Ok(xml))
     })
   }
 

@@ -198,7 +198,7 @@ class AnnotationAPIController @Inject() (
 
   private def getTextAnnotationWithContext(doc: DocumentInfo, annotation: Annotation)(implicit request: Request[AnyContent]) = {
     doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
-      case Some(part) => uploads.readTextfile(doc.ownerName, doc.id, part.getFilename) match {
+      case Some(part) => uploads.readTextfile(doc.ownerName, doc.id, part.getFilename) map {
           case Some(text) =>
             val snippet = extractTextSnippet(text, annotation)
             jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))
@@ -211,13 +211,13 @@ class AnnotationAPIController @Inject() (
       case None =>
         // Annotation referenced a part ID that's not in the database
         Logger.error("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
-        InternalServerError
+        Future.successful(InternalServerError)
       }
   }
 
   /** This may get more sophisticated in the future and include a URL to a clipped and rotated image snippet **/ 
   private def getImageAnnotationWithContext(doc: DocumentInfo, annotation: Annotation)(implicit request: Request[AnyContent]) = {
-    jsonOk(Json.toJson(annotation))
+    Future.successful(jsonOk(Json.toJson(annotation)))
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
@@ -225,7 +225,7 @@ class AnnotationAPIController @Inject() (
       case Some((annotation, _)) => {
         
         if (includeContext) {
-          documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).map(_ match {
+          documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
             case Some((doc, accesslevel)) =>
               if (accesslevel.canRead) {
                 val contentType = annotation.annotates.contentType
@@ -235,16 +235,16 @@ class AnnotationAPIController @Inject() (
                   getImageAnnotationWithContext(doc, annotation)
                 } else {
                   Logger.error("Annotation indicates unsupported content type " + annotation.annotates.contentType)
-                  InternalServerError
+                  Future.successful(InternalServerError)
                 }
               } else {
-                ForbiddenPage
+                Future.successful(ForbiddenPage)
               }
 
             case _ =>
               Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
-              NotFoundPage
-          })
+              Future.successful(NotFoundPage)
+          }
         } else {
           Future.successful(jsonOk(Json.toJson(annotation)))
         }
