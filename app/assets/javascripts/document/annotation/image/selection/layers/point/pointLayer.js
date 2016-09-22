@@ -81,6 +81,7 @@ define([
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.emphasiseAnnotation = emphasiseAnnotation;
+    this.computeSize = function() { return 0; }; // It's a point
 
     Layer.apply(this, [ olMap ]);
   };

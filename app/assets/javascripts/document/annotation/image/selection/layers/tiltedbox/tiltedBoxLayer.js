@@ -53,6 +53,11 @@ define([
 
         annotations = [],
 
+        computeSize = function(annotation) {
+          var rect = anchorToRect(annotation.anchor);
+          return Geom2D.getPolygonArea(rect);
+        },
+
         getAnnotationAt = function(e) {
           // TODO optimize with a spatial tree
           var coord = e.coordinate,
@@ -70,11 +75,8 @@ define([
           if (found.length > 0) {
             // Sort by size, ascending
             found.sort(function(a, b) {
-              var rectA = anchorToRect(a.annotation.anchor),
-                  rectB = anchorToRect(b.annotation.anchor),
-
-                  sizeA = Geom2D.getPolygonArea(rectA),
-                  sizeB = Geom2D.getPolygonArea(rectB);
+              var sizeA = computeSize(a.annotation),
+                  sizeB = computeSize(b.annotation);
 
               return sizeA - sizeB;
             });
@@ -215,6 +217,7 @@ define([
 
     olMap.addLayer(layer);
 
+    this.computeSize = computeSize;
     this.getAnnotationAt = getAnnotationAt;
     this.findById = findById;
     this.addAnnotation = addAnnotation;
