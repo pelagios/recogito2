@@ -23,6 +23,7 @@ require([
 
       formatAction = function(contribution) {
         var action = contribution.action,
+            user = '<a href="/' + contribution.made_by + '">' + contribution.made_by + '</a> ',
             itemType = contribution.affects_item.item_type,
             itemTypeLabel = (function() {
               if (itemType === 'PLACE_BODY')
@@ -35,21 +36,23 @@ require([
             context = contribution.context;
 
         if (action === 'CREATE_BODY' && itemType === 'QUOTE_BODY') {
-          return 'Highlighted section <em>&raquo;' + valAfterShort + '&laquo;</em>';
+          return user + 'highlighted section <em>&raquo;' + valAfterShort + '&laquo;</em>';
         } else if (action === 'CREATE_BODY' && itemType === 'COMMENT_BODY') {
-          return 'New comment <em>&raquo;' + valAfterShort + '&laquo;</em>';
+          return 'New comment by ' + user + ' <em>&raquo;' + valAfterShort + '&laquo;</em>';
+        } else if (action === 'CREATE_BODY'  && itemType === 'TRANSCRIPTION') {
+          return user + 'added transcription <em>&raquo;' + valAfter + '&laquo;</em>';
         } else if (action === 'CREATE_BODY') {
-          return 'Tagged <em>&raquo;' + context + '&laquo;</em> as ' + itemTypeLabel;
+          return user + 'tagged <em>&raquo;' + context + '&laquo;</em> as ' + itemTypeLabel;
         } else if (action === 'CONFIRM_BODY') {
-          return 'Confirmed <em>&raquo;' + context + '&laquo;</em> as ' + itemTypeLabel + ' ' + uriToLink(valAfter);
+          return user + 'confirmed <em>&raquo;' + context + '&laquo;</em> as ' + itemTypeLabel + ' ' + uriToLink(valAfter);
         } else if (action === 'FLAG_BODY') {
-          return 'Flagged ' + itemTypeLabel + '<em>&raquo;' + context + '&laquo;</em>';
+          return user + 'flagged ' + itemTypeLabel + '<em>&raquo;' + context + '&laquo;</em>';
         } else if (action === 'EDIT_BODY' && itemType === 'QUOTE_BODY') {
-          return 'Changed selection from <em>&raquo;' + valBeforeShort + '&laquo;</em> to <em>&raquo;' + valAfterShort + '&laquo;</em>';
+          return user + 'changed selection from <em>&raquo;' + valBeforeShort + '&laquo;</em> to <em>&raquo;' + valAfterShort + '&laquo;</em>';
         } else if (action === 'EDIT_BODY' && itemType === 'PLACE_BODY') {
-          return 'Changed ' + itemTypeLabel + ' from ' + uriToLink(valBefore) + ' to ' + uriToLink(valAfter);
+          return user + 'changed ' + itemTypeLabel + ' from ' + uriToLink(valBefore) + ' to ' + uriToLink(valAfter);
         } else if (action === 'DELETE_ANNOTATION') {
-          return 'Deleted annotation <em>&raquo;' + context + '&laquo;</em>';
+          return user + 'deleted annotation <em>&raquo;' + context + '&laquo;</em>';
         } else {
           return 'An unknown change happend';
         }
