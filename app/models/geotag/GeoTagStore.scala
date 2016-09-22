@@ -57,7 +57,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     def getToponyms(annotation: Annotation): Seq[String] =
       annotation.bodies
         .withFilter(b => b.hasType == AnnotationBody.QUOTE || b.hasType == AnnotationBody.TRANSCRIPTION)
-        .flatMap(_.value)
+        .flatMap(_.value) 
 
     def createGeoTag(annotation: Annotation, placeBody: AnnotationBody) =
       GeoTag(
@@ -66,8 +66,8 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         annotation.annotates.filepartId,
         placeBody.uri.get,
         getToponyms(annotation),
-        Seq.empty[String], // TODO contributors
-        None, // TODO lastModifiedBy
+        annotation.contributors,
+        annotation.lastModifiedBy,
         annotation.lastModifiedAt)
 
     // These are all place bodies that have a URI set
