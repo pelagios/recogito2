@@ -18,7 +18,7 @@
 
     <div class="sidebar">
       @views.html.sidebarHeader(doc.owner)
-    </div> <!-- .sidebar -->
+    </div>
 
     <div class="content">
       <div class="panel">
@@ -81,17 +81,24 @@
       <div class="panel">
         <h2>Annotated Document</h2>
         <div class="inner">
-          <ul>
-            <li>
-              <div class="description">
-                <h3>TEI</h3>
-                <p>Text and place annotations, seralized as TEI/XML</p>
-              </div>
-              <div class="button-container">
-                <a href="@controllers.document.downloads.routes.DownloadsController.downloadTEI(doc.id)" class="btn small"><span class="icon">&#xf019;</span> TEI/XML</a>
-              </div>
-            </li>
-          </ul>
+          @if(doc.fileparts.exists(_.getContentType.startsWith("TEXT"))) {
+            <ul>
+              <li>
+                <div class="description">
+                  <h3>TEI</h3>
+                  <p>
+                    The annotated text in a basic TEI/XML serialization. Note that only place name annotations
+                    are included at the moment.
+                  </p>
+                </div>
+                <div class="button-container">
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadTEI(doc.id)" class="btn small"><span class="icon">&#xf019;</span> TEI/XML</a>
+                </div>
+              </li>
+            </ul>
+          } else {
+            <p class="no-options">No download options available</p>
+          }
         </div>
       </div>
     </div>

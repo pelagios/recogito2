@@ -94,9 +94,31 @@ trait TEISerializer {
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
           <fileDesc>
-            <titleStmt><title></title></titleStmt>
-            <publicationStmt></publicationStmt>
-            <sourceDesc></sourceDesc>
+            <titleStmt><title>{ docInfo.author.map(_ + ": ").getOrElse("") }{ docInfo.title }</title></titleStmt>
+            <publicationStmt>
+              { 
+                (docInfo.dateFreeform, docInfo.dateNumeric) match {
+                  case (Some(df), Some(dn)) =>
+                    <p><date when={ dn.toString }>{ df }</date></p>
+                    
+                  case (Some(df), None) =>
+                    <p>{ df }</p>
+                    
+                  case (None, Some(dn)) =>
+                    <p><date when={ dn.toString}>{ dn.toString }</date></p>
+                    
+                  case _ => <p/>
+                }
+              }
+            </publicationStmt>
+            <sourceDesc>
+              { 
+                docInfo.source match { 
+                  case Some(s) => <p><link target={s} /></p>
+                  case _ => <p/> 
+                }
+              }
+            </sourceDesc>
           </fileDesc>
         </teiHeader>
         <text>
@@ -107,30 +129,3 @@ trait TEISerializer {
   }
   
 }
-    
-    
-    /*
-    val texts = GeoDocumentTexts.findByGeoDocument(gdoc.id.get)
-    
-    val title = 
-      if (gdoc.author.isDefined) 
-        gdoc.author.get + ", " + gdoc.title
-      else
-        gdoc.title
-        
-    val date = (gdoc.date, gdoc.dateComment) match {
-      case (Some(date), Some(dateComment)) => <p><date when={ date.toString}>{ dateComment }</date></p>
-      case (Some(date), None) => <p><date when={ date.toString}>{ date.toString }</date></p>
-      case (None, Some(dateComment)) => <p>{ dateComment }</p>
-      case _ => <p/>
-    }
-    
-    val source = gdoc.source match {
-      case Some(s) => <p><link target={s} /></p>
-      case None => <p>Unknown Source</p>
-    }
-
-
-
-
-}*/
