@@ -23,6 +23,9 @@ trait GeoTagStore extends PlaceStore {
 
   /** Deletes the geotags for a specific annotation ID **/
   def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean]
+  
+  /** Deletes the geotags for a specific document **/
+  def deleteGeoTagsByDocId(documentId: String)(implicit context: ExecutionContext): Future[Boolean]
 
   /** Retrieves the links for a specific annotation ID **/
   def findGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Seq[GeoTag]]
@@ -114,26 +117,24 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       false
     }
   }
-
-  /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
-  override def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
-    findGeoTagsByAnnotationWithId(annotationId.toString).flatMap { idsAndLinks =>
-      if (idsAndLinks.nonEmpty) {
-        es.client execute {
-          bulk ( idsAndLinks.map { case (linkId, _) => delete id linkId from ES.RECOGITO / ES.GEOTAG } )
-        } map {
-          !_.hasFailures
-        } recover { case t: Throwable =>
-          t.printStackTrace()
-          false
-        }
-      } else {
-        // Nothing to delete
-        Future.successful(true)
+  
+  /** Helper to bulk-delete a list of GeoTags **/
+  private def bulkDelete(ids: Seq[String])(implicit context: ExecutionContext): Future[Boolean] =
+    if (ids.isEmpty) {
+      // Nothing to delete
+      Future.successful(true)
+    } else {
+      es.client execute {
+        bulk ( ids.map { tagId => delete id tagId from ES.RECOGITO / ES.GEOTAG } )
+      } map {
+        !_.hasFailures
+      } recover { case t: Throwable =>
+        t.printStackTrace()
+        false
       }
     }
-
-  /** Helper method that retrieves geotags along with their internal _id field **/
+  
+  /** Helper method that retrieves geotags for an annotation along with their internal _id field **/
   private def findGeoTagsByAnnotationWithId(annotationId: String)(implicit context: ExecutionContext): Future[Seq[(String, GeoTag)]] =
     es.client execute {
       search in ES.RECOGITO / ES.GEOTAG query {
@@ -141,6 +142,25 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       }
     } map { _.as[(String, GeoTag)].toSeq }
 
+  /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
+  override def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
+    findGeoTagsByAnnotationWithId(annotationId.toString).flatMap { idsAndTags =>
+      bulkDelete(idsAndTags.map(_._1))
+    }    
+    
+  override def deleteGeoTagsByDocId(documentId: String)(implicit context: ExecutionContext): Future[Boolean] = {
+    
+    def findIdsForDoc(documentId: String) =
+      es.client execute {
+        search in ES.RECOGITO / ES.GEOTAG query {
+          termQuery("document_id" -> documentId)
+        }
+      } map { _.getHits.getHits.map(_.id) }
+
+    
+    findIdsForDoc(documentId).flatMap(bulkDelete(_))
+  }
+    
   override def findGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Seq[GeoTag]] =
     findGeoTagsByAnnotationWithId(annotationId.toString).map(_.map(_._2))
 
