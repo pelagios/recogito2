@@ -26,7 +26,7 @@ class MyRecogitoController @Inject() (
   def my = StackAction { implicit request =>
     loggedIn match {
       case Some(userWithRoles) =>
-        Redirect(routes.MyRecogitoController.index(userWithRoles.user.getUsername, None))
+        Redirect(routes.MyRecogitoController.index(userWithRoles.user.getUsername.toLowerCase, None))
 
       case None =>
         // Not logged in - go to log in and then come back here
@@ -37,7 +37,7 @@ class MyRecogitoController @Inject() (
 
   private def renderPublicProfile(username: String, loggedInUser: Option[UserRecord])(implicit request: RequestHeader) = {
     val f = for {
-      userWithRoles   <- users.findByUsername(username)
+      userWithRoles   <- users.findByUsernameIgnoreCase(username)
       publicDocuments <- if (userWithRoles.isDefined)
                            documents.findByOwner(userWithRoles.get.user.getUsername, true)
                          else

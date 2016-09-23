@@ -89,20 +89,22 @@ class UserService @Inject() (
 
   /** This method is cached, since it's basically called on every request **/
   def findByUsername(username: String) =
-    cachedLookup("user", username, findByUsernameNoCache)
+    cachedLookup("user", username, findByUsernameNoCache(_ , false))
 
-  def findByUsernameNoCache(username: String) = db.query { sql =>
-    val records =
-      sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
-         .where(USER.USERNAME.equal(username))
-         .fetchArray()
+  /** We're not caching at the moment, since it's not called often & would complicate matters **/
+  def findByUsernameIgnoreCase(username: String) =
+    findByUsernameNoCache(username, true)
+    
+  def findByUsernameNoCache(username: String, ignoreCase: Boolean) = db.query { sql =>
+    val base = sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
+    val records = 
+      if (ignoreCase)
+        base.where(USER.USERNAME.equalIgnoreCase(username)).fetchArray()
+      else
+        base.where(USER.USERNAME.equal(username)).fetchArray()
 
     groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord]).headOption
       .map { case (user, roles) => UserWithRoles(user, roles) }
-  }
-
-  def findByUsernameIgnoreCase(username: String) = db.query { sql =>
-    Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
 
   def validateUser(username: String, password: String) =

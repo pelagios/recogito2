@@ -47,7 +47,7 @@ class SignupController @Inject() (
     if (invalidChars.size == 0) {
       try {
         Await.result(users.findByUsernameIgnoreCase(username), 10.second) match {
-          case Some(user) =>
+          case Some(userWithRoles) =>
             Invalid("This username is no longer available")
           case None =>
             Valid
