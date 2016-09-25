@@ -23,7 +23,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
   
-  private def generateRandomID(retriesLeft: Int = 10): String = {
+  def generateRandomID(retriesLeft: Int = 10): String = {
     
     // Takes a set of strings and returns those that already exist in the DB as doc IDs
     def findIds(ids: Set[String])(implicit db: DB) = db.query { sql =>
