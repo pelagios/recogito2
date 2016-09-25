@@ -1,0 +1,12 @@
+Welcome to Recogito
+
+This is just a dummy text document to get you started. Create annotations
+by selecting text with your mouse. We have already created an example commentary
+annotation for you here. Click on it to open it.
+
+Try tagging a word as a place. Recogito will automatically provide a suggestion
+for your selection (which you can confirm or change manually). For example,
+select the word Vienna, and click the "Place" category button in the editor popup.
+
+Ready to go? Upload your own text documents by clicking the blue 'New Document'
+button on your personal start page.
