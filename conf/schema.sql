@@ -8,7 +8,7 @@ CREATE TABLE "user" (
   real_name TEXT,
   bio TEXT,
   website TEXT,
-  quota_mb INT,
+  quota_mb INT NOT NULL DEFAULT 200,
   active BOOLEAN NOT NULL DEFAULT TRUE
 );
 

@@ -95,7 +95,7 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	/**
 	 * The column <code>public.user.quota_mb</code>.
 	 */
-	val QUOTA_MB : TableField[UserRecord, Integer] = createField("quota_mb", org.jooq.impl.SQLDataType.INTEGER, "")
+	val QUOTA_MB : TableField[UserRecord, Integer] = createField("quota_mb", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
 
 	/**
 	 * The column <code>public.user.active</code>.
