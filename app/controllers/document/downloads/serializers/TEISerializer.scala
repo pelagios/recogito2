@@ -7,7 +7,7 @@ import scala.xml.{ Node, Text }
 import storage.Uploads
 import models.document.DocumentInfo
 
-trait TEISerializer {
+trait TEISerializer extends BaseSerializer {
   
   /** Simplistic, but should be all we need. If we need more, we can switch to Apache Commons StringEscapeUtils **/
   private def escape(str: String) =
@@ -24,7 +24,7 @@ trait TEISerializer {
       annotation.anchor.substring(annotation.anchor.indexOf(":") + 1).toInt
       
     // For the time being, TEI will only include place annotations
-    val placeAnnotations = annotations.filter(_.bodies.exists(_.hasType == AnnotationBody.PLACE))
+    val placeAnnotations = sort(annotations.filter(_.bodies.exists(_.hasType == AnnotationBody.PLACE)))
     
     // XML, by nature can't handle overlapping annotations
     val nonOverlappingPlaceAnnotations = placeAnnotations.foldLeft(Seq.empty[Annotation]) { case (result, next) =>
