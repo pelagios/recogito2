@@ -16,6 +16,7 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   jdbc,
   cache,
+  filters,
 
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.6",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
