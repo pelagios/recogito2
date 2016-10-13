@@ -4,6 +4,7 @@ require.config({
 });
 
 require([
+  'common/ui/formatting',
   'common/utils/annotationUtils',
   'common/api',
   'common/config',
@@ -14,6 +15,7 @@ require([
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler',
 ], function(
+  Formatting,
   AnnotationUtils,
   API,
   Config,
@@ -40,7 +42,7 @@ require([
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
-        initPagePrefs = function() {
+        initPage = function() {
           var storedColorscheme = localStorage.getItem('r2.document.edit.colorscheme'),
               colorscheme = (storedColorscheme) ? storedColorscheme : 'BY_STATUS';
 
@@ -49,6 +51,8 @@ require([
 
           if (Config.IS_TOUCH)
             contentNode.className = 'touch';
+
+          Formatting.initTextDirection(contentNode);
         },
 
         setColorscheme = function(mode) {
@@ -80,7 +84,7 @@ require([
 
     rangy.init();
 
-    initPagePrefs();
+    initPage();
 
     API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
        .done(this.onAnnotationsLoaded.bind(this))
