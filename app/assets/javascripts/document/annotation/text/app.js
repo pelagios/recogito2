@@ -13,6 +13,7 @@ require([
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
+  'document/annotation/text/selection/phraseAnnotator',
   'document/annotation/text/selection/selectionHandler',
 ], function(
   Formatting,
@@ -24,15 +25,20 @@ require([
   BaseApp,
   Toolbar,
   Highlighter,
+  PhraseAnnotator,
   SelectionHandler) {
 
   var App = function() {
 
-    var contentNode = document.getElementById('content'),
+    var self = this,
+
+        contentNode = document.getElementById('content'),
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
         highlighter = new Highlighter(contentNode),
+
+        phraseAnnotator = new PhraseAnnotator(contentNode),
 
         selector = new SelectionHandler(contentNode, highlighter),
 
@@ -68,6 +74,19 @@ require([
         onColorschemeChanged = function(mode) {
           setColorscheme(mode);
           localStorage.setItem('r2.document.edit.colorscheme', mode);
+        },
+
+        onCreateAnnotation = function(selection) {
+          var reappliedAnnotations = phraseAnnotator.reapply(selection.annotation);
+
+
+          /*** DUMMY - just a hack!!! ***/
+          // highlighter.initPage(reappliedAnnotations);
+          /*** DUMMY -just a hack!!! ***/
+
+
+          // Call super method
+          self.onCreateAnnotation(selection);
         };
 
     // Toolbar events
@@ -78,7 +97,7 @@ require([
 
     selector.on('select', editor.openSelection);
 
-    editor.on('createAnnotation', this.onCreateAnnotation.bind(this));
+    editor.on('createAnnotation', onCreateAnnotation);
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
     editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 
