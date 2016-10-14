@@ -9,6 +9,7 @@ require([
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/baseApp',
+  'document/annotation/image/iiif/iiifManifest',
   'document/annotation/image/page/help',
   'document/annotation/image/page/toolbar',
   'document/annotation/image/page/viewer',
@@ -20,6 +21,7 @@ require([
   ReadEditor,
   WriteEditor,
   BaseApp,
+  IIIFManifest,
   Help,
   Toolbar,
   Viewer,
@@ -101,6 +103,12 @@ require([
     jQuery(document).ready(function() {
 
       var loadManifest = function() {
+            return jQuery.getJSON('http://demo.iiifhosting.com/iiif/demo/info.json')
+              .then(function(response) {
+                return new IIIFManifest(response);
+              });
+
+            /*
             return jsRoutes.controllers.document.DocumentController
               .getImageManifest(Config.documentId, Config.partSequenceNo)
               .ajax()
@@ -117,6 +125,7 @@ require([
                 Config.imageProperties = imageProperties;
                 return imageProperties;
               });
+            */
           },
 
           /**
