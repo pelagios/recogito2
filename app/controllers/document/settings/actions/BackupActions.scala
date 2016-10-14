@@ -57,7 +57,7 @@ trait BackupActions extends HasDate { self: SettingsController =>
     p.getId,
     p.getTitle,
     p.getContentType,
-    p.getFilename
+    p.getFile
   ))
 
   implicit val metadataWrites: Writes[(DocumentRecord, Seq[DocumentFilepartRecord])] = (
@@ -118,7 +118,7 @@ trait BackupActions extends HasDate { self: SettingsController =>
         addToZip(exportMetadata(doc), "metadata.json", zipStream)
 
         doc.fileparts.foreach(part =>
-          addToZip(exportFile(doc.ownerName, documentId, part.getFilename), "parts" + File.separator + part.getFilename, zipStream))
+          addToZip(exportFile(doc.ownerName, documentId, part.getFile), "parts" + File.separator + part.getFile, zipStream))
 
         annotations.findByDocId(documentId).map { annotations =>
           addToZip(exportAnnotations(documentId, annotations.map(_._1), doc.fileparts), "annotations.jsonl", zipStream)

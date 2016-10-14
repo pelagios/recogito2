@@ -74,7 +74,7 @@ trait TEISerializer extends BaseSerializer {
     
     val fTexts = Future.sequence {
       docInfo.fileparts.map { part =>
-        uploads.readTextfile(docInfo.owner.getUsername, docInfo.id, part.getFilename).map(_.map((_, part)))
+        uploads.readTextfile(docInfo.owner.getUsername, docInfo.id, part.getFile).map(_.map((_, part)))
       }
     }
     

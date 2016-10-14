@@ -9,7 +9,7 @@ require([
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/baseApp',
-  'document/annotation/image/iiif/iiifManifest',
+  'document/annotation/image/iiif/iiifImageInfo',
   'document/annotation/image/page/help',
   'document/annotation/image/page/toolbar',
   'document/annotation/image/page/viewer',
@@ -21,7 +21,7 @@ require([
   ReadEditor,
   WriteEditor,
   BaseApp,
-  IIIFManifest,
+  IIIFImageInfo,
   Help,
   Toolbar,
   Viewer,
@@ -103,29 +103,21 @@ require([
     jQuery(document).ready(function() {
 
       var loadManifest = function() {
-            return jQuery.getJSON('http://demo.iiifhosting.com/iiif/demo/info.json')
-              .then(function(response) {
-                return new IIIFManifest(response);
-              });
-
-            /*
             return jsRoutes.controllers.document.DocumentController
               .getImageManifest(Config.documentId, Config.partSequenceNo)
               .ajax()
               .then(function(response) {
-                // TODO handle difference between Zoomify and IIIF, based on Config.contentType
+                if (Config.contentType === 'IMAGE_UPLOAD') {
+                  // jQuery handles the XML parsing
+                  var props = jQuery(response).find('IMAGE_PROPERTIES'),
+                      width = parseInt(props.attr('WIDTH')),
+                      height = parseInt(props.attr('HEIGHT'));
 
-                // jQuery handles the XML parsing
-                var props = jQuery(response).find('IMAGE_PROPERTIES'),
-                    width = parseInt(props.attr('WIDTH')),
-                    height = parseInt(props.attr('HEIGHT')),
-                    imageProperties = { width: width, height: height };
-
-                // Store image properties in global Config as well
-                Config.imageProperties = imageProperties;
-                return imageProperties;
+                  return { width: width, height: height };
+                } else if (Config.contentType === 'IMAGE_IIIF') {
+                  return new IIIFImageInfo(response);
+                }
               });
-            */
           },
 
           /**

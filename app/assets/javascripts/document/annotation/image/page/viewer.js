@@ -41,28 +41,22 @@ define([
             '<div class="fullscreen control icon">&#xf065;</div>' +
           '</div>'),
 
-        /*
-        projection = new ol.proj.Projection({
-          code: 'ZOOMIFY',
-          units: 'pixels',
-          extent: [0, 0, w, h]
-        }),
-        */
+        projection = (Config.contentType === 'IMAGE_UPLOAD') ?
+          new ol.proj.Projection({
+            code: 'ZOOMIFY',
+            units: 'pixels',
+            extent: [0, 0, w, h]
+          }) : new ol.proj.Projection({
+            code: 'IIIF',
+            units: 'pixels',
+            extent: [0, -h, w, 0]
+          }),
 
-        projection = new ol.proj.Projection({
-          code: 'IIIF',
-          units: 'pixels',
-          extent: [0, -h, w, 0]
-        }),
-
-        /*
-        tileSource = new ol.source.Zoomify({
-          url: BASE_URL,
-          size: [ w, h ]
-        }),
-        */
-
-        tileSource = new IIIFSource(imageProperties),
+        tileSource = (Config.contentType === 'IMAGE_UPLOAD') ?
+          new ol.source.Zoomify({
+            url: BASE_URL,
+            size: [ w, h ]
+          }) : new IIIFSource(imageProperties),
 
         tileLayer = new ol.layer.Tile({ source: tileSource }),
 

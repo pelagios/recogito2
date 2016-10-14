@@ -198,7 +198,7 @@ class AnnotationAPIController @Inject() (
 
   private def getTextAnnotationWithContext(doc: DocumentInfo, annotation: Annotation)(implicit request: Request[AnyContent]) = {
     doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
-      case Some(part) => uploads.readTextfile(doc.ownerName, doc.id, part.getFilename) map {
+      case Some(part) => uploads.readTextfile(doc.ownerName, doc.id, part.getFile) map {
           case Some(text) =>
             val snippet = extractTextSnippet(text, annotation)
             jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))

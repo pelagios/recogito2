@@ -189,7 +189,7 @@ trait RestoreAction extends HasDate {
     val filepartRecords = parseFilepartMetadata(documentRecord.getId, metadataJson) 
     
     val fileparts = filepartRecords.map { record =>
-      val entry = entries.filter(_.getName == "parts" + File.separator + record.getFilename).head
+      val entry = entries.filter(_.getName == "parts" + File.separator + record.getFile).head
       val inputstream = zipFile.getInputStream(entry) 
       (record, inputstream)
     }

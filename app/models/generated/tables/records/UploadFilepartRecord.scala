@@ -108,16 +108,16 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 	}
 
 	/**
-	 * Setter for <code>public.upload_filepart.filename</code>.
+	 * Setter for <code>public.upload_filepart.file</code>.
 	 */
-	def setFilename(value : String) : Unit = {
+	def setFile(value : String) : Unit = {
 		setValue(5, value)
 	}
 
 	/**
-	 * Getter for <code>public.upload_filepart.filename</code>.
+	 * Getter for <code>public.upload_filepart.file</code>.
 	 */
-	def getFilename : String = {
+	def getFile : String = {
 		val r = getValue(5)
 		if (r == null) null else r.asInstanceOf[String]
 	}
@@ -160,14 +160,14 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 	override def field3 : Field[String] = UploadFilepart.UPLOAD_FILEPART.OWNER
 	override def field4 : Field[String] = UploadFilepart.UPLOAD_FILEPART.TITLE
 	override def field5 : Field[String] = UploadFilepart.UPLOAD_FILEPART.CONTENT_TYPE
-	override def field6 : Field[String] = UploadFilepart.UPLOAD_FILEPART.FILENAME
+	override def field6 : Field[String] = UploadFilepart.UPLOAD_FILEPART.FILE
 	override def field7 : Field[Double] = UploadFilepart.UPLOAD_FILEPART.FILESIZE_KB
 	override def value1 : UUID = getId
 	override def value2 : Integer = getUploadId
 	override def value3 : String = getOwner
 	override def value4 : String = getTitle
 	override def value5 : String = getContentType
-	override def value6 : String = getFilename
+	override def value6 : String = getFile
 	override def value7 : Double = getFilesizeKb
 
 	override def value1(value : UUID) : UploadFilepartRecord = {
@@ -196,7 +196,7 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 	}
 
 	override def value6(value : String) : UploadFilepartRecord = {
-		setFilename(value)
+		setFile(value)
 		this
 	}
 
@@ -219,7 +219,7 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 	/**
 	 * Create a detached, initialised UploadFilepartRecord
 	 */
-	def this(id : UUID, uploadId : Integer, owner : String, title : String, contentType : String, filename : String, filesizeKb : Double) = {
+	def this(id : UUID, uploadId : Integer, owner : String, title : String, contentType : String, file : String, filesizeKb : Double) = {
 		this()
 
 		setValue(0, id)
@@ -227,7 +227,7 @@ class UploadFilepartRecord extends UpdatableRecordImpl[UploadFilepartRecord](Upl
 		setValue(2, owner)
 		setValue(3, title)
 		setValue(4, contentType)
-		setValue(5, filename)
+		setValue(5, file)
 		setValue(6, filesizeKb)
 	}
 }

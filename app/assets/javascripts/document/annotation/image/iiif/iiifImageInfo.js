@@ -33,7 +33,7 @@ define([], function() {
    * authors and should not be interpreted as representing official policies, either expressed
    * or implied, of Klokan Technologies GmbH.
    */
-  var IIIFManifest = function(json) {
+  var IIIFImageInfo = function(json) {
     var getURL = function() {
           var id = json['@id'],
               host = json.image_host,
@@ -54,6 +54,6 @@ define([], function() {
     this.tileSize = json.tile_width || this.tiles.width || undefined;
   };
 
-  return IIIFManifest;
+  return IIIFImageInfo;
 
 });

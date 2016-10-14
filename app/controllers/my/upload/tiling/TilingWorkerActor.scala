@@ -20,7 +20,7 @@ class TilingWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, 
       status = ProgressStatus.IN_PROGRESS
       
       val origSender = sender
-      val filename = part.getFilename
+      val filename = part.getFile
       val tilesetDir= new File(documentDir, filename.substring(0, filename.lastIndexOf('.')))
       
       TilingService

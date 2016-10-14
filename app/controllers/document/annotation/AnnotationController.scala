@@ -76,12 +76,12 @@ class AnnotationController @Inject() (
 
     ContentType.withName(currentPart.getContentType) match {
 
-      case Some(ContentType.IMAGE_UPLOAD) =>
+      case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
         annotations.countByDocId(doc.id).map(annotationCount =>
           Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, annotationCount)))
-
+          
       case Some(ContentType.TEXT_PLAIN) =>
-        uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFilename) flatMap {
+        uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile) flatMap {
           case Some(content) =>
             annotations.countByDocId(doc.id).map(annotationCount =>
               Ok(views.html.document.annotation.text(doc, loggedInUser, currentPart, accesslevel, annotationCount, content)))

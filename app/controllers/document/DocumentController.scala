@@ -35,11 +35,16 @@ class DocumentController @Inject() (
           // All uploads are Zoomify format
           Some("ImageProperties.xml")
         else if (contentType == IMAGE_IIIF.toString)
-          None // TODO future feature
+          Some(currentPart.getFile)
         else
           None
 
+      // TODO hack - clean this up!
+          
       maybeManifestName match {
+        case Some(filename) if filename.startsWith("http") =>
+          Future.successful(Redirect(filename))
+              
         case Some(filename) =>
           getTilesetFile(doc.document, currentPart, filename).map {
             case Some(file) => Ok.sendFile(file)
@@ -58,7 +63,7 @@ class DocumentController @Inject() (
       val documentDir = uploads.getDocumentDir(document.getOwner, document.getId).get
 
       // Tileset foldername is, by convention, equal to filename minus extension
-      val foldername = part.getFilename.substring(0, part.getFilename.lastIndexOf('.'))
+      val foldername = part.getFile.substring(0, part.getFile.lastIndexOf('.'))
       val tileFolder = new File(documentDir, foldername)
 
       val file = new File(tileFolder, filepath)
@@ -82,7 +87,7 @@ class DocumentController @Inject() (
   def getThumbnail(docId: String, partNo: Int) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
-      uploads.openThumbnail(doc.ownerName, docId, currentPart.getFilename).map {
+      uploads.openThumbnail(doc.ownerName, docId, currentPart.getFile).map {
         case Some(file) => Ok.sendFile(file)
         case None => NotFoundPage
       }

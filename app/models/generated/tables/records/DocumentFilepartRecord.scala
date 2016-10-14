@@ -92,16 +92,16 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	}
 
 	/**
-	 * Setter for <code>public.document_filepart.filename</code>.
+	 * Setter for <code>public.document_filepart.file</code>.
 	 */
-	def setFilename(value : String) : Unit = {
+	def setFile(value : String) : Unit = {
 		setValue(4, value)
 	}
 
 	/**
-	 * Getter for <code>public.document_filepart.filename</code>.
+	 * Getter for <code>public.document_filepart.file</code>.
 	 */
-	def getFilename : String = {
+	def getFile : String = {
 		val r = getValue(4)
 		if (r == null) null else r.asInstanceOf[String]
 	}
@@ -143,13 +143,13 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	override def field2 : Field[String] = DocumentFilepart.DOCUMENT_FILEPART.DOCUMENT_ID
 	override def field3 : Field[String] = DocumentFilepart.DOCUMENT_FILEPART.TITLE
 	override def field4 : Field[String] = DocumentFilepart.DOCUMENT_FILEPART.CONTENT_TYPE
-	override def field5 : Field[String] = DocumentFilepart.DOCUMENT_FILEPART.FILENAME
+	override def field5 : Field[String] = DocumentFilepart.DOCUMENT_FILEPART.FILE
 	override def field6 : Field[Integer] = DocumentFilepart.DOCUMENT_FILEPART.SEQUENCE_NO
 	override def value1 : UUID = getId
 	override def value2 : String = getDocumentId
 	override def value3 : String = getTitle
 	override def value4 : String = getContentType
-	override def value5 : String = getFilename
+	override def value5 : String = getFile
 	override def value6 : Integer = getSequenceNo
 
 	override def value1(value : UUID) : DocumentFilepartRecord = {
@@ -173,7 +173,7 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	}
 
 	override def value5(value : String) : DocumentFilepartRecord = {
-		setFilename(value)
+		setFile(value)
 		this
 	}
 
@@ -195,14 +195,14 @@ class DocumentFilepartRecord extends UpdatableRecordImpl[DocumentFilepartRecord]
 	/**
 	 * Create a detached, initialised DocumentFilepartRecord
 	 */
-	def this(id : UUID, documentId : String, title : String, contentType : String, filename : String, sequenceNo : Integer) = {
+	def this(id : UUID, documentId : String, title : String, contentType : String, file : String, sequenceNo : Integer) = {
 		this()
 
 		setValue(0, id)
 		setValue(1, documentId)
 		setValue(2, title)
 		setValue(3, contentType)
-		setValue(4, filename)
+		setValue(4, file)
 		setValue(5, sequenceNo)
 	}
 }

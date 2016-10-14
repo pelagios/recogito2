@@ -79,9 +79,9 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	val CONTENT_TYPE : TableField[UploadFilepartRecord, String] = createField("content_type", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
-	 * The column <code>public.upload_filepart.filename</code>.
+	 * The column <code>public.upload_filepart.file</code>.
 	 */
-	val FILENAME : TableField[UploadFilepartRecord, String] = createField("filename", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+	val FILE : TableField[UploadFilepartRecord, String] = createField("file", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>public.upload_filepart.filesize_kb</code>.

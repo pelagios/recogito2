@@ -98,7 +98,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     
     // Import files
     fileparts.foreach { case (part, stream) =>
-      val destination = new File(uploads.getDocumentDir(document.getOwner, document.getId, true).get, part.getFilename).toPath
+      val destination = new File(uploads.getDocumentDir(document.getOwner, document.getId, true).get, part.getFile).toPath
       Files.copy(stream, destination)
     }
   }

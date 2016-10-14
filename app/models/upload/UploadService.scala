@@ -95,7 +95,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
               .fetchOne()) match {
 
       case Some(filepartRecord) => {
-        val file = new File(uploads.PENDING_UPLOADS_DIR, filepartRecord.getFilename)
+        val file = new File(uploads.PENDING_UPLOADS_DIR, filepartRecord.getFile)
         file.delete()
         filepartRecord.delete() == 1
       }
@@ -119,7 +119,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
          .fetchArray
 
     fileparts.foreach(part => {
-      val file = new File(uploads.PENDING_UPLOADS_DIR, part.getFilename)
+      val file = new File(uploads.PENDING_UPLOADS_DIR, part.getFile)
       file.delete()
     })
 
@@ -165,7 +165,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
         document.getId,
         part.getTitle,
         part.getContentType,
-        part.getFilename,
+        part.getFile,
         idx + 1)
     }
         
@@ -174,8 +174,8 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
     
     // Move files from 'pending' to 'user-data' folder
     val filePaths = fileparts.map(filepart => {
-      val source = new File(uploads.PENDING_UPLOADS_DIR, filepart.getFilename).toPath
-      val destination = new File(uploads.getDocumentDir(upload.getOwner, document.getId, true).get, filepart.getFilename).toPath
+      val source = new File(uploads.PENDING_UPLOADS_DIR, filepart.getFile).toPath
+      val destination = new File(uploads.getDocumentDir(upload.getOwner, document.getId, true).get, filepart.getFile).toPath
       Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
     })
 
