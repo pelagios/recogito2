@@ -96,7 +96,7 @@ GET     /api/document/:id/places                     controllers.api.PlaceAPICon
 GET     /api/places/search                           controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
 GET     /api/places/:uri                             controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
 
-GET     /api/contributions/document/:id              controllers.api.ContributionAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 20)
+GET     /api/contributions/document/:id              controllers.api.ContributionAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
 GET     /api/contributions/stats                     controllers.api.ContributionAPIController.getGlobalStats()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
