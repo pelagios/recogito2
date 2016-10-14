@@ -168,6 +168,7 @@ define([
     this.clearSelection = clearSelection;
     this.getSelection = getSelection;
     this.setSelection = setSelection;
+    this.rangeToAnnotationStub = rangeToAnnotationStub;
 
     AbstractSelectionHandler.apply(this);
   };

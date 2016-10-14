@@ -1,11 +1,11 @@
 define(['common/hasEvents'], function(HasEvents) {
 
-  var Alert = function(cssClass, title, message) {
+  var Alert = function(alertType, title, message) {
     var self = this,
 
         element = jQuery(
           '<div class="clicktrap">' +
-            '<div class="alert ' + cssClass + '">' +
+            '<div class="alert ' + alertType + '">' +
               '<h1>' + title + '</h1>' +
               '<p>' + message + '</p>' +
               '<p class="buttons">' +
@@ -32,10 +32,14 @@ define(['common/hasEvents'], function(HasEvents) {
     btnCancel.click(onCancel);
 
     jQuery(document.body).append(element);
-    
+
     HasEvents.apply(this);
   };
   Alert.prototype = Object.create(HasEvents.prototype);
+
+  /** Type constants **/
+  Alert.INFO    = 'info';
+  Alert.WARNING = 'warning';
 
   return Alert;
 

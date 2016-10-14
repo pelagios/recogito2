@@ -32,7 +32,7 @@ require([
                   btnDeleteAnnotations.removeClass('disabled');
                 },
 
-                alert = new Alert('warning', warningTitle, warningMsg);
+                alert = new Alert(Alert.WARNING, warningTitle, warningMsg);
 
             btnDeleteAnnotations.addClass('disabled');
 

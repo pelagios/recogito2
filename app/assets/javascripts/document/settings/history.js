@@ -92,7 +92,7 @@ require([
             'This will permanently delete all edits that happened after the selected time. ' +
             'The operation is not reversible! <strong>Are you sure you want to do this?</strong>';
 
-      new Alert('warning', warningTitle, warningMsg).on('ok', function() {
+      new Alert(Alert.WARNING, warningTitle, warningMsg).on('ok', function() {
         rollback(contributionId);
       });
     });

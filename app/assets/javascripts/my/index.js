@@ -54,7 +54,7 @@ require([
         onClickDelete = function() {
           var title = '<span class="icon">&#xf071;</span> Delete Document',
               message = 'You cannot undo this operation. Are you sure you want to do this?',
-              alert = new Alert('warning', title, message);
+              alert = new Alert(Alert.WARNING, title, message);
 
           alert.on('ok', deleteDocuments);
 

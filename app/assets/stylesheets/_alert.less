@@ -11,12 +11,12 @@
 }
 
 .alert {
+  color:@ocean;
   position:fixed;
   bottom:50%;
   left:50%;
   width:520px;
   margin-left:-200px;
-  color:@error-msg-type;
   .rounded-corners(4px);
   .box-shadow(2px, 2px, 42px, rgba(0, 0, 0, 0.4));
   text-align:center;
@@ -28,7 +28,7 @@
   }
 
   h1 {
-    background-color:@error-msg-type;
+    background-color:@ocean;
     text-align:left;
     margin:0;
     padding:5px 10px;
@@ -57,6 +57,18 @@
   .btn {
     padding:5px 30px;
     margin:0 5px;
+  }
+
+}
+
+.alert.warning {
+  color:@error-msg-type;
+
+  h1 {
+    background-color:@error-msg-type;
+  }
+
+  .btn {
     border-color:@error-msg-type;
   }
 

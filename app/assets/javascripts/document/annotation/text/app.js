@@ -4,6 +4,7 @@ require.config({
 });
 
 require([
+  'common/ui/alert',
   'common/ui/formatting',
   'common/utils/annotationUtils',
   'common/api',
@@ -16,6 +17,7 @@ require([
   'document/annotation/text/selection/phraseAnnotator',
   'document/annotation/text/selection/selectionHandler',
 ], function(
+  Alert,
   Formatting,
   AnnotationUtils,
   API,
@@ -38,7 +40,7 @@ require([
 
         highlighter = new Highlighter(contentNode),
 
-        phraseAnnotator = new PhraseAnnotator(contentNode),
+        phraseAnnotator = new PhraseAnnotator(contentNode, highlighter),
 
         selector = new SelectionHandler(contentNode, highlighter),
 
@@ -77,16 +79,35 @@ require([
         },
 
         onCreateAnnotation = function(selection) {
-          var reappliedAnnotations = phraseAnnotator.reapply(selection.annotation);
+          var reapply = function() {
+                var selections = phraseAnnotator.createSelections(selection.annotation);
+                jQuery.each(selections, function(idx, selection) {
+                  // TODO roll into one request!
+                  self.onCreateAnnotation(selection);
+                });
+              },
 
+              promptReapply = function() {
+                var quote = AnnotationUtils.getQuote(selection.annotation),
+                    occurrenceCount = phraseAnnotator.countOccurrences(quote),
+                    promptTitle = 'Re-Apply',
+                    promptMessage = (occurrenceCount > 1) ?
+                      'There are ' + occurrenceCount + ' more occurrences of <em>' :
+                      'There is 1 more occurrence of <em>';
 
-          /*** DUMMY - just a hack!!! ***/
-          // highlighter.initPage(reappliedAnnotations);
-          /*** DUMMY -just a hack!!! ***/
+                if (occurrenceCount > 0) {
+                  promptMessage +=
+                    quote + '</em> in the text.<br/>Do you want to re-apply this annotation?';
 
+                  new Alert(Alert.INFO, promptTitle, promptMessage).on('ok', reapply);
+                }
+              };
 
-          // Call super method
+          // Store the annotation first
           self.onCreateAnnotation(selection);
+
+          // Then prompt the user if they want to re-apply across the doc
+          promptReapply();
         };
 
     // Toolbar events
