@@ -1,18 +1,22 @@
 package controllers.document.downloads.serializers
 
+import java.io.File
+import java.util.UUID
+import kantan.csv.ops._
 import models.annotation.{Annotation, AnnotationService}
 import models.place.{Place, PlaceService}
+import play.api.libs.Files.TemporaryFile
 import scala.concurrent.ExecutionContext
 
 trait CSVSerializer extends BaseSerializer {
 
-  private val SEPARATOR = ";"
-  private val NEWLINE   = "\n"
+  private val TMP_DIR = System.getProperty("java.io.tmpdir")
+
   private val EMPTY     = ""
 
   def annotationsToCSV(documentId: String)(implicit annotationService: AnnotationService, placeService: PlaceService, ctx: ExecutionContext) = {
 
-    def serializeOne(a: Annotation, places: Seq[Place]) = {
+    def serializeOne(a: Annotation, places: Seq[Place]): Seq[String] = {
       val firstEntity = getFirstEntityBody(a)
       val maybePlace = firstEntity.flatMap(_.uri.flatMap { uri =>
         places.find(_.uris.contains(uri))
@@ -24,15 +28,15 @@ trait CSVSerializer extends BaseSerializer {
           getFirstTranscription(a)
         else None
 
-      a.annotationId + SEPARATOR +
-      quoteOrTranscription.getOrElse(EMPTY) + SEPARATOR +
-      a.anchor + SEPARATOR +
-      firstEntity.map(_.hasType.toString).getOrElse(EMPTY) + SEPARATOR +
-      firstEntity.flatMap(_.uri).getOrElse(EMPTY) + SEPARATOR +
-      maybePlace.map(_.titles.mkString(",")).getOrElse(EMPTY) + SEPARATOR +
-      maybePlace.flatMap(_.representativePoint.map(_.y)).getOrElse(EMPTY) + SEPARATOR +
-      maybePlace.flatMap(_.representativePoint.map(_.x)).getOrElse(EMPTY) + SEPARATOR +
-      firstEntity.flatMap(_.status.map(_.value)).getOrElse(EMPTY) + SEPARATOR
+      Seq(a.annotationId.toString,
+          quoteOrTranscription.getOrElse(EMPTY),
+          a.anchor,
+          firstEntity.map(_.hasType.toString).getOrElse(EMPTY),
+          firstEntity.flatMap(_.uri).getOrElse(EMPTY),
+          maybePlace.map(_.titles.mkString(",")).getOrElse(EMPTY),
+          maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(EMPTY),
+          maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY),
+          firstEntity.flatMap(_.status.map(_.value.toString)).getOrElse(EMPTY))
     }
 
     // This way, futures start immediately, in parallel
@@ -47,9 +51,15 @@ trait CSVSerializer extends BaseSerializer {
 
     f.map { case (annotations, places) =>
       val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "VERIFICATION_STATUS")
-      val serialized = sort(annotations.map(_._1)).map(a => serializeOne(a, places))
-      header.mkString(SEPARATOR) + NEWLINE +
-      serialized.mkString(NEWLINE)
+      
+      val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".csv"))
+      val writer = tmp.file.asCsvWriter[Seq[String]](';', header)
+      
+      val tupled = sort(annotations.map(_._1)).map(a => serializeOne(a, places))
+      tupled.foreach(t => writer.write(t))
+      writer.close()
+      
+      tmp.file
     }
   }
 

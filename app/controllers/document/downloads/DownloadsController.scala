@@ -55,7 +55,7 @@ class DownloadsController @Inject() (
     val maybeUser = loggedIn.map(_.user)
     documentReadResponse(documentId, maybeUser, { case (_, _) => // Used just for the access permission check
       annotationsToCSV(documentId).map { csv =>
-        Ok(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
+        Ok.sendFile(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
       }
     })
   }

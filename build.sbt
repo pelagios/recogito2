@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models",
   "jp.t2v" %% "play2-auth" % "0.14.1",
+  "com.nrinaudo" %% "kantan.csv" % "0.1.15",
 
   "org.geotools" % "gt-geojson" % "14.3",
   "org.jooq" % "jooq" % "3.7.2",
