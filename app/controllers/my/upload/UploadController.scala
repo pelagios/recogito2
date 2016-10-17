@@ -42,8 +42,6 @@ class UploadController @Inject() (
     implicit val system: ActorSystem
   ) extends BaseAuthController(config, documents, users) with I18nSupport {
 
-  private val FILE_ARG = "file"
-
   private val MSG_ERROR = "There was an error processing your data"
 
   val newDocumentForm = Form(
@@ -103,42 +101,56 @@ class UploadController @Inject() (
   def storeFilepart(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
     import UploadController._
-
-    // First, we need to get the pending upload this filepart belongs to
+    
     val username = loggedIn.user.getUsername
+    val isFileupload = request.body.asMultipartFormData.isDefined
+    
+    def storeFilepart(pendingUpload: UploadRecord) = request.body.asMultipartFormData.map(tempfile => {
+      tempfile.file("file").map(f => {
+        uploads.insertUploadFilepart(pendingUpload.getId, username, f).map(_ match {
+          case Right(filepart) =>
+            // Upload was properly identified and stored
+            Ok(Json.toJson(UploadSuccess(filepart.getContentType)))
+
+          case Left(UnsupportedContentType) =>
+            BadRequest("Unknown or unsupported file format")
+
+          case Left(otherFailure) =>
+            // For future use
+            BadRequest(MSG_ERROR)
+        })
+      }).getOrElse({
+        // POST without a file? Not possible through the UI!
+        Logger.warn("Filepart POST without file attached")
+        Future.successful(BadRequest(MSG_ERROR))
+      })
+    }).getOrElse({
+      // POST without form data? Not possible through the UI!
+      Logger.warn("Filepart POST without form data")
+      Future.successful(BadRequest(MSG_ERROR))
+    })
+    
+    def registerIIIFSource(pendingUpload: UploadRecord) =
+      request.body.asFormUrlEncoded.flatMap(_.get("iiif_source").map(_.headOption)).flatten match {
+        case Some(url) =>
+          uploads.insertRemoteFilepart(pendingUpload.getId, username, ContentType.IMAGE_IIIF, url).map(success =>
+            if (success) Ok else InternalServerError)
+          
+        case None =>
+          // POST without IIIF URL? Not possible through the UI!
+          Logger.warn("IIIF POST without URL")
+          Future.successful(BadRequest(MSG_ERROR))
+      }
+
     uploads.findPendingUpload(username)
       .flatMap(_ match {
         case Some(pendingUpload) =>
-          request.body.asMultipartFormData.map(tempfile => {
-            tempfile.file(FILE_ARG).map(f => {
-              uploads.insertFilepart(pendingUpload.getId, username, f).map(_ match {
-                case Right(filepart) =>
-                  // Upload was properly identified and stored
-                  Ok(Json.toJson(UploadSuccess(filepart.getContentType)))
+          if (isFileupload) storeFilepart(pendingUpload) else registerIIIFSource(pendingUpload)
 
-                case Left(UnsupportedContentType) =>
-                  BadRequest("Unknown or unsupported file format")
-
-                case Left(otherFailure) =>
-                  // For future use
-                  BadRequest(MSG_ERROR)
-              })
-            }).getOrElse({
-              // POST without a file? Not possible through the UI!
-              Logger.warn("Filepart POST without file attached")
-              Future.successful(BadRequest(MSG_ERROR))
-            })
-          }).getOrElse({
-            // POST without form data? Not possible through the UI!
-            Logger.warn("Filepart POST without form data")
-            Future.successful(BadRequest(MSG_ERROR))
-          })
-
-        case None => {
+        case None =>
           // No pending upload stored in database? Not possible through the UI!
           Logger.warn("Filepart POST without pending upload")
           Future.successful(BadRequest(MSG_ERROR))
-        }
       })
       .recover { case t: Throwable =>
         t.printStackTrace()
