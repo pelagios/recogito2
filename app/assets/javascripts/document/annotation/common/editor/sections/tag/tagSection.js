@@ -44,6 +44,11 @@ define([
           taglist.append('<li>' + chars + '</li>');
         },
 
+        onTagClicked = function(e) {
+          var chars = jQuery(e.target).text();
+          console.log(chars);
+        },
+
         onKeyDown = function(e) {
           if (e.keyCode === 13) {
             addTag(textarea.text().trim());
@@ -54,6 +59,7 @@ define([
         };
 
     init();
+    taglist.on('click', 'li', onTagClicked);
     textarea.keydown(onKeyDown);
     parent.append(element);
 
