@@ -245,7 +245,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   }
   
   /** Retrieves documents by their owner **/
-  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20) = db.query { sql =>
+  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 100) = db.query { sql =>
     val startTime = System.currentTimeMillis
     
     val total = if (publicOnly)
