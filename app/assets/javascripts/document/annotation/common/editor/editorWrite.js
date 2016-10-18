@@ -40,7 +40,8 @@ define([
                       '</div>' +
                     '</div>' +
                     '<div class="center-sections"></div>' +
-                    '<div class="reply-field"></div>' +
+                    '<div class="reply-section"></div>' +
+                    '<div class="tag-section"></div>' +
                     '<div class="footer">' +
                       '<button class="btn small outline cancel">Cancel</button>' +
                       '<button class="btn small outline ok-next">OK &amp Next</button>' +
@@ -62,7 +63,7 @@ define([
         btnOkAndNext = element.find('button.ok-next'),
         btnOk = element.find('button.ok'),
 
-        replyField = new TextEntryField(element.find('.reply-field'), {
+        replyField = new TextEntryField(element.find('.reply-section'), {
           placeholder : 'Add a comment...',
           cssClass    : 'reply',
           bodyType    : 'COMMENT'

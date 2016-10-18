@@ -1,6 +1,7 @@
 define([
   'document/annotation/common/editor/sections/comment/commentSection',
   'document/annotation/common/editor/sections/place/placeSection',
+  'document/annotation/common/editor/sections/tag/tagSection',
   'document/annotation/common/editor/sections/transcription/transcriptionSection',
   'document/annotation/common/editor/textEntryField',
   'common/utils/annotationUtils',
@@ -9,6 +10,7 @@ define([
 ], function(
   CommentSection,
   PlaceSection,
+  TagSection,
   TranscriptionSection,
   TextEntryField,
   AnnotationUtils,
@@ -21,6 +23,7 @@ define([
 
         transcriptionSectionEl = editorEl.find('.transcription-sections'),
         centerSectionEl = editorEl.find('.center-sections'),
+        tagSectionEl = editorEl.find('.tag-section'),
 
         sections = [],
 
@@ -34,7 +37,8 @@ define([
         setAnnotation = function(annotation) {
           var transcriptionBodies = AnnotationUtils.getBodiesOfType(annotation, 'TRANSCRIPTION'),
               placeBodies = AnnotationUtils.getBodiesOfType(annotation, 'PLACE'),
-              commentBodies = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT');
+              commentBodies = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT'),
+              tagBodies = AnnotationUtils.getBodiesOfType(annotation, 'TAG');
 
           clear();
 
@@ -52,6 +56,8 @@ define([
           jQuery.each(commentBodies, function(idx, commentBody) {
             initCommentSection(commentBody);
           });
+
+          initTagSection(tagBodies);
         },
 
         /** Shorthand for attaching the standard section delete handler **/
@@ -126,7 +132,6 @@ define([
             return storedTranscriptions[storedTranscriptions.length - 1];
         },
 
-        /** Common code for initializing a place section **/
         initPlaceSection = function(placeBody, toponym) {
           var placeSection = new PlaceSection(centerSectionEl, placeBody, toponym);
           forwardEvent(placeSection, 'change'); // Georesolution change needs to be handled by editor
@@ -134,12 +139,16 @@ define([
           sections.push(placeSection);
         },
 
-        /** Common code for initializing a comment section **/
         initCommentSection = function(commentBody) {
           var commentSection = new CommentSection(centerSectionEl, commentBody);
           forwardEvent(commentSection, 'submit'); // Submit event needs to be handled by editor
           handleDelete(commentSection);
           sections.push(commentSection);
+        },
+
+        initTagSection = function(tagBodies) {
+          var tagSection = new TagSection(tagSectionEl, tagBodies);
+          sections.push(tagSection);
         },
 
         /** Creates a new section and queues creating in the annotation for later **/
