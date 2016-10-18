@@ -57,7 +57,7 @@ define([
             initCommentSection(commentBody);
           });
 
-          initTagSection(tagBodies);
+          initTagSection(annotation);
         },
 
         /** Shorthand for attaching the standard section delete handler **/
@@ -146,8 +146,8 @@ define([
           sections.push(commentSection);
         },
 
-        initTagSection = function(tagBodies) {
-          var tagSection = new TagSection(tagSectionEl, tagBodies);
+        initTagSection = function(annotation) {
+          var tagSection = new TagSection(tagSectionEl, annotation);
           sections.push(tagSection);
         },
 

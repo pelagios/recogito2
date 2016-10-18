@@ -1,8 +1,9 @@
 define([
+  'common/config',
   'document/annotation/common/editor/sections/section'
-], function(Section, TextEntryField) {
+], function(Config, Section) {
 
-  var TagSection = function(parent, tagBodies) {
+  var TagSection = function(parent, annotation) {
     var element = jQuery(
           '<div class="section tags">' +
             '<ul></ul>' +
@@ -12,14 +13,21 @@ define([
         taglist = element.find('ul'),
         textarea = element.find('.add-tag'),
 
-        changed = false,
+        queuedUpdates = [],
+
+        init = function() {
+          jQuery.each(annotation.bodies, function(idx, body) {
+            if (body.type === 'TAG')
+              addTag(body.value);
+          });
+        },
 
         hasChanged = function() {
-          return changed;
+          return queuedUpdates.length > 0;
         },
 
         commit = function() {
-          // TODO implement
+          jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
         },
 
         destroy = function() {
@@ -27,7 +35,12 @@ define([
         },
 
         addTag = function(chars) {
-          changed = true;
+          queuedUpdates.push(function() {
+            annotation.bodies.push({
+              type: 'TAG', last_modified_by: Config.me, value: chars
+            });
+          });
+
           taglist.append('<li>' + chars + '</li>');
         },
 
@@ -40,6 +53,7 @@ define([
           }
         };
 
+    init();
     textarea.keydown(onKeyDown);
     parent.append(element);
 
