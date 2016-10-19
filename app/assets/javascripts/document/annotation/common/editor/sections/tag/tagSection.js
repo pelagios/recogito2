@@ -47,7 +47,7 @@ define([
           });
 
           // In read-only mode, hide the list if there are no tags
-          if (tagCount === 0)
+          if (!Config.writeAccess && tagCount === 0)
             element.hide();
         },
 
