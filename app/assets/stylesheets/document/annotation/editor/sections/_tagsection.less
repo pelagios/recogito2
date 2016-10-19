@@ -13,18 +13,42 @@
 
   li, .add-tag {
     margin:1px 1px 1px 0;
-    font-size:16px;
-    line-height:160%;
     display:inline-block;
     .rounded-corners(2px);
+    overflow:hidden;
+    font-size:16px;
+    line-height:160%;
   }
 
   li {
-    padding:0 6px;
     background-color:#fff;
     border:1px solid @lightgrey-border-darker;
     .box-shadow(0, 0, 4px, rgba(0,0,0,0.1));
     cursor:pointer;
+    position:relative;
+    .noselect();
+
+    .label {
+      padding:0 6px;
+    }
+
+    .delete {
+      position:absolute;
+      top:0;
+      right:0;
+      display:block;
+      background-color:@ocean;
+      color:#fff;
+      font-size:14px;
+      line-height:190%;
+      width:0;
+
+      .icon {
+        padding:0 6px;
+      }
+
+    }
+
   }
 
   .add-tag {
