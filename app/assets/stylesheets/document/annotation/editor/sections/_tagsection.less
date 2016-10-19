@@ -2,11 +2,12 @@
   background-color:@blueish-white-hi;
   border-bottom:1px solid @lightgrey-border;
   color:@grey-type;
+  padding:2px 3px;
 
   ul {
-    display:inline-block;
+    display:inline;
     margin:0;
-    padding:2px 3px;
+    padding:0;
     min-width:9px;
     list-style-type:none;
   }
@@ -14,10 +15,10 @@
   li, .add-tag {
     margin:1px 1px 1px 0;
     display:inline-block;
+    vertical-align:top;
     .rounded-corners(2px);
     overflow:hidden;
     font-size:16px;
-    line-height:160%;
   }
 
   li {
@@ -27,6 +28,7 @@
     cursor:pointer;
     position:relative;
     .noselect();
+    line-height:160%;
 
     .label {
       padding:0 6px;
@@ -52,10 +54,10 @@
   }
 
   .add-tag {
-    padding:0 2px;
+    padding:0 4px;
     min-width:80px;
-    display:inline-block;
     outline:none;
+    line-height:170%;
   }
 
   .add-tag:empty:not(:focus):before {

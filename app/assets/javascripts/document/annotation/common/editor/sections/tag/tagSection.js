@@ -55,16 +55,17 @@ define([
         /** Adds a new tag to the annotation **/
         addTag = function(chars) {
           if (!exists(chars)) {
-            var li = createTag(chars);
+            var li = createTag(chars),
+                tag = li.data('tag');
+
             taglist.append(li);
-            queuedUpdates.push(function() { annotation.bodies.push(li.data('tag')); });
+            queuedUpdates.push(function() { annotation.bodies.push(tag); });
           }
         },
 
         /** Deletes a tag from the annotation **/
         deleteTag = function(li) {
           var tag = li.data('tag');
-
           li.remove();
           queuedUpdates.push(function() {
             var idx = annotation.bodies.indexOf(tag);
