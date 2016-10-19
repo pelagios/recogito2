@@ -8,13 +8,14 @@ define([
       ANIM_DURATION = 150;
 
   var TagSection = function(parent, annotation) {
-    var element = jQuery(
+    var element = (Config.writeAccess) ? jQuery(
           '<div class="section tags">' +
             '<ul></ul>' +
             '<div contenteditable="true" spellcheck="false" class="add-tag" data-placeholder="Add tag..." />' +
-          '</div>'),
+          '</div>') : jQuery('<div class="section tags readonly"><ul></ul></div>'),
 
         taglist = element.find('ul'),
+
         textarea = element.find('.add-tag'),
 
         queuedUpdates = [],
@@ -37,10 +38,17 @@ define([
 
         /** Initializes the tag list from the annotation bodies **/
         init = function() {
+          var tagCount = 0;
           jQuery.each(annotation.bodies, function(idx, body) {
-            if (body.type === 'TAG')
+            if (body.type === 'TAG') {
               taglist.append(createTag(body));
+              tagCount++;
+            }
           });
+
+          // In read-only mode, hide the list if there are no tags
+          if (tagCount === 0)
+            element.hide();
         },
 
         /** Tests if the given character string exists as a tag already **/
@@ -138,8 +146,12 @@ define([
         };
 
     init();
-    taglist.on('click', 'li', onTagClicked);
-    textarea.keydown(onKeyDown);
+
+    if (Config.writeAccess) {
+      taglist.on('click', 'li', onTagClicked);
+      textarea.keydown(onKeyDown);
+    }
+
     parent.append(element);
 
     this.hasChanged = hasChanged;
