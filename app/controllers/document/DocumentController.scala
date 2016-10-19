@@ -89,7 +89,7 @@ class DocumentController @Inject() (
     import models.ContentType._
     
     def iiifThumbnailURL(iiifUrl: String) =
-      iiifUrl.substring(0, iiifUrl.length - 9) + "full/160,/0/native.jpg"
+      iiifUrl.substring(0, iiifUrl.length - 9) + "full/160,/0/default.jpg"
     
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>

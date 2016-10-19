@@ -5,7 +5,7 @@
   content: Option[String] = None
 )(implicit request: RequestHeader)
 
-@thumbnailURL(part: models.generated.tables.records.DocumentFilepartRecord)={@if(part.getContentType == "IMAGE_IIIF"){@part.getFile.substring(0, part.getFile.length - 9)square/256,256/0/native.jpg}else{@controllers.document.routes.DocumentController.getImageTile(doc.id, part.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL}}
+@thumbnailURL(part: models.generated.tables.records.DocumentFilepartRecord)={@if(part.getContentType == "IMAGE_IIIF"){@part.getFile.substring(0, part.getFile.length - 9)square/256,256/0/default.jpg}else{@controllers.document.routes.DocumentController.getImageTile(doc.id, part.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL}}
 
 @if(doc.isPublic) {
   <meta property="og:type" content="website" />

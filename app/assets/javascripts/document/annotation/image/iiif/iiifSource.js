@@ -39,7 +39,7 @@ define([], function() {
 
         extension = options.extension || 'jpg',
 
-        quality = options.quality || 'native',
+        quality = options.quality || 'default',
 
         width = options.width,
 

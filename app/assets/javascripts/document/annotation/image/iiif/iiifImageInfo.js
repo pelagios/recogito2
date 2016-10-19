@@ -49,7 +49,7 @@ define([], function() {
     this.height = json.height;
     this.baseUrl = getURL();
     this.tiles = (json.tiles || [{}])[0];
-    this.resolutions = json.scale_factors || this.tiles.scaleFactors;
+    this.resolutions = json.scale_factors || this.tiles.scaleFactors || [ 1, 2, 4, 8, 16 ];
     this.extension = (json.formats || [])[0];
     this.tileSize = json.tile_width || this.tiles.width || undefined;
   };
