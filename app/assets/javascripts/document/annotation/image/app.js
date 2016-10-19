@@ -4,6 +4,7 @@ require.config({
 });
 
 require([
+  'common/ui/alert',
   'common/api',
   'common/config',
   'document/annotation/common/editor/editorRead',
@@ -16,6 +17,7 @@ require([
   'document/annotation/image/selection/highlighter',
   'document/annotation/image/selection/selectionHandler'
 ], function(
+  Alert,
   API,
   Config,
   ReadEditor,
@@ -140,8 +142,11 @@ require([
           },
 
           onLoadError = function(error) {
-            // TODO error indication to user
-            console.log(error);
+            var title = 'Connection Error',
+                message = (Config.contentType === 'IMAGE_IIIF') ?
+                  'There was an error connecting to the remote IIIF endpoint.' :
+                  'An error occured.',
+                alert = new Alert(Alert.ERROR, title, message);
           },
 
           init = function(imageProperties) {
