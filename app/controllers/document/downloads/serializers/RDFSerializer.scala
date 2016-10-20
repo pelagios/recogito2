@@ -2,7 +2,8 @@ package controllers.document.downloads.serializers
 
 import java.io.{ File, FileOutputStream }
 import java.util.UUID
-import models.annotation.{ Annotation, AnnotationService }
+import models.HasDate
+import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.{ DocumentInfo, DocumentService }
 import org.apache.jena.rdf.model.{ Model, ModelFactory }
 import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
@@ -11,14 +12,43 @@ import play.api.libs.Files.TemporaryFile
 import play.api.mvc.{ AnyContent, Request }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.{ ExecutionContext, Future }
-import org.apache.jena.vocabulary.RDFS
-import org.apache.jena.rdf.model.ResourceFactory
-import models.HasDate
+
+sealed class BaseVocab(val getURI: String) {
+  
+  private val model = ModelFactory.createDefaultModel()
+  protected def createResource(term: String) = model.createResource(getURI + term)
+  protected def createProperty(term: String) = model.createProperty(getURI + term)
+  
+}
+
+object OA extends BaseVocab("http://www.w3.org/ns/oa#") {
+  
+  val Annotation = createResource("Annotation")
+  val Tag = createResource("Tag")
+  
+  val hasBody = createProperty("hasBody")
+  val hasTarget = createProperty("hasTarget")
+  
+}
+
+object Content extends BaseVocab("http://www.w3.org/2011/content#") {
+
+  val chars = createProperty("chars")
+  
+}
+
+object Pelagios extends BaseVocab("http://pelagios.github.io/vocab/terms#") {
+  
+  val AnnotatedThing = createResource("AnnotatedThing")
+  
+}
+
 
 trait RDFSerializer extends BaseSerializer with HasDate {
     
   private def createDocumentResource(docInfo: DocumentInfo, baseUri: String, model: Model) = {
     val resource = model.createResource(baseUri)
+    resource.addProperty(RDF.`type`, Pelagios.AnnotatedThing)
     resource.addProperty(DCTerms.title, docInfo.title)
     docInfo.author.map(author => resource.addProperty(DCTerms.creator, author))
     
@@ -30,23 +60,26 @@ trait RDFSerializer extends BaseSerializer with HasDate {
   }
   
   private def createAnnotationResource(docInfo: DocumentInfo, annotation: Annotation, baseUri: String, model: Model) = {
-    val resource = model.createResource(baseUri + "#" + annotation.annotationId)
-    resource.addProperty(RDF.`type`, model.createResource(OA.Annotation))
-    resource.addProperty(model.createProperty(OA.hasTarget), model.createResource(baseUri))
+    val annotationResource = model.createResource(baseUri + "#" + annotation.annotationId)
+    annotationResource.addProperty(RDF.`type`, OA.Annotation)
+    annotationResource.addProperty(OA.hasTarget, model.createResource(baseUri))
     
     annotation.bodies.zipWithIndex.foreach { case (body, idx) =>
-      val bodyResource = model.createResource(resource.getURI + "/body/" + (idx + 1))
-      resource.addProperty(model.createProperty(OA.hasBody), bodyResource)
       
-      if (body.value.isDefined) {
-        bodyResource.addProperty(RDF.`type`, model.createResource(OA.TextualBody))
-        bodyResource.addProperty(model.createProperty(OA.hasBody), body.value.get)
-      } else if (body.uri.isDefined) {
-        // TODO type semantic tag?
-        bodyResource.addProperty(model.createProperty(OA.hasBody), body.uri.get)
+      body.hasType match {
+        case AnnotationBody.PLACE | AnnotationBody.PERSON =>
+          body.uri.map(uri => annotationResource.addProperty(OA.hasBody, model.createResource(uri)))
+          
+        case AnnotationBody.TAG | AnnotationBody.COMMENT =>
+          val tagResource = model.createResource()
+          tagResource.addProperty(RDF.`type`, OA.Tag)
+          body.value.map(chars => tagResource.addProperty(Content.chars, chars))
+          body.lastModifiedBy.map(by => tagResource.addProperty(DCTerms.creator, by))
+          tagResource.addProperty(DCTerms.created, formatDate(body.lastModifiedAt))
+          annotationResource.addProperty(OA.hasBody, tagResource)
+          
+        case _ =>
       }
-      
-      body.lastModifiedBy.map(by => bodyResource.addProperty(DCTerms.creator, by))
     }    
   }
   
@@ -58,8 +91,10 @@ trait RDFSerializer extends BaseSerializer with HasDate {
     annotationService.findByDocId(doc.id).map { annotations =>
       scala.concurrent.blocking { 
         val model = ModelFactory.createDefaultModel()
+        model.setNsPrefix("cnt", Content.getURI)
         model.setNsPrefix("dcterms", DCTerms.getURI)
         model.setNsPrefix("oa", OA.getURI)
+        model.setNsPrefix("pelagios", Pelagios.getURI)
 
         createDocumentResource(doc, baseUri, model)
         annotations.foreach(t => createAnnotationResource(doc, t._1, baseUri, model))
@@ -74,21 +109,5 @@ trait RDFSerializer extends BaseSerializer with HasDate {
     }
     
   }
-  
-}
-
-object OA {
-  
-  val getURI = "http://www.w3.org/ns/oa#"
-  
-  val Annotation = getURI + "Annotation"
-  
-  val annotatedAt = getURI + "annotatedAt"
-  
-  val hasBody = getURI + "hasBody"
-  
-  val TextualBody = getURI + "TextualBody"
-  
-  val hasTarget = getURI + "hasTarget"
   
 }

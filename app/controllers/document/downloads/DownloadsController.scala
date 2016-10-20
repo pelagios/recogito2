@@ -59,14 +59,15 @@ class DownloadsController @Inject() (
     download(documentId, export) 
   }
   
-  private def downloadRDF(documentId: String, format: RDFFormat) = AsyncStack { implicit request =>
-    def export(docInfo: DocumentInfo) = documentToRDF(docInfo, format).map(file => Ok.sendFile(file))
+  private def downloadRDF(documentId: String, format: RDFFormat, extension: String) = AsyncStack { implicit request =>
+    def export(docInfo: DocumentInfo) = documentToRDF(docInfo, format).map(file => 
+      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + "." + extension }))
     download(documentId, export)
   }
   
-  def downloadTTL(documentId: String) = downloadRDF(documentId, RDFFormat.TTL) 
-  def downloadRDFXML(documentId: String) = downloadRDF(documentId, RDFFormat.RDFXML) 
-  def downloadJSONLD(documentId: String) = downloadRDF(documentId, RDFFormat.JSONLD_PRETTY) 
+  def downloadTTL(documentId: String) = downloadRDF(documentId, RDFFormat.TTL, "ttl") 
+  def downloadRDFXML(documentId: String) = downloadRDF(documentId, RDFFormat.RDFXML, "rdf.xml") 
+  def downloadJSONLD(documentId: String) = downloadRDF(documentId, RDFFormat.JSONLD_PRETTY, "jsonld") 
 
   def downloadGeoJSON(documentId: String) = AsyncStack { implicit request =>
     def export(docInfo: DocumentInfo) = placesToGeoJSON(documentId).map { featureCollection =>
