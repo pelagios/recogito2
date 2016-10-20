@@ -5,6 +5,8 @@ import models.annotation.{ Annotation, AnnotationBody }
 import play.api.Logger
 
 trait BaseSerializer {
+  
+  protected val TMP_DIR = System.getProperty("java.io.tmpdir")
 
   private def sortByCharOffset(annotations: Seq[Annotation]) = {
     annotations.sortWith { (a, b) =>
