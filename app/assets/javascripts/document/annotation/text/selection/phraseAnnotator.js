@@ -43,7 +43,8 @@ define([
                   nextIdx = text.indexOf(quote, cursor);
                 }
 
-                // Sorted bottom-to-top, so we can render them safely
+                // Sorted bottom-to-top, so we can render them safely (we
+                // know they are not overlapping, by definition!)
                 return ranges.reverse();
               },
 
@@ -66,7 +67,11 @@ define([
                           content_type: Config.contentType
                         },
                         anchor: 'char-offset:' + computeOffset(),
-                        bodies: annotation.bodies.slice()
+
+                        // Clone bodies
+                        bodies: jQuery.map(annotation.bodies, function(body) {
+                          return jQuery.extend({}, body);
+                        })
                       },
 
                       bounds = range.nativeRange.getBoundingClientRect(),
