@@ -3,6 +3,7 @@ package controllers.document
 import controllers.BaseOptAuthController
 import java.io.File
 import javax.inject.Inject
+import models.ContentType
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.user.UserService
@@ -24,34 +25,22 @@ class DocumentController @Inject() (
   }
 
   def getImageManifest(docId: String, partNo: Int) = AsyncStack { implicit request =>
-
-    import models.ContentType._
-
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
-      val contentType = currentPart.getContentType
-      val maybeManifestName =
-        if (contentType == IMAGE_UPLOAD.toString)
-          // All uploads are Zoomify format
-          Some("ImageProperties.xml")
-        else if (contentType == IMAGE_IIIF.toString)
-          Some(currentPart.getFile)
-        else
-          None
-
-      // TODO hack - clean this up!
-          
-      maybeManifestName match {
-        case Some(filename) if filename.startsWith("http") =>
-          Future.successful(Redirect(filename))
-              
-        case Some(filename) =>
-          getTilesetFile(doc.document, currentPart, filename).map {
+      ContentType.withName(currentPart.getContentType) match {
+        
+        case Some(ContentType.IMAGE_UPLOAD) =>
+          getTilesetFile(doc.document, currentPart, "ImageProperties.xml").map {
             case Some(file) => Ok.sendFile(file)
-            case None => InternalServerError // Document folder doesn't contain a manifset file
+            case None => InternalServerError
           }
-
-        case None => Future.successful(InternalServerError) // Unsupported content type (shouldn't happen)
+          
+        case Some(ContentType.IMAGE_IIIF) =>
+          Future.successful(Redirect(currentPart.getFile))
+          
+        case _ =>
+          Future.successful(InternalServerError)
+          
       }
     })
   }
