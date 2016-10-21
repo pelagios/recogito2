@@ -128,6 +128,7 @@ POST    /settings/account                            controllers.my.settings.Acc
 GET     /settings/password                           controllers.my.settings.PasswordSettingsController.index
 POST    /settings/password                           controllers.my.settings.PasswordSettingsController.updatePassword
 GET     /settings/restore                            controllers.my.settings.RestoreController.index
+POST    /settings/restore                            controllers.my.settings.RestoreController.restore
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

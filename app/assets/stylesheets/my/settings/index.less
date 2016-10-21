@@ -5,6 +5,17 @@ html, body {
   background-color:@blueish-white-hi;
 }
 
+// Hides default file input controls without using display:none
+// cf. http://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/
+input[type=file] {
+  width:0.1px;
+  height:0.1px;
+  opacity:0;
+  overflow:hidden;
+  position:absolute;
+  z-index:-1;
+}
+
 .content {
   margin-left:@sidebar-width;
   padding:20px;

@@ -41,9 +41,12 @@
             You can restore a document from a ZIP package downloaded earlier through Recogito's
             Backup function.
           </p>
-          <a class="btn" href="#"> <!-- TODO -->
-            <span class="icon">&#xf093;</span> Download ZIP Backup Package
-          </a>
+          @helper.form(action = controllers.my.settings.routes.RestoreController.restore(), 'enctype -> "multipart/form-data") {
+            <input type="file" name="backup" id="backup" onchange="this.form.submit()">
+            <label class="btn" for="backup">
+              <span class="icon">&#xf093;</span> Upload ZIP Backup Package
+            </label>
+          }
         </div>
       </div>
     </div>
