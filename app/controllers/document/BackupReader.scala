@@ -116,6 +116,7 @@ trait BackupReader extends HasDate {
     
     def restoreAnnotations(annotationStubs: Iterator[AnnotationStub], docId: String, fileparts: Seq[DocumentFilepartRecord]) = {
       val annotations = annotationStubs.map(stub => stub.toAnnotation(docId, fileparts))
+      // TODO filter - make sure no annotations not linked to any part get imported
       annotationService.insertOrUpdateAnnotations(annotations.toSeq)
     }
     
