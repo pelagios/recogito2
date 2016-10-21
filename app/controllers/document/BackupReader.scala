@@ -31,6 +31,7 @@ trait BackupReader extends HasDate {
       // First preference is to re-use ID from backup
       val id = (json \ "id").asOpt[String] match {
         case Some(preferredId) =>
+          // TODO sanitize the preferred ID
           if (documentService.existsId(preferredId))
             // No longer available
             documentService.generateRandomID()
