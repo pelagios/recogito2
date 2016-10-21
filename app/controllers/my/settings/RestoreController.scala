@@ -4,24 +4,31 @@ import controllers.{ HasUserService, HasConfig, Security }
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
+import models.annotation.AnnotationService
+import models.document.DocumentService
 import models.user.Roles._
 import models.user.UserService
 import play.api.{ Configuration, Logger }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import scala.concurrent.{ ExecutionContext, Future }
+import controllers.document.BackupReader
 
 class RestoreController @Inject() (
     val config: Configuration,
     val users: UserService,
     val messagesApi: MessagesApi,
+    implicit val annotations: AnnotationService,
+    implicit val documents: DocumentService,
     implicit val ctx: ExecutionContext
-) extends Controller with AuthElement with HasUserService with HasConfig with Security with I18nSupport {
+) extends Controller 
+    with AuthElement 
+    with HasUserService 
+    with HasConfig
+    with Security
+    with I18nSupport
+    with BackupReader {
   
-  private def restoreFromZip(zipfile: File, currentUser: String): Future[Unit] = {
-    Future { }
-  }
-
   def index() = StackAction(AuthorityKey -> Normal) { implicit request =>
     Ok(views.html.my.settings.restore(loggedIn.user))
   }
@@ -31,7 +38,8 @@ class RestoreController @Inject() (
       tempfile.file("backup") match {
        
         case Some(filepart) =>
-          restoreFromZip(filepart.ref.file, loggedIn.user.getUsername)
+          // Forces the owner of the backup to the currently logged in user
+          restoreBackup(filepart.ref.file, Some(loggedIn.user.getUsername))
             .map { _ => Redirect(routes.RestoreController.index) }
             .recover { case t: Throwable =>
               t.printStackTrace()

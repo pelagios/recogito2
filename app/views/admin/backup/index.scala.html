@@ -17,16 +17,8 @@
     <div class="content">
       <div class="upload-zip">
         <span>Full backup package</span>
-        @helper.form(action = controllers.admin.backup.routes.BackupAdminController.restoreDocument(), 'enctype -> "multipart/form-data") {
-          <input type="file" id="backup-zip" name="backup-zip">
-          <input type="submit">
-        }
-      </div>
-
-      <div class="upload-jsonl">
-        <span>Annotations Only</span>
-        @helper.form(action = controllers.admin.backup.routes.BackupAdminController.restoreAnnotations(), 'enctype -> "multipart/form-data") {
-          <input type="file" id="backup-jsonl" name="backup-jsonl">
+        @helper.form(action = controllers.admin.backup.routes.BackupAdminController.restore(), 'enctype -> "multipart/form-data") {
+          <input type="file" id="backup" name="backup">
           <input type="submit">
         }
       </div>

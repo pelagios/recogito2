@@ -28,8 +28,7 @@ GET     /admin/users/:username                       controllers.admin.users.Use
 GET     /admin/users                                 controllers.admin.users.UserAdminController.index
 
 GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
-POST    /admin/restore/document                      controllers.admin.backup.BackupAdminController.restoreDocument
-POST    /admin/restore/annotations                   controllers.admin.backup.BackupAdminController.restoreAnnotations
+POST    /admin/restore                               controllers.admin.backup.BackupAdminController.restore
 
 GET     /admin                                       controllers.admin.AdminController.index
 
