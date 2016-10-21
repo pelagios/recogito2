@@ -143,7 +143,7 @@ object BackupReader extends HasDate with HasContentTypeList {
   ) {
     
     def toAnnotatedObject(docId: String, fileparts: Seq[DocumentFilepartRecord]) = AnnotatedObject(
-      documentId.getOrElse(docId),
+      docId,
       filepartId.getOrElse(fileparts.find(_.getTitle.equals(filepartTitle.get)).get.getId),
       contentType: ContentType
     )
