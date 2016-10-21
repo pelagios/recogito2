@@ -27,14 +27,29 @@ trait BackupReader extends HasDate {
   
   def readMetadata(file: File, newOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
     
-    def parseDocumentMetadata(json: JsValue) =    
+    def parseDocumentMetadata(json: JsValue) = {
+      // First preference is to re-use ID from backup
+      val id = (json \ "id").asOpt[String] match {
+        case Some(preferredId) =>
+          if (documentService.existsId(preferredId))
+            // No longer available
+            documentService.generateRandomID()
+          else
+            preferredId
+          
+        case None => // No ID in backup - generate random
+          documentService.generateRandomID()
+      }
+        
+      val owner = newOwner match {
+        case Some(username) => username
+        case _ => (json \ "owner").as[String]
+      }
+
       new DocumentRecord(
         // Reuse ID from backup or create a new one
-        (json \ "id").asOpt[String].getOrElse(documentService.generateRandomID()),
-        { newOwner match {
-          case Some(username) => username
-          case _ => (json \ "owner").as[String]
-        }},
+        id,
+        owner,
         // Reuse upload timestamp from backup or set to 'now'
         new Timestamp((json \ "uploaded_at").asOpt[DateTime].getOrElse(new DateTime()).getMillis),
         (json \ "title").as[String],
@@ -48,6 +63,7 @@ trait BackupReader extends HasDate {
         (json \ "license").asOpt[String].getOrElse(null),
         // Default to 'false'
         (json \ "is_public").asOpt[Boolean].getOrElse(false).asInstanceOf[Boolean])
+    }
     
     def parseFilepartMetadata(documentId: String, json: JsValue) =
       (json \ "parts").as[Seq[JsObject]].zipWithIndex.map { case (obj, idx) =>
