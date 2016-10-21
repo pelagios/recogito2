@@ -1,6 +1,6 @@
 @(
   user: models.generated.tables.records.UserRecord
-)
+)(implicit flash: Flash)
 <!DOCTYPE html>
 <html>
   <head>
@@ -14,7 +14,7 @@
 
       <ul class="menu">
         <li>
-          <a href="#" onclick="return false;">
+          <a href="@controllers.my.settings.routes.AccountSettingsController.index">
             <span class="label">Account</span>
           </a>
         </li>
@@ -26,7 +26,7 @@
         </li>
 
         <li class="active">
-          <a href="#">
+          <a href="#" onclick="return false;">
             <span class="label">Restore from Backup</span>
           </a>
         </li>
@@ -36,6 +36,12 @@
     <div class="content">
       <div class="restore panel centered">
         <h2>Restore</h2>
+        @flash.get("success").map { msg =>
+          <div class="success flash-message"><span class="icon">&#xf00c;</span> @msg</div>
+        }
+        @flash.get("error").map { msg =>
+          <div class="error flash-message"><span class="icon">&#xf00d;</span> @msg</div>
+        }
         <div class="inner">
           <p class="description">
             You can restore a document from a ZIP package downloaded earlier through Recogito's
