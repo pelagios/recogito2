@@ -42,9 +42,14 @@ class RestoreController @Inject() (
           restoreBackup(filepart.ref.file, Some(loggedIn.user.getUsername))
             .map { _ => 
               Redirect(routes.RestoreController.index).flashing("success" -> "The document was restored successfully.") 
-            }.recover { case t: Throwable =>
-              t.printStackTrace()
-              Redirect(routes.RestoreController.index).flashing("error" -> "There was an error restoring your document.") 
+            }.recover { 
+              
+              case e: InvalidSignatureException =>
+                Redirect(routes.RestoreController.index).flashing("error" -> "The authenticity of your backup could not be verified.")
+                
+              case t: Throwable =>
+                t.printStackTrace()
+                Redirect(routes.RestoreController.index).flashing("error" -> "There was an error restoring your document.") 
             }
           
         case None =>

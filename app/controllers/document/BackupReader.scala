@@ -1,7 +1,8 @@
 package controllers.document
 
 import collection.JavaConverters._
-import java.io.File
+import controllers.HasConfig
+import java.io.{ File, InputStream }
 import java.sql.Timestamp
 import java.util.UUID
 import java.util.zip.ZipFile
@@ -16,13 +17,13 @@ import play.api.libs.functional.syntax._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
 
-trait BackupReader extends HasDate {
+trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
   
   import BackupReader._
   
   private def openZipFile(file: File) = {
     val zipFile = new ZipFile(file)
-    (zipFile, zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX"))) // Damn you Apple!
+    (zipFile, zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX")))
   }
   
   def readMetadata(file: File, newOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
@@ -82,6 +83,7 @@ trait BackupReader extends HasDate {
       val (zipFile, entries) = openZipFile(file)
       val metadataEntry = entries.filter(_.getName == "metadata.json").head
       val metadataJson  = Json.parse(Source.fromInputStream(zipFile.getInputStream(metadataEntry), "UTF-8").getLines.mkString("\n"))
+        
       val documentRecord  = parseDocumentMetadata(metadataJson)
       val filepartRecords = parseFilepartMetadata(documentRecord.getId, metadataJson) 
       
@@ -116,22 +118,29 @@ trait BackupReader extends HasDate {
     }
     
     def restoreAnnotations(annotationStubs: Iterator[AnnotationStub], docId: String, fileparts: Seq[DocumentFilepartRecord]) = {
+      val filepartIds = fileparts.map(_.getId) 
+        
       val annotations = annotationStubs
         .map(stub => stub.toAnnotation(docId, fileparts))
-        .filter(annotation => fileparts.contains(annotation.annotates.filepartId))
+        .filter(annotation => filepartIds.contains(annotation.annotates.filepartId))
  
       annotationService.insertOrUpdateAnnotations(annotations.toSeq)
     }
     
-    val fReadMetadata = readMetadata(file, newOwner)
-    val fReadAnnotations = readAnnotations(file)
-    
-    for {
-      (document, parts) <- fReadMetadata
-      annotationStubs <- fReadAnnotations
-      _ <- restoreDocument(document, parts)
-      _ <- restoreAnnotations(annotationStubs, document.getId, parts)
-    } yield Unit
+    validateBackup(file).flatMap { valid =>
+      if (!valid)
+        throw new InvalidSignatureException
+        
+      val fReadMetadata = readMetadata(file, newOwner)
+      val fReadAnnotations = readAnnotations(file)
+      
+      for {
+        (document, parts) <- fReadMetadata
+        annotationStubs <- fReadAnnotations
+        _ <- restoreDocument(document, parts)
+        _ <- restoreAnnotations(annotationStubs, document.getId, parts)
+      } yield Unit
+    }
 
   }
   

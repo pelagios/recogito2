@@ -1,6 +1,9 @@
 package controllers.document
 
+import controllers.HasConfig
 import java.io.{ File, FileInputStream, FileOutputStream, BufferedInputStream, ByteArrayInputStream, InputStream, PrintWriter }
+import java.math.BigInteger
+import java.security.{ MessageDigest, DigestInputStream }
 import java.util.UUID
 import java.util.zip.{ ZipEntry, ZipOutputStream }
 import models.HasDate
@@ -14,8 +17,9 @@ import play.api.libs.functional.syntax._
 import play.api.libs.Files.TemporaryFile
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
+import java.security.DigestInputStream
 
-trait BackupWriter extends HasDate {
+trait BackupWriter extends HasDate with HasBackupValidation { self: HasConfig =>
   
   private val TMP = System.getProperty("java.io.tmpdir")
   
@@ -23,8 +27,10 @@ trait BackupWriter extends HasDate {
   
   private def writeToZip(inputStream: InputStream, filename: String, zip: ZipOutputStream) = {
     zip.putNextEntry(new ZipEntry(filename))
-
-    val in = new BufferedInputStream(inputStream)
+     
+    val md = MessageDigest.getInstance(ALGORITHM)    
+    val in = new DigestInputStream(new BufferedInputStream(inputStream), md)
+    
     var b = in.read()
     while (b > -1) {
       zip.write(b)
@@ -33,6 +39,8 @@ trait BackupWriter extends HasDate {
 
     in.close()
     zip.closeEntry()
+    
+    new BigInteger(1, md.digest()).toString(16)
   }
   
   def createBackup(doc: DocumentInfo)(implicit ctx: ExecutionContext, uploads: Uploads, annotations: AnnotationService): Future[File] = {
@@ -58,7 +66,7 @@ trait BackupWriter extends HasDate {
       annotations.foreach(a => writer.println(Json.stringify(Json.toJson(a))))
       writer.close()
       new FileInputStream(tmp.file)
-  }
+    }
     
     Future {
       new TemporaryFile(new File(TMP, doc.id + ".zip"))
@@ -66,14 +74,18 @@ trait BackupWriter extends HasDate {
       val zipStream = new ZipOutputStream(new FileOutputStream(zipFile.file))
 
       writeToZip(getManifestAsStream(), "manifest", zipStream)
-      writeToZip(getMetadataAsStream(doc), "metadata.json", zipStream)
+      val metadataHash = writeToZip(getMetadataAsStream(doc), "metadata.json", zipStream)
 
-      doc.fileparts.foreach { part =>
+      val fileHashes = doc.fileparts.map { part =>
         writeToZip(getFileAsStream(doc.ownerName, doc.id, part.getFile), "parts" + File.separator + part.getFile, zipStream)
       }
 
       annotations.findByDocId(doc.id).map { annotations =>
-        writeToZip(getAnnotationsAsStream(doc.id, annotations.map(_._1), doc.fileparts), "annotations.jsonl", zipStream)
+        val annotationsHash = writeToZip(getAnnotationsAsStream(doc.id, annotations.map(_._1), doc.fileparts), "annotations.jsonl", zipStream)
+        
+        val signature = computeSignature(metadataHash, fileHashes, annotationsHash)
+        writeToZip(new ByteArrayInputStream(signature.getBytes), "signature", zipStream)
+        
         zipStream.close()
         zipFile.file
       }

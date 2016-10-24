@@ -27,8 +27,6 @@ class UserService @Inject() (
     implicit val ctx: ExecutionContext,
     implicit val db: DB
   ) extends BaseService with HasConfig with HasEncryption {
-
-  private val SHA_256 = "SHA-256"
   
   private val DEFAULT_QUOTA = 200 // TODO make configurable
 
@@ -144,7 +142,7 @@ class UserService @Inject() (
 
   /** Utility function to compute an MD5 password hash **/
   private def computeHash(str: String) = {
-    val md = MessageDigest.getInstance(SHA_256).digest(str.getBytes)
+    val md = MessageDigest.getInstance("SHA-256").digest(str.getBytes)
     new BigInteger(1, md).toString(16)
   }
 
