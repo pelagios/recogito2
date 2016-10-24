@@ -20,6 +20,10 @@ define([
 
         queuedUpdates = [],
 
+        escapeHtml = function(text) {
+          return jQuery('<div/>').text(text).html();
+        },
+
         /**
          * Creates a new tag element and attaches the tag to it as data.
          *
@@ -29,7 +33,7 @@ define([
           var tag = (charsOrTag.type) ? charsOrTag :
                 { type: 'TAG', last_modified_by: Config.me, value: charsOrTag.trim() },
 
-              li = jQuery('<li><span class="label">' + tag.value + '</span>' +
+              li = jQuery('<li><span class="label">' + escapeHtml(tag.value) + '</span>' +
                 '<span class="delete"><span class="icon">&#xf014;</span></span></li>');
 
           li.data('tag', tag);
