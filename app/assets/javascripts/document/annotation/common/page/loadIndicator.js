@@ -1,7 +1,7 @@
 define([], function() {
 
   var LoadIndicator = function(containerEl) {
-    var clickTrap = jQuery('.load-clicktrap'),
+    var clicktrap = jQuery('.load-clicktrap'),
 
         init = function() {
           var windowHeight = window.innerHeight,
@@ -16,7 +16,7 @@ define([], function() {
                 '</div>'),
 
               showIcon = function() {
-                clickTrap.append(loadIcon);
+                clicktrap.append(loadIcon);
                 loadIcon.fadeIn(250);
               };
 
@@ -28,7 +28,10 @@ define([], function() {
         },
 
         destroy = function() {
-          clickTrap.fadeOut(150);
+          clicktrap.fadeOut({
+            duration: 150,
+            complete: function() { clicktrap.remove(); }
+          });
         };
 
     init();
