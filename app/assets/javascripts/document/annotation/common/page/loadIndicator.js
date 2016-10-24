@@ -28,7 +28,7 @@ define([], function() {
         },
 
         destroy = function() {
-          // clickTrap.fadeOut(150);
+          clickTrap.fadeOut(150);
         };
 
     init();
