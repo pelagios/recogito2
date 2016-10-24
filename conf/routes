@@ -98,6 +98,11 @@ GET     /api/contributions/document/:id              controllers.api.Contributio
 GET     /api/contributions/stats                     controllers.api.ContributionAPIController.getGlobalStats()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# GAPVIS API
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+GET     /gapvis/books                                controllers.gapvis.BooksController.list
+GET     /gapvis/books/:id                            controllers.gapvis.BooksController.book(id: String)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - upload
 #
 # TODO do we want to move uploads to /upload?
