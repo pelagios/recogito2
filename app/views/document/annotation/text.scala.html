@@ -134,7 +134,10 @@
       </ul>
     </div> <!-- .sidebar -->
 
-    <div id="content">@content</div>
+    <div id="main">
+      <div id="content">@content</div>
+      <div class="load-clicktrap"></div>
+    </div>
 
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,

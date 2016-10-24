@@ -34,6 +34,8 @@ require([
 
     var self = this,
 
+        containerNode = document.getElementById('main'),
+
         contentNode = document.getElementById('content'),
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
@@ -45,8 +47,8 @@ require([
         selector = new SelectionHandler(contentNode, highlighter),
 
         editor = (Config.writeAccess) ?
-          new WriteEditor(contentNode, selector) :
-          new ReadEditor(contentNode),
+          new WriteEditor(containerNode, selector) :
+          new ReadEditor(containerNode),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
@@ -114,7 +116,7 @@ require([
     toolbar.on('annotationModeChanged', editor.setAnnotationMode);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
-    BaseApp.apply(this, [ highlighter, selector ]);
+    BaseApp.apply(this, [ containerNode, highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
 

@@ -2,13 +2,15 @@
 define([
   'common/api',
   'common/config',
-  'document/annotation/common/page/header'
-], function(API, Config, Header) {
+  'document/annotation/common/page/header',
+  'document/annotation/common/page/loadIndicator'
+], function(API, Config, Header, LoadIndicator) {
 
-  var BaseApp = function(highlighter, selector) {
+  var BaseApp = function(containerEl, highlighter, selector) {
     this.highlighter = highlighter;
     this.selector = selector;
     this.header = new Header();
+    this.loadIndicator = new LoadIndicator(containerEl);
   };
 
   BaseApp.prototype.onAnnotationsLoaded = function(annotations) {
@@ -25,6 +27,8 @@ define([
       if (preselected)
         this.selector.setSelection(preselected);
     }
+
+    this.loadIndicator.destroy();
   };
 
   BaseApp.prototype.onAnnotationsLoadError = function(annotations) {

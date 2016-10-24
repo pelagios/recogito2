@@ -1,6 +1,7 @@
 @import "../../../_globals.less";
 @import "../../../_alert.less";
 @import "../../_header.less";
+@import "../_loadindicator.less";
 @import "../_toolbar.less";
 @import "../editor/_editor.less";
 
@@ -67,24 +68,29 @@ body {
   top:70px;
 }
 
-#content {
+#main {
   position:relative;
-  margin:50px 50px 50px 230px;
-  line-height:170%;
-  font-family:"Times New Roman", Times, serif;
-  white-space:pre-wrap;
-  font-size:17px;
-  min-width:568px;
-  max-width:1024px;
-  word-wrap:break-word;
-}
+  margin:0 0 50px 200px;
 
-#content.rtl {
-  direction:rtl;
-}
+  #content {
+    padding:50px 50px 0 30px;
+    line-height:170%;
+    font-family:"Times New Roman", Times, serif;
+    white-space:pre-wrap;
+    font-size:17px;
+    min-width:568px;
+    max-width:1024px;
+    word-wrap:break-word;
+  }
 
-#content.touch {
-  margin-top:5px;
+  #content.rtl {
+    direction:rtl;
+  }
+
+  #content.touch {
+    margin-top:5px;
+  }
+
 }
 
 .selection {
