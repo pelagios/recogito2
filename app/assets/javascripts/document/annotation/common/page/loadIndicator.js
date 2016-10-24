@@ -13,18 +13,13 @@ define([], function() {
               loadIcon = jQuery(
                 '<div class="load-icon">' +
                   '<img src="/assets/images/wait-circle-static.gif">' +
-                '</div>'),
-
-              showIcon = function() {
-                clicktrap.append(loadIcon);
-                loadIcon.fadeIn(250);
-              };
+                '</div>');
 
           loadIcon.css('padding-top', visibleContentHeight / 2 - 12);
           loadIcon.hide();
 
-          // Only show icon if wait time exceeds 250ms
-          setTimeout(showIcon, 250);
+          clicktrap.append(loadIcon);
+          loadIcon.fadeIn(250);
         },
 
         destroy = function() {
