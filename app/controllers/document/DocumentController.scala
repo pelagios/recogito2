@@ -3,6 +3,7 @@ package controllers.document
 import controllers.BaseOptAuthController
 import java.io.File
 import javax.inject.Inject
+import models.ContentType
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.user.UserService
@@ -24,29 +25,22 @@ class DocumentController @Inject() (
   }
 
   def getImageManifest(docId: String, partNo: Int) = AsyncStack { implicit request =>
-
-    import models.ContentType._
-
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
-      val contentType = currentPart.getContentType
-      val maybeManifestName =
-        if (contentType == IMAGE_UPLOAD.toString)
-          // All uploads are Zoomify format
-          Some("ImageProperties.xml")
-        else if (contentType == IMAGE_IIIF.toString)
-          None // TODO future feature
-        else
-          None
-
-      maybeManifestName match {
-        case Some(filename) =>
-          getTilesetFile(doc.document, currentPart, filename).map {
+      ContentType.withName(currentPart.getContentType) match {
+        
+        case Some(ContentType.IMAGE_UPLOAD) =>
+          getTilesetFile(doc.document, currentPart, "ImageProperties.xml").map {
             case Some(file) => Ok.sendFile(file)
-            case None => InternalServerError // Document folder doesn't contain a manifset file
+            case None => InternalServerError
           }
-
-        case None => Future.successful(InternalServerError) // Unsupported content type (shouldn't happen)
+          
+        case Some(ContentType.IMAGE_IIIF) =>
+          Future.successful(Redirect(currentPart.getFile))
+          
+        case _ =>
+          Future.successful(InternalServerError)
+          
       }
     })
   }
@@ -58,7 +52,7 @@ class DocumentController @Inject() (
       val documentDir = uploads.getDocumentDir(document.getOwner, document.getId).get
 
       // Tileset foldername is, by convention, equal to filename minus extension
-      val foldername = part.getFilename.substring(0, part.getFilename.lastIndexOf('.'))
+      val foldername = part.getFile.substring(0, part.getFile.lastIndexOf('.'))
       val tileFolder = new File(documentDir, foldername)
 
       val file = new File(tileFolder, filepath)
@@ -80,11 +74,21 @@ class DocumentController @Inject() (
   }
 
   def getThumbnail(docId: String, partNo: Int) = AsyncStack { implicit request =>
+    
+    import models.ContentType._
+    
+    def iiifThumbnailURL(iiifUrl: String) =
+      iiifUrl.substring(0, iiifUrl.length - 9) + "full/160,/0/default.jpg"
+    
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
-      uploads.openThumbnail(doc.ownerName, docId, currentPart.getFilename).map {
-        case Some(file) => Ok.sendFile(file)
-        case None => NotFoundPage
+      if (currentPart.getContentType == IMAGE_IIIF.toString) {        
+        Future.successful(Redirect(iiifThumbnailURL(currentPart.getFile)))
+      } else {
+        uploads.openThumbnail(doc.ownerName, docId, currentPart.getFile).map {
+          case Some(file) => Ok.sendFile(file)
+          case None => NotFoundPage
+        }
       }
     })
   }

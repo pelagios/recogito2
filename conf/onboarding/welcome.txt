@@ -1,0 +1,13 @@
+Welcome to Recogito
+
+This is a sample text to get you started with Recogito's text annotation interface. Create annotations by selecting text with your mouse. We have already created an example commentary annotation for you here. Click on it to open it.
+
+You can tag words or phrases as places. Recogito will automatically provide a suggested match for your selection. You can confirm it, or change it manually. For example, try selecting the word Vienna, and click the "Place" category button in the editor popup.
+
+When the editor popup is open, you can use the left and right arrow keys on your keyboard to jump to the previous or next annotation.
+
+Use the toolbar to switch between different annotation modes. The "Quick" mode allows you to tag words with a category ("Place" is currently the only available, but more options will come in the future) without the popup opening. This way you can go through a text much faster, and leave the detail work of verifying automatic matches for later.
+
+Another aspect you can change from the toolbar is colour coding. Annotations are initially coloured by their type. E.g. commentary is shown in yellow, places in blue. Change the coding to "By Verification Status" to see which annotations are verified (green) vs. unverified (grey) automatic matches.
+
+Ready to go? Upload your own texts by clicking the blue 'New Document' button on your personal start page & have fun using Recogito.

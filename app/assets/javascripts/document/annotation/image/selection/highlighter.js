@@ -22,6 +22,11 @@ define([
             return layers[shapeType];
           },
 
+          computeSize = function(annotation) {
+            var layer = getLayer(annotation);
+            return layer.computeSize(annotation);
+          },
+
           getAnnotationAt = function(e) {
             var allAnnotations = [];
 
@@ -31,7 +36,10 @@ define([
                allAnnotations.push(result);
             });
 
-            // TODO sort by size and pick smallest
+            // Sort by size, ascending
+            allAnnotations.sort(function(a, b) {
+              return computeSize(a.annotation) - computeSize(b.annotation);
+            });
 
             if (allAnnotations.length > 0)
               return allAnnotations[0];

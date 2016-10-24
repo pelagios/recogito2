@@ -17,6 +17,7 @@ import play.api.mvc.MultipartFormData.FilePart
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import storage.{ DB, Uploads }
+import models.generated.tables.records.UploadFilepartRecord
 
 class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) {
 
@@ -52,7 +53,8 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
                 nullIfEmpty(description),
                 nullIfEmpty(language),
                 nullIfEmpty(source),
-                nullIfEmpty(edition))
+                nullIfEmpty(edition),
+                null)
 
             sql.attach(upload)
             upload.changed(UPLOAD.ID, false);
@@ -64,8 +66,8 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
       upload
   }
 
-  /** Inserts a new filepart - metadata goes to the DB, content to the pending-uploads dir **/
-  def insertFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile]):
+  /** Inserts a new locally stored filepart - metadata goes to the DB, content to the pending-uploads dir **/
+  def insertUploadFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile]):
     Future[Either[ContentIdentificationFailure, UploadFilepartRecord]] = db.withTransaction { sql =>
 
     val id = UUID.randomUUID
@@ -85,6 +87,16 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
       case Left(identificationFailure) => Left(identificationFailure)
     }
   }
+  
+  /** Inserts a new remote filepart - metadata goes to the DB, content stays external **/
+  def insertRemoteFilepart(uploadId: Int, owner: String, contentType: ContentType, url: String) = db.withTransaction { sql =>
+    val id = UUID.randomUUID
+    val title = url // TODO how should we derive a sensible title?
+    
+    val filepartRecord = new UploadFilepartRecord(id, uploadId, owner, title, contentType.toString, url, null)
+    val rows = sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
+    rows == 1
+  }
 
   /** Deletes a filepart - record is removed from the DB, file from the data directory **/
   def deleteFilepartByTitleAndOwner(title: String, owner: String) = db.withTransaction { sql =>
@@ -94,7 +106,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
               .fetchOne()) match {
 
       case Some(filepartRecord) => {
-        val file = new File(uploads.PENDING_UPLOADS_DIR, filepartRecord.getFilename)
+        val file = new File(uploads.PENDING_UPLOADS_DIR, filepartRecord.getFile)
         file.delete()
         filepartRecord.delete() == 1
       }
@@ -118,7 +130,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
          .fetchArray
 
     fileparts.foreach(part => {
-      val file = new File(uploads.PENDING_UPLOADS_DIR, part.getFilename)
+      val file = new File(uploads.PENDING_UPLOADS_DIR, part.getFile)
       file.delete()
     })
 
@@ -164,18 +176,21 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
         document.getId,
         part.getTitle,
         part.getContentType,
-        part.getFilename,
+        part.getFile,
         idx + 1)
     }
         
     val inserts = docFileparts.map(p => sql.insertInto(DOCUMENT_FILEPART).set(p))    
     sql.batch(inserts:_*).execute()
     
-    // Move files from 'pending' to 'user-data' folder
-    val filePaths = fileparts.map(filepart => {
-      val source = new File(uploads.PENDING_UPLOADS_DIR, filepart.getFilename).toPath
-      val destination = new File(uploads.getDocumentDir(upload.getOwner, document.getId, true).get, filepart.getFilename).toPath
-      Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
+    // Move uploaded files from 'pending' to 'user-data' folder (disregard remote files)
+    fileparts.map(filepart => {
+      val isLocalFile = ContentType.withName(filepart.getContentType).map(_.isLocal).getOrElse(false)
+      if (isLocalFile) {
+        val source = new File(uploads.PENDING_UPLOADS_DIR, filepart.getFile).toPath
+        val destination = new File(uploads.getDocumentDir(upload.getOwner, document.getId, true).get, filepart.getFile).toPath
+        Files.move(source, destination, StandardCopyOption.ATOMIC_MOVE)
+      }
     })
 
     // Delete Upload and UploadFilepart records from the staging area tables

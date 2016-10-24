@@ -5,8 +5,15 @@ html, body {
   background-color:@blueish-white-hi;
 }
 
-.sidebar {
-  padding-top:10px;
+// Hides default file input controls without using display:none
+// cf. http://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/
+input[type=file] {
+  width:0.1px;
+  height:0.1px;
+  opacity:0;
+  overflow:hidden;
+  position:absolute;
+  z-index:-1;
 }
 
 .content {
@@ -15,75 +22,26 @@ html, body {
 
   .panel {
     max-width:800px;
+
+    a {
+      margin:10px 0;
+      padding:10px 20px;
+      width:260px;
+    }
+
+    .icon {
+      font-size:17px;
+      padding-right:15px;
+    }
+
   }
 
-  form {
-
-    dt, dd {
-      display:inline-block;
-    }
-
-    dt {
-      width:110px;
-      text-align:right;
-    }
-
-    dd.info {
-      color:@lightgrey-type;
-    }
-
-    input[type=text], input[type=password], textarea {
-      padding:5px 6px;
-      margin:7px 10px;
-      width:320px;
-      font-size:16px;
-    }
-
-    input:-webkit-autofill {
-      -webkit-box-shadow:0 0 0px 1000px white inset;
-      -webkit-text-fill-color:#525252 !important;
-    }
-
-    textarea {
-      display:inline-block;
-      vertical-align:middle;
-      height:80px;
-    }
-
-    button {
-      margin:7px 10px;
-      padding:5px;
-      width:320px;
-      box-sizing:border-box;
-    }
-
+  .panel.restore .inner {
+    padding-bottom:25px;
   }
 
 }
 
 .password-settings dd.info {
   display:none;
-}
-
-.message {
-  padding:8px 15px;
-  font-size:16px;
-
-  .icon {
-    font-size:14px;
-    padding-right:3px;
-  }
-
-}
-
-.message.success {
-  color:@success-msg-type;
-  background-color:@success-msg-bg;
-  border-bottom:1px solid @success-msg-border;
-}
-
-.message.error {
-  color:@error-msg-type;
-  background-color:@error-msg-bg;
-  border-bottom:1px solid @error-msg-border;
 }

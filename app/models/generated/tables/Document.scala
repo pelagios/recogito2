@@ -108,6 +108,11 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	val EDITION : TableField[DocumentRecord, String] = createField("edition", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
+	 * The column <code>public.document.license</code>.
+	 */
+	val LICENSE : TableField[DocumentRecord, String] = createField("license", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * The column <code>public.document.is_public</code>.
 	 */
 	val IS_PUBLIC : TableField[DocumentRecord, Boolean] = createField("is_public", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), "")

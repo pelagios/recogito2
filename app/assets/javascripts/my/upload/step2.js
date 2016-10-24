@@ -6,7 +6,17 @@ require.config({
 require(['common/config'], function(Config) {
 
   jQuery(document).ready(function() {
-    var btnNext = jQuery('input.next'),
+    var previewTemplate = '<div class="dz-preview dz-file-preview">' +
+          '  <div class="dz-details">' +
+          '    <div class="dz-size" data-dz-size=""></div>' +
+          '    <div class="dz-filename"><span data-dz-name=""></span></div>' +
+          '  </div>' +
+          '  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress=""></span></div>' +
+          '  <a class="dz-remove" title="Click to remove the file" data-dz-remove></a>' +
+          '  <div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
+          '</div>',
+
+        btnNext = jQuery('input.next'),
 
         nerPanel = jQuery('.ner'),
 
@@ -96,6 +106,23 @@ require(['common/config'], function(Config) {
         onUploadError = function(e, response) {
           jQuery(e.previewElement).addClass('upload-failed');
           refresh();
+        },
+
+        registerIIIFSource = function(url) {
+          jsRoutes.controllers.my.upload.UploadController.storeFilepart(Config.owner).ajax({
+            data: { iiif_source: url },
+
+            success: function(result) {
+              // TODO just a hack to demo the principle!
+              var preview = jQuery(previewTemplate);
+              preview.find('.dz-filename span').html(url);
+              preview.find('.dz-upload').css('width', '100%');
+              jQuery('#uploaded').append(preview);
+              
+              refresh();
+              jQuery('input.next').prop('disabled', false);
+            }
+          });
         };
 
       new Dropzone('#dropzone', {
@@ -104,21 +131,28 @@ require(['common/config'], function(Config) {
         dictRemoveFile: '',
         maxFilesize:200,
         previewsContainer: document.getElementById('uploaded-now'),
-        previewTemplate:
-          '<div class="dz-preview dz-file-preview">' +
-          '  <div class="dz-details">' +
-          '    <div class="dz-size" data-dz-size=""></div>' +
-          '    <div class="dz-filename"><span data-dz-name=""></span></div>' +
-          '  </div>' +
-          '  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress=""></span></div>' +
-          '  <a class="dz-remove" title="Click to remove the file" data-dz-remove></a>' +
-          '  <div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
-          '</div>',
+        previewTemplate: previewTemplate,
+
         init: function() {
           this.on('addedfile', refresh);
           this.on('removedfile', onDelete);
           this.on('success', onUploadSuccess);
           this.on('error', onUploadError);
+        },
+
+        drop: function(e) {
+          var link = e.dataTransfer.getData('URL'),
+
+              // Can hopefully be replaced at some point...
+              isIIIFUrl = function(url) {
+                if (url.indexOf('http://') === 0 || url.indexOf('http://') === 0)
+                  return url.indexOf('/info.json') === url.length - 10;
+                else
+                  return false;
+              };
+
+          if (link && isIIIFUrl(link))
+            registerIIIFSource(link);
         }
       });
 

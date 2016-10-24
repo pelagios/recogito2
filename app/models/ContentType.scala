@@ -20,6 +20,10 @@ sealed trait ContentType {
 
   lazy val isData  = media == "DATA"
   
+  lazy val isLocal =
+    // No other remote types supported at present
+    subtype != "IIIF" 
+  
 }
 
 object ContentType {

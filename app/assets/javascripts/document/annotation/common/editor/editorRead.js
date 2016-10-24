@@ -11,6 +11,7 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
                   '<div class="annotation-editor-popup-inner">' +
                     '<div class="transcription-sections"></div>' +
                     '<div class="center-sections"></div>' +
+                    '<div class="tag-section"></div>' +
                   '</div>' +
                 '</div>');
 

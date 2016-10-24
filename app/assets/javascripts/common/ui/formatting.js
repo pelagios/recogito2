@@ -31,6 +31,31 @@ define(function() {
           year = date.getFullYear();
 
       return MONTH_NAMES_SHORT[month] + ' ' + day + ', ' + year;
+    },
+
+    initTextDirection : function(containerEl) {
+      var plaintext = containerEl.innerHTML.substring(0, 200),
+
+          isRTL = function() {
+            var ltrChars = 0,
+                rtlChars = 0,
+                charCode;
+
+            for (var i = 0, len = plaintext.length; i < len; i++) {
+              charCode = plaintext[i].charCodeAt();
+              if (charCode > 64) {
+                if (charCode < 1478)
+                  ltrChars++;
+                else
+                  rtlChars++;
+              }
+            }
+
+            return rtlChars > ltrChars;
+          };
+
+      if (isRTL())
+        jQuery(containerEl).addClass('rtl');
     }
 
   };

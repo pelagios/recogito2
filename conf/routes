@@ -28,8 +28,7 @@ GET     /admin/users/:username                       controllers.admin.users.Use
 GET     /admin/users                                 controllers.admin.users.UserAdminController.index
 
 GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
-POST    /admin/restore/document                      controllers.admin.backup.BackupAdminController.restoreDocument
-POST    /admin/restore/annotations                   controllers.admin.backup.BackupAdminController.restoreAnnotations
+POST    /admin/restore                               controllers.admin.backup.BackupAdminController.restore
 
 GET     /admin                                       controllers.admin.AdminController.index
 
@@ -45,14 +44,18 @@ GET     /document/:id/map                            controllers.document.map.Ma
 GET     /document/:id/stats                          controllers.document.stats.StatsController.showDocumentStats(id: String)
 
 GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
-GET     /document/:id/downloads/annotations.jsonl    controllers.document.downloads.DownloadsController.downloadAnnotations(id: String)
 GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String)
+GET     /document/:id/downloads/ttl                  controllers.document.downloads.DownloadsController.downloadTTL(id: String)
+GET     /document/:id/downloads/rdf                  controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
+GET     /document/:id/downloads/jsonld               controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)
 GET     /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String)
+GET     /document/:id/downloads/tei                  controllers.document.downloads.DownloadsController.downloadTEI(id: String)
 
 GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
 
 GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
 PUT     /document/:id/settings/sortorder             controllers.document.settings.SettingsController.setSortOrder(id: String)
+POST    /document/:id/settings/metadata              controllers.document.settings.SettingsController.updateDocumentMetadata(id: String)
 PUT     /document/:id/settings/public                controllers.document.settings.SettingsController.setIsPublic(id: String, enabled: Boolean)
 PUT     /document/:id/settings/collaborator          controllers.document.settings.SettingsController.addCollaborator(id: String)
 DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
@@ -94,7 +97,7 @@ GET     /api/document/:id/places                     controllers.api.PlaceAPICon
 GET     /api/places/search                           controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
 GET     /api/places/:uri                             controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
 
-GET     /api/contributions/document/:id              controllers.api.ContributionAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 20)
+GET     /api/contributions/document/:id              controllers.api.ContributionAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
 GET     /api/contributions/stats                     controllers.api.ContributionAPIController.getGlobalStats()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,6 +131,8 @@ GET     /settings/account                            controllers.my.settings.Acc
 POST    /settings/account                            controllers.my.settings.AccountSettingsController.updateAccountSettings
 GET     /settings/password                           controllers.my.settings.PasswordSettingsController.index
 POST    /settings/password                           controllers.my.settings.PasswordSettingsController.updatePassword
+GET     /settings/restore                            controllers.my.settings.RestoreController.index
+POST    /settings/restore                            controllers.my.settings.RestoreController.restore
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

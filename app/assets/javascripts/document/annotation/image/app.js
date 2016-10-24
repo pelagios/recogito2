@@ -4,22 +4,26 @@ require.config({
 });
 
 require([
+  'common/ui/alert',
   'common/api',
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/baseApp',
+  'document/annotation/image/iiif/iiifImageInfo',
   'document/annotation/image/page/help',
   'document/annotation/image/page/toolbar',
   'document/annotation/image/page/viewer',
   'document/annotation/image/selection/highlighter',
   'document/annotation/image/selection/selectionHandler'
 ], function(
+  Alert,
   API,
   Config,
   ReadEditor,
   WriteEditor,
   BaseApp,
+  IIIFImageInfo,
   Help,
   Toolbar,
   Viewer,
@@ -105,17 +109,16 @@ require([
               .getImageManifest(Config.documentId, Config.partSequenceNo)
               .ajax()
               .then(function(response) {
-                // TODO handle difference between Zoomify and IIIF, based on Config.contentType
+                if (Config.contentType === 'IMAGE_UPLOAD') {
+                  // jQuery handles the XML parsing
+                  var props = jQuery(response).find('IMAGE_PROPERTIES'),
+                      width = parseInt(props.attr('WIDTH')),
+                      height = parseInt(props.attr('HEIGHT'));
 
-                // jQuery handles the XML parsing
-                var props = jQuery(response).find('IMAGE_PROPERTIES'),
-                    width = parseInt(props.attr('WIDTH')),
-                    height = parseInt(props.attr('HEIGHT')),
-                    imageProperties = { width: width, height: height };
-
-                // Store image properties in global Config as well
-                Config.imageProperties = imageProperties;
-                return imageProperties;
+                  return { width: width, height: height };
+                } else if (Config.contentType === 'IMAGE_IIIF') {
+                  return new IIIFImageInfo(response);
+                }
               });
           },
 
@@ -139,8 +142,11 @@ require([
           },
 
           onLoadError = function(error) {
-            // TODO error indication to user
-            console.log(error);
+            var title = 'Connection Error',
+                message = (Config.contentType === 'IMAGE_IIIF') ?
+                  'There was an error connecting to the remote IIIF endpoint.' :
+                  'An error occured.',
+                alert = new Alert(Alert.ERROR, title, message);
           },
 
           init = function(imageProperties) {

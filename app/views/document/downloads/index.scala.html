@@ -17,8 +17,8 @@
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "downloads")
 
     <div class="sidebar">
-      @views.html.document.sidebarHeader(doc.owner)
-    </div> <!-- .sidebar -->
+      @views.html.sidebarHeader(doc.owner)
+    </div>
 
     <div class="content">
       <div class="panel">
@@ -43,8 +43,9 @@
                   and Dublin Core.</p>
               </div>
               <div class="button-container">
-                <a class="btn small disabled"><span class="icon">&#xf019;</span> RDF/Turtle</a>
-                <a class="btn small disabled"><span class="icon">&#xf019;</span> RDF/XML</a>
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadJSONLD(doc.id)" class="btn small"><span class="icon">&#xf019;</span> JSON-LD</a>
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadTTL(doc.id)" class="btn small"><span class="icon">&#xf019;</span> RDF/Turtle</a>
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadRDFXML(doc.id)" class="btn small"><span class="icon">&#xf019;</span> RDF/XML</a>
               </div>
             </li>
           </ul>
@@ -54,32 +55,52 @@
       <div class="panel">
         <h2>Places</h2>
         <div class="inner">
-          <li>
-            <div class="description">
-              <h3>GeoJSON</h3>
-              <p>Confirmed geo-located places in the document as a GeoJSON FeatureCollection.</p>
-            </div>
-            <div class="button-container">
-              <a href="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id)" class="btn small"><span class="icon">&#xf019;</span> GeoJSON</a>
-            </div>
-          </li>
+          <ul>
+            <li>
+              <div class="description">
+                <h3>GeoJSON</h3>
+                <p>Confirmed geo-located places in the document as a GeoJSON FeatureCollection.</p>
+              </div>
+              <div class="button-container">
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id)" class="btn small"><span class="icon">&#xf019;</span> GeoJSON</a>
+              </div>
+            </li>
 
-          <li>
-            <div class="description">
-              <h3>KML</h3>
-              <p>Confirmed geo-located places as KML file, for viewing in Google Earth.</p>
-            </div>
-            <div class="button-container">
-              <a class="btn small disabled"><span class="icon">&#xf019;</span> KML</a>
-            </div>
-          </li>
+            <li>
+              <div class="description">
+                <h3>KML</h3>
+                <p>Confirmed geo-located places as KML file, for viewing in Google Earth.</p>
+              </div>
+              <div class="button-container">
+                <a class="btn small disabled"><span class="icon">&#xf019;</span> KML</a>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
 
       <div class="panel">
         <h2>Annotated Document</h2>
         <div class="inner">
-          <p class="no-options">No download options available yet.</p>
+          @if(doc.fileparts.exists(_.getContentType.startsWith("TEXT"))) {
+            <ul>
+              <li>
+                <div class="description">
+                  <h3>TEI</h3>
+                  <p>
+                    The annotated text in a basic TEI/XML serialization. Note: only place name annotations
+                    are included at the moment. Also, overlapping annotations are filtered out as TEI does
+                    not support them.
+                  </p>
+                </div>
+                <div class="button-container">
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadTEI(doc.id)" class="btn small"><span class="icon">&#xf019;</span> TEI/XML</a>
+                </div>
+              </li>
+            </ul>
+          } else {
+            <p class="no-options">No download options available</p>
+          }
         </div>
       </div>
     </div>

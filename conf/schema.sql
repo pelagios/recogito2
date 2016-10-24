@@ -8,6 +8,7 @@ CREATE TABLE "user" (
   real_name TEXT,
   bio TEXT,
   website TEXT,
+  quota_mb INT NOT NULL DEFAULT 200,
   active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -39,7 +40,8 @@ CREATE TABLE upload (
   description TEXT,
   language TEXT,
   source TEXT,
-  edition TEXT
+  edition TEXT,
+  license TEXT
 );
 
 CREATE TABLE upload_filepart (
@@ -48,7 +50,7 @@ CREATE TABLE upload_filepart (
   owner TEXT NOT NULL REFERENCES "user"(username),
   title TEXT NOT NULL,
   content_type TEXT NOT NULL,
-  filename TEXT NOT NULL,
+  file TEXT NOT NULL,
   filesize_kb DOUBLE PRECISION,
   -- TODO filepart metadata (source, identifier,... ?)
   UNIQUE (owner, title)
@@ -67,6 +69,7 @@ CREATE TABLE document (
   language TEXT,
   source TEXT,
   edition TEXT,
+  license TEXT,
   is_public BOOLEAN NOT NULL DEFAULT FALSE
 );
 
@@ -75,7 +78,7 @@ CREATE TABLE document_filepart (
   document_id TEXT NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   content_type TEXT NOT NULL,
-  filename TEXT NOT NULL,
+  file TEXT NOT NULL,
   sequence_no INTEGER NOT NULL
   -- TODO filepart metadata (source, identifier,... ?)
 );

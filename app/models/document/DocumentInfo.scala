@@ -29,6 +29,8 @@ case class DocumentInfo(document: DocumentRecord, fileparts: Seq[DocumentFilepar
   
   lazy val edition: Option[String] = Option(document.getEdition)
   
+  lazy val license: Option[String] = Option(document.getLicense)
+  
   lazy val isPublic: Boolean = document.getIsPublic
   
 }

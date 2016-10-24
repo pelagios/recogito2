@@ -1,14 +1,22 @@
 package controllers.landing
 
 import controllers.{ HasConfig, HasUserService, Security }
+import java.io.FileInputStream
+import java.sql.Timestamp
+import java.util.{ Date, UUID }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.{ AuthElement, Login }
+import models.ContentType
+import models.annotation.{ Annotation, AnnotationService }
+import models.document.DocumentService
 import models.user.UserService
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.i18n.{ I18nSupport, MessagesApi }
+import play.api.libs.json.{ Json, JsObject }
 import play.api.mvc.{ Action, Controller }
 import scala.concurrent.{ Await, Future, ExecutionContext }
 import scala.concurrent.duration._
@@ -19,6 +27,8 @@ class SignupController @Inject() (
     val config: Configuration,
     val users: UserService,
     val messagesApi: MessagesApi,
+    val annotations: AnnotationService,
+    val documents: DocumentService,
     implicit val ctx: ExecutionContext
   ) extends Controller with AuthElement with HasUserService with HasConfig with Security with Login with I18nSupport {
 
@@ -47,7 +57,7 @@ class SignupController @Inject() (
     if (invalidChars.size == 0) {
       try {
         Await.result(users.findByUsernameIgnoreCase(username), 10.second) match {
-          case Some(user) =>
+          case Some(userWithRoles) =>
             Invalid("This username is no longer available")
           case None =>
             Valid
@@ -71,6 +81,50 @@ class SignupController @Inject() (
       "password" -> nonEmptyText
     )(SignupData.apply)(SignupData.unapply)
   )
+  
+  private def importOnboardingContent(username: String) = {
+    val document = new DocumentRecord(
+      documents.generateRandomID(),
+      username,
+      new Timestamp(new Date().getTime),
+      "Welcome to Recogito",
+      "Recogito Team",
+      null, // TODO timestamp_numeric
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      false)
+    
+    val filepart = new DocumentFilepartRecord(
+      UUID.randomUUID(),
+      document.getId,
+      "welcome.txt",
+      ContentType.TEXT_PLAIN.toString,
+      "welcome.txt",
+      1)
+    
+    val fileInputStream = new FileInputStream("conf/onboarding/welcome.txt")
+
+    val annotation = 
+      Json.parse(new FileInputStream("conf/onboarding/welcome.json")).as[JsObject] ++
+      Json.obj(
+        "annotation_id" -> UUID.randomUUID(),
+        "version_id" -> UUID.randomUUID(),
+        "annotates" -> Json.obj(
+          "document_id" -> document.getId,
+          "filepart_id" -> filepart.getId,
+          "content_type" -> filepart.getContentType
+        )
+      )
+
+    for {
+      _ <- documents.importDocument(document, Seq((filepart, fileInputStream)))    
+      _ <- annotations.insertOrUpdateAnnotation(Json.fromJson[Annotation](annotation).get)
+    } yield ()
+  }
 
   def showSignupForm = Action {
     Ok(views.html.landing.signup(signupForm))
@@ -81,13 +135,19 @@ class SignupController @Inject() (
       formWithErrors =>
         Future.successful(BadRequest(views.html.landing.signup(formWithErrors))),
 
-      signupData =>
-        users.insertUser(signupData.username, signupData.email, signupData.password)
+      signupData => {
+        val fUser = for {
+          user <- users.insertUser(signupData.username, signupData.email, signupData.password)
+          _ <- importOnboardingContent(user.getUsername)
+        } yield user
+        
+        fUser
           .flatMap(user => gotoLoginSucceeded(user.getUsername))
           .recover { case t:Throwable => {
             t.printStackTrace()
             Ok(views.html.landing.signup(signupForm.bindFromRequest, Some(DEFAULT_ERROR_MESSAGE)))
           }}
+      }
     )
   }
 

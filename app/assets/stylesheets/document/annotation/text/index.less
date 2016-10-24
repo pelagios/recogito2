@@ -1,4 +1,5 @@
 @import "../../../_globals.less";
+@import "../../../_alert.less";
 @import "../../_header.less";
 @import "../_toolbar.less";
 @import "../editor/_editor.less";
@@ -72,10 +73,14 @@ body {
   line-height:170%;
   font-family:"Times New Roman", Times, serif;
   white-space:pre-wrap;
-  unicode-bidi:plaintext;
   font-size:17px;
   min-width:568px;
   max-width:1024px;
+  word-wrap:break-word;
+}
+
+#content.rtl {
+  direction:rtl;
 }
 
 #content.touch {
@@ -84,4 +89,9 @@ body {
 
 .selection {
   background-color:fade(@ocean, 35%);
+}
+
+.alert em {
+  font-style:normal;
+  text-decoration:underline;
 }

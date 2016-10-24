@@ -4,6 +4,9 @@
   currentPart: Option[models.generated.tables.records.DocumentFilepartRecord] = None,
   content: Option[String] = None
 )(implicit request: RequestHeader)
+
+@thumbnailURL(part: models.generated.tables.records.DocumentFilepartRecord)={@if(part.getContentType == "IMAGE_IIIF"){@part.getFile.substring(0, part.getFile.length - 9)square/256,256/0/default.jpg}else{@controllers.document.routes.DocumentController.getImageTile(doc.id, part.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL}}
+
 @if(doc.isPublic) {
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
@@ -28,8 +31,8 @@
       <meta name="twitter:description" content="@annotationCount annotations" />
       <meta property="og:image:width" content="256" />
       <meta property="og:image:height" content="256" />
-      <meta property="og:image" content="@controllers.document.routes.DocumentController.getImageTile(doc.id, part.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL" />
-      <meta name="twitter:image" content="@controllers.document.routes.DocumentController.getImageTile(doc.id, part.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL" /> }
+      <meta property="og:image" content="@thumbnailURL(part)" />
+      <meta name="twitter:image" content="@thumbnailURL(part)" /> }
     case _ => {
       <meta property="og:title" content="@doc.author.map(_ + ": ")@doc.title" />
       <meta name="twitter:title" content="@doc.author.map(_ + ": ")@doc.title" />

@@ -25,7 +25,7 @@ case class Annotation (
 
   bodies: Seq[AnnotationBody]
 
-)    
+)
 
 case class AnnotatedObject(documentId: String, filepartId: UUID, contentType: ContentType)
 

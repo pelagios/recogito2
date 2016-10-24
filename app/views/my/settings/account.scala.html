@@ -1,4 +1,7 @@
-@(settingsForm: Form[controllers.my.settings.AccountSettingsData])(implicit messages: Messages, flash: Flash)
+@(
+  settingsForm: Form[controllers.my.settings.AccountSettingsData],
+  user: models.generated.tables.records.UserRecord
+)(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 <html>
   <head>
@@ -8,6 +11,8 @@
 
   <body>
     <div class="sidebar">
+      @views.html.sidebarHeader(user)
+
       <ul class="menu">
         <li class="active">
           <a href="#" onclick="return false;">
@@ -20,6 +25,12 @@
             <span class="label">Password</span>
           </a>
         </li>
+
+        <li>
+          <a href="@controllers.my.settings.routes.RestoreController.index">
+            <span class="label">Restore from Backup</span>
+          </a>
+        </li>
       </ul>
     </div>
 
@@ -28,13 +39,13 @@
       <div class="panel account-settings">
         <h2>Account Settings</h2>
         @flash.get("success").map { msg =>
-          <div class="success message"><span class="icon">&#xf00c;</span> @msg</div>
+          <div class="success flash-message"><span class="icon">&#xf00c;</span> @msg</div>
         }
         @flash.get("error").map { msg =>
-          <div class="error message"><span class="icon">&#xf00d;</span> @msg</div>
+          <div class="error flash-message"><span class="icon">&#xf00d;</span> @msg</div>
         }
         <div class="inner">
-          @helper.form(action = controllers.my.settings.routes.AccountSettingsController.updateAccountSettings(), args = 'autocomplete -> "off") {
+          @helper.form(action = controllers.my.settings.routes.AccountSettingsController.updateAccountSettings(), args = 'class -> "crud", 'autocomplete -> "off") {
             @helper.inputText(settingsForm("email"), args = '_label -> "E-Mail", '_help -> "", 'autocomplete -> "false")
             @helper.inputText(settingsForm("name"), args = '_label -> "Name", '_help -> "Optional", 'placeholder -> "Your name", 'autocomplete -> "false")
             @helper.textarea(settingsForm("bio"), args = '_label -> "About You", '_help -> "Optional", 'placeholder -> "Tell other users something about yourself", 'autocomplete -> "false")

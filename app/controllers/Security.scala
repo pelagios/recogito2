@@ -1,6 +1,6 @@
 package controllers
 
-import jp.t2v.lab.play2.auth.{ AuthConfig, CookieTokenAccessor }
+import jp.t2v.lab.play2.auth.{ AsyncIdContainer, AuthConfig, CookieTokenAccessor, CookieIdContainer }
 import models.user.Roles._
 import models.user.{ UserService, UserWithRoles }
 import models.generated.tables.records.{ UserRecord, UserRoleRecord }
@@ -48,10 +48,12 @@ trait Security extends AuthConfig { self: HasConfig with HasUserService =>
       case role: Role => user.hasRole(role)
     }
   }
-
+  
   override lazy val tokenAccessor = new CookieTokenAccessor(
     cookieSecureOption = config.getBoolean("auth.cookie.secure").getOrElse(false),
     cookieMaxAge       = Some(sessionTimeoutInSeconds)
   )
+  
+  override lazy val idContainer: AsyncIdContainer[Id] = AsyncIdContainer(new CookieIdContainer[Id])
 
 }

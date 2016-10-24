@@ -71,6 +71,7 @@
     </div>
 
     @helper.javascriptRouter("jsRoutes")(
+      controllers.my.upload.routes.javascript.UploadController.storeFilepart,
       controllers.my.upload.routes.javascript.UploadController.deleteFilepart
     )
 
