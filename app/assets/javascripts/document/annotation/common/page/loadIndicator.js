@@ -10,7 +10,10 @@ define([], function() {
 
               visibleContentHeight = windowHeight - headerHeight,
 
-              loadIcon = jQuery('<img src="/assets/images/wait-circle.gif">'),
+              loadIcon = jQuery(
+                '<div class="load-icon">' +
+                  '<img src="/assets/images/wait-circle-static.gif">' +
+                '</div>'),
 
               showIcon = function() {
                 clickTrap.append(loadIcon);
@@ -25,7 +28,7 @@ define([], function() {
         },
 
         destroy = function() {
-          clickTrap.fadeOut(150);
+          // clickTrap.fadeOut(150);
         };
 
     init();
