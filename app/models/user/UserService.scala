@@ -29,6 +29,8 @@ class UserService @Inject() (
   ) extends BaseService with HasConfig with HasEncryption {
 
   private val SHA_256 = "SHA-256"
+  
+  private val DEFAULT_QUOTA = 200 // TODO make configurable
 
   def listUsers(offset: Int = 0, limit: Int = 20) = db.query { sql =>
     val startTime = System.currentTimeMillis
@@ -40,7 +42,7 @@ class UserService @Inject() (
   def insertUser(username: String, email: String, password: String) = db.withTransaction { sql =>
     val salt = randomSalt
     val user = new UserRecord(username, encrypt(email), computeHash(salt + password), salt,
-      new Timestamp(new Date().getTime), null, null, null, true)
+      new Timestamp(new Date().getTime), null, null, null, DEFAULT_QUOTA, true)
     sql.insertInto(USER).set(user).execute()
     user
   }
@@ -87,20 +89,22 @@ class UserService @Inject() (
 
   /** This method is cached, since it's basically called on every request **/
   def findByUsername(username: String) =
-    cachedLookup("user", username, findByUsernameNoCache)
+    cachedLookup("user", username, findByUsernameNoCache(_ , false))
 
-  def findByUsernameNoCache(username: String) = db.query { sql =>
-    val records =
-      sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
-         .where(USER.USERNAME.equal(username))
-         .fetchArray()
+  /** We're not caching at the moment, since it's not called often & would complicate matters **/
+  def findByUsernameIgnoreCase(username: String) =
+    findByUsernameNoCache(username, true)
+    
+  def findByUsernameNoCache(username: String, ignoreCase: Boolean) = db.query { sql =>
+    val base = sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
+    val records = 
+      if (ignoreCase)
+        base.where(USER.USERNAME.equalIgnoreCase(username)).fetchArray()
+      else
+        base.where(USER.USERNAME.equal(username)).fetchArray()
 
     groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord]).headOption
       .map { case (user, roles) => UserWithRoles(user, roles) }
-  }
-
-  def findByUsernameIgnoreCase(username: String) = db.query { sql =>
-    Option(sql.selectFrom(USER).where(USER.USERNAME.equalIgnoreCase(username)).fetchOne())
   }
 
   def validateUser(username: String, password: String) =

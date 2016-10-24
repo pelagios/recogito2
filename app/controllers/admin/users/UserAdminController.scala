@@ -28,7 +28,7 @@ class UserAdminController @Inject() (
 
       case Some(user) =>
         documents.findByOwner(username).map(documents =>
-          Ok(views.html.admin.users.details(user, documents)))
+          Ok(views.html.admin.users.details(user, documents))) 
 
       case None => Future.successful(NotFoundPage)
 

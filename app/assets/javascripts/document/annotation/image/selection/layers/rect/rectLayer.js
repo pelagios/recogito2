@@ -35,18 +35,20 @@ define([
 
         rectVectorSource = new ol.source.Vector({}),
 
+        computeSize = function(annotation) {
+          var bounds = parseAnchor(annotation.anchor);
+          return bounds.w * bounds.h;
+        },
+
         getAnnotationAt = function(e) {
           var hoveredFeatures = rectVectorSource.getFeaturesAtCoordinate(e.coordinate);
 
           if (hoveredFeatures.length > 0) {
             hoveredFeatures.sort(function(a, b) {
-              var rectA = a.getGeometry().getCoordinates(),
-                  rectB = b.getGeometry().getCoordinates(),
+              var annotationA = a.get('annotation'),
+                  annotationB = b.get('annotation');
 
-                  sizeA = Geom2D.getPolygonArea(rectA),
-                  sizeB = Geom2D.getPolygonArea(rectB);
-
-              return sizeA - sizeB;
+              return computeSize(annotationA) - computeSize(annotationB);
             });
 
             return {
@@ -103,6 +105,7 @@ define([
       style: Style.BOX
     }));
 
+    this.computeSize = computeSize;
     this.getAnnotationAt = getAnnotationAt;
     this.findById = findById;
     this.addAnnotation = addAnnotation;

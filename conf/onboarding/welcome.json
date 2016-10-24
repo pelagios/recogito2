@@ -1,0 +1,19 @@
+{
+  "contributors": [ "Recogito" ],
+  "anchor": "char-offset:224",
+  "last_modified_by": "Recogito",
+  "last_modified_at": "2016-09-25T13:41:00Z",
+  "bodies": [
+    {
+      "type": "QUOTE",
+      "last_modified_by": "Recogito",
+      "last_modified_at": "2016-09-25T13:41:00Z",
+      "value": "here"
+    },{
+      "type": "COMMENT",
+      "last_modified_by": "Recogito",
+      "last_modified_at": "2016-09-25T13:41:00Z",
+      "value": "This is an example commentary annotation. Try adding a reply below!"
+    }
+  ]
+}

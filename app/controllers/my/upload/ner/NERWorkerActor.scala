@@ -64,10 +64,10 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
   private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File) =
     part.getContentType match {
       case t if t == ContentType.TEXT_PLAIN.toString =>
-        parsePlaintext(document, part, new File(documentDir, part.getFilename))
+        parsePlaintext(document, part, new File(documentDir, part.getFile))
 
       case t => {
-        Logger.info("Skipping NER for file of unsupported type " + t + ": " + documentDir.getName + File.separator + part.getFilename)
+        Logger.info("Skipping NER for file of unsupported type " + t + ": " + documentDir.getName + File.separator + part.getFile)
         Future { Seq.empty[Phrase] }
       }
     }

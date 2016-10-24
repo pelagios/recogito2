@@ -101,7 +101,8 @@ define([
             return;
 
           // Check for new text selection first - takes precedence over clicked annotation span
-          if (!selection.isCollapsed &&
+          if (Config.writeAccess &&
+              !selection.isCollapsed &&
                selection.rangeCount == 1 &&
                selection.getRangeAt(0).toString().trim().length > 0) {
 
@@ -167,6 +168,7 @@ define([
     this.clearSelection = clearSelection;
     this.getSelection = getSelection;
     this.setSelection = setSelection;
+    this.rangeToAnnotationStub = rangeToAnnotationStub;
 
     AbstractSelectionHandler.apply(this);
   };

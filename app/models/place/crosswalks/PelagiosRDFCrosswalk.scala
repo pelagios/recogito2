@@ -10,7 +10,6 @@ import java.io.FileInputStream
 
 object PelagiosRDFCrosswalk {
   
-
   private def convertPeriodOfTime(period: PeriodOfTime): TemporalBounds = {
     val startDate = period.start
     val endDate = period.end.getOrElse(startDate)

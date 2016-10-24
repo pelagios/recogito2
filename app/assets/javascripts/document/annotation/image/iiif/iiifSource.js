@@ -39,7 +39,7 @@ define([], function() {
 
         extension = options.extension || 'jpg',
 
-        quality = options.quality || 'native',
+        quality = options.quality || 'default',
 
         width = options.width,
 
@@ -90,7 +90,7 @@ define([], function() {
 
       crossOrigin: options.crossOrigin,
 
-      tileUrlFunction: function(tileCoord, pixelRatio, projection) {
+      tileUrlFunction: function(tileCoord, pixelRatio) {
         var z = tileCoord[0],
             x = tileCoord[1],
             y = -tileCoord[2] - 1,

@@ -216,8 +216,7 @@ define([
          * CSS classes, and attaching the annotation object to the elements.
          */
         convertSelectionToAnnotation = function(selection) {
-          var anchor = selection.annotation.anchor.substr(12),
-              quote = AnnotationUtils.getQuote(selection.annotation);
+          var anchor = selection.annotation.anchor.substr(12);
 
           updateStyles(selection.annotation, selection.spans);
 

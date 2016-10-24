@@ -1,6 +1,6 @@
 # Recogito 2
 
-Home of Recogito v2.0 - a Linked Data annotation tool for texts and images, developed by
+Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation tool for texts and images, developed by
 [Pelagios](http://commons.pelagios.org). Track our progress on
 [Waffle.io](http://waffle.io/pelagios/recogito2).
 

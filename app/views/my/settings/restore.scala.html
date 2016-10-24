@@ -1,0 +1,60 @@
+@(
+  user: models.generated.tables.records.UserRecord
+)(implicit flash: Flash)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Account Settings</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/settings/index.css")"/>
+  </head>
+
+  <body>
+    <div class="sidebar">
+      @views.html.sidebarHeader(user)
+
+      <ul class="menu">
+        <li>
+          <a href="@controllers.my.settings.routes.AccountSettingsController.index">
+            <span class="label">Account</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="@controllers.my.settings.routes.PasswordSettingsController.index">
+            <span class="label">Password</span>
+          </a>
+        </li>
+
+        <li class="active">
+          <a href="#" onclick="return false;">
+            <span class="label">Restore from Backup</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <div class="restore panel centered">
+        <h2>Restore</h2>
+        @flash.get("success").map { msg =>
+          <div class="success flash-message"><span class="icon">&#xf00c;</span> @msg</div>
+        }
+        @flash.get("error").map { msg =>
+          <div class="error flash-message"><span class="icon">&#xf00d;</span> @msg</div>
+        }
+        <div class="inner">
+          <p class="description">
+            You can restore a document from a ZIP package downloaded earlier through Recogito's
+            Backup function.
+          </p>
+          @helper.form(action = controllers.my.settings.routes.RestoreController.restore(), 'enctype -> "multipart/form-data") {
+            <input type="file" name="backup" id="backup" onchange="this.form.submit()">
+            <label class="btn" for="backup">
+              <span class="icon">&#xf093;</span> Upload ZIP Backup Package
+            </label>
+          }
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

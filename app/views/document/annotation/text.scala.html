@@ -44,6 +44,7 @@
         @doc.author.map(_ + ": ")@doc.title
       </h1>
       <h2 class="date">@doc.dateFreeform</h2>
+      <p class="source">@views.html.document.sourceLink(doc.source)</p>
       <p class="quick-stats">
         <span class="icon comment">&#xf0e5;</span>
         <span class="annotations">-</span> Annotations
@@ -114,7 +115,7 @@
     </div> <!-- .header-toolbar -->
 
     <div class="sidebar">
-      @views.html.document.sidebarHeader(doc.owner)
+      @views.html.sidebarHeader(doc.owner)
 
       <ul class="menu">
         @for(part <- doc.fileparts) {

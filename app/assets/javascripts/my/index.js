@@ -3,7 +3,11 @@ require.config({
   fileExclusionRegExp: /^lib$/
 });
 
-require(['common/ui/touch', 'common/config'], function(Touch, Config) {
+require([
+  'common/ui/alert',
+  'common/ui/touch',
+  'common/config'
+], function(Alert, Touch, Config) {
 
   jQuery(document).ready(function() {
         /** Document elements **/
@@ -48,7 +52,12 @@ require(['common/ui/touch', 'common/config'], function(Touch, Config) {
 
         /** User clicked the trashcan icon **/
         onClickDelete = function() {
-          deleteDocuments(getSelectedDocumentIDs());
+          var title = '<span class="icon">&#xf071;</span> Delete Document',
+              message = 'You cannot undo this operation. Are you sure you want to do this?',
+              alert = new Alert(Alert.WARNING, title, message);
+
+          alert.on('ok', deleteDocuments);
+
           return false;
         },
 
@@ -77,8 +86,9 @@ require(['common/ui/touch', 'common/config'], function(Touch, Config) {
         },
 
         /** Deletes documents sequentially **/
-        deleteDocuments = function(ids) {
-          var head, tail;
+        deleteDocuments = function() {
+          var ids = getSelectedDocumentIDs(),
+              head, tail;
 
           if (ids.length > 0) {
             head = ids[0];

@@ -4,6 +4,8 @@ require.config({
 });
 
 require([
+  'common/ui/alert',
+  'common/ui/formatting',
   'common/utils/annotationUtils',
   'common/api',
   'common/config',
@@ -12,8 +14,11 @@ require([
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
+  'document/annotation/text/selection/phraseAnnotator',
   'document/annotation/text/selection/selectionHandler',
 ], function(
+  Alert,
+  Formatting,
   AnnotationUtils,
   API,
   Config,
@@ -22,15 +27,20 @@ require([
   BaseApp,
   Toolbar,
   Highlighter,
+  PhraseAnnotator,
   SelectionHandler) {
 
   var App = function() {
 
-    var contentNode = document.getElementById('content'),
+    var self = this,
+
+        contentNode = document.getElementById('content'),
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
         highlighter = new Highlighter(contentNode),
+
+        phraseAnnotator = new PhraseAnnotator(contentNode, highlighter),
 
         selector = new SelectionHandler(contentNode, highlighter),
 
@@ -40,7 +50,7 @@ require([
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
-        initPagePrefs = function() {
+        initPage = function() {
           var storedColorscheme = localStorage.getItem('r2.document.edit.colorscheme'),
               colorscheme = (storedColorscheme) ? storedColorscheme : 'BY_STATUS';
 
@@ -49,6 +59,8 @@ require([
 
           if (Config.IS_TOUCH)
             contentNode.className = 'touch';
+
+          Formatting.initTextDirection(contentNode);
         },
 
         setColorscheme = function(mode) {
@@ -64,6 +76,38 @@ require([
         onColorschemeChanged = function(mode) {
           setColorscheme(mode);
           localStorage.setItem('r2.document.edit.colorscheme', mode);
+        },
+
+        onCreateAnnotation = function(selection) {
+          var reapply = function() {
+                var selections = phraseAnnotator.createSelections(selection.annotation);
+                jQuery.each(selections, function(idx, selection) {
+                  // TODO roll into one request!
+                  self.onCreateAnnotation(selection);
+                });
+              },
+
+              promptReapply = function() {
+                var quote = AnnotationUtils.getQuote(selection.annotation),
+                    occurrenceCount = phraseAnnotator.countOccurrences(quote),
+                    promptTitle = 'Re-Apply',
+                    promptMessage = (occurrenceCount > 1) ?
+                      'There are ' + occurrenceCount + ' more occurrences of <em>' :
+                      'There is 1 more occurrence of <em>';
+
+                if (occurrenceCount > 0) {
+                  promptMessage +=
+                    quote + '</em> in the text.<br/>Do you want to re-apply this annotation?';
+
+                  new Alert(Alert.INFO, promptTitle, promptMessage).on('ok', reapply);
+                }
+              };
+
+          // Store the annotation first
+          self.onCreateAnnotation(selection);
+
+          // Then prompt the user if they want to re-apply across the doc
+          promptReapply();
         };
 
     // Toolbar events
@@ -74,13 +118,13 @@ require([
 
     selector.on('select', editor.openSelection);
 
-    editor.on('createAnnotation', this.onCreateAnnotation.bind(this));
+    editor.on('createAnnotation', onCreateAnnotation);
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
     editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 
     rangy.init();
 
-    initPagePrefs();
+    initPage();
 
     API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
        .done(this.onAnnotationsLoaded.bind(this))

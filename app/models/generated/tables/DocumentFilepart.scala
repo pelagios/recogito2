@@ -73,9 +73,9 @@ class DocumentFilepart(alias : String, aliased : Table[DocumentFilepartRecord], 
 	val CONTENT_TYPE : TableField[DocumentFilepartRecord, String] = createField("content_type", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
-	 * The column <code>public.document_filepart.filename</code>.
+	 * The column <code>public.document_filepart.file</code>.
 	 */
-	val FILENAME : TableField[DocumentFilepartRecord, String] = createField("filename", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+	val FILE : TableField[DocumentFilepartRecord, String] = createField("file", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
 	 * The column <code>public.document_filepart.sequence_no</code>.

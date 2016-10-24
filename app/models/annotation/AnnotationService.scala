@@ -163,11 +163,13 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
     }
     
     val deleteVersions = deleteHistoryRecordsByDocId(docId)
+    val deleteGeoTags = deleteGeoTagsByDocId(docId)
     
     for {
       s1 <- deleteAnnotations
       s2 <- deleteVersions
-    } yield (s1 && s2)
+      s3 <- deleteGeoTags
+    } yield (s1 && s2 && s3)
   }
 
   /** Retrieves all annotations on a given filepart **/
