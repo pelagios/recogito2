@@ -5,6 +5,7 @@
   "affects_item": {
     "item_type": "PLACE_BODY",
     "document_id": "98muze1cl3saib",
+    "document_owner": "rainer",
     "filepart_id": "a7126845-16ac-434b-99bd-0f297e227822",
     "content_type": [ "TEXT", "TEXT_PLAIN" ],
     "annotation_id": "7cfa1504-26de-45ef-a590-8b60ea8a60e8",

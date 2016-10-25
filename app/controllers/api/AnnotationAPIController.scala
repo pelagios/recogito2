@@ -9,6 +9,7 @@ import models.annotation._
 import models.contribution._
 import models.document.{ DocumentService, DocumentInfo }
 import models.user.UserService
+import models.generated.tables.records.DocumentRecord
 import org.joda.time.DateTime
 import play.api.{ Configuration, Logger }
 import play.api.mvc.{ AnyContent, Request, Result }
@@ -166,7 +167,7 @@ class AnnotationAPIController @Inject() (
                   val f = for {
                     (annotationStored, _, previousVersion) <- annotations.insertOrUpdateAnnotation(annotation)
                     success <- if (annotationStored)
-                                 contributions.insertContributions(validateUpdate(annotation, previousVersion))
+                                 contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
                                else
                                  Future.successful(false)
                   } yield success
@@ -254,7 +255,7 @@ class AnnotationAPIController @Inject() (
     }
   }
 
-  private def createDeleteContribution(annotation: Annotation, user: String, time: DateTime) =
+  private def createDeleteContribution(annotation: Annotation, document: DocumentRecord, user: String, time: DateTime) =
     Contribution(
       ContributionAction.DELETE_ANNOTATION,
       user,
@@ -262,6 +263,7 @@ class AnnotationAPIController @Inject() (
       Item(
         ItemType.ANNOTATION,
         annotation.annotates.documentId,
+        document.getOwner,
         Some(annotation.annotates.filepartId),
         annotation.annotates.contentType,
         Some(annotation.annotationId),
@@ -282,7 +284,7 @@ class AnnotationAPIController @Inject() (
               val now = DateTime.now
               annotations.deleteAnnotation(id, user, now).flatMap {
                 case Some(annotation) =>
-                  contributions.insertContribution(createDeleteContribution(annotation, user, now)).map(success =>
+                  contributions.insertContribution(createDeleteContribution(annotation, document, user, now)).map(success =>
                     if (success) Status(200) else InternalServerError)
 
                 case None =>

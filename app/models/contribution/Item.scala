@@ -14,6 +14,8 @@ case class Item(
   
   documentId: String,
   
+  documentOwner: String,
+  
   filepartId: Option[UUID],
   
   contentType: ContentType,
@@ -33,6 +35,7 @@ object Item extends HasContentTypeList {
   implicit val itemFormat: Format[Item] = (
     (JsPath \ "item_type").format[ItemType.Value] and
     (JsPath \ "document_id").format[String] and
+    (JsPath \ "document_owner").format[String] and
     (JsPath \ "filepart_id").formatNullable[UUID] and
     (JsPath \ "content_type").format[JsValue].inmap[ContentType](fromCTypeList, toCTypeList) and
     (JsPath \ "annotation_id").formatNullable[UUID] and

@@ -3,6 +3,7 @@ package controllers
 import models.ContentType
 import models.annotation.{ Annotation, AnnotationBody, AnnotationStatus }
 import models.contribution._
+import models.generated.tables.records.DocumentRecord
 
 trait HasAnnotationValidation {
   
@@ -16,7 +17,7 @@ trait HasAnnotationValidation {
         a.hasType == AnnotationBody.QUOTE || a.hasType == AnnotationBody.TRANSCRIPTION)
       .headOption.flatMap(_.value)
 
-  private def createBodyContribution(annotationAfter: Annotation, createdBody: AnnotationBody) =
+  private def createBodyContribution(annotationAfter: Annotation, createdBody: AnnotationBody, document: DocumentRecord) =
     Contribution(
       ContributionAction.CREATE_BODY,
       annotationAfter.lastModifiedBy.get,
@@ -24,6 +25,7 @@ trait HasAnnotationValidation {
       Item(
         ItemType.fromBodyType(createdBody.hasType),
         annotationAfter.annotates.documentId,
+        document.getOwner,
         Some(annotationAfter.annotates.filepartId),
         annotationAfter.annotates.contentType,
         Some(annotationAfter.annotationId),
@@ -53,7 +55,7 @@ trait HasAnnotationValidation {
     }
   }
 
-  private def changeBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, bodyBefore: AnnotationBody, bodyAfter: AnnotationBody) =
+  private def changeBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, bodyBefore: AnnotationBody, bodyAfter: AnnotationBody, document: DocumentRecord) =
     Contribution(
       determineChangeAction(bodyBefore, bodyAfter),
       annotationAfter.lastModifiedBy.get,
@@ -61,6 +63,7 @@ trait HasAnnotationValidation {
       Item(
         ItemType.fromBodyType(bodyAfter.hasType),
         annotationAfter.annotates.documentId,
+        document.getOwner,
         Some(annotationAfter.annotates.filepartId),
         annotationAfter.annotates.contentType,
         Some(annotationAfter.annotationId),
@@ -73,7 +76,7 @@ trait HasAnnotationValidation {
       getContext(annotationAfter)
     )
 
-  private def deleteBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, deletedBody: AnnotationBody) =
+  private def deleteBodyContribution(annotationBefore: Annotation, annotationAfter: Annotation, deletedBody: AnnotationBody, document: DocumentRecord) =
     Contribution(
       ContributionAction.DELETE_BODY,
       annotationAfter.lastModifiedBy.get,
@@ -81,6 +84,7 @@ trait HasAnnotationValidation {
       Item(
         ItemType.fromBodyType(deletedBody.hasType),
         annotationAfter.annotates.documentId,
+        document.getOwner,
         Some(annotationAfter.annotates.filepartId),
         annotationAfter.annotates.contentType,
         Some(annotationAfter.annotationId),
@@ -97,7 +101,7 @@ trait HasAnnotationValidation {
   private def isPredecessorTo(before: AnnotationBody, after: AnnotationBody): Boolean =
     after.hasType == before.hasType
 
-  def validateUpdate(annotation: Annotation, previousVersion: Option[Annotation]): Seq[Contribution] = {
+  def validateUpdate(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord): Seq[Contribution] = {
 
     // TODO validation!
     // - make sure doc/filepart ID remains unchanged
@@ -107,24 +111,24 @@ trait HasAnnotationValidation {
     // TODO check any things the current user should not be able to manipulate
     // - createdAt/By info on bodies not touched by the user must be unchanged
 
-    computeContributions(annotation, previousVersion)
+    computeContributions(annotation, previousVersion, document)
   }
 
   /** Performs a 'diff' on the annotations, returning the corresponding Contributions **/
-  def computeContributions(annotation: Annotation, previousVersion: Option[Annotation]) = previousVersion match {
+  def computeContributions(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord) = previousVersion match {
     case Some(before) => {
       // Body order never changes - so we compare before & after step by step
       annotation.bodies.foldLeft((Seq.empty[Contribution], before.bodies)) { case ((contributions, referenceBodies), nextBodyAfter) =>
         // Leading bodies that are not predecessors to bodies in the new annotation are DELETIONS
         val deletions = referenceBodies
           .takeWhile(bodyBefore => !isPredecessorTo(bodyBefore, nextBodyAfter))
-          .map(deletedBody => deleteBodyContribution(before, annotation, deletedBody))
+          .map(deletedBody => deleteBodyContribution(before, annotation, deletedBody, document))
 
         // Once we're through detecting deletions, we continue with the remaining before-bodies
         val remainingReferenceBodies = referenceBodies.drop(deletions.size)
         if (remainingReferenceBodies.isEmpty) {
           // None left? Then this new body is an addition
-          (contributions ++ deletions :+ createBodyContribution(annotation, nextBodyAfter),
+          (contributions ++ deletions :+ createBodyContribution(annotation, nextBodyAfter, document),
             remainingReferenceBodies)
         } else if (remainingReferenceBodies.head.equalsIgnoreModified(nextBodyAfter)) {
           // This body is unchanged - continue with next
@@ -132,7 +136,7 @@ trait HasAnnotationValidation {
             remainingReferenceBodies.tail)
         } else {
           // This body was updated
-          (contributions ++ deletions :+ changeBodyContribution(before, annotation, remainingReferenceBodies.head, nextBodyAfter),
+          (contributions ++ deletions :+ changeBodyContribution(before, annotation, remainingReferenceBodies.head, nextBodyAfter, document),
             remainingReferenceBodies.tail)
         }
       }._1 // We're not interested in the empty list of 'remaining reference bodies'
@@ -144,7 +148,7 @@ trait HasAnnotationValidation {
         // TODO new annotation with no previous version - generate contributions
         Seq.empty[Contribution]
       else
-        annotation.bodies.map(body => createBodyContribution(annotation, body))
+        annotation.bodies.map(body => createBodyContribution(annotation, body, document))
     }
   }
 
