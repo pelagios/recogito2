@@ -39,8 +39,10 @@ require([
           return user + 'highlighted section <em>&raquo;' + valAfterShort + '&laquo;</em>';
         } else if (action === 'CREATE_BODY' && itemType === 'COMMENT_BODY') {
           return 'New comment by ' + user + ' <em>&raquo;' + valAfterShort + '&laquo;</em>';
-        } else if (action === 'CREATE_BODY'  && itemType === 'TRANSCRIPTION') {
+        } else if (action === 'CREATE_BODY' && itemType === 'TRANSCRIPTION') {
           return user + 'added transcription <em>&raquo;' + valAfter + '&laquo;</em>';
+        } else if (action === 'CREATE_BODY' && itemType === 'TAG_BODY') {
+          return user + ' tagged <em>&raquo;' + context + '&laquo;</em> with <em>&raquo;' + valAfter + '&laquo;</em>';
         } else if (action === 'CREATE_BODY') {
           return user + 'tagged <em>&raquo;' + context + '&laquo;</em> as ' + itemTypeLabel;
         } else if (action === 'CONFIRM_BODY') {
