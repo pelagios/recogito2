@@ -1,7 +1,7 @@
 define(['common/config'], function(Config) {
 
-      // Duration for showing the 'Save OK' status info
-  var SHOW_STATUS_SAVED_FOR_MS = 5000;
+  // Duration for showing the 'Save OK'/save error status info
+  var SHOW_RESPONSE_STATUS_FOR_MS = 5000;
 
   var Header = function() {
 
@@ -13,7 +13,7 @@ define(['common/config'], function(Config) {
           jQuery('.header-iconbar').append(el);
           return el;
         })(),
-        
+
         saveMessageTimer = false,
 
         /** Document owner username **/
@@ -70,17 +70,18 @@ define(['common/config'], function(Config) {
           saveMessageEl.html('Saving...');
         },
 
-        showStatusSaved = function() {
+        showStatusSaved = function(message) {
           clearMessageFadeTimer();
-          saveMessageEl.html('All edits saved');
+          saveMessageEl.html('Annotation saved');
           saveMessageTimer = setTimeout(function() {
             saveMessageEl.fadeOut();
             saveMessageTimer = false;
-          }, SHOW_STATUS_SAVED_FOR_MS);
+          }, SHOW_RESPONSE_STATUS_FOR_MS);
         },
 
         showSaveError = function(error) {
-          // TODO implement
+          clearMessageFadeTimer();
+          saveMessageEl.html('<span class="save-error">Error saving annotation. Please refresh page.</span>');
         };
 
     this.incrementAnnotationCount = incrementAnnotationCount;
