@@ -39,7 +39,7 @@ class RestoreController @Inject() (
        
         case Some(filepart) =>
           // Forces the owner of the backup to the currently logged in user
-          restoreBackup(filepart.ref.file, Some(loggedIn.user.getUsername))
+          restoreBackup(filepart.ref.file, true, Some(loggedIn.user.getUsername))
             .map { _ => 
               Redirect(routes.RestoreController.index).flashing("success" -> "The document was restored successfully.") 
             }.recover { 

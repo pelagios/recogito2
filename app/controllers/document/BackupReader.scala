@@ -26,7 +26,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
     (zipFile, zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX")))
   }
   
-  def readMetadata(file: File, newOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
+  def readMetadata(file: File, forcedOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
     
     def parseDocumentMetadata(json: JsValue) = {
       // First preference is to re-use ID from backup
@@ -43,7 +43,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
           documentService.generateRandomID()
       }
         
-      val owner = newOwner match {
+      val owner = forcedOwner match {
         case Some(username) => username
         case _ => (json \ "owner").as[String]
       }
@@ -103,7 +103,11 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
     }
   }
   
-  def restoreBackup(file: File, newOwner: Option[String] = None)(implicit ctx: ExecutionContext, annotationService: AnnotationService, documentService: DocumentService) = {
+  def restoreBackup(
+      file: File,
+      validateBeforeImport: Boolean,
+      forcedOwner: Option[String]
+    )(implicit ctx: ExecutionContext, annotationService: AnnotationService, documentService: DocumentService) = {
     
     def restoreDocument(document: DocumentRecord, parts: Seq[DocumentFilepartRecord]) = {
       val (zipFile, entries) = openZipFile(file)
@@ -127,11 +131,8 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
       annotationService.insertOrUpdateAnnotations(annotations.toSeq)
     }
     
-    validateBackup(file).flatMap { valid =>
-      if (!valid)
-        throw new InvalidSignatureException
-        
-      val fReadMetadata = readMetadata(file, newOwner)
+    def restore() = {
+      val fReadMetadata = readMetadata(file, forcedOwner)
       val fReadAnnotations = readAnnotations(file)
       
       for {
@@ -141,7 +142,16 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         _ <- restoreAnnotations(annotationStubs, document.getId, parts)
       } yield Unit
     }
-
+    
+    if (validateBeforeImport)
+      validateBackup(file).flatMap { valid =>
+        if (!valid)
+          throw new InvalidSignatureException
+          
+        restore()
+      }
+    else
+      restore()
   }
   
 }
