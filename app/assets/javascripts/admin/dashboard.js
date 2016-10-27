@@ -15,7 +15,7 @@ require(['common/ui/formatting'], function(Formatting) {
 
         refreshHighscores = function(scores) {
 
-          var maxScore = Math.max(jQuery.map(scores, function(score) {
+          var maxScore = Math.max.apply(null, jQuery.map(scores, function(score) {
                 return score.value;
               })),
 
@@ -36,7 +36,7 @@ require(['common/ui/formatting'], function(Formatting) {
                   '</tr>');
               };
 
-          jQuery.each(scores.reverse(), function(idx, score) {
+          jQuery.each(scores, function(idx, score) {
             topUsers.append(createRow(score.username, score.value));
           });
         },
