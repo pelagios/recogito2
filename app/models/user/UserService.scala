@@ -18,6 +18,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Either, Left, Right }
 import storage.{ DB, Uploads }
 import sun.security.provider.SecureRandom
+import org.apache.commons.lang3.RandomStringUtils
 
 @Singleton
 class UserService @Inject() (
@@ -42,11 +43,23 @@ class UserService @Inject() (
   }
 
   def insertUser(username: String, email: String, password: String) = db.withTransaction { sql =>
-    val salt = randomSalt
+    val salt = randomSalt()
     val user = new UserRecord(username, encrypt(email), computeHash(salt + password), salt,
       new Timestamp(new Date().getTime), null, null, null, DEFAULT_QUOTA, true)
     sql.insertInto(USER).set(user).execute()
     user
+  }
+  
+  def resetPassword(username: String): Future[String] = db.withTransaction { sql =>
+    val randomPassword = RandomStringUtils.randomAlphanumeric(18)
+    val salt = randomSalt()
+    sql.update(USER)
+      .set(USER.PASSWORD_HASH, computeHash(salt + randomPassword))
+      .set(USER.SALT, salt)
+      .where(USER.USERNAME.equal(username))
+      .execute()
+      
+    randomPassword  
   }
   
   def updatePassword(username: String, currentPassword: String, newPassword: String): Future[Either[String, Unit]] = db.withTransaction { sql =>
@@ -55,7 +68,7 @@ class UserService @Inject() (
         val isValid = computeHash(user.getSalt + currentPassword) == user.getPasswordHash
         if (isValid) {
           // User credentials OK - update password
-          val salt = randomSalt
+          val salt = randomSalt()
           val rows = 
             sql.update(USER)
               .set(USER.PASSWORD_HASH, computeHash(salt + newPassword))
@@ -137,7 +150,7 @@ class UserService @Inject() (
     uploads.getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l)
 
   /** Utility function to create new random salt for password hashing **/
-  private def randomSalt = {
+  private def randomSalt() = {
     val r = new SecureRandom()
     val salt = new Array[Byte](32)
     r.engineNextBytes(salt)

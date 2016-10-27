@@ -5,13 +5,15 @@ require.config({
 
 require(['common/ui/formatting'], function(Formatting) {
 
+  var REFRESH_INTERVAL_MS = 1000;
+
   jQuery(document).ready(function() {
 
     var totalEdits = jQuery('.total-edits .number'),
         totalAnnotations = jQuery('.total-annotations .number'),
         registeredUsers = jQuery('.registered-users .number'),
 
-        topUsers = jQuery('.top-users table'),
+        topContributors = jQuery('.top-contributors table'),
 
         refreshHighscores = function(scores) {
 
@@ -36,8 +38,9 @@ require(['common/ui/formatting'], function(Formatting) {
                   '</tr>');
               };
 
+          topContributors.empty();
           jQuery.each(scores, function(idx, score) {
-            topUsers.append(createRow(score.username, score.value));
+            topContributors.append(createRow(score.username, score.value));
           });
         },
 
@@ -55,9 +58,9 @@ require(['common/ui/formatting'], function(Formatting) {
           });
         },
 
-
         refresh = function() {
           refreshContributionStats();
+          window.setTimeout(refresh, REFRESH_INTERVAL_MS);
         };
 
     refresh();
