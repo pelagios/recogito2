@@ -1,6 +1,7 @@
 package controllers.my.settings
 
 import controllers.{ HasUserService, HasConfig, Security }
+import controllers.document.HasBackupValidation
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
@@ -44,7 +45,7 @@ class RestoreController @Inject() (
               Redirect(routes.RestoreController.index).flashing("success" -> "The document was restored successfully.") 
             }.recover { 
               
-              case e: InvalidSignatureException =>
+              case e: HasBackupValidation.InvalidSignatureException =>
                 Redirect(routes.RestoreController.index).flashing("error" -> "The authenticity of your backup could not be verified.")
                 
               case t: Throwable =>

@@ -9,9 +9,17 @@ import controllers.HasConfig
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
 
-trait HasBackupValidation { self: HasConfig =>
+object HasBackupValidation {
   
   class InvalidSignatureException extends RuntimeException
+  
+  class InvalidBackupException extends RuntimeException
+  
+  class DocumentExistsException extends RuntimeException
+    
+}
+
+trait HasBackupValidation { self: HasConfig =>
   
   protected val ALGORITHM = "SHA-256"
   

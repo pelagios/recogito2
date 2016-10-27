@@ -26,27 +26,33 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
     (zipFile, zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX")))
   }
   
-  def readMetadata(file: File, forcedOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
+  def readMetadata(file: File, runAsAdmin: Boolean, forcedOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
     
     def parseDocumentMetadata(json: JsValue) = {
-      // First preference is to re-use ID from backup
-      val id = (json \ "id").asOpt[String] match {
-        case Some(preferredId) =>
-          // TODO sanitize the preferred ID
-          if (documentService.existsId(preferredId))
-            // No longer available
-            documentService.generateRandomID()
-          else
-            preferredId
-          
-        case None => // No ID in backup - generate random
-          documentService.generateRandomID()
-      }
+      // User ID from backup, or create new if allowed (for interop with legacy backups)
+      val id = (json \ "id").asOpt[String]
+        .getOrElse { 
+          if (!runAsAdmin) // Only admins may import legacy backups
+            throw new HasBackupValidation.InvalidBackupException
+            
+          documentService.generateRandomID() 
+        }
+      
+      if (documentService.existsId(id))
+        throw new HasBackupValidation.DocumentExistsException
         
       val owner = forcedOwner match {
-        case Some(username) => username
-        case _ => (json \ "owner").as[String]
-      }
+          // Personal restore always forces the document owner to the logged-in user
+          case Some(username) => username
+
+          // Only admins can retain the user from the backup metadata - but 
+          // forceOwner == None && runAsAdmin == false should never happen
+          case _ =>
+            if (!runAsAdmin)
+              throw new RuntimeException
+
+            (json \ "owner").as[String]
+        }
 
       new DocumentRecord(
         // Reuse ID from backup or create a new one
@@ -105,7 +111,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
   
   def restoreBackup(
       file: File,
-      validateBeforeImport: Boolean,
+      runAsAdmin: Boolean,
       forcedOwner: Option[String]
     )(implicit ctx: ExecutionContext, annotationService: AnnotationService, documentService: DocumentService) = {
     
@@ -132,7 +138,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
     }
     
     def restore() = {
-      val fReadMetadata = readMetadata(file, forcedOwner)
+      val fReadMetadata = readMetadata(file, runAsAdmin, forcedOwner)
       val fReadAnnotations = readAnnotations(file)
       
       for {
@@ -143,15 +149,15 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
       } yield Unit
     }
     
-    if (validateBeforeImport)
+    if (runAsAdmin) // Admins can just restore...
+      restore()
+    else // ...anyone else needs to go through validation first
       validateBackup(file).flatMap { valid =>
         if (!valid)
-          throw new InvalidSignatureException
+          throw new HasBackupValidation.InvalidSignatureException
           
         restore()
       }
-    else
-      restore()
   }
   
 }
