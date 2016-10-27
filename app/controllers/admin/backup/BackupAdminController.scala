@@ -26,11 +26,15 @@ class BackupAdminController @Inject() (
   def restore = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     request.body.asMultipartFormData.flatMap(_.file("backup")) match {
       case Some(formData) =>
-          restoreBackup(formData.ref.file, false, None).map(_ => Redirect(routes.BackupAdminController.index))
-            .recover { case t: Throwable =>
-              t.printStackTrace()
-              InternalServerError
-            }
+          restoreBackup(
+            formData.ref.file,
+            runAsAdmin = true,
+            forcedOwner = None
+          ).map(_ => Redirect(routes.BackupAdminController.index)
+          ).recover { case t: Throwable =>
+             t.printStackTrace()
+             InternalServerError
+          }
         
       case None => 
         Future.successful(BadRequest)

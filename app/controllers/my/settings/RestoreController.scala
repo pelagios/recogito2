@@ -40,18 +40,21 @@ class RestoreController @Inject() (
        
         case Some(filepart) =>
           // Forces the owner of the backup to the currently logged in user
-          restoreBackup(filepart.ref.file, true, Some(loggedIn.user.getUsername))
-            .map { _ => 
-              Redirect(routes.RestoreController.index).flashing("success" -> "The document was restored successfully.") 
-            }.recover { 
+          restoreBackup(
+            filepart.ref.file,
+            runAsAdmin = false,
+            forcedOwner = Some(loggedIn.user.getUsername)
+          ).map { _ => 
+            Redirect(routes.RestoreController.index).flashing("success" -> "The document was restored successfully.") 
+          }.recover { 
+            
+            case e: HasBackupValidation.InvalidSignatureException =>
+              Redirect(routes.RestoreController.index).flashing("error" -> "The authenticity of your backup could not be verified.")
               
-              case e: HasBackupValidation.InvalidSignatureException =>
-                Redirect(routes.RestoreController.index).flashing("error" -> "The authenticity of your backup could not be verified.")
-                
-              case t: Throwable =>
-                t.printStackTrace()
-                Redirect(routes.RestoreController.index).flashing("error" -> "There was an error restoring your document.") 
-            }
+            case t: Throwable =>
+              t.printStackTrace()
+              Redirect(routes.RestoreController.index).flashing("error" -> "There was an error restoring your document.") 
+          }
           
         case None =>
           Logger.warn("Personal document restore POST without file attached")
