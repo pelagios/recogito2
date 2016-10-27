@@ -29,7 +29,7 @@ require(['common/ui/formatting'], function(Formatting) {
                     '<td><a href=/admin/users/' + username + '">' + username + '</a></td>' +
                     '<td>' +
                       '<div class="meter">' +
-                        '<div class="bar" style="width:' + toPercent(count) + '%"></div>' +
+                        '<div class="bar rounded" style="width:' + toPercent(count) + '%"></div>' +
                       '</div>' +
                     '</td>' +
                     '<td>' + Formatting.formatNumber(count) + ' Edits</td>' +
