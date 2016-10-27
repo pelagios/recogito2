@@ -1,4 +1,5 @@
 @import "../_globals.less";
+@import "../_meter.less";
 @import "_grid.less";
 
 html, body {
@@ -30,7 +31,7 @@ html, body {
   padding:5px 0 8px;
   height:100%;
 
-   * {
+   span {
      display:block;
      line-height:170%;
    }
@@ -54,4 +55,48 @@ html, body {
 .h2>.metric .number {
   padding:17% 0;
   font-size:36px;
+}
+
+.top-users {
+
+  table {
+    padding:10px 15px;
+    box-sizing:border-box;
+    width:100%;
+    text-align:left;
+
+    td {
+      padding:0 5px;
+      vertical-align:middle;
+      font-size:14px;
+    }
+
+    td:first-child {
+      width:1%;
+
+      a {
+        color:@standard-type;
+        text-decoration:none;
+      }
+
+    }
+
+    td:last-child {
+      width:1%;
+      white-space:nowrap;
+    }
+
+    .meter {
+      width:95%;
+      height:10px;
+      margin-top:2px;
+    }
+
+    .bar {
+      background-color:@ocean;
+    }
+
+
+  }
+
 }
