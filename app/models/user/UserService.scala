@@ -30,6 +30,10 @@ class UserService @Inject() (
   
   private val DEFAULT_QUOTA = 200 // TODO make configurable
 
+  def countUsers() = db.query { sql =>
+    sql.selectCount().from(USER).fetchOne(0, classOf[Int])
+  }
+  
   def listUsers(offset: Int = 0, limit: Int = 20) = db.query { sql =>
     val startTime = System.currentTimeMillis
     val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])

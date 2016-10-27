@@ -25,6 +25,11 @@ define(function() {
         return '';
     },
 
+    /** Current implementation relies on numeral.js **/
+    formatNumber : function(n) {
+      return numeral(n).format('0,0');
+    },
+
     formatDay : function(date) {
       var day = date.getDate(),
           month = date.getMonth(),

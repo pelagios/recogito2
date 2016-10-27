@@ -1,0 +1,23 @@
+@cell-height:100px;
+
+.cell {
+  position:relative;
+  display:inline-block;
+  box-sizing:border-box;
+  vertical-align:middle;
+  height:@cell-height;
+  margin:0;
+  float:left;
+  padding:4px;
+}
+
+.cell.no-pad {
+  padding:0;
+}
+
+.cell.w2  { width:16.6%; }
+.cell.w3  { width:25%; }
+.cell.w6  { width:50%; }
+.cell.w7  { width:58.3%; }
+.cell.w12 { width:100%; }
+.cell.h2 {  height:(@cell-height * 2); }

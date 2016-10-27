@@ -2,6 +2,7 @@ require.config({
   baseUrl : "/assets/javascripts",
   fileExclusionRegExp : /^lib$/,
   modules : [
+    { name : 'admin/dashboard' },
     { name : 'document/annotation/image/app' },
     { name : 'document/annotation/text/app' },
     { name : 'document/map/app' },

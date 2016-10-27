@@ -1,6 +1,6 @@
 package controllers.admin
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, WebJarAssets }
 import javax.inject.Inject
 import models.document.DocumentService
 import models.user.UserService
@@ -10,12 +10,12 @@ import play.api.Configuration
 class AdminController @Inject() (
     val config: Configuration,
     val documents: DocumentService,
-    val users: UserService
+    val users: UserService,
+    implicit val webjars: WebJarAssets
   ) extends BaseAuthController(config, documents, users) {
         
-  /** TODO placeholder **/
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>
-    Redirect(controllers.admin.gazetteers.routes.GazetteerAdminController.index())
+    Ok(views.html.admin.index())
   }
   
 }

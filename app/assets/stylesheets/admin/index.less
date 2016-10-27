@@ -1,0 +1,57 @@
+@import "../_globals.less";
+@import "_grid.less";
+
+html, body {
+  background-color:@blueish-white;
+}
+
+.content {
+  max-width:1150px;
+  min-width:920px;
+  margin:0 auto;
+  padding:30px 0;
+}
+
+.content:after {
+  content:'';
+  display:block;
+  clear:both;
+}
+
+.metric {
+  margin:0;
+  position:relative;
+  box-sizing:border-box;
+  color:@standard-type;
+  background-color:#fff;
+  border:1px solid @standard-type;
+  text-align:center;
+  .rounded-corners(3px);
+  padding:5px 0 8px;
+  height:100%;
+
+   * {
+     display:block;
+     line-height:170%;
+   }
+
+   .number {
+     padding:3% 0;
+     font-size:28px;
+   }
+
+   .caption {
+     position:absolute;
+     bottom:0;
+     width:100%;
+     background-color:@standard-type;
+     color:#fff;
+     font-size:14px;
+   }
+
+}
+
+.h2>.metric .number {
+  padding:17% 0;
+  font-size:36px;
+}

@@ -27,8 +27,8 @@ libraryDependencies ++= Seq(
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models",
   "jp.t2v" %% "play2-auth" % "0.14.1",
-  "org.apache.jena" % "jena-arq" % "3.1.0",  
-  
+  "org.apache.jena" % "jena-arq" % "3.1.0",
+
   "org.geotools" % "gt-geojson" % "14.3",
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
@@ -47,6 +47,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
   "org.webjars" % "leaflet" % "0.7.7",
+  "org.webjars" % "numeral-js" % "1.5.3-1",
   "org.webjars" % "openlayers" % "3.13.0",
   "org.webjars" % "requirejs" % "2.1.22",
   "org.webjars" % "typeaheadjs" % "0.11.1",

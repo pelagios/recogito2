@@ -58,12 +58,12 @@ require([], function() {
         },
 
         updateAll = function() {
-          jsRoutes.controllers.api.ContributionAPIController.getGlobalStats().ajax().done(function(stats) {
-            updateTotalContributions(stats.total_contributions);
-            updateByUser(stats.by_user);
-            updateByAction(stats.by_action);
-            updateByItemType(stats.by_item_type);
-            updateContributionHistory(stats.contribution_history);
+          jsRoutes.controllers.api.StatsAPIController.getDashboardStats().ajax().done(function(stats) {
+            updateTotalContributions(stats.contributions.total_contributions);
+            updateByUser(stats.contributions.by_user);
+            updateByAction(stats.contributions.by_action);
+            updateByItemType(stats.contributions.by_item_type);
+            updateContributionHistory(stats.contributions.contribution_history);
           });
         };
 

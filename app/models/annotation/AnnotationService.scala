@@ -132,6 +132,11 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         // Annotation not found
         Future.successful(None)
     })
+    
+  def countTotal(): Future[Long] =
+    es.client execute {
+      count from ES.RECOGITO / ES.ANNOTATION
+    } map { _.getCount }
         
   def countByDocId(id: String): Future[Long] =
     es.client execute {

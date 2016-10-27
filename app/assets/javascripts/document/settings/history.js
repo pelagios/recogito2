@@ -99,7 +99,7 @@ require([
       });
     });
 
-    jsRoutes.controllers.api.ContributionAPIController.getContributionHistory(Config.documentId).ajax().done(function(history) {
+    jsRoutes.controllers.api.StatsAPIController.getContributionHistory(Config.documentId).ajax().done(function(history) {
       var contributions = jQuery('.edit-history');
 
       history.items.reduce(function(previous, contribution) {
