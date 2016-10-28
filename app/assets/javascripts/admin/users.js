@@ -24,7 +24,6 @@ require([], function(Formatting) {
 
     jQuery('.user-list').jsGrid({
       width:'100%',
-      height:'400px',
       sorting: true,
       paging: true,
       pageSize: 40,

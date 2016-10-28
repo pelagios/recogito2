@@ -1,0 +1,45 @@
+@import "../_globals.less";
+
+html, body {
+  background-color:@blueish-white;
+}
+
+.user-list {
+
+  .jsgrid-grid-header, .jsgrid-grid-body {
+    overflow:visible !important;
+  }
+
+  .jsgrid-header-row, tr:last-child {
+    background-color:#fff;
+    border-bottom:1px solid @lightgrey-border-darker;
+
+    th { padding-top:20px; }
+
+  }
+
+  th {
+    text-align:left;
+  }
+
+  .jsgrid-align-right {
+    text-align:right;
+  }
+
+  td:first-child, th:first-child {
+    padding-left:80px;
+  }
+
+  td:last-child, th:last-child {
+    padding-right:80px;
+  }
+
+  .jsgrid-row td {
+    background-color:#fff;
+  }
+
+  .jsgrid-alt-row td {
+    background-color:@blueish-white-hi;
+  }
+
+}
