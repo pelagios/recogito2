@@ -20,6 +20,7 @@ class UserAPIController @Inject() (
     implicit val ctx: ExecutionContext
   ) extends BaseController(config, users) with AuthElement with HasPrettyPrintJSON with HasDate {
 
+  /** TODO redirects to login for unauthorized users - as a JSON method, should send FORBIDDEN **/
   def listUsers(offset: Int, size: Int, sortBy: Option[String], sortOrder: Option[String]) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     users.listUsers(offset, size, sortBy, sortOrder.flatMap(o => SortOrder.fromString(o))).map { userList =>
       jsonOk(Json.toJson(userList.map { user =>

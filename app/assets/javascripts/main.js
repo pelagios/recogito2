@@ -3,6 +3,7 @@ require.config({
   fileExclusionRegExp : /^lib$/,
   modules : [
     { name : 'admin/dashboard' },
+    { name : 'admin/users' },
     { name : 'document/annotation/image/app' },
     { name : 'document/annotation/text/app' },
     { name : 'document/map/app' },
