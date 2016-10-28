@@ -7,6 +7,23 @@ import scala.concurrent.duration._
 import scala.reflect.ClassTag
 import storage.DB
 
+/** Generic sort order symbol **/
+sealed class SortOrder
+
+object SortOrder {
+  case object ASC extends SortOrder
+  case object DESC extends SortOrder
+  
+  def fromString(str: String): Option[SortOrder] =
+    if (str.equalsIgnoreCase("asc"))
+      Some(ASC)
+    else if (str.equalsIgnoreCase("desc"))
+      Some(DESC)
+    else
+      None
+      
+}
+
 /** Various helpers of general use to Service classes **/
 trait BaseService {
 

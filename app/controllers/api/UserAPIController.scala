@@ -3,6 +3,7 @@ package controllers.api
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import controllers.{ BaseController, HasPrettyPrintJSON }
+import models.SortOrder
 import models.user.UserService
 import models.user.Roles.Admin
 import models.generated.tables.records.UserRecord
@@ -18,9 +19,9 @@ class UserAPIController @Inject() (
     val users: UserService,
     implicit val ctx: ExecutionContext
   ) extends BaseController(config, users) with AuthElement with HasPrettyPrintJSON with HasDate {
-  
-  def listUsers(offset: Int, size: Int) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    users.listUsers(offset, size).map { userList =>
+
+  def listUsers(offset: Int, size: Int, sortBy: Option[String], sortOrder: Option[String]) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+    users.listUsers(offset, size, sortBy, sortOrder.flatMap(o => SortOrder.fromString(o))).map { userList =>
       jsonOk(Json.toJson(userList.map { user =>
         Json.obj(
           "username" -> user.getUsername,
@@ -32,5 +33,5 @@ class UserAPIController @Inject() (
       }))
     }
   }
-  
+
 }

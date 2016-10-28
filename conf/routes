@@ -100,7 +100,7 @@ GET     /api/place/:uri                             controllers.api.PlaceAPICont
 GET     /api/stats/document/:id/history              controllers.api.StatsAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
 GET     /api/stats                                   controllers.api.StatsAPIController.getDashboardStats()
 
-GET     /api/user                                    controllers.api.UserAPIController.listUsers(offset: Int ?= 0, size: Int ?= 100)
+GET     /api/user                                    controllers.api.UserAPIController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - upload

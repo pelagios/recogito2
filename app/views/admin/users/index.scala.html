@@ -1,4 +1,4 @@
-@(users: Page[models.generated.tables.records.UserRecord])(implicit request: RequestHeader, webjars: WebJarAssets)
+@()(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
@@ -34,7 +34,7 @@
             var offset = (filter.pageIndex - 1) * filter.pageSize,
                 size = filter.pageSize;
 
-            return jQuery.getJSON('/api/user?offset=' + offset + '&size=' + size).then(function(response) {
+            return jQuery.getJSON('/api/user?offset=' + offset + '&size=' + size + '&sortBy=' + filter.sortField + '&sortOrder=' + filter.sortOrder).then(function(response) {
               return {
                 'data': response.items,
                 'itemsCount': response.total
@@ -43,7 +43,7 @@
           }
         }
       });
-      
+
     });
     </script>
   </head>

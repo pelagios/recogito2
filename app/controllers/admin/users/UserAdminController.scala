@@ -18,9 +18,8 @@ class UserAdminController @Inject() (
     implicit val webjars: WebJarAssets
   ) extends BaseAuthController(config, documents, users) {
 
-  def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    users.listUsers(0, 500).map(users => 
-      Ok(views.html.admin.users.index(users)))
+  def index = StackAction(AuthorityKey -> Admin) { implicit request =>
+    Ok(views.html.admin.users.index())
   }
 
   def showDetails(username: String) = AsyncStack(AuthorityKey -> Admin) { implicit request =>

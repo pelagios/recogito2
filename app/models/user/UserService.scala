@@ -6,11 +6,12 @@ import java.security.MessageDigest
 import java.sql.Timestamp
 import java.util.Date
 import javax.inject.{ Inject, Singleton }
-import models.{ BaseService, Page }
+import models.{ BaseService, Page, SortOrder }
 import models.generated.Tables._
 import models.generated.tables.records.{ UserRecord, UserRoleRecord }
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
+import org.apache.commons.lang3.RandomStringUtils
 import play.api.Configuration
 import play.api.cache.CacheApi
 import scala.collection.JavaConversions._
@@ -18,7 +19,6 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Either, Left, Right }
 import storage.{ DB, Uploads }
 import sun.security.provider.SecureRandom
-import org.apache.commons.lang3.RandomStringUtils
 
 @Singleton
 class UserService @Inject() (
@@ -28,17 +28,33 @@ class UserService @Inject() (
     implicit val ctx: ExecutionContext,
     implicit val db: DB
   ) extends BaseService with HasConfig with HasEncryption {
-  
+
   private val DEFAULT_QUOTA = 200 // TODO make configurable
 
   def countUsers() = db.query { sql =>
     sql.selectCount().from(USER).fetchOne(0, classOf[Int])
   }
-  
-  def listUsers(offset: Int = 0, limit: Int = 20) = db.query { sql =>
+
+  def listUsers(offset: Int = 0, limit: Int = 20, sortBy: Option[String], sortOrder: Option[SortOrder]) = db.query { sql =>
     val startTime = System.currentTimeMillis
+
+    val sortField = sortBy.flatMap(fieldname =>
+      USER.fields().find(_.getName.equalsIgnoreCase(fieldname)))
+
     val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])
-    val users = sql.selectFrom(USER).limit(limit).offset(offset).fetch().into(classOf[UserRecord])
+    
+    val query = sortField match {
+      case Some(field) => 
+        val order = sortOrder.getOrElse(SortOrder.ASC)
+        if (order == SortOrder.ASC)
+          sql.selectFrom(USER).orderBy(field.asc())
+        else
+          sql.selectFrom(USER).orderBy(field.desc())
+              
+      case None => sql.selectFrom(USER)
+    }
+    
+    val users = query.limit(limit).offset(offset).fetch().into(classOf[UserRecord])
     Page(System.currentTimeMillis - startTime, total, offset, limit, users.toSeq)
   }
 
@@ -49,7 +65,7 @@ class UserService @Inject() (
     sql.insertInto(USER).set(user).execute()
     user
   }
-  
+
   def resetPassword(username: String): Future[String] = db.withTransaction { sql =>
     val randomPassword = RandomStringUtils.randomAlphanumeric(18)
     val salt = randomSalt()
@@ -58,10 +74,10 @@ class UserService @Inject() (
       .set(USER.SALT, salt)
       .where(USER.USERNAME.equal(username))
       .execute()
-      
-    randomPassword  
+
+    randomPassword
   }
-  
+
   def updatePassword(username: String, currentPassword: String, newPassword: String): Future[Either[String, Unit]] = db.withTransaction { sql =>
     Option(sql.selectFrom(USER).where(USER.USERNAME.equal(username)).fetchOne()) match {
       case Some(user) => {
@@ -69,7 +85,7 @@ class UserService @Inject() (
         if (isValid) {
           // User credentials OK - update password
           val salt = randomSalt()
-          val rows = 
+          val rows =
             sql.update(USER)
               .set(USER.PASSWORD_HASH, computeHash(salt + newPassword))
               .set(USER.SALT, salt)
@@ -81,14 +97,14 @@ class UserService @Inject() (
           Left("Invalid Password")
         }
       }
-      
+
       case None =>
         throw new Exception("Attempt to update password on unknown username")
     }
   }
-  
+
   def updateUserSettings(username: String, email: String, realname: Option[String], bio: Option[String], website: Option[String]) = db.withTransaction { sql =>
-    val rows = 
+    val rows =
       sql.update(USER)
         .set(USER.EMAIL, encrypt(email))
         .set(USER.REAL_NAME, realname.getOrElse(null))
@@ -96,11 +112,11 @@ class UserService @Inject() (
         .set(USER.WEBSITE, website.getOrElse(null))
         .where(USER.USERNAME.equal(username))
         .execute()
-       
+
     removeFromCache("user", username)
-       
+
     rows == 1
-  } 
+  }
 
   /** This method is cached, since it's basically called on every request **/
   def findByUsername(username: String) =
@@ -109,10 +125,10 @@ class UserService @Inject() (
   /** We're not caching at the moment, since it's not called often & would complicate matters **/
   def findByUsernameIgnoreCase(username: String) =
     findByUsernameNoCache(username, true)
-    
+
   def findByUsernameNoCache(username: String, ignoreCase: Boolean) = db.query { sql =>
     val base = sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
-    val records = 
+    val records =
       if (ignoreCase)
         base.where(USER.USERNAME.equalIgnoreCase(username)).fetchArray()
       else
@@ -127,7 +143,7 @@ class UserService @Inject() (
       case Some(userWithRoles) => computeHash(userWithRoles.user.getSalt + password) == userWithRoles.user.getPasswordHash
       case None => false
     })
-    
+
   /** Runs a prefix search on usernames.
     *
     * To keep result size low (and add some extra 'privacy') the method only matches on
@@ -143,7 +159,7 @@ class UserService @Inject() (
     else
       Seq.empty[String]
   }
-  
+
   def decryptEmail(email: String) = decrypt(email)
 
   def getUsedDiskspaceKB(username: String) =
