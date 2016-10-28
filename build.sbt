@@ -52,6 +52,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "requirejs" % "2.1.22",
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "velocity" % "1.1.0",
+  "org.webjars.bower" % "js-grid" % "1.4.1",
   "org.webjars.bower" % "plotly.js" % "1.12.0",
   "org.webjars.bower" % "rangy" % "1.3.0",
   "org.webjars.bower" % "timeago" % "1.4.1",

@@ -94,11 +94,13 @@ GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationA
 GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
 GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
 
-GET     /api/places/search                           controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
-GET     /api/places/:uri                             controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
+GET     /api/place/search                           controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
+GET     /api/place/:uri                             controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
 
 GET     /api/stats/document/:id/history              controllers.api.StatsAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
 GET     /api/stats                                   controllers.api.StatsAPIController.getDashboardStats()
+
+GET     /api/user                                    controllers.api.UserAPIController.listUsers(offset: Int ?= 0, size: Int ?= 100)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - upload

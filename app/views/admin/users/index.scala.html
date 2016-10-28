@@ -4,9 +4,48 @@
   <head>
     <title>Recogito Administration - Users</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/admin/dashboard.css")"/>
+    <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("jsgrid.min.css"))" />
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("plotly.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/admin/statsDashboard.js")"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("jsgrid.min.js"))"></script>
+    <script>
+    jQuery(document).ready(function() {
+
+      jQuery("#users").jsGrid({
+        width: "100%",
+        height: "400px",
+
+        sorting: true,
+
+        paging: true,
+        pageSize: 5,
+        pageLoading: true,
+        autoload: true,
+
+        fields: [
+            { name: "username", type: "text", title: "Username" },
+            { name: "email", type: "text", title: "E-Mail" },
+            { name: "real_name", type: "text", title: "Real Name" },
+            { name: "member_since", type: "text", title: "Member Since" },
+            { name: "quota", type: "number", title: "Quota" }
+        ],
+
+        controller: {
+          loadData: function(filter) {
+            var offset = (filter.pageIndex - 1) * filter.pageSize,
+                size = filter.pageSize;
+
+            return jQuery.getJSON('/api/user?offset=' + offset + '&size=' + size).then(function(response) {
+              return {
+                'data': response.items,
+                'itemsCount': response.total
+              };
+            });
+          }
+        }
+      });
+      
+    });
+    </script>
   </head>
   <body>
     <div class="side-navbar">
@@ -17,27 +56,6 @@
       </ul>
     </div>
 
-    <div class="user-list">
-      <p>Total users: @users.total</p>
-      <ul>
-        @for(user <- users.items) {
-          <li><a href="@controllers.admin.users.routes.UserAdminController.showDetails(user.getUsername)">@user.getUsername</a></li>
-        }
-      </ul>
-    </div>
-
-    <div class="dashboard">
-      <div id="contribution-history"></div>
-      <div>
-        <div id="total-contributions"></div>
-        <div id="by-user"></div>
-        <div id="by-action" class="piechart"></div>
-        <div id="by-item-type" class="piechart"></div>
-      </div>
-    </div>
-
-    @helper.javascriptRouter("jsRoutes")(
-      controllers.api.routes.javascript.StatsAPIController.getDashboardStats
-    )
+    <div id="users" style="width:100%"></div>
   </body>
 </html>
