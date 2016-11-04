@@ -38,6 +38,9 @@ libraryDependencies ++= Seq(
   "org.pelagios" % "scalagios-core" % "2.0.1" from "https://github.com/pelagios/scalagios/releases/download/v2.0.1/scalagios-core.jar",
   "org.openrdf.sesame" % "sesame-rio-n3" % "2.7.5",
   "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.7.5",
+  
+  // Recogito plugin API
+  "org.pelagios" % "recogito-plugin-sdk" % "0.0.1" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.0.1/recogito-plugin-sdk-0.0.1.jar",
 
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
 

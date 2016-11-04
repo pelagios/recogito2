@@ -15,6 +15,8 @@ import scala.concurrent.Future
 import scala.io.Source
 import storage.ES
 
+import org.pelagios.recogito.sdk.ner._
+
 private[ner] object NERWorkerActor {
 
   val SUPPORTED_CONTENT_TYPES = Set(ContentType.TEXT_PLAIN).map(_.toString)
@@ -37,7 +39,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       parseFilepart(document, part, documentDir).map { phrases =>
         // val entities = phrases.filter(p => (p.entityTag == "LOCATION" || p.entityTag == "PERSON"))
         // TODO temporarily disabling PERSON tags for first pre-release
-        val entities = phrases.filter(p => p.entityTag == "LOCATION")
+        val entities = phrases.filter(p => p.entityType == EntityType.LOCATION)
         resolve(entities).map { annotations =>
           annotationService.insertOrUpdateAnnotations(annotations).map { result =>
             progress = 1.0
@@ -68,7 +70,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
 
       case t => {
         Logger.info("Skipping NER for file of unsupported type " + t + ": " + documentDir.getName + File.separator + part.getFile)
-        Future { Seq.empty[Phrase] }
+        Future { Seq.empty[Entity] }
       }
     }
 
@@ -77,29 +79,29 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     NERService.parse(text)
   }
   
-  private def resolve(entities: Seq[Phrase]): Future[Seq[Annotation]] =
+  private def resolve(entities: Seq[Entity]): Future[Seq[Annotation]] =
     // Chaining futures to resolve annotation sequentially
-    entities.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, phrase) => 
+    entities.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, entity) => 
       future.flatMap { annotations =>
         val fAnnotation = 
-          if (phrase.entityTag == "LOCATION") {
-            placeService.searchPlaces(phrase.chars, 0, 1).map { topHits =>
+          if (entity.entityType == EntityType.LOCATION) {
+            placeService.searchPlaces(entity.chars, 0, 1).map { topHits =>
               if (topHits.total > 0)
                 // TODO be smarter about choosing the right URI from the place
-                toAnnotation(phrase, AnnotationBody.PLACE, Some(topHits.items(0)._1.id))
+                toAnnotation(entity, AnnotationBody.PLACE, Some(topHits.items(0)._1.id))
               else
                 // No gazetteer match found
-                toAnnotation(phrase, AnnotationBody.PLACE)
+                toAnnotation(entity, AnnotationBody.PLACE)
             }
           } else {       
-            Future.successful(toAnnotation(phrase, AnnotationBody.PERSON))
+            Future.successful(toAnnotation(entity, AnnotationBody.PERSON))
           }
         
         fAnnotation.map(annotation => annotations :+ annotation)
       }
     }
   
-  private def toAnnotation(phrase: Phrase, annotationType: AnnotationBody.Value, uri: Option[String] = None): Annotation = {
+  private def toAnnotation(entity: Entity, annotationType: AnnotationBody.Value, uri: Option[String] = None): Annotation = {
     val now = DateTime.now
     
     Annotation(
@@ -107,7 +109,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       UUID.randomUUID,
       AnnotatedObject(document.getId, part.getId, ContentType.withName(part.getContentType).get),
       Seq.empty[String], // No contributing users
-      "char-offset:" + phrase.charOffset,
+      "char-offset:" + entity.charOffset,
       None, // no last modifying user
       now,
       Seq(
@@ -115,7 +117,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
           AnnotationBody.QUOTE,
           None,  // no last modifying user
           now,
-          Some(phrase.chars),
+          Some(entity.chars),
           None,  // uri
           None), // status
         AnnotationBody(

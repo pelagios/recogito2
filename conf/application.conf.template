@@ -62,6 +62,10 @@ db.default.password="postgres-password-goes-here"
 play.modules.enabled += "storage.DBModule"
 play.modules.enabled += "storage.ESModule"
 
+akka {  
+    jvm-exit-on-fatal-error = off
+}
+
 contexts {
     database {
         fork-join-executor {

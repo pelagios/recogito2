@@ -3,6 +3,7 @@ package controllers.my.upload.ner
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
+import org.pelagios.recogito.sdk.ner.EntityType
 import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -18,14 +19,14 @@ class NERServiceSpec extends Specification {
   
   "The NER parse function" should {
     
-    val entities =  Await.result(NERService.parse(TEST_TEXT), 10 seconds)
+    val entities =  Await.result(NERService.parse(TEST_TEXT), 60 seconds)
     
-    "detect 11 Named Entites in the test text" in {
-      entities.size must equalTo (11)
+    "detect 8 Named Entites in the test text" in {
+      entities.size must equalTo (8)
     }
     
     "detect 3 Locations - Pylos, Sparta and Ithaca" in {
-      val locations = entities.filter(_.entityTag == "LOCATION").map(_.chars)
+      val locations = entities.filter(_.entityType == EntityType.LOCATION).map(_.chars)
       locations.size must equalTo(3)
       locations must contain("Pylos")
       locations must contain("Sparta")
@@ -33,11 +34,11 @@ class NERServiceSpec extends Specification {
     }
     
     "detect 1 date" in {
-      entities.filter(_.entityTag.equals("DATE")).size must equalTo(1)
+      entities.filter(_.entityType.equals(EntityType.DATE)).size must equalTo(1)
     }
     
     "detect 4 persons - Ulysses (2x), Penelope and Telemachus" in {
-      val persons = entities.filter(_.entityTag == "PERSON").map(_.chars)
+      val persons = entities.filter(_.entityType == EntityType.PERSON).map(_.chars)
       persons.size must equalTo(4)
       persons must contain("Penelope")
       persons must contain("Telemachus")
