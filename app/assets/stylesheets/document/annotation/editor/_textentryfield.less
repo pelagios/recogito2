@@ -2,7 +2,6 @@
   padding:0;
   margin:0;
   font-size:16px;
-  border-top:1px solid @lightgrey-border;
 
   .textarea {
     padding:10px 15px;
@@ -26,4 +25,8 @@
 
 .field.new-transcription .textarea, .field.reply .textarea {
   background-color:@blueish-white-hi;
+}
+
+.field:not:first-child {
+  border-top:1px solid @lightgrey-border;
 }
