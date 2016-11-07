@@ -55,7 +55,7 @@ define([
 
           jQuery.each(textNodeProperties, function(i, props) {
             jQuery.each(charOffsets, function(j, charOffset)  {
-              if (charOffset >= props.start && charOffset <= props.end) {
+              if (charOffset > props.start && charOffset <= props.end) {
                 positions.push({
                   charOffset: charOffset,
                   node: props.node,
