@@ -38,7 +38,7 @@ libraryDependencies ++= Seq(
   "org.pelagios" % "scalagios-core" % "2.0.1" from "https://github.com/pelagios/scalagios/releases/download/v2.0.1/scalagios-core.jar",
   "org.openrdf.sesame" % "sesame-rio-n3" % "2.7.5",
   "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.7.5",
-  
+
   // Recogito plugin API
   "org.pelagios" % "recogito-plugin-sdk" % "0.0.1" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.0.1/recogito-plugin-sdk-0.0.1.jar",
 
@@ -73,6 +73,10 @@ pipelineStages := Seq(rjs, digest, gzip)
 includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
+
+unmanagedClasspath in Runtime <++= (baseDirectory) map { base =>
+  Attributed.blankSeq((file("plugins/") ** "*.jar").get)
+}
 
 val generateJOOQ = taskKey[Seq[File]]("Generate JooQ classes")
 
