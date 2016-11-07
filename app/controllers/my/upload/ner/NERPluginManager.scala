@@ -14,15 +14,7 @@ object NERPluginManager {
   
   val plugins = {
     Logger.info("Loading available NER plugins...")
-    
-    val jarFiles =
-      FileUtils.iterateFiles(PLUGIN_DIR, Seq("jar").toArray[String], true)
-        .asScala.toArray
-    Logger.info("Found jar files")
-    jarFiles.foreach(f => Logger.info("  " + f.getName))
-    
-    val classLoader = new URLClassLoader(jarFiles.map(f => f.toURI.toURL), Thread.currentThread().getContextClassLoader)
-    val serviceLoader = ServiceLoader.load(classOf[NERPlugin], classLoader)
+    val serviceLoader = ServiceLoader.load(classOf[NERPlugin], Thread.currentThread().getContextClassLoader)
     
     val plugins = serviceLoader.asScala.toSeq
     Logger.info("Successfully loaded " + plugins.size + " NER plugins:")
