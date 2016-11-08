@@ -27,7 +27,7 @@ trait HasAnnotationValidation {
         annotationAfter.annotates.documentId,
         document.getOwner,
         Some(annotationAfter.annotates.filepartId),
-        annotationAfter.annotates.contentType,
+        Some(annotationAfter.annotates.contentType),
         Some(annotationAfter.annotationId),
         Some(annotationAfter.versionId),
         None,
@@ -65,7 +65,7 @@ trait HasAnnotationValidation {
         annotationAfter.annotates.documentId,
         document.getOwner,
         Some(annotationAfter.annotates.filepartId),
-        annotationAfter.annotates.contentType,
+        Some(annotationAfter.annotates.contentType),
         Some(annotationAfter.annotationId),
         Some(annotationAfter.versionId),
         // At least currently, bodies have either value or URI - never both
@@ -86,7 +86,7 @@ trait HasAnnotationValidation {
         annotationAfter.annotates.documentId,
         document.getOwner,
         Some(annotationAfter.annotates.filepartId),
-        annotationAfter.annotates.contentType,
+        Some(annotationAfter.annotates.contentType),
         Some(annotationAfter.annotationId),
         Some(annotationAfter.versionId),
         // At least currently, bodies have either value or URI - never both

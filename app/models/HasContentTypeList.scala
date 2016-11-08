@@ -7,9 +7,9 @@ import play.api.libs.json.{ Json, JsValue }
   * This way we can use it for analytics more easily. E.g. 'TEXT_PLAIN' -> [ 'TEXT', 'TEXT_PLAIN' ] 
   */
 trait HasContentTypeList {
-    
+  
   /** For convenience, this method accepts JSON strings as well as string arrays **/
-  def fromCTypeList(typeOrList: JsValue): ContentType = {
+  def fromCTypeList(typeOrList: JsValue): ContentType =
     typeOrList.asOpt[Seq[String]] match {
       case Some(list) => list.flatMap(ContentType.withName(_)).head
       case None => typeOrList.asOpt[String] match {
@@ -17,9 +17,8 @@ trait HasContentTypeList {
         case None => throw new Exception("Invalid JSON - malformed content type: " + typeOrList)
       }
     }
-  }
     
-  def toCTypeList(ctype: ContentType): JsValue =
-    Json.toJson(Seq(ctype.media, ctype.name))
-  
+  def toCTypeList(contentType: ContentType): JsValue =
+    Json.toJson(Seq(contentType.media, contentType.name))
+    
 }

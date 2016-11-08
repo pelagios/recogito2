@@ -265,7 +265,7 @@ class AnnotationAPIController @Inject() (
         annotation.annotates.documentId,
         document.getOwner,
         Some(annotation.annotates.filepartId),
-        annotation.annotates.contentType,
+        Some(annotation.annotates.contentType),
         Some(annotation.annotationId),
         None, None, None
       ),

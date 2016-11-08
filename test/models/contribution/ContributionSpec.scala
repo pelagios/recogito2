@@ -37,7 +37,7 @@ class ContributionSpec extends Specification {
       item.documentId must equalTo("98muze1cl3saib")
       item.documentOwner must equalTo("rainer")
       item.filepartId must equalTo(Some(UUID.fromString("a7126845-16ac-434b-99bd-0f297e227822")))
-      item.contentType must equalTo(ContentType.TEXT_PLAIN)
+      item.contentType must equalTo(Some(ContentType.TEXT_PLAIN))
       item.annotationId must equalTo(Some(UUID.fromString("7cfa1504-26de-45ef-a590-8b60ea8a60e8")))
       item.annotationVersionId must equalTo(Some(UUID.fromString("e868423f-5ea9-42ed-bb7d-5e1fac9195a0")))
       
@@ -58,7 +58,7 @@ class ContributionSpec extends Specification {
           "98muze1cl3saib",
           "rainer",
           Some(UUID.fromString("7ccbf5dd-335b-4d59-bff6-d8d59d977825")),
-          ContentType.TEXT_TEIXML,
+          Some(ContentType.TEXT_TEIXML),
           Some(UUID.fromString("7cfa1504-26de-45ef-a590-8b60ea8a60e8")),
           Some(UUID.fromString("e868423f-5ea9-42ed-bb7d-5e1fac9195a0")),
           Some("just a comment"),

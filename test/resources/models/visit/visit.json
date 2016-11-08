@@ -1,0 +1,19 @@
+{
+  "url": "http://recogito.pelagios.org/document/fb2f3hm1ihnwgn/part/1/edit",
+  "referer": "http://recogito.pelagios.org/rainer",
+  "visited_at": "2016-11-08T07:27:00Z",
+  "client": {
+    "ip": "62.218.164.126",
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/52.0.2743.116 Chrome/52.0.2743.116 Safari/537.36",
+    "browser": "CHROME",
+    "os": "LINUX",
+    "device_type": "COMPUTER"
+  },
+  "response_format": "text/html",
+  "visited_item": {
+    "document_id": "fb2f3hm1ihnwgn",
+    "document_owner": "rainer",
+    "filepart_id": "a7126845-16ac-434b-99bd-0f297e227822",
+    "content_type": [ "TEXT", "TEXT_PLAIN" ]
+  }
+}

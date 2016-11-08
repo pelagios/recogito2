@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
   "commons-io" % "commons-io" % "2.4",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models",
+  "eu.bitwalker" % "UserAgentUtils" % "1.20",
   "jp.t2v" %% "play2-auth" % "0.14.1",
   "org.apache.jena" % "jena-arq" % "3.1.0",
 

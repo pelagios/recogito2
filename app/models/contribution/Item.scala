@@ -18,7 +18,7 @@ case class Item(
   
   filepartId: Option[UUID],
   
-  contentType: ContentType,
+  contentType: Option[ContentType],
   
   annotationId: Option[UUID],
   
@@ -37,7 +37,8 @@ object Item extends HasContentTypeList {
     (JsPath \ "document_id").format[String] and
     (JsPath \ "document_owner").format[String] and
     (JsPath \ "filepart_id").formatNullable[UUID] and
-    (JsPath \ "content_type").format[JsValue].inmap[ContentType](fromCTypeList, toCTypeList) and
+    (JsPath \ "content_type").formatNullable[JsValue]
+      .inmap[Option[ContentType]](_.map(fromCTypeList), _.map(toCTypeList)) and
     (JsPath \ "annotation_id").formatNullable[UUID] and
     (JsPath \ "annotation_version_id").formatNullable[UUID] and
     (JsPath \ "value_before").formatNullable[String] and
