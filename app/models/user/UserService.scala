@@ -137,6 +137,10 @@ class UserService @Inject() (
     groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord]).headOption
       .map { case (user, roles) => UserWithRoles(user, roles) }
   }
+  
+  def findByEmail(email: String) = db.query { sql =>
+    Option(sql.selectFrom(USER).where(USER.EMAIL.equalIgnoreCase(encrypt(email))).fetchOne())
+  }
 
   def validateUser(username: String, password: String) =
     findByUsername(username).map(_ match {

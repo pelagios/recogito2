@@ -15,6 +15,8 @@ POST    /signup                                      controllers.landing.SignupC
 GET     /login                                       controllers.landing.LoginLogoutController.showLoginForm(destination: Option[String] ?= None)
 POST    /login                                       controllers.landing.LoginLogoutController.processLogin
 GET     /logout                                      controllers.landing.LoginLogoutController.logout
+GET     /reset_password                              controllers.landing.ResetPasswordController.showResetForm
+POST    /reset_password                              controllers.landing.ResetPasswordController.resetPassword
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Administration area

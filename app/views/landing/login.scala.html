@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Recogito Login</title>
+    <title>Login | Recogito</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/login.css")"/>
   </head>
   <body>
@@ -15,6 +15,9 @@
       @helper.form(action = controllers.landing.routes.LoginLogoutController.processLogin(), args = 'autocomplete -> "off") {
         @helper.inputText(loginForm("username"), args = 'placeholder -> "Username", 'autocomplete -> "false")
         @helper.inputPassword(loginForm("password"), args = 'placeholder -> "Password", 'autocomplete -> "false")
+
+        <a class="forgot-password" href="@controllers.landing.routes.ResetPasswordController.showResetForm()">Forgot Password?</a>
+
         <button type="submit" class="btn"/>
           <span class="icon">&#xf090;</span>
           Log In
@@ -22,7 +25,7 @@
       }
     </div>
 
-    <div id="register">
+    <div class="register">
       Don't have an account?
       <a href="@controllers.landing.routes.SignupController.showSignupForm()">
         Create one now!

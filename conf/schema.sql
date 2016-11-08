@@ -1,7 +1,7 @@
 -- note: 'user' is a keyword in posgres, so we need those quotes
 CREATE TABLE "user" (
   username TEXT NOT NULL PRIMARY KEY,
-  email TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   salt TEXT NOT NULL,
   member_since TIMESTAMP WITH TIME ZONE NOT NULL,

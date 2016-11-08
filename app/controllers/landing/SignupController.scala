@@ -41,7 +41,7 @@ class SignupController @Inject() (
   // We use usernames as first-level URL elements, therefore some are prohibited (cf. routes file)
   private val RESERVED_NAMES =
     Set("admin", "api", "assets", "document", "favicon.ico", "guest", "help", "login", "logout",
-        "pelagios", "recogito", "signup", "settings", "webjars")
+        "pelagios", "recogito", "reset_password", "signup", "settings", "webjars")
 
   private val isNotReserved: Constraint[String] = Constraint("constraints.notreserved")({username =>
     if (RESERVED_NAMES.contains(username.toLowerCase))
@@ -51,7 +51,7 @@ class SignupController @Inject() (
   })
 
   /** Username must be unique in DB, and may not contain special characters **/
-  private val validAndAvailable: Constraint[String] = Constraint("constraints.valid")({ username =>
+  private val usernameValidAndAvailable: Constraint[String] = Constraint("constraints.username.valid")({ username =>
     // Check if username contains only valid characters
     val invalidChars = username.filter(!VALID_CHARACTERS.contains(_)).toSeq
     if (invalidChars.size == 0) {
@@ -73,11 +73,18 @@ class SignupController @Inject() (
       Invalid("Please don't use special characters - " + invalidChars.mkString(", "))
     }
   })
+  
+  private val emailAvailable: Constraint[String] = Constraint("constraints.email.available")({ email =>
+    Await.result(users.findByEmail(email), 10.second) match {
+      case Some(user) => Invalid("This E-Mail is already in use")
+      case None => Valid
+    }
+  })
 
   val signupForm = Form(
     mapping(
-      "username" -> nonEmptyText(minLength=3, maxLength=16).verifying(isNotReserved).verifying(validAndAvailable),
-      "email" -> email,
+      "username" -> nonEmptyText(minLength=3, maxLength=16).verifying(isNotReserved).verifying(usernameValidAndAvailable),
+      "email" -> email.verifying(emailAvailable),
       "password" -> nonEmptyText
     )(SignupData.apply)(SignupData.unapply)
   )
