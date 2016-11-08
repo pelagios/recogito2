@@ -34,7 +34,7 @@ class ResetPasswordController @Inject() (
         |
         |   $newPassword
         |
-        |Please log in to Recogito with this password. You can then change it
+        |Please log in to Recogito with this password. You can change it
         |in your personal Account Settings.
         |
         |Cheers,
@@ -42,7 +42,7 @@ class ResetPasswordController @Inject() (
     
     val email = Email(
       "Your Recogito password was reset",
-      "Pelagios Commons <commons@pelagios.org>",
+      "Recogito Team <noreply@pelagios.org>",
       Seq(users.decryptEmail(user.getEmail)),
       Some(message)
     )
