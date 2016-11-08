@@ -28,7 +28,7 @@ class VisitSpec extends Specification {
       
       val visit = result.get
       visit.url must equalTo("http://recogito.pelagios.org/document/fb2f3hm1ihnwgn/part/1/edit")
-      visit.referer must equalTo("http://recogito.pelagios.org/rainer")
+      visit.referer must equalTo(Some("http://recogito.pelagios.org/rainer"))
       visit.visitedAt must equalTo(visitedAt)  
       visit.responseFormat must equalTo("text/html")
       
@@ -53,7 +53,7 @@ class VisitSpec extends Specification {
     "yield an equal Visit" in {
       val visit = Visit(
         "http://recogito.pelagios.org/document/fb2f3hm1ihnwgn/part/1/edit",
-        "http://recogito.pelagios.org/rainer",
+        Some("http://recogito.pelagios.org/rainer"),
         visitedAt,
         Client(
           "62.218.164.126",

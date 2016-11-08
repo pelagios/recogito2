@@ -11,7 +11,7 @@ case class Visit(
     
   url: String,
 
-  referer: String,
+  referer: Option[String],
    
   visitedAt: DateTime,
   
@@ -27,7 +27,7 @@ object Visit extends HasDate {
   
   implicit val visitFormat: Format[Visit] = (
     (JsPath \ "url").format[String] and
-    (JsPath \ "referer").format[String] and
+    (JsPath \ "referer").formatNullable[String] and
     (JsPath \ "visited_at").format[DateTime] and
     (JsPath \ "client").format[Client] and
     (JsPath \ "response_format").format[String] and
