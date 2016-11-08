@@ -48,6 +48,8 @@ class ResetPasswordController @Inject() (
     )
     
     mailerClient.send(email)
+  } recover { case t: Throwable =>
+    t.printStackTrace
   }
   
   def showResetForm = Action { implicit request =>
