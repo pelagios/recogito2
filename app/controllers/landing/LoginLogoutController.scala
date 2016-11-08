@@ -14,7 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 case class LoginData(username: String, password: String)
 
-class LoginLogoutController @Inject() (
+class LoginLogoutController @Inject() (    
     val config: Configuration,
     val users: UserService,
     implicit val ctx: ExecutionContext,

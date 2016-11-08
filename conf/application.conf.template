@@ -38,7 +38,7 @@ recogito.upload.dir = uploads
 # Max. disk space per user in MB
 recogito.upload.quota = 200
 
-# E-Mail encryption key (optional) 
+# E-Mail encryption key (optional)
 recogito.email.key = "my secret key"
 
 # Database configuration
@@ -62,7 +62,7 @@ db.default.password="postgres-password-goes-here"
 play.modules.enabled += "storage.DBModule"
 play.modules.enabled += "storage.ESModule"
 
-akka {  
+akka {
     jvm-exit-on-fatal-error = off
 }
 
@@ -72,4 +72,14 @@ contexts {
           parallelism-max = 9
         }
     }
+}
+
+play.mailer {
+  host = smtp.example.com
+  port = 25
+  ssl = no
+  tls = no
+  user = "admin@example.com"
+  password = admin
+  mock = true
 }

@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.6",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
+  "com.typesafe.play" %% "play-mailer" % "5.0.0",
   "com.vividsolutions" % "jts" % "1.13",
   "commons-io" % "commons-io" % "2.4",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
