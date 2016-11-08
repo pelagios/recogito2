@@ -12,6 +12,8 @@ import play.api.{ Configuration, Logger }
 import play.api.mvc.{ RequestHeader, Result }
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
+import controllers.HasVisitLogging
+import models.visit.VisitService
 
 class AnnotationController @Inject() (
     val config: Configuration,
@@ -19,9 +21,10 @@ class AnnotationController @Inject() (
     val documents: DocumentService,
     val users: UserService,
     val uploads: Uploads,
+    implicit val visits: VisitService,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(config, documents, users) {
+  ) extends BaseOptAuthController(config, documents, users) with HasVisitLogging {
 
   /** For convenience: redirects to proper annotation view, given various ID combinations  **/
   def resolveAnnotationView(documentId: String, maybePartId: Option[java.util.UUID], maybeAnnotationId: Option[java.util.UUID]) = AsyncStack { implicit request =>
@@ -72,8 +75,12 @@ class AnnotationController @Inject() (
       currentPart: DocumentFilepartRecord,
       loggedInUser: Option[UserRecord],
       accesslevel: DocumentAccessLevel
-    )(implicit request: RequestHeader) =
-
+    )(implicit request: RequestHeader) = {
+    
+    // Log as a Visit if this is a read-only access
+    if (accesslevel == DocumentAccessLevel.READ)
+      logVisit(doc.document, Some(currentPart), "text/html")
+      
     ContentType.withName(currentPart.getContentType) match {
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
@@ -96,5 +103,7 @@ class AnnotationController @Inject() (
         // Unknown content type in DB, or content type we don't have an annotation view for - should never happen
         Future.successful(InternalServerError)
     }
+    
+  }
 
 }

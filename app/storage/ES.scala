@@ -33,9 +33,10 @@ object ES {
   // Mapping type names
   val ANNOTATION         = "annotation"
   val ANNOTATION_HISTORY = "annotation_history"
-  val CONTRIBUTION       = "contribution"
   val GEOTAG             = "geotag"
   val PLACE              = "place"
+  val CONTRIBUTION       = "contribution"
+  val VISIT              = "visit"
   
   // Maximum response size in ES
   val MAX_SIZE           = 2147483647
