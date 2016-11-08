@@ -24,7 +24,7 @@ class ResetPasswordController @Inject() (
   )
 
   /** TODO make configurable **/
-  private def sendMail(user: UserRecord, newPassword: String) = {
+  private def sendMail(user: UserRecord, newPassword: String) = Future {
     val name = Option(user.getRealName).getOrElse(user.getUsername)
     
     val message =
@@ -47,7 +47,7 @@ class ResetPasswordController @Inject() (
       Some(message)
     )
     
-    mailerClient.send(email) 
+    mailerClient.send(email)
   }
   
   def showResetForm = Action { implicit request =>
