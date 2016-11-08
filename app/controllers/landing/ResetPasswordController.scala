@@ -22,22 +22,7 @@ class ResetPasswordController @Inject() (
   val resetPasswordForm = Form(
     mapping("email" -> email)(ResetPasswordData.apply)(ResetPasswordData.unapply)
   )
-  
-  /**
-case class Email(subject: String,
-                 from: String,
-                 to: Seq[String] = Seq.empty,
-                 bodyText: Option[String] = None,
-                 bodyHtml: Option[String] = None,
-                 charset: Option[String] = None,
-                 cc: Seq[String] = Seq.empty,
-                 bcc: Seq[String] = Seq.empty,
-                 replyTo: Option[String] = None,
-                 bounceAddress: Option[String] = None,
-                 attachments: Seq[Attachment] = Seq.empty,
-                 headers: Seq[(String, String)] = Seq.empty)
-   */
-  
+
   /** TODO make configurable **/
   private def sendMail(user: UserRecord, newPassword: String) = {
     val name = Option(user.getRealName).getOrElse(user.getUsername)
