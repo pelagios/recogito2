@@ -11,6 +11,7 @@ require(['common/ui/formatting'], function(Formatting) {
 
     var totalEdits = jQuery('.total-edits .number'),
         totalAnnotations = jQuery('.total-annotations .number'),
+        totalVisits = jQuery('.total-visits .number'),
         registeredUsers = jQuery('.registered-users .number'),
 
         topContributors = jQuery('.top-contributors table'),
@@ -52,6 +53,7 @@ require(['common/ui/formatting'], function(Formatting) {
           jsRoutes.controllers.api.StatsAPIController.getDashboardStats().ajax().done(function(stats) {
             fillNumber(totalEdits, stats.contributions.total_contributions);
             fillNumber(totalAnnotations, stats.total_annotations);
+            fillNumber(totalVisits, stats.total_visits);
             fillNumber(registeredUsers, stats.total_users);
 
             refreshHighscores(stats.contributions.by_user);
