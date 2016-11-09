@@ -298,5 +298,5 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
        .where(DOCUMENT.ID.equal(document.getId))
        .execute()
   }
-
+  
 }

@@ -143,6 +143,11 @@ class UserService @Inject() (
       .map { case (user, roles) => UserWithRoles(user, roles) }
   }
   
+  def deleteByUsername(username: String) = db.withTransaction { sql =>
+    sql.deleteFrom(USER_ROLE).where(USER_ROLE.USERNAME.equal(username)).execute()
+    sql.deleteFrom(USER).where(USER.USERNAME.equal(username)).execute()
+  }
+  
   def findByEmail(email: String) = db.query { sql =>
     Option(sql.selectFrom(USER).where(USER.EMAIL.equalIgnoreCase(encrypt(email))).fetchOne())
   }
@@ -162,7 +167,7 @@ class UserService @Inject() (
     if (query.size > 2)
       sql.selectFrom(USER)
          .where(USER.USERNAME.like(query + "%")
-           .and(USER.USERNAME.length().lt(query.size + 4)))
+           .and(USER.USERNAME.length().lt(query.size + 8)))
          .fetch()
          .getValues(USER.USERNAME, classOf[String]).toSeq
     else

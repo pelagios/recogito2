@@ -5,6 +5,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
+import org.apache.commons.io.FileUtils
 
 @Singleton
 class Uploads @Inject() (config: Configuration) {
@@ -67,6 +68,12 @@ class Uploads @Inject() (config: Configuration) {
       Some(userFolder)
     } else {
       None
+    }
+  }
+  
+  def deleteUserDir(username: String)(implicit ctx: ExecutionContext): Future[Unit] = Future { 
+    scala.concurrent.blocking {
+      getUserDir(username).map(userdir => FileUtils.deleteDirectory(userdir))
     }
   }
 

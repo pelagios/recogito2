@@ -5,18 +5,22 @@ import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import models.user.Roles._
 import models.user.UserService
+import models.upload.UploadService
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import scala.concurrent.{ ExecutionContext, Future }
+import storage.Uploads
 
 case class AccountSettingsData(email: String, name: Option[String], bio: Option[String], website: Option[String])
 
 class AccountSettingsController @Inject() (
     val config: Configuration,
     val users: UserService,
+    val uploadService: UploadService,
+    val uploadStore: Uploads,
     val messagesApi: MessagesApi,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
@@ -61,12 +65,28 @@ class AccountSettingsController @Inject() (
   }
   
   def deleteAccount() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-
-    play.api.Logger.info("Deleting...")
+    val username = loggedIn.user.getUsername
     
-    // Delete uploaded documents
+    val fDeleteUserDir = uploadStore.deleteUserDir(username)
+    val fDeletePendingUpload = uploadService.deletePendingUpload(username)
     
-    Future { Ok }
+    val f = for {
+      _ <- fDeleteUserDir
+      _ <- fDeletePendingUpload
+      
+      // TODO delete from DB: sharing policies
+      // TODO delete from DB: documents and document_fileparts
+      
+      _ <- users.deleteByUsername(username)
+    } yield ()
+    
+    f.map { _ =>
+      
+      // TODO log out
+      // TODO redirect to good bye page
+      
+      Ok
+    }
   }
 
 }
