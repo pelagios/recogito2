@@ -81,9 +81,6 @@ define([
         },
 
         showCard = function(annotation, slideDirection) {
-
-          console.log(annotation);
-
           var createTextSnippet = function() {
                 var quote = AnnotationUtils.getQuote(annotation),
                     offset = annotation.context.char_offset,

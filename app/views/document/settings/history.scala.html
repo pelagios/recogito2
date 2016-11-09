@@ -16,6 +16,7 @@
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.api.routes.javascript.StatsAPIController.getContributionHistory,
+    controllers.document.annotation.routes.javascript.AnnotationController.resolveAnnotationView,
     controllers.document.settings.routes.javascript.SettingsController.rollbackByTime
   )
 }
