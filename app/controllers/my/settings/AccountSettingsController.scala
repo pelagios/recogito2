@@ -1,6 +1,6 @@
 package controllers.my.settings
 
-import controllers.{ HasUserService, HasConfig, Security }
+import controllers.{ HasUserService, HasConfig, Security, WebJarAssets }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import models.user.Roles._
@@ -18,6 +18,7 @@ class AccountSettingsController @Inject() (
     val config: Configuration,
     val users: UserService,
     val messagesApi: MessagesApi,
+    implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
   ) extends Controller with AuthElement with HasUserService with HasConfig with Security with I18nSupport {
 
@@ -57,6 +58,15 @@ class AccountSettingsController @Inject() (
             Redirect(routes.AccountSettingsController.index).flashing("error" -> "There was an error while saving your settings.")
           }}
     )
+  }
+  
+  def deleteAccount() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+
+    play.api.Logger.info("Deleting...")
+    
+    // Delete uploaded documents
+    
+    Future { Ok }
   }
 
 }

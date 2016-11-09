@@ -10,6 +10,7 @@ require.config({
     { name : 'document/settings/delete' },
     { name : 'document/settings/history' },
     { name : 'document/settings/sharing' },
+    { name : 'my/settings/account' },
     { name : 'my/upload/step1' },
     { name : 'my/upload/step2' },
     { name : 'my/upload/step3' },

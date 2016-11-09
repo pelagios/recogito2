@@ -1,4 +1,4 @@
-require([], function(Config) {
+require([], function() {
 
   jQuery(document).ready(function() {
         /** NEXT button to skip to next wizard phase **/

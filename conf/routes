@@ -128,6 +128,7 @@ GET     /:username/upload/tiling-progress/:docId     controllers.my.upload.Uploa
 
 GET     /settings/account                            controllers.my.settings.AccountSettingsController.index
 POST    /settings/account                            controllers.my.settings.AccountSettingsController.updateAccountSettings
+DELETE  /settings/account                            controllers.my.settings.AccountSettingsController.deleteAccount
 GET     /settings/password                           controllers.my.settings.PasswordSettingsController.index
 POST    /settings/password                           controllers.my.settings.PasswordSettingsController.updatePassword
 GET     /settings/restore                            controllers.my.settings.RestoreController.index
