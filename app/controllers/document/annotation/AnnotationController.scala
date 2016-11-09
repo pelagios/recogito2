@@ -77,9 +77,7 @@ class AnnotationController @Inject() (
       accesslevel: DocumentAccessLevel
     )(implicit request: RequestHeader) = {
     
-    // Log as a Visit if this is a read-only access
-    if (accesslevel == DocumentAccessLevel.READ)
-      logVisit(doc.document, Some(currentPart), "text/html")
+    logVisit(doc.document, Some(currentPart), accesslevel, "text/html")
       
     ContentType.withName(currentPart.getContentType) match {
 

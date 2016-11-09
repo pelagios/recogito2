@@ -1,6 +1,8 @@
 package models.visit
 
 import java.util.UUID
+import models.ContentType
+import models.document.DocumentAccessLevel
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -10,7 +12,6 @@ import play.api.libs.json.Json
 import play.api.test._
 import play.api.test.Helpers._
 import scala.io.Source
-import models.ContentType
 
 @RunWith(classOf[JUnitRunner])
 class VisitSpec extends Specification {
@@ -31,6 +32,7 @@ class VisitSpec extends Specification {
       visit.referer must equalTo(Some("http://recogito.pelagios.org/rainer"))
       visit.visitedAt must equalTo(visitedAt)  
       visit.responseFormat must equalTo("text/html")
+      visit.accessLevel must equalTo(Some(DocumentAccessLevel.READ))
       
       val client = visit.client
       client.ip must equalTo("62.218.164.126")
@@ -68,7 +70,8 @@ class VisitSpec extends Specification {
           "rainer",
           Some(UUID.randomUUID),
           Some(ContentType.TEXT_PLAIN)
-        ))
+        )),
+        Some(DocumentAccessLevel.READ)
       )
         
       // Convert to JSON

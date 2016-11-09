@@ -15,5 +15,6 @@
     "document_owner": "rainer",
     "filepart_id": "a7126845-16ac-434b-99bd-0f297e227822",
     "content_type": [ "TEXT", "TEXT_PLAIN" ]
-  }
+  },
+  "access_level": "READ"
 }

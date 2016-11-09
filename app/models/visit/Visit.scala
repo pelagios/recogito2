@@ -2,6 +2,7 @@ package models.visit
 
 import java.util.UUID
 import models.{ ContentType, HasContentTypeList, HasDate }
+import models.document.DocumentAccessLevel
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -19,7 +20,9 @@ case class Visit(
   
   responseFormat: String,
   
-  visitedItem: Option[VisitedItem]
+  visitedItem: Option[VisitedItem],
+  
+  accessLevel: Option[DocumentAccessLevel]
   
 )
 
@@ -31,7 +34,8 @@ object Visit extends HasDate {
     (JsPath \ "visited_at").format[DateTime] and
     (JsPath \ "client").format[Client] and
     (JsPath \ "response_format").format[String] and
-    (JsPath \ "visited_item").formatNullable[VisitedItem]
+    (JsPath \ "visited_item").formatNullable[VisitedItem] and
+    (JsPath \ "access_level").formatNullable[DocumentAccessLevel]
   )(Visit.apply, unlift(Visit.unapply))
   
 }

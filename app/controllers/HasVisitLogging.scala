@@ -2,6 +2,7 @@ package controllers
 
 import eu.bitwalker.useragentutils.UserAgent
 import models.visit._
+import models.document.DocumentAccessLevel
 import models.generated.tables.records.DocumentRecord
 import play.api.mvc.{ AnyContent, RequestHeader }
 import play.api.http.HeaderNames
@@ -14,6 +15,7 @@ trait HasVisitLogging {
   def logVisit(
     doc: DocumentRecord,
     part: Option[DocumentFilepartRecord],
+    accessLevel: DocumentAccessLevel,
     responseFormat: String
   )(implicit request: RequestHeader, visitService: VisitService) = {
     
@@ -38,7 +40,8 @@ trait HasVisitLogging {
         doc.getOwner,
         part.map(_.getId),
         part.flatMap(p => ContentType.withName(p.getContentType))
-      ))
+      )),
+      Some(accessLevel)
     )
     
     visitService.insertVisit(visit)
