@@ -93,6 +93,9 @@ class UserService @Inject() (
               .set(USER.SALT, salt)
               .where(USER.USERNAME.equal(username))
               .execute()
+              
+          removeFromCache("user", username)
+          
           Right(Unit)
         } else {
           // User failed password validation
