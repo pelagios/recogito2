@@ -75,6 +75,8 @@ class UserService @Inject() (
       .where(USER.USERNAME.equal(username))
       .execute()
 
+    removeFromCache("user", username)
+    
     randomPassword
   }
 
