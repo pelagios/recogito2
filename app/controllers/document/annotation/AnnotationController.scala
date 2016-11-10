@@ -77,7 +77,7 @@ class AnnotationController @Inject() (
       accesslevel: DocumentAccessLevel
     )(implicit request: RequestHeader) = {
     
-    logVisit(doc.document, Some(currentPart), accesslevel, "text/html")
+    logDocumentView(doc.document, Some(currentPart), accesslevel)
       
     ContentType.withName(currentPart.getContentType) match {
 

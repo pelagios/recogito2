@@ -12,7 +12,7 @@ require(['common/ui/alert'], function(Alert) {
           var alert = new Alert(
                 Alert.WARNING,
                 '<span class="icon">&#xf071;</span> Delete Account',
-                '<strong>Are you absolutely sure you want to do this?</strong>'
+                'Are you absolutely sure you want to do this? Deleting your account is irreversible.'
               ),
 
               executeDelete = function() {
@@ -42,6 +42,7 @@ require(['common/ui/alert'], function(Alert) {
 
           btnDelete.addClass('disabled');
           alert.on('ok', executeDelete);
+          alert.on('cancel', function() { btnDelete.removeClass('disabled'); });
         };
 
     btnDelete.click(deleteAccount);

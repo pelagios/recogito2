@@ -12,39 +12,54 @@ import models.ContentType
 
 trait HasVisitLogging {
   
-  def logVisit(
-    doc: DocumentRecord,
-    part: Option[DocumentFilepartRecord],
-    accessLevel: DocumentAccessLevel,
-    responseFormat: String
-  )(implicit request: RequestHeader, visitService: VisitService) = {
+  /** Common code for logging a visit **/
+  private def log(
+      doc: Option[DocumentRecord],
+      part: Option[DocumentFilepartRecord],
+      responseFormat: String,
+      accesslevel: Option[DocumentAccessLevel]
+    )(implicit request: RequestHeader, visitService: VisitService) = {
     
-    val userAgentString = request.headers.get(HeaderNames.USER_AGENT)
-    val userAgent = userAgentString.map(ua => UserAgent.parseUserAgentString(ua))
+    val userAgentHeader = request.headers.get(HeaderNames.USER_AGENT)
+    val userAgent = userAgentHeader.map(ua => UserAgent.parseUserAgentString(ua))
     val os = userAgent.map(_.getOperatingSystem)
     
-    val visit = Visit(
+    val item = doc.map(doc => VisitedItem(
+      doc.getId,
+      doc.getOwner,
+      part.map(_.getId),
+      part.flatMap(pt => ContentType.withName(pt.getContentType))
+    ))
+    
+    visitService.insertVisit(Visit(
       request.uri,
       request.headers.get(HeaderNames.REFERER),
       DateTime.now(),
       Client(
         request.remoteAddress,
-        userAgentString.getOrElse("UNKNOWN"),
+        userAgentHeader.getOrElse("UNKNOWN"),
         userAgent.map(_.getBrowser.getGroup.getName).getOrElse("UNKNOWN"),
         os.map(_.getName).getOrElse("UNKNOWN"),
         os.map(_.getDeviceType.getName).getOrElse("UNKNOWN")  
       ),
       responseFormat,
-      Some(VisitedItem(
-        doc.getId,
-        doc.getOwner,
-        part.map(_.getId),
-        part.flatMap(p => ContentType.withName(p.getContentType))
-      )),
-      Some(accessLevel)
-    )
-    
-    visitService.insertVisit(visit)
+      item,
+      accesslevel
+    ))    
   }
   
+  def logPageView(accesslevel: Option[DocumentAccessLevel])(implicit request: RequestHeader, visitService: VisitService) =
+    log(None, None, "text/html", accesslevel)
+
+  def logDocumentView(
+      doc: DocumentRecord, part: Option[DocumentFilepartRecord], accesslevel: DocumentAccessLevel
+    )(implicit request: RequestHeader, visitService: VisitService) = 
+      log(Some(doc), part, "text/html", Some(accesslevel))
+    
+  def logDownload(
+      doc: DocumentRecord, responseFormat: String
+    )(implicit request: RequestHeader, visitService: VisitService) =
+      log(Some(doc), None, responseFormat, None)
+     
+    
 }
