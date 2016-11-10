@@ -2,7 +2,7 @@ package controllers.my.settings
 
 import controllers.{ HasUserService, HasConfig, Security, WebJarAssets }
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
+import jp.t2v.lab.play2.auth.{ AuthElement, Logout }
 import models.annotation.AnnotationService
 import models.contribution.ContributionService
 import models.user.Roles._
@@ -29,7 +29,7 @@ class AccountSettingsController @Inject() (
     val messagesApi: MessagesApi,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
-  ) extends Controller with AuthElement with HasUserService with HasConfig with Security with I18nSupport {
+  ) extends Controller with AuthElement with HasUserService with HasConfig with Security with Logout with I18nSupport {
 
   val accountSettingsForm = Form(
     mapping(
@@ -119,11 +119,7 @@ class AccountSettingsController @Inject() (
     } yield ()
     
     f.map { _ =>
-      
-      // TODO log out
-      // TODO redirect to good bye page
-      // TODO clear user from cache
-      
+      gotoLogoutSucceeded
       Ok
     }
   }

@@ -16,12 +16,27 @@ require(['common/ui/alert'], function(Alert) {
               ),
 
               executeDelete = function() {
+                var redirectToSplashpage = function() {
+                      window.location.replace('/');
+                    };
+
                 jsRoutes.controllers.my.settings.AccountSettingsController.deleteAccount().ajax()
                   .done(function(response) {
+                    var alert = new Alert(
+                      Alert.INFO,
+                      'Good Bye',
+                      'Good Bye &amp; thanks for checking out Recogito. We appreciate your feedback ' +
+                      'via the <a href="http://commons.pelagios.org/groups/recogito-users/">Recogito Users group</a>.'
+                    );
 
-                    // TODO say goodbye
-
-                    btnDelete.removeClass('disabled');
+                    alert.on('ok', redirectToSplashpage);
+                  })
+                  .fail(function(error) {
+                    new Alert(
+                      Alert.ERROR,
+                      'Error',
+                      'An error occured while deleting your account.'
+                    );
                   });
               };
 

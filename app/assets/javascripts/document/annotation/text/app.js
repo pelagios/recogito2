@@ -101,7 +101,7 @@ require([
                   promptMessage +=
                     quote + '</em> in the text.<br/>Do you want to re-apply this annotation?';
 
-                  new Alert(Alert.INFO, promptTitle, promptMessage).on('ok', reapply);
+                  new Alert(Alert.PROMPT, promptTitle, promptMessage).on('ok', reapply);
                 }
               };
 

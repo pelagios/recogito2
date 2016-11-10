@@ -28,8 +28,8 @@ define(['common/hasEvents'], function(HasEvents) {
           element.remove();
         };
 
-    // Errors just have an 'OK' button
-    if (alertType === Alert.ERROR)
+    // ERROR and INFO just have an 'OK' button
+    if (alertType === Alert.ERROR || alertType === Alert.INFO)
       btnCancel.hide();
 
     btnOK.click(onOK);
@@ -42,7 +42,8 @@ define(['common/hasEvents'], function(HasEvents) {
   Alert.prototype = Object.create(HasEvents.prototype);
 
   /** Type constants **/
-  Alert.INFO    = 'info';
+  Alert.INFO = 'info';
+  Alert.PROMPT = 'info prompt';
   Alert.WARNING = 'warning';
   Alert.ERROR   = 'error';
 

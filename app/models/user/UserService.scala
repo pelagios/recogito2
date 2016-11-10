@@ -146,6 +146,7 @@ class UserService @Inject() (
   def deleteByUsername(username: String) = db.withTransaction { sql =>
     sql.deleteFrom(USER_ROLE).where(USER_ROLE.USERNAME.equal(username)).execute()
     sql.deleteFrom(USER).where(USER.USERNAME.equal(username)).execute()
+    removeFromCache("user", username)
   }
   
   def findByEmail(email: String) = db.query { sql =>
