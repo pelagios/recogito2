@@ -82,4 +82,8 @@ trait SharingPolicies { self: DocumentService =>
     Page(System.currentTimeMillis - startTime, total, offset, limit, records)
   }
   
+  def deletePoliciesSharedWith(username: String) = db.withTransaction { sql =>
+    
+  }
+  
 }

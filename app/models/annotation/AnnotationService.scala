@@ -149,7 +149,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       search in ES.RECOGITO / ES.ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) start offset limit limit
     } map(_.as[(Annotation, Long)].toSeq)
 
-  /** Deletes all annotations on a given document **/
+  /** Deletes all annotations, geo-tags & version history on a given document **/
   def deleteByDocId(docId: String): Future[Boolean] = {
     val deleteAnnotations = findByDocId(docId).flatMap { annotationsAndVersions =>
       if (annotationsAndVersions.size > 0) {

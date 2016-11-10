@@ -11,7 +11,7 @@ import models.generated.tables.records._
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import play.api.Logger
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
 import storage.{ DB, Uploads }
 
@@ -259,6 +259,11 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
   }
   
+  /** Convenience method to list all document IDs owned by the given user **/
+  def listAllIdsByOwner(owner: String) = db.query { sql => 
+    sql.select(DOCUMENT.ID).from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetch(0, classOf[String]).toSeq
+  }
+  
   /** Retrieves documents by their owner **/
   def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 100) = db.query { sql =>
     val startTime = System.currentTimeMillis
@@ -288,15 +293,40 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     sql.deleteFrom(DOCUMENT_FILEPART)
        .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
        .execute()
-
-    // Note: some documents may not have local files - e.g. IIIF  
-    val maybeDocumentDir = uploads.getDocumentDir(document.getOwner, document.getId)
-    if (maybeDocumentDir.isDefined)
-      FileUtils.deleteDirectory(maybeDocumentDir.get)
     
+    // Delete document records
     sql.deleteFrom(DOCUMENT)
        .where(DOCUMENT.ID.equal(document.getId))
        .execute()
+       
+    // Delete files - note: some documents may not have local files (e.g. IIIF)  
+    val maybeDocumentDir = uploads.getDocumentDir(document.getOwner, document.getId)
+    if (maybeDocumentDir.isDefined)
+      FileUtils.deleteDirectory(maybeDocumentDir.get)
+  }
+  
+  def deleteByOwner(username: String)(implicit ctx: ExecutionContext) = db.withTransaction { sql =>
+    // Delete sharing policies
+    sql.deleteFrom(SHARING_POLICY)
+       .where(SHARING_POLICY.DOCUMENT_ID.in(
+         sql.select(DOCUMENT.ID).from(DOCUMENT).where(DOCUMENT.OWNER.equal(username))
+       ))
+       .execute()
+    
+    // Delete filepart records
+    sql.deleteFrom(DOCUMENT_FILEPART)
+       .where(DOCUMENT_FILEPART.DOCUMENT_ID.in(
+         sql.select(DOCUMENT.ID).from(DOCUMENT).where(DOCUMENT.OWNER.equal(username))
+       ))
+       .execute()
+       
+    // Delete document records
+    sql.deleteFrom(DOCUMENT)
+       .where(DOCUMENT.OWNER.equal(username))
+       .execute()
+       
+    // Delete files
+    uploads.deleteUserDir(username)
   }
   
 }

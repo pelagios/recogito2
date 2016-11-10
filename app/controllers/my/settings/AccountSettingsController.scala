@@ -3,24 +3,29 @@ package controllers.my.settings
 import controllers.{ HasUserService, HasConfig, Security, WebJarAssets }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
+import models.annotation.AnnotationService
+import models.contribution.ContributionService
 import models.user.Roles._
 import models.user.UserService
 import models.upload.UploadService
+import models.document.DocumentService
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
-import scala.concurrent.{ ExecutionContext, Future }
-import storage.Uploads
+import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.duration._
 
 case class AccountSettingsData(email: String, name: Option[String], bio: Option[String], website: Option[String])
 
 class AccountSettingsController @Inject() (
     val config: Configuration,
     val users: UserService,
-    val uploadService: UploadService,
-    val uploadStore: Uploads,
+    val annotations: AnnotationService,
+    val contributions: ContributionService,
+    val documents: DocumentService,
+    val uploads: UploadService,
     val messagesApi: MessagesApi,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
@@ -65,18 +70,51 @@ class AccountSettingsController @Inject() (
   }
   
   def deleteAccount() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    
+    def deleteFromIndex(documentIds: Seq[String]) = {  
+      def deleteOneDocument(docId: String): Future[Unit] = {
+        // Annotations, geo-tags and version history
+        val deleteAnnotations = annotations.deleteByDocId(docId)
+          
+        // Contributions
+        val deleteContributions = contributions.deleteHistory(docId) 
+          
+        for {
+          _ <- deleteAnnotations
+          _ <- deleteContributions
+        } yield ()
+      }
+      
+      Future {
+        scala.concurrent.blocking {
+          documentIds.foreach(id => Await.result(deleteOneDocument(id), 10.second))
+        }
+      }
+    }
+    
     val username = loggedIn.user.getUsername
     
-    val fDeleteUserDir = uploadStore.deleteUserDir(username)
-    val fDeletePendingUpload = uploadService.deletePendingUpload(username)
+    // Fetch IDs of all documents owned by this user
+    val fOwnedDocumentIds = documents.listAllIdsByOwner(username)
+        
+    // Delete pending upload & upload_filepart records
+    val fDeletePendingUpload = uploads.deletePendingUpload(username)
     
+    // Delete sharing policies 'shared_with' this user
+    val fDeleteSharedWith = documents.deletePoliciesSharedWith(username)
+        
     val f = for {
-      _ <- fDeleteUserDir
+      ids <- fOwnedDocumentIds
       _ <- fDeletePendingUpload
+      _ <- fDeleteSharedWith
       
-      // TODO delete from DB: sharing policies
-      // TODO delete from DB: documents and document_fileparts
+      // Delete owned documents, document_fileparts & sharing policies linked to them
+      _ <- documents.deleteByOwner(username) 
       
+      // Delete annotations, history, geotags & contributions
+      _ <- deleteFromIndex(ids)
+
+      // User & roles
       _ <- users.deleteByUsername(username)
     } yield ()
     
@@ -84,6 +122,7 @@ class AccountSettingsController @Inject() (
       
       // TODO log out
       // TODO redirect to good bye page
+      // TODO clear user from cache
       
       Ok
     }
