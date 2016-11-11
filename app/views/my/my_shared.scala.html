@@ -50,6 +50,8 @@
     </tbody>
   </table>
 
+  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("shared"), None, None).url, sharedDocuments)
+
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView
   )

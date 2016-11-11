@@ -1,0 +1,41 @@
+@(baseUrl: String, page: models.Page[_ <: Any])
+
+@createRange(currentPage: Int, totalPages: Int) = @{
+  val maxLength = 10
+  val minNumber = currentPage - maxLength / 2
+  val maxNumber = currentPage + maxLength / 2 - 1
+
+  (minNumber, maxNumber) match {
+    case (min, max) if max <= maxLength && min <= 0 => 1 to Math.min(max, totalPages)
+    case (min, max) if max > totalPages => min until totalPages
+    case (min, max) => min to max
+  }
+}
+
+@if(page.total > 0) {
+  <div class="pagination">
+    @defining{ (Math.ceil(page.total.toFloat / page.limit).toInt, Math.floor(page.offset.toFloat / page.limit).toInt + 1) } { case (totalPages, currentPage) =>
+      <ul>
+        @if(currentPage == 1) {
+          <li><span>&laquo;</span></li>
+        } else {
+          <li><a href="@baseUrl?page=@{currentPage - 1}">&laquo;</a></li>
+        }
+
+        @for(idx <- createRange(currentPage, totalPages)) {
+          @if(currentPage == idx) {
+            <li class="current"><span>@idx</span></li>
+          } else {
+            <li><a href="@baseUrl?page=@idx">@idx</a></li>
+          }
+        }
+
+        @if(currentPage == totalPages) {
+          <li><span>&raquo;</span></li>
+        } else {
+          <li><a href="@baseUrl?page=@{currentPage + 1}">&raquo;</a></li>
+        }
+      </ul>
+    }
+  </div>
+}

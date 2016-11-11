@@ -21,12 +21,14 @@ class MyRecogitoController @Inject() (
 
   // TODO this may depend on user in the future
   private lazy val QUOTA = config.getInt("recogito.upload.quota").getOrElse(200)
+  
+  private lazy val DOCUMENTS_PER_PAGE = 10
 
   /** A convenience '/my' route that redirects to the personal index **/
   def my = StackAction { implicit request =>
     loggedIn match {
       case Some(userWithRoles) =>
-        Redirect(routes.MyRecogitoController.index(userWithRoles.user.getUsername.toLowerCase, None))
+        Redirect(routes.MyRecogitoController.index(userWithRoles.user.getUsername.toLowerCase, None, None, None))
 
       case None =>
         // Not logged in - go to log in and then come back here
@@ -50,9 +52,9 @@ class MyRecogitoController @Inject() (
     }}
   }
 
-  private def renderMyDocuments(user: UserRecord, usedSpace: Long)(implicit request: RequestHeader) = {
+  private def renderMyDocuments(user: UserRecord, usedSpace: Long, offset: Int, sortBy: Option[String])(implicit request: RequestHeader) = {
     val f = for {
-      myDocuments <- documents.findByOwner(user.getUsername, false)
+      myDocuments <- documents.findByOwner(user.getUsername, false, offset, DOCUMENTS_PER_PAGE)
       sharedCount <- documents.countBySharedWith(user.getUsername)
     } yield (myDocuments, sharedCount)
 
@@ -61,10 +63,10 @@ class MyRecogitoController @Inject() (
     }
   }
 
-  private def renderSharedWithMe(user: UserRecord, usedSpace: Long)(implicit request: RequestHeader) = {
+  private def renderSharedWithMe(user: UserRecord, usedSpace: Long, offset: Int, sortBy: Option[String])(implicit request: RequestHeader) = {
     val f = for {
       myDocsCount <- documents.countByOwner(user.getUsername, false)
-      docsSharedWithMe <- documents.findBySharedWith(user.getUsername)
+      docsSharedWithMe <- documents.findBySharedWith(user.getUsername, offset, DOCUMENTS_PER_PAGE)
     } yield (myDocsCount, docsSharedWithMe)
 
     f.map { case (myDocsCount, docsSharedWithMe) =>
@@ -72,20 +74,22 @@ class MyRecogitoController @Inject() (
     }
   }
 
-  def index(usernameInPath: String, tab: Option[String]) = AsyncStack { implicit request =>
+  def index(usernameInPath: String, tab: Option[String], page: Option[Int], sortBy: Option[String]) = AsyncStack { implicit request =>
     // If the user is logged in & the name in the path == username it's the profile owner
     val isProfileOwner = loggedIn match {
       case Some(userWithRoles) => userWithRoles.user.getUsername.equalsIgnoreCase(usernameInPath)
       case None => false
     }
+    
+    val offset = (page.getOrElse(1) - 1) * DOCUMENTS_PER_PAGE
 
     if (isProfileOwner) {
       val user = loggedIn.get.user
       val usedSpace = users.getUsedDiskspaceKB(user.getUsername)
 
       tab match {
-        case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace)
-        case _ => renderMyDocuments(user, usedSpace)
+        case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace, offset, sortBy)
+        case _ => renderMyDocuments(user, usedSpace, offset, sortBy)
       }
     } else {
       renderPublicProfile(usernameInPath, loggedIn.map(_.user))

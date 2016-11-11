@@ -1,0 +1,37 @@
+.pagination {
+
+  ul {
+    list-style-type:none;
+  }
+
+  li {
+    display:inline-block;
+    width:40px;
+    height:40px;
+    line-height:40px;
+    border:1px solid @lightgrey-border-darker;
+    text-align:center;
+    position:relative;
+    color:@lightblue-type;
+    margin:0 3px;
+
+    a {
+      display:inline-block;
+      width:100%;
+      height:100%;
+      text-decoration:none;
+      color:@standard-type;
+    }
+
+    a:hover {
+      background-color:#fff;
+    }
+
+  }
+
+  li.current {
+    background-color:#fff;
+    color:@standard-type;
+  }
+
+}

@@ -101,10 +101,10 @@ class UploadController @Inject() (
   def storeFilepart(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
     import UploadController._
-    
+
     val username = loggedIn.user.getUsername
     val isFileupload = request.body.asMultipartFormData.isDefined
-    
+
     def storeFilepart(pendingUpload: UploadRecord) = request.body.asMultipartFormData.map(tempfile => {
       tempfile.file("file").map(f => {
         uploads.insertUploadFilepart(pendingUpload.getId, username, f).map(_ match {
@@ -129,13 +129,13 @@ class UploadController @Inject() (
       Logger.warn("Filepart POST without form data")
       Future.successful(BadRequest(MSG_ERROR))
     })
-    
+
     def registerIIIFSource(pendingUpload: UploadRecord) =
       request.body.asFormUrlEncoded.flatMap(_.get("iiif_source").map(_.headOption)).flatten match {
         case Some(url) =>
           uploads.insertRemoteFilepart(pendingUpload.getId, username, ContentType.IMAGE_IIIF, url).map(success =>
             if (success) Ok else InternalServerError)
-          
+
         case None =>
           // POST without IIIF URL? Not possible through the UI!
           Logger.warn("IIIF POST without URL")
@@ -207,11 +207,11 @@ class UploadController @Inject() (
       .deletePendingUpload(loggedIn.user.getUsername)
       .map(success => {
         // TODO add error message if success == false
-        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None))
+        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None, None, None))
       })
       .recover{ case t =>
         // TODO add error message
-        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None))
+        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None, None, None))
       }
   }
 

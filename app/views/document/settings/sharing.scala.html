@@ -31,7 +31,7 @@
         @for(shared <- sharingPolicies) {
           <tr data-username="@shared.getSharedWith" data-level="@shared.getAccessLevel">
             <td class="col-user">
-              <a href="@controllers.my.routes.MyRecogitoController.index(shared.getSharedWith, None)">@shared.getSharedWith</a>
+              <a href="@controllers.my.routes.MyRecogitoController.index(shared.getSharedWith, None, None, None)">@shared.getSharedWith</a>
             </td>
             <td class="col-permissions">
               <button class="permissions btn small"><span class="label">@shared.getAccessLevel</span><span class="icon">&#xf0dd;</span></button>
