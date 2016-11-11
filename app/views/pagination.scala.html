@@ -1,4 +1,4 @@
-@(baseUrl: String, page: models.Page[_ <: Any])
+@(baseUrl: String, page: models.Page[_ <: Any])(implicit request: RequestHeader)
 
 @createRange(currentPage: Int, totalPages: Int) = @{
   val maxLength = 10
@@ -12,6 +12,13 @@
   }
 }
 
+@createLink(page: Int) = @{
+  val queryParams: Map[String, String] =
+    request.queryString.filter(_._1 != "p").mapValues(_.head) + ("p" -> page.toString)
+
+  baseUrl + "?" + queryParams.map { case (key, value) => key + "=" + value }.mkString("&")
+}
+
 @if(page.total > 0) {
   <div class="pagination">
     @defining{ (Math.ceil(page.total.toFloat / page.limit).toInt, Math.floor(page.offset.toFloat / page.limit).toInt + 1) } { case (totalPages, currentPage) =>
@@ -19,21 +26,21 @@
         @if(currentPage == 1) {
           <li><span>&laquo;</span></li>
         } else {
-          <li><a href="@baseUrl?p=@{currentPage - 1}">&laquo;</a></li>
+          <li><a href="@createLink(currentPage - 1)">&laquo;</a></li>
         }
 
         @for(idx <- createRange(currentPage, totalPages)) {
           @if(currentPage == idx) {
             <li class="current"><span>@idx</span></li>
           } else {
-            <li><a href="@baseUrl?p=@idx">@idx</a></li>
+            <li><a href="@createLink(idx)">@idx</a></li>
           }
         }
 
         @if(currentPage == totalPages) {
           <li><span>&raquo;</span></li>
         } else {
-          <li><a href="@baseUrl?p=@{currentPage + 1}">&raquo;</a></li>
+          <li><a href="@createLink(currentPage + 1)">&raquo;</a></li>
         }
       </ul>
     }
