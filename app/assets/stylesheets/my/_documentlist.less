@@ -39,8 +39,24 @@
       background-color:#fff;
     }
 
+    td {
+      cursor:pointer;
+    }
+
+    .sort {
+      float:right;
+      padding-right:5px;
+      font-size:14px;
+      color:@lightblue-type;
+    }
+
     td:hover {
       background-color:darken(#fff, 2%);
+
+      .sort {
+        color:@standard-type;
+      }
+
     }
 
   }

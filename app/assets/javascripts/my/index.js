@@ -6,12 +6,16 @@ require.config({
 require([
   'common/ui/alert',
   'common/ui/touch',
+  'common/utils/urlUtils',
   'common/config'
-], function(Alert, Touch, Config) {
+], function(Alert, Touch, URLUtils, Config) {
 
   jQuery(document).ready(function() {
         /** Document elements **/
     var documents = jQuery('.document'),
+
+        /** Table sort buttons **/
+        sortButtons = jQuery('.sortable'),
 
         /** Tool buttons **/
         btnDeleteSelected = jQuery('button.delete'),
@@ -57,8 +61,12 @@ require([
               alert = new Alert(Alert.WARNING, title, message);
 
           alert.on('ok', deleteDocuments);
-
           return false;
+        },
+
+        onClickSort = function(e) {
+          var field = jQuery(e.target).closest('td').data('field');
+          URLUtils.setQueryParam('sortby', field);
         },
 
         /** Temporary: user clicked an icon representing an unimplemented feature **/
@@ -114,6 +122,7 @@ require([
           window.location.href = url;
         };
 
+    sortButtons.click(onClickSort);
     btnDeleteSelected.click(onClickDelete);
 
     // TODO temporary: register dummy handlers on icons for unimplemented features

@@ -19,21 +19,21 @@
         @if(currentPage == 1) {
           <li><span>&laquo;</span></li>
         } else {
-          <li><a href="@baseUrl?page=@{currentPage - 1}">&laquo;</a></li>
+          <li><a href="@baseUrl?p=@{currentPage - 1}">&laquo;</a></li>
         }
 
         @for(idx <- createRange(currentPage, totalPages)) {
           @if(currentPage == idx) {
             <li class="current"><span>@idx</span></li>
           } else {
-            <li><a href="@baseUrl?page=@idx">@idx</a></li>
+            <li><a href="@baseUrl?p=@idx">@idx</a></li>
           }
         }
 
         @if(currentPage == totalPages) {
           <li><span>&raquo;</span></li>
         } else {
-          <li><a href="@baseUrl?page=@{currentPage + 1}">&raquo;</a></li>
+          <li><a href="@baseUrl?p=@{currentPage + 1}">&raquo;</a></li>
         }
       </ul>
     }
