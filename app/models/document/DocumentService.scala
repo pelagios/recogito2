@@ -5,7 +5,7 @@ import java.io.{ File, InputStream }
 import java.nio.file.Files
 import java.util.UUID
 import javax.inject.{ Inject, Singleton }
-import models.{ BaseService, Page }
+import models.{ BaseService, Page, SortOrder }
 import models.generated.Tables._
 import models.generated.tables.records._
 import org.apache.commons.io.FileUtils
@@ -265,9 +265,11 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   }
   
   /** Retrieves documents by their owner **/
-  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20) = db.query { sql =>
+  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
     val startTime = System.currentTimeMillis
-    
+
+    val sortField = sortBy.flatMap(getField(DOCUMENT, _))
+
     val total = if (publicOnly)
       sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true))).fetchOne(0, classOf[Int])
     else
@@ -278,7 +280,17 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     else
       sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner))
 
-    val items = query.limit(limit).offset(offset).fetchArray().toSeq
+    val items = sortField match {
+      case Some(sort) => 
+        val order = sortOrder.getOrElse(SortOrder.ASC)
+        if (order == SortOrder.ASC)
+          query.orderBy(sort.asc).limit(limit).offset(offset).fetchArray().toSeq
+        else
+          query.orderBy(sort.desc).limit(limit).offset(offset).fetchArray().toSeq 
+      
+      case None => query.limit(limit).offset(offset).fetchArray().toSeq
+    }
+    
     Page(System.currentTimeMillis - startTime, total, offset, limit, items)
   }
     

@@ -1,6 +1,6 @@
 package models
 
-import org.jooq.Record
+import org.jooq.{ Table, Record }
 import play.api.cache.CacheApi
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
@@ -21,7 +21,6 @@ object SortOrder {
       Some(DESC)
     else
       None
-      
 }
 
 /** Various helpers of general use to Service classes **/
@@ -60,5 +59,8 @@ trait BaseService {
   protected def removeFromCache(prefix: String, key: String)(implicit cache: CacheApi) = {
     cache.remove(prefix + "_" + key)
   }
+  
+  protected def getField[T <: Table[_]](table: T, fieldname: String) =
+    table.fields().find(_.getName.equalsIgnoreCase(fieldname))
 
 }

@@ -21,15 +21,15 @@
     <thead>
       <tr>
         <td></td> <!-- content type icon -->
-        <td>Author</td>
-        <td>Name</td>
-        <td>Date</td>
-        <td>Owner</td>
-        <td>Shared By</td>
-        <td class="centered">Permission Level</td>
-        <td>Last Edit</td>
-        <td>File Size</td>
-        <td>Annotations</td>
+        <td class="sortable" data-field="author">Author<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="title">Title<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="date_freeform">Date<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="owner">Owner<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="shared-by">Shared By<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable centered" data-field="permission">Permission Level<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="edit-at">Last Edit<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="filesize">File Size<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="annotations">Annotations<span class="sort icon">&#xf0dc;</span></td>
       </tr>
     </thead>
     <tbody>
@@ -50,7 +50,7 @@
     </tbody>
   </table>
 
-  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("shared"), None, None).url, sharedDocuments)
+  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("shared"), None, None, None).url, sharedDocuments)
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView

@@ -38,8 +38,7 @@ class UserService @Inject() (
   def listUsers(offset: Int = 0, limit: Int = 20, sortBy: Option[String], sortOrder: Option[SortOrder]) = db.query { sql =>
     val startTime = System.currentTimeMillis
 
-    val sortField = sortBy.flatMap(fieldname =>
-      USER.fields().find(_.getName.equalsIgnoreCase(fieldname)))
+    val sortField = sortBy.flatMap(getField(USER, _))
 
     val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])
     
@@ -47,9 +46,9 @@ class UserService @Inject() (
       case Some(field) => 
         val order = sortOrder.getOrElse(SortOrder.ASC)
         if (order == SortOrder.ASC)
-          sql.selectFrom(USER).orderBy(field.asc())
+          sql.selectFrom(USER).orderBy(field.asc)
         else
-          sql.selectFrom(USER).orderBy(field.desc())
+          sql.selectFrom(USER).orderBy(field.desc)
               
       case None => sql.selectFrom(USER)
     }

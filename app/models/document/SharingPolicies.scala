@@ -2,7 +2,7 @@ package models.document
 
 import java.sql.Timestamp
 import java.util.Date
-import models.Page
+import models.{ Page, SortOrder }
 import models.generated.Tables._
 import models.generated.tables.records.{ DocumentRecord, SharingPolicyRecord }
 import storage.DB
@@ -64,22 +64,28 @@ trait SharingPolicies { self: DocumentService =>
   }
   
   /** Lists the documents shared with a given user (paged response **/
-  def findBySharedWith(sharedWith: String, offset: Int = 0, limit: Int = 20) = db.query { sql =>
+  def findBySharedWith(sharedWith: String, offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
     val startTime = System.currentTimeMillis
+    
+    val sortField = sortBy.flatMap(getField(SHARING_POLICY, _))
     
     val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
     
-    val records = 
+    val query = 
       sql.selectFrom(SHARING_POLICY
            .join(DOCUMENT)
            .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
          .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
-         .limit(limit)
-         .offset(offset)
-         .fetchArray.toSeq
-         .map(r => (r.into(classOf[DocumentRecord]), r.into(classOf[SharingPolicyRecord])))
+         
+    val items = sortField match {
+      case Some(sort) => query.orderBy(sort).limit(limit).offset(offset).fetchArray().toSeq
+      case None => query.limit(limit).offset(offset).fetchArray().toSeq
+    }
+    
+    val mapped = items
+      .map(r => (r.into(classOf[DocumentRecord]), r.into(classOf[SharingPolicyRecord])))
 
-    Page(System.currentTimeMillis - startTime, total, offset, limit, records)
+    Page(System.currentTimeMillis - startTime, total, offset, limit, mapped)
   }
   
   def deletePoliciesSharedWith(username: String) = db.withTransaction { sql =>

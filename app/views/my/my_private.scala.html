@@ -11,8 +11,8 @@
       <tr>
         <td></td> <!-- content type icon -->
         <td class="sortable" data-field="author">Author<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="name">Name<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="date">Date<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="title">Title<span class="sort icon">&#xf0dc;</span></td>
+        <td class="sortable" data-field="date_freeform">Date<span class="sort icon">&#xf0dc;</span></td>
         <td class="sortable" data-field="edit-at">Last Edit<span class="sort icon">&#xf0dc;</span></td>
         <td class="sortable" data-field="filesize">File Size<span class="sort icon">&#xf0dc;</span></td>
         <td class="sortable" data-field="annotations">Annotations<span class="sort icon">&#xf0dc;</span></td>
@@ -33,7 +33,7 @@
     </tbody>
   </table>
 
-  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, None, None, None).url, documents)
+  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, None, None, None, None).url, documents)
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView,

@@ -1,6 +1,6 @@
 @(owner: models.generated.tables.records.UserRecord)
 <div class="sidebar-header">
-  <a href="@controllers.my.routes.MyRecogitoController.index(owner.getUsername.toLowerCase, None, None, None)">
+  <a href="@controllers.my.routes.MyRecogitoController.index(owner.getUsername.toLowerCase, None, None, None, None)">
     @if(Option(owner.getRealName).isDefined) {
       <h1>@owner.getRealName</h1>
       <h2>@@@owner.getUsername</h2>

@@ -139,7 +139,7 @@ POST    /settings/restore                            controllers.my.settings.Res
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my                                          controllers.my.MyRecogitoController.my
-GET     /:username                                   controllers.my.MyRecogitoController.index(username: String, tab: Option[String], p: Option[Int], sortBy: Option[String])
+GET     /:username                                   controllers.my.MyRecogitoController.index(username: String, tab: Option[String], p: Option[Int], sortby: Option[String], order: Option[String])
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Application root
