@@ -59,7 +59,7 @@ class MyRecogitoController @Inject() (
     } yield (myDocuments, sharedCount)
 
     f.map { case (myDocuments, sharedCount) =>
-      Ok(views.html.my.my_private(user, usedSpace, QUOTA, myDocuments, sharedCount))
+      Ok(views.html.my.my_private(user, usedSpace, QUOTA, myDocuments, sharedCount, sortBy, sortOrder))
     }
   }
 
@@ -70,7 +70,7 @@ class MyRecogitoController @Inject() (
     } yield (myDocsCount, docsSharedWithMe)
 
     f.map { case (myDocsCount, docsSharedWithMe) =>
-      Ok(views.html.my.my_shared(user, usedSpace, QUOTA, myDocsCount, docsSharedWithMe))
+      Ok(views.html.my.my_shared(user, usedSpace, QUOTA, myDocsCount, docsSharedWithMe, sortBy, sortOrder))
     }
   }
 

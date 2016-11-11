@@ -3,7 +3,9 @@
   usedDiskspace: Long,
   quotaMB: Int,
   myDocCount: Int,
-  sharedDocuments: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord)]
+  sharedDocuments: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord)],
+  sortBy: Option[String],
+  sortOrder: Option[models.SortOrder]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
 @accessLevel(lvl: String) = {
@@ -21,15 +23,17 @@
     <thead>
       <tr>
         <td></td> <!-- content type icon -->
-        <td class="sortable" data-field="author">Author<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="title">Title<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="date_freeform">Date<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="owner">Owner<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="shared-by">Shared By<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable centered" data-field="permission">Permission Level<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="edit-at">Last Edit<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="filesize">File Size<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="annotations">Annotations<span class="sort icon">&#xf0dc;</span></td>
+        @views.html.tableHeader(Seq(
+          "author" -> "Author",
+          "title" -> "Title",
+          "date_freeform" -> "Date",
+          "owner" -> "Owner",
+          "shared-by" -> "Shared By",
+          "permission" -> "Permission Level",
+          "edit-at" -> "Last Edit",
+          "filesize" -> "File Size",
+          "annotations" -> "Annotations"
+        ), sortBy, sortOrder)
       </tr>
     </thead>
     <tbody>

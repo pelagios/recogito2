@@ -3,19 +3,24 @@
   usedDiskspace: Long,
   quotaMB: Int,
   documents: models.Page[models.generated.tables.records.DocumentRecord],
-  sharedWithMeCount: Int
+  sharedWithMeCount: Int,
+  sortBy: Option[String],
+  sortOrder: Option[models.SortOrder]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
+
 @_layout(user, usedDiskspace, quotaMB, documents.total, sharedWithMeCount, "my") {
   <table class="document-list">
     <thead>
       <tr>
         <td></td> <!-- content type icon -->
-        <td class="sortable" data-field="author">Author<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="title">Title<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="date_freeform">Date<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="edit-at">Last Edit<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="filesize">File Size<span class="sort icon">&#xf0dc;</span></td>
-        <td class="sortable" data-field="annotations">Annotations<span class="sort icon">&#xf0dc;</span></td>
+        @views.html.tableHeader(Seq(
+          "author" -> "Author",
+          "title" -> "Title",
+          "date_freeform" -> "Date",
+          "edit-at" -> "Last Edit",
+          "filesize" -> "File Size",
+          "annotations" -> "Annotations"
+        ), sortBy, sortOrder)
       </tr>
     </thead>
     <tbody>
