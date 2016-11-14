@@ -85,7 +85,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
       future.flatMap { annotations =>
         val fAnnotation = 
           if (entity.entityType == EntityType.LOCATION) {
-            placeService.searchPlaces(entity.chars, 0, 1).map { topHits =>
+            placeService.searchPlaces(ES.sanitize(entity.chars), 0, 1).map { topHits =>
               if (topHits.total > 0)
                 // TODO be smarter about choosing the right URI from the place
                 toAnnotation(entity, AnnotationBody.PLACE, Some(topHits.items(0)._1.id))
