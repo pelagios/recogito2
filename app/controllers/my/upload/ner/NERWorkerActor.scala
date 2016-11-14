@@ -92,6 +92,9 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
               else
                 // No gazetteer match found
                 toAnnotation(entity, AnnotationBody.PLACE)
+            }.recover { case t: Throwable =>
+              t.printStackTrace()
+              toAnnotation(entity, AnnotationBody.PLACE)
             }
           } else {       
             Future.successful(toAnnotation(entity, AnnotationBody.PERSON))
