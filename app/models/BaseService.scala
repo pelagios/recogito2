@@ -62,5 +62,8 @@ trait BaseService {
   
   protected def getField[T <: Table[_]](table: T, fieldname: String) =
     table.fields().find(_.getName.equalsIgnoreCase(fieldname))
+    
+  protected def getField[T <: Table[_]](tables: Seq[T], fieldname: String) =
+    tables.flatMap(_.fields).find(_.getName.equalsIgnoreCase(fieldname))
 
 }
