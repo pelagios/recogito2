@@ -1,12 +1,11 @@
 package models
 
-import org.jooq.{ Table, Record }
+import org.jooq.{ Table, Record, SortField }
 import play.api.cache.CacheApi
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
 import storage.DB
-import org.jooq.SortField
 
 /** Generic sort order symbol **/
 sealed class SortOrder
