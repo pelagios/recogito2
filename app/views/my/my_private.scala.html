@@ -15,10 +15,13 @@
         @views.html.tableHeader(Seq(
           "author" -> "Author",
           "title" -> "Title",
+          "language" -> "Language",
           "date_freeform" -> "Date",
-          "edit_at" -> "Last Edit At",
-          "edit_by" -> "Last Edit By",
-          "annotations" -> "Annotations"
+          "uploaded_at" -> "Uploaded",
+          "edit_at" -> "Last edit at",
+          "edit_by" -> "Last edit by",
+          "annotations" -> "Annotations",
+          "is_public" -> "Public"
         ), sortBy, sortOrder)
       </tr>
     </thead>
@@ -28,10 +31,13 @@
           <td></td> <!-- content type icon -->
           <td>@row._1.getAuthor</td>
           <td>@row._1.getTitle</td>
+          <td class="centered">@row._1.getLanguage</td>
           <td>@row._1.getDateFreeform</td>
+          <td><time class="timeago" datetime="@row._1.getUploadedAt"></time></td>
           <td><time class="timeago" datetime="@row._2.map(_.madeAt)"></time></td>
           <td>@row._2.map(_.madeBy)</td>
           <td class="centered">@row._3</td>
+          <td class="centered">@if(row._1.getIsPublic){<span class="icon">&#xf00c;</span>}</td>
         </tr>
       }
     </tbody>

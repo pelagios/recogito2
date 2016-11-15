@@ -25,13 +25,15 @@
         @views.html.tableHeader(Seq(
           "author" -> "Author",
           "title" -> "Title",
+          "language" -> "Language",
           "date_freeform" -> "Date",
           "owner" -> "Owner",
           "shared_by" -> "Shared By",
           "access_level" -> "Permission Level",
           "edit-at" -> "Last Edit",
           "filesize" -> "File Size",
-          "annotations" -> "Annotations"
+          "annotations" -> "Annotations",
+          "is_public" -> "Public"
         ), sortBy, sortOrder)
       </tr>
     </thead>
@@ -41,6 +43,7 @@
           <td></td> <!-- content type icon -->
           <td>@document.getAuthor</td>
           <td>@document.getTitle</td>
+          <td class="centered">@document.getLanguage</td>
           <td>@document.getDateFreeform</td>
           <td>@document.getOwner</td>
           <td>@sharingPolicy.getSharedBy</td>
@@ -48,6 +51,7 @@
           <td>-</td>
           <td>-</td>
           <td>-</td>
+          <td class="centered">@if(document.getIsPublic){<span class="icon">&#xf00c;</span>}</td>
         </tr>
       }
     </tbody>
