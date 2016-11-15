@@ -76,6 +76,10 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       val contributionsWithId = response.as[(Contribution, String)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, contributionsWithId)
     }
+    
+  /** Shorthand to get the most recent contribution to the given document **/
+  def getLastContribution(documentId: String) =
+    getHistory(documentId, 0, 1).map(_.items.headOption.map(_._1))
 
   /** Retrieves a contribution by its ElasticSearch ID **/
   def findById(id: String): Future[Option[(Contribution, String)]] =

@@ -4,6 +4,8 @@ import controllers.{ BaseController, Security, WebJarAssets }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.{ Page, SortOrder }
+import models.annotation.AnnotationService
+import models.contribution.ContributionService
 import models.user.UserService
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, UserRecord }
@@ -12,6 +14,8 @@ import play.api.mvc.RequestHeader
 import scala.concurrent.{ ExecutionContext, Future }
 
 class MyRecogitoController @Inject() (
+    val annotations: AnnotationService,
+    val contributions: ContributionService,
     val documents: DocumentService,
     val users: UserService,
     val config: Configuration,
@@ -19,9 +23,6 @@ class MyRecogitoController @Inject() (
     implicit val webjars: WebJarAssets
   ) extends BaseController(config, users) with OptionalAuthElement {
 
-  // TODO this may depend on user in the future
-  private lazy val QUOTA = config.getInt("recogito.upload.quota").getOrElse(200)
-  
   private lazy val DOCUMENTS_PER_PAGE = 10
 
   /** A convenience '/my' route that redirects to the personal index **/
@@ -53,13 +54,34 @@ class MyRecogitoController @Inject() (
   }
 
   private def renderMyDocuments(user: UserRecord, usedSpace: Long, offset: Int, sortBy: Option[String], sortOrder: Option[SortOrder])(implicit request: RequestHeader) = {
-    val f = for {
-      myDocuments <- documents.findByOwner(user.getUsername, false, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
-      sharedCount <- documents.countBySharedWith(user.getUsername)
+    // Fetch properties located in the DB
+    val fMyDocuments = documents.findByOwner(user.getUsername, false, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
+    val fSharedCount = documents.countBySharedWith(user.getUsername)
+    val fDBProps = for {
+      myDocuments <- fMyDocuments
+      sharedCount <- fSharedCount
     } yield (myDocuments, sharedCount)
-
-    f.map { case (myDocuments, sharedCount) =>
-      Ok(views.html.my.my_private(user, usedSpace, QUOTA, myDocuments, sharedCount, sortBy, sortOrder))
+    
+    // Fetch properties located in the index
+    val fAllProps = fDBProps.flatMap { case (myDocuments, sharedCount) =>
+      val docIds = myDocuments.items.map(_.getId)
+      val fLastEdits = Future.sequence(docIds.map(id => contributions.getLastContribution(id).map((id, _))))
+      val fAnnotationsPerDoc = Future.sequence(docIds.map(id => annotations.countByDocId(id).map((id, _))))
+      
+      for {
+        lastEdits <- fLastEdits
+        annotationsPerDoc <- fAnnotationsPerDoc
+      } yield (myDocuments, sharedCount, lastEdits.toMap, annotationsPerDoc.toMap)
+    }
+    
+    fAllProps.map { case (myDocuments, sharedCount, lastEdits, annotationsPerDoc) =>
+      val tableRow = myDocuments.map { doc =>
+        val lastEdit = lastEdits.find(_._1 == doc.getId).flatMap(_._2)
+        val annotations = annotationsPerDoc.find(_._1 == doc.getId).map(_._2).getOrElse(0l)
+        (doc, lastEdit, annotations)
+      }
+      
+      Ok(views.html.my.my_private(user, usedSpace, tableRow, sharedCount, sortBy, sortOrder))
     }
   }
 
@@ -70,7 +92,7 @@ class MyRecogitoController @Inject() (
     } yield (myDocsCount, docsSharedWithMe)
 
     f.map { case (myDocsCount, docsSharedWithMe) =>
-      Ok(views.html.my.my_shared(user, usedSpace, QUOTA, myDocsCount, docsSharedWithMe, sortBy, sortOrder))
+      Ok(views.html.my.my_shared(user, usedSpace, myDocsCount, docsSharedWithMe, sortBy, sortOrder))
     }
   }
 

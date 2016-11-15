@@ -30,7 +30,6 @@ libraryDependencies ++= Seq(
   "eu.bitwalker" % "UserAgentUtils" % "1.20",
   "jp.t2v" %% "play2-auth" % "0.14.1",
   "org.apache.jena" % "jena-arq" % "3.1.0",
-
   "org.geotools" % "gt-geojson" % "14.3",
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",

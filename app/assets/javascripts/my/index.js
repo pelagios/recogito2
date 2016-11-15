@@ -28,6 +28,10 @@ require([
         btnAccountSettings = jQuery('.account-settings'),
         btnGridView = jQuery('.display-mode'),
 
+        formatTime = function() {
+          jQuery('time.timeago').timeago();
+        },
+
         /** Resolves the click target to the parent document element **/
         getClickedDocument = function(e) {
           var docEl = jQuery(e.target).closest('.document');
@@ -127,6 +131,8 @@ require([
 
           window.location.href = url;
         };
+
+    formatTime();
 
     sortButtons.click(onClickSort);
     btnDeleteSelected.click(onClickDelete);

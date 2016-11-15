@@ -1,14 +1,13 @@
 @(
   user: models.generated.tables.records.UserRecord,
   usedDiskspace: Long,
-  quotaMB: Int,
-  documents: models.Page[models.generated.tables.records.DocumentRecord],
+  documents: models.Page[(models.generated.tables.records.DocumentRecord, Option[models.contribution.Contribution], Long)],
   sharedWithMeCount: Int,
   sortBy: Option[String],
   sortOrder: Option[models.SortOrder]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
-@_layout(user, usedDiskspace, quotaMB, documents.total, sharedWithMeCount, "my") {
+@_layout(user, usedDiskspace, documents.total, sharedWithMeCount, "my") {
   <table class="document-list">
     <thead>
       <tr>
@@ -17,22 +16,22 @@
           "author" -> "Author",
           "title" -> "Title",
           "date_freeform" -> "Date",
-          "edit-at" -> "Last Edit",
-          "filesize" -> "File Size",
+          "edit_at" -> "Last Edit At",
+          "edit_by" -> "Last Edit By",
           "annotations" -> "Annotations"
         ), sortBy, sortOrder)
       </tr>
     </thead>
     <tbody>
-      @for(document <- documents.items) {
-        <tr class="document" data-id="@document.getId">
+      @for(row <- documents.items) {
+        <tr class="document" data-id="@row._1.getId">
           <td></td> <!-- content type icon -->
-          <td>@document.getAuthor</td>
-          <td>@document.getTitle</td>
-          <td>@document.getDateFreeform</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
+          <td>@row._1.getAuthor</td>
+          <td>@row._1.getTitle</td>
+          <td>@row._1.getDateFreeform</td>
+          <td><time class="timeago" datetime="@row._2.map(_.madeAt)"></time></td>
+          <td>@row._2.map(_.madeBy)</td>
+          <td class="centered">@row._3</td>
         </tr>
       }
     </tbody>

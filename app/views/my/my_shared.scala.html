@@ -1,7 +1,6 @@
 @(
   user: models.generated.tables.records.UserRecord,
   usedDiskspace: Long,
-  quotaMB: Int,
   myDocCount: Int,
   sharedDocuments: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord)],
   sortBy: Option[String],
@@ -18,7 +17,7 @@
   }}}
 }
 
-@_layout(user, usedDiskspace, quotaMB, myDocCount, sharedDocuments.total, "shared") {
+@_layout(user, usedDiskspace, myDocCount, sharedDocuments.total, "shared") {
   <table class="document-list">
     <thead>
       <tr>
