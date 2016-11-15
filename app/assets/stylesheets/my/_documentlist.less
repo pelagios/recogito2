@@ -43,11 +43,26 @@
       cursor:pointer;
     }
 
-    .sort {
+    td.sortable::after {
+      content:'\f0dc';
+      font-size:14px;
+      color:@lightblue-type;
       float:right;
       padding-right:5px;
       font-size:14px;
       color:@lightblue-type;
+    }
+
+    td.sorted {
+      background-color:@blueish-white-hi;
+    }
+
+    td.sortable.sorted.asc::after {
+      content:'\f0dd';
+    }
+
+    td.sortable.sorted.desc::after {
+      content:'\f0de';
     }
 
     td:hover {

@@ -1,16 +1,16 @@
 @(cells: Seq[(String, String)], sortBy: Option[String], sortOrder: Option[models.SortOrder])(implicit request: RequestHeader)
 
-@icon(field: String) = @{
+@cssClass(field: String) = @{
   if (sortBy == Some(field)) {
     sortOrder match {
-      case Some(order) if order == models.SortOrder.DESC => "&#xf0dd;"
-      case _ => "&#xf0de;"
+      case Some(order) if order == models.SortOrder.DESC => Some("sorted desc")
+      case _ => Some("sorted asc")
     }
   } else {
-    "&#xf0dc;"
+    None
   }
 }
 
 @for(cell <- cells) {
-  <td class="sortable" data-field="@cell._1">@cell._2<span class="sort icon">@Html(icon(cell._1))</span></td>
+  <td class="sortable@cssClass(cell._1).map(" " + _).getOrElse("")" data-field="@cell._1">@cell._2</td>
 }

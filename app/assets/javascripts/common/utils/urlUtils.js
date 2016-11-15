@@ -16,12 +16,11 @@ define([], function() {
       return parsed;
     },
 
-    setQueryParam : function(key, val) {
+    setQueryParams : function(params) {
       var baseUrl = window.location.protocol + '//' + window.location.host + location.pathname,
           currentParams = this.parseQueryString();
 
-      currentParams[key] = val;
-
+      jQuery.extend(currentParams, params);
       window.location.href = baseUrl + '?' + jQuery.param(currentParams);
     }
 

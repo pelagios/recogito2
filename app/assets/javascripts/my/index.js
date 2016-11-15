@@ -65,8 +65,14 @@ require([
         },
 
         onClickSort = function(e) {
-          var field = jQuery(e.target).closest('td').data('field');
-          URLUtils.setQueryParam('sortby', field);
+          var el = jQuery(e.target).closest('td'),
+              fieldName = el.data('field'),
+              cssClass = el.attr('class'),
+              sortOrder =
+                (cssClass.indexOf('sorted') === -1) ? 'asc' : // Currently unsorted - use ASC
+                (cssClass.indexOf('asc') > -1) ? 'desc' : 'asc'; // If there's an order, toggle
+
+          URLUtils.setQueryParams({ 'sortby': fieldName, 'order': sortOrder });
         },
 
         /** Temporary: user clicked an icon representing an unimplemented feature **/
