@@ -67,7 +67,7 @@ trait SharingPolicies { self: DocumentService =>
   def findBySharedWith(sharedWith: String, offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
     val startTime = System.currentTimeMillis
     
-    val sortField = sortBy.flatMap(getField(Seq(DOCUMENT, SHARING_POLICY), _))
+    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT, SHARING_POLICY), fieldname, sortOrder))
     
     val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
     
@@ -78,13 +78,7 @@ trait SharingPolicies { self: DocumentService =>
          .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
          
     val items = sortField match {
-      case Some(sort) => 
-        val order = sortOrder.getOrElse(SortOrder.ASC)
-        if (order == SortOrder.ASC)
-          query.orderBy(sort.asc).limit(limit).offset(offset).fetchArray().toSeq
-        else
-          query.orderBy(sort.desc).limit(limit).offset(offset).fetchArray().toSeq
-        
+      case Some(sort) => query.orderBy(sort).limit(limit).offset(offset).fetchArray().toSeq
       case None => query.limit(limit).offset(offset).fetchArray().toSeq
     }
     

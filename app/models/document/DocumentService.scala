@@ -268,7 +268,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
     val startTime = System.currentTimeMillis
 
-    val sortField = sortBy.flatMap(getField(DOCUMENT, _))
+    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT), fieldname, sortOrder))
 
     val total = if (publicOnly)
       sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true))).fetchOne(0, classOf[Int])
@@ -281,13 +281,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner))
 
     val items = sortField match {
-      case Some(sort) => 
-        val order = sortOrder.getOrElse(SortOrder.ASC)
-        if (order == SortOrder.ASC)
-          query.orderBy(sort.asc).limit(limit).offset(offset).fetchArray().toSeq
-        else
-          query.orderBy(sort.desc).limit(limit).offset(offset).fetchArray().toSeq 
-      
+      case Some(sort) => query.orderBy(sort).limit(limit).offset(offset).fetchArray().toSeq
       case None => query.limit(limit).offset(offset).fetchArray().toSeq
     }
     

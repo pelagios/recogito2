@@ -38,18 +38,12 @@ class UserService @Inject() (
   def listUsers(offset: Int = 0, limit: Int = 20, sortBy: Option[String], sortOrder: Option[SortOrder]) = db.query { sql =>
     val startTime = System.currentTimeMillis
 
-    val sortField = sortBy.flatMap(getField(USER, _))
+    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(USER), fieldname, sortOrder))
 
     val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])
     
     val query = sortField match {
-      case Some(field) => 
-        val order = sortOrder.getOrElse(SortOrder.ASC)
-        if (order == SortOrder.ASC)
-          sql.selectFrom(USER).orderBy(field.asc)
-        else
-          sql.selectFrom(USER).orderBy(field.desc)
-              
+      case Some(field) => sql.selectFrom(USER).orderBy(field)
       case None => sql.selectFrom(USER)
     }
     

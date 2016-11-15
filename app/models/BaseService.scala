@@ -6,6 +6,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
 import storage.DB
+import org.jooq.SortField
 
 /** Generic sort order symbol **/
 sealed class SortOrder
@@ -59,11 +60,16 @@ trait BaseService {
   protected def removeFromCache(prefix: String, key: String)(implicit cache: CacheApi) = {
     cache.remove(prefix + "_" + key)
   }
-  
-  protected def getField[T <: Table[_]](table: T, fieldname: String) =
-    table.fields().find(_.getName.equalsIgnoreCase(fieldname))
-    
-  protected def getField[T <: Table[_]](tables: Seq[T], fieldname: String) =
-    tables.flatMap(_.fields).find(_.getName.equalsIgnoreCase(fieldname))
+
+  protected def getSortField[T <: Table[_]](tables: Seq[T], fieldname: String, sortOrder: Option[SortOrder]) = {
+    val maybeField = tables.flatMap(_.fields).find(_.getName.equalsIgnoreCase(fieldname))
+    maybeField.map { field =>
+      val order = sortOrder.getOrElse(SortOrder.ASC)
+      if (order == SortOrder.ASC)
+        field.asc
+      else
+        field.desc
+    }
+  }
 
 }
