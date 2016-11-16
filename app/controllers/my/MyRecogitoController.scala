@@ -23,7 +23,9 @@ class MyRecogitoController @Inject() (
     implicit val webjars: WebJarAssets
   ) extends BaseController(config, users) with OptionalAuthElement {
 
-  private lazy val DOCUMENTS_PER_PAGE = 10
+  private val DOCUMENTS_PER_PAGE = 10
+  
+  private val INDEX_SORT_PROPERTIES = Seq("edit_by", "edit_at", "annotations")
 
   /** A convenience '/my' route that redirects to the personal index **/
   def my = StackAction { implicit request =>
@@ -52,8 +54,20 @@ class MyRecogitoController @Inject() (
       case None => NotFoundPage
     }}
   }
+  
+  private def sortByIndexProperty(username: String, sortBy: String, sortOrder: SortOrder) = {
+    documents.listAllIdsByOwner(username).map { allIds =>
+      // annotations.getDocumentsSortedByAnnotations
+    }
+      
+    // TODO step 2: restricting to these IDs, query the index for the first N docs, sorted by the sortBy field
+  }
 
   private def renderMyDocuments(user: UserRecord, usedSpace: Long, offset: Int, sortBy: Option[String], sortOrder: Option[SortOrder])(implicit request: RequestHeader) = {
+    
+    // Sort via index?
+    val sortByIndexedProp = sortBy.map(fieldname => INDEX_SORT_PROPERTIES.contains(fieldname.toLowerCase)).getOrElse(false)
+    
     // Fetch properties located in the DB
     val fMyDocuments = documents.findByOwner(user.getUsername, false, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
     val fSharedCount = documents.countBySharedWith(user.getUsername)
