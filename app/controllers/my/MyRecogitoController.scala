@@ -25,7 +25,7 @@ class MyRecogitoController @Inject() (
 
   private val DOCUMENTS_PER_PAGE = 10
   
-  private val INDEX_SORT_PROPERTIES = Seq("edit_by", "edit_at", "annotations")
+  private val INDEX_SORT_PROPERTIES = Seq("last_modified_at", "last_modified_by", "annotations")
   
   private def isSortingByIndex(sortBy: Option[String]) =
     sortBy.map(fieldname => INDEX_SORT_PROPERTIES.contains(fieldname.toLowerCase)).getOrElse(false)
@@ -46,12 +46,11 @@ class MyRecogitoController @Inject() (
   }
   
   /** Takes a list of docIds and sorts them accourding to the given index property **/
-  private def sortByIndexProperty(docIds: Seq[String], sortBy: String, sortOrder: SortOrder, offset: Int): Future[Seq[String]] = {
-    if (sortBy == "annotations")
-      annotations.sortDocsByAnnotationCount(docIds, sortOrder, offset, DOCUMENTS_PER_PAGE)
-    else
-      // TODO implement sorting based on last edit
-      Future.successful(docIds)
+  private def sortByIndexProperty(docIds: Seq[String], sortBy: String, sortOrder: SortOrder, offset: Int): Future[Seq[String]] = sortBy match {
+    case "annotations" => annotations.sortDocsByAnnotationCount(docIds, sortOrder, offset, DOCUMENTS_PER_PAGE)
+    case "last_modified_at" => contributions.sortDocsByLastModifiedAt(docIds, sortOrder, offset, DOCUMENTS_PER_PAGE)
+    case "last_modified_by" => contributions.sortDocsByLastModifiedBy(docIds, sortOrder, offset, DOCUMENTS_PER_PAGE)
+    case _ => Future.successful(docIds)
   }
   
   /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/

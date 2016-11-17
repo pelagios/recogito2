@@ -80,7 +80,24 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   /** Shorthand to get the most recent contribution to the given document **/
   def getLastContribution(documentId: String) =
     getHistory(documentId, 0, 1).map(_.items.headOption.map(_._1))
-
+    
+  private def sortByField[B](docIds: Seq[String], sortOrder: models.SortOrder, offset: Int, limit: Int, field: Option[Contribution] => B)(implicit ordering: Ordering[B]) =
+    Future.sequence(docIds.map(id => getLastContribution(id).map(contribution => (id, contribution)))).map { idsAndContributions => 
+      val sorted = idsAndContributions.sortBy(t => field(t._2)).map(_._1).reverse
+      if (sortOrder == models.SortOrder.ASC)
+        sorted.drop(offset).take(limit)
+      else
+        sorted.dropRight(offset).takeRight(limit)
+    }    
+      
+  /** Sorts the given list of document IDs by the time of last modification **/
+  def sortDocsByLastModifiedAt(docIds: Seq[String], sortOrder: models.SortOrder, offset: Int, limit: Int) =
+    sortByField(docIds, sortOrder, offset, limit, { c => c.map(_.madeAt.getMillis) })
+    
+  /** Sorts the given list of document IDs by the last modifying user **/
+  def sortDocsByLastModifiedBy(docIds: Seq[String], sortOrder: models.SortOrder, offset: Int, limit: Int) =
+    sortByField(docIds, sortOrder, offset, limit, { c => c.map(_.madeBy) })
+  
   /** Retrieves a contribution by its ElasticSearch ID **/
   def findById(id: String): Future[Option[(Contribution, String)]] =
     es.client execute {
