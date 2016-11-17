@@ -36,7 +36,7 @@ trait GeoJSONSerializer extends BaseSerializer {
         place.representativeGeometry.map { geometry => 
           GeoJSONFeature(
             geometry,
-            place.titles,
+            place.titles.distinct,
             // Keep only records explicitly referenced in the annotations
             place.isConflationOf.filter(g => placeURIs.contains(g.uri)),
             annotationsOnThisPlace
