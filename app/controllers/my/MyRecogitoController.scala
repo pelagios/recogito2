@@ -55,47 +55,78 @@ class MyRecogitoController @Inject() (
     }}
   }
   
-  private def sortByIndexProperty(username: String, sortBy: String, sortOrder: SortOrder) = {
-    documents.listAllIdsByOwner(username).map { allIds =>
-      // annotations.getDocumentsSortedByAnnotations
-    }
+  private def fetchIndexedProperties(docIds: Seq[String]) = {
+    val fLastEdits = Future.sequence(docIds.map(id => contributions.getLastContribution(id).map((id, _))))
+    val fAnnotationsPerDoc = Future.sequence(docIds.map(id => annotations.countByDocId(id).map((id, _))))
       
-    // TODO step 2: restricting to these IDs, query the index for the first N docs, sorted by the sortBy field
+    for {
+      lastEdits <- fLastEdits
+      annotationsPerDoc <- fAnnotationsPerDoc
+    } yield (lastEdits.toMap, annotationsPerDoc.toMap)    
+  }
+  
+  private def sortByIndexProperty(username: String, sortBy: String, sortOrder: SortOrder, offset: Int) = {
+    val startTime = System.currentTimeMillis()
+    
+    val docOrdering = documents.listAllIdsByOwner(username).flatMap { docIds =>
+      if (sortBy == "annotations")
+        annotations.sortDocsByAnnotationCount(docIds, sortOrder, offset, DOCUMENTS_PER_PAGE).map((_, docIds.size))
+      else
+        // TODO implement last-edit sorting
+        Future.successful((docIds, docIds.size))
+    }
+    
+    docOrdering.flatMap { case (docIds, totalCount) =>
+      val fDocuments = documents.findByIds(docIds)
+      val fIndexedProperties = fetchIndexedProperties(docIds)
+      
+      val f = for {
+        documents <- fDocuments
+        indexProps <- fIndexedProperties
+      } yield (documents, indexProps._1, indexProps._2)
+      
+      f.map { case (documents, lastEdit, annotations) =>
+        val sortedDocuments = docIds.map(id => documents.find(_.getId == id).get)
+        val docPage = Page(System.currentTimeMillis - startTime, totalCount, offset, DOCUMENTS_PER_PAGE, sortedDocuments)
+        (docPage, lastEdit, annotations)
+      }
+    }    
+  }
+  
+  private def sortByDBProperty(username: String, sortBy: Option[String], sortOrder: Option[SortOrder], offset: Int) = {
+    // Fetch properties located in the DB
+    val fMyDocuments = documents.findByOwner(username, false, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
+    
+    // Fetch properties located in the index
+    fMyDocuments.flatMap { myDocuments =>
+      fetchIndexedProperties(myDocuments.items.map(_.getId))
+        .map { case (lastEdit, annotations) => (myDocuments, lastEdit, annotations) }        
+    }    
   }
 
   private def renderMyDocuments(user: UserRecord, usedSpace: Long, offset: Int, sortBy: Option[String], sortOrder: Option[SortOrder])(implicit request: RequestHeader) = {
-    
-    // Sort via index?
-    val sortByIndexedProp = sortBy.map(fieldname => INDEX_SORT_PROPERTIES.contains(fieldname.toLowerCase)).getOrElse(false)
-    
-    // Fetch properties located in the DB
-    val fMyDocuments = documents.findByOwner(user.getUsername, false, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
     val fSharedCount = documents.countBySharedWith(user.getUsername)
-    val fDBProps = for {
-      myDocuments <- fMyDocuments
+
+    val sortByIndexedProp = sortBy.map(fieldname => INDEX_SORT_PROPERTIES.contains(fieldname.toLowerCase)).getOrElse(false)
+    val fDocsAndProperties = if (sortByIndexedProp)
+        sortByIndexProperty(user.getUsername, sortBy.get, sortOrder.getOrElse(SortOrder.ASC), offset)
+      else
+        sortByDBProperty(user.getUsername, sortBy, sortOrder, offset)
+        
+    val f = for {
       sharedCount <- fSharedCount
-    } yield (myDocuments, sharedCount)
+      (documents, lastEdits, annotationCounts) <- fDocsAndProperties
+    } yield (sharedCount, documents, lastEdits, annotationCounts)
     
-    // Fetch properties located in the index
-    val fAllProps = fDBProps.flatMap { case (myDocuments, sharedCount) =>
-      val docIds = myDocuments.items.map(_.getId)
-      val fLastEdits = Future.sequence(docIds.map(id => contributions.getLastContribution(id).map((id, _))))
-      val fAnnotationsPerDoc = Future.sequence(docIds.map(id => annotations.countByDocId(id).map((id, _))))
-      
-      for {
-        lastEdits <- fLastEdits
-        annotationsPerDoc <- fAnnotationsPerDoc
-      } yield (myDocuments, sharedCount, lastEdits.toMap, annotationsPerDoc.toMap)
-    }
-    
-    fAllProps.map { case (myDocuments, sharedCount, lastEdits, annotationsPerDoc) =>
-      val tableRow = myDocuments.map { doc =>
+
+    f.map { case (sharedCount, myDocuments, lastEdits, annotationCounts) =>
+      val page = myDocuments.map { doc =>
         val lastEdit = lastEdits.find(_._1 == doc.getId).flatMap(_._2)
-        val annotations = annotationsPerDoc.find(_._1 == doc.getId).map(_._2).getOrElse(0l)
+        val annotations = annotationCounts.find(_._1 == doc.getId).map(_._2).getOrElse(0l)
         (doc, lastEdit, annotations)
       }
       
-      Ok(views.html.my.my_private(user, usedSpace, tableRow, sharedCount, sortBy, sortOrder))
+      Ok(views.html.my.my_private(user, usedSpace, page, sharedCount, sortBy, sortOrder))
     }
   }
 

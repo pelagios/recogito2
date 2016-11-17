@@ -6,6 +6,8 @@ import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
 import javax.inject.{ Inject, Singleton }
 import models.geotag.ESGeoTagStore
+import org.elasticsearch.search.aggregations.bucket.terms.Terms
+import org.elasticsearch.search.aggregations.bucket.nested.Nested
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
@@ -238,6 +240,51 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         Future.successful(false)
       }
     }
+  }
+  
+  /** Sorts the given list of document IDs by the number of annotations on the documents **/
+  def sortDocsByAnnotationCount(docIds: Seq[String], sortOrder: models.SortOrder, offset: Int, limit: Int) = {
+    
+    import scala.collection.JavaConverters._
+    
+    val numberOfBuckets = 
+      if (sortOrder == models.SortOrder.ASC)
+        offset + limit
+      else
+        docIds.size
+        
+    es.client execute {
+      search in ES.RECOGITO / ES.ANNOTATION query {
+        nestedQuery("annotates").query {
+          bool {
+            should {
+              docIds.map(id => termQuery("annotates.document_id" -> id))
+            }
+          }
+        }
+      } aggs {
+        aggregation nested("by_document") path "annotates" aggs (
+          aggregation terms "document_id" field "annotates.document_id"
+        ) 
+      } size numberOfBuckets limit 0
+    } map { response =>
+      val byDocument = response.getAggregations.get("by_document").asInstanceOf[Nested]
+        .getAggregations.get("document_id").asInstanceOf[Terms]
+      
+      val annotatedDocs = byDocument.getBuckets.asScala.map(_.getKey).toSeq
+      if (annotatedDocs.size >= limit) {
+        annotatedDocs.take(limit)
+      } else { 
+         val unannotatedDocs = (docIds diff annotatedDocs)
+         val docs = 
+           if (sortOrder == models.SortOrder.ASC)
+             (annotatedDocs ++ unannotatedDocs)
+           else
+             (annotatedDocs ++ unannotatedDocs).reverse
+           
+         docs.drop(offset).take(limit)
+      }
+    } 
   }
 
 }

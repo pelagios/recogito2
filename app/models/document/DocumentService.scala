@@ -175,6 +175,11 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     sql.batch(updates:_*).execute()
   }
   
+  /** Batch-retrieves the document records with the given IDs **/
+  def findByIds(docIds: Seq[String]) = db.query { sql => 
+    sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds)).fetchArray().toSeq
+  }
+  
   /** Retrieves a document record by its ID, along with access permissions for the given user **/
   def getDocumentRecord(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
     loggedInUser match {
