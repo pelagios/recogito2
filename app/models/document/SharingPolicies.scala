@@ -1,5 +1,6 @@
 package models.document
 
+import collection.JavaConversions._
 import java.sql.Timestamp
 import java.util.Date
 import models.{ Page, SortOrder }
@@ -61,6 +62,11 @@ trait SharingPolicies { self: DocumentService =>
   /** Returns the number of documents shared with a given user **/
   def countBySharedWith(sharedWith: String) = db.query { sql =>
     sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
+  }
+  
+  /** Convenience method to list all document IDs shared with the given user **/
+  def listAllIdsSharedWith(username: String) = db.query { sql => 
+    sql.select(SHARING_POLICY.DOCUMENT_ID).from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(username)).fetch(0, classOf[String]).toSeq
   }
   
   /** Lists the documents shared with a given user (paged response **/

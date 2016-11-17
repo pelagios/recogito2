@@ -180,6 +180,18 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds)).fetchArray().toSeq
   }
   
+  /** Batch-retrieves the document records with the given ID, plus the sharing policy with the given user **/
+  def findByIdsWithSharingPolicy(docIds: Seq[String], sharedWith: String) = db.query { sql =>
+    val results = sql.selectFrom(SHARING_POLICY
+         .join(DOCUMENT)
+         .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
+       .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
+       .and(DOCUMENT.ID.in(docIds))
+       .fetchArray().toSeq
+    
+    results.map(r => (r.into(classOf[DocumentRecord]), r.into(classOf[SharingPolicyRecord])))
+  }
+  
   /** Retrieves a document record by its ID, along with access permissions for the given user **/
   def getDocumentRecord(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
     loggedInUser match {

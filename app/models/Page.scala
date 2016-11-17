@@ -10,10 +10,14 @@ case class Page[A](took: Long, total: Long, offset: Int, limit: Long, items: Seq
   /** Helper to perform a map to the items in the page **/
   def map[B](f: (A) => B): Page[B] =
     Page(took, total, offset, limit, items.map(f))
-   
+
+  def zip[B](s: Seq[B]) =
+    Page(took, total, offset, limit, items.zip(s))
+
   /** Helper to perform a map, while updating the 'took' value at the same time **/
   def map[B](f: (A) => B, changedTook: Long): Page[B] =
     Page(changedTook, total, offset, limit, items.map(f))
+    
 
 }
 

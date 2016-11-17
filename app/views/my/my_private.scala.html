@@ -1,13 +1,13 @@
 @(
   user: models.generated.tables.records.UserRecord,
   usedDiskspace: Long,
-  documents: models.Page[(models.generated.tables.records.DocumentRecord, Option[models.contribution.Contribution], Long)],
+  rows: models.Page[(models.generated.tables.records.DocumentRecord, Option[models.contribution.Contribution], Long)],
   sharedWithMeCount: Int,
   sortBy: Option[String],
   sortOrder: Option[models.SortOrder]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
-@_layout(user, usedDiskspace, documents.total, sharedWithMeCount, "my") {
+@_layout(user, usedDiskspace, rows.total, sharedWithMeCount, "my") {
   <table class="document-list">
     <thead>
       <tr>
@@ -26,24 +26,24 @@
       </tr>
     </thead>
     <tbody>
-      @for(row <- documents.items) {
-        <tr class="document" data-id="@row._1.getId">
+      @for((doc, lastEdit, annotationCount) <- rows.items) {
+        <tr class="document" data-id="@doc.getId">
           <td></td> <!-- content type icon -->
-          <td>@row._1.getAuthor</td>
-          <td>@row._1.getTitle</td>
-          <td class="centered">@row._1.getLanguage</td>
-          <td>@row._1.getDateFreeform</td>
-          <td><time class="timeago" datetime="@row._1.getUploadedAt"></time></td>
-          <td><time class="timeago" datetime="@row._2.map(_.madeAt)"></time></td>
-          <td>@row._2.map(_.madeBy)</td>
-          <td class="centered">@row._3</td>
-          <td class="centered">@if(row._1.getIsPublic){<span class="icon">&#xf00c;</span>}</td>
+          <td>@doc.getAuthor</td>
+          <td>@doc.getTitle</td>
+          <td class="centered">@doc.getLanguage</td>
+          <td>@doc.getDateFreeform</td>
+          <td><time class="timeago" datetime="@doc.getUploadedAt"></time></td>
+          <td><time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time></td>
+          <td>@lastEdit.map(_.madeBy)</td>
+          <td class="centered">@annotationCount</td>
+          <td class="centered">@if(doc.getIsPublic){<span class="icon">&#xf00c;</span>}</td>
         </tr>
       }
     </tbody>
   </table>
 
-  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, None, None, None, None).url, documents)
+  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, None, None, None, None).url, rows)
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView,

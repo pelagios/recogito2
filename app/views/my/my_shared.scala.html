@@ -2,7 +2,7 @@
   user: models.generated.tables.records.UserRecord,
   usedDiskspace: Long,
   myDocCount: Int,
-  sharedDocuments: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord)],
+  rows: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord, Option[models.contribution.Contribution], Long)],
   sortBy: Option[String],
   sortOrder: Option[models.SortOrder]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
@@ -17,7 +17,7 @@
   }}}
 }
 
-@_layout(user, usedDiskspace, myDocCount, sharedDocuments.total, "shared") {
+@_layout(user, usedDiskspace, myDocCount, rows.total, "shared") {
   <table class="document-list">
     <thead>
       <tr>
@@ -29,35 +29,35 @@
           "date_freeform" -> "Date",
           "owner" -> "Owner",
           "shared_by" -> "Shared By",
-          "access_level" -> "Permission Level",
-          "edit-at" -> "Last Edit",
-          "filesize" -> "File Size",
+          "access_level" -> "Permission",
+          "last_modified_at" -> "Last edit at",
+          "last_modified_by" -> "Last edit by",
           "annotations" -> "Annotations",
           "is_public" -> "Public"
         ), sortBy, sortOrder)
       </tr>
     </thead>
     <tbody>
-      @for((document, sharingPolicy) <- sharedDocuments.items) {
-        <tr class="document" data-id="@document.getId">
+      @for((doc, sharingPolicy, lastEdit, annotationCount) <- rows.items) {
+        <tr class="document" data-id="@doc.getId">
           <td></td> <!-- content type icon -->
-          <td>@document.getAuthor</td>
-          <td>@document.getTitle</td>
-          <td class="centered">@document.getLanguage</td>
-          <td>@document.getDateFreeform</td>
-          <td>@document.getOwner</td>
+          <td>@doc.getAuthor</td>
+          <td>@doc.getTitle</td>
+          <td class="centered">@doc.getLanguage</td>
+          <td>@doc.getDateFreeform</td>
+          <td>@doc.getOwner</td>
           <td>@sharingPolicy.getSharedBy</td>
           <td class="centered">@accessLevel(sharingPolicy.getAccessLevel)</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td class="centered">@if(document.getIsPublic){<span class="icon">&#xf00c;</span>}</td>
+          <td><time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time></td>
+          <td>@lastEdit.map(_.madeBy)</td>
+          <td class="centered">@annotationCount</td>
+          <td class="centered">@if(doc.getIsPublic){<span class="icon">&#xf00c;</span>}</td>
         </tr>
       }
     </tbody>
   </table>
 
-  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("shared"), None, None, None).url, sharedDocuments)
+  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("shared"), None, None, None).url, rows)
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView
