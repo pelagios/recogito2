@@ -87,7 +87,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       if (sortOrder == models.SortOrder.ASC)
         sorted.drop(offset).take(limit)
       else
-        sorted.dropRight(offset).takeRight(limit)
+        sorted.dropRight(offset).takeRight(limit).reverse
     }    
       
   /** Sorts the given list of document IDs by the time of last modification **/
