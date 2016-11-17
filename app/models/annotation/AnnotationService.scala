@@ -271,19 +271,15 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       val byDocument = response.getAggregations.get("by_document").asInstanceOf[Nested]
         .getAggregations.get("document_id").asInstanceOf[Terms]
       
-      val annotatedDocs = byDocument.getBuckets.asScala.map(_.getKey).toSeq
-      if (annotatedDocs.size >= limit) {
-        annotatedDocs.take(limit)
-      } else { 
-         val unannotatedDocs = (docIds diff annotatedDocs)
-         val docs = 
-           if (sortOrder == models.SortOrder.ASC)
-             (annotatedDocs ++ unannotatedDocs)
-           else
-             (annotatedDocs ++ unannotatedDocs).reverse
-           
-         docs.drop(offset).take(limit)
-      }
+      val annotatedDocs = byDocument.getBuckets.asScala.map(_.getKey).toSeq   
+      val unannotatedDocs = (docIds diff annotatedDocs)
+      val docs = 
+        if (sortOrder == models.SortOrder.ASC)
+          (annotatedDocs ++ unannotatedDocs)
+        else
+          (annotatedDocs ++ unannotatedDocs).reverse
+     
+      docs.drop(offset).take(limit)
     } 
   }
 
