@@ -80,7 +80,10 @@ object GeoJSONFeature extends HasGeometry {
   )(f => (
       "Feature",
       f.geometry,
-      Json.obj("titles" -> f.titles.mkString(", ")), // Empty properties object (for now)
+      Json.obj(
+        "titles" -> f.titles.mkString(", "),
+        "annotations" -> f.annotations.size
+      ),
       f.gazetteerRecords.map(_.uri),
       f.gazetteerRecords.map(_.title),
       f.gazetteerRecords.flatMap(_.placeTypes),
