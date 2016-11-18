@@ -3,7 +3,10 @@ require.config({
   fileExclusionRegExp: /^lib$/
 });
 
-require(['common/ui/formatting'], function(Formatting) {
+require([
+  'common/ui/formatting',
+  'common/utils/contributionUtils'
+], function(Formatting, ContributionUtils) {
 
   var REFRESH_INTERVAL_MS = 1000;
 
@@ -15,6 +18,8 @@ require(['common/ui/formatting'], function(Formatting) {
         registeredUsers = jQuery('.registered-users .number'),
 
         topContributors = jQuery('.top-contributors table'),
+
+        rightNow = jQuery('.right-now ul'),
 
         refreshHighscores = function(scores) {
 
@@ -51,12 +56,18 @@ require(['common/ui/formatting'], function(Formatting) {
               };
 
           jsRoutes.controllers.api.StatsAPIController.getDashboardStats().ajax().done(function(stats) {
-            fillNumber(totalEdits, stats.contributions.total_contributions);
+            fillNumber(totalEdits, stats.contribution_stats.total_contributions);
             fillNumber(totalAnnotations, stats.total_annotations);
             fillNumber(totalVisits, stats.total_visits);
             fillNumber(registeredUsers, stats.total_users);
 
-            refreshHighscores(stats.contributions.by_user);
+            // TODO refactor into separate function + optimize. We don't need to clear list every time
+            rightNow.empty();
+            jQuery.each(stats.recent_contributions, function(idx, contribution) {
+              rightNow.append('<li>' + ContributionUtils.format(contribution) + '</li>');
+            });
+
+            refreshHighscores(stats.contribution_stats.by_user);
           });
         },
 

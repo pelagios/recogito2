@@ -63,6 +63,15 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         }
       }
     }
+    
+  def getMostRecent(n: Int): Future[Seq[Contribution]] =
+    es.client execute {
+      search in ES.RECOGITO / ES.CONTRIBUTION sort (
+        field sort "made_at" order SortOrder.DESC
+      ) limit n
+    } map { response =>
+      response.as[(Contribution, String)].toSeq.map(_._1)
+    }
 
   /** Returns the contribution history on a given document, as a paged result **/
   def getHistory(documentId: String, offset: Int = 0, limit: Int = 20): Future[Page[(Contribution, String)]] =

@@ -29,22 +29,25 @@ class StatsAPIController @Inject() (
 
   // TODO does this mix concerns too much?
   def getDashboardStats() = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+    val fRecentContributions = contributions.getMostRecent(20)
     val fContributionStats = contributions.getGlobalStats()
     val fTotalAnnotations = annotations.countTotal()
     val fTotalVisits = visits.countTotal()
     val fTotalUsers = users.countUsers()
 
     val f = for {
+      recent <- fRecentContributions
       stats <- fContributionStats
       annotationCount <- fTotalAnnotations
       visitCount <- fTotalVisits
       userCount <- fTotalUsers
-    } yield (stats, annotationCount, visitCount, userCount)
+    } yield (recent, stats, annotationCount, visitCount, userCount)
 
-    f.map { case (stats, annotationCount, visitCount, userCount) =>
+    f.map { case (recent, stats, annotationCount, visitCount, userCount) =>
       val response =
         Json.obj(
-          "contributions" -> stats,
+          "recent_contributions" -> recent,
+          "contribution_stats" -> stats,
           "total_annotations" -> annotationCount,
           "total_visits" -> visitCount,
           "total_users" -> userCount)

@@ -52,6 +52,7 @@
 
       <div class="cell w7 h3">
         <div class="metric right-now">
+          <ul></ul>
           <span class="caption">Recogito Right Now</span>
         </div>
       </div>
@@ -66,7 +67,8 @@
     </div> <!-- .content -->
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.api.routes.javascript.StatsAPIController.getDashboardStats
+      controllers.api.routes.javascript.StatsAPIController.getDashboardStats,
+      controllers.document.annotation.routes.javascript.AnnotationController.resolveAnnotationView
     )
   </body>
 </html>
