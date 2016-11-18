@@ -5,6 +5,7 @@
     <title>Recogito | Admin Dashboard</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/admin/index.css")"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("jquery.timeago.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("numeral.min.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/admin/dashboard.js")"></script>
   </head>
@@ -52,7 +53,7 @@
 
       <div class="cell w7 h3">
         <div class="metric right-now">
-          <ul></ul>
+          <div class="container"><ul></ul></div>
           <span class="caption">Recogito Right Now</span>
         </div>
       </div>

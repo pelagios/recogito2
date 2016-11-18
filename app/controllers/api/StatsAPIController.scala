@@ -29,7 +29,7 @@ class StatsAPIController @Inject() (
 
   // TODO does this mix concerns too much?
   def getDashboardStats() = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    val fRecentContributions = contributions.getMostRecent(20)
+    val fRecentContributions = contributions.getMostRecent(10)
     val fContributionStats = contributions.getGlobalStats()
     val fTotalAnnotations = annotations.countTotal()
     val fTotalVisits = visits.countTotal()

@@ -2,6 +2,7 @@ define([], function() {
 
   return {
 
+    // TODO escape angle brackets
     format : function(contribution) {
       var action = contribution.action,
           user = '<a href="/' + contribution.made_by + '">' + contribution.made_by + '</a> ',

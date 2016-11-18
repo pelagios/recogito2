@@ -64,7 +64,11 @@ require([
             // TODO refactor into separate function + optimize. We don't need to clear list every time
             rightNow.empty();
             jQuery.each(stats.recent_contributions, function(idx, contribution) {
-              rightNow.append('<li>' + ContributionUtils.format(contribution) + '</li>');
+              rightNow.append(
+                '<li>' +
+                  ContributionUtils.format(contribution) +
+                  '<span class="made-at">' + Formatting.timeSince(contribution.made_at) + '</span>' +
+                '</li>');
             });
 
             refreshHighscores(stats.contribution_stats.by_user);
