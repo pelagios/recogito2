@@ -20,17 +20,17 @@
 @_layout(user, usedDiskspace, myDocCount, rows.total, "shared") {
   <table class="document-list">
     <colgroup>
-      <col style="width:11%"> <!-- author -->
-      <col style="width:18%"> <!-- title -->
-      <col style="width:8%">  <!-- language -->
-      <col style="width:8%">  <!-- date -->
-      <col style="width:7%">  <!-- owner -->
-      <col style="width:8.5%">  <!-- shared by -->
+      <col style="width:11%">  <!-- author -->
+      <col style="width:18%">  <!-- title -->
+      <col style="width:8%">   <!-- language -->
+      <col style="width:8%">   <!-- date -->
+      <col style="width:7%">   <!-- owner -->
+      <col style="width:8.5%"> <!-- shared by -->
       <col style="width:6.5%">  <!-- access -->
-      <col style="width:9%">  <!-- last edit at -->
-      <col style="width:7%">  <!-- last edit by -->
-      <col style="width:9.5%">  <!-- annotations -->
-      <col style="width:7.5%">  <!-- public -->
+      <col style="width:9%">   <!-- last edit at -->
+      <col style="width:7%">   <!-- last edit by -->
+      <col style="width:10%">  <!-- annotations -->
+      <col style="width:7%">   <!-- public -->
     </colgroup>
     <thead>
       <tr>
@@ -50,26 +50,28 @@
       </tr>
     </thead>
     <tbody>
-      @for((doc, sharingPolicy, lastEdit, annotationCount) <- rows.items) {
-        <tr class="document" data-id="@doc.getId">
-          <td>@doc.getAuthor</td>
-          <td>@doc.getTitle</td>
-          <td class="centered">@doc.getLanguage</td>
-          <td>@doc.getDateFreeform</td>
-          <td>@doc.getOwner</td>
-          <td>@sharingPolicy.getSharedBy</td>
-          <td class="centered">@accessLevel(sharingPolicy.getAccessLevel)</td>
-          <td>
-            @lastEdit match {
-              case Some(edit) if (edit.madeAt.plusMinutes(11) isAfter org.joda.time.DateTime.now) => {
-                <span title="Document may still be in use by @edit.madeBy" class="in-use"><span class="icon">&#xf071;</span> <time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time></span> }
-              case _ => { <time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time> }
-            }
-          </td>
-          <td>@lastEdit.map(_.madeBy)</td>
-          <td class="centered">@annotationCount</td>
-          <td class="centered">@if(doc.getIsPublic){<span class="icon">&#xf00c;</span>}</td>
-        </tr>
+      @defining(java.text.NumberFormat.getIntegerInstance()) { decimalFormat =>
+        @for((doc, sharingPolicy, lastEdit, annotationCount) <- rows.items) {
+          <tr class="document" data-id="@doc.getId">
+            <td>@doc.getAuthor</td>
+            <td>@doc.getTitle</td>
+            <td class="centered">@doc.getLanguage</td>
+            <td>@doc.getDateFreeform</td>
+            <td>@doc.getOwner</td>
+            <td>@sharingPolicy.getSharedBy</td>
+            <td class="centered">@accessLevel(sharingPolicy.getAccessLevel)</td>
+            <td>
+              @lastEdit match {
+                case Some(edit) if (edit.madeAt.plusMinutes(11) isAfter org.joda.time.DateTime.now) => {
+                  <span title="Document may still be in use by @edit.madeBy" class="in-use"><span class="icon">&#xf071;</span> <time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time></span> }
+                case _ => { <time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time> }
+              }
+            </td>
+            <td>@lastEdit.map(_.madeBy)</td>
+            <td class="centered">@decimalFormat.format(annotationCount)</td>
+            <td class="centered">@if(doc.getIsPublic){<span class="icon">&#xf00c;</span>}</td>
+          </tr>
+        }
       }
     </tbody>
   </table>
