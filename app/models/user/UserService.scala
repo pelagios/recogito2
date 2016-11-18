@@ -29,7 +29,7 @@ class UserService @Inject() (
     implicit val db: DB
   ) extends BaseService with HasConfig with HasEncryption {
 
-  private val DEFAULT_QUOTA = 200 // TODO make configurable
+  private val DEFAULT_QUOTA = config.getInt("recogito.upload.quota").getOrElse(200) // The default default
 
   def countUsers() = db.query { sql =>
     sql.selectCount().from(USER).fetchOne(0, classOf[Int])
@@ -169,9 +169,6 @@ class UserService @Inject() (
   }
 
   def decryptEmail(email: String) = decrypt(email)
-
-  def getUsedDiskspaceKB(username: String) =
-    uploads.getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l)
 
   /** Utility function to create new random salt for password hashing **/
   private def randomSalt() = {

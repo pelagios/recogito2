@@ -35,7 +35,7 @@ auth.cookie.secure=false
 # Uploads location
 recogito.upload.dir = uploads
 
-# Max. disk space per user in MB
+# Default max. disk space per user in MB
 recogito.upload.quota = 200
 
 # E-Mail encryption key (optional)

@@ -36,7 +36,7 @@
       </tr>
     </thead>
     <tbody>
-      @defining((new java.text.SimpleDateFormat("dd MMM yyyy"), java.text.NumberFormat.getIntegerInstance())) { case (dateFormat, decimalFormat) =>
+      @defining((new java.text.SimpleDateFormat("d MMM yyyy"), java.text.NumberFormat.getIntegerInstance())) { case (dateFormat, decimalFormat) =>
         @for((doc, lastEdit, annotationCount) <- rows.items) {
           <tr class="document" data-id="@doc.getId">
             <td>@doc.getAuthor</td>

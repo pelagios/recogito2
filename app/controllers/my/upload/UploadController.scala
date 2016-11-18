@@ -8,10 +8,9 @@ import controllers.my.upload.tiling.TilingService
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
-import models.ContentType
-import models.ContentIdentificationFailures._
+import models.{ ContentType, UnsupportedContentTypeException }
 import models.document.DocumentService
-import models.upload.UploadService
+import models.upload.{ UploadService, QuotaExceededException }
 import models.generated.tables.records.UploadRecord
 import models.user.UserService
 import models.user.Roles._
@@ -58,7 +57,6 @@ class UploadController @Inject() (
 
   implicit def uploadRecordToNewDocumentData(r: UploadRecord) =
     NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getLanguage, r.getSource, r.getEdition)
-
 
   def showStep1(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     uploads.findPendingUpload(loggedIn.user.getUsername).map(_ match {
@@ -107,13 +105,16 @@ class UploadController @Inject() (
 
     def storeFilepart(pendingUpload: UploadRecord) = request.body.asMultipartFormData.map(tempfile => {
       tempfile.file("file").map(f => {
-        uploads.insertUploadFilepart(pendingUpload.getId, username, f).map(_ match {
+        uploads.insertUploadFilepart(pendingUpload.getId, loggedIn.user, f).map(_ match {
           case Right(filepart) =>
             // Upload was properly identified and stored
             Ok(Json.toJson(UploadSuccess(filepart.getContentType)))
 
-          case Left(UnsupportedContentType) =>
+          case Left(e: UnsupportedContentTypeException) =>
             BadRequest("Unknown or unsupported file format")
+            
+          case Left(e: QuotaExceededException) =>
+            BadRequest("Not enough space - you only have " + e.remainingSpaceKb / 1024 + " MB remaining")
 
           case Left(otherFailure) =>
             // For future use

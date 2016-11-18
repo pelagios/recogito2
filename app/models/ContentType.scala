@@ -26,9 +26,9 @@ sealed trait ContentType {
   
 }
 
-object ContentType {
+class UnsupportedContentTypeException extends RuntimeException
 
-  import ContentIdentificationFailures._
+object ContentType {
   
   case object TEXT_PLAIN    extends ContentType { val media = "TEXT"  ; val subtype = "PLAIN" }
   case object TEXT_TEIXML   extends ContentType { val media = "TEXT"  ; val subtype = "TEIXML" }
@@ -57,27 +57,19 @@ object ContentType {
   }
 
   /** TODO analyze based on the actual file, not just the extension! **/
-  def fromFile(file: File): Either[ContentIdentificationFailure, ContentType] = {
+  def fromFile(file: File): Either[Exception, ContentType] = {
     val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
     extension match {
       case "txt" =>
         Right(TEXT_PLAIN)
 
       case "jpg" | "tif" | "png" =>
-        if (VIPS_INSTALLED) Right(IMAGE_UPLOAD) else Left(UnsupportedContentType)
+        if (VIPS_INSTALLED) Right(IMAGE_UPLOAD) else Left(new UnsupportedContentTypeException)
 
       case _ =>
-        Left(UnsupportedContentType)
+        Left(new UnsupportedContentTypeException)
     }
 
   }
   
-}
-
-object ContentIdentificationFailures {
-  
-  sealed trait ContentIdentificationFailure
-  
-  case object UnsupportedContentType extends ContentIdentificationFailure
-    
 }

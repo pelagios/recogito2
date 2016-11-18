@@ -7,10 +7,9 @@ import java.sql.Timestamp
 import java.util.{ Date, UUID }
 import javax.inject.Inject
 import models.ContentType
-import models.ContentIdentificationFailures._
 import models.document.DocumentService
 import models.generated.Tables._
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord }
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord, UserRecord }
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
@@ -18,6 +17,8 @@ import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import storage.{ DB, Uploads }
 import models.generated.tables.records.UploadFilepartRecord
+
+class QuotaExceededException(val remainingSpaceKb: Long, val filesizeKb: Double) extends RuntimeException
 
 class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) {
 
@@ -67,24 +68,33 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
   }
 
   /** Inserts a new locally stored filepart - metadata goes to the DB, content to the pending-uploads dir **/
-  def insertUploadFilepart(uploadId: Int, owner: String, filepart: FilePart[TemporaryFile]):
-    Future[Either[ContentIdentificationFailure, UploadFilepartRecord]] = db.withTransaction { sql =>
-
-    val id = UUID.randomUUID
-    val title = filepart.filename
-    val extension = title.substring(title.lastIndexOf('.'))
-    val filesize = filepart.ref.file.length.toDouble / 1024
-    val file = new File(uploads.PENDING_UPLOADS_DIR, id.toString + extension)
-
-    ContentType.fromFile(file) match {
-      case Right(contentType) => {
-        filepart.ref.moveTo(file)
-        val filepartRecord = new UploadFilepartRecord(id, uploadId, owner, title, contentType.toString, file.getName, filesize)
-        sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
-        Right(filepartRecord)
+  def insertUploadFilepart(uploadId: Int, owner: UserRecord, filepart: FilePart[TemporaryFile]):
+    Future[Either[Exception, UploadFilepartRecord]] = db.withTransaction { sql =>
+     
+    val filesizeKb = filepart.ref.file.length.toDouble / 1024
+    
+    val usedDiskspaceKb = uploads.getUsedDiskspaceKB(owner.getUsername)
+    val remainingDiskspaceKb = owner.getQuotaMb * 1024 - usedDiskspaceKb
+    val isQuotaExceeded = remainingDiskspaceKb < filesizeKb
+    
+    if (isQuotaExceeded) {
+      Left(new QuotaExceededException(remainingDiskspaceKb, filesizeKb))
+    } else {
+      val id = UUID.randomUUID
+      val title = filepart.filename
+      val extension = title.substring(title.lastIndexOf('.'))
+      val file = new File(uploads.PENDING_UPLOADS_DIR, id.toString + extension)
+  
+      ContentType.fromFile(file) match {
+        case Right(contentType) => {
+          filepart.ref.moveTo(file)
+          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.getUsername, title, contentType.toString, file.getName, filesizeKb)
+          sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
+          Right(filepartRecord)
+        }
+  
+        case Left(e) => Left(e)
       }
-
-      case Left(identificationFailure) => Left(identificationFailure)
     }
   }
   

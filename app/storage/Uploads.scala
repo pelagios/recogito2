@@ -71,6 +71,10 @@ class Uploads @Inject() (config: Configuration) {
     }
   }
   
+  /** TODO make async **/
+  def getUsedDiskspaceKB(username: String) =
+    getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l) / 1024
+  
   def deleteUserDir(username: String)(implicit ctx: ExecutionContext): Future[Unit] = Future { 
     scala.concurrent.blocking {
       getUserDir(username).map(userdir => FileUtils.deleteDirectory(userdir))

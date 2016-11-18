@@ -29,10 +29,10 @@
 
           <div class="used-diskspace">
             <div class="meter">
-              <div class="bar" style="width:@{Math.max(1.5, 100 * usedDiskspace.toDouble / (user.getQuotaMb * 1024 * 1024)) }%"></div>
+              <div class="bar" style="width:@{Math.max(1.5, 100 * usedDiskspace.toDouble / (user.getQuotaMb * 1024)) }%"></div>
             </div>
             <span class="label">
-              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / (1024 * 1024)) } of @user.getQuotaMb MB Used
+              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / 1024) } of @user.getQuotaMb MB Used
             </span>
           </div>
 

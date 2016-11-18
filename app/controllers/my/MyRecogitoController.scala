@@ -12,12 +12,14 @@ import models.generated.tables.records.{ DocumentRecord, UserRecord }
 import play.api.Configuration
 import play.api.mvc.RequestHeader
 import scala.concurrent.{ ExecutionContext, Future }
+import storage.Uploads
 
 class MyRecogitoController @Inject() (
     val annotations: AnnotationService,
     val contributions: ContributionService,
     val documents: DocumentService,
     val users: UserService,
+    val uploads: Uploads,
     val config: Configuration,
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarAssets
@@ -164,7 +166,7 @@ class MyRecogitoController @Inject() (
 
     if (isProfileOwner) {
       val user = loggedIn.get.user
-      val usedSpace = users.getUsedDiskspaceKB(user.getUsername)
+      val usedSpace = uploads.getUsedDiskspaceKB(user.getUsername)
 
       tab match {
         case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace, offset, sortBy, sortOrder)
