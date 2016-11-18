@@ -1,121 +1,133 @@
 @import "../_pagination.less";
 
-.document-panel table.document-list {
+.document-panel {
   width:100%;
-  border-collapse:collapse;
+  min-width:1024px;
 
-  tr {
-    height:46px;
-    border-bottom:1px solid @lightgrey-border-darker;
-    .noselect();
-  }
-
-  td {
-    padding:0 10px;
-    color:@standard-type;
-    font-size:15px;
-    cursor:default;
-  }
-
-  td.centered {
-    text-align:center;
-  }
-
-  td:first-child {
-    padding-left:50px;
-  }
-
-  td:last-child {
-    padding-right:20px;
-  }
-
-  .icon {
-    font-size:14px;
-  }
-
-  thead {
+  table.document-list {
+    width:100%;
+    border-collapse:collapse;
 
     tr {
-      background-color:#fff;
+      height:46px;
+      border-bottom:1px solid @lightgrey-border-darker;
+      .noselect();
     }
 
     td {
-      cursor:pointer;
+      padding:0 10px;
+      color:@standard-type;
+      font-size:15px;
+      cursor:default;
+      max-width:0; // http://stackoverflow.com/questions/9789723/css-text-overflow-in-a-table-cell
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
-    td.sortable::after {
-      content:'\f0dc';
-      font-family:FontAwesome;
+    td.centered {
+      text-align:center;
+    }
+
+    td:first-child {
+      padding-left:50px;
+    }
+
+    td:last-child {
+      padding-right:20px;
+    }
+
+    .icon {
       font-size:14px;
-      color:@lightblue-type;
-      float:right;
-      padding-right:5px;
-      font-size:14px;
-      color:@lightblue-type;
     }
 
-    td.sorted {
-      background-color:@blueish-white-hi;
-    }
+    thead {
 
-    td.sortable.sorted.asc::after {
-      content:'\f0dd';
-    }
-
-    td.sortable.sorted.desc::after {
-      content:'\f0de';
-    }
-
-    td:hover {
-      background-color:darken(#fff, 2%);
-
-      .sort {
-        color:@standard-type;
+      tr {
+        background-color:#fff;
       }
-
-    }
-
-  }
-
-  tbody {
-
-    tr.selected {
-      background-color:@ocean;
 
       td {
-        color:#fff;
-      }
-
-      td.actions span {
-        visibility:visible;
-      }
-
-    }
-
-    .in-use {
-      color:@red-type;
-
-      .icon { padding-right: 3px; }
-
-    }
-
-    td.actions {
-      text-align:center;
-
-      span {
-        font-family:Tonicons;
-        font-size:26px;
-        line-height:30px;
-        visibility:hidden;
         cursor:pointer;
       }
 
+      td.sortable::after {
+        content:'\f0dc';
+        font-family:FontAwesome;
+        float:right;
+        font-size:12px;
+        line-height:26px;
+        color:lighten(@lightblue-type, 25%);
+      }
+
+      td.sorted {
+        background-color:@blueish-white-hi;
+      }
+
+      td.sortable.sorted::after, td.sortable:hover::after {
+        color:@lightblue-type;
+      }
+
+      td.sortable.sorted.asc::after {
+        content:'\f0dd';
+      }
+
+      td.sortable.sorted.desc::after {
+        content:'\f0de';
+      }
+
+      td:hover {
+        background-color:darken(#fff, 2%);
+
+        .sort {
+          color:@standard-type;
+        }
+
+      }
+
+    }
+
+    tbody {
+
+      tr.selected {
+        background-color:@ocean;
+
+        td {
+          color:#fff;
+        }
+
+        td.actions span {
+          visibility:visible;
+        }
+
+      }
+
+      .in-use {
+        color:@red-type;
+
+        .icon { padding-right: 3px; }
+
+      }
+
+      td.actions {
+        text-align:center;
+
+        span {
+          font-family:Tonicons;
+          font-size:26px;
+          line-height:30px;
+          visibility:hidden;
+          cursor:pointer;
+        }
+
+      }
+
     }
 
   }
 
-}
+  .document-list.public tbody tr * {
+    cursor:pointer;
+  }
 
-.document-list.public tbody tr * {
-  cursor:pointer;
 }

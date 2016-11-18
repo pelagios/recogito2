@@ -19,19 +19,31 @@
 
 @_layout(user, usedDiskspace, myDocCount, rows.total, "shared") {
   <table class="document-list">
+    <colgroup>
+      <col style="width:11%"> <!-- author -->
+      <col style="width:18%"> <!-- title -->
+      <col style="width:8%">  <!-- language -->
+      <col style="width:8%">  <!-- date -->
+      <col style="width:7%">  <!-- owner -->
+      <col style="width:8.5%">  <!-- shared by -->
+      <col style="width:6.5%">  <!-- access -->
+      <col style="width:9%">  <!-- last edit at -->
+      <col style="width:7%">  <!-- last edit by -->
+      <col style="width:9.5%">  <!-- annotations -->
+      <col style="width:7.5%">  <!-- public -->
+    </colgroup>
     <thead>
       <tr>
-        <td></td> <!-- content type icon -->
         @views.html.tableHeader(Seq(
           "author" -> "Author",
           "title" -> "Title",
           "language" -> "Language",
           "date_freeform" -> "Date",
           "owner" -> "Owner",
-          "shared_by" -> "Shared By",
-          "access_level" -> "Permission",
-          "last_modified_at" -> "Last edit at",
-          "last_modified_by" -> "Last edit by",
+          "shared_by" -> "Shared by",
+          "access_level" -> "Access",
+          "last_modified_at" -> "Last edit",
+          "last_modified_by" -> "By",
           "annotations" -> "Annotations",
           "is_public" -> "Public"
         ), sortBy, sortOrder)
@@ -40,7 +52,6 @@
     <tbody>
       @for((doc, sharingPolicy, lastEdit, annotationCount) <- rows.items) {
         <tr class="document" data-id="@doc.getId">
-          <td></td> <!-- content type icon -->
           <td>@doc.getAuthor</td>
           <td>@doc.getTitle</td>
           <td class="centered">@doc.getLanguage</td>

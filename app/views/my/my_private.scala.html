@@ -9,17 +9,27 @@
 
 @_layout(user, usedDiskspace, rows.total, sharedWithMeCount, "my") {
   <table class="document-list">
+    <colgroup>
+      <col style="width:14%">
+      <col style="width:19%">
+      <col style="width:9%">
+      <col style="width:8%">
+      <col style="width:9%">
+      <col style="width:13%">
+      <col style="width:10%">
+      <col style="width:10%">
+      <col style="width:8%">
+    </colgroup>
     <thead>
       <tr>
-        <td></td> <!-- content type icon -->
         @views.html.tableHeader(Seq(
           "author" -> "Author",
           "title" -> "Title",
           "language" -> "Language",
           "date_freeform" -> "Date",
           "uploaded_at" -> "Uploaded",
-          "last_modified_at" -> "Last edit at",
-          "last_modified_by" -> "Last edit by",
+          "last_modified_at" -> "Last edit",
+          "last_modified_by" -> "By",
           "annotations" -> "Annotations",
           "is_public" -> "Public"
         ), sortBy, sortOrder)
@@ -28,7 +38,6 @@
     <tbody>
       @for((doc, lastEdit, annotationCount) <- rows.items) {
         <tr class="document" data-id="@doc.getId">
-          <td></td> <!-- content type icon -->
           <td>@doc.getAuthor</td>
           <td>@doc.getTitle</td>
           <td class="centered">@doc.getLanguage</td>
