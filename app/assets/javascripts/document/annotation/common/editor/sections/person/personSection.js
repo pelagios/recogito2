@@ -1,7 +1,8 @@
 define([
-  'document/annotation/common/editor/sections/section',
-  'common/ui/formatting'
-], function(Section, Formatting) {
+  'common/ui/formatting',
+  'common/config',
+  'document/annotation/common/editor/sections/section'
+], function(Formatting, Config, Section) {
 
   var PersonSection = function(parent, personBody, personName) {
     var self = this,
@@ -14,8 +15,7 @@ define([
                   '<span class="at">' +
                     Formatting.timeSince(personBody.last_modified_at) +
                   '</span>' +
-                '</div>' +
-                '<button class="btn tiny delete icon">&#xf014;</button>'),
+                '</div>'),
 
               el = jQuery(
                 '<div class="section category person">' +
@@ -23,8 +23,13 @@ define([
                   '<div class="info"><span>Marked as a Person</span></div>' +
                 '</div>');
 
-          if (personBody.last_modified_by)
-            el.find('.info').append(lastModified);
+          if (personBody.last_modified_by) {
+            var infoEl = el.find('.info');
+            infoEl.append(lastModified);
+
+            if (Config.writeAccess)
+              infoEl.append('<button class="btn tiny delete icon">&#xf014;</button>');
+          }
 
           parent.append(el);
           return el;
