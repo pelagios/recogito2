@@ -59,6 +59,8 @@ object AnnotationBody extends Enumeration with HasDate {
   val PERSON = Value("PERSON")
 
   val PLACE = Value("PLACE")
+  
+  val EVENT = Value("EVENT")
 
   val QUOTE = Value("QUOTE")
 

@@ -61,6 +61,10 @@ object ItemType extends Enumeration {
   
   val PLACE_BODY = Value("PLACE_BODY")
   
+  val PERSON_BODY = Value("PERSON_BODY")
+  
+  val EVENT_BODY = Value("EVENT_BODY")
+  
   val TAG_BODY = Value("TAG_BODY")
 
   def fromBodyType(bodyType: AnnotationBody.Value) = bodyType match {
@@ -68,6 +72,10 @@ object ItemType extends Enumeration {
     case AnnotationBody.COMMENT => COMMENT_BODY
 
     case AnnotationBody.PLACE => PLACE_BODY
+
+    case AnnotationBody.PERSON => PERSON_BODY
+
+    case AnnotationBody.EVENT => EVENT_BODY
 
     case AnnotationBody.QUOTE => QUOTE_BODY
 

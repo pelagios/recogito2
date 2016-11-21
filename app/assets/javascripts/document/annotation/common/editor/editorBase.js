@@ -106,14 +106,14 @@ define([
   };
 
   /**
-   * Helper to retrieve the most recent toponym. Since the editor fields may
-   * contain info that is not yet stored in the annotation bodies, we need to
+   * Helper to retrieve the most recent context (quote or transcription). Since the editor
+   * fields may contain info that is not yet stored in the annotation bodies, we need to
    * obtain this from the editor directly.
    *
    * It is (sensibly) assumed that annotations will either have one QUOTE (text) or
    * multiple TRANSCRIPTION (image) bodies, never both.
    */
-  EditorBase.prototype.getMostRecentToponym = function() {
+  EditorBase.prototype.getMostRecentContext = function() {
     var quote = AnnotationUtils.getQuote(this.currentSelection.annotation);
     if (quote)
       return quote;

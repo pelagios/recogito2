@@ -121,17 +121,17 @@ define([
         /** Click on 'Place' button adds a new PLACE body **/
         onAddPlace = function() {
           self.sectionList.createNewSection({ type: 'PLACE', status: { value: 'UNVERIFIED' } },
-            self.getMostRecentToponym());
+            self.getMostRecentContext());
         },
 
         /** Click on 'Person' button adds a new PERSON body **/
         onAddPerson = function() {
-          // TODO implemenet
+          self.sectionList.createNewSection({ type: 'PERSON' }, self.getMostRecentContext());
         },
 
         /** Click on 'Event' button adds a new EVENT body **/
         onAddEvent = function() {
-          // TODO implemenet
+          self.sectionList.createNewSection({ type: 'EVENT' }, self.getMostRecentContext());
         },
 
         /** 'Cancel' clears the selection and closes the editor **/
@@ -186,7 +186,7 @@ define([
 
         /** User clicked 'change georesolution' - open the panel **/
         onChangeGeoresolution = function(section) {
-          georesolutionPanel.open(self.getMostRecentToponym(), section.body);
+          georesolutionPanel.open(self.getMostRecentContext(), section.body);
         },
 
         /** Georesolution was changed - forward changes to the section list **/

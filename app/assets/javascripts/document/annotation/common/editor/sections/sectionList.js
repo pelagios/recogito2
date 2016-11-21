@@ -1,5 +1,6 @@
 define([
   'document/annotation/common/editor/sections/comment/commentSection',
+  'document/annotation/common/editor/sections/person/personSection',
   'document/annotation/common/editor/sections/place/placeSection',
   'document/annotation/common/editor/sections/tag/tagSection',
   'document/annotation/common/editor/sections/transcription/transcriptionSection',
@@ -9,6 +10,7 @@ define([
   'common/hasEvents'
 ], function(
   CommentSection,
+  PersonSection,
   PlaceSection,
   TagSection,
   TranscriptionSection,
@@ -37,6 +39,7 @@ define([
         setAnnotation = function(annotation) {
           var transcriptionBodies = AnnotationUtils.getBodiesOfType(annotation, 'TRANSCRIPTION'),
               placeBodies = AnnotationUtils.getBodiesOfType(annotation, 'PLACE'),
+              personBodies = AnnotationUtils.getBodiesOfType(annotation, 'PERSON'),
               commentBodies = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT'),
               tagBodies = AnnotationUtils.getBodiesOfType(annotation, 'TAG');
 
@@ -51,6 +54,10 @@ define([
           jQuery.each(placeBodies, function(idx, placeBody) {
             // TODO what about toponym arg?
             initPlaceSection(placeBody);
+          });
+
+          jQuery.each(personBodies, function(idex, personBody) {
+            initPersonSection(personBody);
           });
 
           jQuery.each(commentBodies, function(idx, commentBody) {
@@ -139,6 +146,12 @@ define([
           sections.push(placeSection);
         },
 
+        initPersonSection = function(personBody) {
+          var personSection = new PersonSection(centerSectionEl, personBody);
+          handleDelete(personSection);
+          sections.push(personSection);
+        },
+
         initCommentSection = function(commentBody) {
           var commentSection = new CommentSection(centerSectionEl, commentBody);
           forwardEvent(commentSection, 'submit'); // Submit event needs to be handled by editor
@@ -155,9 +168,9 @@ define([
         createNewSection = function(body, quote) {
           if (body.type === 'PLACE') {
             initPlaceSection(body, quote);
+          } else if (body.type === 'PERSON') {
+            initPersonSection(body);
           }
-
-          // TODO implement additional body types
 
           queuedUpdates.push(function() {
             currentAnnotation.bodies.push(body);
