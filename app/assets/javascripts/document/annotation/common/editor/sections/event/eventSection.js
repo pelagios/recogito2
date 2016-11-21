@@ -22,8 +22,8 @@ define([
                 '<button class="btn tiny delete icon">&#xf014;</button>'),
 
               el = jQuery(
-                '<div class="section event">' +
-                  '<div class="event-icon">&#xf005;</div>' +
+                '<div class="section category event">' +
+                  '<div class="category-icon">&#xf005;</div>' +
                   '<div class="info"><span>Marked as an Event</span></div>' +
                 '</div>');
 

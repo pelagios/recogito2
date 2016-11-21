@@ -5,7 +5,7 @@ define([
 
   var PersonSection = function(parent, personBody, personName) {
     var self = this,
-    
+
         element = (function() {
           var lastModified = jQuery(
                 '<div class="last-modified">' +
@@ -18,8 +18,8 @@ define([
                 '<button class="btn tiny delete icon">&#xf014;</button>'),
 
               el = jQuery(
-                '<div class="section person">' +
-                  '<div class="head-icon">&#xe863;</div>' +
+                '<div class="section category person">' +
+                  '<div class="category-icon">&#xe863;</div>' +
                   '<div class="info"><span>Marked as a Person</span></div>' +
                 '</div>');
 

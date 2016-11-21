@@ -1,39 +1,17 @@
-.section.event {
-  position:relative;
+@event-signature-color:#ac3eab;
 
-  .event-icon {
-    position:absolute;
+.section.event {
+
+  .category-icon {
     font-family:FontAwesome;
-    top:0;
-    left:0;
-    bottom:0;
-    padding:20px 0;
-    width:110px;
-    text-align:center;
-    background-color:#f0ad4e;
-    font-size:45px;
-    line-height:45px;
-    color:#fff;
+    background-color:@event-signature-color;
   }
 
   .info {
-    position:relative;
-    height:90px;
-    margin-left:110px;
-    box-sizing:border-box;
-    padding:30px 0 12px 12px;
-    background-color:#fff;
-    color:darken(#f0ad4e, 10%);
-    font-size:17px;
-    font-weight:normal;
-    line-height:21px;
+    color:darken(@event-signature-color, 10%);
 
     button.delete {
-      background-color:#f0ad4e;
-      border:none;
-      position:absolute;
-      right:7px;
-      bottom:11px;
+      background-color:@event-signature-color;
     }
 
   }

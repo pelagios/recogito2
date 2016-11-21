@@ -37,7 +37,7 @@ define(function() {
       var t, i, len;
       for (i=0, len=annotation.bodies.length; i<len; i++) {
         t = annotation.bodies[i].type;
-        if (t === 'PLACE' || t === 'PERSON')
+        if (t === 'PLACE' || t === 'PERSON' || t === 'EVENT')
           return t;
       }
     },
