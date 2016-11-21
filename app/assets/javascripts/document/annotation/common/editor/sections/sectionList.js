@@ -1,5 +1,6 @@
 define([
   'document/annotation/common/editor/sections/comment/commentSection',
+  'document/annotation/common/editor/sections/event/eventSection',
   'document/annotation/common/editor/sections/person/personSection',
   'document/annotation/common/editor/sections/place/placeSection',
   'document/annotation/common/editor/sections/tag/tagSection',
@@ -10,6 +11,7 @@ define([
   'common/hasEvents'
 ], function(
   CommentSection,
+  EventSection,
   PersonSection,
   PlaceSection,
   TagSection,
@@ -40,6 +42,7 @@ define([
           var transcriptionBodies = AnnotationUtils.getBodiesOfType(annotation, 'TRANSCRIPTION'),
               placeBodies = AnnotationUtils.getBodiesOfType(annotation, 'PLACE'),
               personBodies = AnnotationUtils.getBodiesOfType(annotation, 'PERSON'),
+              eventBodies = AnnotationUtils.getBodiesOfType(annotation, 'EVENT'),
               commentBodies = AnnotationUtils.getBodiesOfType(annotation, 'COMMENT'),
               tagBodies = AnnotationUtils.getBodiesOfType(annotation, 'TAG');
 
@@ -53,16 +56,16 @@ define([
 
           jQuery.each(placeBodies, function(idx, placeBody) {
             // TODO what about toponym arg?
-            initPlaceSection(placeBody);
-          });
+            initPlaceSection(placeBody); });
 
-          jQuery.each(personBodies, function(idex, personBody) {
-            initPersonSection(personBody);
-          });
+          jQuery.each(personBodies, function(idx, personBody) {
+            initPersonSection(personBody); });
+
+          jQuery.each(eventBodies, function(idx, eventBody) {
+            initEventSection(eventBody); });
 
           jQuery.each(commentBodies, function(idx, commentBody) {
-            initCommentSection(commentBody);
-          });
+            initCommentSection(commentBody); });
 
           initTagSection(annotation);
         },
@@ -152,6 +155,12 @@ define([
           sections.push(personSection);
         },
 
+        initEventSection = function(eventBody) {
+          var eventSection = new EventSection(centerSectionEl, eventBody);
+          handleDelete(eventSection);
+          sections.push(eventSection);
+        },
+
         initCommentSection = function(commentBody) {
           var commentSection = new CommentSection(centerSectionEl, commentBody);
           forwardEvent(commentSection, 'submit'); // Submit event needs to be handled by editor
@@ -170,6 +179,8 @@ define([
             initPlaceSection(body, quote);
           } else if (body.type === 'PERSON') {
             initPersonSection(body);
+          } else if (body.type === 'EVENT') {
+            initEventSection(body);
           }
 
           queuedUpdates.push(function() {

@@ -126,12 +126,12 @@ define([
 
         /** Click on 'Person' button adds a new PERSON body **/
         onAddPerson = function() {
-          self.sectionList.createNewSection({ type: 'PERSON' }, self.getMostRecentContext());
+          self.sectionList.createNewSection({ type: 'PERSON' });
         },
 
         /** Click on 'Event' button adds a new EVENT body **/
         onAddEvent = function() {
-          self.sectionList.createNewSection({ type: 'EVENT' }, self.getMostRecentContext());
+          self.sectionList.createNewSection({ type: 'EVENT' });
         },
 
         /** 'Cancel' clears the selection and closes the editor **/
