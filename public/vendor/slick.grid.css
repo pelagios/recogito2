@@ -5,20 +5,20 @@ No built-in (selected, editable, highlight, flashing, invalid, loading, :focus) 
 classes should alter those!
 */
 
-.slick-header.ui-state-default, .slick-headerrow.ui-state-default {
+.slick-header.ui-state-default, .slick-headerrow.ui-state-default, .slick-footerrow.ui-state-default, .slick-group-header.ui-state-default {
   width: 100%;
   overflow: hidden;
   border-left: 0px;
 }
 
-.slick-header-columns, .slick-headerrow-columns {
+.slick-header-columns, .slick-headerrow-columns, .slick-footerrow-columns, .slick-group-header-columns {
   position: relative;
   white-space: nowrap;
   cursor: default;
   overflow: hidden;
 }
 
-.slick-header-column.ui-state-default {
+.slick-header-column.ui-state-default, .slick-group-header-column.ui-state-default {
   position: relative;
   display: inline-block;
   overflow: hidden;
@@ -35,7 +35,21 @@ classes should alter those!
   float: left;
 }
 
-.slick-headerrow-column.ui-state-default {
+.slick-footerrow-column.ui-state-default {
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  margin: 0;
+  padding: 4px;
+  border-right: 1px solid silver;
+  border-left: 0px;
+  border-top: 0px;
+  border-bottom: 0px;
+  float: left;
+  line-height: 20px;
+  vertical-align: middle;
+}
+
+.slick-headerrow-column.ui-state-default, .slick-footerrow-column.ui-state-default {
   padding: 4px;
 }
 
@@ -72,7 +86,7 @@ classes should alter those!
 }
 
 .slick-resizable-handle-hover {
-	background-color: #ccc;
+  background-color: #ccc;
 }
 
 .slick-sortable-placeholder {
@@ -82,7 +96,7 @@ classes should alter those!
 .grid-canvas {
   position: relative;
   outline: 0;
-	overflow: hidden;
+  overflow: hidden;
 }
 
 .slick-row.ui-widget-content, .slick-row.ui-state-active {
@@ -91,7 +105,7 @@ classes should alter those!
   width: 100%;
 }
 
-.slick-cell, .slick-headerrow-column {
+.slick-cell, .slick-headerrow-column, .slick-footerrow-column {
   position: absolute;
   border: 1px solid transparent;
   border-right: 1px dotted silver;
@@ -143,7 +157,7 @@ classes should alter those!
   display: inline-block;
   background: blue;
   opacity: 0.15;
-  filter: alpha(opacity = 15);
+  filter: alpha(opacity=15);
   cursor: move;
 }
 
@@ -152,7 +166,7 @@ classes should alter those!
   height: 2px;
   background: blue;
   opacity: 0.7;
-  filter: alpha(opacity = 70);
+  filter: alpha(opacity=70);
 }
 
 .slick-selection {
@@ -162,37 +176,37 @@ classes should alter those!
 }
 
 .slick-pane {
-	position: absolute;
-	outline: 0;
-	overflow: hidden;
-	width: 100%;
+  position: absolute;
+  outline: 0;
+  overflow: hidden;
+  width: 100%;
 }
 
 .slick-pane-header {
-	display: block;
+  display: block;
 }
 
 .slick-header {
-	overflow: hidden;
-	position: relative;
+  overflow: hidden;
+  position: relative;
 }
 
 .slick-headerrow {
-	overflow: hidden;
-	position: relative;
+  overflow: hidden;
+  position: relative;
 }
 
 .slick-top-panel-scroller {
-	overflow: hidden;
-	position: relative;
+  overflow: hidden;
+  position: relative;
 }
 
 .slick-top-panel {
-	width:10000px
+  width: 10000px
 }
 
 .slick-viewport {
-	position: relative;
-	outline: 0;
-	width: 100%;
+  position: relative;
+  outline: 0;
+  width: 100%;
 }

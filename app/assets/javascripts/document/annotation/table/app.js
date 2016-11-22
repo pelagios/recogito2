@@ -15,9 +15,9 @@ require([
           var dataView = new Slick.Data.DataView(),
 
               options = {
-                enableCellNavigation: true,
-                enableColumnReorder: false,
-                fullWidthRows: true,
+                enableCellNavigation:true,
+                enableColumnReorder:false,
+                fullWidthRows:true,
                 defaultColumnWidth:120,
                 rowHeight:34,
                 frozenColumn:1
@@ -48,7 +48,22 @@ require([
               onRowsChanged = function(e, args) {
                 grid.invalidateRows(args.rows);
                 grid.render();
-              };
+              },
+
+              onSelectedRowsChanged = function(e, args) {
+                console.log(args);
+                /*
+                rightClickMenu.hide();
+                if (args.rows.length === 0) {
+                  currentSelection = false;
+                } else {
+                  currentSelection = args.rows;
+                  if (args.rows.length > 0) {
+                    var place = self._grid.getDataItem(args.rows[0]);
+                    self.fireEvent('selectionChanged', args, place);
+                  }
+                }*/
+              },
 
               onSort = function(e, args) {
                 var comparator = function(a, b) {
@@ -61,10 +76,14 @@ require([
               };
 
           grid.onSort.subscribe(onSort);
+          grid.setSelectionModel(new Slick.RowSelectionModel());
+          grid.onSelectedRowsChanged.subscribe(onSelectedRowsChanged);
 
           dataView.onRowCountChanged.subscribe(onRowCountChanged);
           dataView.onRowsChanged.subscribe(onRowsChanged);
           dataView.setItems(data);
+
+          // $(window).resize(function() { self._grid.resizeCanvas(); });
         },
 
         onLoadError = function(error) {

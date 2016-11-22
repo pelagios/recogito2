@@ -1,2 +1,5 @@
-- [JLynch7/SlickGrid, 2.0-frozenRowsAndColumns branch](https://github.com/JLynch7/SlickGrid/tree/2.0-frozenRowsAndColumns) (fork of the original [SlickGrid](http://github.com/mleibman/SlickGrid) which includes support for frozen columns), MIT license
-- [jquery.event.drag-2.2.js](http://threedubmedia.com/code/event/drag), MIT license
+* [X-SlickGrid](https://github.com/ddomingues/X-SlickGrid) (fork of the original
+  [SlickGrid](http://github.com/mleibman/SlickGrid) which adds support for frozen columns),
+  MIT license
+* [jquery.event.drag-2.2.js](http://threedubmedia.com/code/event/drag), MIT license
+* [Official jQuery Mouse Wheel Plugin](https://github.com/jquery/jquery-mousewheel)
