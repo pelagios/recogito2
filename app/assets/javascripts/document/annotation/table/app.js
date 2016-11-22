@@ -4,14 +4,31 @@ require.config({
 });
 
 require([
-  'common/config'
-], function(Config) {
+  'common/config',
+  'document/annotation/common/editor/editorRead',
+  'document/annotation/common/editor/editorWrite',
+  'document/annotation/table/selection/selectionHandler'
+], function(
+  Config,
+  ReadEditor,
+  WriteEditor,
+  SelectionHandler) {
 
   var App = function() {
-    var dataURL = jsRoutes.controllers.document.DocumentController
+
+    var containerNode = document.getElementById('main'),
+
+        selector = new SelectionHandler(),
+
+        editor = (Config.writeAccess) ?
+          new WriteEditor(containerNode, selector) :
+          new ReadEditor(containerNode),
+
+        dataURL = jsRoutes.controllers.document.DocumentController
           .getDataTable(Config.documentId, Config.partSequenceNo).absoluteURL(),
 
         onLoadComplete = function(results) {
+          
           var dataView = new Slick.Data.DataView(),
 
               options = {
@@ -36,7 +53,7 @@ require([
               grid = new Slick.Grid('#table', dataView, frozenColumns.concat(columns), options),
 
               data = jQuery.map(results.data, function(f, idx) {
-                f.id = idx;
+                f.id = idx; // ID field required by dataView - we'll reuse it for the index
                 return f;
               }),
 
@@ -78,6 +95,8 @@ require([
         onLoadError = function(error) {
           // TODO implement
         };
+
+    // selector.on('select', editor.openSelection);
 
     Papa.parse(dataURL, {
       download : true,

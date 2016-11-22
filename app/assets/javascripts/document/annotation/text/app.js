@@ -15,7 +15,7 @@ require([
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/phraseAnnotator',
-  'document/annotation/text/selection/selectionHandler',
+  'document/annotation/text/selection/selectionHandler'
 ], function(
   Alert,
   Formatting,
