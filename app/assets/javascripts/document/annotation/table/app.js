@@ -52,17 +52,6 @@ require([
 
               onSelectedRowsChanged = function(e, args) {
                 console.log(args);
-                /*
-                rightClickMenu.hide();
-                if (args.rows.length === 0) {
-                  currentSelection = false;
-                } else {
-                  currentSelection = args.rows;
-                  if (args.rows.length > 0) {
-                    var place = self._grid.getDataItem(args.rows[0]);
-                    self.fireEvent('selectionChanged', args, place);
-                  }
-                }*/
               },
 
               onSort = function(e, args) {
@@ -83,7 +72,7 @@ require([
           dataView.onRowsChanged.subscribe(onRowsChanged);
           dataView.setItems(data);
 
-          // $(window).resize(function() { self._grid.resizeCanvas(); });
+          jQuery(window).resize(function() { grid.resizeCanvas(); });
         },
 
         onLoadError = function(error) {

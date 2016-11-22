@@ -10,10 +10,10 @@ html, body {
 }
 
 #main {
-  position:relative;
   flex:1;
   margin-left:@sidebar-width;
   background-color:@blueish-white;
+  overflow:hidden;
 }
 
 #table {
@@ -52,17 +52,6 @@ html, body {
     text-align:center;
   }
 
-  /*
-  .slick-row.active {
-    background-color:@ocean;
-    color:#fff;
-
-    .slick-cell.l0, .slick-cell.l1 {
-      background-color:@ocean;
-    }
-
-  }
-  */
   .slick-cell.selected {
     background-color:@ocean;
     color:#fff;
