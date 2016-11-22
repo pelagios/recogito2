@@ -60,14 +60,14 @@ object ContentType {
   def fromFile(file: File): Either[Exception, ContentType] = {
     val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
     extension match {
-      case "txt" =>
-        Right(TEXT_PLAIN)
+      case "txt" => Right(TEXT_PLAIN)
 
-      case "jpg" | "tif" | "png" =>
+      case "jpg" | "jpeg" | "tif" | "tiff" | "png" =>
         if (VIPS_INSTALLED) Right(IMAGE_UPLOAD) else Left(new UnsupportedContentTypeException)
+        
+      case "csv" => Right(DATA_CSV)
 
-      case _ =>
-        Left(new UnsupportedContentTypeException)
+      case _ => Left(new UnsupportedContentTypeException)
     }
 
   }

@@ -1,7 +1,7 @@
 @(
   doc: models.document.DocumentInfo,
-  currentUser: Option[models.generated.tables.records.UserRecord],
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
+  currentUser: Option[models.generated.tables.records.UserRecord],
   accessLevel: models.document.DocumentAccessLevel,
   annotationCount: Long,
   content: String
@@ -15,10 +15,6 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text/index.css")"/>
     <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
-    <link rel="apple-touch-icon" sizes="57x57" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
-    <link rel="apple-touch-icon" sizes="114x114" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
-    <link rel="apple-touch-icon" sizes="72x72" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
-    <link rel="apple-touch-icon" sizes="144x144" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
     <script src="@routes.WebJarAssets.at(webjars.locate("leaflet.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("jquery.timeago.js"))"></script>

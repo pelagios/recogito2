@@ -34,6 +34,8 @@ libraryDependencies ++= Seq(
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
   "org.jooq" % "jooq-meta" % "3.7.2",
+  "org.postgresql" % "postgresql" % "9.4.1208.jre7",
+  "org.webjars" %% "webjars-play" % "2.5.0",
 
   // Scalagios core + transient dependencies
   "org.pelagios" % "scalagios-core" % "2.0.1" from "https://github.com/pelagios/scalagios/releases/download/v2.0.1/scalagios-core.jar",
@@ -43,16 +45,13 @@ libraryDependencies ++= Seq(
   // Recogito plugin API
   "org.pelagios" % "recogito-plugin-sdk" % "0.0.1" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.0.1/recogito-plugin-sdk-0.0.1.jar",
 
-  "org.postgresql" % "postgresql" % "9.4.1208.jre7",
-
-  "org.webjars" %% "webjars-play" % "2.5.0",
-
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
   "org.webjars" % "leaflet" % "0.7.7",
   "org.webjars" % "numeral-js" % "1.5.3-1",
   "org.webjars" % "openlayers" % "3.13.0",
+  "org.webjars" % "papa-parse" % "4.1.0-1",
   "org.webjars" % "requirejs" % "2.1.22",
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "velocity" % "1.1.0",

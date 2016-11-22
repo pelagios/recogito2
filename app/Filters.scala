@@ -5,9 +5,12 @@ import akka.stream.Materializer
 
 class Filters @Inject() (implicit materializer: Materializer) extends HttpFilters {
   
-  private val jsonGzipFilter = new GzipFilter(shouldGzip = (request, response) =>
-    response.body.contentType.exists(_.startsWith("application/json")))
+  private val gzipFilter = new GzipFilter(shouldGzip = (request, response) =>
+    response.body.contentType.exists { contentType => 
+      contentType.startsWith("application/json") ||
+      contentType.startsWith("text/csv") 
+    })
   
-  def filters = Seq(jsonGzipFilter)
+  def filters = Seq(gzipFilter)
   
 }

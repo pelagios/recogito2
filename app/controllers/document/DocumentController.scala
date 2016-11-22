@@ -23,6 +23,24 @@ class DocumentController @Inject() (
   def initialDocumentView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationView(docId, 1))
   }
+  
+  /** Common retrieval code for tiles and manifests **/
+  private def getTilesetFile(document: DocumentRecord, part: DocumentFilepartRecord, filepath: String): Future[Option[File]] = Future {
+    scala.concurrent.blocking {
+      // ownerDataDir must exist unless DB integrity broken - outer documentPartResponse will handle failure
+      val documentDir = uploads.getDocumentDir(document.getOwner, document.getId).get
+
+      // Tileset foldername is, by convention, equal to filename minus extension
+      val foldername = part.getFile.substring(0, part.getFile.lastIndexOf('.'))
+      val tileFolder = new File(documentDir, foldername)
+
+      val file = new File(tileFolder, filepath)
+      if (file.exists)
+        Some(file)
+      else
+        None
+    }
+  }
 
   def getImageManifest(docId: String, partNo: Int) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
@@ -43,24 +61,6 @@ class DocumentController @Inject() (
           
       }
     })
-  }
-
-  /** Common retrieval code for tiles and manifests **/
-  private def getTilesetFile(document: DocumentRecord, part: DocumentFilepartRecord, filepath: String): Future[Option[File]] = Future {
-    scala.concurrent.blocking {
-      // ownerDataDir must exist unless DB integrity broken - outer documentPartResponse will handle failure
-      val documentDir = uploads.getDocumentDir(document.getOwner, document.getId).get
-
-      // Tileset foldername is, by convention, equal to filename minus extension
-      val foldername = part.getFile.substring(0, part.getFile.lastIndexOf('.'))
-      val tileFolder = new File(documentDir, foldername)
-
-      val file = new File(tileFolder, filepath)
-      if (file.exists)
-        Some(file)
-      else
-        None
-    }
   }
 
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack { implicit request =>
@@ -87,7 +87,23 @@ class DocumentController @Inject() (
       } else {
         uploads.openThumbnail(doc.ownerName, docId, currentPart.getFile).map {
           case Some(file) => Ok.sendFile(file)
-          case None => NotFoundPage
+          case None => NotFound
+        }
+      }
+    })
+  }
+  
+  def getDataTable(docId: String, partNo: Int) = AsyncStack { implicit request =>
+    val maybeUser = loggedIn.map(_.user)
+    documentPartResponse(docId, partNo, maybeUser, { case (document, currentPart, accesslevel) =>
+      Future {
+        scala.concurrent.blocking {
+          val documentDir = uploads.getDocumentDir(document.owner.getUsername, document.id).get
+          val file = new File(documentDir, currentPart.getFile)
+          if (file.exists)
+            Ok.sendFile(file)
+          else
+            NotFound
         }
       }
     })

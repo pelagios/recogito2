@@ -89,13 +89,17 @@ class AnnotationController @Inject() (
         uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile) flatMap {
           case Some(content) =>
             annotations.countByDocId(doc.id).map(annotationCount =>
-              Ok(views.html.document.annotation.text(doc, loggedInUser, currentPart, accesslevel, annotationCount, content)))
+              Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, annotationCount, content)))
 
           case None =>
             // Filepart found in DB, but not file on filesystem
             Logger.error("Filepart recorded in the DB is missing on the filesystem: " + doc.ownerName + ", " + doc.id)
             Future.successful(InternalServerError)
         }
+        
+      case Some(ContentType.DATA_CSV) =>
+        annotations.countByDocId(doc.id).map(annotationCount =>
+          Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, annotationCount)))
 
       case _ =>
         // Unknown content type in DB, or content type we don't have an annotation view for - should never happen

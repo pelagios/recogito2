@@ -1,0 +1,2 @@
+- [JLynch7/SlickGrid, 2.0-frozenRowsAndColumns branch](https://github.com/JLynch7/SlickGrid/tree/2.0-frozenRowsAndColumns) (fork of the original [SlickGrid](http://github.com/mleibman/SlickGrid) which includes support for frozen columns), MIT license
+- [jquery.event.drag-2.2.js](http://threedubmedia.com/code/event/drag), MIT license
