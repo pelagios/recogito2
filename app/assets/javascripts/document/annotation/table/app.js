@@ -8,6 +8,7 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/table/selection/highlighter',
   'document/annotation/table/selection/selectionHandler'
@@ -16,9 +17,12 @@ require([
   Config,
   ReadEditor,
   WriteEditor,
+  LoadIndicator,
   BaseApp,
   Highlighter,
   SelectionHandler) {
+
+  var loadIndicator = new LoadIndicator();
 
   var App = function(results) {
 
@@ -93,7 +97,7 @@ require([
     dataView.onRowsChanged.subscribe(onRowsChanged);
     dataView.setItems(data);
 
-    BaseApp.apply(this, [ containerNode, highlighter, selector ]);
+    BaseApp.apply(this, [ highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
 
@@ -104,8 +108,8 @@ require([
     jQuery(window).resize(function() { grid.resizeCanvas(); });
 
     API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-       .done(this.onAnnotationsLoaded.bind(this))
-       .fail(this.onAnnotationsLoadError.bind(this));
+       .done(this.onAnnotationsLoaded.bind(this)).then(loadIndicator.destroy)
+       .fail(this.onAnnotationsLoadError.bind(this)).then(loadIndicator.destroy);
   };
   App.prototype = Object.create(BaseApp.prototype);
 
@@ -121,6 +125,8 @@ require([
         onLoadError = function(error) {
           // TODO implement
         };
+
+    loadIndicator.init(document.getElementById('table-container'));
 
     Papa.parse(dataURL, {
       download : true,

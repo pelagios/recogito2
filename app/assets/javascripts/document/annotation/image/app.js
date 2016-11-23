@@ -9,6 +9,7 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/image/iiif/iiifImageInfo',
   'document/annotation/image/page/help',
@@ -22,6 +23,7 @@ require([
   Config,
   ReadEditor,
   WriteEditor,
+  LoadIndicator,
   BaseApp,
   IIIFImageInfo,
   Help,
@@ -30,6 +32,8 @@ require([
   Highlighter,
   SelectionHandler
 ) {
+
+    var loadIndicator = new LoadIndicator();
 
     /** The app is instantiated after the image manifest was loaded **/
     var App = function(imageProperties) {
@@ -83,7 +87,7 @@ require([
       toolbar.on('toolChanged', onToolChanged);
       toolbar.on('toggleHelp', onToggleHelp);
 
-      BaseApp.apply(this, [ contentNode, highlighter, selector ]);
+      BaseApp.apply(this, [ highlighter, selector ]);
 
       viewer.on('fullscreen', onToggleFullscreen);
 
@@ -96,15 +100,17 @@ require([
       olMap.on('postrender', onMapMove);
 
       API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-         .done(this.onAnnotationsLoaded.bind(this))
-         .fail(this.onAnnotationsLoadError.bind(this));
+         .done(this.onAnnotationsLoaded.bind(this)).then(loadIndicator.destroy)
+         .fail(this.onAnnotationsLoadError.bind(this)).then(loadIndicator.destroy);
     };
     App.prototype = Object.create(BaseApp.prototype);
 
     /** On page load, fetch the manifest and instantiate the app **/
     jQuery(document).ready(function() {
 
-      var loadManifest = function() {
+      var imagePane = document.getElementById('image-pane'),
+
+          loadManifest = function() {
             return jsRoutes.controllers.document.DocumentController
               .getImageManifest(Config.documentId, Config.partSequenceNo)
               .ajax()
@@ -130,15 +136,13 @@ require([
            * matters. Easier to determine the offset via JS at page load.)
            */
           setImagePaneTop = function() {
-            var imagePane = jQuery('#image-pane'),
-
-                iconbar = jQuery('.header-iconbar'),
+            var iconbar = jQuery('.header-iconbar'),
                 infobox = jQuery('.header-infobox'),
                 toolbar = jQuery('.header-toolbar'),
 
                 offset = iconbar.outerHeight() + infobox.outerHeight() + toolbar.outerHeight();
 
-            imagePane.css('top', offset);
+            jQuery(imagePane).css('top', offset);
           },
 
           onLoadError = function(error) {
@@ -154,6 +158,7 @@ require([
           };
 
       setImagePaneTop();
+      loadIndicator.init(imagePane);
 
       loadManifest()
         .done(init)

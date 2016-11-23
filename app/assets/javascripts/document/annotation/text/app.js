@@ -11,6 +11,7 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/selection/highlighter',
@@ -24,6 +25,7 @@ require([
   Config,
   ReadEditor,
   WriteEditor,
+  LoadIndicator,
   BaseApp,
   Toolbar,
   Highlighter,
@@ -33,6 +35,8 @@ require([
   var App = function() {
 
     var self = this,
+
+        loadIndicator = new LoadIndicator(),
 
         containerNode = document.getElementById('main'),
 
@@ -58,6 +62,8 @@ require([
 
           setColorscheme(colorscheme);
           toolbar.setCurrentColorscheme(colorscheme);
+
+          loadIndicator.init(containerNode);
 
           if (Config.IS_TOUCH)
             contentNode.className = 'touch';
@@ -116,7 +122,7 @@ require([
     toolbar.on('annotationModeChanged', editor.setAnnotationMode);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
-    BaseApp.apply(this, [ containerNode, highlighter, selector ]);
+    BaseApp.apply(this, [ highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
 
@@ -129,8 +135,8 @@ require([
     initPage();
 
     API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-       .done(this.onAnnotationsLoaded.bind(this))
-       .fail(this.onAnnotationsLoadError.bind(this));
+       .done(this.onAnnotationsLoaded.bind(this)).then(loadIndicator.destroy)
+       .fail(this.onAnnotationsLoadError.bind(this)).then(loadIndicator.destroy);
   };
   App.prototype = Object.create(BaseApp.prototype);
 

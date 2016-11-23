@@ -1,36 +1,35 @@
 define([], function() {
 
-  var LoadIndicator = function(containerEl) {
-    var clicktrap = jQuery('.load-clicktrap'),
+  var LoadIndicator = function() {
 
-        init = function() {
+    var element = jQuery(
+          '<div class="load-clicktrap">' +
+            '<div class="load-icon">' +
+              '<img src="/assets/images/wait-circle-static.gif">' +
+            '</div>' +
+          '</div>'),
+
+        init = function(containerEl) {
           var windowHeight = window.innerHeight,
-
               headerHeight = jQuery(containerEl).position().top,
-
               visibleContentHeight = windowHeight - headerHeight,
-
-              loadIcon = jQuery(
-                '<div class="load-icon">' +
-                  '<img src="/assets/images/wait-circle-static.gif">' +
-                '</div>');
+              loadIcon = element.find('.load-icon');
 
           loadIcon.css('padding-top', visibleContentHeight / 2 - 12);
           loadIcon.hide();
 
-          clicktrap.append(loadIcon);
+          jQuery(containerEl).append(element);
           loadIcon.fadeIn(250);
         },
 
         destroy = function() {
-          clicktrap.fadeOut({
+          element.fadeOut({
             duration: 150,
-            complete: function() { clicktrap.remove(); }
+            complete: function() { element.remove(); }
           });
         };
 
-    init();
-
+    this.init = init;
     this.destroy = destroy;
   };
 
