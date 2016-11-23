@@ -37,7 +37,7 @@ require([
 
         // Default leading columns
         frozenColumns = [
-          { id: '__annotation', name: '', field: '__annotation', width: 50 },
+          { id: '__annotation', name: '', field: '__annotation', width: 90, formatter: Highlighter.CellFormatter },
           { id: 'id', name: '#', field: 'id', width: 50, sortable: true }
         ],
 
@@ -52,7 +52,7 @@ require([
           return f;
         }),
 
-        highlighter = new Highlighter(),
+        highlighter = new Highlighter(grid),
 
         selector = new SelectionHandler(grid, highlighter),
 

@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     @views.html.document.standardMeta(doc, annotationCount, Some(currentPart), None)
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/table/index.css")"/>
+    <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/table/colorByType.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
     <link rel="stylesheet" href="@routes.Assets.versioned("vendor/slick.grid.css")"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("leaflet.js"))"></script>
@@ -81,7 +82,10 @@
     </div> <!-- .sidebar -->
 
     <div id="main">
-      <div id="table-container"><div id="table"></div></div>
+      <div id="table-container">
+        <div id="table"></div>
+        <div class="load-clicktrap"></div>
+      </div>
     </div>
 
     @helper.javascriptRouter("jsRoutes")(

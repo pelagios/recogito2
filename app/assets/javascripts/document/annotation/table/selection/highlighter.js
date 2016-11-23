@@ -1,15 +1,24 @@
 define([
+  'common/utils/annotationUtils',
   'document/annotation/common/selection/abstractHighlighter'
-], function(AbstractHighlighter) {
+], function(AnnotationUtils, AbstractHighlighter) {
 
-  var Highlighter = function() {
+  var Highlighter = function(grid) {
 
-    var findById = function(id) {
+    var dataView = grid.getData(),
+
+        findById = function(id) {
 
         },
 
         initPage = function(annotations) {
-          console.log(annotations);
+          jQuery.each(annotations, function(idx, annotation) {
+            var rowIdx = parseInt(annotation.anchor.substring(4)),
+                row = dataView.getItem(rowIdx);
+
+            row.__annotation = annotation;
+            dataView.updateItem(rowIdx, row);
+          });
         },
 
         refreshAnnotation = function(annotation) {
@@ -33,6 +42,18 @@ define([
     AbstractHighlighter.apply(this);
   };
   Highlighter.prototype = Object.create(AbstractHighlighter.prototype);
+
+  /** Formatter for the 'annotation' indicator cell **/
+  Highlighter.CellFormatter = function(row, cell, val, columnDef, dataContext) {
+    if (dataContext.__annotation) {
+      var annotation = dataContext.__annotation,
+          entityType = AnnotationUtils.getEntityType(annotation),
+          cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation';
+          label = (entityType) ? entityType : '';
+
+      return '<span class="' + cssClass + '">' + label + '</span>';
+    }
+  };
 
   return Highlighter;
 
