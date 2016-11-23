@@ -5,7 +5,9 @@ define([
 
   var Highlighter = function(grid) {
 
-    var dataView = grid.getData(),
+    var annotationIndex = {}, // To keep track of annotationId -> rowIdx concordances
+
+        dataView = grid.getData(),
 
         findById = function(id) {
 
@@ -17,6 +19,7 @@ define([
                 row = dataView.getItem(rowIdx);
 
             row.__annotation = annotation;
+            annotationIndex[annotation.annotation_id] = rowIdx;
             dataView.updateItem(rowIdx, row);
           });
         },
@@ -26,7 +29,15 @@ define([
         },
 
         removeAnnotation = function(annotation) {
-          console.log('remove annotation');
+          var annotationId = annotation.annotation_id,
+              rowIdx = annotationIndex[annotationId];
+
+          if (rowIdx) {
+            delete annotationIndex[annotationId];
+            delete dataView.getItem(rowIdx).__annotation;
+            grid.invalidateRow(rowIdx);
+            grid.render();
+          }
         },
 
         convertSelectionToAnnotation = function(selection) {
