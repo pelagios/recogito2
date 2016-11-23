@@ -11,6 +11,8 @@ define([
 
         leftViewPort = jQuery('.slick-viewport-left'),
 
+        currentSelection = false,
+
         getFrozenRowElement = function() {
           var selectedRow = grid.getActiveCellNode().closest('.slick-row.active'),
               isFrozenRow = selectedRow.parents('.slick-viewport-left').length > 0;
@@ -23,8 +25,7 @@ define([
         },
 
         onSelectedRowsChanged = function(e, args) {
-
-          var createNewSelection = function(rowIdx, rowElement) {
+          var createNewSelection = function(rowIdx, cellDiv) {
                 var annotationStub = {
                       annotates: {
                         document_id: Config.documentId,
@@ -40,15 +41,17 @@ define([
                 return {
                   isNew: true,
                   annotation: annotationStub,
-                  bounds: rowElement.getBoundingClientRect()
+                  bounds: cellDiv.getBoundingClientRect(),
+                  cell: cellDiv
                 };
               },
 
-              getExisingSelection = function(rowElement, rowData) {
+              getExisingSelection = function(cellDiv, rowData) {
                 return {
                   isNew: false,
                   annotation: rowData.__annotation,
-                  bounds: rowElement.getBoundingClientRect()
+                  bounds: cellDiv.getBoundingClientRect(),
+                  cell: cellDiv
                 };
               };
 
@@ -57,26 +60,34 @@ define([
             // TODO support multi-select
 
             var firstRowIdx = args.rows[0],
-                firstRowElement = getFrozenRowElement();
-                firstRowData = dataView.getItem(firstRowIdx);
+                firstRowElement = getFrozenRowElement(),
+                firstRowData = dataView.getItem(firstRowIdx),
+                selection = (firstRowData.__annotation) ?
+                  getExisingSelection(firstRowElement, firstRowData) :
+                  createNewSelection(firstRowIdx, firstRowElement);
 
-            if (firstRowData.__annotation)
-              self.fireEvent('select', getExisingSelection(firstRowElement, firstRowData));
-            else
-              self.fireEvent('select', createNewSelection(firstRowIdx, firstRowElement));
+            currentSelection = selection;
+            self.fireEvent('select', selection);
           }
         },
 
         getSelection = function() {
-          var rows = grid.getSelectedRows();
-          console.log('get selection');
+          if (currentSelection) {
+            // Client bounds may have changed in the meantime due to scrolling
+            currentSelection.bounds = currentSelection.cell.getBoundingClientRect();
+            return currentSelection;
+          }
         },
 
         setSelection = function(selection) {
+
+          // TODO implement (needed for #{id} direct links)
+
           console.log('set selection');
         },
 
         clearSelection = function() {
+          currentSelection = false;
           grid.setSelectedRows([]);
         };
 

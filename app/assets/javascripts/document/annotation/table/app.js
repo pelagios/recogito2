@@ -78,9 +78,16 @@ require([
               };
 
           dataView.sort(comparator, args.sortAsc);
+        },
+
+        onScroll = function(e, args) {
+          var selection = selector.getSelection();
+          if (selection)
+            editor.setPosition(selection.bounds);
         };
 
     grid.onSort.subscribe(onSort);
+    grid.onScroll.subscribe(onScroll);
 
     dataView.onRowCountChanged.subscribe(onRowCountChanged);
     dataView.onRowsChanged.subscribe(onRowsChanged);
