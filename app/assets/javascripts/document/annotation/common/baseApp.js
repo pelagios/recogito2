@@ -16,7 +16,7 @@ define([
   BaseApp.prototype.onAnnotationsLoaded = function(annotations) {
     var urlHash = (window.location.hash) ? window.location.hash.substring(1) : false,
         preselected;
-
+        
     this.header.incrementAnnotationCount(annotations.length);
     // var startTime = new Date().getTime();
     this.highlighter.initPage(annotations);
