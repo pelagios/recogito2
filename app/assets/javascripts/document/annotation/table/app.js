@@ -7,28 +7,24 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/table/selection/highlighter',
   'document/annotation/table/selection/selectionHandler'
 ], function(
   Config,
   ReadEditor,
   WriteEditor,
+  Highlighter,
   SelectionHandler) {
 
   var App = function() {
 
-    var containerNode = document.getElementById('main'),
-
-        selector = new SelectionHandler(),
-
-        editor = (Config.writeAccess) ?
-          new WriteEditor(containerNode, selector) :
-          new ReadEditor(containerNode),
+    var containerNode = document.getElementById('table-container'),
 
         dataURL = jsRoutes.controllers.document.DocumentController
           .getDataTable(Config.documentId, Config.partSequenceNo).absoluteURL(),
 
         onLoadComplete = function(results) {
-          
+
           var dataView = new Slick.Data.DataView(),
 
               options = {
@@ -57,6 +53,14 @@ require([
                 return f;
               }),
 
+              highlighter = new Highlighter(),
+
+              selector = new SelectionHandler(grid, highlighter),
+
+              editor = (Config.writeAccess) ?
+                new WriteEditor(containerNode, selector) :
+                new ReadEditor(containerNode),
+
               onRowCountChanged = function(e, args) {
                 grid.updateRowCount();
                 grid.render();
@@ -65,10 +69,6 @@ require([
               onRowsChanged = function(e, args) {
                 grid.invalidateRows(args.rows);
                 grid.render();
-              },
-
-              onSelectedRowsChanged = function(e, args) {
-                console.log(args);
               },
 
               onSort = function(e, args) {
@@ -82,12 +82,12 @@ require([
               };
 
           grid.onSort.subscribe(onSort);
-          grid.setSelectionModel(new Slick.RowSelectionModel());
-          grid.onSelectedRowsChanged.subscribe(onSelectedRowsChanged);
 
           dataView.onRowCountChanged.subscribe(onRowCountChanged);
           dataView.onRowsChanged.subscribe(onRowsChanged);
           dataView.setItems(data);
+
+          selector.on('select', editor.openSelection);
 
           jQuery(window).resize(function() { grid.resizeCanvas(); });
         },
