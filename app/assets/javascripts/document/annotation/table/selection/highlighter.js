@@ -22,15 +22,15 @@ define([
         },
 
         refreshAnnotation = function(annotation) {
-
+          console.log('refresh annotation');
         },
 
         removeAnnotation = function(annotation) {
-
+          console.log('remove annotation');
         },
 
         convertSelectionToAnnotation = function(selection) {
-
+          console.log('convert selection to annotation');
         };
 
     this.findById = findById;
@@ -49,7 +49,7 @@ define([
       var annotation = dataContext.__annotation,
           entityType = AnnotationUtils.getEntityType(annotation),
           cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation';
-          label = (entityType) ? entityType : '';
+          label = (entityType) ? entityType : '&nbsp;';
 
       return '<span class="' + cssClass + '">' + label + '</span>';
     }

@@ -53,14 +53,16 @@ html, body {
       border-color:@lightgrey-border-darker;
     }
 
-    .slick-cell.l0, .slick-cell.l1 {
+    .slick-cell.l0, .slick-cell.l0.selected,
+    .slick-cell.l1 {
       background-color:#fff;
       text-align:center;
+      color:@standard-type;
       padding:0;
     }
 
     .slick-cell.selected {
-      background-color:lighten(@ocean, 15%);
+      background-color:@ocean;
       color:#fff;
     }
 
@@ -93,9 +95,11 @@ html, body {
 
     span.annotation {
       display:inline-block;
-      width:100%;
-      height:100%;
+      width:80%;
+      height:23px;
       color:#fff;
+      line-height:24px;
+      .rounded-corners(2px);
     }
 
   }
