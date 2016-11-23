@@ -10,6 +10,10 @@ html, body {
   flex-direction: column;
 }
 
+.header-toolbar {
+  text-align:right;
+}
+
 #main {
   flex:1;
   margin-left:@sidebar-width;
@@ -28,7 +32,6 @@ html, body {
   height:100%;
 
   .slick-header {
-    background-color:#fff;
     border-bottom:1px solid @lightgrey-border-darker;
   }
 
@@ -39,10 +42,15 @@ html, body {
     padding:0 16px 0 8px;
     height:34px;
     line-height:34px;
+    background-color:@blueish-white-hi;
+  }
+
+  .slick-header-column.frozen {
+    background-color:#fff;
   }
 
   .slick-resizable-handle {
-    border-right:1px solid @lightgrey-border;
+    border-right:1px solid @lightgrey-border-darker;
   }
 
   .slick-cell {
