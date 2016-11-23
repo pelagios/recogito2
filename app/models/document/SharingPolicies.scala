@@ -95,7 +95,7 @@ trait SharingPolicies { self: DocumentService =>
   }
   
   def deletePoliciesSharedWith(username: String) = db.withTransaction { sql =>
-    
+    sql.deleteFrom(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(username)).execute()
   }
   
 }
