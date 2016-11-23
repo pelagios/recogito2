@@ -81,7 +81,7 @@ define(['common/config'], function(Config) {
 
         showSaveError = function(error) {
           clearMessageFadeTimer();
-          saveMessageEl.html('<span class="save-error">Error saving annotation. Please refresh page.</span>');
+          saveMessageEl.html('<span class="save-error">Error saving annotation. Try refreshing the page.</span>');
         };
 
     this.incrementAnnotationCount = incrementAnnotationCount;

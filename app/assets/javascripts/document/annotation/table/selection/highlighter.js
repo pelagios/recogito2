@@ -10,43 +10,47 @@ define([
         dataView = grid.getData(),
 
         findById = function(id) {
+          var rowIdx = annotationIndex[id];
+          if (rowIdx)
+            return dataView.getItem(rowIdx).__annotation;
+        },
 
+        bindAnnotation = function(annotation) {
+          var rowIdx = parseInt(annotation.anchor.substring(4)),
+              row = dataView.getItem(rowIdx);
+
+          row.__annotation = annotation;
+          annotationIndex[annotation.annotation_id] = rowIdx;
+          dataView.updateItem(rowIdx, row);
         },
 
         initPage = function(annotations) {
           jQuery.each(annotations, function(idx, annotation) {
-            var rowIdx = parseInt(annotation.anchor.substring(4)),
-                row = dataView.getItem(rowIdx);
-
-            row.__annotation = annotation;
-            annotationIndex[annotation.annotation_id] = rowIdx;
-            dataView.updateItem(rowIdx, row);
+            bindAnnotation(annotation);
           });
-        },
-
-        refreshAnnotation = function(annotation) {
-          console.log('refresh annotation');
         },
 
         removeAnnotation = function(annotation) {
           var annotationId = annotation.annotation_id,
-              rowIdx = annotationIndex[annotationId];
+              rowIdx = annotationIndex[annotationId],
+              row;
 
           if (rowIdx) {
+            row = dataView.getItem(rowIdx);
+
             delete annotationIndex[annotationId];
-            delete dataView.getItem(rowIdx).__annotation;
-            grid.invalidateRow(rowIdx);
-            grid.render();
+            delete row.__annotation;
+            dataView.updateItem(rowIdx, row);
           }
         },
 
         convertSelectionToAnnotation = function(selection) {
-          console.log('convert selection to annotation');
+          bindAnnotation(selection.annotation);
         };
 
     this.findById = findById;
     this.initPage = initPage;
-    this.refreshAnnotation = refreshAnnotation;
+    this.refreshAnnotation = function() {}; // Not needed for tables
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
 
