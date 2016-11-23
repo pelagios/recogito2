@@ -30,6 +30,11 @@ define([
           });
         },
 
+        refreshAnnotation = function(annotation) {
+          // Redraws the annotation, e.g. to account for changed entity types
+          bindAnnotation(annotation);
+        },
+
         removeAnnotation = function(annotation) {
           var annotationId = annotation.annotation_id,
               rowIdx = annotationIndex[annotationId],
@@ -50,7 +55,7 @@ define([
 
     this.findById = findById;
     this.initPage = initPage;
-    this.refreshAnnotation = function() {}; // Not needed for tables
+    this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
 
@@ -60,13 +65,23 @@ define([
 
   /** Formatter for the 'annotation' indicator cell **/
   Highlighter.CellFormatter = function(row, cell, val, columnDef, dataContext) {
+    var ICONS = {
+          'PLACE'  : '&#xf041;',
+          'PERSON' : '&#xf007;',
+          'EVENT'  : '&#xf005;'
+        },
+
+        getIcon = function(entityType) {
+          var icon = ICONS[entityType];
+          if (icon) return icon; else return '&#xf02b;';
+        };
+
     if (dataContext.__annotation) {
       var annotation = dataContext.__annotation,
           entityType = AnnotationUtils.getEntityType(annotation),
           cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation';
-          label = (entityType) ? entityType : '&nbsp;';
 
-      return '<span class="' + cssClass + '">' + label + '</span>';
+      return '<span class="' + cssClass + '" title="' + entityType + '">' + getIcon(entityType) + '</span>';
     }
   };
 
