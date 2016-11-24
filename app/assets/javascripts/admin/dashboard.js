@@ -57,9 +57,16 @@ require([
                 return entry.value;
               }),
 
-              data = { labels: labels, series: [ series ] };
+              data = { labels: labels, series: [ series ] },
 
-          new Chartist.Bar('#activity-history-chart', data);
+              opts = { axisX: {
+                labelInterpolationFnc: function skipLabels(value, index) {
+                  return index % 2  === 0 ? value : null;
+                },
+                showGrid: false
+              }};
+
+          new Chartist.Bar('#activity-history-chart', data, opts);
         },
 
         refreshContributionsRightNow = function(stats) {
@@ -113,7 +120,7 @@ require([
 
         refresh = function() {
           refreshContributionStats();
-          // window.setTimeout(refresh, REFRESH_INTERVAL_MS);
+          window.setTimeout(refresh, REFRESH_INTERVAL_MS);
         };
 
     refresh();
