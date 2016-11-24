@@ -5,7 +5,7 @@
 )(implicit header: RequestHeader, webjars: WebJarAssets, messages: Messages, flash: Flash)
 
 @_layout("Recogito | Settings - Metadata", doc, currentUser, Some("metadata")) {
-  <div class="edit-metadata panel centered">
+  <div class="document-metadata panel centered">
     <h2>Document Metadata</h2>
     @flash.get("success").map { msg =>
       <div class="success flash-message"><span class="icon">&#xf00c;</span> @msg</div>
@@ -30,4 +30,26 @@
       }
     </div>
   </div>
+
+  <div class="part-metadata panel centered">
+    <h2>Document Parts <span class="num-files">(@doc.fileparts.size file@if(doc.fileparts.size > 1){s})</span></h2>
+    <div class="inner">
+      <p><span class="icon">&#xf047;</span> Drag to change order</p>
+      <ul>
+        @for(part <- doc.fileparts) {
+          <li>
+            @part.getTitle
+            <button class="btn small disabled"><span class="icon">&#xf040;</span> Edit Metadata</button>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+
+  <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>
+  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/metadata.js")"></script>
+
+  @helper.javascriptRouter("jsRoutes")(
+    controllers.document.settings.routes.javascript.SettingsController.setSortOrder
+  )
 }

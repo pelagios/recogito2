@@ -1,7 +1,66 @@
-.edit-metadata {
+.document-metadata, .part-metadata  {
 
-  form {
+  form { text-align:left; }
+
+}
+
+.part-metadata {
+
+  .inner {
+    background-color:#fff;
+  }
+
+  .num-files {
+    color:@lightblue-type;
+  }
+
+  p {
+    margin:10px 0 25px 0;
+    color:@lightblue-type;
+
+    .icon {
+      padding:0 2px;
+      font-size:14px;
+    }
+
+  }
+
+  ul {
+    list-style-type:none;
+    margin:0;
+    padding:0;
+  }
+
+  li {
+    position:relative;
     text-align:left;
+    cursor:move;
+    padding:10px;
+    margin:6px 5px;
+    background-color:@blueish-white-hi;
+    border:1px solid darken(@form-grey-border, 2%);
+
+    button.btn.small {
+      position:absolute;
+      top:7px;
+      right:10px;
+      padding:4px 10px;
+
+      .icon {
+        font-size:14px;
+        padding:0 8px 0 0;
+      }
+
+    }
+
+  }
+
+  li:before {
+    content:'\f047';
+    color:@lightblue-type;
+    font-size:14px;
+    font-family:FontAwesome;
+    padding-right:8px;
   }
 
 }
