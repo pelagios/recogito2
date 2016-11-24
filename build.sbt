@@ -43,7 +43,7 @@ libraryDependencies ++= Seq(
   "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.7.5",
 
   // Recogito plugin API
-  "org.pelagios" % "recogito-plugin-sdk" % "0.0.1" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.0.1/recogito-plugin-sdk-0.0.1.jar",
+  "org.pelagios" % "recogito-plugin-sdk" % "0.0.2" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.0.2/recogito-plugin-sdk-0.0.2.jar",
 
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
@@ -60,7 +60,7 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "rangy" % "1.3.0",
   "org.webjars.bower" % "timeago" % "1.4.1",
   "org.webjars.npm" % "chartist" % "0.9.8",
-  
+
   specs2 % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"
 )
