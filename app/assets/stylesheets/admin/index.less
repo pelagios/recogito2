@@ -103,24 +103,37 @@ html, body {
 
 .right-now {
   position:relative;
+  padding:0;
 
   .container {
-    padding:10px 20px;
-    border-bottom:30px solid transparent;
+    border-bottom:23px solid transparent;
     height:100%;
     overflow:hidden !important;
     box-sizing:border-box;
     text-align:left;
   }
 
-  ul {
-    list-style-type:none;
-    padding:0;
-    margin:0;
-  }
+  table {
+    width:100%;
+    border-collapse:collapse;
 
-  .made-at {
-    float:right;
+    tr.even td {
+      background-color:@blueish-white-hi;
+    }
+
+    td {
+      padding:2px 8px;
+      font-size:15px;
+
+      a { color:@lightblue-type; }
+      em { font-style:normal; }
+
+    }
+
+    td.made-at {
+      text-align:right;
+    }
+
   }
 
 }

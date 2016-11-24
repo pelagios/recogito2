@@ -19,7 +19,7 @@ require([
 
         topContributors = jQuery('.top-contributors table'),
 
-        rightNow = jQuery('.right-now ul'),
+        rightNow = jQuery('.right-now table'),
 
         refreshHighscores = function(scores) {
 
@@ -50,6 +50,28 @@ require([
           });
         },
 
+        refreshContributionsRightNow = function(recentContributions) {
+
+          console.log(recentContributions);
+          
+          // TODO optimize. We don't need to clear list every time
+          rightNow.empty();
+          jQuery.each(recentContributions, function(idx, contribution) {
+            var odd = idx % 2,
+                row = jQuery(
+                  '<tr>' +
+                    '<td>' + ContributionUtils.format(contribution) + '</td>' +
+                    '<td></td>' + // TODO document
+                    '<td class="made-at">' + Formatting.timeSince(contribution.made_at) + '</td>' +
+                  '</tr>');
+
+            if (!odd)
+              row.addClass('even');
+
+            rightNow.append(row);
+          });
+        },
+
         refreshContributionStats = function() {
           var fillNumber = function(field, num) {
                 field.html(Formatting.formatNumber(num));
@@ -61,16 +83,7 @@ require([
             fillNumber(totalVisits, stats.total_visits);
             fillNumber(registeredUsers, stats.total_users);
 
-            // TODO refactor into separate function + optimize. We don't need to clear list every time
-            rightNow.empty();
-            jQuery.each(stats.recent_contributions, function(idx, contribution) {
-              rightNow.append(
-                '<li>' +
-                  ContributionUtils.format(contribution) +
-                  '<span class="made-at">' + Formatting.timeSince(contribution.made_at) + '</span>' +
-                '</li>');
-            });
-
+            refreshContributionsRightNow(stats.recent_contributions);
             refreshHighscores(stats.contribution_stats.by_user);
           });
         },

@@ -30,10 +30,6 @@ define([
           });
         },
 
-        refreshAnnotation = function(annotation) {
-          bindAnnotation(annotation);
-        },
-
         removeAnnotation = function(annotation) {
           var annotationId = annotation.annotation_id,
               rowIdx = annotationIndex[annotationId],
