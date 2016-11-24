@@ -61,7 +61,7 @@ require([
 
               opts = { axisX: {
                 labelInterpolationFnc: function skipLabels(value, index) {
-                  return index % 2  === 0 ? value : null;
+                  return index % 3  === 0 ? value : null;
                 },
                 showGrid: false
               }};
