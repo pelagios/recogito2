@@ -35,7 +35,7 @@ define(['common/utils/placeUtils'], function(PlaceUtils) {
         return user + 'highlighted section ' + context;
       } else if (action === 'CREATE_BODY' && itemType === 'COMMENT_BODY') {
         return 'New comment by ' + user + ' <em>&raquo;' + valAfterShort + '&laquo;</em>';
-      } else if (action === 'CREATE_BODY' && itemType === 'TRANSCRIPTION') {
+      } else if (action === 'CREATE_BODY' && itemType === 'TRANSCRIPTION_BODY') {
         return user + 'added transcription <em>&raquo;' + valAfter + '&laquo;</em>';
       } else if (action === 'CREATE_BODY' && itemType === 'TAG_BODY') {
         return user + ' tagged ' + context + ' with <em>&raquo;' + valAfter + '&laquo;</em>';
