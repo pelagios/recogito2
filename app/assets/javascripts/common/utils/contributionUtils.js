@@ -1,4 +1,4 @@
-define([], function() {
+define(['common/utils/placeUtils'], function(PlaceUtils) {
 
   var uriToLink = function(uri) {
         if (uri) {

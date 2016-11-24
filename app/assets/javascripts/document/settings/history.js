@@ -7,8 +7,7 @@ require([
   'common/ui/alert',
   'common/ui/formatting',
   'common/utils/contributionUtils',
-  'common/utils/placeUtils',
-  'common/config'], function(Alert, Formatting, ContributionUtils, PlaceUtils, Config) {
+  'common/config'], function(Alert, Formatting, ContributionUtils, Config) {
 
       /** Checks if two dates are on the same UTC day **/
   var isSameDay = function(a, b) {
