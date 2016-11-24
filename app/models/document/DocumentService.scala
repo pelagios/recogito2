@@ -5,12 +5,16 @@ import java.io.{ File, InputStream }
 import java.nio.file.Files
 import java.util.UUID
 import javax.inject.{ Inject, Singleton }
-import models.{ BaseService, Page, SortOrder }
+import models.{ BaseService, HasDate, Page, SortOrder }
 import models.generated.Tables._
 import models.generated.tables.records._
+import org.joda.time.DateTime
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import play.api.Logger
+import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
 import storage.{ DB, Uploads }
@@ -20,6 +24,8 @@ case class PartOrdering(partId: UUID, seqNo: Int)
 @Singleton
 class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends BaseService with SharingPolicies {
   
+  
+
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
   
@@ -353,3 +359,53 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   }
   
 }
+
+object DocumentService extends HasDate {
+  
+  implicit val documentRecordWrites: Writes[DocumentRecord] = (
+    (JsPath \ "id").write[String] and
+    (JsPath \ "owner").write[String] and
+    (JsPath \ "uploaded_at").write[DateTime] and
+    (JsPath \ "title").write[String] and
+    (JsPath \ "author").writeNullable[String] and
+    // TODO date_numeric
+    (JsPath \ "date_freeform").writeNullable[String] and
+    (JsPath \ "description").writeNullable[String] and
+    (JsPath \ "language").writeNullable[String] and
+    (JsPath \ "source").writeNullable[String] and
+    (JsPath \ "edition").writeNullable[String] and
+    (JsPath \ "is_public").write[Boolean]
+  )(d => (
+    d.getId,
+    d.getOwner,
+    new DateTime(d.getUploadedAt.getTime),
+    d.getTitle,
+    Option(d.getAuthor),
+    // TODO date_numeric
+    Option(d.getDateFreeform),
+    Option(d.getDescription),
+    Option(d.getLanguage),
+    Option(d.getSource),
+    Option(d.getEdition),
+    d.getIsPublic
+  ))
+
+  implicit val documentFilepartRecordWrites: Writes[DocumentFilepartRecord] = (
+    (JsPath \ "id").write[UUID] and
+    (JsPath \ "title").write[String] and
+    (JsPath \ "content_type").write[String] and
+    (JsPath \ "filename").write[String]
+  )(p => (
+    p.getId,
+    p.getTitle,
+    p.getContentType,
+    p.getFile
+  ))
+  
+  implicit val metadataWrites: Writes[(DocumentRecord, Seq[DocumentFilepartRecord])] = (
+    (JsPath).write[DocumentRecord] and
+    (JsPath \ "parts").write[Seq[DocumentFilepartRecord]]
+  )(tuple => (tuple._1, tuple._2))
+  
+}
+

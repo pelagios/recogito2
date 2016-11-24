@@ -10,20 +10,15 @@ import models.HasDate
 import models.annotation.{ Annotation, AnnotationService }
 import models.document.DocumentInfo
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import org.joda.time.DateTime
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
+import play.api.libs.json.Json
 import play.api.libs.Files.TemporaryFile
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
 import java.security.DigestInputStream
 
-trait BackupWriter extends HasDate with HasBackupValidation { self: HasConfig =>
+trait BackupWriter extends HasBackupValidation { self: HasConfig =>
   
   private val TMP = System.getProperty("java.io.tmpdir")
-  
-  import BackupWriter._
   
   private def writeToZip(inputStream: InputStream, filename: String, zip: ZipOutputStream) = {
     zip.putNextEntry(new ZipEntry(filename))
@@ -56,6 +51,10 @@ trait BackupWriter extends HasDate with HasBackupValidation { self: HasConfig =>
     }
     
     def getMetadataAsStream(doc: DocumentInfo) = {
+      
+      // DocumentRecord JSON serialization
+      import models.document.DocumentService._
+      
       val json = Json.prettyPrint(Json.toJson((doc.document, doc.fileparts)))
       new ByteArrayInputStream(json.getBytes)
     }
@@ -91,54 +90,5 @@ trait BackupWriter extends HasDate with HasBackupValidation { self: HasConfig =>
       }
     }
   }
-  
-}
-
-object BackupWriter {
-  
-  implicit val documentRecordWrites: Writes[DocumentRecord] = (
-    (JsPath \ "id").write[String] and
-    (JsPath \ "owner").write[String] and
-    (JsPath \ "uploaded_at").write[DateTime] and
-    (JsPath \ "title").write[String] and
-    (JsPath \ "author").writeNullable[String] and
-    // TODO date_numeric
-    (JsPath \ "date_freeform").writeNullable[String] and
-    (JsPath \ "description").writeNullable[String] and
-    (JsPath \ "language").writeNullable[String] and
-    (JsPath \ "source").writeNullable[String] and
-    (JsPath \ "edition").writeNullable[String] and
-    (JsPath \ "is_public").write[Boolean]
-  )(d => (
-    d.getId,
-    d.getOwner,
-    new DateTime(d.getUploadedAt.getTime),
-    d.getTitle,
-    Option(d.getAuthor),
-    // TODO date_numeric
-    Option(d.getDateFreeform),
-    Option(d.getDescription),
-    Option(d.getLanguage),
-    Option(d.getSource),
-    Option(d.getEdition),
-    d.getIsPublic
-  ))
-
-  implicit val documentFilepartRecordWrites: Writes[DocumentFilepartRecord] = (
-    (JsPath \ "id").write[UUID] and
-    (JsPath \ "title").write[String] and
-    (JsPath \ "content_type").write[String] and
-    (JsPath \ "filename").write[String]
-  )(p => (
-    p.getId,
-    p.getTitle,
-    p.getContentType,
-    p.getFile
-  ))
-  
-  implicit val metadataWrites: Writes[(DocumentRecord, Seq[DocumentFilepartRecord])] = (
-    (JsPath).write[DocumentRecord] and
-    (JsPath \ "parts").write[Seq[DocumentFilepartRecord]]
-  )(tuple => (tuple._1, tuple._2))
   
 }

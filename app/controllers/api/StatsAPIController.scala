@@ -29,6 +29,10 @@ class StatsAPIController @Inject() (
 
   // TODO does this mix concerns too much?
   def getDashboardStats() = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+    
+    // DocumentRecord JSON serialization
+    import DocumentService._
+    
     val fRecentContributions = contributions.getMostRecent(10)
     val fContributionStats = contributions.getGlobalStats()
     val fTotalAnnotations = annotations.countTotal()
@@ -36,17 +40,19 @@ class StatsAPIController @Inject() (
     val fTotalUsers = users.countUsers()
 
     val f = for {
-      recent <- fRecentContributions
+      recentContributions <- fRecentContributions
+      recentAffectedDocuments <- documents.findByIds(recentContributions.map(_.affectsItem.documentId))
       stats <- fContributionStats
       annotationCount <- fTotalAnnotations
       visitCount <- fTotalVisits
       userCount <- fTotalUsers
-    } yield (recent, stats, annotationCount, visitCount, userCount)
-
-    f.map { case (recent, stats, annotationCount, visitCount, userCount) =>
+    } yield (recentContributions, recentAffectedDocuments, stats, annotationCount, visitCount, userCount)
+    
+    f.map { case (recentContributions, recentAffectedDocuments, stats, annotationCount, visitCount, userCount) =>
       val response =
         Json.obj(
-          "recent_contributions" -> recent,
+          "recent_contributions" -> recentContributions,
+          "recent_documents" -> recentAffectedDocuments,
           "contribution_stats" -> stats,
           "total_annotations" -> annotationCount,
           "total_visits" -> visitCount,
