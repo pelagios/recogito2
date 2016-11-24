@@ -14,12 +14,10 @@ require([
 
     var totalEdits = jQuery('.total-edits .number'),
         totalAnnotations = jQuery('.total-annotations .number'),
-        totalVisits = jQuery('.total-visits .number'),
         registeredUsers = jQuery('.registered-users .number'),
-
         topContributors = jQuery('.top-contributors table'),
-
         rightNow = jQuery('.right-now table'),
+        totalVisits = jQuery('.total-visits .number'),
 
         refreshHighscores = function(scores) {
 
@@ -48,6 +46,20 @@ require([
           jQuery.each(scores, function(idx, score) {
             topContributors.append(createRow(score.username, score.value));
           });
+        },
+
+        refreshContributionHistory = function(history) {
+          var labels = jQuery.map(history, function(entry) {
+                return Formatting.formatDay(new Date(entry.date), { includeYear: false });
+              }),
+
+              series = jQuery.map(history, function(entry) {
+                return entry.value;
+              }),
+
+              data = { labels: labels, series: [ series ] };
+
+          new Chartist.Bar('#activity-history-chart', data);
         },
 
         refreshContributionsRightNow = function(stats) {
@@ -91,9 +103,9 @@ require([
           jsRoutes.controllers.api.StatsAPIController.getDashboardStats().ajax().done(function(stats) {
             fillNumber(totalEdits, stats.contribution_stats.total_contributions);
             fillNumber(totalAnnotations, stats.total_annotations);
-            fillNumber(totalVisits, stats.total_visits);
             fillNumber(registeredUsers, stats.total_users);
-
+            fillNumber(totalVisits, stats.total_visits);
+            refreshContributionHistory(stats.contribution_stats.contribution_history);
             refreshContributionsRightNow(stats);
             refreshHighscores(stats.contribution_stats.by_user);
           });
@@ -101,7 +113,7 @@ require([
 
         refresh = function() {
           refreshContributionStats();
-          window.setTimeout(refresh, REFRESH_INTERVAL_MS);
+          // window.setTimeout(refresh, REFRESH_INTERVAL_MS);
         };
 
     refresh();

@@ -59,7 +59,8 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "plotly.js" % "1.12.0",
   "org.webjars.bower" % "rangy" % "1.3.0",
   "org.webjars.bower" % "timeago" % "1.4.1",
-
+  "org.webjars.npm" % "chartist" % "0.9.8",
+  
   specs2 % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"
 )

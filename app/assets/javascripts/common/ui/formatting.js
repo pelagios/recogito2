@@ -30,12 +30,15 @@ define(function() {
       return numeral(n).format('0,0');
     },
 
-    formatDay : function(date) {
-      var day = date.getDate(),
-          month = date.getMonth(),
-          year = date.getFullYear();
+    formatDay : function(date, opts) {
+      var includeYear = (opts && opts.hasOwnProperty('includeYear')) ?
+            opts.includeYear : true,
 
-      return MONTH_NAMES_SHORT[month] + ' ' + day + ', ' + year;
+          day = date.getDate(),
+          month = date.getMonth(),
+          year = includeYear ? ', ' + date.getFullYear() : '';
+
+      return MONTH_NAMES_SHORT[month] + ' ' + day + year;
     },
 
     initTextDirection : function(containerEl) {
