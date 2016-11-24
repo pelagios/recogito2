@@ -1,5 +1,17 @@
 define([], function() {
 
+  var uriToLink = function(uri) {
+        if (uri) {
+          var parsed = PlaceUtils.parseURI(uri);
+          if (parsed.shortcode)
+            return '<a href="' + uri + '" target="_blank">' + parsed.shortcode + ':' + parsed.id + '</a>';
+          else
+            return '<a href="' + uri + '" target="_blank">' + uri + '</a>';
+        } else {
+          return '<em>[none]</em>';
+        }
+      };
+
   return {
 
     // TODO escape angle brackets

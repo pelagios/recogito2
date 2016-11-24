@@ -10,20 +10,8 @@ require([
   'common/utils/placeUtils',
   'common/config'], function(Alert, Formatting, ContributionUtils, PlaceUtils, Config) {
 
-  var uriToLink = function(uri) {
-        if (uri) {
-          var parsed = PlaceUtils.parseURI(uri);
-          if (parsed.shortcode)
-            return '<a href="' + uri + '" target="_blank">' + parsed.shortcode + ':' + parsed.id + '</a>';
-          else
-            return '<a href="' + uri + '" target="_blank">' + uri + '</a>';
-        } else {
-          return '<em>[none]</em>';
-        }
-      },
-
       /** Checks if two dates are on the same UTC day **/
-      isSameDay = function(a, b) {
+  var isSameDay = function(a, b) {
         var dateA = new Date(a),
             dateB = new Date(b),
 
