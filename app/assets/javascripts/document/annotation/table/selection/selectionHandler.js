@@ -17,11 +17,11 @@ define([
           var selectedRow = grid.getActiveCellNode().closest('.slick-row.active'),
               isFrozenRow = selectedRow.parents('.slick-viewport-left').length > 0;
 
-          // We always want the popup to hover over the frozen side of the row
+          // Popup should always hover over the first cell, which is part of the frozen row
           if (!isFrozenRow)
-            selectedRow = leftViewPort.find('.slick-row').eq(selectedRow.index());
+            selectedRow = leftViewPort.find('.slick-cell.frozen.selected').parent();
 
-          return selectedRow.find('.l1')[0];
+          return selectedRow.find('.l0')[0];
         },
 
         onSelectedRowsChanged = function(e, args) {

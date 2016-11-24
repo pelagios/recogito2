@@ -31,7 +31,6 @@ define([
         },
 
         refreshAnnotation = function(annotation) {
-          // Redraws the annotation, e.g. to account for changed entity types
           bindAnnotation(annotation);
         },
 
@@ -55,7 +54,7 @@ define([
 
     this.findById = findById;
     this.initPage = initPage;
-    this.refreshAnnotation = refreshAnnotation;
+    this.refreshAnnotation = bindAnnotation;
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
 
@@ -63,7 +62,7 @@ define([
   };
   Highlighter.prototype = Object.create(AbstractHighlighter.prototype);
 
-  /** Formatter for the 'annotation' indicator cell **/
+  /** SlickGrid Formatter for the 'annotation' cell **/
   Highlighter.CellFormatter = function(row, cell, val, columnDef, dataContext) {
     var ICONS = {
           'PLACE'  : '&#xf041;',

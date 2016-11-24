@@ -16,7 +16,7 @@ html, body {
 
 #main {
   flex:1;
-  margin-left:@sidebar-width;
+  padding-left:@sidebar-width;
   background-color:@blueish-white;
   overflow:hidden;
 }
@@ -25,6 +25,12 @@ html, body {
   position:relative;
   width:100%;
   height:100%;
+
+  // Editor popup needs to a bit more to the left than normal
+  .annotation-editor-popup {
+    margin-left:-4px;
+  }
+
 }
 
 #table {
@@ -33,6 +39,18 @@ html, body {
 
   .slick-header {
     border-bottom:1px solid @lightgrey-border-darker;
+  }
+
+  .slick-header-columns-left > .slick-header-column:first-child::after {
+    content:' ';
+    position: absolute;
+    font-size: 0.1px;
+    display: block;
+    width: 4px;
+    right: 0px;
+    top: 0;
+    height: 100%;
+    border-right:1px solid @lightgrey-border-darker;
   }
 
   .slick-header-column.ui-state-default {
@@ -62,7 +80,7 @@ html, body {
     border-color:@lightgrey-border-darker;
   }
 
-  .slick-cell.l0, .slick-cell.l0.selected,
+  .slick-cell.l0,
   .slick-cell.l1 {
     background-color:#fff;
     text-align:center;

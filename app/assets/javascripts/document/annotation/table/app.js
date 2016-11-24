@@ -41,7 +41,7 @@ require([
 
         // Default leading columns
         frozenColumns = [
-          { id: '__annotation', name: '', field: '__annotation', width: 55, formatter: Highlighter.CellFormatter },
+          { id: '__annotation', name: '', field: '__annotation', width: 45, formatter: Highlighter.CellFormatter, resizable: false },
           { id: 'id', name: '#', field: 'id', width: 65, sortable: true }
         ],
 
