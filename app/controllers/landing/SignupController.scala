@@ -43,7 +43,7 @@ class SignupController @Inject() (
     Set("admin", "api", "assets", "document", "favicon.ico", "guest", "help", "login", "logout",
         "pelagios", "recogito", "reset_password", "signup", "settings", "webjars")
 
-  private val isNotReserved: Constraint[String] = Constraint("constraints.notreserved")({username =>
+  private val isNotReserved: Constraint[String] = Constraint("constraints.notreserved")({ username =>
     if (RESERVED_NAMES.contains(username.toLowerCase))
       Invalid(username + " is a reserved word")
     else

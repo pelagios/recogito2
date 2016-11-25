@@ -45,12 +45,10 @@ class LoginLogoutController @Inject() (
         Future(BadRequest(views.html.landing.login(formWithErrors))),
 
       loginData =>
-        users.validateUser(loginData.username, loginData.password).flatMap(isValid => {
-          if (isValid)
-            gotoLoginSucceeded(loginData.username)
-          else
-            Future(Redirect(routes.LoginLogoutController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
-        })
+        users.validateUser(loginData.username, loginData.password).flatMap {
+          case Some(validUser) => gotoLoginSucceeded(validUser.getUsername)
+          case None => Future(Redirect(routes.LoginLogoutController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
+        }
     )
   }
 

@@ -146,11 +146,21 @@ class UserService @Inject() (
     Option(sql.selectFrom(USER).where(USER.EMAIL.equalIgnoreCase(encrypt(email))).fetchOne())
   }
 
-  def validateUser(username: String, password: String) =
-    findByUsername(username).map(_ match {
-      case Some(userWithRoles) => computeHash(userWithRoles.user.getSalt + password) == userWithRoles.user.getPasswordHash
-      case None => false
-    })
+  def validateUser(username: String, password: String): Future[Option[UserRecord]] = {
+    val f =
+      if (username.contains("@"))
+        findByEmail(username)
+      else
+        findByUsername(username).map(_.map(_.user))
+      
+    f.map {
+      case Some(user) =>
+        val isValid = computeHash(user.getSalt + password) == user.getPasswordHash
+        if (isValid) Some(user) else None
+      
+      case None => None
+    }
+  }
 
   /** Runs a prefix search on usernames.
     *

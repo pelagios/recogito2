@@ -13,7 +13,7 @@
       }
 
       @helper.form(action = controllers.landing.routes.LoginLogoutController.processLogin(), args = 'autocomplete -> "off") {
-        @helper.inputText(loginForm("username"), args = 'placeholder -> "Username", 'autocomplete -> "false")
+        @helper.inputText(loginForm("username"), args = 'placeholder -> "Username or E-Mail", 'autocomplete -> "false")
         @helper.inputPassword(loginForm("password"), args = 'placeholder -> "Password", 'autocomplete -> "false")
 
         <a class="forgot-password" href="@controllers.landing.routes.ResetPasswordController.showResetForm()">Forgot Password?</a>
