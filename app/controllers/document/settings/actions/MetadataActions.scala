@@ -48,11 +48,11 @@ trait MetadataActions { self: SettingsController =>
 
   val documentMetadataForm = Form(
     mapping(
-      "title" -> text,
+      "title" -> nonEmptyText,
       "author" -> optional(text),
       "date_freeform" -> optional(text),
       "description" -> optional(text(maxLength=256)),
-      "language" -> optional(text),
+      "language" -> optional(text.verifying("2- or 3-digit ISO language code required", { t => t.size > 1 && t.size < 4 })),
       "source" -> optional(text),
       "edition" -> optional(text),
       "license" -> optional(text)
@@ -76,8 +76,8 @@ trait MetadataActions { self: SettingsController =>
     documentAdminAction(docId, loggedIn.user.getUsername, { doc =>
       documentMetadataForm.bindFromRequest.fold(
         formWithErrors =>
-          Future.successful(BadRequest(views.html.document.settings.metadata(metadataForm(doc.document), doc, loggedIn.user))),
-
+          Future.successful(BadRequest(views.html.document.settings.metadata(formWithErrors, doc, loggedIn.user))),
+        
         f =>
           documents.updateMetadata(
             docId, f.title, f.author, f.dateFreeform, f.description, f.language, f.source, f.edition, f.license
