@@ -69,6 +69,7 @@ object Keys {
 	val UPLOAD_FILEPART_PKEY = UniqueKeys0.UPLOAD_FILEPART_PKEY
 	val UPLOAD_FILEPART_OWNER_TITLE_KEY = UniqueKeys0.UPLOAD_FILEPART_OWNER_TITLE_KEY
 	val USER_PKEY = UniqueKeys0.USER_PKEY
+	val USER_EMAIL_KEY = UniqueKeys0.USER_EMAIL_KEY
 	val USER_ROLE_PKEY = UniqueKeys0.USER_ROLE_PKEY
 
 	// -------------------------------------------------------------------------
@@ -112,6 +113,7 @@ object Keys {
 		val UPLOAD_FILEPART_PKEY : UniqueKey[UploadFilepartRecord] = AbstractKeys.createUniqueKey(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.ID)
 		val UPLOAD_FILEPART_OWNER_TITLE_KEY : UniqueKey[UploadFilepartRecord] = AbstractKeys.createUniqueKey(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.OWNER, UploadFilepart.UPLOAD_FILEPART.TITLE)
 		val USER_PKEY : UniqueKey[UserRecord] = AbstractKeys.createUniqueKey(User.USER, User.USER.USERNAME)
+		val USER_EMAIL_KEY : UniqueKey[UserRecord] = AbstractKeys.createUniqueKey(User.USER, User.USER.EMAIL)
 		val USER_ROLE_PKEY : UniqueKey[UserRoleRecord] = AbstractKeys.createUniqueKey(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)
 	}
 

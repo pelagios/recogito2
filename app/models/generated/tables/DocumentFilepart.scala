@@ -83,6 +83,11 @@ class DocumentFilepart(alias : String, aliased : Table[DocumentFilepartRecord], 
 	val SEQUENCE_NO : TableField[DocumentFilepartRecord, Integer] = createField("sequence_no", org.jooq.impl.SQLDataType.INTEGER.nullable(false), "")
 
 	/**
+	 * The column <code>public.document_filepart.source</code>.
+	 */
+	val SOURCE : TableField[DocumentFilepartRecord, String] = createField("source", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * Create a <code>public.document_filepart</code> table reference
 	 */
 	def this() = {

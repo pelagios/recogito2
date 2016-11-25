@@ -24,8 +24,6 @@ case class PartOrdering(partId: UUID, seqNo: Int)
 @Singleton
 class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends BaseService with SharingPolicies {
   
-  
-
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
   
@@ -394,12 +392,14 @@ object DocumentService extends HasDate {
     (JsPath \ "id").write[UUID] and
     (JsPath \ "title").write[String] and
     (JsPath \ "content_type").write[String] and
-    (JsPath \ "filename").write[String]
+    (JsPath \ "file").write[String] and
+    (JsPath \ "source").writeNullable[String]
   )(p => (
     p.getId,
     p.getTitle,
     p.getContentType,
-    p.getFile
+    p.getFile,
+    Option(p.getSource)
   ))
   
   implicit val metadataWrites: Writes[(DocumentRecord, Seq[DocumentFilepartRecord])] = (

@@ -111,7 +111,8 @@ class SignupController @Inject() (
       "welcome.txt",
       ContentType.TEXT_PLAIN.toString,
       "welcome.txt",
-      1)
+      1,
+      null)
     
     val fileInputStream = new FileInputStream("conf/onboarding/welcome.txt")
 

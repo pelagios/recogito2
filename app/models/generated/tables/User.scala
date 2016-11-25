@@ -125,7 +125,7 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	}
 
 	override def getKeys : List[ UniqueKey[UserRecord] ] = {
-		return Arrays.asList[ UniqueKey[UserRecord] ](Keys.USER_PKEY)
+		return Arrays.asList[ UniqueKey[UserRecord] ](Keys.USER_PKEY, Keys.USER_EMAIL_KEY)
 	}
 
 	override def as(alias : String) : User = {

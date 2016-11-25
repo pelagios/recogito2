@@ -89,6 +89,11 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	val FILESIZE_KB : TableField[UploadFilepartRecord, Double] = createField("filesize_kb", org.jooq.impl.SQLDataType.DOUBLE, "")
 
 	/**
+	 * The column <code>public.upload_filepart.source</code>.
+	 */
+	val SOURCE : TableField[UploadFilepartRecord, String] = createField("source", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * Create a <code>public.upload_filepart</code> table reference
 	 */
 	def this() = {

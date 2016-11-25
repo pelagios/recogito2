@@ -52,7 +52,7 @@ CREATE TABLE upload_filepart (
   content_type TEXT NOT NULL,
   file TEXT NOT NULL,
   filesize_kb DOUBLE PRECISION,
-  -- TODO filepart metadata (source, identifier,... ?)
+  source text,
   UNIQUE (owner, title)
 );
 
@@ -79,8 +79,8 @@ CREATE TABLE document_filepart (
   title TEXT NOT NULL,
   content_type TEXT NOT NULL,
   file TEXT NOT NULL,
-  sequence_no INTEGER NOT NULL
-  -- TODO filepart metadata (source, identifier,... ?)
+  sequence_no INTEGER NOT NULL,
+  source TEXT
 );
 
 -- users can organize documents into folders

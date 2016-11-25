@@ -81,8 +81,9 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
           documentId,
           (obj \ "title").as[String],
           (obj \ "content_type").as[String],
-          (obj \ "filename").as[String],
-          idx + 1)
+          (obj \ "file").as[String],
+          idx + 1,
+          (obj \ "source").asOpt[String].getOrElse(null))
       }
           
     scala.concurrent.blocking {      

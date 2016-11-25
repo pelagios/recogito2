@@ -88,7 +88,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
       ContentType.fromFile(file) match {
         case Right(contentType) => {
           filepart.ref.moveTo(file)
-          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.getUsername, title, contentType.toString, file.getName, filesizeKb)
+          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.getUsername, title, contentType.toString, file.getName, filesizeKb, null)
           sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
           Right(filepartRecord)
         }
@@ -103,7 +103,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
     val id = UUID.randomUUID
     val title = url // TODO how should we derive a sensible title?
     
-    val filepartRecord = new UploadFilepartRecord(id, uploadId, owner, title, contentType.toString, url, null)
+    val filepartRecord = new UploadFilepartRecord(id, uploadId, owner, title, contentType.toString, url, null, null)
     val rows = sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     rows == 1
   }
@@ -187,7 +187,8 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
         part.getTitle,
         part.getContentType,
         part.getFile,
-        idx + 1)
+        idx + 1,
+        part.getSource)
     }
         
     val inserts = docFileparts.map(p => sql.insertInto(DOCUMENT_FILEPART).set(p))    
