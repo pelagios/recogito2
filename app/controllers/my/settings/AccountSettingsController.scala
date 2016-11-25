@@ -100,13 +100,13 @@ class AccountSettingsController @Inject() (
     // Delete pending upload & upload_filepart records
     val fDeletePendingUpload = uploads.deletePendingUpload(username)
     
-    // Delete sharing policies 'shared_with' this user
-    val fDeleteSharedWith = documents.deletePoliciesSharedWith(username)
+    // Delete sharing policies shared by and with this user
+    val fDeleteSharingPolicies = documents.deleteAffectedPolicies(username)
         
     val f = for {
       ids <- fOwnedDocumentIds
       _ <- fDeletePendingUpload
-      _ <- fDeleteSharedWith
+      _ <- fDeleteSharingPolicies
       
       // Delete owned documents, document_fileparts & sharing policies linked to them
       _ <- documents.deleteByOwner(username) 
