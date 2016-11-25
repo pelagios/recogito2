@@ -97,19 +97,6 @@ CREATE TABLE folder_association (
   document_id TEXT NOT NULL REFERENCES document(id)
 );
 
--- teams are a first level entities similar to user
--- CREATE TABLE team (
---   title TEXT NOT NULL PRIMARY KEY,
---   created_by TEXT NOT NULL REFERENCES "user"(username),
---   created_at TIMESTAMP WITH TIME ZONE NOT NULL
--- );
-
--- CREATE TABLE team_membership (
---   username TEXT NOT NULL REFERENCES "user"(username),
---   team TEXT NOT NULL REFERENCES team(title),
---   member_since TIMESTAMP WITH TIME ZONE NOT NULL
--- );
-
 -- ledger of shared documents and folders
 CREATE TABLE sharing_policy (
   id SERIAL PRIMARY KEY,

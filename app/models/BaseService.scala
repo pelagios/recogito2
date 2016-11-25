@@ -31,7 +31,14 @@ trait BaseService {
     (0 to record.size - 1).map(idx => {
       record.getValue(idx) != null
     }).exists(_ == true)
-
+    
+  /** Optional strings should be turned to null for JOOQ **/
+  protected def optString(str: Option[String]) = str match {
+    case Some(str) if str.isEmpty => null
+    case Some(str) => str
+    case None => null
+  }
+  
   /** Converts the results of a two-table left join to a Map[DomainObj1, Seq[DomainObj2]] **/
   protected def groupLeftJoinResult[T <: Record, V <: Record](records: Seq[Record], t: Class[T], v: Class[V]) =
     records

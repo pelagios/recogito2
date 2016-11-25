@@ -22,7 +22,19 @@
         @helper.inputText(metadataForm("language"), args = '_label -> "Language", '_help -> "", 'autocomplete -> "false")
         @helper.inputText(metadataForm("source"), args = '_label -> "Source", '_help -> "", 'autocomplete -> "false")
         @helper.inputText(metadataForm("edition"), args = '_label -> "Edition", '_help -> "", 'autocomplete -> "false")
-        @helper.inputText(metadataForm("license"), args = '_label -> "License", '_help -> "", 'autocomplete -> "false")
+        <dl id="license_field">
+          <dt>
+            <label for="license">License</label>
+          </dt>
+          <dd>
+            <select id="license" name="license">
+              <option value @if(doc.license.isEmpty) { selected="true" }>-- Select a license --</option>
+              @for(license <- models.document.License.values) {
+                <option value="@license.uri" @if(doc.license == Some(license.uri)) { selected="true" }>@license.name</option>
+              }
+            </select>
+          </dd>
+        </dl>
         <dt></dt>
         <dd>
           <button type="submit" class="btn"/>Save Changes</button>

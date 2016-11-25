@@ -134,13 +134,13 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
 
     val rowsAffected = sql.update(DOCUMENT)
       .set(DOCUMENT.TITLE, title)
-      .set(DOCUMENT.AUTHOR, author.getOrElse(null))
-      .set(DOCUMENT.DATE_FREEFORM, dateFreeform.getOrElse(null))
-      .set(DOCUMENT.DESCRIPTION, description.getOrElse(null))
-      .set(DOCUMENT.LANGUAGE, language.getOrElse(null))
-      .set(DOCUMENT.SOURCE, source.getOrElse(null))
-      .set(DOCUMENT.EDITION, edition.getOrElse(null))
-      .set(DOCUMENT.LICENSE, license.getOrElse(null))
+      .set(DOCUMENT.AUTHOR, optString(author))
+      .set(DOCUMENT.DATE_FREEFORM, optString(dateFreeform))
+      .set(DOCUMENT.DESCRIPTION, optString(description))
+      .set(DOCUMENT.LANGUAGE, optString(language))
+      .set(DOCUMENT.SOURCE, optString(source))
+      .set(DOCUMENT.EDITION, optString(edition))
+      .set(DOCUMENT.LICENSE, optString(license))
       .where(DOCUMENT.ID.equal(docId)).execute() 
     
     rowsAffected == 1

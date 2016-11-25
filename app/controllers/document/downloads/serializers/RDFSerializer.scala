@@ -56,7 +56,7 @@ trait RDFSerializer extends BaseSerializer with HasDate {
     docInfo.description.map(description => resource.addProperty(DCTerms.description, description))
     docInfo.source.map(source => resource.addProperty(DCTerms.source, source))
     docInfo.language.map(language => resource.addProperty(DCTerms.language, language))
-    docInfo.license.map(license => resource.addProperty(DCTerms.license, license))
+    docInfo.license.map(license => resource.addProperty(DCTerms.license, license.toString))
   }
   
   private def createAnnotationResource(docInfo: DocumentInfo, annotation: Annotation, baseUri: String, model: Model) = {

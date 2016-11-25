@@ -1,5 +1,6 @@
 package models.document
 
+import java.net.URI
 import java.sql.Timestamp
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UserRecord }
 
@@ -29,7 +30,7 @@ case class DocumentInfo(document: DocumentRecord, fileparts: Seq[DocumentFilepar
   
   lazy val edition: Option[String] = Option(document.getEdition)
   
-  lazy val license: Option[String] = Option(document.getLicense)
+  lazy val license: Option[URI] = Option(document.getLicense).map(new URI(_))
   
   lazy val isPublic: Boolean = document.getIsPublic
   

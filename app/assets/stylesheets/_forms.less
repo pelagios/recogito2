@@ -20,14 +20,17 @@ dd.info {
   color:@lightgrey-type;
 }
 
-input, textarea {
+input, textarea, select {
   border:0;
   outline:none;
   font-size:17px;
+}
+
+input, textarea {
   -webkit-appearance:none;
 }
 
-input[type=text], input[type=password], textarea {
+input[type=text], input[type=password], textarea, select {
   box-sizing:border-box;
   color:@form-type;
   background-color:#fff;
@@ -36,7 +39,7 @@ input[type=text], input[type=password], textarea {
   border:1px solid @form-grey-border;
 }
 
-input[type=text]:focus, input[type=password]:focus, textarea:focus {
+input[type=text]:focus, input[type=password]:focus, textarea:focus, select:focus {
   border-color:@form-blue-border;
   box-shadow:0 0 4px 0 @form-blue-glow;
 }
@@ -127,7 +130,7 @@ form.crud {
     text-align:right;
   }
 
-  input[type=text], input[type=password], textarea {
+  input[type=text], input[type=password], textarea, select {
     padding:5px 6px;
     margin:7px 10px;
     width:320px;
