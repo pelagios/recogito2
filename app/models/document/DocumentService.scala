@@ -146,6 +146,16 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     rowsAffected == 1
   }
   
+  def updateFilepartMetadata(docId: String, partId: UUID, title: String, source: Option[String]) = db.withTransaction { sql =>
+    val rowsAffected = sql.update(DOCUMENT_FILEPART)
+      .set(DOCUMENT_FILEPART.TITLE, title)
+      .set(DOCUMENT_FILEPART.SOURCE, optString(source))
+      .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId).and(DOCUMENT_FILEPART.ID.equal(partId)))
+      .execute()
+      
+    rowsAffected == 1
+  }
+  
   /** Changes the sequence numbers of fileparts for a specific document **/
   def setFilepartSortOrder(docId: String, sortOrder: Seq[PartOrdering]) = db.withTransaction { sql =>
     // To verify validaty of the request, load the fileparts from the DB first...

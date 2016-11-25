@@ -60,14 +60,18 @@
   </div>
 
   <script>
-    window.config = {
-      documentId: '@doc.id'
+    @defining(models.document.DocumentService.documentFilepartRecordWrites) { implicit writes =>
+      window.config = {
+        documentId: "@doc.id",
+        fileparts: @Html(play.api.libs.json.Json.toJson(doc.fileparts).toString)
+      }
     }
   </script>
   <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>
   <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/metadata.js")"></script>
 
   @helper.javascriptRouter("jsRoutes")(
-    controllers.document.settings.routes.javascript.SettingsController.setSortOrder
+    controllers.document.settings.routes.javascript.SettingsController.setSortOrder,
+    controllers.document.settings.routes.javascript.SettingsController.updateFilepartMetadata
   )
 }

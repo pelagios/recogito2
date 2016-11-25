@@ -5,35 +5,88 @@ require.config({
 
 require(['common/config'], function(Config) {
 
-  var PartMetadataEditor = function() {
+  var PartMetadataEditor = function(part) {
     var element = jQuery(
           '<div class="part-metadata-editor clicktrap">' +
             '<div class="modal-wrapper">' +
               '<div class="modal">' +
 
                 '<div class="modal-header">' +
-                  '<h2>Part Metadata</h2>' +
+                  '<h2>' + part.title + '</h2>' +
                   '<button class="nostyle outline-icon cancel">&#xe897;</button>' +
                 '</div>' +
 
                 '<div class="modal-body">' +
-                '</div>' +
+                  '<form class="crud">' +
+                    '<div class="error"></div>' +
+                    '<dl id="part-title-field">' +
+                      '<dt><label for="part-title">Title</label></dt>' +
+                      '<dd>' +
+                        '<input type="text" id="part-title" name="part-title" value="' + part.title + '" autocomplete="false">' +
+                      '</dd>' +
+                    '</dl>' +
 
+                    '<dl id="part-source-field">' +
+                      '<dt><label for="part-source">Source</label></dt>' +
+                      '<dd>' +
+                        '<input type="text" id="part-source" name="part-source" autocomplete="false">' +
+                      '</dd>' +
+                    '</dl>' +
+
+                    '<dt></dt>' +
+                    '<button type="submit" class="btn">Save Changes</button>' +
+                  '</form>' +
+                '</div>' +
               '</div>' +
             '</div>' +
           '</div>'),
 
+        form = element.find('form'),
+
+        errorMessage = element.find('.error'),
+
         btnCancel = element.find('.cancel'),
+
+        init = function() {
+          // Populate form
+          if (part.source)
+            element.find('#part-source').attr('value', part.source);
+
+          // Form submit handler
+          form.submit(onSubmit);
+
+          // 'X' icon click handler
+          btnCancel.click(destroy);
+
+          // Attach element to DOM and make draggable
+          jQuery(document.body).append(element);
+          element.find('.modal-wrapper').draggable({ handle: '.modal-header' });
+        },
+
+        getValue = function(selector) {
+          var value = form.find(selector).val().trim();
+          if (value.length > 0)
+            return value;
+        },
+
+        onSubmit = function() {
+          jsRoutes.controllers.document.settings.SettingsController.updateFilepartMetadata(Config.documentId, part.id).ajax({
+            data: { title: getValue('#part-title'), source: getValue('#part-source') }
+          }).success(function() {
+            destroy();
+            window.location.reload(true);
+          }).fail(function(error) {
+            errorMessage.html(error.responseText);
+          });
+          return false;
+        },
 
         destroy = function() {
           element.remove();
         };
 
-    btnCancel.click(destroy);
-
-    jQuery(document.body).append(element);
+    init();
   };
-
 
   jQuery(document).ready(function() {
 
@@ -63,7 +116,7 @@ require(['common/config'], function(Config) {
           jsRoutes.controllers.document.settings.SettingsController.setSortOrder(Config.documentId).ajax({
             data: JSON.stringify(sortOrder),
             contentType: 'application/json'
-          }).success(function(error) {
+          }).success(function() {
             setFlashMessage('success', '<span class="icon">&#xf00c;</span> Your settings have been saved.');
           }).fail(function(error) {
             setFlashMessage('error', '<span class="icon">&#xf00d;</span> ' + error);
@@ -71,8 +124,13 @@ require(['common/config'], function(Config) {
         },
 
         onOpenPartEditor = function(e) {
-          console.log(e);
-          var editor = new PartMetadataEditor();
+          var partId = jQuery(e.target).closest('li').data('id'),
+
+              part = jQuery.grep(Config.fileparts, function(part) {
+                return part.id === partId;
+              })[0],
+
+              editor = new PartMetadataEditor(part);
         };
 
     // Make filepart elements sortable (and disable selection)

@@ -32,6 +32,14 @@ case class DocumentMetadata(
 
 )
 
+case class FilepartMetadata(
+
+  title: String,
+  
+  source: Option[String]
+
+)
+
 trait MetadataActions { self: SettingsController =>
 
   implicit val orderingReads: Reads[PartOrdering] = (
@@ -94,6 +102,36 @@ trait MetadataActions { self: SettingsController =>
               .flashing("error" -> "There was an error while saving your settings.")
           }
       )
+    })
+  }
+  
+  def updateFilepartMetadata(docId: String, partId: UUID) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    
+    def bindFromRequest(): Either[String, FilepartMetadata] =
+      getFormParam("title") match {
+        case Some(title) if title.isEmpty => Left("Title required")
+        case Some(title) => Right(FilepartMetadata(title, getFormParam("source")))
+        case None => Left("Title required")
+      }
+  
+    documentAdminAction(docId, loggedIn.user.getUsername, { doc =>
+      // Make sure we're not updating a part that isn't in this document
+      if (doc.fileparts.exists(_.getId == partId)) {
+        bindFromRequest() match {
+          case Right(partMetadata) => 
+            documents.updateFilepartMetadata(doc.id, partId, partMetadata.title, partMetadata.source).map { success =>
+              if (success)
+                Ok
+              else
+                InternalServerError
+            }
+            
+          case Left(error) =>
+            Future.successful(BadRequest(error))
+        }       
+      } else {
+        Future.successful(BadRequest)
+      }
     })
   }
 
