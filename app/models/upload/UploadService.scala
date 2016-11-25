@@ -52,7 +52,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
                 nullIfEmpty(author),
                 nullIfEmpty(dateFreeform),
                 nullIfEmpty(description),
-                nullIfEmpty(language),
+                nullIfEmpty(language.toUpperCase),
                 nullIfEmpty(source),
                 nullIfEmpty(edition),
                 null)
