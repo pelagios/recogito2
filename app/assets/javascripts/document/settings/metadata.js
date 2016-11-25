@@ -5,9 +5,41 @@ require.config({
 
 require(['common/config'], function(Config) {
 
+  var PartMetadataEditor = function() {
+    var element = jQuery(
+          '<div class="part-metadata-editor clicktrap">' +
+            '<div class="modal-wrapper">' +
+              '<div class="modal">' +
+
+                '<div class="modal-header">' +
+                  '<h2>Part Metadata</h2>' +
+                  '<button class="nostyle outline-icon cancel">&#xe897;</button>' +
+                '</div>' +
+
+                '<div class="modal-body">' +
+                '</div>' +
+
+              '</div>' +
+            '</div>' +
+          '</div>'),
+
+        btnCancel = element.find('.cancel'),
+
+        destroy = function() {
+          element.remove();
+        };
+
+    btnCancel.click(destroy);
+
+    jQuery(document.body).append(element);
+  };
+
+
   jQuery(document).ready(function() {
 
-    var parts = jQuery('li.filepart'),
+    var partList = jQuery('.part-metadata ul'),
+
+        parts = jQuery('li.filepart'),
 
         flashMessage = jQuery('.part-metadata .flash-message'),
 
@@ -36,14 +68,22 @@ require(['common/config'], function(Config) {
           }).fail(function(error) {
             setFlashMessage('error', '<span class="icon">&#xf00d;</span> ' + error);
           });
+        },
+
+        onOpenPartEditor = function(e) {
+          console.log(e);
+          var editor = new PartMetadataEditor();
         };
 
     // Make filepart elements sortable (and disable selection)
-    jQuery('.part-metadata ul').disableSelection();
-    jQuery('.part-metadata ul').sortable({
+    partList.disableSelection();
+    partList.sortable({
       start: clearFlashMessage,
       stop: onOrderChanged
     });
+
+    // 'Edit part metadata' button handler
+    partList.on('click', 'button', onOpenPartEditor);
   });
 
 });
