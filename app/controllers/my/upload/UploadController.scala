@@ -49,7 +49,7 @@ class UploadController @Inject() (
       "author" -> text,
       "date_freeform" -> text,
       "description" -> text,
-      "language" -> text.verifying("2- or 3-digit ISO language code required", { t => t.size > 1 && t.size < 4 }),
+      "language" -> text.verifying("2- or 3-digit ISO language code required", { t => t.isEmpty || (t.size > 1 && t.size < 4) }),
       "source" -> text,
       "edition" -> text
     )(NewDocumentData.apply)(NewDocumentData.unapply)
