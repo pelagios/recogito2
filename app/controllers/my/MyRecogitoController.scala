@@ -8,7 +8,7 @@ import models.annotation.AnnotationService
 import models.contribution.{ Contribution, ContributionService }
 import models.user.UserService
 import models.document.DocumentService
-import models.generated.tables.records.{ DocumentRecord, UserRecord }
+import models.generated.tables.records.{ DocumentRecord, SharingPolicyRecord, UserRecord }
 import play.api.Configuration
 import play.api.mvc.RequestHeader
 import scala.concurrent.{ ExecutionContext, Future }
@@ -32,17 +32,20 @@ class MyRecogitoController @Inject() (
   private def isSortingByIndex(sortBy: Option[String]) =
     sortBy.map(fieldname => INDEX_SORT_PROPERTIES.contains(fieldname.toLowerCase)).getOrElse(false)
 
-  private def renderPublicProfile(username: String, loggedInUser: Option[UserRecord])(implicit request: RequestHeader) = {
+  private def renderPublicProfile(owner: String, loggedInUser: Option[UserRecord])(implicit request: RequestHeader) = {
+    val fOwnerWithRoles = users.findByUsernameIgnoreCase(owner)
+    
+    // TODO add pagination and sorting options
+    
+    val fDocs = documents.findAccessibleDocuments(owner, loggedInUser.map(_.getUsername), 0, 100)
+    
     val f = for {
-      userWithRoles   <- users.findByUsernameIgnoreCase(username)
-      publicDocuments <- if (userWithRoles.isDefined)
-                           documents.findByOwner(userWithRoles.get.user.getUsername, true)
-                         else
-                           Future.successful(Page.empty[DocumentRecord])
-    } yield (userWithRoles, publicDocuments)
+      ownerWithRoles <- fOwnerWithRoles
+      docs <- fDocs
+    } yield (ownerWithRoles, docs)    
 
-    f.map { case (userWithRoles, publicDocuments) => userWithRoles match {
-      case Some(u) => Ok(views.html.my.my_public(u.user, publicDocuments, loggedInUser))
+    f.map { case (ownerWithRoles, docs) => ownerWithRoles match {
+      case Some(o) => Ok(views.html.my.my_public(o.user, docs, loggedInUser))
       case None => NotFoundPage
     }}
   }
@@ -92,7 +95,7 @@ class MyRecogitoController @Inject() (
           }
         }
       } else {
-        documents.findByOwner(user.getUsername, false, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
+        documents.findByOwner(user.getUsername, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
       }
         
     val f = for {

@@ -306,19 +306,15 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   }
   
   /** Retrieves documents by their owner **/
-  def findByOwner(owner: String, publicOnly: Boolean = false, offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
+  def findByOwner(owner: String, offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
     val startTime = System.currentTimeMillis
 
     val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT), fieldname, sortOrder))
 
-    val total = if (publicOnly)
-      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true))).fetchOne(0, classOf[Int])
-    else
+    val total =
       sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
     
-    val query = if (publicOnly)
-      sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true)))
-    else
+    val query =
       sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner))
 
     val items = sortField match {
@@ -327,6 +323,44 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     }
     
     Page(System.currentTimeMillis - startTime, total, offset, limit, items)
+  }
+  
+  /** Retrieves documents from a given owner visible to the given logged in user.
+    *
+    * If there is currently no logged in user, only public documents are returned.  
+    */
+  def findAccessibleDocuments(
+      owner: String,
+      loggedInUser: Option[String],
+      offset: Int = 0, limit: Int = 20,
+      sortBy: Option[String] = None,
+      sortOrder: Option[SortOrder] = None
+    ) = db.query { sql =>
+        
+    val startTime = System.currentTimeMillis
+    
+    // TODO sorting
+        
+    val queries = Seq(sql.selectCount(), sql.select())
+      .map { q => loggedInUser match {
+        
+          case Some(loggedIn) =>
+            q.from(DOCUMENT.leftOuterJoin(SHARING_POLICY)
+               .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID)))
+             .where(DOCUMENT.OWNER.equal(owner).and(
+               DOCUMENT.IS_PUBLIC.equal(true)
+                 .or(SHARING_POLICY.SHARED_WITH.equal(loggedIn))))
+                 
+          case None =>       
+            q.from(DOCUMENT).where(DOCUMENT.IS_PUBLIC.equal(true))
+            
+        }
+      }
+    
+    val total = queries(0).fetchOne(0, classOf[Int])   
+    val items = queries(1).limit(limit).offset(offset).fetch().into(classOf[DocumentRecord])
+    
+    Page(System.currentTimeMillis - startTime, total, offset, limit, items) 
   }
     
   /** Deletes a document by its ID, along with filepart records and files **/
