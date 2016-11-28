@@ -30,7 +30,7 @@
             <select id="license" name="license">
               <option value @if(doc.license.isEmpty) { selected="true" }>-- Select a license --</option>
               @for(license <- models.document.License.values) {
-                <option value="@license.uri" @if(doc.license == Some(license.uri)) { selected="true" }>@license.name</option>
+                <option value="@license.acronym" @if(doc.license == Some(license.uri)) { selected="true" }>@license.name</option>
               }
             </select>
           </dd>

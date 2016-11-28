@@ -30,7 +30,7 @@ case class DocumentInfo(document: DocumentRecord, fileparts: Seq[DocumentFilepar
   
   lazy val edition: Option[String] = Option(document.getEdition)
   
-  lazy val license: Option[URI] = Option(document.getLicense).map(new URI(_))
+  lazy val license: Option[License] = Option(document.getLicense).flatMap(License.fromAcronym(_))
   
   lazy val isPublic: Boolean = document.getIsPublic
   
