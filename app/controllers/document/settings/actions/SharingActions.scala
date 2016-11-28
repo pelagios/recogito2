@@ -30,8 +30,13 @@ object CollaboratorStub {
 trait SharingActions extends HasPrettyPrintJSON { self: SettingsController =>
     
   def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { _ =>
-      documents.setPublicVisibility(documentId, enabled).map(_ => Status(200))
+    documentAdminAction(documentId, loggedIn.user.getUsername, { doc =>
+      // Make sure the license allows public access
+      if (doc.license.map(_.isOpen).getOrElse(false))
+        documents.setPublicVisibility(documentId, enabled).map(_ => Status(200))
+      else
+        // Note: setting is_public=true for a close document is not possible through UI!
+        Future.successful(BadRequest)
     })
   }
   

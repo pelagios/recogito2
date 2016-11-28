@@ -8,8 +8,15 @@
   <div class="panel share-public">
     <h2>Public Access</h2>
     <div class="inner">
-      <input type="checkbox" id="public-access" name="public-access" @if(doc.isPublic) { checked="checked" } />
+      <input type="checkbox" id="public-access" name="public-access" @if(doc.isPublic) { checked="checked" } @if(!doc.license.map(_.isOpen).getOrElse(false)) { disabled="true" } />
       <label for="public-access">Visible to all</label>
+      @if(doc.license.isEmpty) {
+        <span class="license-warning"><span class="icon">&#xf071;</span>
+          Set an open license in the <a href="?tab=metadata">metadata settings</a> before enabling public access.
+        </span>
+      } else { @if(!doc.license.get.isOpen) {
+        <span class="license-warning"><span class="icon">&#xf071;</span> The document license (@doc.license.get.name) does not permit public access.</span>
+      }}
       <p class="checkbox-details">
         This document will be visible to the public. Visitors can see your annotations, but
         not edit. Visitors can also download the annotation data from the download page. Link to share:

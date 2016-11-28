@@ -132,7 +132,11 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     description: Option[String], language: Option[String], source: Option[String], edition: Option[String],
     license: Option[String]): Future[Boolean] = db.withTransaction { sql =>  
 
-    val rowsAffected = sql.update(DOCUMENT)
+    // If the update sets the document to a non-open license, make sure is_public is set to false
+    val hasNonOpenLicense = license.map(acronym =>
+      License.fromAcronym(acronym).map(!_.isOpen).getOrElse(true)).getOrElse(true)
+      
+    val q = sql.update(DOCUMENT)
       .set(DOCUMENT.TITLE, title)
       .set(DOCUMENT.AUTHOR, optString(author))
       .set(DOCUMENT.DATE_FREEFORM, optString(dateFreeform))
@@ -141,7 +145,13 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       .set(DOCUMENT.SOURCE, optString(source))
       .set(DOCUMENT.EDITION, optString(edition))
       .set(DOCUMENT.LICENSE, optString(license))
-      .where(DOCUMENT.ID.equal(docId)).execute() 
+      
+    val rowsAffected =
+      if (hasNonOpenLicense)
+        q.set[java.lang.Boolean](DOCUMENT.IS_PUBLIC, false)
+         .where(DOCUMENT.ID.equal(docId)).execute()
+      else
+        q.where(DOCUMENT.ID.equal(docId)).execute()
     
     rowsAffected == 1
   }
