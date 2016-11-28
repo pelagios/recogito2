@@ -2,7 +2,8 @@
 
 html, body {
   font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 18px;
+  font-size:18px;
+  line-height:160%;
 }
 
 .inner {
@@ -16,7 +17,7 @@ html, body {
   height:95px;
 
   .inner {
-    color:lighten(@lightblue-type, 17%);
+    color:lighten(@lightblue-type, 12%);
     font-family:OpenSans;
     font-weight:bold;
     font-size:35px;
@@ -34,7 +35,7 @@ html, body {
 
     .links {
       position:absolute;
-      top:32px;
+      top:36px;
       right:0;
       font-size:15px;
 
@@ -61,7 +62,7 @@ html, body {
   background-image: url("/assets/images/egerton_ms_73.jpg");
   background-position:center top;
   color:#fff;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.35);
 
   .wrapper {
     padding-top:90px;
@@ -74,7 +75,7 @@ html, body {
 
     .sub-title {
       color:@lightblue-type-disabled;
-      font-size:18px;
+      font-size:19px;
       font-family:OpenSans;
       font-weight:bold;
       line-height:180%;
@@ -90,12 +91,38 @@ html, body {
 
 }
 
+.toc {
+  position:absolute;
+  top:0;
+  right:0;
+  font-size:16px;
+
+  ul {
+    list-style-type:none;
+    padding:0;
+    margin:0;
+  }
+
+  li {
+    padding:5px 0;
+  }
+
+  a {
+    color:@ocean;
+    text-decoration:none;
+  }
+
+}
+
 .article {
-  line-height:180%;
+  padding:20px 0 50px 0;
 
   h2 {
-    font-size:26px;
-    line-height:38px;
+    padding-top:20px;
+    font-family:PTSansNarrow;
+    color:@ocean;
+    font-size:30px;
+    font-weight:normal;
   }
 
 }
