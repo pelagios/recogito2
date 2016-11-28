@@ -12,7 +12,7 @@ import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.{ Action, Controller }
 import scala.concurrent.{ ExecutionContext, Future }
 
-case class LoginData(username: String, password: String)
+case class LoginData(usernameOrPassword: String, password: String)
 
 class LoginLogoutController @Inject() (    
     val config: Configuration,
@@ -45,7 +45,7 @@ class LoginLogoutController @Inject() (
         Future(BadRequest(views.html.landing.login(formWithErrors))),
 
       loginData =>
-        users.validateUser(loginData.username, loginData.password).flatMap {
+        users.validateUser(loginData.usernameOrPassword, loginData.password).flatMap {
           case Some(validUser) => gotoLoginSucceeded(validUser.getUsername)
           case None => Future(Redirect(routes.LoginLogoutController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
         }
