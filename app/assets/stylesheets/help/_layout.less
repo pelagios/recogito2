@@ -1,34 +1,42 @@
 @import "../_globals.less";
 
+html, body {
+  font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 18px;
+}
+
 .inner {
   position:relative;
   margin:0 auto;
   width:880px;
   height:100%;
-  display:table;
 }
 
 .page-header {
   height:95px;
 
   .inner {
+    color:lighten(@lightblue-type, 17%);
+    font-family:OpenSans;
+    font-weight:bold;
+    font-size:35px;
 
     .logo {
-      display:table-cell;
-      vertical-align:middle;
+      padding-top:30px;
 
       img {
-        width:104px;
-        height:35px;
+        vertical-align:middle;
+        width:130px;
+        height:39px;
       }
 
     }
 
     .links {
-      height:100%;
-      display:table-cell;
-      text-align:right;
-      vertical-align:middle;
+      position:absolute;
+      top:32px;
+      right:0;
+      font-size:15px;
 
       a {
         color:@lightblue-type;
@@ -56,12 +64,12 @@
   text-shadow: 0 1px 1px rgba(0,0,0,0.4);
 
   .wrapper {
-    display:table-cell;
-    vertical-align:middle;
+    padding-top:90px;
 
     h1 {
+      font-family:PTSansNarrow;
       font-weight:normal;
-      font-size:48px;
+      font-size:50px;
     }
 
     .sub-title {
@@ -78,6 +86,16 @@
 
     }
 
+  }
+
+}
+
+.article {
+  line-height:180%;
+
+  h2 {
+    font-size:26px;
+    line-height:38px;
   }
 
 }
