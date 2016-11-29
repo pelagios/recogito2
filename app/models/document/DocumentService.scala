@@ -352,7 +352,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
                  .or(SHARING_POLICY.SHARED_WITH.equal(loggedIn))))
                  
           case None =>       
-            q.from(DOCUMENT).where(DOCUMENT.IS_PUBLIC.equal(true))
+            q.from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true)))
             
         }
       }
