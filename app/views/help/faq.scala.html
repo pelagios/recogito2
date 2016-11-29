@@ -1,13 +1,95 @@
-@()
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Recogito | Guide</title>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/help/faq.css")"/>
-  </head>
-  <body>
+@()(implicit request: RequestHeader)
+@_layout("FAQ", "Recogito Frequently Asked Questions") {
+  <h1>Frequently Asked Questions</h1>
+} {
+  <h2 id="supported-formats">What kind of documents can I upload?</h2>
+  <p>Presently, Recogito supports:</p>
+  <ul>
+    <li>UTF-8 plaintext files</li>
+    <li>Images in JPEG, TIFF and PNG format</li>
+    <li>Images served via <a href="http://iiif.io" target="_blank">IIIF</a> (currently, single images only)</li>
+  </ul>
+  <p>
+    We are working towards support for TEI/XML-encoded texts, data tables in CSV format, and support for
+    IIIF collection manifests.
+  </p>
 
+  <h2 id="user-quota">Can I upload unlimited documents?</h2>
+  <p>
+    No. The standard private work spaces have an upload limit of 200 MB. Please get in touch
+    with us if you require additional space.
+  </p>
 
+  <h2 id="legal">Are there legal considerations to using Recogito?</h2>
+  <p>
+    UK Copyright Law permits the use of third party material for &quot;private and research study
+    purposes&quot;. Uploaded documents are hosted in your private area, and will be accessible only
+    to you - unless you choose to share them with other users. You can make documents publicly
+    available by ticking the &quot;Visible to all&quot; option in your document sharing options.
+    But may strictly only do so in circumstances where the document is not under copyright. (Please
+    also refer to our <a href="/signup">Terms and Conditions</a>.)
+  </p>
+  <p>
+    Copyright is an automatic right. But other licensing arrangements may also apply and you must
+    take legal responsibility for adhering to them. In particular, be aware that some &quot;open&quot;
+    Creative Commons licenses have a &quot;No Derivatives&quot; clause which according to most
+    copyright laws includes annotations. You may not make such works public within Recogito without
+    prior consent from the copyright owner.
+  </p>
 
-  </body>
-</html>
+  <h2 id="concurrent-editing">Can I work on the same document with other people at the same time?</h2>
+  <p>
+    Yes, you can work concurrently on the same document. But at present you will not be able
+    to see other people's edits in real-time like, say, in Google Drive.
+  </p>
+
+  <h2 id="what-is-a-gazetteer">What is a gazetteer?</h2>
+  <p>To paraphrase from the introductory chapters of
+    <a href="http://www.iupress.indiana.edu/product_info.php?products_id=808056" target="_blank">Berman,
+    Mostern &amp; Southall, Placing Names: Enriching and Integrating Gazetteers</a>: Most simply,
+    a gazetteer is a list of places. A <em>digital gazetteer</em>, in particular, will often include
+    names, coordinates and sometimes features types for each place as well. Today, gazetteers are
+    the basis for much of the spatial search and visualization we all have come to take for
+    granted on the Web.
+  </p>
+
+  <h2 id="available-gazetteers">Which gazetteers are currently available in Recogito?</h2>
+  <p>The following gazetteers are currently available</p>
+  <ul>
+    <li><a href="http://pleiades.stoa.org" target="_blank">Pleiades Gazetteer of the Ancient World</a></li>
+    <li>Places from the <a href="http://dare.ht.lu.se/" target="_blank">Digital Atlas of the Roman Empire</a></li>
+    <li><a href="http://www.geonames.org" target="_blank">GeoNames</a></li>
+  </ul>
+
+  <h2 id="which-gazetteer">How do I know which gazetteer to use?</h2>
+  <p>
+    Different gazetteers will provide different, often complementary (and sometimes even conflicting),
+    information about places for particular time periods or regions. We recommend that you select
+    the gazetteer you feel best reflects the document that you are working on, e.g.
+    <a href="http://pleiades.stoa.org" target="_blank">Pleiades</a> for Ancient history,
+    <a href="http://www.geonames.org" target="_blank">GeoNames</a> for contemporary material.
+  </p>
+  <p>
+    We aim to add further gazetteers to Recogito over time. In additiona, we are working actively
+    with the gazetteer community to assist in the <em>alignment</em> of gazetteers - which means
+    that place references you associate with one gazetteer will automatically become associated with
+    relevant places in other gazetteers as well.
+  </p>
+
+  <h2 id="what-is-linked-data">What is Linked Data and how does Recogito use it?</h2>
+  <p>
+    <a href="https://en.wikipedia.org/wiki/Linked_data" target="_blank">Linked Data</a> is a way of
+    connecting online resources that have some element in common. In our case, that common element
+    is <em>Place</em>: Recogito connects documents to online gazetteers and makes annotations
+    available to you in a Linked Data format called the
+    <a href="http://www.openannotation.org/spec/core/" target="_blank">Open Annotation Data Model</a>.
+  </p>
+
+  <h2 id="citing-recogito">How can I cite Recogito in a bibliography?</h2>
+  <p>Please list our URL and the month and year you accessed it, as in the following example:</p>
+
+  <blockquote>
+    Recogito, an initiative of Pelagios Commons:
+    <a href="http://recogito.pelagios.org/">http://recogito.pelagios.org/</a> (accessed 12 September 2016)
+  </blockquote>
+}

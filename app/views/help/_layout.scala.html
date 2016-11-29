@@ -1,0 +1,58 @@
+@(title: String, synopsis: String)(articleHeading: Html)(article: Html)(implicit request: RequestHeader)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito | @title</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/help/guide.css")"/>
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@@pelagiosproject" />
+    <meta property="og:title" content="Recogito Help" />
+    <meta name="twitter:title" content="Recogito Help" />
+    <meta property="og:description" content="@synopsis" />
+    <meta name="twitter:description" content="@synopsis" />
+    <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+    <meta property="og:image:width" content="240" />
+    <meta property="og:image:height" content="240" />
+    <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+    <meta property="og:url" content="@controllers.landing.routes.LandingController.index.absoluteURL" />
+    <link rel="apple-touch-icon" sizes="57x57" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
+    <link rel="apple-touch-icon" sizes="114x114" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
+    <link rel="apple-touch-icon" sizes="72x72" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
+    <link rel="apple-touch-icon" sizes="144x144" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
+  </head>
+
+  <body>
+    <div class="page-header">
+      <div class="inner">
+        <div class="logo">
+          <img src="@routes.Assets.versioned("images/logo-recogito-small.png")"><span class="page-title">Help</span>
+        </div>
+
+        <div class="links">
+          @if(title == "Guide") { <a href="#" onclick="javascript:return false;" class="current">Guide</a>
+            } else { <a href="@controllers.help.routes.HelpController.showGuide()">Guide</a> }
+
+          @if(title == "FAQ") { <a href="#" onclick="javascript:return false;" class="current">FAQ</a>
+            } else { <a href="@controllers.help.routes.HelpController.showFAQ()">FAQ</a> }
+
+          @if(title == "About") { <a href="#" onclick="javascript:return false;" class="current">About</a>
+            } else { <a href="@controllers.help.routes.HelpController.showAbout()">About</a> }
+
+          <a target="_blank" href="http://commons.pelagios.org">Pelagios Commons</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-heading">
+      <div class="inner">
+        <div class="wrapper">@articleHeading</div>
+      </div>
+    </div>
+
+    <div class="article">
+      <div class="inner">@article</div>
+    </div>
+
+  </body>
+</html>

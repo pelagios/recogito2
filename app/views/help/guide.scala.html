@@ -1,96 +1,47 @@
 @()(implicit request: RequestHeader)
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Recogito | Guide</title>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/help/guide.css")"/>
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@@pelagiosproject" />
-    <meta property="og:title" content="Recogito Help" />
-    <meta name="twitter:title" content="Recogito Help" />
-    <meta property="og:description" content="User Guide" />
-    <meta name="twitter:description" content="User Guide" />
-    <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
-    <meta property="og:image:width" content="240" />
-    <meta property="og:image:height" content="240" />
-    <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
-    <meta property="og:url" content="@controllers.landing.routes.LandingController.index.absoluteURL" />
-    <link rel="apple-touch-icon" sizes="57x57" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
-    <link rel="apple-touch-icon" sizes="114x114" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
-    <link rel="apple-touch-icon" sizes="72x72" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
-    <link rel="apple-touch-icon" sizes="144x144" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
-  </head>
+@_layout("Guide", "10 Minute Tour of Recogito") {
+  <h1>10 Minute Tour</h1>
+  <span class="sub-title"><span class="icon">&#xf017;</span> A Quick Introduction to Recogito</span>
+} {
+  <div class="toc">
+    <ul>
+      <li><a href="#what">What is Recogito?</a></li>
+      <li><a href="#upload">Upload a Document</a></li>
+      <li><a href="#annotations">Create Annotations</a></li>
+      <li><a href="#map">Identify and Map Places</a></li>
+      <li><a href="#invite">Invite Other Users</a></li>
+    </ul>
+  </div>
 
-  <body>
-    <div class="page-header">
-      <div class="inner">
-        <div class="logo">
-          <img src="@routes.Assets.versioned("images/logo-recogito-small.png")"><span class="page-title">Guide</span>
-        </div>
+  <p>[...]</p>
 
-        <div class="links">
-          <a href="#">FAQ</a>
-          <a href="#">About</a>
-          <a target="_blank" href="http://commons.pelagios.org">Pelagios Commons</a>
-        </div>
-      </div>
-    </div>
+  <p>You will learn how to:</p>
 
-    <div class="article-heading">
-      <div class="inner">
-        <div class="wrapper">
-          <h1>10 Minute Tutorial</h1>
-          <span class="sub-title"><span class="icon">&#xf017;</span> A Quick Introduction to Recogito</span>
-        </div>
-      </div>
-    </div>
+  <ul>
+    <li>Upload texts and images</li>
+    <li>Create annotations</li>
+    <li>Identify and map places in your documents</li>
+    <li>Invite other users to work with you on your documents</li>
+    <li>Download and re-use your data outside of Recogito</li>
+  </ul>
 
-    <div class="article">
-      <div class="inner">
-        <div class="toc">
-          <ul>
-            <li><a href="#what">What is Recogito?</a></li>
-            <li><a href="#upload">Upload a Document</a></li>
-            <li><a href="#annotations">Create Annotations</a></li>
-            <li><a href="#map">Identify and Map Places</a></li>
-            <li><a href="#invite">Invite Other Users</a></li>
-          </ul>
-        </div>
+  <h2 id="what">What is Recogito?</h2>
 
-        <p>[...]</p>
+  <p>[...]</p>
 
-        <p>You will learn how to:</p>
+  <h2 id="upload">Step 1. Upload a Document</h2>
 
-        <ul>
-          <li>Upload texts and images</li>
-          <li>Create annotations</li>
-          <li>Identify and map places in your documents</li>
-          <li>Invite other users to work with you on your documents</li>
-          <li>Download and re-use your data outside of Recogito</li>
-        </ul>
+  <p>[...]</p>
 
-        <h2 id="what">What is Recogito?</h2>
+  <h2 id="annotations">Step 2. Create Annotations</h2>
 
-        <p>[...]</p>
+  <p>[...]</p>
 
-        <h2 id="upload">Step 1. Upload a Document</h2>
+  <h2 id="map">Step 3. Identify and Map Places</h2>
 
-        <p>[...]</p>
+  <p>[...]</p>
 
-        <h2 id="annotations">Step 2. Create Annotations</h2>
+  <h2 id="invite">Step 4. Invite Other Users</h2>
 
-        <p>[...]</p>
-
-        <h2 id="map">Step 3. Identify and Map Places</h2>
-
-        <p>[...]</p>
-
-        <h2 id="invite">Step 4. Invite Other Users</h2>
-
-        <p>[...]</p>
-
-      </div>
-    </div>
-  </body>
-</html>
+  <p>[...]</p>
+}
