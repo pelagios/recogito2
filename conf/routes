@@ -24,8 +24,8 @@ POST    /reset_password                              controllers.landing.ResetPa
 
 GET     /help/about                                  controllers.help.HelpController.showAbout
 GET     /help/faq                                    controllers.help.HelpController.showFAQ
-GET     /help/guide                                  controllers.help.HelpController.showGuide
-GET     /help                                        controllers.help.HelpController.showGuide
+GET     /help/tour                                   controllers.help.HelpController.showTour
+GET     /help                                        controllers.help.HelpController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Administration area
