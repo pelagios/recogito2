@@ -51,7 +51,7 @@ require([
 
         grid = new Slick.Grid('#table', dataView, frozenColumns.concat(columns), options),
 
-        data = jQuery.map(results.data, function(f, idx) {
+        data = results.data.map(function(f, idx) {
           f.id = idx; // ID field required by dataView - we'll reuse it for the index
           return f;
         }),
