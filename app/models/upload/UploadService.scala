@@ -84,10 +84,10 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
       val title = filepart.filename
       val extension = title.substring(title.lastIndexOf('.'))
       val file = new File(uploads.PENDING_UPLOADS_DIR, id.toString + extension)
-  
+      filepart.ref.moveTo(file)
+      
       ContentType.fromFile(file) match {
         case Right(contentType) => {
-          filepart.ref.moveTo(file)
           val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.getUsername, title, contentType.toString, file.getName, filesizeKb, null)
           sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
           Right(filepartRecord)
