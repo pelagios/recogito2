@@ -3,6 +3,7 @@ package models
 import java.io.File
 import play.api.Logger
 import scala.util.Try
+import scala.io.Source
 import scala.language.postfixOps
 import sys.process._
 
@@ -27,6 +28,8 @@ sealed trait ContentType {
 }
 
 class UnsupportedContentTypeException extends RuntimeException
+
+class UnsupportedTextEncodingException extends RuntimeException
 
 object ContentType {
   
@@ -58,9 +61,18 @@ object ContentType {
 
   /** TODO analyze based on the actual file, not just the extension! **/
   def fromFile(file: File): Either[Exception, ContentType] = {
+    
+    def isReadableTextFile(file: File) =
+      Try(Source.fromFile(file).getLines.mkString("\n")).isSuccess
+    
     val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
     extension match {
-      case "txt" => Right(TEXT_PLAIN)
+      case "txt" =>
+        // Make sure the file has a readable encoding
+        if (isReadableTextFile(file))
+          Right(TEXT_PLAIN)
+        else
+          Left(new UnsupportedTextEncodingException)
 
       case "jpg" | "jpeg" | "tif" | "tiff" | "png" =>
         if (VIPS_INSTALLED) Right(IMAGE_UPLOAD) else Left(new UnsupportedContentTypeException)

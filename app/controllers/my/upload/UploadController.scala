@@ -8,7 +8,7 @@ import controllers.my.upload.tiling.TilingService
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
-import models.{ ContentType, UnsupportedContentTypeException }
+import models.{ ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException }
 import models.document.DocumentService
 import models.upload.{ UploadService, QuotaExceededException }
 import models.generated.tables.records.UploadRecord
@@ -112,6 +112,9 @@ class UploadController @Inject() (
 
           case Left(e: UnsupportedContentTypeException) =>
             BadRequest("Unknown or unsupported file format")
+            
+          case Left(e: UnsupportedTextEncodingException) =>
+            BadRequest("Unknown or unsupported text encoding")
             
           case Left(e: QuotaExceededException) =>
             BadRequest("Not enough space - you only have " + e.remainingSpaceKb / 1024 + " MB remaining")
