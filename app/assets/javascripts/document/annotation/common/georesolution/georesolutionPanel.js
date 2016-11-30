@@ -83,6 +83,9 @@ define([
 
           placeBody = false,
 
+          /** Either the value of the search field, or the 'fuzzified' version, with ~ appended **/
+          currentSearch = false,
+
           currentSearchResults = [],
           currentSearchResultsTotal,
 
@@ -255,10 +258,23 @@ define([
 
           search = function(opt_offset) {
             var offset = (opt_offset) ? opt_offset : 0,
-                query = searchInput.val().trim();
 
-            if (query.length > 0)
-              API.searchPlaces(query, offset).done(onNextPage);
+                endsWith = function(str, char) {
+                  return str.indexOf(char, str.length -  char.length) !== -1;
+                },
+
+                onResponse = function(response) {
+                  // Try again with a fuzzy search
+                  if (response.total === 0 && !endsWith(currentSearch, '~')) {
+                    currentSearch = currentSearch + '~';
+                    API.searchPlaces(currentSearch, offset).done(onNextPage);
+                  } else {
+                    onNextPage(response);
+                  }
+                };
+
+            if (currentSearch)
+              API.searchPlaces(currentSearch, offset).done(onResponse);
           },
 
           clear = function() {
@@ -274,6 +290,7 @@ define([
             placeBody = body;
 
             searchInput.val(toponym);
+            currentSearch = toponym;
             element.show();
             map.refresh();
 
@@ -312,7 +329,15 @@ define([
 
     btnFlag.click(onFlag);
     btnCancel.click(close);
-    searchInput.keyup(function(e) { if (e.which === 13) { clear(); search(); } });
+    searchInput.keyup(function(e) {
+      if (e.which === 13) {
+        clear();
+        currentSearch = searchInput.val().trim();
+        if (currentSearch.length === 0)
+          currentSearch = false;
+        search();
+      }
+    });
 
     blockMouseWheelBubbling();
 
