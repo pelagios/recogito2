@@ -1,9 +1,9 @@
-@(title: String, synopsis: String)(articleHeading: Html)(article: Html)(implicit request: RequestHeader)
+@(title: String, synopsis: String, stylesheet: String)(articleHeading: Html)(article: Html)(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito | @title</title>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/help/help.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/help/" + stylesheet)"/>
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@@pelagiosproject" />

@@ -42,7 +42,7 @@ require([
         // Default leading columns
         frozenColumns = [
           { id: '__annotation', name: '', field: '__annotation', width: 45, formatter: Highlighter.CellFormatter, resizable: false },
-          { id: 'id', name: '#', field: 'id', width: 65, sortable: true }
+          { id: 'idx', name: '#', field: 'idx', width: 65, sortable: true }
         ],
 
         columns = jQuery.map(results.meta.fields, function(f) {
@@ -52,7 +52,12 @@ require([
         grid = new Slick.Grid('#table', dataView, frozenColumns.concat(columns), options),
 
         data = results.data.map(function(f, idx) {
-          f.id = idx; // ID field required by dataView - we'll reuse it for the index
+          f.idx = idx;
+
+          // SlickGrid needs an ID field, use index unless the CSV has one already
+          // TODO in case there's an ID field in the CSV already, check if it is unique
+          if (!f.id) f.id = idx;
+
           return f;
         }),
 
