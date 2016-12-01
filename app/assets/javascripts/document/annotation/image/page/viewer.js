@@ -38,8 +38,11 @@ define([
               '<div class="zoom-in control" title="Zoom in">+</div>' +
               '<div class="zoom-out control" title="Zoom out">&ndash;</div>' +
             '</div>' +
+            '<div class="reset-rotation control" title="Reset rotation"><span class="icon">&#xf176;</span></div>' +
             '<div class="fullscreen control icon">&#xf065;</div>' +
           '</div>'),
+
+        resetRotationIcon = controlsEl.find('.reset-rotation span'),
 
         projection = (Config.contentType === 'IMAGE_UPLOAD') ?
           new ol.proj.Projection({
@@ -82,11 +85,39 @@ define([
           var view = olMap.getView(),
               currentZoom = view.getZoom(),
               animation = ol.animation.zoom({
-                duration: 250, resolution: olMap.getView().getResolution()
+                duration: 250, resolution: view.getResolution()
               });
 
           olMap.beforeRender(animation);
-          olMap.getView().setZoom(currentZoom + increment);
+          view.setZoom(currentZoom + increment);
+        },
+
+        updateRotationIcon = function() {
+          var rotation = olMap.getView().getRotation();
+
+          resetRotationIcon.css({
+            transform: 'rotate(' + rotation + 'rad)',
+          });
+        },
+
+        resetRotation = function() {
+          var view = olMap.getView(),
+
+              currentRotation = (function() {
+                var r = view.getRotation() % (2 * Math.PI);
+                if (r < -Math.PI)
+                  r += 2 * Math.PI;
+                else if (r > Math.PI)
+                  r -= 2 * Math.PI;
+                return r;
+              })(),
+
+              animation = ol.animation.rotate({
+                duration: 250, rotation: currentRotation
+              });
+
+          olMap.beforeRender(animation);
+          view.setRotation(0);
         },
 
         toggleFullscreen = function() {
@@ -134,14 +165,18 @@ define([
         },
 
         initControls = function() {
-          var zoomIn = controlsEl.find('.zoom-in'),
-              zoomOut = controlsEl.find('.zoom-out'),
-              fullscreen = controlsEl.find('.fullscreen');
+          var zoomInBtn = controlsEl.find('.zoom-in'),
+              zoomOutBtn = controlsEl.find('.zoom-out'),
+              resetRotationBtn = controlsEl.find('.reset-rotation'),
+              fullscreenBtn = controlsEl.find('.fullscreen');
 
-          zoomIn.click(function() { changeZoom(1); });
-          zoomOut.click(function() { changeZoom(-1); });
+          zoomInBtn.click(function() { changeZoom(1); });
+          zoomOutBtn.click(function() { changeZoom(-1); });
 
-          fullscreen.click(toggleFullscreen);
+          olMap.on('postrender', updateRotationIcon);
+          resetRotationBtn.click(resetRotation);
+
+          fullscreenBtn.click(toggleFullscreen);
 
           imagePane.append(controlsEl);
         };
