@@ -164,11 +164,47 @@
 
   <h2 id="map">Step 3. Identify and Map Places</h2>
 
+  <p>
+    You already know how to annotate a word or phrase in a document, and identify it as a
+    reference to a place. Now let's assign this reference to a
+    <a href="@controllers.help.routes.HelpController.showFAQ()#what-is-a-gazetteer">gazetteer</a>,
+    so that Recogito can plot it on the map.
+  </p>
+
+  <p>
+    Click <strong>Place</strong> in the annotation editor. Recogito will attempt to
+    provide an automatic suggestion from
+    <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">its
+    supported gazetteers</a>. You can either <strong>confirm</strong> this suggestion, or
+    try to find a better match in the gazetteer search dialog. If you can't find a suitable match,
+    you also have the option to <strong>flag</strong> this place reference, as an indication that
+    no suitable match was available.
+  </p>
+
+  <p>
+    <img src="@routes.Assets.versioned("images/help/create-text-annotation.gif")">
+  </p>
+
+  <p>
+    To speed up your work, Recogito will automatically search the text for identical phrases
+    and give you the option to <strong>re-apply</strong> the gazetteer assignment to all
+    other matches.
+  </p>
+
   <h2 id="export">Step 4. Export Your Data</h2>
+
+  <p>
+    Selecting the <span class="outline-icon">&#xe875;</span> icon in the main navigation bar
+    will take you to the available export options for your document.
+  </p>
+
+  <p>
+    <img src="@routes.Assets.versioned("images/help/export.png")">
+  </p>
 
   <h2 id="invite">Step 5. Invite Other Users</h2>
 
   <p>
-    <img class="tour-animation" src="@routes.Assets.versioned("images/help/share.gif")">
+    <img src="@routes.Assets.versioned("images/help/share.gif")">
   </p>
 }
