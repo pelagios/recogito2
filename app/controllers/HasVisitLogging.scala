@@ -48,8 +48,8 @@ trait HasVisitLogging {
     ))    
   }
   
-  def logPageView(accesslevel: Option[DocumentAccessLevel])(implicit request: RequestHeader, visitService: VisitService) =
-    log(None, None, "text/html", accesslevel)
+  def logPageView()(implicit request: RequestHeader, visitService: VisitService) =
+    log(None, None, "text/html", None)
 
   def logDocumentView(
       doc: DocumentRecord, part: Option[DocumentFilepartRecord], accesslevel: DocumentAccessLevel

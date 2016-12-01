@@ -1,18 +1,24 @@
 package controllers.help
 
-import play.api.mvc.Controller
-import play.api.mvc.Action
+import controllers.HasVisitLogging
+import javax.inject.Inject
+import models.visit.VisitService
+import play.api.mvc.{ Action, Controller, RequestHeader }
+import play.twirl.api.HtmlFormat
 
-class HelpController extends Controller {
+class HelpController @Inject() (implicit val visits: VisitService) extends Controller with HasVisitLogging {
 
-  // TODO track visits
-
+  private def result(template: HtmlFormat.Appendable)(implicit request: RequestHeader) = {
+    logPageView()
+    Ok(template)
+  }
+  
   def index         = Action { Redirect(routes.HelpController.showTutorial()) }
 
-  def showAbout     = Action { implicit request => Ok(views.html.help.about()) }
+  def showAbout     = Action { implicit request => result(views.html.help.about()) }
 
-  def showFAQ       = Action { implicit request => Ok(views.html.help.faq())   }
+  def showFAQ       = Action { implicit request => result(views.html.help.faq())   }
 
-  def showTutorial  = Action { implicit request => Ok(views.html.help.tutorial()) }
+  def showTutorial  = Action { implicit request => result(views.html.help.tutorial()) }
 
 }
