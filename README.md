@@ -50,7 +50,8 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
   to generate one for you - type `activator playGenerateSecret`.
 * Production deployment requires and ElasticSearch installation. (Recogito will automatically
   create an embedded ElasticSearch index if cannot find a running cluster. However we strictly
-  recommend this only for development purposes.)
+  recommend this only for development purposes!) For the time being, we recommend to stick to
+  [ElasticSearch version 1.7](https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-5).
 * Last but not least: another reminder to remove the default 'recogito' admin user - or at least
   change its password!
 
