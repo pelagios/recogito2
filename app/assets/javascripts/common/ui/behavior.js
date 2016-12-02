@@ -2,7 +2,7 @@ define(['common/config'], function(Config) {
 
   return {
 
-    makeSticky : function(element, maxScroll) {
+    makeElementSticky : function(element, maxScroll) {
       var onScroll = function() {
         var scrollTop = jQuery(window).scrollTop();
         if (scrollTop > maxScroll)
@@ -18,6 +18,18 @@ define(['common/config'], function(Config) {
         onScroll();
         jQuery(window).scroll(onScroll);
       }
+    },
+
+    animateAnchorNav : function(containerEl) {
+      containerEl.on('click', 'a', function(e) {
+        e.preventDefault();
+
+        jQuery('html, body').animate({
+          scrollTop: jQuery(jQuery.attr(this, 'href')).offset().top
+        }, 500);
+
+        return false;
+      });
     }
 
   };

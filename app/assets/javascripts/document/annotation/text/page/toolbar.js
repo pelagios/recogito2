@@ -1,4 +1,8 @@
-define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
+define([
+  'common/ui/behavior',
+  'common/config',
+  'common/hasEvents'
+], function(Behavior, Config, HasEvents) {
 
   var Toolbar = function(rootNode) {
     var self = this,
@@ -15,24 +19,6 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
         maxScroll = jQuery('.header-infobox').outerHeight() -
           jQuery('.header-iconbar').outerHeight() + 1,
-
-        makeToolbarSticky = function() {
-          var onScroll = function() {
-            var scrollTop = jQuery(window).scrollTop();
-            if (scrollTop > maxScroll) // Title area minus height of icon bar
-              rootNode.addClass('fixed');
-            else
-              rootNode.removeClass('fixed');
-          };
-
-          if (Config.IS_TOUCH) {
-            rootNode.addClass('sticky');
-          } else {
-            // In case the page is initally scrolled after load
-            onScroll();
-            jQuery(window).scroll(onScroll);
-          }
-        },
 
         disableAnnotationControls = function() {
           var menuItems = annotationModes.find('li');
@@ -108,7 +94,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
     else
       disableAnnotationControls();
 
-    makeToolbarSticky();
+    Behavior.makeElementSticky(rootNode, maxScroll);
     attachClickHandlers();
 
     this.setCurrentColorscheme = setCurrentColorscheme;
