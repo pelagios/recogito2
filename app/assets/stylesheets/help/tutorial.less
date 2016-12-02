@@ -8,9 +8,25 @@
 
 .toc-wrapper {
   position:absolute;
-  top:0;
   width:100%;
+  height:0;
+  overflow:visible;
   z-index:1;
+}
+
+.toc-wrapper.fixed {
+  position:fixed;
+  top:0;
+}
+
+.toc-wrapper.sticky {
+  float:left;
+  position:-webkit-sticky;
+  position:-moz-sticky;
+  position:-ms-sticky;
+  position:-o-sticky;
+  position:sticky;
+  top:0;
 }
 
 .toc {
@@ -37,21 +53,8 @@
 
 }
 
-.toc-wrapper.fixed {
-  position:fixed;
-  top:0;
-}
-
-.toc-wrapper.sticky {
-  position:-webkit-sticky;
-  position:-moz-sticky;
-  position:-ms-sticky;
-  position:-o-sticky;
-  position:sticky;
-  top:0;
-}
-
 .article {
+  width:100%;
 
   .tip {
     padding:2px 15px;

@@ -1,4 +1,4 @@
-@(title: String, synopsis: String, stylesheet: String)(articleHeading: Html)(article: Html)(implicit request: RequestHeader)
+@(title: String, synopsis: String, stylesheet: String)(articleHeading: Html)(content: Html)(implicit request: RequestHeader)
 <!DOCTYPE html>
 <html>
   <head>
@@ -52,9 +52,7 @@
       </div>
     </div>
 
-    <div class="article">
-      @article
-    </div>
+    @content
 
   </body>
 </html>
