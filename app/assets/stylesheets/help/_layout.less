@@ -14,46 +14,42 @@ html, body {
 .page-header {
   height:95px;
 
-  .inner {
+  .logo {
     color:lighten(@lightgrey-type, 12%);
-    font-family:OpenSans;
+    padding-top:30px;
     font-size:35px;
+    font-family:OpenSans;
 
-    .logo {
-      padding-top:30px;
+    a { text-decoration:none; }
 
-      a { text-decoration:none; }
-
-      img {
-        vertical-align:middle;
-        width:130px;
-        height:39px;
-      }
-
+    img {
+      vertical-align:middle;
+      width:130px;
+      height:39px;
     }
 
-    .links {
-      position:absolute;
-      top:36px;
-      right:0;
-      font-size:15px;
+  }
 
-      a {
-        color:@lightgrey-type;
-        text-decoration:none;
-        display:inline-block;
-        margin:0 10px;
-      }
+  .links {
+    position:absolute;
+    font-family:PTSansNarrow;
+    top:36px;
+    right:0;
 
-      a:hover {
-        text-decoration:underline;
-      }
+    a {
+      color:lighten(@ocean, 18%);
+      text-decoration:none;
+      display:inline-block;
+      margin:0 10px;
+    }
 
-      a.current {
-        color:darken(@lightgrey-type, 14%);
-        font-weight:bold;
-      }
+    a:hover {
+      color:@ocean;
+      text-decoration:underline;
+    }
 
+    a.current {
+      color:@ocean;
     }
 
   }
