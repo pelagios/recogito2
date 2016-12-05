@@ -63,7 +63,7 @@
             <td>
               @lastEdit match {
                 case Some(edit) if (edit.madeAt.plusMinutes(11) isAfter org.joda.time.DateTime.now) => {
-                  <span title="Document may still be in use by @edit.madeBy" class="in-use"><span class="icon">&#xf071;</span> <time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time></span> }
+                  <span title="Document may still be in use by @edit.madeBy" class="in-use"><time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time> <span class="icon">&#xf071;</span></span> }
                 case _ => { <time class="timeago" datetime="@lastEdit.map(_.madeAt)"></time> }
               }
             </td>
