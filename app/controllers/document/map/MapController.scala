@@ -3,6 +3,7 @@ package controllers.document.map
 import controllers.{ BaseOptAuthController, HasVisitLogging, WebJarAssets }
 import javax.inject.Inject
 import models.document.DocumentService
+import models.annotation.AnnotationService
 import models.user.UserService
 import models.user.Roles._
 import models.visit.VisitService
@@ -12,6 +13,7 @@ import controllers.WebJarAssets
 
 class MapController @Inject() (
     val config: Configuration,
+    val annotations: AnnotationService,
     val document: DocumentService,
     val users: UserService,
     implicit val visitService: VisitService,
@@ -24,7 +26,9 @@ class MapController @Inject() (
     
     documentReadResponse(documentId, maybeUser,  { case (doc, accesslevel) =>
       logDocumentView(doc.document, None, accesslevel)
-      Future.successful(Ok(views.html.document.map.index(doc, maybeUser, accesslevel)))
+      annotations.countByDocId(documentId).map { documentAnnotationCount =>
+        Ok(views.html.document.map.index(doc, maybeUser, accesslevel, documentAnnotationCount))
+      }
     })
   }
 

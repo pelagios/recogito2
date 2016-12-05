@@ -1,7 +1,8 @@
 @(
   doc: models.document.DocumentInfo,
   currentUser: Option[models.generated.tables.records.UserRecord],
-  accessLevel: models.document.DocumentAccessLevel
+  accessLevel: models.document.DocumentAccessLevel,
+  annotationCount: Long
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
