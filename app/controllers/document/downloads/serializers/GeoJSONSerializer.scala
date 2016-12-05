@@ -65,6 +65,8 @@ case class GeoJSONFeature(geometry: Geometry, titles: Seq[String], gazetteerReco
 }
 
 object GeoJSONFeature extends HasGeometry {
+
+  private def toOptSeq[T](s: Seq[T]) = if (s.isEmpty) None else Some(s)
   
   implicit val geoJSONFeatureWrites: Writes[GeoJSONFeature] = (
     (JsPath \ "type").write[String] and
@@ -72,11 +74,11 @@ object GeoJSONFeature extends HasGeometry {
     (JsPath \ "properties").write[JsObject] and
     (JsPath \ "uris").write[Seq[String]] and
     (JsPath \ "titles").write[Seq[String]] and
-    (JsPath \ "place_types").write[Seq[String]] and
+    (JsPath \ "place_types").writeNullable[Seq[String]] and
     (JsPath \ "source_gazetteers").write[Seq[String]] and
-    (JsPath \ "quotes").write[Seq[String]] and
-    (JsPath \ "tags").write[Seq[String]] and
-    (JsPath \ "comments").write[Seq[String]] 
+    (JsPath \ "quotes").writeNullable[Seq[String]] and
+    (JsPath \ "tags").writeNullable[Seq[String]] and
+    (JsPath \ "comments").writeNullable[Seq[String]] 
   )(f => (
       "Feature",
       f.geometry,
@@ -86,11 +88,11 @@ object GeoJSONFeature extends HasGeometry {
       ),
       f.gazetteerRecords.map(_.uri),
       f.gazetteerRecords.map(_.title),
-      f.gazetteerRecords.flatMap(_.placeTypes),
+      toOptSeq(f.gazetteerRecords.flatMap(_.placeTypes)),
       f.gazetteerRecords.map(_.sourceGazetteer.name),
-      f.quotes,
-      f.tags,
-      f.comments
+      toOptSeq(f.quotes),
+      toOptSeq(f.tags),
+      toOptSeq(f.comments)
     )
   )
   
