@@ -8,6 +8,7 @@
   <head>
     <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    @views.html.document.standardMeta(doc, annotationCount)
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/map/index.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("leaflet.js"))"></script>
