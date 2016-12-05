@@ -42,14 +42,14 @@
       <p>
         Recogito provides a personal workspace where you can upload, collect and organize
         your source materials - texts and images <!-- and tabular data-->- and collaborate in their
-        annotation and interpretation. Recogito enables you to make your work
+        annotation and interpretation. Recogito enables you to make your work more
         visible on the Web more easily, and to expose the results of your research
         as Open Data.
       </p>
 
       <p>
-        This tutorial will teach you the essentials of working with Recogito. To complete the
-        tutorial, you need a <a href="http://recogito.pelagios.org/signup" target="_blank">Recogito
+        This tutorial will teach you the essentials of working with Recogito. To complete it,
+        you need a <a href="http://recogito.pelagios.org/signup" target="_blank">Recogito
         account</a>, and two sample documents: a plain .txt file with some text, and an image file.
       </p>
 
@@ -78,17 +78,17 @@
       <ol>
         <li>Enter a title for your document and click <strong>Next</strong>.</li>
         <li>Upload your text file. You can either click <strong>Choose a File to Attach</strong>
-          and select it in the file browser, or you can drag it into the upload area with your
-          mouse.</li>
+          and select it in the file browser, or you can drag and drop it into the upload area with
+          your mouse.</li>
         <li>Recogito can run <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank">Named
-          Entity Recognition (NER)</a> on your text. This will attempt to identify and pre-annotate places
-          and persons automatically. Check <strong>Apply automatic annotation</strong> and click
-          <strong>Next</strong>.</li>
+          Entity Recognition (NER)</a> on your text. This means it will attempt to identify and
+          pre-annotate places and persons automatically. Check <strong>Apply automatic
+          annotation</strong> and click <strong>Next</strong>.</li>
       </ol>
 
       <p>
-        Depending on the length of your text, NER may take a while (up to several minutes). Once
-        completed, click <strong>Done</strong>. Congratulations! You have imported your first document
+        Depending on the length of your text, NER may take a while. Once completed, click
+        <strong>Done</strong>. Congratulations! You have imported your first document
         into your workspace.
       </p>
 
@@ -119,7 +119,7 @@
       </p>
 
       <p>
-        Try experimenting with the annotation tool. You can edit or delete each part of an
+        Try experimenting with the annotation editor. You can change or delete each part of an
         annotation seperately, after you have created it. (To delete a tag, click on it first
         to get a delete button.) Deleting all parts of an annotation will also remove the highlight
         from the text.
@@ -131,7 +131,7 @@
         <img src="@routes.Assets.versioned("images/help/image-controls.png")" class="inline right">
         Open your image document. Recogito has a <strong>zoomable view</strong> so you can
         navigate even highest-resolution images easily. Zoom using your mousewheel or
-        the <span class="key">+</span> <span class="key">-</span> control buttons in the upper right
+        the <span class="key">+</span> <span class="key">-</span> buttons in the upper right
         corner. On touch devices you can also use a &quot;pinch&quot; gesture. Pan by dragging and
         releasing the image.
       </p>
@@ -139,20 +139,21 @@
       <p>
         You can <strong>rotate</strong> the image at arbitrary angles. On a desktop computer,
         hold <span class="key">SHIFT</span> + <span class="key">Alt</span> while dragging with your
-        mouse. On touch devices, use a pinch gesture. Use the control button with the single arrow to
-        quickly rotate the image back to its original orientation.
+        mouse. On touch devices, use a pinch gesture. Use the button with the single arrow
+        <span class="key icon">&#xf176;</span> to quickly rotate the image back to its
+        original orientation.
       </p>
 
       <p>
         Let's create our first image annotation. In the toolbar, there is a drop-down menu where you
         can switch between Recogito's different selection modes: Point, Rectangle and Tilted Box.
-        Select <strong>Point</strong> and create an annotation by clicking somewhere on your image.
+        Select <strong>Point</strong> and create an annotation by clicking somewhere in your image.
         Switch back to <strong>Move</strong> to resume standard image navigation.
       </p>
 
       <p>
-        Now try annotating an area: pick the <strong>Rectangle</strong> tool. Click on your
-        image once to select the starting corner of the area. Then click again for the opposite corner.
+        Now try annotating an area: pick the <strong>Rectangle</strong> tool. Click once to
+        select the starting corner of the area. Then click again for the opposite corner.
       </p>
 
       <p>
@@ -164,6 +165,12 @@
         Click <strong>and hold</strong> the mouse button to draw the baseline of the box. Then release
         the mouse button. Move the mouse to define the height of the box, and click when you are
         happy with the height.
+      </p>
+
+      <p class="tip">
+        Tip: the Tilted Box tool is especially useful for annotating labels in maps. Because
+        there is an explicit <strong>baseline</strong>, the data you generate
+        will also retain information about the <strong>orientation</strong> of the label.
       </p>
 
       <h2 id="map">Step 3. Identify and Map Places</h2>
@@ -180,8 +187,8 @@
         provide an automatic suggestion from
         <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">its
         supported gazetteers</a>. You can either <strong>confirm</strong> this suggestion, or
-        try to find a better match in the gazetteer search dialog. If you can't find a suitable match,
-        you also have the option to <strong>flag</strong> this place reference, as an indication that
+        try to find a better match in the gazetteer search. If you can't find a suitable match,
+        you also have the option to <strong>flag</strong> this reference, as an indication that
         no suitable match was available.
       </p>
 
@@ -198,8 +205,8 @@
       <h2 id="export">Step 4. Export Your Data</h2>
 
       <p>
-        Selecting the <span class="outline-icon">&#xe875;</span> icon in the main navigation bar
-        will take you to the available <strong>export options</strong> for your document. In
+        Select the <span class="outline-icon">&#xe875;</span> icon in the main navigation bar.
+        This will take you to the available <strong>export options</strong> for your document. In
         addition to the options listed on this page, you can also download a <strong>backup
         package</strong> of your work from the <span class="outline-icon">&#xe8c9;</span> document
         settings page. We recommend to download backups for archiving and as an added security measure.
@@ -224,18 +231,18 @@
       </p>
 
       <p>
-        Use the search box at the bottom of the <strong>Collaborators</strong> box to grant a user
-        access to your document. You choose the level of access that user is allowed to have:
+        Use the search field at the bottom of the <strong>Collaborators</strong> box to grant a user
+        access to your document. You can choose between different levels of access:
       </p>
 
       <ul>
         <li><strong>Read</strong> allows users to view document and annotations, but not add
-          comments annotations themselves.</li>
+          annotations and comments themselves.</li>
 
         <li><strong>Write</strong> allows users to view and annotate the document.</li>
 
-        <li><strong>Admin</strong> provides write access, but additionally allows users to
-          edit document metadata, invite additional collaborators, and perform administrative
+        <li><strong>Admin</strong> provides write access, and additionally allows users to
+          edit document metadata, invite other collaborators, and perform administrative
           actions like downloading backups.</li>
       </ul>
 
