@@ -11,5 +11,13 @@
   </head>
   <body>
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "stats")
+
+    <div class="sidebar">
+      @views.html.sidebarHeader(doc.owner)
+    </div>
+
+    <div class="content">
+      <p>The document annotations stats page is still under construction. Bear with us.</p>
+    </div>
   </body>
 </html>
