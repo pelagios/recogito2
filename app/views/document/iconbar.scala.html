@@ -34,12 +34,12 @@
         </a>
       </li>
 
-      <li class="tooltip bottom@if(activeView == "discussion") { active}">
+      <!-- li class="tooltip bottom@if(activeView == "discussion") { active}">
         <a href="@controllers.document.discussion.routes.DiscussionController.showDiscussionBoard(document.getId)">
           <span class="icon">&#xe862;</span>
           <span class="hint">Discuss this document</span>
         </a>
-      </li>
+      </li -->
 
       @if(accessLevel.isAdmin) {
         <li class="tooltip bottom@if(activeView == "settings") { active}">
