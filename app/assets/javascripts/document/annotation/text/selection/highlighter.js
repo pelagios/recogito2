@@ -53,9 +53,6 @@ define([
         calculateDomPositionWithin = function(textNodeProperties, charOffsets) {
           var positions = [];
 
-          console.log(textNodeProperties);
-          console.log(charOffsets);
-
           jQuery.each(textNodeProperties, function(i, props) {
             jQuery.each(charOffsets, function(j, charOffset)  {
               if (charOffset > props.start && charOffset <= props.end) {
@@ -194,6 +191,8 @@ define([
                 bounds = { start: anchor, end: anchor + quote.length },
                 range = rangy.createRange(),
                 positions, spans;
+
+            console.log(annotation);
 
             if (previousBounds && intersects(previousBounds, bounds)) {
               positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
