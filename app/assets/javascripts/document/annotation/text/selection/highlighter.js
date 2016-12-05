@@ -53,6 +53,9 @@ define([
         calculateDomPositionWithin = function(textNodeProperties, charOffsets) {
           var positions = [];
 
+          console.log(textNodeProperties);
+          console.log(textNodeProperties);
+
           jQuery.each(textNodeProperties, function(i, props) {
             jQuery.each(charOffsets, function(j, charOffset)  {
               if (charOffset > props.start && charOffset <= props.end) {
