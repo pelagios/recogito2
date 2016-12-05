@@ -345,11 +345,10 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       .map { q => loggedInUser match {
         
           case Some(loggedIn) =>
-            q.from(DOCUMENT.leftOuterJoin(SHARING_POLICY)
-               .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID)))
-             .where(DOCUMENT.OWNER.equal(owner).and(
-               DOCUMENT.IS_PUBLIC.equal(true)
-                 .or(SHARING_POLICY.SHARED_WITH.equal(loggedIn))))
+            q.from(DOCUMENT)
+              .where(DOCUMENT.OWNER.equal(owner).and(
+                DOCUMENT.ID.in(sql.select(SHARING_POLICY.DOCUMENT_ID).from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(loggedIn)))
+                  .or(DOCUMENT.IS_PUBLIC.equal(true))))
                  
           case None =>       
             q.from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true)))
