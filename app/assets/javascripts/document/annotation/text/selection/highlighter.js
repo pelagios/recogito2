@@ -54,7 +54,7 @@ define([
           var positions = [];
 
           console.log(textNodeProperties);
-          console.log(textNodeProperties);
+          console.log(charOffsets);
 
           jQuery.each(textNodeProperties, function(i, props) {
             jQuery.each(charOffsets, function(j, charOffset)  {
