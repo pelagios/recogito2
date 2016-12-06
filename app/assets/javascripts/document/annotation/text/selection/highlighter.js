@@ -8,7 +8,7 @@ define([
   var Highlighter = function(rootNode) {
 
         /** Recursively gets all text nodes inside a given node **/
-    var walkTextNodes = function(node, nodeArray) {
+    var walkTextNodes = function(node, maxOffset, nodeArray) {
           var nodes = (nodeArray) ? nodeArray : [];
 
           if (node.nodeType === TEXT)
@@ -17,7 +17,7 @@ define([
           node = node.firstChild;
 
           while(node) {
-            walkTextNodes(node, nodes);
+            walkTextNodes(node, maxOffset, nodes);
             node = node.nextSibling;
           }
 
@@ -76,9 +76,12 @@ define([
          * pairs of a list of absolute character offsets in the total text.
          */
         charOffsetsToDOMPosition = function(charOffsets) {
-          var textNodeProps = (function() {
+
+          var maxOffset = Math.max.apply(null, charOffsets),
+
+              textNodeProps = (function() {
                 var start = 0;
-                return jQuery.map(walkTextNodes(rootNode), function(node) {
+                return walkTextNodes(rootNode, maxOffset).map(function(node) {
                   var nodeLength = jQuery(node).text().length,
                       nodeProps = { node: node, start: start, end: start + nodeLength };
 
