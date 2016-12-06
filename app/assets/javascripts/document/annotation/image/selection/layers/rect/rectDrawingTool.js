@@ -51,21 +51,12 @@ define([
                       },
                       anchor: anchor,
                       bodies: []
-                    },
-
-                    mapBounds = {
-                      top    : coords[0][1],
-                      right  : x + w,
-                      bottom : coords[1][1],
-                      left   : x,
-                      width  : w,
-                      height : h
                     };
 
                 self.fireEvent('newSelection', {
                   isNew: true,
                   annotation: annotation,
-                  mapBounds: mapBounds
+                  mapBounds: self.pointArrayToBounds(coords)
                 });
               };
 

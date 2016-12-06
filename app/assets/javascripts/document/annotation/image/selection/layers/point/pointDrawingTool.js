@@ -34,7 +34,7 @@ define([
                 bodies: []
               },
 
-              mapBounds = this.pointToBounds(e.coordinate);
+              mapBounds = self.pointArrayToBounds([ e.coordinate ]);
 
           drawPoint(e.coordinate);
 

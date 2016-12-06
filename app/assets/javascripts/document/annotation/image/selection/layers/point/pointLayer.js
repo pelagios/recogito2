@@ -19,18 +19,21 @@ define([
           if (closestPoint && self.computePxDistance(e.pixel, closestPoint) < MIN_SELECTION_DISTANCE) {
             return {
               annotation: closestFeature.get('annotation'),
-              mapBounds: self.pointToBounds(closestFeature.getGeometry().getCoordinates())
+              mapBounds: self.pointArrayToBounds([ closestPoint ])
             };
           }
         },
 
         findById = function(id) {
-          var feature = self.findFeatureByAnnotationId(id, pointVectorSource);
-          if (feature)
+          var feature = self.findFeatureByAnnotationId(id, pointVectorSource),
+              point;
+          if (feature) {
+            point = feature.getGeometry().getCoordinates();
             return {
               annotation: feature.get('annotation'),
-              mapBounds: self.pointToBounds(feature.getGeometry().getCoordinates())
+              mapBounds: self.pointArrayToBounds([ point ])
             };
+          }
         },
 
         /** Note that this method breaks for annotations that are not point annotations! **/

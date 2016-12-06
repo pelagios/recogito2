@@ -16,27 +16,10 @@ define(['common/hasEvents'], function(HasEvents) {
   };
 
   /** Utility to convert a point to (point-sized) bounds **/
-  Layer.prototype.pointToBounds = function(coordinate) {
-    return {
-      top    : coordinate[1],
-      right  : coordinate[0],
-      bottom : coordinate[1],
-      left   : coordinate[0],
-      width  : 0,
-      height : 0
-    };
-  };
-
-  /** Utility to convert a rectangle (represented as OL3 coord array) to bounds **/
-  Layer.prototype.rectToBounds = function(coords) {
-    return {
-      top    : coords[0][1],
-      right  : coords[2][0],
-      bottom : coords[1][1],
-      left   : coords[0][0],
-      width  : coords[3][0] - coords[0][0],
-      height : coords[0][1] - coords[1][1]
-    };
+  Layer.prototype.pointArrayToBounds = function(coordinates) {
+    return coordinates.map(function(coord) {
+      return { x: coord[0], y: - coord[1] };
+    });
   };
 
   /**

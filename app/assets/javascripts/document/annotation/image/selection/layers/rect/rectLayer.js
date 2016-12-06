@@ -53,7 +53,7 @@ define([
 
             return {
               annotation: hoveredFeatures[0].get('annotation'),
-              mapBounds: self.rectToBounds(hoveredFeatures[0].getGeometry().getCoordinates()[0])
+              mapBounds: self.pointArrayToBounds(hoveredFeatures[0].getGeometry().getCoordinates()[0])
             };
           }
         },
@@ -63,7 +63,7 @@ define([
           if (feature)
             return {
               annotation: feature.get('annotation'),
-              mapBounds: self.rectToBounds(feature.getGeometry().getCoordinates()[0])
+              mapBounds: self.pointArrayToBounds(feature.getGeometry().getCoordinates()[0])
             };
         },
 

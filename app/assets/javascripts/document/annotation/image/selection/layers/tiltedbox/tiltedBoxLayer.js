@@ -29,22 +29,6 @@ define([
             p4 = { x: x - height * Math.sin(a), y: y - height * Math.cos(a) };
 
         return [ p1, p2, p3, p4 ];
-      },
-
-      rectToBounds =  function(rect) {
-        var minX = Math.min(rect[0].x, rect[1].x, rect[2].x, rect[3].x),
-            minY = Math.min(rect[0].y, rect[1].y, rect[2].y, rect[3].y),
-            maxX = Math.max(rect[0].x, rect[1].x, rect[2].x, rect[3].x),
-            maxY = Math.max(rect[0].y, rect[1].y, rect[2].y, rect[3].y);
-
-        return {
-          top    : -minY,
-          right  : maxX,
-          bottom : -maxY,
-          left   : minX,
-          width  : maxX - minX,
-          height : maxY - minY
-        };
       };
 
   var TiltedBoxLayer = function(olMap) {
@@ -68,7 +52,7 @@ define([
             if(Geom2D.intersects(coord[0], - coord[1], rect))
               found.push({
                 annotation: annotation,
-                mapBounds: rectToBounds(rect)
+                mapBounds: rect
               });
           });
 
@@ -97,7 +81,7 @@ define([
           if (foundAnnotation)
             return {
               annotation: foundAnnotation,
-              mapBounds: rectToBounds(anchorToRect(foundAnnotation.anchor))
+              mapBounds: anchorToRect(foundAnnotation.anchor)
             };
         },
 

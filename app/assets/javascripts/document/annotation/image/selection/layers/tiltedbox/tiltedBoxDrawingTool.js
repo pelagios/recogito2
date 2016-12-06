@@ -192,7 +192,7 @@ define([
           self.fireEvent('newSelection', {
             isNew      : true,
             annotation : annotationStub,
-            mapBounds  : self.pointToBounds(imageAnchorCoords)
+            mapBounds  : self.pointArrayToBounds([ imageAnchorCoords ])
           });
         },
 

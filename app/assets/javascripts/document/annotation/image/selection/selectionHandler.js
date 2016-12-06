@@ -35,41 +35,31 @@ define([
           /** Converts the given map-coordinate bounds to viewport bounds **/
           mapBoundsToScreenBounds = function(mapBounds) {
             var offset = jQuery(containerEl).offset(),
-                topLeft = olMap.getPixelFromCoordinate([ mapBounds.left, mapBounds.top ]),
-                bottomRight = olMap.getPixelFromCoordinate([ mapBounds.right, mapBounds.bottom ]),
-                bounds = {
-                  top    : topLeft[1] + offset.top,
-                  right  : bottomRight[0] + offset.left,
-                  bottom : bottomRight[1] + offset.top,
-                  left   : topLeft[0] + offset.left,
-                  width  : 0,
-                  height : 0
-                },
 
-                flipVertical = function() {
-                  var top = bounds.top,
-                      bottom = bounds.bottom;
+                pxBounds = mapBounds.map(function(coord) {
+                  return olMap.getPixelFromCoordinate([ coord.x, - coord.y ]);
+                }),
 
-                  bounds.top = bottom;
-                  bounds.bottom = top;
-                },
+                bbox = (function() {
+                  var x = pxBounds.map(function(px) { return px[0]; }),
+                      y = pxBounds.map(function(px) { return px[1]; }),
 
-                flipHorizontal = function() {
-                  var left = bounds.left,
-                      right = bounds.right;
+                      top = Math.min.apply(null, y) + offset.top ,
+                      right = Math.max.apply(null, x) + offset.left,
+                      bottom = Math.max.apply(null, y) + offset.top,
+                      left = Math.min.apply(null, x) + offset.left;
 
-                  bounds.left = right;
-                  bounds.right = left;
-                };
+                  return {
+                    top    : top,
+                    right  : right,
+                    bottom : bottom,
+                    left   : left,
+                    width  : right - left,
+                    height : bottom - top
+                  };
+                })();
 
-            // Box might be flipped if map is rotated
-            if (bounds.top > bounds.bottom)
-              flipVertical();
-
-            if (bounds.left > bounds.right)
-              flipHorizontal();
-
-            return bounds;
+            return bbox;
           },
 
           addScreenBounds = function(selection) {
