@@ -52,6 +52,7 @@ define(['common/ui/alert'], function(Alert) {
     this.resolutions = json.scale_factors || this.tiles.scaleFactors || [ 1, 2, 4, 8, 16 ];
     this.extension = (json.formats || [])[0];
     this.tileSize = json.tile_width || this.tiles.width || undefined;
+    this.crossOrigin = true;
 
     if (!this.width || !this.height || !this.baseUrl)
       new Alert(Alert.ERROR, 'Invalid Manifest', 'Could not open the IIIF image. The manifest appears to be invalid.');
