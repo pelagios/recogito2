@@ -113,7 +113,7 @@ require([
           loadManifest = function() {
             return jsRoutes.controllers.document.DocumentController
               .getImageManifest(Config.documentId, Config.partSequenceNo)
-              .ajax()
+              .ajax({ crossDomain: true })
               .then(function(response) {
                 if (Config.contentType === 'IMAGE_UPLOAD') {
                   // jQuery handles the XML parsing
