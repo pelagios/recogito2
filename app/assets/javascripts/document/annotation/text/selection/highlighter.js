@@ -214,28 +214,23 @@ define([
                 bounds = { start: anchor, end: anchor + quote.length },
                 range = rangy.createRange(),
                 positions, spans;
-            try {
-              if (previousBounds && intersects(previousBounds, bounds)) {
-                positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
-                range.setStart(positions[0].node, positions[0].offset);
-                range.setEnd(positions[1].node, positions[1].offset);
-                spans = wrapRange(range);
-              } else {
-                // Fast rendering through Rangy's API
-                setNonOverlappingRange(range, anchor, quote.length);
-                classApplier.applyToRange(range);
-                spans = [ range.getNodes()[0].parentElement ];
-              }
 
-              // Attach annotation data as payload to the SPANs and set id, if any
-              updateStyles(annotation, spans);
-              bindToElements(annotation, spans);
-              return bounds;
-            } catch (e) {
-              console.log('Error rendering annotation');
-              console.log(e);
-              console.log(annotation);
+            if (previousBounds && intersects(previousBounds, bounds)) {
+              positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
+              range.setStart(positions[0].node, positions[0].offset);
+              range.setEnd(positions[1].node, positions[1].offset);
+              spans = wrapRange(range);
+            } else {
+              // Fast rendering through Rangy's API
+              setNonOverlappingRange(range, anchor, quote.length);
+              classApplier.applyToRange(range);
+              spans = [ range.getNodes()[0].parentElement ];
             }
+
+            // Attach annotation data as payload to the SPANs and set id, if any
+            updateStyles(annotation, spans);
+            bindToElements(annotation, spans);
+            return bounds;
 
           }, false);
         },
