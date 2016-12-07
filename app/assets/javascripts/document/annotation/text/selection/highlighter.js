@@ -8,16 +8,29 @@ define([
   var Highlighter = function(rootNode) {
 
         /** Recursively gets all text nodes inside a given node **/
-    var walkTextNodes = function(node, maxOffset, nodeArray) {
-          var nodes = (nodeArray) ? nodeArray : [];
+    var walkTextNodes = function(node, stopOffset, nodeArray) {
+          var nodes = (nodeArray) ? nodeArray : [],
+
+              offset = (function() {
+                var runningOffset = 0;
+                nodes.forEach(function(node) {
+                  runningOffset += jQuery(node).text().length;
+                });
+                return runningOffset;
+              })(),
+
+              keepWalking = true;
+
+          if (offset > stopOffset)
+            return false;
 
           if (node.nodeType === TEXT)
             nodes.push(node);
 
           node = node.firstChild;
 
-          while(node) {
-            walkTextNodes(node, maxOffset, nodes);
+          while(node && keepWalking) {
+            keepWalking = walkTextNodes(node, stopOffset, nodes);
             node = node.nextSibling;
           }
 
@@ -30,7 +43,16 @@ define([
          * with a hand-coded dropWhile & takeWhile.
          */
         textNodesBetween = function(startNode, endNode, rootNode) {
-          var allTextNodes = walkTextNodes(rootNode),
+              // To improve performance, don't walk the DOM longer than necessary
+          var stopOffset = (function() {
+                var rangeToEnd = rangy.createRange();
+                rangeToEnd.setStart(rootNode, 0);
+                rangeToEnd.setEnd(endNode, jQuery(endNode).text().length);
+                return rangeToEnd.toString().length;
+              })(),
+
+              allTextNodes = walkTextNodes(rootNode, stopOffset),
+
               nodesBetween = [],
               len = allTextNodes.length,
               take = false,
@@ -76,7 +98,6 @@ define([
          * pairs of a list of absolute character offsets in the total text.
          */
         charOffsetsToDOMPosition = function(charOffsets) {
-
           var maxOffset = Math.max.apply(null, charOffsets),
 
               textNodeProps = (function() {
@@ -120,10 +141,9 @@ define([
             var endWrapper = surround(endRange);
 
             // And wrap nodes in between, if any
-            var centerWrappers = jQuery.map(nodesBetween.reverse(), function(node) {
-              var r = rangy.createRange();
-              r.selectNodeContents(node);
-              return surround(r);
+            var centerWrappers = nodesBetween.reverse().map(function(node) {
+              var wrapped = jQuery(node).wrap('<span></span>').closest('span');
+              return wrapped[0];
             });
 
             return [ startWrapper ].concat(centerWrappers,  [ endWrapper ]);
@@ -194,7 +214,6 @@ define([
                 bounds = { start: anchor, end: anchor + quote.length },
                 range = rangy.createRange(),
                 positions, spans;
-
             try {
               if (previousBounds && intersects(previousBounds, bounds)) {
                 positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
@@ -217,6 +236,7 @@ define([
               console.log(e);
               console.log(annotation);
             }
+
           }, false);
         },
 
