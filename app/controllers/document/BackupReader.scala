@@ -147,7 +147,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         annotationStubs <- fReadAnnotations
         _ <- restoreDocument(document, parts)
         _ <- restoreAnnotations(annotationStubs, document.getId, parts)
-      } yield Unit
+      } yield (document, parts)
     }
     
     if (runAsAdmin) // Admins can just restore...
