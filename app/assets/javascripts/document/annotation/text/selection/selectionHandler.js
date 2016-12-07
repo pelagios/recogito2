@@ -87,17 +87,22 @@ define([
         },
 
         onMouseup = function(e) {
-          var isEventOnEditor = jQuery(e.target).closest('.annotation-editor-popup').length > 0,
-
               // Click happend on an existing annotation span?
-              annotationSpan = jQuery(e.target).closest('.annotation'),
+          var annotationSpan = jQuery(e.target).closest('.annotation'),
 
-              // Or click was part of a new text selection ?
+              // Or click was part of a new text selection?
               selection = rangy.getSelection(),
+
+              // Check if selection is (fully or partially) on the editor
+              isSelectionOnEditor =
+                jQuery(selection.anchorNode) // mouse event target
+                  .add(jQuery(selection.focusNode)) // start node of the selection
+                  .closest('.annotation-editor-popup').length > 0,
+
               selectedRange, annotation, bounds, spans;
 
           // If the mouseup happened on the editor, we'll ignore
-          if (isEventOnEditor)
+          if (isSelectionOnEditor)
             return;
 
           // Check for new text selection first - takes precedence over clicked annotation span
