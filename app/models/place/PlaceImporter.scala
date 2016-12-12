@@ -1,10 +1,11 @@
 package models.place
 
+import models.geotag.GeoTagStore
 import play.api.Logger
 import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
 
-trait PlaceImporter { self: PlaceStore =>
+trait PlaceImporter { self: PlaceStore with GeoTagStore =>
 
   // Maximum number of URIs we will concatenate to an OR query
   private def MAX_URIS_IN_QUERY = 100
@@ -113,16 +114,9 @@ trait PlaceImporter { self: PlaceStore =>
     for {
       (placesBefore, placesAfter) <- conflateAffectedPlaces(GazetteerRecord.normalize(record))
       failedUpdates <- storeUpdatedPlaces(placesAfter)
-      // Only do deletes if we know updates were stored first!
       failedDeletes <- if (failedUpdates.isEmpty) deleteMergedPlaces(placesBefore, placesAfter) else Future.successful(Seq.empty[String])
-    } yield failedUpdates.isEmpty && failedDeletes.isEmpty
-
-    // TODO Now we need to re-write the GeoTags
-    // TODO - identify which record-to-place-mappings have changed
-    // TODO - fetch those from the store
-    // TODO - update them to the new value
-    // TODO Note: this is a running system, users may have changed the
-    // TODO the link - use optimistic locking, re-run failures
+      geotagRewriteSuccessful <- if (failedDeletes.isEmpty) rewriteGeoTags(placesBefore.map(_._1), placesAfter) else Future.successful(false)
+    } yield failedUpdates.isEmpty && failedDeletes.isEmpty && geotagRewriteSuccessful
   }
 
   /** TODO chain the Futures properly instead of using Await! **/

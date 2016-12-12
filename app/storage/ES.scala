@@ -43,9 +43,7 @@ object ES extends ElasticSearchSanitizer {
 
   // Max. number of retries to do in case of failed imports
   val MAX_RETRIES        = 10
-  
 
-  
 }
 
 /** ElasticSearch client + start & stop helpers **/

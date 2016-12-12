@@ -2,6 +2,7 @@ package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import java.io.{ File, FileInputStream }
+import models.geotag.GeoTagStore
 import org.joda.time.DateTime
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -15,7 +16,7 @@ import scala.concurrent.duration._
 import models.place.crosswalks.PelagiosRDFCrosswalk
 
 // So we can instantiate a PlaceService running on a mock store
-class TestPlaceService extends MockPlaceStore with PlaceImporter
+class TestPlaceService extends MockPlaceStore with PlaceImporter with GeoTagStore
 
 @RunWith(classOf[JUnitRunner])
 class PlaceServiceSpec extends Specification {

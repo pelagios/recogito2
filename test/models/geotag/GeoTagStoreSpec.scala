@@ -21,9 +21,6 @@ import scala.concurrent.duration._
 import storage.ES
 import storage.HasES
 
-// So we can instantiate an ES Place + GeoTagStore
-class TestGeoTagStore(val es: ES) extends ESPlaceStore with ESGeoTagStore with HasES
-
 @RunWith(classOf[JUnitRunner])
 class GeoTagStoreSpec extends Specification with AfterAll {
   
@@ -128,14 +125,12 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       "http://pleiades.stoa.org/places/491741",
       Seq.empty[String], Seq("rainer"), Some("rainer"),
       annotatesVindobonaAndThessaloniki.lastModifiedAt)
-        
-    val testStore = new TestGeoTagStore(es) // Store extends GeoTagServiceLike
               
     def flush() = Await.result(es.flushIndex, 10 seconds)
     def insertAnnotation(a: Annotation) = Await.result(annotations.insertOrUpdateAnnotation(a), 10 seconds)
-    def totalGeoTags() = Await.result(testStore.totalGeoTags(), 10 seconds)
-    def findByAnnotationId(id: UUID) = Await.result(testStore.findGeoTagsByAnnotation(id), 10 seconds)
-    def searchPlacesInDocument(query: String, documentId: String) = Await.result(testStore.searchPlacesInDocument(query, documentId), 10 seconds)
+    def totalGeoTags() = Await.result(places.totalGeoTags(), 10 seconds)
+    def findByAnnotationId(id: UUID) = Await.result(places.findGeoTagsByAnnotation(id), 10 seconds)
+    def searchPlacesInDocument(query: String, documentId: String) = Await.result(places.searchPlacesInDocument(query, documentId), 10 seconds)
     
     "After creating 2 annotations with 1 geotag each, the GeoTagService" should {
       
@@ -201,7 +196,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         // In any case - deleting a place is something that only happens underneath the hood,
         // so we don't want to expose this as a functionality in the PlaceService
 
-        val deleteSuccess = Await.result(testStore.deletePlace("http://pleiades.stoa.org/places/128537"), 10 seconds)
+        val deleteSuccess = Await.result(places.deletePlace("http://pleiades.stoa.org/places/128537"), 10 seconds)
         deleteSuccess must equalTo(true)
         flush()
         
@@ -231,7 +226,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       
     }
     
-    "When merging places, the GeoTagService" should {
+    "When merging places, the PlaceStore" should {
 
       val recordA = GazetteerRecord(
         "http://www.example.com/places/a",
@@ -298,7 +293,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         // If GeoTags were properly re-written, the query will return the merged place
         val placesInDocumentAfter = Await.result(places.listPlacesInDocument(annotation.annotates.documentId), 10 seconds)
         placesInDocumentAfter.total must equalTo(1)
-        placesInDocumentBefore.items.head._1.isConflationOf must containAllOf(Seq(recordA, recordB, recordC))
+        placesInDocumentAfter.items.head._1.isConflationOf must containAllOf(Seq(recordA, recordB, recordC))
       }
       
     }

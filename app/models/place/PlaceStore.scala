@@ -14,6 +14,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.language.postfixOps
 import storage.{ ES, HasES }
+import models.geotag.GeoTagStore
 
 trait PlaceStore {
 
@@ -49,7 +50,7 @@ trait PlaceStore {
 
 }
 
-private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter { self: HasES =>
+private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with GeoTagStore { self: HasES =>
 
   implicit object PlaceIndexable extends Indexable[Place] {
     override def json(p: Place): String = Json.stringify(Json.toJson(p))

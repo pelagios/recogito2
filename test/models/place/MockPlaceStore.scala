@@ -2,12 +2,15 @@ package models.place
 
 import collection.JavaConverters._
 import com.vividsolutions.jts.geom.Coordinate
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import models.Page
+import models.annotation.Annotation
+import models.geotag.GeoTagStore
 import play.api.Logger
 import scala.concurrent.{ ExecutionContext, Future }
-import models.Page
 
-class MockPlaceStore extends PlaceStore {
+class MockPlaceStore extends PlaceStore with GeoTagStore {
   
   val mockIndex = new ConcurrentHashMap[String, Place]
   
@@ -16,8 +19,7 @@ class MockPlaceStore extends PlaceStore {
       mockIndex.size
     }
 
-  def listGazetteers()(implicit context: ExecutionContext) =
-    throw new UnsupportedOperationException
+  def listGazetteers()(implicit context: ExecutionContext) = ???
   
   def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext) = 
     Future {
@@ -65,5 +67,15 @@ class MockPlaceStore extends PlaceStore {
       
       Page(0l, results.size, 0, limit, results.take(limit))
     }
+  
+  /** Unimplemented GeoTagStore methods **/
+  def totalGeoTags()(implicit context: ExecutionContext) = ???
+  def insertOrUpdateGeoTagsForAnnotation(annotation: Annotation)(implicit context: ExecutionContext) = ???
+  def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext) = ???
+  def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext) = ???
+  def deleteGeoTagsByDocId(documentId: String)(implicit context: ExecutionContext) = ???
+  def findGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext) = ???
+  def listPlacesInDocument(docId: String, offset: Int = 0, limit: Int)(implicit context: ExecutionContext) = ???
+  def searchPlacesInDocument(query: String, docId: String, offset: Int = 0, limit: Int)(implicit context: ExecutionContext) = ???
       
 }

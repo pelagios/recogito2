@@ -21,7 +21,7 @@ trait GeoTagStore extends PlaceStore {
   /** Inserts or updates geotags for an annotation **/
   def insertOrUpdateGeoTagsForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean]
   
-  /** Rewrites GeoTags after an update to the place index **/
+  /** Re-writes GeoTags after an update to the place store **/
   def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean]
 
   /** Deletes the geotags for a specific annotation ID **/
@@ -120,8 +120,41 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       false
     }
   }
-  
-  def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean] = ???
+    
+  def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean] = {
+
+    def getTagsForPlaces(places: Seq[Place]) = es.client execute {
+      search in ES.RECOGITO / ES.GEOTAG query {
+        bool {
+          should (
+            places.map { place => hasParentQuery(ES.PLACE).query { termQuery("id", place.id) } }
+          )
+        }
+      }
+    } map { _.as[(String, GeoTag)].toSeq }
+
+    // TODO Users may have changed the link in the meantime - use optimistic locking, re-run failures
+    def rewriteOne(id: String, tag: GeoTag) = {
+      val newParent = placesAfterUpdate.find { _.uris.contains(tag.gazetteerUri) }.get
+      es.client execute {
+        update id id in ES.RECOGITO / ES.GEOTAG source tag parent newParent.id docAsUpsert
+      } map { _.isCreated }
+    }
+    
+    if (placesBeforeUpdate.size > 0)
+      getTagsForPlaces(placesBeforeUpdate).flatMap { case idsAndTags =>
+        if (idsAndTags.size > 0) {
+          val fSuccesses = Future.sequence(idsAndTags.map { case (id, tag) => rewriteOne(id, tag) })
+          fSuccesses.map { _.exists { _ == false } }
+        } else {
+          // Nothing to update
+          Future.successful(true)
+        }
+      }      
+    else
+      // No need to update any GeoTags if no existing places were affected by the import
+      Future.successful(true)
+  }
   
   /** Helper to bulk-delete a list of GeoTags **/
   private def bulkDelete(ids: Seq[String])(implicit context: ExecutionContext): Future[Boolean] =

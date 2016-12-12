@@ -1,6 +1,7 @@
 package models.place
 
 import java.io.File
+import models.geotag.ESGeoTagStore
 import org.apache.commons.io.FileUtils
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.specs2.mutable._
@@ -18,7 +19,7 @@ import scala.util.Random
 import play.api.Play
 
 // So we can instantiate an ElasticSearch place store
-class TestPlaceStore(val es: ES) extends ESPlaceStore with HasES
+class TestPlaceStore(val es: ES) extends ESPlaceStore with HasES with ESGeoTagStore
 
 @RunWith(classOf[JUnitRunner])
 class PlaceStoreSpec extends Specification with AfterAll {
