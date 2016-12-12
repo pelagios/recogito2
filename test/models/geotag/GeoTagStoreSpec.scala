@@ -118,7 +118,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       annotatesVindobonaAndThessaloniki.annotates.documentId,
       annotatesVindobonaAndThessaloniki.annotates.filepartId,
       "http://pleiades.stoa.org/places/128537",
-      Seq.empty[String], Seq.empty[String], None,
+      Seq.empty[String], Seq("rainer"), Some("rainer"),
       annotatesVindobonaAndThessaloniki.lastModifiedAt)
         
     val linkToThessaloniki = GeoTag(
@@ -126,7 +126,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       annotatesVindobonaAndThessaloniki.annotates.documentId,
       annotatesVindobonaAndThessaloniki.annotates.filepartId,
       "http://pleiades.stoa.org/places/491741",
-      Seq.empty[String], Seq.empty[String], None,
+      Seq.empty[String], Seq("rainer"), Some("rainer"),
       annotatesVindobonaAndThessaloniki.lastModifiedAt)
         
     val testStore = new TestGeoTagStore(es) // Store extends GeoTagServiceLike
