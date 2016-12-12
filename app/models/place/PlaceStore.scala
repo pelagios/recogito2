@@ -87,7 +87,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
       (true, r.getVersion)
     } recover { case t: Throwable =>
       Logger.error("Error indexing place " + place.id + ": " + t.getMessage)
-      t.printStackTrace
+      // t.printStackTrace
       (false, -1l)
     }
 

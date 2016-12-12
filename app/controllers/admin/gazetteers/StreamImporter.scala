@@ -5,9 +5,10 @@ import akka.stream.scaladsl._
 import akka.util.ByteString
 import java.io.InputStream
 import models.place.{ GazetteerRecord, PlaceService }
+import play.api.Logger
+import play.api.libs.json.Json
 import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._
-import play.api.libs.json.Json
 
 class StreamImporter(implicit materializer: Materializer) {
   
@@ -32,8 +33,11 @@ class StreamImporter(implicit materializer: Materializer) {
     
     val importer = Sink.foreach[Seq[Option[GazetteerRecord]]] { records =>
       val toImport = records.flatten
-      play.api.Logger.info("Importing " + toImport.size + " records")
-      Await.result(places.importRecords(toImport), 1.minute)
+      try {
+        Await.result(places.importRecords(toImport), 120.minute)
+      } catch { case t: Throwable =>
+        t.printStackTrace
+      }
     }
     
     val graph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>

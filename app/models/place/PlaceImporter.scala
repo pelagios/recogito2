@@ -11,7 +11,7 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
   private def MAX_URIS_IN_QUERY = 100
 
   // Maximum number of times a gazetteer record or place link update will be retried in case of failure
-  private def MAX_RETRIES = 10
+  private def MAX_RETRIES = 5
 
   /** Retrieves all places in the store that will be affected from adding the record **/
   private[place] def getAffectedPlaces(normalizedRecord: GazetteerRecord)(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] = {
@@ -126,20 +126,19 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
         try {
           (record, Await.result(importRecord(record), 5.seconds))
         } catch { case t: Throwable =>
-          t.printStackTrace()
+          // t.printStackTrace()
+          play.api.Logger.warn(t.getMessage)
           (record, false)
         }
       }.filter(!_._2).map(_._1)
     }.flatMap { failedRecords =>
+      Logger.info("Imported " + (records.size - failedRecords.size) + " records") 
       if (failedRecords.size > 0 && retries > 0) {
         Logger.warn(failedRecords.size + " gazetteer records failed to import - retrying")
         importRecords(failedRecords, retries - 1)
       } else {
-        Logger.info("Successfully imported " + (records.size - failedRecords.size) + " records")
-        if (failedRecords.size > 0)
-          Logger.error(failedRecords.size + " gazetteer records failed without recovery")
-        else
-          Logger.info("No failed imports")
+        if (failedRecords.size > 0) Logger.error(failedRecords.size + " gazetteer records failed without recovery")
+        else Logger.info("No failed imports")
         Future.successful(failedRecords)
       }
     }
