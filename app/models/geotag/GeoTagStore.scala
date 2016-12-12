@@ -20,6 +20,9 @@ trait GeoTagStore extends PlaceStore {
 
   /** Inserts or updates geotags for an annotation **/
   def insertOrUpdateGeoTagsForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean]
+  
+  /** Rewrites GeoTags after an update to the place index **/
+  def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean]
 
   /** Deletes the geotags for a specific annotation ID **/
   def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean]
@@ -117,6 +120,8 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       false
     }
   }
+  
+  def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean] = ???
   
   /** Helper to bulk-delete a list of GeoTags **/
   private def bulkDelete(ids: Seq[String])(implicit context: ExecutionContext): Future[Boolean] =
