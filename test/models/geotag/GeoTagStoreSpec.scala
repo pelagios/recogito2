@@ -4,7 +4,7 @@ import java.io.File
 import java.util.UUID
 import models.ContentType
 import models.annotation._
-import models.place.{ PlaceService, ESPlaceStore }
+import models.place._
 import models.place.crosswalks.PelagiosRDFCrosswalk
 import org.apache.commons.io.FileUtils
 import org.joda.time.{ DateTime, DateTimeZone }
@@ -227,6 +227,78 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         
         success.size must equalTo(2)
         totalGeoTags() must equalTo(0)
+      }
+      
+    }
+    
+    "When merging places, the GeoTagService" should {
+
+      val recordA = GazetteerRecord(
+        "http://www.example.com/places/a",
+        Gazetteer("Example Gazetteer"),
+        now,
+        None,
+        "Record A",
+        Seq(),
+        Seq(),
+        None,
+        None,
+        None,
+        Seq(),
+        None,
+        None,
+        Seq(),
+        Seq())
+      
+      val recordB = recordA.copy(
+        uri = "http://www.example.com/places/b",
+        title = "Record B"
+      )
+      
+      val recordC = recordA.copy(
+        uri = "http://www.example.com/places/c",
+        title = "Record C",
+        closeMatches = Seq("http://www.example.com/places/a", "http://www.example.com/places/b")
+      )
+      
+      val annotation = Annotation(
+        UUID.randomUUID,
+        UUID.randomUUID,
+        AnnotatedObject("cbrjoouex3qyu3", UUID.randomUUID, ContentType.TEXT_PLAIN),
+        Seq.empty[String],
+        "char-offset:1234",
+        None,
+        now,
+        Seq(AnnotationBody(
+          AnnotationBody.PLACE,
+          None,
+          now,
+          None,
+          Some("http://www.example.com/places/b"),
+          Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
+
+      "update the GeoTag-Place relation accordingly" in {
+        // Import records A and B as separate places
+        Await.result(places.importRecords(Seq(recordA, recordB)), 10 seconds)
+        flush()
+        
+        // Import annotation pointing to record B
+        insertAnnotation(annotation)
+        flush()
+        
+        // If the GeoTag was created properly, we'll find a single place, consisting of just recordB
+        val placesInDocumentBefore = Await.result(places.listPlacesInDocument(annotation.annotates.documentId), 10 seconds)
+        placesInDocumentBefore.total must equalTo(1)
+        placesInDocumentBefore.items.head._1.isConflationOf must equalTo(Seq(recordB))
+        
+        // Now import record C, which will merge records A and B to one place
+        Await.result(places.importRecord(recordC), 10 seconds)
+        flush()
+        
+        // If GeoTags were properly re-written, the query will return the merged place
+        val placesInDocumentAfter = Await.result(places.listPlacesInDocument(annotation.annotates.documentId), 10 seconds)
+        placesInDocumentAfter.total must equalTo(1)
+        placesInDocumentBefore.items.head._1.isConflationOf must containAllOf(Seq(recordA, recordB, recordC))
       }
       
     }
