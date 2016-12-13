@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Recogito | @title</title>
+    <title>@title</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/help/" + stylesheet)"/>
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@@pelagiosproject" />
-    <meta property="og:title" content="Recogito Help" />
-    <meta name="twitter:title" content="Recogito Help" />
+    <meta property="og:title" content="@title" />
+    <meta name="twitter:title" content="@title" />
     <meta property="og:description" content="@synopsis" />
     <meta name="twitter:description" content="@synopsis" />
     <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
@@ -32,13 +32,13 @@
         </div>
 
         <div class="links">
-          @if(title == "Tutorial") { <a href="#" onclick="javascript:return false;" class="current">Tutorial</a>
+          @if(title == "Recogito in 10 Minutes") { <a href="#" onclick="javascript:return false;" class="current">Tutorial</a>
             } else { <a href="@controllers.help.routes.HelpController.showTutorial()">Tutorial</a> }
 
-          @if(title == "FAQ") { <a href="#" onclick="javascript:return false;" class="current">FAQ</a>
+          @if(title == "FAQ | Recogito") { <a href="#" onclick="javascript:return false;" class="current">FAQ</a>
             } else { <a href="@controllers.help.routes.HelpController.showFAQ()">FAQ</a> }
 
-          @if(title == "About") { <a href="#" onclick="javascript:return false;" class="current">About</a>
+          @if(title == "About | Recogito") { <a href="#" onclick="javascript:return false;" class="current">About</a>
             } else { <a href="@controllers.help.routes.HelpController.showAbout()">About</a> }
 
           <a target="_blank" href="http://commons.pelagios.org/groups/recogito-users/">Forum</a>
