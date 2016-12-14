@@ -3,54 +3,11 @@ package models.task
 import javax.inject.{ Inject, Singleton }
 import java.sql.Timestamp
 import java.util.UUID
+import models.BaseService
 import models.generated.Tables.TASK
+import models.generated.tables.records.TaskRecord
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.DB
-
-private[task] case class ProgressTracker(
-
-  private val db: DB,
-  
-  private implicit val ctx: ExecutionContext,
-  
-  val id: UUID,
-  
-  val taskType: String,
-  
-  val className: String,
-  
-  val lookupKey: Option[String],
-  
-  val spawnedBy: Option[String],
-  
-  val spawnedAt: Timestamp,
-  
-  val stoppedAt: Option[Timestamp],
-  
-  val stoppedWith: Option[String],
-  
-  val status: TaskStatus.Value,
-  
-  val progress: Int
-  
-) {
-  
-  def commit(): Future[ProgressTracker] = {
-    // TODO persist to DB
-    null
-  }
-  
-  def updateStatus(status: TaskStatus.Value): Future[ProgressTracker] = {
-    val updated = this.copy(status = status)
-    updated.commit()
-  }
-  
-  def updateProgress(progress: Int) = {
-    val updated = this.copy(progress = progress)
-    updated.commit()
-  }
-  
-}
 
 object TaskStatus extends Enumeration {
 
@@ -65,31 +22,59 @@ object TaskStatus extends Enumeration {
 }
 
 @Singleton
-class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) {
+class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) extends BaseService {
   
-  def newProgressTracker(
-    taskType: String,
-    className: String,
-    lookupKey: Option[String],
-    spawnedBy: Option[String]
-  ): Future[ProgressTracker] = {
+  def findById(uuid: UUID) = ???
+  
+  def findByTypeAndKey(taskType: String, lookupKey: String) = ???
+  
+  def updateProgress(uuid: UUID, progress: Int): Future[Unit] = db.withTransaction { sql => 
+    sql.update(TASK)
+      .set[Integer](TASK.PROGRESS, progress)
+      .where(TASK.ID.equal(uuid))
+      .execute()
+  }
+  
+  def updateProgress(taskType: String, lookupKey: String, progress: Int): Future[Unit] = db.withTransaction { sql =>
+    sql.update(TASK)
+      .set[Integer](TASK.PROGRESS, progress)
+      .where(TASK.TASK_TYPE.equal(taskType.toString).and(TASK.LOOKUP_KEY.equal(lookupKey)))
+      .execute()
+  }
+  
+  def updateStatus(uuid: UUID, status: TaskStatus.Value): Future[Unit] = db.withTransaction { sql => 
+    sql.update(TASK)
+      .set(TASK.STATUS, status.toString)
+      .where(TASK.ID.equal(uuid))
+      .execute()
+  }
+  
+  def updateStatus(taskType: String, lookupKey: String, status: TaskStatus.Value): Future[Unit] = db.withTransaction { sql => 
+    sql.update(TASK)
+      .set(TASK.STATUS, status.toString)
+      .where(TASK.TASK_TYPE.equal(taskType.toString).and(TASK.LOOKUP_KEY.equal(lookupKey)))
+      .execute()
+  }
+  
+  def insertTask(taskType: String, className: String, lookupKey: Option[String], spawnedBy: Option[String]): Future[UUID] = db.withTransaction { sql =>
+    val uuid = UUID.randomUUID
     
-    val tracker =
-      ProgressTracker(
-        db,
-        ctx,
-        UUID.randomUUID,
-        taskType,
-        className,
-        lookupKey,
-        spawnedBy,
-        new Timestamp(System.currentTimeMillis),
-        None,
-        None,
-        TaskStatus.PENDING,
-        0)
-     
-    tracker.commit().map(_ => tracker)     
+    val taskRecord = new TaskRecord(
+      uuid,
+      taskType,
+      className,
+      optString(lookupKey),
+      optString(spawnedBy),
+      new Timestamp(System.currentTimeMillis),
+      null, // stopped_at
+      null, // stopped_with
+      TaskStatus.PENDING.toString,
+      0
+    )
+    
+    sql.insertInto(TASK).set(taskRecord).execute()
+    
+    uuid
   }
 
 }

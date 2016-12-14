@@ -6,24 +6,20 @@ import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.sql.Timestamp
 import java.util.{ Date, UUID }
 import javax.inject.Inject
-import models.ContentType
+import models.{ BaseService, ContentType }
 import models.document.DocumentService
 import models.generated.Tables._
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UploadRecord, UploadFilepartRecord, UserRecord }
+import models.generated.tables.records._
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import storage.{ DB, Uploads }
-import models.generated.tables.records.UploadFilepartRecord
 
 class QuotaExceededException(val remainingSpaceKb: Long, val filesizeKb: Double) extends RuntimeException
 
-class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) {
-
-  /** Java-interop helper that turns empty strings to null, so they are properly inserted by JOOQ **/
-  private def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
+class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) extends BaseService {
 
   /** Inserts a new upload, or updates an existing one if it already exists **/
   def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String) =
