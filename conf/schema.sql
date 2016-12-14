@@ -121,7 +121,7 @@ CREATE TABLE sharing_policy (
 -- );
 
 CREATE TABLE task (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   task_type TEXT NOT NULL,
   class_name TEXT NOT NULL,
   -- some tasks will lookup by task-specific keys (e.g. documentId)

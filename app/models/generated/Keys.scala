@@ -54,7 +54,6 @@ object Keys {
 
 	val IDENTITY_FOLDER = Identities0.IDENTITY_FOLDER
 	val IDENTITY_SHARING_POLICY = Identities0.IDENTITY_SHARING_POLICY
-	val IDENTITY_TASK = Identities0.IDENTITY_TASK
 	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
 	val IDENTITY_USER_ROLE = Identities0.IDENTITY_USER_ROLE
 
@@ -103,7 +102,6 @@ object Keys {
 	private object Identities0 extends AbstractKeys {
 		val IDENTITY_FOLDER : Identity[FolderRecord, Integer] = AbstractKeys.createIdentity(Folder.FOLDER, Folder.FOLDER.ID)
 		val IDENTITY_SHARING_POLICY : Identity[SharingPolicyRecord, Integer] = AbstractKeys.createIdentity(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
-		val IDENTITY_TASK : Identity[TaskRecord, Integer] = AbstractKeys.createIdentity(Task.TASK, Task.TASK.ID)
 		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
 		val IDENTITY_USER_ROLE : Identity[UserRoleRecord, Integer] = AbstractKeys.createIdentity(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)
 	}

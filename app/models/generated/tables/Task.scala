@@ -10,6 +10,7 @@ import java.lang.String
 import java.sql.Timestamp
 import java.util.Arrays
 import java.util.List
+import java.util.UUID
 
 import javax.annotation.Generated
 
@@ -18,7 +19,6 @@ import models.generated.Public
 import models.generated.tables.records.TaskRecord
 
 import org.jooq.Field
-import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -55,7 +55,7 @@ class Task(alias : String, aliased : Table[TaskRecord], parameters : Array[ Fiel
 	/**
 	 * The column <code>public.task.id</code>.
 	 */
-	val ID : TableField[TaskRecord, Integer] = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
+	val ID : TableField[TaskRecord, UUID] = createField("id", org.jooq.impl.SQLDataType.UUID.nullable(false), "")
 
 	/**
 	 * The column <code>public.task.task_type</code>.
@@ -118,10 +118,6 @@ class Task(alias : String, aliased : Table[TaskRecord], parameters : Array[ Fiel
 
 	private def this(alias : String, aliased : Table[TaskRecord]) = {
 		this(alias, aliased, null)
-	}
-
-	override def getIdentity : Identity[TaskRecord, Integer] = {
-		Keys.IDENTITY_TASK
 	}
 
 	override def getPrimaryKey : UniqueKey[TaskRecord] = {

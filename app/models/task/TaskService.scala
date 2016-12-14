@@ -1,12 +1,19 @@
 package models.task
 
-import java.sql.Timestamp
-import storage.DB
 import javax.inject.{ Inject, Singleton }
+import java.sql.Timestamp
+import java.util.UUID
+import models.generated.Tables.TASK
+import scala.concurrent.{ ExecutionContext, Future }
+import storage.DB
 
 private[task] case class ProgressTracker(
 
   private val db: DB,
+  
+  private implicit val ctx: ExecutionContext,
+  
+  val id: UUID,
   
   val taskType: String,
   
@@ -22,47 +29,67 @@ private[task] case class ProgressTracker(
   
   val stoppedWith: Option[String],
   
-  val status: String,
+  val status: TaskStatus.Value,
   
   val progress: Int
   
 ) {
   
-  def updateStatus(status: String) = {
+  def commit(): Future[ProgressTracker] = {
     // TODO persist to DB
-    this.copy(status = status)
+    null
+  }
+  
+  def updateStatus(status: TaskStatus.Value): Future[ProgressTracker] = {
+    val updated = this.copy(status = status)
+    updated.commit()
   }
   
   def updateProgress(progress: Int) = {
-    // TODO persist to DB
-    this.copy(progress = progress)
+    val updated = this.copy(progress = progress)
+    updated.commit()
   }
   
 }
 
-@Singleton
-class TaskService @Inject() (val db: DB) {
+object TaskStatus extends Enumeration {
 
+  val PENDING = Value("PENDING")
+
+  val RUNNING = Value("RUNNING")
+  
+  val COMPLETED = Value("COMPLETED")
+  
+  val FAILED = Value("FAILED")
+
+}
+
+@Singleton
+class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) {
+  
   def newProgressTracker(
     taskType: String,
     className: String,
     lookupKey: Option[String],
     spawnedBy: Option[String]
-  ) = {
+  ): Future[ProgressTracker] = {
     
-    // TODO persist to DB
-    
-    ProgressTracker(
-      db,
-      taskType,
-      className,
-      lookupKey,
-      spawnedBy,
-      new Timestamp(System.currentTimeMillis),
-      None,
-      None,
-      "PENDING", // TODO enum
-      0)
+    val tracker =
+      ProgressTracker(
+        db,
+        ctx,
+        UUID.randomUUID,
+        taskType,
+        className,
+        lookupKey,
+        spawnedBy,
+        new Timestamp(System.currentTimeMillis),
+        None,
+        None,
+        TaskStatus.PENDING,
+        0)
+     
+    tracker.commit().map(_ => tracker)     
   }
 
 }
