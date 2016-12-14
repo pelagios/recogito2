@@ -11,6 +11,7 @@ import models.generated.tables.DocumentFilepart
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
 import models.generated.tables.SharingPolicy
+import models.generated.tables.Task
 import models.generated.tables.Upload
 import models.generated.tables.UploadFilepart
 import models.generated.tables.User
@@ -53,6 +54,11 @@ object Tables {
 	 * The table public.sharing_policy
 	 */
 	val SHARING_POLICY = models.generated.tables.SharingPolicy.SHARING_POLICY
+
+	/**
+	 * The table public.task
+	 */
+	val TASK = models.generated.tables.Task.TASK
 
 	/**
 	 * The table public.upload

@@ -13,6 +13,7 @@ import models.generated.tables.DocumentFilepart
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
 import models.generated.tables.SharingPolicy
+import models.generated.tables.Task
 import models.generated.tables.Upload
 import models.generated.tables.UploadFilepart
 import models.generated.tables.User
@@ -22,6 +23,7 @@ import models.generated.tables.records.DocumentRecord
 import models.generated.tables.records.FolderAssociationRecord
 import models.generated.tables.records.FolderRecord
 import models.generated.tables.records.SharingPolicyRecord
+import models.generated.tables.records.TaskRecord
 import models.generated.tables.records.UploadFilepartRecord
 import models.generated.tables.records.UploadRecord
 import models.generated.tables.records.UserRecord
@@ -52,6 +54,7 @@ object Keys {
 
 	val IDENTITY_FOLDER = Identities0.IDENTITY_FOLDER
 	val IDENTITY_SHARING_POLICY = Identities0.IDENTITY_SHARING_POLICY
+	val IDENTITY_TASK = Identities0.IDENTITY_TASK
 	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
 	val IDENTITY_USER_ROLE = Identities0.IDENTITY_USER_ROLE
 
@@ -64,6 +67,8 @@ object Keys {
 	val FOLDER_PKEY = UniqueKeys0.FOLDER_PKEY
 	val SHARING_POLICY_PKEY = UniqueKeys0.SHARING_POLICY_PKEY
 	val SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY = UniqueKeys0.SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY
+	val TASK_PKEY = UniqueKeys0.TASK_PKEY
+	val TASK_TASK_TYPE_LOOKUP_KEY_KEY = UniqueKeys0.TASK_TASK_TYPE_LOOKUP_KEY_KEY
 	val UPLOAD_PKEY = UniqueKeys0.UPLOAD_PKEY
 	val UPLOAD_OWNER_KEY = UniqueKeys0.UPLOAD_OWNER_KEY
 	val UPLOAD_FILEPART_PKEY = UniqueKeys0.UPLOAD_FILEPART_PKEY
@@ -98,6 +103,7 @@ object Keys {
 	private object Identities0 extends AbstractKeys {
 		val IDENTITY_FOLDER : Identity[FolderRecord, Integer] = AbstractKeys.createIdentity(Folder.FOLDER, Folder.FOLDER.ID)
 		val IDENTITY_SHARING_POLICY : Identity[SharingPolicyRecord, Integer] = AbstractKeys.createIdentity(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
+		val IDENTITY_TASK : Identity[TaskRecord, Integer] = AbstractKeys.createIdentity(Task.TASK, Task.TASK.ID)
 		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
 		val IDENTITY_USER_ROLE : Identity[UserRoleRecord, Integer] = AbstractKeys.createIdentity(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)
 	}
@@ -108,6 +114,8 @@ object Keys {
 		val FOLDER_PKEY : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
 		val SHARING_POLICY_PKEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.DOCUMENT_ID, SharingPolicy.SHARING_POLICY.SHARED_WITH)
+		val TASK_PKEY : UniqueKey[TaskRecord] = AbstractKeys.createUniqueKey(Task.TASK, Task.TASK.ID)
+		val TASK_TASK_TYPE_LOOKUP_KEY_KEY : UniqueKey[TaskRecord] = AbstractKeys.createUniqueKey(Task.TASK, Task.TASK.TASK_TYPE, Task.TASK.LOOKUP_KEY)
 		val UPLOAD_PKEY : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.ID)
 		val UPLOAD_OWNER_KEY : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.OWNER)
 		val UPLOAD_FILEPART_PKEY : UniqueKey[UploadFilepartRecord] = AbstractKeys.createUniqueKey(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.ID)
