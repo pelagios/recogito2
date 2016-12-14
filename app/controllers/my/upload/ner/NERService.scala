@@ -9,6 +9,7 @@ import javax.inject.{ Inject, Singleton }
 import models.annotation.AnnotationService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.place.PlaceService
+import models.task.TaskService
 import org.pelagios.recogito.sdk.ner.Entity
 import play.api.Logger
 import scala.collection.JavaConverters._
@@ -44,7 +45,7 @@ object NERService {
 }
 
 @Singleton
-class NERService @Inject() (annotations: AnnotationService, places: PlaceService, uploads: Uploads) extends ProcessingService {
+class NERService @Inject() (annotations: AnnotationService, places: PlaceService, taskService: TaskService, uploads: Uploads) extends ProcessingService {
 
   /** Spawns a new background parse process.
     *
@@ -57,7 +58,7 @@ class NERService @Inject() (annotations: AnnotationService, places: PlaceService
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
   private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10.minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, keepalive, annotations, places), name = "ner_doc_" + document.getId)
+    val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, keepalive, taskService, annotations, places), name = "ner_doc_" + document.getId)
     actor ! ProcessingTaskMessages.Start
   }
 

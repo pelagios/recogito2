@@ -8,13 +8,13 @@ import models.ContentType
 import models.annotation._
 import models.place.PlaceService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.task.TaskService
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
 import scala.io.Source
 import storage.ES
-
 import org.pelagios.recogito.sdk.ner._
 
 private[ner] object NERWorkerActor {
@@ -23,7 +23,14 @@ private[ner] object NERWorkerActor {
 
 }
 
-private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepartRecord, documentDir: File, annotationService: AnnotationService, placeService: PlaceService) extends Actor {
+private[ner] class NERWorkerActor(
+    document: DocumentRecord,
+    part: DocumentFilepartRecord,
+    documentDir: File, 
+    taskService: TaskService,
+    annotationService: AnnotationService,
+    placeService: PlaceService
+  ) extends Actor {
 
   import controllers.my.upload.ProcessingTaskMessages._
 
@@ -35,7 +42,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
     case Start => {
       status = ProgressStatus.IN_PROGRESS
       val origSender = sender
-      
+
       parseFilepart(document, part, documentDir).map { phrases =>
         // val entities = phrases.filter(p => (p.entityTag == "LOCATION" || p.entityTag == "PERSON"))
         // TODO temporarily disabling PERSON tags for first pre-release
@@ -44,6 +51,7 @@ private[ner] class NERWorkerActor(document: DocumentRecord, part: DocumentFilepa
           annotationService.insertOrUpdateAnnotations(annotations).map { result =>
             progress = 1.0
             status = ProgressStatus.COMPLETED
+            
             if (result.size == 0)
               origSender ! Completed
             else

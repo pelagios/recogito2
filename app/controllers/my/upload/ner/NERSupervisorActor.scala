@@ -3,16 +3,18 @@ package controllers.my.upload.ner
 import akka.actor.Props
 import controllers.my.upload.{ BaseSupervisorActor, TaskType }
 import java.io.File
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import scala.concurrent.duration.FiniteDuration
 import models.annotation.AnnotationService
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.place.PlaceService
+import models.task.TaskService
+import scala.concurrent.duration.FiniteDuration
 
 private[ner] class NERSupervisorActor(
     task: TaskType, 
     document: DocumentRecord,
     parts: Seq[DocumentFilepartRecord],
     dir: File, keepalive: FiniteDuration,
+    taskService: TaskService,
     annotations: AnnotationService,
     places: PlaceService
   ) extends BaseSupervisorActor(task, document, parts, dir, keepalive) {
@@ -21,7 +23,7 @@ private[ner] class NERSupervisorActor(
   override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
     parts
       .filter(part => NERWorkerActor.SUPPORTED_CONTENT_TYPES.contains(part.getContentType))
-      .map(p => context.actorOf(Props(classOf[NERWorkerActor], document, p, dir, annotations, places), name="ner_doc_" + document.getId + "_part" + p.getId))
+      .map(p => context.actorOf(Props(classOf[NERWorkerActor], document, p, dir, taskService, annotations, places), name="ner_doc_" + document.getId + "_part" + p.getId))
 
 }
 

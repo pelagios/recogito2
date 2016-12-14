@@ -124,7 +124,7 @@ CREATE TABLE task (
   id UUID PRIMARY KEY,
   task_type TEXT NOT NULL,
   class_name TEXT NOT NULL,
-  -- some tasks will lookup by task-specific keys (e.g. documentId)
+  -- some progress queries will retrieve multiple tasks by task-specific keys (e.g. documentId)
   lookup_key TEXT,
   spawned_by TEXT,
   spawned_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -132,6 +132,5 @@ CREATE TABLE task (
   -- all-purpose text field for holding results, exception message, etc.
   stopped_with TEXT,
   status TEXT NOT NULL DEFAULT 'PENDING',
-  progress INTEGER NOT NULL,
-  UNIQUE (task_type, lookup_key)
+  progress INTEGER NOT NULL
 );

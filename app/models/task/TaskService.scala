@@ -24,9 +24,13 @@ object TaskStatus extends Enumeration {
 @Singleton
 class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) extends BaseService {
   
-  def findById(uuid: UUID) = ???
+  def findById(uuid: UUID) = db.query { sql =>
+    sql.selectFrom(TASK).where(TASK.ID.equal(uuid)).fetchOne()
+  }
   
-  def findByTypeAndKey(taskType: String, lookupKey: String) = ???
+  def findByTypeAndKey(taskType: String, lookupKey: String) = db.query { sql =>
+    sql.selectFrom(TASK).where(TASK.TASK_TYPE.equal(taskType)).and(TASK.LOOKUP_KEY.equal(lookupKey)).fetchOne()    
+  }
   
   def updateProgress(uuid: UUID, progress: Int): Future[Unit] = db.withTransaction { sql => 
     sql.update(TASK)
@@ -34,25 +38,11 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       .where(TASK.ID.equal(uuid))
       .execute()
   }
-  
-  def updateProgress(taskType: String, lookupKey: String, progress: Int): Future[Unit] = db.withTransaction { sql =>
-    sql.update(TASK)
-      .set[Integer](TASK.PROGRESS, progress)
-      .where(TASK.TASK_TYPE.equal(taskType.toString).and(TASK.LOOKUP_KEY.equal(lookupKey)))
-      .execute()
-  }
-  
+    
   def updateStatus(uuid: UUID, status: TaskStatus.Value): Future[Unit] = db.withTransaction { sql => 
     sql.update(TASK)
       .set(TASK.STATUS, status.toString)
       .where(TASK.ID.equal(uuid))
-      .execute()
-  }
-  
-  def updateStatus(taskType: String, lookupKey: String, status: TaskStatus.Value): Future[Unit] = db.withTransaction { sql => 
-    sql.update(TASK)
-      .set(TASK.STATUS, status.toString)
-      .where(TASK.TASK_TYPE.equal(taskType.toString).and(TASK.LOOKUP_KEY.equal(lookupKey)))
       .execute()
   }
   
