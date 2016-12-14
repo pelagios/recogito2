@@ -67,7 +67,6 @@ object Keys {
 	val SHARING_POLICY_PKEY = UniqueKeys0.SHARING_POLICY_PKEY
 	val SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY = UniqueKeys0.SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY
 	val TASK_PKEY = UniqueKeys0.TASK_PKEY
-	val TASK_TASK_TYPE_LOOKUP_KEY_KEY = UniqueKeys0.TASK_TASK_TYPE_LOOKUP_KEY_KEY
 	val UPLOAD_PKEY = UniqueKeys0.UPLOAD_PKEY
 	val UPLOAD_OWNER_KEY = UniqueKeys0.UPLOAD_OWNER_KEY
 	val UPLOAD_FILEPART_PKEY = UniqueKeys0.UPLOAD_FILEPART_PKEY
@@ -113,7 +112,6 @@ object Keys {
 		val SHARING_POLICY_PKEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.DOCUMENT_ID, SharingPolicy.SHARING_POLICY.SHARED_WITH)
 		val TASK_PKEY : UniqueKey[TaskRecord] = AbstractKeys.createUniqueKey(Task.TASK, Task.TASK.ID)
-		val TASK_TASK_TYPE_LOOKUP_KEY_KEY : UniqueKey[TaskRecord] = AbstractKeys.createUniqueKey(Task.TASK, Task.TASK.TASK_TYPE, Task.TASK.LOOKUP_KEY)
 		val UPLOAD_PKEY : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.ID)
 		val UPLOAD_OWNER_KEY : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.OWNER)
 		val UPLOAD_FILEPART_PKEY : UniqueKey[UploadFilepartRecord] = AbstractKeys.createUniqueKey(UploadFilepart.UPLOAD_FILEPART, UploadFilepart.UPLOAD_FILEPART.ID)

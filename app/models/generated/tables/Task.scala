@@ -125,7 +125,7 @@ class Task(alias : String, aliased : Table[TaskRecord], parameters : Array[ Fiel
 	}
 
 	override def getKeys : List[ UniqueKey[TaskRecord] ] = {
-		return Arrays.asList[ UniqueKey[TaskRecord] ](Keys.TASK_PKEY, Keys.TASK_TASK_TYPE_LOOKUP_KEY_KEY)
+		return Arrays.asList[ UniqueKey[TaskRecord] ](Keys.TASK_PKEY)
 	}
 
 	override def as(alias : String) : Task = {

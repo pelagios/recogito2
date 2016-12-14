@@ -124,7 +124,7 @@ CREATE TABLE task (
   id UUID PRIMARY KEY,
   task_type TEXT NOT NULL,
   class_name TEXT NOT NULL,
-  -- some progress queries will retrieve multiple tasks by task-specific keys (e.g. documentId)
+  -- some progress queries will retrieve multiple tasks by task-specific keys (e.gcd. documentId)
   lookup_key TEXT,
   spawned_by TEXT,
   spawned_at TIMESTAMP WITH TIME ZONE NOT NULL,
