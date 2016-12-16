@@ -7,7 +7,7 @@
 .settings
 .cache-*
 recogito.db
-/vagrant
+/vagrant/.vagrant
 /index
 /uploads
 /.idea
