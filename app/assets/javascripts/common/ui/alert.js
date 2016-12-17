@@ -1,7 +1,9 @@
 define(['common/hasEvents'], function(HasEvents) {
 
-  var Alert = function(alertType, title, message) {
+  var Alert = function(alertType, title, message, opt_labels) {
     var self = this,
+
+        labels = opt_labels || {},
 
         element = jQuery(
           '<div class="clicktrap">' +
@@ -9,8 +11,8 @@ define(['common/hasEvents'], function(HasEvents) {
               '<h1>' + title + '</h1>' +
               '<p>' + message + '</p>' +
               '<p class="buttons">' +
-                '<button class="btn ok">OK</button>' +
-                '<button class="btn outline cancel">Cancel</button>' +
+                '<button class="btn ok">' + (labels.ok || 'OK') + '</button>' +
+                '<button class="btn outline cancel">' + (labels.cancel || 'Cancel') + '</button>' +
               '</p>' +
             '</div>' +
           '</div>'),
