@@ -4,6 +4,8 @@ import akka.actor.ActorSystem
 import com.google.inject.AbstractModule
 import java.sql.Connection
 import javax.inject.{ Inject, Singleton }
+import models.user.UserService
+import models.user.Roles
 import org.jooq.impl.DSL
 import org.jooq.{ SQLDialect, DSLContext }
 import play.api.db.Database
@@ -49,7 +51,7 @@ class DBModule extends AbstractModule {
 }
 
 @Singleton
-class DBInitializer @Inject() (db: Database) {
+class DBInitializer @Inject() (db: Database, userService: UserService, implicit val ctx: ExecutionContext) {
 
   // Does the user table exist? Run schema generation if not.
   db.withConnection { connection =>
@@ -61,6 +63,7 @@ class DBInitializer @Inject() (db: Database) {
   
   /** Database setup **/
   private def initDB(connection: Connection) = {
+    
     // Splitting by ; is not 100% robust - but should be sufficient for our own schema file
     val statement = connection.createStatement
 
@@ -74,6 +77,13 @@ class DBInitializer @Inject() (db: Database) {
 
     statement.executeBatch()
     statement.close()    
-  }  
+    
+    val f = for {
+      _ <- userService.insertUser("recogito", "recogito@example.com", "recogito")
+      _ <- userService.insertUserRole("recogito", Roles.Admin)
+    } yield()
+    
+    f.recover { case t: Throwable => t.printStackTrace() }
+  } 
   
 }

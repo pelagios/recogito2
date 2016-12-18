@@ -7,6 +7,7 @@ import java.sql.Timestamp
 import java.util.Date
 import javax.inject.{ Inject, Singleton }
 import models.{ BaseService, Page, SortOrder }
+import models.user.Roles.Role
 import models.generated.Tables._
 import models.generated.tables.records.{ UserRecord, UserRoleRecord }
 import org.apache.commons.codec.binary.Base64
@@ -57,6 +58,13 @@ class UserService @Inject() (
       new Timestamp(new Date().getTime), null, null, null, DEFAULT_QUOTA, true)
     sql.insertInto(USER).set(user).execute()
     user
+  }
+  
+  def insertUserRole(username: String, role: Role) = db.withTransaction { sql =>
+    sql.insertInto(USER_ROLE)
+      .set(USER_ROLE.USERNAME, username)
+      .set(USER_ROLE.HAS_ROLE, role.toString)
+      .execute()
   }
 
   def resetPassword(username: String): Future[String] = db.withTransaction { sql =>
