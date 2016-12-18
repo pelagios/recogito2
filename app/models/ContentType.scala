@@ -63,7 +63,13 @@ object ContentType {
   def fromFile(file: File): Either[Exception, ContentType] = {
     
     def isReadableTextFile(file: File) =
-      Try(Source.fromFile(file).getLines.mkString("\n")).isSuccess
+      try {
+        Source.fromFile(file).getLines.mkString("\n")
+        true
+      } catch { 
+        case t: java.nio.charset.MalformedInputException => false
+        case t: Throwable => throw t
+      }
     
     val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
     extension match {
