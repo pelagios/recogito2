@@ -216,15 +216,22 @@ class AnnotationAPIController @Inject() (
       }
   }
 
-  /** This may get more sophisticated in the future and include a URL to a clipped and rotated image snippet **/ 
+  /** This may get more sophisticated in the future and include a URL to a clipped and rotated image snippet **/
   private def getImageAnnotationWithContext(doc: DocumentInfo, annotation: Annotation)(implicit request: Request[AnyContent]) = {
     Future.successful(jsonOk(Json.toJson(annotation)))
+  }
+
+  def getImage(id: UUID) = AsyncStack { implicit request =>
+    
+    // TODO implement
+    
+    Future.successful(Ok)
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
     annotations.findById(id).flatMap {
       case Some((annotation, _)) => {
-        
+
         if (includeContext) {
           documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
             case Some((doc, accesslevel)) =>
