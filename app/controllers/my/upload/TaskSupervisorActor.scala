@@ -16,8 +16,6 @@ case class TaskType(name: String) {
 trait ProcessingService {
   
   def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit
-  
-  def queryProgress(documentId: String): Future[Option[TaskRecordAggregate]]
 
 }
 

@@ -9,6 +9,7 @@ import java.util.UUID
 import javax.inject.Inject
 import models.{ ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException }
 import models.document.DocumentService
+import models.task.TaskService
 import models.upload.{ UploadService, QuotaExceededException }
 import models.generated.tables.records.UploadRecord
 import models.user.UserService
@@ -31,6 +32,7 @@ class UploadController @Inject() (
     val config: Configuration,
     val documents: DocumentService,
     val users: UserService,
+    val taskService: TaskService,
     val uploads: UploadService,
     val tilingService: TilingService,
     val nerService: NERService,
@@ -219,12 +221,14 @@ class UploadController @Inject() (
   }
 
   /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
-  private def queryTaskProgress(username: String, docId: String, service: ProcessingService) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def queryTaskProgress(username: String, docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
+    // taskService.findByDocumentAndTaskType(NERService.TASK_NER.toString, documentId)
+    
     documents.getDocumentRecord(docId, Some(username)).flatMap(_ match {
       // Make sure only users with read access can see the progress
       case Some((document, accesslevel)) if accesslevel.canRead => {
-        service.queryProgress(docId).map(_ match {
+        taskService.findByDocument(docId).map(_ match {
           case Some(result) => jsonOk(Json.toJson(result))
           case None => NotFoundPage
         })
@@ -238,9 +242,5 @@ class UploadController @Inject() (
         Future.successful(NotFoundPage)
     })
   }
-
-  def queryNERProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, nerService)
-
-  def queryTilingProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, tilingService)
 
 }

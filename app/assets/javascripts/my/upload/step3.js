@@ -8,45 +8,22 @@ require(['common/config'], function(Config) {
   var POLL_INTERVAL = 1000, // Poll interval in milliseconds
 
       // Map (task type -> query URL)
-      QUERY_URLS = {
-        NER          : '/' + Config.owner + '/upload/ner-progress/' + Config.documentId,
-        IMAGE_TILING : '/' + Config.owner + '/upload/tiling-progress/' + Config.documentId
-      },
+      QUERY_URL = '/' + Config.owner + '/upload/progress/' + Config.documentId,
 
-      // Map listing the tasks that apply to each content type
-      APPLICABLE_TASKS = {
-        TEXT_PLAIN : [ 'NER' ],
-        IMAGE_UPLOAD: [ 'IMAGE_TILING' ]
-      },
-
-      Filepart = function(containerElement, runningTasks) {
+      Filepart = function(containerElement) {
         var element = jQuery(containerElement).find('.filepart-processing-progress'),
 
             contentType = jQuery(containerElement).data('type'),
 
             id = jQuery(containerElement).data('id'),
 
-            // The running tasks that apply to this particular contentType
-            applicableRunningTasks = (function() {
-              var applicableTasks = APPLICABLE_TASKS[contentType];
+            runningTasks = [],
 
-              return jQuery.grep(runningTasks, function(runningTask) {
-                return applicableTasks.indexOf(runningTask) > -1;
-              });
-            })(),
-
-            progressPerTask = (function() {
-              var progressPerTask = {};
-
-              jQuery.each(applicableRunningTasks, function(idx, t) {
-                progressPerTask[t] = 'PENDING';
-              });
-
-              return progressPerTask;
-            })(),
-
-            updateElement = function(progress) {
+            updateElement = function() {
               if (isSuccess()) {
+
+                console.log('success: ' + id);
+
                 element.addClass('completed');
                 element.html('&#xf00c');
               } else  if (isFailed()) {
@@ -56,35 +33,26 @@ require(['common/config'], function(Config) {
             },
 
             isPending = function() {
-              var completedTasks = [];
-
-              jQuery.each(progressPerTask, function(task, status) {
-                if (status === 'COMPLETED' || status === 'FAILED')
-                  completedTasks.push(task);
+              var completedTasks = jQuery.grep(runningTasks, function(task) {
+                return task.status === 'COMPLETED' || task.status === 'FAILED';
               });
 
-              return completedTasks.length !== applicableRunningTasks.length;
+              return completedTasks.length !== runningTasks.length;
             },
 
             /** Returns true if ALL tasks on this part are COMPLETED **/
             isSuccess = function() {
-              var succeededTasks = [];
-
-              jQuery.each(progressPerTask, function(task, status) {
-                if (status === 'COMPLETED')
-                  succeededTasks.push(task);
+              var succeededTasks = jQuery.grep(runningTasks, function(task) {
+                return task.status === 'COMPLETED';
               });
 
-              return succeededTasks.length === applicableRunningTasks.length;
+              return succeededTasks.length === runningTasks.length;
             },
 
             /** Returns true if ANY task on this part is FAILED **/
             isFailed = function() {
-              var failedTasks = [];
-
-              jQuery.each(progressPerTask, function(task, status) {
-                if (status === 'FAILED')
-                  failedTasks.push(task);
+              var failedTasks = jQuery.grep(runningTasks, function(task) {
+                return task.status === 'FAILED';
               });
 
               return failedTasks.length > 0;
@@ -97,14 +65,14 @@ require(['common/config'], function(Config) {
 
         /** Updates the filepart element with the given progress information **/
         this.update = function(progress) {
-          var thisTask =  jQuery.grep(progress.subtasks, function(subtask) {
-            return subtask.filepart_id === id;
-          })[0];
+          
+          console.log(progress.status);
 
-          if (applicableRunningTasks.indexOf(thisTask.task_type) > -1) {
-            progressPerTask[thisTask.task_type] = thisTask.status;
-            updateElement(thisTask);
-          }
+          runningTasks = jQuery.grep(progress.subtasks, function(subtask) {
+            return subtask.filepart_id === id;
+          });
+
+          updateElement();
         };
 
         this.id = id;
@@ -129,10 +97,8 @@ require(['common/config'], function(Config) {
         },
 
         // Polls the progress on the processing task with the specified URL
-        pollProcessingProgress = function(taskType) {
-          var queryURL = QUERY_URLS[taskType];
-
-          jQuery.getJSON(queryURL, function(response) {
+        pollProcessingProgress = function(queryURL) {
+          jQuery.getJSON(QUERY_URL, function(response) {
             var pendingWorkers;
 
             // Update all fileparts
@@ -146,7 +112,7 @@ require(['common/config'], function(Config) {
             });
 
             if (pendingWorkers.length > 0)
-              setTimeout(function() { pollProcessingProgress(taskType); }, POLL_INTERVAL);
+              setTimeout(function() { pollProcessingProgress(); }, POLL_INTERVAL);
 
             // Check if we're done
             if (allPartsFinished())
@@ -172,9 +138,7 @@ require(['common/config'], function(Config) {
     if (Config.tasks.length === 0)
       jQuery('.btn.next').prop('disabled', false);
     else
-      jQuery.each(Config.tasks, function(idx, taskURL) {
-        pollProcessingProgress(taskURL);
-      });
+      pollProcessingProgress();
 
     // Make filepart elements sortable (and disable selection)
     jQuery('ul.fileparts').disableSelection();

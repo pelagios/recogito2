@@ -45,9 +45,5 @@ class TilingService @Inject() (uploads: Uploads, taskService: TaskService) exten
     val actor = system.actorOf(Props(classOf[TilingSupervisorActor], TilingService.TASK_TILING, document, parts, sourceFolder, taskService), name = "tile_doc_" + document.getId)
     actor ! ProcessingMessages.Start
   }
-  
-  /** Queries the tiling progress for a specific document **/
-  override def queryProgress(documentId: String) =
-    taskService.findByDocument(TilingService.TASK_TILING.toString, documentId)
 
 }

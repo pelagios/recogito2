@@ -28,7 +28,7 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
     sql.selectFrom(TASK).where(TASK.ID.equal(uuid)).fetchOne()
   }
   
-  def findByDocument(taskType: String, documentId: String) = db.query { sql =>
+  def findByDocument(documentId: String) = db.query { sql =>
     val records = 
       sql.selectFrom(TASK).where(TASK.DOCUMENT_ID.equal(documentId))
         .fetchArray().toSeq
@@ -37,6 +37,14 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       Some(TaskRecordAggregate(records))
     else
       None
+  }
+  
+  def deleteById(uuid: UUID) = db.withTransaction { sql =>
+    sql.deleteFrom(TASK).where(TASK.ID.equal(uuid)).execute()
+  }
+  
+  def deleteByDocument(documentId: String) = db.withTransaction { sql =>
+    sql.deleteFrom(TASK).where(TASK.DOCUMENT_ID.equal(documentId)).execute()
   }
   
   def updateProgress(uuid: UUID, progress: Int): Future[Unit] = db.withTransaction { sql => 
@@ -67,6 +75,7 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       .set(TASK.STOPPED_AT, new Timestamp(System.currentTimeMillis))
       .set(TASK.STOPPED_WITH, optString(completedWith))
       .set[Integer](TASK.PROGRESS, 100)
+      .where(TASK.ID.equal(uuid))
       .execute()
   }
   
@@ -75,6 +84,7 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       .set(TASK.STATUS, TaskStatus.FAILED.toString)
       .set(TASK.STOPPED_AT, new Timestamp(System.currentTimeMillis))
       .set(TASK.STOPPED_WITH, optString(failedWith))
+      .where(TASK.ID.equal(uuid))
       .execute()
   }
   

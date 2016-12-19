@@ -131,8 +131,7 @@ DELETE  /:username/upload/step-2/:filename           controllers.my.upload.Uploa
 GET     /:username/upload/step-3                     controllers.my.upload.UploadController.showStep3(username: String)
 POST    /:username/upload/step-3                     controllers.my.upload.UploadController.showStep3(username: String)
 GET     /:username/upload/cancel                     controllers.my.upload.UploadController.cancelUploadWizard(username: String)
-GET     /:username/upload/ner-progress/:docId        controllers.my.upload.UploadController.queryNERProgress(username: String, docId: String)
-GET     /:username/upload/tiling-progress/:docId     controllers.my.upload.UploadController.queryTilingProgress(username: String, docId: String)
+GET     /:username/upload/progress/:docId            controllers.my.upload.UploadController.queryTaskProgress(username: String, docId: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal settings

@@ -58,9 +58,5 @@ class NERService @Inject() (annotations: AnnotationService, places: PlaceService
     val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, taskService, annotations, places), name = "ner_doc_" + document.getId)
     actor ! ProcessingMessages.Start
   }
-  
-  /** Queries the NER progress for a specific document **/
-  override def queryProgress(documentId: String) =
-    taskService.findByDocument(NERService.TASK_NER.toString, documentId)
-  
+
 }
