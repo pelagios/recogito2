@@ -68,9 +68,14 @@ class Task(alias : String, aliased : Table[TaskRecord], parameters : Array[ Fiel
 	val CLASS_NAME : TableField[TaskRecord, String] = createField("class_name", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
-	 * The column <code>public.task.lookup_key</code>.
+	 * The column <code>public.task.document_id</code>.
 	 */
-	val LOOKUP_KEY : TableField[TaskRecord, String] = createField("lookup_key", org.jooq.impl.SQLDataType.CLOB, "")
+	val DOCUMENT_ID : TableField[TaskRecord, String] = createField("document_id", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
+	 * The column <code>public.task.filepart_id</code>.
+	 */
+	val FILEPART_ID : TableField[TaskRecord, UUID] = createField("filepart_id", org.jooq.impl.SQLDataType.UUID, "")
 
 	/**
 	 * The column <code>public.task.spawned_by</code>.

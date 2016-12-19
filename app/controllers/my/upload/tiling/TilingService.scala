@@ -1,14 +1,12 @@
 package controllers.my.upload.tiling
 
 import akka.actor.{ ActorSystem, Props }
-import akka.pattern.ask
-import akka.util.Timeout
 import controllers.my.upload._
 import java.io.File
 import javax.inject.{ Inject, Singleton }
+import models.task.TaskService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.Uploads
 import sys.process._
@@ -31,7 +29,7 @@ object TilingService {
 }
 
 @Singleton
-class TilingService @Inject() (uploads: Uploads) extends ProcessingService {
+class TilingService @Inject() (uploads: Uploads, taskService: TaskService) extends ProcessingService {
 
   /** Spawns a new background tiling process.
     *
@@ -43,22 +41,13 @@ class TilingService @Inject() (uploads: Uploads) extends ProcessingService {
     spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
-  private[tiling] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10 minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], TilingService.TASK_TILING, document, parts, sourceFolder, keepalive), name = "tile_doc_" + document.getId)
-    actor ! ProcessingTaskMessages.Start
+  private[tiling] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File)(implicit system: ActorSystem): Unit = {
+    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], TilingService.TASK_TILING, document, parts, sourceFolder, taskService), name = "tile_doc_" + document.getId)
+    actor ! ProcessingMessages.Start
   }
-
-  /** Queries the progress for a specific process **/
-  override def queryProgress(documentId: String, timeout: FiniteDuration = 10 seconds)(implicit context: ExecutionContext, system: ActorSystem) = {
-    ProcessingTaskSupervisor.getSupervisorActor(TilingService.TASK_TILING, documentId) match {
-      case Some(actor) => {
-        implicit val t = Timeout(timeout)
-        (actor ? ProcessingTaskMessages.QueryProgress).mapTo[ProcessingTaskMessages.DocumentProgress].map(Some(_))
-      }
-
-      case None =>
-        Future.successful(None)
-    }
-  }
+  
+  /** Queries the tiling progress for a specific document **/
+  override def queryProgress(documentId: String) =
+    taskService.findByDocument(TilingService.TASK_TILING.toString, documentId)
 
 }

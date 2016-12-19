@@ -1,8 +1,7 @@
 package controllers.my.upload
 
 import akka.actor.ActorSystem
-import controllers.{ BaseAuthController, WebJarAssets }
-import controllers.my.upload.ProcessingTaskMessages._
+import controllers.{ BaseAuthController, HasPrettyPrintJSON, WebJarAssets }
 import controllers.my.upload.ner.NERService
 import controllers.my.upload.tiling.TilingService
 import java.io.File
@@ -39,7 +38,10 @@ class UploadController @Inject() (
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext,
     implicit val system: ActorSystem
-  ) extends BaseAuthController(config, documents, users) with I18nSupport {
+  ) extends BaseAuthController(config, documents, users) with I18nSupport with HasPrettyPrintJSON {
+  
+  implicit val uploadSuccessWrites: Writes[UploadSuccess] =
+    (JsPath \ "content_type").write[String].contramap(_.contentType)
 
   private val MSG_ERROR = "There was an error processing your data"
 
@@ -97,9 +99,6 @@ class UploadController @Inject() (
 
   /** Stores a filepart during step 2 **/
   def storeFilepart(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-
-    import UploadController._
-
     val username = loggedIn.user.getUsername
     val isFileupload = request.body.asMultipartFormData.isDefined
 
@@ -165,7 +164,7 @@ class UploadController @Inject() (
   /** Deletes a filepart during step 2 **/
   def deleteFilepart(usernameInPath: String, filename: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     uploads.deleteFilepartByTitleAndOwner(filename, loggedIn.user.getUsername).map(success => {
-      if (success) Ok("ok.") else NotFoundPage
+      if (success) Ok else NotFoundPage
     })
   }
 
@@ -222,16 +221,12 @@ class UploadController @Inject() (
   /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
   private def queryTaskProgress(username: String, docId: String, service: ProcessingService) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
-    import UploadController._
-
     documents.getDocumentRecord(docId, Some(username)).flatMap(_ match {
       // Make sure only users with read access can see the progress
       case Some((document, accesslevel)) if accesslevel.canRead => {
         service.queryProgress(docId).map(_ match {
-          case Some(result) =>
-            Ok(Json.toJson(result))
-          case None =>
-            NotFoundPage
+          case Some(result) => jsonOk(Json.toJson(result))
+          case None => NotFoundPage
         })
       }
 
@@ -247,31 +242,5 @@ class UploadController @Inject() (
   def queryNERProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, nerService)
 
   def queryTilingProgress(usernameInPath: String, id: String) = queryTaskProgress(usernameInPath, id, tilingService)
-
-}
-
-/** Defines JSON serialization for NER progress messages **/
-object UploadController {
-
-  implicit val uploadSuccessWrites: Writes[UploadSuccess] =
-    (JsPath \ "content_type").write[String].contramap(_.contentType)
-
-  implicit val progressStatusValueWrites: Writes[ProgressStatus.Value] =
-    Writes[ProgressStatus.Value](status => JsString(status.toString))
-
-  implicit val taskTypeWrites: Writes[TaskType] =
-    Writes[TaskType](t => JsString(t.name))
-
-  implicit val workerProgressWrites: Writes[WorkerProgress] = (
-    (JsPath \ "filepart_id").write[UUID] and
-    (JsPath \ "status").write[ProgressStatus.Value] and
-    (JsPath \ "progress").write[Double]
-  )(unlift(WorkerProgress.unapply))
-
-  implicit val documentProgressWrites: Writes[DocumentProgress] = (
-    (JsPath \ "document_id").write[String] and
-    (JsPath \ "task_name").write[TaskType] and
-    (JsPath \ "progress").write[Seq[WorkerProgress]]
-  )(unlift(DocumentProgress.unapply))
 
 }

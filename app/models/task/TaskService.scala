@@ -28,8 +28,15 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
     sql.selectFrom(TASK).where(TASK.ID.equal(uuid)).fetchOne()
   }
   
-  def findByTypeAndKey(taskType: String, lookupKey: String) = db.query { sql =>
-    sql.selectFrom(TASK).where(TASK.TASK_TYPE.equal(taskType)).and(TASK.LOOKUP_KEY.equal(lookupKey)).fetchOne()    
+  def findByDocument(taskType: String, documentId: String) = db.query { sql =>
+    val records = 
+      sql.selectFrom(TASK).where(TASK.DOCUMENT_ID.equal(documentId))
+        .fetchArray().toSeq
+    
+    if (records.size > 0)
+      Some(TaskRecordAggregate(records))
+    else
+      None
   }
   
   def updateProgress(uuid: UUID, progress: Int): Future[Unit] = db.withTransaction { sql => 
@@ -46,14 +53,47 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       .execute()
   }
   
-  def insertTask(taskType: String, className: String, lookupKey: Option[String], spawnedBy: Option[String]): Future[UUID] = db.withTransaction { sql =>
+  def updateStatusAndProgress(uuid: UUID, status: TaskStatus.Value, progress: Int): Future[Unit] = db.withTransaction { sql =>
+    sql.update(TASK)
+      .set(TASK.STATUS, status.toString)
+      .set[Integer](TASK.PROGRESS, progress)
+      .where(TASK.ID.equal(uuid))
+      .execute()
+  }
+  
+  def setCompleted(uuid: UUID, completedWith: Option[String] = None): Future[Unit] = db.withTransaction { sql =>
+    sql.update(TASK)
+      .set(TASK.STATUS, TaskStatus.COMPLETED.toString)
+      .set(TASK.STOPPED_AT, new Timestamp(System.currentTimeMillis))
+      .set(TASK.STOPPED_WITH, optString(completedWith))
+      .set[Integer](TASK.PROGRESS, 100)
+      .execute()
+  }
+  
+  def setFailed(uuid: UUID, failedWith: Option[String] = None): Future[Unit] = db.withTransaction { sql =>
+    sql.update(TASK)
+      .set(TASK.STATUS, TaskStatus.FAILED.toString)
+      .set(TASK.STOPPED_AT, new Timestamp(System.currentTimeMillis))
+      .set(TASK.STOPPED_WITH, optString(failedWith))
+      .execute()
+  }
+  
+  def insertTask(
+      taskType: String,
+      className: String,
+      documentId: Option[String],
+      filepartId: Option[UUID],
+      spawnedBy: Option[String]
+    ): Future[UUID] = db.withTransaction { sql =>
+      
     val uuid = UUID.randomUUID
     
     val taskRecord = new TaskRecord(
       uuid,
       taskType,
       className,
-      optString(lookupKey),
+      optString(documentId),
+      filepartId.getOrElse(null),
       optString(spawnedBy),
       new Timestamp(System.currentTimeMillis),
       null, // stopped_at

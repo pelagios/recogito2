@@ -1,21 +1,21 @@
 package controllers.my.upload.ner
 
 import akka.actor.Actor
-import controllers.my.upload.ProgressStatus
 import java.io.File
 import java.util.UUID
 import models.ContentType
 import models.annotation._
 import models.place.PlaceService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import models.task.TaskService
+import models.task.{ TaskStatus, TaskService }
 import org.joda.time.DateTime
+import org.pelagios.recogito.sdk.ner._
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.Future
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration._
 import scala.io.Source
 import storage.ES
-import org.pelagios.recogito.sdk.ner._
 
 private[ner] object NERWorkerActor {
 
@@ -32,41 +32,47 @@ private[ner] class NERWorkerActor(
     placeService: PlaceService
   ) extends Actor {
 
-  import controllers.my.upload.ProcessingTaskMessages._
-
-  var progress = 0.0
-  var status = ProgressStatus.PENDING
-
+  import controllers.my.upload.ProcessingMessages._
+    
   def receive = {
 
     case Start => {
-      status = ProgressStatus.IN_PROGRESS
       val origSender = sender
+      
+      val taskId = Await.result(
+        taskService.insertTask(
+          NERService.TASK_NER.toString,
+          this.getClass.getName,
+          Some(document.getId),
+          Some(part.getId),
+          Some(document.getOwner)),
+        10.seconds)
+        
+      taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
 
       parseFilepart(document, part, documentDir).map { phrases =>
-        // val entities = phrases.filter(p => (p.entityTag == "LOCATION" || p.entityTag == "PERSON"))
-        // TODO temporarily disabling PERSON tags for first pre-release
-        val entities = phrases.filter(p => p.entityType == EntityType.LOCATION)
+        
+        taskService.updateProgress(taskId, 50)
+        
+        val entities = phrases.filter(p => p.entityType == EntityType.LOCATION || p.entityType == EntityType.PERSON)        
         resolve(entities).map { annotations =>
-          annotationService.insertOrUpdateAnnotations(annotations).map { result =>
-            progress = 1.0
-            status = ProgressStatus.COMPLETED
-            
+          annotationService.insertOrUpdateAnnotations(annotations).map { result =>            
             if (result.size == 0)
-              origSender ! Completed
+              taskService.setCompleted(taskId)
             else
-              origSender ! Failed
+              taskService.setFailed(taskId, Some("Failed to insert " + result.size + " annotations"))
+       
+            origSender ! Stopped
           }
         }
       }.recover { case t => {
         t.printStackTrace
-        status = ProgressStatus.FAILED
-        origSender ! Failed(t.getMessage)
+        
+        taskService.setFailed(taskId, Some(t.getMessage))
+        
+        origSender ! Stopped
       }}
     }
-
-    case QueryProgress =>
-      sender ! WorkerProgress(part.getId, status, progress)
 
   }
 

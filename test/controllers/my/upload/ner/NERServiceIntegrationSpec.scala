@@ -31,9 +31,7 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
   override def afterAll = FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
   
   "The NER service" should {
-    
-    val KEEP_ALIVE = 10 seconds
-    
+
     val now = new Timestamp(System.currentTimeMillis)
     
     // Two test documents
@@ -53,8 +51,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
       Logger.info("[NERServiceIntegrationSpec] Submitting 2 documents to NER service")
         
       val processStartTime = System.currentTimeMillis
-      nerService.spawnTask(document1, parts1, dir, KEEP_ALIVE)
-      nerService.spawnTask(document2, parts2, dir, KEEP_ALIVE)
+      nerService.spawnTask(document1, parts1, dir)
+      nerService.spawnTask(document2, parts2, dir)
       
       "start NER on the 2 test documents without blocking" in { 
         (System.currentTimeMillis - processStartTime).toInt must be <(1000)
@@ -69,6 +67,7 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
           
           val queryStartTime = System.currentTimeMillis
           
+          /*
           val result1 = Await.result(nerService.queryProgress(document1.getId), 10 seconds)
           val result2 = Await.result(nerService.queryProgress(document2.getId), 10 seconds)
           
@@ -85,6 +84,7 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
             isComplete = true
           
           Thread.sleep(2000)
+          */
         }
         
         success
@@ -98,6 +98,7 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
         
         (System.currentTimeMillis - queryStartTime).toInt must be <(500)
         
+        /*
         result1.isDefined must equalTo(true) 
         result2.isDefined must equalTo(true) 
         
@@ -109,17 +110,10 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
           
         totalProgress1 must equalTo(1.0)
         totalProgress2 must equalTo(1.0)
-      }
-      
-      "reject progress queries after the KEEPALIVE time has expired" in {
-        Thread.sleep(KEEP_ALIVE.toMillis)
-        Logger.info("[NERServiceIntegrationSpec] KEEPALIVE expired")
+        */
         
-        val result1 = Await.result(nerService.queryProgress(document1.getId), 10 seconds)
-        val result2 = Await.result(nerService.queryProgress(document2.getId), 10 seconds)
+        failure
         
-        result1.isDefined must equalTo(false)
-        result2.isDefined must equalTo(false)
       }
       
     }

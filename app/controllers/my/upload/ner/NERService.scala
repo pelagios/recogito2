@@ -1,8 +1,6 @@
 package controllers.my.upload.ner
 
 import akka.actor.{ ActorSystem, Props }
-import akka.pattern.ask
-import akka.util.Timeout
 import controllers.my.upload._
 import java.io.File
 import javax.inject.{ Inject, Singleton }
@@ -14,7 +12,6 @@ import org.pelagios.recogito.sdk.ner.Entity
 import play.api.Logger
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.concurrent.duration._
 import storage.Uploads
 
 object NERService { 
@@ -57,22 +54,13 @@ class NERService @Inject() (annotations: AnnotationService, places: PlaceService
     spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
-  private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: Duration = 10.minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, keepalive, taskService, annotations, places), name = "ner_doc_" + document.getId)
-    actor ! ProcessingTaskMessages.Start
+  private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File)(implicit system: ActorSystem): Unit = {
+    val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, taskService, annotations, places), name = "ner_doc_" + document.getId)
+    actor ! ProcessingMessages.Start
   }
-
-  /** Queries the progress for a specific process **/
-  override def queryProgress(documentId: String, timeout: FiniteDuration = 60.seconds)(implicit context: ExecutionContext, system: ActorSystem) = {
-    ProcessingTaskSupervisor.getSupervisorActor(NERService.TASK_NER, documentId) match {
-      case Some(actor) => {
-        implicit val t = Timeout(timeout)
-        (actor ? ProcessingTaskMessages.QueryProgress).mapTo[ProcessingTaskMessages.DocumentProgress].map(Some(_))
-      }
-
-      case None =>
-        Future.successful(None)
-    }
-  }
-
+  
+  /** Queries the NER progress for a specific document **/
+  override def queryProgress(documentId: String) =
+    taskService.findByDocument(NERService.TASK_NER.toString, documentId)
+  
 }

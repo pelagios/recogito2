@@ -97,13 +97,13 @@ require(['common/config'], function(Config) {
 
         /** Updates the filepart element with the given progress information **/
         this.update = function(progress) {
-          if (applicableRunningTasks.indexOf(progress.task_name) > -1) {
-            var progressOnThisPart = jQuery.grep(progress.progress, function(p) {
-                                       return p.filepart_id === id;
-                                     })[0];
+          var thisTask =  jQuery.grep(progress.subtasks, function(subtask) {
+            return subtask.filepart_id === id;
+          })[0];
 
-            progressPerTask[progress.task_name] = progressOnThisPart.status;
-            updateElement(progress);
+          if (applicableRunningTasks.indexOf(thisTask.task_type) > -1) {
+            progressPerTask[thisTask.task_type] = thisTask.status;
+            updateElement(thisTask);
           }
         };
 
