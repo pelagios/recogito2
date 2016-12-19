@@ -7,6 +7,7 @@ import javax.inject.{ Inject, Singleton }
 import models.task.TaskService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.duration._
 import scala.language.postfixOps
 import storage.Uploads
 import sys.process._
@@ -41,8 +42,8 @@ class TilingService @Inject() (uploads: Uploads, taskService: TaskService) exten
     spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
-  private[tiling] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], TilingService.TASK_TILING, document, parts, sourceFolder, taskService), name = "tile_doc_" + document.getId)
+  private[tiling] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: FiniteDuration = 10.minutes)(implicit system: ActorSystem): Unit = {
+    val actor = system.actorOf(Props(classOf[TilingSupervisorActor], TilingService.TASK_TILING, document, parts, sourceFolder, taskService, keepalive), name = "tile_doc_" + document.getId)
     actor ! ProcessingMessages.Start
   }
 

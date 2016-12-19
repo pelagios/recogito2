@@ -12,6 +12,7 @@ import org.pelagios.recogito.sdk.ner.Entity
 import play.api.Logger
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.duration._
 import storage.Uploads
 
 object NERService { 
@@ -54,8 +55,8 @@ class NERService @Inject() (annotations: AnnotationService, places: PlaceService
     spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
 
   /** We're splitting this function, so we can inject alternative folders for testing **/
-  private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, taskService, annotations, places), name = "ner_doc_" + document.getId)
+  private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: FiniteDuration = 10.minutes)(implicit system: ActorSystem): Unit = {
+    val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, taskService, annotations, places, keepalive), name = "ner_doc_" + document.getId)
     actor ! ProcessingMessages.Start
   }
 

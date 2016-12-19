@@ -7,6 +7,7 @@ import models.annotation.AnnotationService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.place.PlaceService
 import models.task.TaskService
+import scala.concurrent.duration.FiniteDuration
 
 private[ner] class NERSupervisorActor(
     task: TaskType, 
@@ -15,8 +16,9 @@ private[ner] class NERSupervisorActor(
     dir: File,
     taskService: TaskService,
     annotations: AnnotationService,
-    places: PlaceService
-  ) extends TaskSupervisorActor(task, document, parts, dir) {
+    places: PlaceService,
+    keepalive: FiniteDuration
+  ) extends TaskSupervisorActor(task, document, parts, dir, taskService, keepalive) {
   
   /** Creates workers for every content type indicated as 'supported' by the Worker class **/
   override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =

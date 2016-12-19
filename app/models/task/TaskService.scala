@@ -39,12 +39,10 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       None
   }
   
-  def deleteById(uuid: UUID) = db.withTransaction { sql =>
-    sql.deleteFrom(TASK).where(TASK.ID.equal(uuid)).execute()
-  }
-  
-  def deleteByDocument(documentId: String) = db.withTransaction { sql =>
-    sql.deleteFrom(TASK).where(TASK.DOCUMENT_ID.equal(documentId)).execute()
+  def deleteByTypeAndDocument(taskType: String, documentId: String) = db.withTransaction { sql =>
+    sql.deleteFrom(TASK)
+      .where(TASK.TASK_TYPE.equal(taskType))
+      .and(TASK.DOCUMENT_ID.equal(documentId)).execute()
   }
   
   def updateProgress(uuid: UUID, progress: Int): Future[Unit] = db.withTransaction { sql => 

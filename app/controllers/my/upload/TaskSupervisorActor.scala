@@ -4,8 +4,10 @@ import akka.actor.{ Actor, ActorSystem, ActorRef }
 import akka.contrib.pattern.Aggregator
 import java.io.File
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.task.{ TaskService, TaskRecordAggregate }
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Future
-import models.task.TaskRecordAggregate
+import scala.concurrent.duration.FiniteDuration
 
 case class TaskType(name: String) {
   
@@ -32,7 +34,9 @@ abstract class TaskSupervisorActor(
     taskType: TaskType,
     document: DocumentRecord,
     parts: Seq[DocumentFilepartRecord],
-    documentDir: File
+    documentDir: File,
+    taskService: TaskService,
+    keepalive: FiniteDuration
   ) extends Actor with Aggregator  {
   
   import ProcessingMessages._
@@ -63,7 +67,10 @@ abstract class TaskSupervisorActor(
   
   private def shutdown() = {
     workers.foreach(context.stop(_))
-    context.stop(self)
+    context.system.scheduler.scheduleOnce(keepalive) {
+      taskService.deleteByTypeAndDocument(taskType.toString, document.getId)
+      context.stop(self)
+    }
   }
   
 }

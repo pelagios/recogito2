@@ -21,9 +21,6 @@ require(['common/config'], function(Config) {
 
             updateElement = function() {
               if (isSuccess()) {
-
-                console.log('success: ' + id);
-
                 element.addClass('completed');
                 element.html('&#xf00c');
               } else  if (isFailed()) {
@@ -65,9 +62,6 @@ require(['common/config'], function(Config) {
 
         /** Updates the filepart element with the given progress information **/
         this.update = function(progress) {
-          
-          console.log(progress.status);
-
           runningTasks = jQuery.grep(progress.subtasks, function(subtask) {
             return subtask.filepart_id === id;
           });

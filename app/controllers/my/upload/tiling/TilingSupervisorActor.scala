@@ -6,14 +6,16 @@ import controllers.my.upload.{ TaskSupervisorActor, TaskType }
 import models.ContentType
 import models.task.TaskService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import scala.concurrent.duration.FiniteDuration
 
 private[tiling] class TilingSupervisorActor(
     task: TaskType,
     document: DocumentRecord,
     parts: Seq[DocumentFilepartRecord],
     documentDir: File,
-    taskService: TaskService
-  ) extends TaskSupervisorActor(task, document, parts, documentDir) {
+    taskService: TaskService,
+    keepalive: FiniteDuration
+  ) extends TaskSupervisorActor(task, document, parts, documentDir, taskService, keepalive) {
   
   /** Creates workers for every image upload **/
   override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
