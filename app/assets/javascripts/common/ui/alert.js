@@ -11,8 +11,8 @@ define(['common/hasEvents'], function(HasEvents) {
               '<h1>' + title + '</h1>' +
               '<p>' + message + '</p>' +
               '<p class="buttons">' +
-                '<button class="btn ok">' + (labels.ok || 'OK') + '</button>' +
-                '<button class="btn outline cancel">' + (labels.cancel || 'Cancel') + '</button>' +
+                '<button class="btn ok"></button>' +
+                '<button class="btn outline cancel"></button>' +
               '</p>' +
             '</div>' +
           '</div>'),
@@ -31,8 +31,13 @@ define(['common/hasEvents'], function(HasEvents) {
         };
 
     // ERROR and INFO just have an 'OK' button
-    if (alertType === Alert.ERROR || alertType === Alert.INFO)
+    if (alertType === Alert.ERROR || alertType === Alert.INFO) {
+      btnOK.html(labels.ok || 'OK');
       btnCancel.hide();
+    } else {
+      btnOK.html(labels.ok || 'YES');
+      btnCancel.html(labels.cancel || 'NO');
+    }
 
     btnOK.click(onOK);
     btnCancel.click(onCancel);

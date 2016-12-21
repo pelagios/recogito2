@@ -101,14 +101,13 @@ require([
                     promptTitle = 'Re-Apply',
                     promptMessage = (occurrenceCount > 1) ?
                       'There are ' + occurrenceCount + ' more occurrences of <em>' :
-                      'There is 1 more occurrence of <em>',
-                    labels = { ok: 'Yes', cancel: 'No' };
+                      'There is 1 more occurrence of <em>';
 
                 if (occurrenceCount > 0) {
                   promptMessage +=
                     quote + '</em> in the text.<br/>Do you want to re-apply this annotation?';
 
-                  new Alert(Alert.PROMPT, promptTitle, promptMessage, labels).on('ok', reapply);
+                  new Alert(Alert.PROMPT, promptTitle, promptMessage).on('ok', reapply);
                 }
               };
 
