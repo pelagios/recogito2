@@ -1,7 +1,8 @@
 package controllers.my.settings
 
+import akka.actor.ActorSystem
 import controllers.{ HasUserService, HasConfig, Security }
-import controllers.document.HasBackupValidation
+import controllers.document.{ BackupReader, HasBackupValidation }
 import java.io.File
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
@@ -13,7 +14,7 @@ import play.api.{ Configuration, Logger }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.Controller
 import scala.concurrent.{ ExecutionContext, Future }
-import controllers.document.BackupReader
+import transform.tiling.TilingService
 
 class RestoreController @Inject() (
     val config: Configuration,
@@ -21,7 +22,9 @@ class RestoreController @Inject() (
     val messagesApi: MessagesApi,
     implicit val annotations: AnnotationService,
     implicit val documents: DocumentService,
-    implicit val ctx: ExecutionContext
+    implicit val tiling: TilingService,
+    implicit val ctx: ExecutionContext,
+    implicit val system: ActorSystem
 ) extends Controller 
     with AuthElement 
     with HasUserService 

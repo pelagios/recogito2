@@ -1,5 +1,6 @@
 package controllers.document
 
+import akka.actor.ActorSystem
 import collection.JavaConverters._
 import controllers.HasConfig
 import java.io.{ File, InputStream }
@@ -16,6 +17,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
+import transform.tiling.TilingService
 
 trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
   
@@ -114,7 +116,15 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
       file: File,
       runAsAdmin: Boolean,
       forcedOwner: Option[String]
-    )(implicit ctx: ExecutionContext, annotationService: AnnotationService, documentService: DocumentService) = {
+    )(implicit annotationService: AnnotationService,
+               documentService: DocumentService,
+               tilingService: TilingService,
+               ctx: ExecutionContext,
+               system: ActorSystem) = {
+    
+    def restoreTilesets(document: DocumentRecord, imageParts: Seq[DocumentFilepartRecord]) = {
+      tilingService.spawnTask(document, imageParts)
+    }
     
     def restoreDocument(document: DocumentRecord, parts: Seq[DocumentFilepartRecord]) = {
       val (zipFile, entries) = openZipFile(file)
@@ -125,8 +135,15 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         (part, stream)
       }
       
-      documentService.importDocument(document, fileparts) 
-    }
+      documentService.importDocument(document, fileparts).map { _ =>
+        // TODO wait for tiling to be finished?
+        val uploadedImageParts = fileparts.filter { case (part, _) =>
+          ContentType.withName(part.getContentType) == Some(ContentType.IMAGE_UPLOAD) }.map(_._1)
+        
+        if (uploadedImageParts.size > 0)
+          restoreTilesets(document, uploadedImageParts)
+      }
+    }    
     
     def restoreAnnotations(annotationStubs: Iterator[AnnotationStub], docId: String, fileparts: Seq[DocumentFilepartRecord]) = {
       val filepartIds = fileparts.map(_.getId) 

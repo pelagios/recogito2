@@ -17,7 +17,7 @@ import transform.tiling.TilingService
 class BackupAdminController @Inject() (
     val config: Configuration,
     val users: UserService,
-    val tilingService: TilingService,
+    implicit val tilingService: TilingService,
     implicit val annotations: AnnotationService,
     implicit val documents: DocumentService,
     implicit val ctx: ExecutionContext,
@@ -33,14 +33,8 @@ class BackupAdminController @Inject() (
     
     request.body.asMultipartFormData.flatMap(_.file("backup")) match {
       case Some(formData) =>
-        restoreBackup(formData.ref.file, runAsAdmin = true, forcedOwner = None).map { case (doc, fileparts) =>
-          val images = fileparts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
-          
-          if (images.size > 0) 
-            tilingService.spawnTask(doc, images)
-            
+        restoreBackup(formData.ref.file, runAsAdmin = true, forcedOwner = None).map { case (doc, fileparts) =>          
           Redirect(routes.BackupAdminController.index)
-          
         }.recover { case t: Throwable =>
           t.printStackTrace()
           InternalServerError
