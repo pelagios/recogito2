@@ -1,4 +1,4 @@
-package controllers.my.upload.ner
+package transform.ner
 
 import akka.actor.Actor
 import java.io.File
@@ -6,33 +6,26 @@ import java.util.UUID
 import models.ContentType
 import models.annotation._
 import models.place.PlaceService
+import models.task._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import models.task.{ TaskStatus, TaskService }
 import org.joda.time.DateTime
 import org.pelagios.recogito.sdk.ner._
 import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.io.Source
 import storage.ES
 
-private[ner] object NERWorkerActor {
-
-  val SUPPORTED_CONTENT_TYPES = Set(ContentType.TEXT_PLAIN).map(_.toString)
-
-}
-
-private[ner] class NERWorkerActor(
+class NERWorkerActor(
     document: DocumentRecord,
     part: DocumentFilepartRecord,
     documentDir: File, 
     taskService: TaskService,
     annotationService: AnnotationService,
-    placeService: PlaceService
-  ) extends Actor {
+    placeService: PlaceService,
+    implicit val ctx: ExecutionContext) extends Actor {
 
-  import controllers.my.upload.ProcessingMessages._
+  import transform.TransformTaskMessages._ 
     
   def receive = {
 
@@ -41,7 +34,7 @@ private[ner] class NERWorkerActor(
 
       val taskId = Await.result(
         taskService.insertTask(
-          NERService.TASK_NER.toString,
+          NERService.TASK_TYPE,
           this.getClass.getName,
           Some(document.getId),
           Some(part.getId),

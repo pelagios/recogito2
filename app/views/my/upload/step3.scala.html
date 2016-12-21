@@ -1,7 +1,7 @@
 @(username: String,
   document: models.generated.tables.records.DocumentRecord,
   fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord],
-  tasks: Seq[controllers.my.upload.TaskType])(implicit request: RequestHeader, webjars: WebJarAssets)
+  tasks: Seq[models.task.TaskType])(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
@@ -14,7 +14,7 @@
       window.config = {
         owner      : '@username',
         documentId : '@document.getId',
-        tasks      : [ @Html(tasks.map("'" + _.name + "'").mkString(", ")) ]
+        tasks      : [ @Html(tasks.map("'" + _ + "'").mkString(", ")) ]
       };
     </script>
   </head>

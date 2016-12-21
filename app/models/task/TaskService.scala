@@ -9,6 +9,12 @@ import models.generated.tables.records.TaskRecord
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.DB
 
+case class TaskType(private val name: String) {
+  
+  override def toString = name
+  
+}
+
 object TaskStatus extends Enumeration {
 
   val PENDING = Value("PENDING")
@@ -39,9 +45,9 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       None
   }
   
-  def deleteByTypeAndDocument(taskType: String, documentId: String) = db.withTransaction { sql =>
+  def deleteByTypeAndDocument(taskType: TaskType, documentId: String) = db.withTransaction { sql =>
     sql.deleteFrom(TASK)
-      .where(TASK.TASK_TYPE.equal(taskType))
+      .where(TASK.TASK_TYPE.equal(taskType.toString))
       .and(TASK.DOCUMENT_ID.equal(documentId)).execute()
   }
   
@@ -87,7 +93,7 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
   }
   
   def insertTask(
-      taskType: String,
+      taskType: TaskType,
       className: String,
       documentId: Option[String],
       filepartId: Option[UUID],
@@ -98,7 +104,7 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
     
     val taskRecord = new TaskRecord(
       uuid,
-      taskType,
+      taskType.toString,
       className,
       optString(documentId),
       filepartId.getOrElse(null),

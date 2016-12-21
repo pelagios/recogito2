@@ -1,15 +1,11 @@
-package controllers.my.upload
+package controllers.my
 
 import akka.actor.ActorSystem
 import controllers.{ BaseAuthController, HasPrettyPrintJSON, WebJarAssets }
-import controllers.my.upload.ner.NERService
-import controllers.my.upload.tiling.TilingService
-import java.io.File
-import java.util.UUID
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.{ ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException }
 import models.document.DocumentService
-import models.task.TaskService
+import models.task.{ TaskService, TaskType }
 import models.upload.{ UploadService, QuotaExceededException }
 import models.generated.tables.records.UploadRecord
 import models.user.UserService
@@ -23,6 +19,8 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.implicitConversions
+import transform.ner.NERService
+import transform.tiling.TilingService
 
 case class UploadSuccess(contentType: String)
 
@@ -80,7 +78,7 @@ class UploadController @Inject() (
 
       docData =>
         uploads.storePendingUpload(loggedIn.user.getUsername, docData.title, docData.author, docData.dateFreeform, docData.description, docData.language, docData.source, docData.edition)
-          .flatMap(user => Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath))))
+          .flatMap(user => Future.successful(Redirect(controllers.my.routes.UploadController.showStep2(usernameInPath))))
           .recover { case t: Throwable => {
             t.printStackTrace()
             Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
@@ -95,7 +93,7 @@ class UploadController @Inject() (
         Ok(views.html.my.upload.step2(usernameInPath, fileparts))
 
       case None =>
-        Redirect(controllers.my.upload.routes.UploadController.showStep1(usernameInPath))
+        Redirect(controllers.my.routes.UploadController.showStep1(usernameInPath))
     })
   }
 
@@ -176,7 +174,7 @@ class UploadController @Inject() (
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
           // No fileparts - force user to step 2
-          Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep2(usernameInPath)))
+          Future.successful(Redirect(controllers.my.routes.UploadController.showStep2(usernameInPath)))
         } else {
           // Pending upload + fileparts available - proceed
           uploads.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
@@ -187,14 +185,14 @@ class UploadController @Inject() (
             val applyNER = checkParamValue("apply-ner", "on")
             if (applyNER) {
               nerService.spawnTask(doc, docParts)
-              runningTasks.append(NERService.TASK_NER)
+              runningTasks.append(NERService.TASK_TYPE)
             }
 
             // Tile images
             val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
             if (imageParts.size > 0) {
               tilingService.spawnTask(doc, imageParts)
-              runningTasks.append(TilingService.TASK_TILING)
+              runningTasks.append(TilingService.TASK_TYPE)
             }
 
             Ok(views.html.my.upload.step3(usernameInPath, doc, docParts, runningTasks))
@@ -203,7 +201,7 @@ class UploadController @Inject() (
 
       case None =>
         // No pending upload - force user to step 1
-        Future.successful(Redirect(controllers.my.upload.routes.UploadController.showStep1(usernameInPath)))
+        Future.successful(Redirect(controllers.my.routes.UploadController.showStep1(usernameInPath)))
     })
   }
 

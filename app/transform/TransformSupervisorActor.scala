@@ -1,46 +1,25 @@
-package controllers.my.upload
+package transform
 
-import akka.actor.{ Actor, ActorSystem, ActorRef }
+import akka.actor.{ Actor, ActorRef }
 import akka.contrib.pattern.Aggregator
 import java.io.File
+import models.task.{ TaskType, TaskService }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import models.task.{ TaskService, TaskRecordAggregate }
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
-case class TaskType(name: String) {
-  
-  override def toString = name
-  
-}
-
-trait ProcessingService {
-  
-  def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit
-
-}
-
-private[upload] object ProcessingMessages {
-  
-  sealed abstract trait ProcessingMessage
-  case object Start extends ProcessingMessage
-  case object Stopped extends ProcessingMessage
-  
-}
-
-/** A base class that encapsulates most of the functionality needed by task supervisor actors **/
-abstract class TaskSupervisorActor(
+abstract class TransformSupervisorActor(
     taskType: TaskType,
     document: DocumentRecord,
     parts: Seq[DocumentFilepartRecord],
     documentDir: File,
     taskService: TaskService,
-    keepalive: FiniteDuration
-  ) extends Actor with Aggregator  {
-  
-  import ProcessingMessages._
-    
+    keepalive: FiniteDuration,
+    implicit val ctx: ExecutionContext
+  ) extends Actor with Aggregator {
+      
+  import TransformTaskMessages._ 
+ 
   private val workers = spawnWorkers(document, parts, documentDir)
 
   private var remainingWorkers = workers.size
@@ -68,7 +47,7 @@ abstract class TaskSupervisorActor(
   private def shutdown() = {
     workers.foreach(context.stop(_))
     context.system.scheduler.scheduleOnce(keepalive) {
-      taskService.deleteByTypeAndDocument(taskType.toString, document.getId)
+      taskService.deleteByTypeAndDocument(taskType, document.getId)
       context.stop(self)
     }
   }

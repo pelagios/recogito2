@@ -12,7 +12,7 @@ import models.user.UserService
 import models.user.Roles._
 import play.api.Configuration
 import scala.concurrent.{ ExecutionContext, Future }
-import controllers.my.upload.tiling.TilingService
+import transform.tiling.TilingService
   
 class BackupAdminController @Inject() (
     val config: Configuration,

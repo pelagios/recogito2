@@ -1,23 +1,26 @@
-package controllers.my.upload.ner
+package transform.ner
 
 import akka.actor.{ ActorSystem, Props }
-import controllers.my.upload._
 import java.io.File
 import javax.inject.{ Inject, Singleton }
+import models.ContentType
 import models.annotation.AnnotationService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.place.PlaceService
-import models.task.TaskService
-import org.pelagios.recogito.sdk.ner.Entity
+import models.task.{ TaskService, TaskType }
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import org.pelagios.recogito.sdk.ner._
 import play.api.Logger
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import storage.Uploads
+import transform._
 
 object NERService { 
   
-  val TASK_NER = TaskType("NER")
+  val TASK_TYPE = TaskType("NER")
+  
+  val SUPPORTED_CONTENT_TYPES = Set(ContentType.TEXT_PLAIN).map(_.toString)
 
   private var runningPipelines = 0
 
@@ -43,7 +46,12 @@ object NERService {
 }
 
 @Singleton
-class NERService @Inject() (annotations: AnnotationService, places: PlaceService, taskService: TaskService, uploads: Uploads) extends ProcessingService {
+class NERService @Inject() (
+    annotations: AnnotationService,
+    places: PlaceService,
+    taskService: TaskService,
+    uploads: Uploads,
+    ctx: ExecutionContext) extends TransformService {
 
   /** Spawns a new background parse process.
     *
@@ -54,10 +62,27 @@ class NERService @Inject() (annotations: AnnotationService, places: PlaceService
   override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
     spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
 
-  /** We're splitting this function, so we can inject alternative folders for testing **/
-  private[ner] def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], sourceFolder: File, keepalive: FiniteDuration = 10.minutes)(implicit system: ActorSystem): Unit = {
-    val actor = system.actorOf(Props(classOf[NERSupervisorActor], NERService.TASK_NER, document, parts, sourceFolder, taskService, annotations, places, keepalive), name = "ner_doc_" + document.getId)
-    actor ! ProcessingMessages.Start
+  /** We're splitting this, so we can inject alternative folders for testing **/
+  private[ner] def spawnTask(
+      document: DocumentRecord,
+      parts: Seq[DocumentFilepartRecord],
+      sourceFolder: File,
+      keepalive: FiniteDuration = 10.minutes)(implicit system: ActorSystem): Unit = {
+    
+    val actor = system.actorOf(
+        Props(
+          classOf[NERSupervisorActor], 
+          document, 
+          parts,
+          sourceFolder,
+          taskService,
+          annotations,
+          places,
+          keepalive,
+          ctx),
+        name = "ner.doc." + document.getId)
+        
+    actor ! TransformTaskMessages.Start
   }
 
 }

@@ -27,7 +27,7 @@
         <li class="arrow">Enter Metadata</li><li class="active arrow">Attach Files</li><li>Import</li>
       </ul>
 
-      <form action="@controllers.my.upload.routes.UploadController.storeFilepart(username)" id="dropzone">
+      <form action="@controllers.my.routes.UploadController.storeFilepart(username)" id="dropzone">
         <h2>Drag Files Here</h2>
         <p>or</p>
         <div id="choose-file" class="choose-file btn btn-large btn-blue"><span class="icon">&#xf055;</span> Choose a File to Attach</div>
@@ -49,9 +49,9 @@
         <div id="uploaded-now" class="dropzone-previews"></div>
       </div>
 
-      <form id="buttons" method="POST" action="@controllers.my.upload.routes.UploadController.showStep3(username)">
+      <form id="buttons" method="POST" action="@controllers.my.routes.UploadController.showStep3(username)">
         <div class="buttons-left">
-          <a class="back btn btn-large btn-blue" href="@controllers.my.upload.routes.UploadController.showStep1(username)">Back</a>
+          <a class="back btn btn-large btn-blue" href="@controllers.my.routes.UploadController.showStep1(username)">Back</a>
         </div>
 
         <div class="ner">
@@ -64,15 +64,15 @@
         </div>
 
         <div class="buttons-right">
-          <a href="@controllers.my.upload.routes.UploadController.cancelUploadWizard(username)" class="cancel btn outline">Cancel</a>
+          <a href="@controllers.my.routes.UploadController.cancelUploadWizard(username)" class="cancel btn outline">Cancel</a>
           <input type="submit" class="next btn" disabled="true" value="Next" />
         </div>
       </form>
     </div>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.my.upload.routes.javascript.UploadController.storeFilepart,
-      controllers.my.upload.routes.javascript.UploadController.deleteFilepart
+      controllers.my.routes.javascript.UploadController.storeFilepart,
+      controllers.my.routes.javascript.UploadController.deleteFilepart
     )
 
   </body>

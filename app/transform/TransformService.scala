@@ -1,0 +1,21 @@
+package transform
+
+import akka.actor.ActorSystem 
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+
+private[transform] object TransformTaskMessages {
+  
+  sealed abstract trait TransformTaskMessage
+  
+  case object Start extends TransformTaskMessage
+  
+  case object Stopped extends TransformTaskMessage
+  
+}
+
+trait TransformService {
+    
+  def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit
+
+}
+

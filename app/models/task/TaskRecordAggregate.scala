@@ -16,7 +16,7 @@ case class TaskRecordAggregate(taskRecords: Seq[TaskRecord]) {
     fields.head
   }
 
-  lazy val taskType = getDistinctField[String](_.getTaskType, "different task types")
+  lazy val taskType = TaskType(getDistinctField[String](_.getTaskType, "different task types"))
 
   lazy val className = getDistinctField[String](_.getClassName, "different class names")
   

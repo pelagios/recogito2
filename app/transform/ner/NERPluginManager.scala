@@ -1,12 +1,10 @@
-package controllers.my.upload.ner
+package transform.ner
 
-import play.api.Logger
 import java.io.File
-import org.apache.commons.io.FileUtils
-import scala.collection.JavaConverters._
-import java.net.URLClassLoader
 import java.util.ServiceLoader
+import play.api.Logger
 import org.pelagios.recogito.sdk.ner.NERPlugin
+import scala.collection.JavaConverters._
 
 object NERPluginManager {
   

@@ -78,7 +78,7 @@ require(['common/config'], function(Config) {
   jQuery(document).ready(function() {
 
     var fileparts = jQuery.map(jQuery('.filepart-preview'), function(el) {
-          return new Filepart(el, Config.tasks);
+          return new Filepart(el);
         }),
 
         /** Returns true if all parts are either completed or failed **/

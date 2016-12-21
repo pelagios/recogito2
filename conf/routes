@@ -117,24 +117,7 @@ GET     /api/stats                                   controllers.api.StatsAPICon
 GET     /api/user                                    controllers.api.UserAPIController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal space - upload
-#
-# TODO do we want to move uploads to /upload?
-#
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-GET     /:username/upload/step-1                     controllers.my.upload.UploadController.showStep1(username: String)
-POST    /:username/upload/step-1                     controllers.my.upload.UploadController.storeDocumentMetadata(username: String)
-GET     /:username/upload/step-2                     controllers.my.upload.UploadController.showStep2(username: String)
-POST    /:username/upload/step-2                     controllers.my.upload.UploadController.storeFilepart(username: String)
-DELETE  /:username/upload/step-2/:filename           controllers.my.upload.UploadController.deleteFilepart(username: String, filename: String)
-GET     /:username/upload/step-3                     controllers.my.upload.UploadController.showStep3(username: String)
-POST    /:username/upload/step-3                     controllers.my.upload.UploadController.showStep3(username: String)
-GET     /:username/upload/cancel                     controllers.my.upload.UploadController.cancelUploadWizard(username: String)
-GET     /:username/upload/progress/:docId            controllers.my.upload.UploadController.queryTaskProgress(username: String, docId: String)
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal settings
+# Personal space - settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /settings/account                            controllers.my.settings.AccountSettingsController.index
@@ -144,6 +127,20 @@ GET     /settings/password                           controllers.my.settings.Pas
 POST    /settings/password                           controllers.my.settings.PasswordSettingsController.updatePassword
 GET     /settings/restore                            controllers.my.settings.RestoreController.index
 POST    /settings/restore                            controllers.my.settings.RestoreController.restore
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal space - upload
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /:username/upload/step-1                     controllers.my.UploadController.showStep1(username: String)
+POST    /:username/upload/step-1                     controllers.my.UploadController.storeDocumentMetadata(username: String)
+GET     /:username/upload/step-2                     controllers.my.UploadController.showStep2(username: String)
+POST    /:username/upload/step-2                     controllers.my.UploadController.storeFilepart(username: String)
+DELETE  /:username/upload/step-2/:filename           controllers.my.UploadController.deleteFilepart(username: String, filename: String)
+GET     /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
+POST    /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
+GET     /:username/upload/cancel                     controllers.my.UploadController.cancelUploadWizard(username: String)
+GET     /:username/upload/progress/:docId            controllers.my.UploadController.queryTaskProgress(username: String, docId: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

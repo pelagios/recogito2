@@ -1,31 +1,33 @@
-package controllers.my.upload.tiling
+package transform.tiling
 
 import akka.actor.Actor
 import java.io.File
 import models.task.{ TaskService, TaskStatus }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._
 
 class TilingWorkerActor(
     document: DocumentRecord,
     part: DocumentFilepartRecord,
     documentDir: File,
-    taskService: TaskService) extends Actor {
+    taskService: TaskService,
+    implicit val ctx: ExecutionContext) extends Actor {
 
-  import controllers.my.upload.ProcessingMessages._
+  import transform.TransformTaskMessages._ 
 
   def receive = {
 
-    case Start => {      
+    case Start => {   
       val origSender = sender
+      
       val filename = part.getFile
-      val tilesetDir= new File(documentDir, filename.substring(0, filename.lastIndexOf('.')))
+      val tilesetDir =
+        new File(documentDir, filename.substring(0, filename.lastIndexOf('.')))
       
       val taskId = Await.result(
         taskService.insertTask(
-          TilingService.TASK_TILING.toString,
+          TilingService.TASK_TYPE,
           this.getClass.getName,
           Some(document.getId),
           Some(part.getId),
