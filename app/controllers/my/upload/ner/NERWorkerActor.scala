@@ -38,7 +38,7 @@ private[ner] class NERWorkerActor(
 
     case Start => {
       val origSender = sender
-      
+
       val taskId = Await.result(
         taskService.insertTask(
           NERService.TASK_NER.toString,
