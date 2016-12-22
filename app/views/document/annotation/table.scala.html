@@ -63,9 +63,9 @@
               <span class="label">BULK ANNOTATION</span>
               <div class="submenu" style="display:none;">
                 <ul>
-                  <li data-mode="QUICK" data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
-                  <li data-mode="QUICK" data-type="PERSON" class="disabled"><span class="icon">&#xf007;</span> Persons</li>
-                  <li data-mode="QUICK" data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
+                  <li data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
+                  <li data-type="PERSON" class="disabled"><span class="icon">&#xf007;</span> Persons</li>
+                  <li data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
                 </ul>
               </div>
             </li>
@@ -114,6 +114,8 @@
       controllers.api.routes.javascript.AnnotationAPIController.deleteAnnotation,
       controllers.api.routes.javascript.PlaceAPIController.findPlaceByURI,
       controllers.api.routes.javascript.PlaceAPIController.searchPlaces,
+      controllers.api.routes.javascript.TaskAPIController.spawnTask,
+      controllers.api.routes.javascript.TaskAPIController.queryProgress,
       controllers.document.routes.javascript.DocumentController.getDataTable
     )
   </body>

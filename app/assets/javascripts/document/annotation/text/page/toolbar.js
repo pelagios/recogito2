@@ -65,6 +65,8 @@ define([
               currentMode = { mode: mode, type: type };
               self.fireEvent('annotationModeChanged', currentMode);
             }
+
+            return false;
           });
 
           colorSchemes.on('click', 'li', function(e) {

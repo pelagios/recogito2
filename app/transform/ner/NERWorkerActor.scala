@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 import scala.io.Source
 import storage.ES
 
-class NERWorkerActor(
+private[ner] class NERWorkerActor(
     document: DocumentRecord,
     part: DocumentFilepartRecord,
     documentDir: File, 

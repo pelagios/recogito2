@@ -1,16 +1,17 @@
-package transform.ner
+package transform.georesolution
 
 import akka.actor.Props
 import java.io.File
+import models.ContentType
 import models.annotation.AnnotationService
-import models.place.PlaceService
 import models.task.TaskService
+import models.place.PlaceService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.ExecutionContext
 import transform.TransformSupervisorActor
 
-private[ner] class NERSupervisorActor(
+private[georesolution] class GeoresolutionSupervisorActor(
     document: DocumentRecord,
     parts: Seq[DocumentFilepartRecord],
     dir: File,
@@ -20,7 +21,7 @@ private[ner] class NERSupervisorActor(
     keepalive: FiniteDuration,
     ctx: ExecutionContext
   ) extends TransformSupervisorActor(
-      NERService.TASK_TYPE,
+      GeoresolutionService.TASK_TYPE,
       document,
       parts,
       dir,
@@ -28,13 +29,12 @@ private[ner] class NERSupervisorActor(
       keepalive,
       ctx) {
 
-  /** Creates workers for every content type indicated as 'supported' by the Worker class **/
   override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
     parts
-      .filter(part => NERService.SUPPORTED_CONTENT_TYPES.contains(part.getContentType))
+      .filter(_.getContentType == ContentType.DATA_CSV.toString)
       .map(part => context.actorOf(
         Props(
-          classOf[NERWorkerActor],
+          classOf[GeoresolutionWorkerActor],
           document,
           part,
           dir,
@@ -42,6 +42,6 @@ private[ner] class NERSupervisorActor(
           annotations,
           places,
           ctx),
-        name = "ner.doc." + document.getId + ".part." + part.getId))
-
+        name = "georesolution.doc." + document.getId + ".part." + part.getId))
+  
 }

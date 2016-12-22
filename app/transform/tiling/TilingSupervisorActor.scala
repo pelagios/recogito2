@@ -37,6 +37,6 @@ private[tiling] class TilingSupervisorActor(
             dir,
             taskService,
             ctx),
-          name="tile.doc." + document.getId + ".part." + part.getId))
+          name = "tile.doc." + document.getId + ".part." + part.getId))
 
 }

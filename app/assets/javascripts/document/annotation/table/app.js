@@ -10,6 +10,7 @@ require([
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
+  'document/annotation/table/bulk/bulkEditorPlace',
   'document/annotation/table/page/toolbar',
   'document/annotation/table/selection/highlighter',
   'document/annotation/table/selection/selectionHandler'
@@ -20,6 +21,7 @@ require([
   WriteEditor,
   LoadIndicator,
   BaseApp,
+  PlaceBulkEditor,
   Toolbar,
   Highlighter,
   SelectionHandler) {
@@ -73,6 +75,11 @@ require([
           new WriteEditor(containerNode, selector) :
           new ReadEditor(containerNode),
 
+        onBulkAnnotation = function(type) {
+          var columnNames = columns.map(function(f) {  return f.name; }),
+              bulkEditor = (type === 'PLACE') ? new PlaceBulkEditor(columnNames) : false;
+        },
+
         onRowCountChanged = function(e, args) {
           grid.updateRowCount();
           grid.render();
@@ -98,6 +105,8 @@ require([
           if (selection)
             editor.setPosition(selection.bounds);
         };
+
+    toolbar.on('bulkAnnotation', onBulkAnnotation);
 
     grid.onSort.subscribe(onSort);
     grid.onScroll.subscribe(onScroll);

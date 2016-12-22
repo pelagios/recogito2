@@ -7,7 +7,7 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._
 
-class TilingWorkerActor(
+private[tiling] class TilingWorkerActor(
     document: DocumentRecord,
     part: DocumentFilepartRecord,
     documentDir: File,
