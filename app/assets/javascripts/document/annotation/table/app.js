@@ -10,6 +10,7 @@ require([
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
+  'document/annotation/table/page/toolbar',
   'document/annotation/table/selection/highlighter',
   'document/annotation/table/selection/selectionHandler'
 ], function(
@@ -19,6 +20,7 @@ require([
   WriteEditor,
   LoadIndicator,
   BaseApp,
+  Toolbar,
   Highlighter,
   SelectionHandler) {
 
@@ -27,6 +29,8 @@ require([
   var App = function(results) {
 
     var containerNode = document.getElementById('table-container'),
+
+        toolbar = new Toolbar(jQuery('.header-toolbar')),
 
         dataView = new Slick.Data.DataView(),
 
