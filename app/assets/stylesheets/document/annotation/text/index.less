@@ -24,6 +24,7 @@ body {
 
   li.quick::before {
     display:inline-block;
+    position:relative;
     width:7px;
     content:'';
     font-family:FontAwesome;
@@ -31,12 +32,12 @@ body {
 
   li.quick.PLACE::before {
     content:'\f041';
-    left:3px;
+    left:0;
   }
 
   li.quick.PERSON::before {
     content:'\f007';
-    left:2px;
+    left:-3px;
   }
 
   li.quick.TAGS::before {

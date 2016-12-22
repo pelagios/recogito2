@@ -48,8 +48,8 @@ define([
                 mode = t.data('mode'),
                 type = t.data('type');
 
-            // TODO temporary: disable PERSON & TAGS quick modes for 1st pre-release
-            if (type === 'PERSON' || type === 'TAGS')
+            // TODO temporary: disable TAGS quick mode
+            if (type === 'TAGS')
               return;
 
             if (isModeChanged(mode, type)) {
