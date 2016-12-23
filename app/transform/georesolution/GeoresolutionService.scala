@@ -13,7 +13,7 @@ import storage.Uploads
 import transform._
 import com.vividsolutions.jts.geom.Point
 
-case class Georesolvable(toponym: String, coord: Option[Point])
+case class Georesolvable(anchor: String, toponym: String, coord: Option[Point])
 
 object GeoresolutionService {
   
