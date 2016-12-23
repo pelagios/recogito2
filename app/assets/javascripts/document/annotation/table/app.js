@@ -76,8 +76,7 @@ require([
           new ReadEditor(containerNode),
 
         onBulkAnnotation = function(type) {
-          var columnNames = columns.map(function(f) {  return f.name; }),
-              bulkEditor = (type === 'PLACE') ? new PlaceBulkEditor(columnNames) : false;
+          var bulkEditor = (type === 'PLACE') ? new PlaceBulkEditor(results.meta) : false;
         },
 
         onRowCountChanged = function(e, args) {

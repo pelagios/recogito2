@@ -15,7 +15,7 @@ private[transform] object TransformTaskMessages {
 
 trait TransformService {
     
-  def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit
+  def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String] = Map.empty[String, String])(implicit system: ActorSystem): Unit
 
 }
 

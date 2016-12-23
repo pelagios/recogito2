@@ -1,6 +1,7 @@
 package transform.georesolution
 
 import akka.actor.{ ActorSystem, Props }
+import com.vividsolutions.jts.geom.Coordinate
 import java.io.File
 import javax.inject.{ Inject, Singleton }
 import models.annotation.AnnotationService
@@ -11,9 +12,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import storage.Uploads
 import transform._
-import com.vividsolutions.jts.geom.Point
 
-case class Georesolvable(anchor: String, toponym: String, coord: Option[Point])
+case class Georesolvable(toponym: String, coord: Option[Coordinate])
 
 object GeoresolutionService {
   
@@ -29,15 +29,16 @@ class GeoresolutionService @Inject() (
     uploads: Uploads,
     ctx: ExecutionContext) extends TransformService {
   
-  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
+  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String])(implicit system: ActorSystem): Unit =
+    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get, args, 10.minutes)
 
   /** We're splitting this, so we can inject alternative folders for testing **/
   private[georesolution] def spawnTask(
       document: DocumentRecord,
       parts: Seq[DocumentFilepartRecord],
       sourceFolder: File,
-      keepalive: FiniteDuration = 10.minutes)(implicit system: ActorSystem): Unit = {
+      args: Map[String, String],
+      keepalive: FiniteDuration)(implicit system: ActorSystem): Unit = {
     
     val actor = system.actorOf(
         Props(
@@ -45,6 +46,7 @@ class GeoresolutionService @Inject() (
           document, 
           parts,
           sourceFolder,
+          args,
           taskService,
           annotations,
           places,

@@ -32,15 +32,16 @@ object TilingService {
 @Singleton
 class TilingService @Inject() (uploads: Uploads, taskService: TaskService, ctx: ExecutionContext) extends TransformService {
 
-  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
+  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String])(implicit system: ActorSystem): Unit =
+    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get, args, 10.minutes)
 
   /** We're splitting this, so we can inject alternative folders for testing **/
   private[tiling] def spawnTask(
       document: DocumentRecord,
       parts: Seq[DocumentFilepartRecord],
       sourceFolder: File,
-      keepalive: FiniteDuration = 10.minutes)(implicit system: ActorSystem): Unit = {
+      args: Map[String, String],
+      keepalive: FiniteDuration)(implicit system: ActorSystem): Unit = {
     
     val actor = system.actorOf(
       Props(
@@ -48,6 +49,7 @@ class TilingService @Inject() (uploads: Uploads, taskService: TaskService, ctx: 
         document,
         parts,
         sourceFolder,
+        args,
         taskService,
         keepalive,
         ctx),

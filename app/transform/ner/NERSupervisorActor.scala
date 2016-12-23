@@ -14,6 +14,7 @@ private[ner] class NERSupervisorActor(
     document: DocumentRecord,
     parts: Seq[DocumentFilepartRecord],
     dir: File,
+    args: Map[String, String],
     taskService: TaskService,
     annotations: AnnotationService,
     places: PlaceService,
@@ -24,12 +25,13 @@ private[ner] class NERSupervisorActor(
       document,
       parts,
       dir,
+      args,
       taskService,
       keepalive,
       ctx) {
 
   /** Creates workers for every content type indicated as 'supported' by the Worker class **/
-  override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
+  override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, args: Map[String, String]) =
     parts
       .filter(part => NERService.SUPPORTED_CONTENT_TYPES.contains(part.getContentType))
       .map(part => context.actorOf(
@@ -38,6 +40,7 @@ private[ner] class NERSupervisorActor(
           document,
           part,
           dir,
+          args,
           taskService,
           annotations,
           places,

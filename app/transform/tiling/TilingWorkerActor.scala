@@ -11,6 +11,7 @@ private[tiling] class TilingWorkerActor(
     document: DocumentRecord,
     part: DocumentFilepartRecord,
     documentDir: File,
+    args: Map[String, String],
     taskService: TaskService,
     implicit val ctx: ExecutionContext) extends Actor {
 

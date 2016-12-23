@@ -20,6 +20,7 @@ private[ner] class NERWorkerActor(
     document: DocumentRecord,
     part: DocumentFilepartRecord,
     documentDir: File, 
+    args: Map[String, String],
     taskService: TaskService,
     annotationService: AnnotationService,
     placeService: PlaceService,

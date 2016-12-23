@@ -21,7 +21,9 @@ case class TaskDefinition(
   
   documentId: String,
   
-  filepartId: Option[UUID]
+  filepartId: Option[UUID],
+  
+  args: Map[String, String]
   
 )
 
@@ -30,7 +32,8 @@ object TaskDefinition {
   implicit val taskDefinitonReads: Reads[TaskDefinition] = (
     (JsPath \ "task_type").read[String].map(str => TaskType(str)) and
     (JsPath \ "document_id").read[String] and
-    (JsPath \ "filepart_id").readNullable[UUID]
+    (JsPath \ "filepart_id").readNullable[UUID] and
+    (JsPath \ "args").read[Map[String, String]]
   )(TaskDefinition.apply _)
 
 }
@@ -52,7 +55,7 @@ class TaskAPIController @Inject() (
           if (accesslevel.canWrite)
             taskDefinition.taskType match {  
               case TaskType("GEORESOLUTION") =>
-                georesolution.spawnTask(docInfo.document, docInfo.fileparts)
+                georesolution.spawnTask(docInfo.document, docInfo.fileparts, taskDefinition.args)
                 Ok
                 
               case t =>

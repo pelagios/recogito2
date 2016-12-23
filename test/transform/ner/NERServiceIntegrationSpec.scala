@@ -68,8 +68,8 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
     Logger.info("[NERServiceIntegrationSpec] Submitting 2 documents to NER service")
 
     val processStartTime = System.currentTimeMillis
-    nerService.spawnTask(document1, parts1, dir, KEEPALIVE)
-    nerService.spawnTask(document2, parts2, dir, KEEPALIVE)
+    nerService.spawnTask(document1, parts1, dir, Map.empty[String, String], KEEPALIVE)
+    nerService.spawnTask(document2, parts2, dir, Map.empty[String, String], KEEPALIVE)
 
     "start NER on the 2 test documents without blocking" in {
       (System.currentTimeMillis - processStartTime).toInt must be <(1000)

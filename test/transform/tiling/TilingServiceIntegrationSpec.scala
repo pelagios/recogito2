@@ -62,7 +62,7 @@ class TilingServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitS
     val dir = new File("test/resources/transform/tiling")
 
     val processStartTime = System.currentTimeMillis
-    tilingService.spawnTask(document, parts, dir, KEEPALIVE)
+    tilingService.spawnTask(document, parts, dir, Map.empty[String, String], KEEPALIVE)
 
     "start tiling on the test image without blocking" in {
       (System.currentTimeMillis - processStartTime).toInt must be <(1000)

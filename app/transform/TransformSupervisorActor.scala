@@ -9,22 +9,28 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
 abstract class TransformSupervisorActor(
-    taskType: TaskType,
-    document: DocumentRecord,
-    parts: Seq[DocumentFilepartRecord],
-    documentDir: File,
-    taskService: TaskService,
-    keepalive: FiniteDuration,
+    taskType        : TaskType,
+    document        : DocumentRecord,
+    parts           : Seq[DocumentFilepartRecord],
+    documentDir     : File,
+    args            : Map[String, String],
+    taskService     : TaskService,
+    keepalive       : FiniteDuration,
     implicit val ctx: ExecutionContext
   ) extends Actor with Aggregator {
       
   import TransformTaskMessages._ 
  
-  private val workers = spawnWorkers(document, parts, documentDir)
+  private val workers = spawnWorkers(document, parts, documentDir, args)
 
   private var remainingWorkers = workers.size
   
-  def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File): Seq[ActorRef]
+  def spawnWorkers(
+    document: DocumentRecord,
+    parts: Seq[DocumentFilepartRecord],
+    dir: File,
+    args: Map[String, String]
+  ): Seq[ActorRef]
 
   expect {
 

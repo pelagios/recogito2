@@ -13,6 +13,7 @@ private[tiling] class TilingSupervisorActor(
     document   : DocumentRecord,
     parts      : Seq[DocumentFilepartRecord],
     documentDir: File,
+    args       : Map[String, String],
     taskService: TaskService,
     keepalive  : FiniteDuration,
     ctx        : ExecutionContext
@@ -21,12 +22,13 @@ private[tiling] class TilingSupervisorActor(
       document,
       parts,
       documentDir,
+      args,
       taskService,
       keepalive,
       ctx) {
   
   /** Creates workers for every image upload **/
-  override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
+  override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, args: Map[String, String]) =
     parts
       .filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
       .map(part => context.actorOf(
@@ -35,6 +37,7 @@ private[tiling] class TilingSupervisorActor(
             document,
             part,
             dir,
+            args,
             taskService,
             ctx),
           name = "tile.doc." + document.getId + ".part." + part.getId))

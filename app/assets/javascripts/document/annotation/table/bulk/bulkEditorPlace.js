@@ -3,11 +3,11 @@ define([
   'document/annotation/table/bulk/bulkEditorBase'
 ], function(Config, BaseBulkEditor) {
 
-  var PlaceBulkEditor = function(columns) {
+  var PlaceBulkEditor = function(metadata) {
     var options =
           '<option></option>' +
-          columns.map(function(name) {
-            return '<option>' + name + '</option>';
+          metadata.fields.map(function(name, idx) {
+            return '<option value="' + idx + '">' + name + '</option>';
           }).join(''),
 
         form = jQuery(
@@ -50,7 +50,8 @@ define([
                 document_id : Config.documentId,
                 filepart_id : Config.partId,
                 args        : {
-                  place_column : placeColumn,
+                  delimiter    : metadata.delimiter,
+                  toponym_column : placeColumn,
                   lat_column   : latColumn,
                   lon_column   : lonColumn
                 }
@@ -66,6 +67,7 @@ define([
           } catch (error) {
             console.log(error);
           }
+
           return false;
 
         };

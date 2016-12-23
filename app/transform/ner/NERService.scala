@@ -59,15 +59,16 @@ class NERService @Inject() (
     * for any of the fileparts does not exist. This should, however, never
     * happen. If it does, something is seriously broken with the DB integrity.
     */
-  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get)
+  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String])(implicit system: ActorSystem): Unit =
+    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get, args, 10.minutes)
 
   /** We're splitting this, so we can inject alternative folders for testing **/
   private[ner] def spawnTask(
       document: DocumentRecord,
       parts: Seq[DocumentFilepartRecord],
       sourceFolder: File,
-      keepalive: FiniteDuration = 10.minutes)(implicit system: ActorSystem): Unit = {
+      args: Map[String, String],
+      keepalive: FiniteDuration)(implicit system: ActorSystem): Unit = {
     
     val actor = system.actorOf(
         Props(
@@ -75,6 +76,7 @@ class NERService @Inject() (
           document, 
           parts,
           sourceFolder,
+          args,
           taskService,
           annotations,
           places,

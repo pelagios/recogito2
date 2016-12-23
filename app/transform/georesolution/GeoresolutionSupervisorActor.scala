@@ -15,6 +15,7 @@ private[georesolution] class GeoresolutionSupervisorActor(
     document: DocumentRecord,
     parts: Seq[DocumentFilepartRecord],
     dir: File,
+    args: Map[String, String],
     taskService: TaskService,
     annotations: AnnotationService,
     places: PlaceService,
@@ -25,11 +26,12 @@ private[georesolution] class GeoresolutionSupervisorActor(
       document,
       parts,
       dir,
+      args,
       taskService,
       keepalive,
       ctx) {
 
-  override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File) =
+  override def spawnWorkers(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], dir: File, args: Map[String, String]) =
     parts
       .filter(_.getContentType == ContentType.DATA_CSV.toString)
       .map(part => context.actorOf(
@@ -38,6 +40,7 @@ private[georesolution] class GeoresolutionSupervisorActor(
           document,
           part,
           dir,
+          args,
           taskService,
           annotations,
           places,
