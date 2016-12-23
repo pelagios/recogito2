@@ -1,7 +1,6 @@
 package transform.georesolution
 
 import akka.actor.{ ActorSystem, Props }
-import com.vividsolutions.jts.geom.Coordinate
 import java.io.File
 import javax.inject.{ Inject, Singleton }
 import models.annotation.AnnotationService
@@ -12,8 +11,6 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import storage.Uploads
 import transform._
-
-case class Georesolvable(toponym: String, coord: Option[Coordinate])
 
 object GeoresolutionService {
   
