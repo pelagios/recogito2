@@ -84,7 +84,8 @@ object ImageService {
     val dir = uploads.getDocumentDir(doc.ownerName, doc.id).get
     
     val sourceFile = new File(dir, part.getFile)
-    val destFile = TemporaryFile(new File(TMP, annotation.annotationId + ".jpg")).file
+    val tmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".jpg"))
+    val destFile = tmp.file.getAbsolutePath
     
     val anchor = ImageAnchor.parse(annotation.anchor).get
     val x = anchor.bounds.x
@@ -94,7 +95,7 @@ object ImageService {
 
     s"vips crop $sourceFile $destFile $x $y $w $h" ! 
     
-    destFile
+    tmp.file
   }
 
 }
