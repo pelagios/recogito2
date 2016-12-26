@@ -97,7 +97,7 @@ class AnnotationAPIController @Inject() (
     val contributions: ContributionService,
     val documents: DocumentService,
     val users: UserService,
-    val uploads: Uploads,
+    implicit val uploads: Uploads,
     implicit val ctx: ExecutionContext
   ) extends BaseController(config, users)
       with OptionalAuthElement
@@ -222,17 +222,36 @@ class AnnotationAPIController @Inject() (
     Future.successful(jsonOk(Json.toJson(annotation)))
   }
 
-  def getImage(id: UUID) = AsyncStack { implicit request =>
+  def getImage(id: UUID) = AsyncStack { implicit request =>    
+    val username = loggedIn.map(_.user.getUsername)
     
-    // TODO implement
-    
-    // Step 1: get annotation
-    // Step 2: get document
-    // Step 3: 
-    //   if (read) access allowed -> return cutout image
-    //   else Forbidden
-    
-    Future.successful(Ok)
+    annotations.findById(id).flatMap {
+      case Some((annotation, _)) =>
+        val docId = annotation.annotates.documentId
+        val partId = annotation.annotates.filepartId
+        
+        documents.getExtendedInfo(docId, username).flatMap {
+          case Some((doc, accesslevel)) =>
+            doc.fileparts.find(_.getId == partId) match {
+              case Some(filepart) =>
+                if (accesslevel.canRead) ImageService.cutout(doc, filepart, annotation).map(file =>
+                  Ok.sendFile(file))
+                else
+                  Future.successful(Forbidden)
+                
+              case None =>
+                Logger.error(s"Attempted to render image for annotation $id but filepart $partId not found")
+                Future.successful(InternalServerError)
+            }
+            
+          case None =>
+            // Annotation exists, but not the doc?
+            Logger.error(s"Attempted to render image for annotation $id but document $docId not found")
+            Future.successful(InternalServerError)
+        }
+      
+      case None => Future.successful(NotFound)
+    }
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>

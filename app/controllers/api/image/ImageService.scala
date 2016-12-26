@@ -6,8 +6,11 @@ import models.document.DocumentInfo
 import models.generated.tables.records.DocumentFilepartRecord
 import play.api.libs.Files.TemporaryFile
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.language.postfixOps
 import scala.util.Try
 import storage.Uploads
+import sys.process._
+import scala.util.Success
 
 case class Bounds(x: Int, y: Int, width: Int, height: Int)
 
@@ -45,16 +48,20 @@ object ImageAnchor {
     }
 
   // point:1099,1018
-  def parsePointAnchor(anchor: String): Option[PointAnchor] = {
-    val maybePoint = Try(anchor.substring(6).split(',').map(_.toInt))
-    if (maybePoint.isSuccess)
-      Some(PointAnchor(maybePoint.get(0), maybePoint.get(1)))
-    else
-      None
-  }
+  def parsePointAnchor(anchor: String): Option[PointAnchor] =
+    Try(anchor.substring(6).split(',').map(_.toInt)) match {
+      case Success(point) => Some(PointAnchor(point(0), point(1)))
+      case _ => None
+    }
 
   // rect:x=3184,y=1131,w=905,h=938
-  def parseRectAnchor(anchor: String): Option[RectAnchor] = ???
+  def parseRectAnchor(anchor: String): Option[RectAnchor] =
+    Try(anchor.substring(5).split(',').map(_.substring(2).toInt)) match {
+      case Success(values) =>
+        Some(RectAnchor(values(0), values(1), values(2), values(3)))
+        
+      case _ => None
+    }
 
   // tbox:x=3713,y=4544,a=0.39618258447890137,l=670,h=187
   def parseTiltedBoxAnchor(anchor: String): Option[TiltedBoxAnchor] = ???
@@ -84,8 +91,8 @@ object ImageService {
     val y = anchor.bounds.y
     val w = anchor.bounds.width
     val h = anchor.bounds.height
-    
-    s"vips crop $sourceFile $destFile $x $y $w $h"
+
+    s"vips crop $sourceFile $destFile $x $y $w $h" ! 
     
     destFile
   }
