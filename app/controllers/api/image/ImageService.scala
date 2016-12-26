@@ -1,13 +1,39 @@
 package controllers.api.image
 
+import java.io.File
 import models.annotation.Annotation
 import models.document.DocumentInfo
+import models.generated.tables.records.DocumentFilepartRecord
+import play.api.libs.Files.TemporaryFile
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
+import storage.Uploads
 
-sealed trait ImageAnchor
-case class PointAnchor(x: Int, y: Int) extends ImageAnchor
-case class RectAnchor(x: Int, y: Int, w: Int, h: Int) extends ImageAnchor
-case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends ImageAnchor
+case class Bounds(x: Int, y: Int, width: Int, height: Int)
+
+sealed trait ImageAnchor {
+  
+  def bounds: Bounds
+  
+}
+
+case class PointAnchor(x: Int, y: Int) extends ImageAnchor {
+  
+  val bounds = Bounds(x, y, 0, 0)
+  
+}
+
+case class RectAnchor(x: Int, y: Int, w: Int, h: Int) extends ImageAnchor {
+  
+  val bounds = Bounds(x, y, w, h)
+  
+}
+
+case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends ImageAnchor {
+  
+  def bounds = ???
+  
+}
 
 object ImageAnchor {
 
@@ -37,6 +63,8 @@ object ImageAnchor {
 
 object ImageService {
 
+  private val TMP = System.getProperty("java.io.tmpdir")
+  
   // left = x - h * sin a
   // top = y - l * sin a - h * cos a
   // right = x + l * cos a
@@ -45,17 +73,21 @@ object ImageService {
   // vips crop egerton_ms_2855_f004r.tif cropped.tif 1000 500 300 150
   // vips similarity cropped.tif rot.tif --angle 30
 
-  def getContext(doc: DocumentInfo, annotation: Annotation) {
-    play.api.Logger.info(ImageAnchor.parse(annotation.anchor).toString)
-    /*
-    Future {
-      s"vips dzsave $file $destFolder --layout zoomify" !
-    } map { result =>
-      if (result == 0)
-        Unit
-      else
-        throw new Exception("Image tiling failed for " + file.getAbsolutePath + " to " + destFolder.getAbsolutePath)
-    }*/
+  def cutout(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation)(implicit uploads: Uploads, ctx: ExecutionContext) = Future {
+    val dir = uploads.getDocumentDir(doc.ownerName, doc.id).get
+    
+    val sourceFile = new File(dir, part.getFile)
+    val destFile = TemporaryFile(new File(TMP, annotation.annotationId + ".jpg")).file
+    
+    val anchor = ImageAnchor.parse(annotation.anchor).get
+    val x = anchor.bounds.x
+    val y = anchor.bounds.y
+    val w = anchor.bounds.width
+    val h = anchor.bounds.height
+    
+    s"vips crop $sourceFile $destFile $x $y $w $h"
+    
+    destFile
   }
 
 }

@@ -1,6 +1,7 @@
 package controllers.api
 
 import controllers._
+import controllers.api.image.ImageService
 import java.util.UUID
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
@@ -224,6 +225,12 @@ class AnnotationAPIController @Inject() (
   def getImage(id: UUID) = AsyncStack { implicit request =>
     
     // TODO implement
+    
+    // Step 1: get annotation
+    // Step 2: get document
+    // Step 3: 
+    //   if (read) access allowed -> return cutout image
+    //   else Forbidden
     
     Future.successful(Ok)
   }
