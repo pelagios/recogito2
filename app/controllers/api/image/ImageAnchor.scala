@@ -4,7 +4,13 @@ import scala.language.implicitConversions
 
 sealed trait ImageAnchor {
   
-  case class Bounds(x: Int, y: Int, width: Int, height: Int)
+  case class Bounds(left: Int, top: Int, right: Int, bottom: Int) {
+    
+    val width = right - left
+    
+    val height = bottom - top
+    
+  }
   
   def bounds: Bounds
   
@@ -16,38 +22,67 @@ case class PointAnchor(x: Int, y: Int) extends ImageAnchor {
   
   private val HEIGHT = 120
   
-  val bounds = Bounds(x - WIDTH / 2, y - HEIGHT / 2, WIDTH, HEIGHT)
+  val bounds = Bounds(x - WIDTH / 2, y - HEIGHT / 2, x + WIDTH / 2, y + HEIGHT / 2)
   
 }
 
 case class RectAnchor(x: Int, y: Int, w: Int, h: Int) extends ImageAnchor {
   
-  val bounds = Bounds(x, y, w, h)
+  val bounds = Bounds(x, y, x + w, y + h)
   
 }
 
 case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends ImageAnchor {
   
   implicit def doubleToInt(d: Double) = d.toInt
-  
+    
   val bounds = {
     
-    def boundsQ1() = Bounds(
-      x - h * Math.sin(a),
-      y - l * Math.sin(a) - h * Math.cos(a),
-      l * Math.cos(a) + h * Math.sin(a),
-      l * Math.sin(a) + h * Math.cos(a))
+    def boundsQ1() = { 
+      val sinA = Math.sin(a)
+      val cosA = Math.cos(a)
+      
+      Bounds(
+        x - h * sinA,
+        y - l * sinA - h * cosA,
+        x + l * cosA,
+        y)
+    }
     
-    def boundsQ2() = ???
+    def boundsQ2() = {
+      val sinB = Math.sin(a - Math.PI / 2)
+      val cosB = Math.cos(a - Math.PI / 2)
+      Bounds(
+        x - l * sinB - h * cosB,
+        y - l * cosB,
+        x,
+        y + h * sinB)
+    }
     
-    def boundsQ3() = ???
+    def boundsQ3() = {
+      val sinG = Math.sin(a - Math.PI)
+      val cosG = Math.cos(a - Math.PI)
+      Bounds(
+        x - l * cosG,
+        y,
+        x + h * sinG,
+        y + l * sinG + h * cosG)
+    }
     
-    def boundsQ4() = ??? 
+    def boundsQ4() = {
+      val sinD = Math.sin(Math.PI / 2 - a)
+      val cosD = Math.cos(Math.PI / 2 - a)
+      Bounds(
+        x,
+        y - h * sinD,
+        x + h * cosD + l * sinD,
+        y + l * cosD)
+    }
     
     a match {
       case a if a >= 0 && a < Math.PI / 2 => boundsQ1
-      case a if a < Math.PI => boundsQ2
-      case a if a < 3 * Math.PI / 2 => boundsQ3
+      case a if a >= 0 && a < Math.PI => boundsQ2
+      case a if a < - Math.PI / 2 => boundsQ3
       case _ => boundsQ4
     }
   }

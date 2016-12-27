@@ -20,18 +20,34 @@ object ImageService {
     val dir = uploads.getDocumentDir(doc.ownerName, doc.id).get
     
     val sourceFile = new File(dir, part.getFile)
-    val tmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".jpg"))
-    val destFile = tmp.file.getAbsolutePath
+    val croppedTmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".jpg"))
+    val croppedFile = croppedTmp.file.getAbsolutePath
     
     val anchor = ImageAnchor.parse(annotation.anchor)
-    val x = anchor.bounds.x
-    val y = anchor.bounds.y
+    
+    val x = anchor.bounds.left
+    val y = anchor.bounds.top
     val w = anchor.bounds.width
     val h = anchor.bounds.height
 
-    s"vips crop $sourceFile $destFile $x $y $w $h" ! 
+    s"vips crop $sourceFile $croppedFile $x $y $w $h" ! 
     
-    tmp.file
+    anchor match {
+      case tbox: TiltedBoxAnchor =>    
+        val rotatedTmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".rot.jpg"))
+        val rotatedFile = rotatedTmp.file.getAbsolutePath      
+        
+        val angle = 180 * tbox.a / Math.PI
+
+        // TODO clip
+
+        s"vips similarity $croppedFile $rotatedFile --angle $angle" !
+        
+        rotatedTmp.file
+        
+      case _ => croppedTmp.file
+    }
+    
   }
 
 }
