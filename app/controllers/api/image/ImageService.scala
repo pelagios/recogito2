@@ -6,7 +6,7 @@ import models.document.DocumentInfo
 import models.generated.tables.records.DocumentFilepartRecord
 import play.api.libs.Files.TemporaryFile
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.language.postfixOps
+import scala.language.{ implicitConversions, postfixOps }
 import scala.util.Try
 import storage.Uploads
 import sys.process._
@@ -22,7 +22,11 @@ sealed trait ImageAnchor {
 
 case class PointAnchor(x: Int, y: Int) extends ImageAnchor {
   
-  val bounds = Bounds(x, y, 0, 0)
+  private val WIDTH = 120
+  
+  private val HEIGHT = 120
+  
+  val bounds = Bounds(x - WIDTH / 2, y - HEIGHT / 2, WIDTH, HEIGHT)
   
 }
 
@@ -34,8 +38,30 @@ case class RectAnchor(x: Int, y: Int, w: Int, h: Int) extends ImageAnchor {
 
 case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends ImageAnchor {
   
-  def bounds = ???
+  implicit def doubleToInt(d: Double) = d.toInt
   
+  val bounds = {
+    
+    def boundsQ1() = Bounds(
+      x - h * Math.sin(a),
+      y - l * Math.sin(a) - h * Math.cos(a),
+      l * Math.cos(a) + h * Math.sin(a),
+      l * Math.sin(a) + h * Math.cos(a))
+    
+    def boundsQ2() = ???
+    
+    def boundsQ3() = ???
+    
+    def boundsQ4() = ??? 
+    
+    a match {
+      case a if a >= 0 && a < Math.PI / 2 => boundsQ1
+      case a if a < Math.PI => boundsQ2
+      case a if a < 3 * Math.PI / 2 => boundsQ3
+      case _ => boundsQ4
+    }
+  }
+
 }
 
 object ImageAnchor {
@@ -47,14 +73,15 @@ object ImageAnchor {
       case "tbox"  => parseTiltedBoxAnchor(anchor)
     }
 
-  // point:1099,1018
+  // Example: point:1099,1018
   def parsePointAnchor(anchor: String): Option[PointAnchor] =
     Try(anchor.substring(6).split(',').map(_.toInt)) match {
       case Success(point) => Some(PointAnchor(point(0), point(1)))
       case _ => None
     }
 
-  // rect:x=3184,y=1131,w=905,h=938
+  // Example: rect:x=3184,y=1131,w=905,h=938
+  // TODO make robust against changes in arg order
   def parseRectAnchor(anchor: String): Option[RectAnchor] =
     Try(anchor.substring(5).split(',').map(_.substring(2).toInt)) match {
       case Success(values) =>
@@ -63,19 +90,20 @@ object ImageAnchor {
       case _ => None
     }
 
-  // tbox:x=3713,y=4544,a=0.39618258447890137,l=670,h=187
-  def parseTiltedBoxAnchor(anchor: String): Option[TiltedBoxAnchor] = ???
+  // Example: tbox:x=3713,y=4544,a=0.39618258447890137,l=670,h=187
+  // TODO make robust against changes in arg order
+  def parseTiltedBoxAnchor(anchor: String): Option[TiltedBoxAnchor] = 
+    Try(anchor.substring(5).split(',').map(_.substring(2))) match {
+      case Success(values) =>
+        Some(TiltedBoxAnchor(values(0).toInt, values(1).toInt, values(2).toDouble, values(3).toInt, values(4).toInt))
+      case _ => None
+    }
 
 }
 
 object ImageService {
 
   private val TMP = System.getProperty("java.io.tmpdir")
-  
-  // left = x - h * sin a
-  // top = y - l * sin a - h * cos a
-  // right = x + l * cos a
-  // bottom = y
 
   // vips crop egerton_ms_2855_f004r.tif cropped.tif 1000 500 300 150
   // vips similarity cropped.tif rot.tif --angle 30
