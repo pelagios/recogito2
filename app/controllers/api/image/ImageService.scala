@@ -7,7 +7,6 @@ import models.generated.tables.records.DocumentFilepartRecord
 import play.api.libs.Files.TemporaryFile
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.{ implicitConversions, postfixOps }
-import scala.util.Try
 import storage.Uploads
 import sys.process._
 import scala.util.Success
@@ -66,38 +65,43 @@ case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends Im
 
 object ImageAnchor {
 
-  def parse(anchor: String): Option[ImageAnchor] =
+  def parse(anchor: String): ImageAnchor =
     anchor.substring(0, anchor.indexOf(':')) match {
       case "point" => parsePointAnchor(anchor)
       case "rect"  => parseRectAnchor(anchor)
       case "tbox"  => parseTiltedBoxAnchor(anchor)
     }
+  
+  private def parseArgs(anchor: String) = 
+    anchor.substring(anchor.indexOf(':') + 1).split(',').map(arg =>
+      (arg.substring(0, arg.indexOf('=')) -> arg.substring(arg.indexOf('=') + 1))).toMap
 
-  // Example: point:1099,1018
-  def parsePointAnchor(anchor: String): Option[PointAnchor] =
-    Try(anchor.substring(6).split(',').map(_.toInt)) match {
-      case Success(point) => Some(PointAnchor(point(0), point(1)))
-      case _ => None
-    }
+  // Eg. point:1099,1018
+  def parsePointAnchor(anchor: String) = {
+    val args = anchor.substring(6).split(',').map(_.toInt)
+    PointAnchor(args(0), args(1))
+  }
 
-  // Example: rect:x=3184,y=1131,w=905,h=938
-  // TODO make robust against changes in arg order
-  def parseRectAnchor(anchor: String): Option[RectAnchor] =
-    Try(anchor.substring(5).split(',').map(_.substring(2).toInt)) match {
-      case Success(values) =>
-        Some(RectAnchor(values(0), values(1), values(2), values(3)))
-        
-      case _ => None
-    }
+  // Eg. rect:x=3184,y=1131,w=905,h=938
+  def parseRectAnchor(anchor: String) = {
+    val args = parseArgs(anchor)
+    RectAnchor(
+      args.get("x").get.toInt,
+      args.get("y").get.toInt,
+      args.get("w").get.toInt,
+      args.get("h").get.toInt)
+  }
 
-  // Example: tbox:x=3713,y=4544,a=0.39618258447890137,l=670,h=187
-  // TODO make robust against changes in arg order
-  def parseTiltedBoxAnchor(anchor: String): Option[TiltedBoxAnchor] = 
-    Try(anchor.substring(5).split(',').map(_.substring(2))) match {
-      case Success(values) =>
-        Some(TiltedBoxAnchor(values(0).toInt, values(1).toInt, values(2).toDouble, values(3).toInt, values(4).toInt))
-      case _ => None
-    }
+  // Eg. tbox:x=3713,y=4544,a=0.39618258447890137,l=670,h=187
+  def parseTiltedBoxAnchor(anchor: String) = {
+    val args = parseArgs(anchor)
+    TiltedBoxAnchor(
+      args.get("x").get.toInt,
+      args.get("y").get.toInt,
+      args.get("a").get.toDouble,
+      args.get("l").get.toInt,
+      args.get("h").get.toInt)
+  }
 
 }
 
@@ -115,7 +119,7 @@ object ImageService {
     val tmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".jpg"))
     val destFile = tmp.file.getAbsolutePath
     
-    val anchor = ImageAnchor.parse(annotation.anchor).get
+    val anchor = ImageAnchor.parse(annotation.anchor)
     val x = anchor.bounds.x
     val y = anchor.bounds.y
     val w = anchor.bounds.width
