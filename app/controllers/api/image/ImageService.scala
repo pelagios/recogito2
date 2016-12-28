@@ -14,8 +14,6 @@ object ImageService {
 
   private val TMP = System.getProperty("java.io.tmpdir")
 
-  // vips similarity cropped.tif rot.tif --angle 30
-
   def cutout(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation)(implicit uploads: Uploads, ctx: ExecutionContext) = Future {
     val dir = uploads.getDocumentDir(doc.ownerName, doc.id).get
     
@@ -38,12 +36,28 @@ object ImageService {
         val rotatedFile = rotatedTmp.file.getAbsolutePath      
         
         val angle = 180 * tbox.a / Math.PI
-
-        // TODO clip
-
+                
         s"vips similarity $croppedFile $rotatedFile --angle $angle" !
+
+        // TODO can rotate and crop happen in the same vips command?
+        val k = Math.sin(tbox.a) * Math.cos(tbox.a)
         
-        rotatedTmp.file
+        // TODO correct signs per quadrant!
+        val x = (tbox.h * k).toInt
+        val y = (tbox.l * k).toInt
+        
+        play.api.Logger.info("w=" + tbox.l)
+        play.api.Logger.info("h=" + tbox.h)
+
+        val clippedTmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".clip.jpg"))
+        val clippedFile = clippedTmp.file.getAbsolutePath
+        
+        val w = tbox.l
+        val h = tbox.h
+        
+        s"vips crop $rotatedFile $clippedFile $x $y $w $h" ! 
+        
+        clippedTmp.file
         
       case _ => croppedTmp.file
     }
