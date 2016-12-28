@@ -11,7 +11,7 @@ sealed trait ImageAnchor {
     val height = bottom - top
     
   }
-  
+    
   def bounds: Bounds
   
 }
@@ -79,11 +79,11 @@ case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends Im
         y + l * cosD)
     }
     
-    a match {
-      case a if a >= 0 && a < Math.PI / 2 => boundsQ1
-      case a if a >= 0 && a < Math.PI => boundsQ2
-      case a if a < - Math.PI / 2 => boundsQ3
-      case _ => boundsQ4
+    ImageAnchor.getQuadrant(a) match {
+      case ImageAnchor.QUADRANT_1 => boundsQ1
+      case ImageAnchor.QUADRANT_2 => boundsQ2
+      case ImageAnchor.QUADRANT_3 => boundsQ3
+      case ImageAnchor.QUADRANT_4 => boundsQ4
     }
   }
 
@@ -91,6 +91,19 @@ case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends Im
 
 object ImageAnchor {
 
+  sealed trait QUADRANT
+  case object QUADRANT_1 extends QUADRANT
+  case object QUADRANT_2 extends QUADRANT
+  case object QUADRANT_3 extends QUADRANT
+  case object QUADRANT_4 extends QUADRANT
+
+  def getQuadrant(rad: Double) = rad match {
+    case a if a >= 0 && a < Math.PI / 2 => QUADRANT_1
+    case a if a >= 0 && a < Math.PI => QUADRANT_2
+    case a if a < - Math.PI / 2 => QUADRANT_3
+    case _ => QUADRANT_4
+  }  
+  
   def parse(anchor: String): ImageAnchor =
     anchor.substring(0, anchor.indexOf(':')) match {
       case "point" => parsePointAnchor(anchor)

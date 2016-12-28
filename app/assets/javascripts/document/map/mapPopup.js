@@ -92,8 +92,9 @@ define([
               },
 
               createImageSnippet = function() {
-                // TODO in the future, we may have an image snippet (but not now)
-                return '';
+                return'<img src="' +
+                  jsRoutes.controllers.api.AnnotationAPIController
+                    .getImage(annotation.annotation_id).absoluteURL() + '">';
               },
 
               currentCard = element.find('.snippet-text .card').first(),

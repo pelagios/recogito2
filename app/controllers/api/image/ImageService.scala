@@ -43,12 +43,13 @@ object ImageService {
         val k = Math.sin(tbox.a) * Math.cos(tbox.a)
         
         // TODO correct signs per quadrant!
-        val x = (tbox.h * k).toInt
-        val y = (tbox.l * k).toInt
+        val (x, y) = ImageAnchor.getQuadrant(tbox.a) match {
+          case ImageAnchor.QUADRANT_1 | ImageAnchor.QUADRANT_3 =>
+            ((tbox.h * k).toInt, (tbox.l * k).toInt)
+          case _ =>
+            (Math.abs(tbox.l * k).toInt, Math.abs(tbox.h * k).toInt)
+        }
         
-        play.api.Logger.info("w=" + tbox.l)
-        play.api.Logger.info("h=" + tbox.h)
-
         val clippedTmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".clip.jpg"))
         val clippedFile = clippedTmp.file.getAbsolutePath
         
