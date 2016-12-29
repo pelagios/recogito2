@@ -70,13 +70,13 @@ case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends Im
     }
     
     def boundsQ4() = {
-      val sinD = Math.sin(Math.PI / 2 - a)
-      val cosD = Math.cos(Math.PI / 2 - a)
+      val sinD = Math.sin(Math.PI + a)
+      val cosD = Math.cos(Math.PI + a)
       Bounds(
-        x,
-        y - h * sinD,
-        x + h * cosD + l * sinD,
-        y + l * cosD)
+        x - l * cosD,
+        y,
+        x + h * sinD,
+        y + l * sinD + h * cosD)
     }
     
     ImageAnchor.getQuadrant(a) match {
@@ -100,7 +100,7 @@ object ImageAnchor {
   def getQuadrant(rad: Double) = rad match {
     case a if a >= 0 && a < Math.PI / 2 => QUADRANT_1
     case a if a >= 0 && a < Math.PI => QUADRANT_2
-    case a if a < - Math.PI / 2 => QUADRANT_3
+    case a if a < 0 && a > - Math.PI / 2 => QUADRANT_3
     case _ => QUADRANT_4
   }  
   

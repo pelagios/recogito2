@@ -27,35 +27,33 @@ object ImageService {
     val y = anchor.bounds.top
     val w = anchor.bounds.width
     val h = anchor.bounds.height
-
+    
     s"vips crop $sourceFile $croppedFile $x $y $w $h" ! 
     
     anchor match {
       case tbox: TiltedBoxAnchor =>    
         val rotatedTmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".rot.jpg"))
         val rotatedFile = rotatedTmp.file.getAbsolutePath      
-        
-        val angle = 180 * tbox.a / Math.PI
+        val angleDeg = 180 * tbox.a / Math.PI
                 
-        s"vips similarity $croppedFile $rotatedFile --angle $angle" !
+        s"vips similarity $croppedFile $rotatedFile --angle $angleDeg" !
 
         // TODO can rotate and crop happen in the same vips command?
-        val k = Math.sin(tbox.a) * Math.cos(tbox.a)
-        
-        // TODO correct signs per quadrant!
-        val (x, y) = ImageAnchor.getQuadrant(tbox.a) match {
-          case ImageAnchor.QUADRANT_1 | ImageAnchor.QUADRANT_3 =>
-            ((tbox.h * k).toInt, (tbox.l * k).toInt)
-          case _ =>
-            (Math.abs(tbox.l * k).toInt, Math.abs(tbox.h * k).toInt)
-        }
-        
         val clippedTmp = new TemporaryFile(new File(TMP, annotation.annotationId + ".clip.jpg"))
         val clippedFile = clippedTmp.file.getAbsolutePath
         
+        val a =  ImageAnchor.getQuadrant(tbox.a) match {
+          case ImageAnchor.QUADRANT_1 | ImageAnchor.QUADRANT_3 => tbox.a
+          case ImageAnchor.QUADRANT_2 => tbox.a - Math.PI / 2
+          case ImageAnchor.QUADRANT_4 => Math.PI / 2 - tbox.a
+        }
+
+        val k = Math.sin(a) * Math.cos(a)
+        val x = (tbox.h * k).toInt
+        val y = (tbox.l * k).toInt
         val w = tbox.l
         val h = tbox.h
-        
+                        
         s"vips crop $rotatedFile $clippedFile $x $y $w $h" ! 
         
         clippedTmp.file
