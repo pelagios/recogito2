@@ -49,8 +49,8 @@ object ImageService {
         }
 
         val k = Math.sin(a) * Math.cos(a)
-        val x = (tbox.h * k).toInt
-        val y = (tbox.l * k).toInt
+        val x = Math.abs(tbox.h * k).toInt
+        val y = Math.abs(tbox.l * k).toInt
         val w = tbox.l
         val h = tbox.h
                         
