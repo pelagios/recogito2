@@ -92,9 +92,9 @@ define([
               },
 
               createImageSnippet = function() {
-                return'<img src="' +
+                return'<div class="image-preview"><img src="' +
                   jsRoutes.controllers.api.AnnotationAPIController
-                    .getImage(annotation.annotation_id).absoluteURL() + '">';
+                    .getImage(annotation.annotation_id).absoluteURL() + '"></div>';
               },
 
               currentCard = element.find('.snippet-text .card').first(),
