@@ -28,6 +28,9 @@ object ImageService {
     val w = anchor.bounds.width
     val h = anchor.bounds.height
     
+    play.api.Logger.info(anchor.toString)
+    play.api.Logger.info(anchor.bounds.toString)
+    
     s"vips crop $sourceFile $croppedFile $x $y $w $h" ! 
     
     anchor match {
@@ -52,8 +55,10 @@ object ImageService {
         val x = Math.abs(tbox.h * k).toInt
         val y = Math.abs(tbox.l * k).toInt
         val w = tbox.l
-        val h = tbox.h
-                        
+        val h = Math.abs(tbox.h)
+        
+        play.api.Logger.info(s"vips crop $rotatedFile $clippedFile $x $y $w $h")
+        
         s"vips crop $rotatedFile $clippedFile $x $y $w $h" ! 
         
         clippedTmp.file

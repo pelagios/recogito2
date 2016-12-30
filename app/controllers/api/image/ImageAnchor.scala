@@ -28,7 +28,13 @@ case class PointAnchor(x: Int, y: Int) extends ImageAnchor {
 
 case class RectAnchor(x: Int, y: Int, w: Int, h: Int) extends ImageAnchor {
   
-  val bounds = Bounds(x, y, x + w, y + h)
+  val bounds = (w, h) match {
+    case (w, h) if w > 0 && h > 0 => Bounds(x, y, x + w, y + h)
+    case (w, h) if w < 0 && h > 0 => Bounds(x + w, y, x, y + h)
+    case (w, h) if w > 0 && h < 0 => Bounds(x, y + h, x + w, y)
+    case (w, h) if w < 0 && h < 0 => Bounds(x + w, y + h, x, y)
+  }
+
   
 }
 
@@ -39,45 +45,87 @@ case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends Im
   val bounds = {
     
     def boundsQ1() = { 
+      play.api.Logger.info("Q1")
+      
       val sinA = Math.sin(a)
       val cosA = Math.cos(a)
       
-      Bounds(
-        x - h * sinA,
-        y - l * sinA - h * cosA,
-        x + l * cosA,
-        y)
+      if (h > 0)
+        Bounds(
+          x - h * sinA,
+          y - l * sinA - h * cosA,
+          x + l * cosA,
+          y)
+      else
+        Bounds(
+          x,
+          y - l * sinA,
+          x + l * cosA - h * sinA,
+          y - h * cosA)
     }
     
     def boundsQ2() = {
-      val sinB = Math.sin(a - Math.PI / 2)
-      val cosB = Math.cos(a - Math.PI / 2)
-      Bounds(
-        x - l * sinB - h * cosB,
-        y - l * cosB,
-        x,
-        y + h * sinB)
+      play.api.Logger.info("Q2")
+      
+      val sinB = Math.sin(Math.PI - a)
+      val cosB = Math.cos(Math.PI - a)
+      
+      if (h > 0)
+        Bounds(
+          x - l * cosB,
+          y - l * sinB - h * cosB,
+          x + h * sinB,
+          y)
+      else
+        Bounds(
+          x - l * cosB + h * sinB,
+          y - l * sinB,
+          x,
+          y - h * cosB)
     }
     
-    def boundsQ3() = {
-      val sinG = Math.sin(a - Math.PI)
-      val cosG = Math.cos(a - Math.PI)
-      Bounds(
-        x - l * cosG,
-        y,
-        x + h * sinG,
-        y + l * sinG + h * cosG)
+    def boundsQ3() = {      
+      play.api.Logger.info("Q3")
+      
+      val sinG = Math.sin(Math.PI + a)
+      val cosG = Math.cos(Math.PI + a)
+      
+      if (h > 0)
+        Bounds(
+          x - l * cosG - h * sinG,
+          y - h * cosG,
+          x,
+          y + l * sinG)
+       else
+        Bounds(
+          x - l * cosG,
+          y,
+          x - h * sinG,
+          y + l * sinG - h * cosG)
     }
     
     def boundsQ4() = {
-      val sinD = Math.sin(Math.PI + a)
-      val cosD = Math.cos(Math.PI + a)
-      Bounds(
-        x - l * cosD,
-        y,
-        x + h * sinD,
-        y + l * sinD + h * cosD)
+      play.api.Logger.info("Q4")
+      
+      val sinD = Math.sin(-a)
+      val cosD = Math.cos(-a)
+      
+      if (h > 0)
+        Bounds(
+          x,
+          y - h * cosD,
+          x + l * cosD + h * sinD,
+          y + l * sinD)
+      else
+        Bounds(
+          x + h * sinD,
+          y,
+          x + l * cosD,
+          y + l * sinD - h * cosD)
     }
+    
+    play.api.Logger.info("angle=" + 180 * a / Math.PI)
+    play.api.Logger.info("h=" + h)
     
     ImageAnchor.getQuadrant(a) match {
       case ImageAnchor.QUADRANT_1 => boundsQ1
@@ -100,7 +148,7 @@ object ImageAnchor {
   def getQuadrant(rad: Double) = rad match {
     case a if a >= 0 && a < Math.PI / 2 => QUADRANT_1
     case a if a >= 0 && a < Math.PI => QUADRANT_2
-    case a if a < 0 && a > - Math.PI / 2 => QUADRANT_3
+    case a if a < 0 && a < - Math.PI / 2 => QUADRANT_3
     case _ => QUADRANT_4
   }  
   
