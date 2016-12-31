@@ -105,17 +105,20 @@ case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends Im
       
       if (h > 0)
         Bounds(
-          x - h * sinD,
-          y,
-          x + l * cosD,
-          y + l * sinD + h * cosD)
+          x,
+          y - h * cosD,
+          x + l * cosD + h * sinD,
+          y + l * sinD)
       else
         Bounds(
-          x,
-          y + h * cosD,
-          x + l * cosD - h * sinD,
-          y + l * sinD)
+          x + h * sinD,
+          y,
+          x + l * cosD,
+          y + l * sinD - h * cosD)
+
     }
+    
+    // play.api.Logger.info("a=" + 180 * a / Math.PI)
     
     ImageAnchor.getQuadrant(a) match {
       case ImageAnchor.QUADRANT_1 => boundsQ1
