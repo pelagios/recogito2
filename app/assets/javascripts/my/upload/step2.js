@@ -109,7 +109,7 @@ require(['common/config'], function(Config) {
         },
 
         registerIIIFSource = function(url) {
-          jsRoutes.controllers.my.upload.UploadController.storeFilepart(Config.owner).ajax({
+          jsRoutes.controllers.my.UploadController.storeFilepart(Config.owner).ajax({
             data: { iiif_source: url },
 
             success: function(result) {
@@ -118,7 +118,7 @@ require(['common/config'], function(Config) {
               preview.find('.dz-filename span').html(url);
               preview.find('.dz-upload').css('width', '100%');
               jQuery('#uploaded').append(preview);
-              
+
               refresh();
               jQuery('input.next').prop('disabled', false);
             }
