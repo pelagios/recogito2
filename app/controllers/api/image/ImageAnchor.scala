@@ -176,11 +176,11 @@ object ImageAnchor {
   def parseTiltedBoxAnchor(anchor: String) = {
     val args = parseArgs(anchor)
     TiltedBoxAnchor(
-      args.get("x").get.toInt,
-      args.get("y").get.toInt,
+      Math.round(args.get("x").get.toFloat),
+      Math.round(args.get("y").get.toFloat),
       args.get("a").get.toDouble,
-      args.get("l").get.toInt,
-      args.get("h").get.toInt)
+      Math.round(args.get("l").get.toFloat),
+      Math.round(args.get("h").get.toFloat))
   }
 
 }
