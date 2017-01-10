@@ -3,64 +3,44 @@ require.config({
   fileExclusionRegExp: /^lib$/
 });
 
-require(['common/config'], function(Config) {
+require([
+  'common/ui/modal',
+  'common/config'
+], function(Modal, Config) {
 
   var PartMetadataEditor = function(part) {
-    var element = jQuery(
-          '<div class="part-metadata-editor clicktrap">' +
-            '<div class="modal-wrapper">' +
-              '<div class="modal">' +
+    var self = this,
 
-                '<div class="modal-header">' +
-                  '<h2>' + part.title + '</h2>' +
-                  '<button class="nostyle outline-icon cancel">&#xe897;</button>' +
-                '</div>' +
+       form = jQuery(
+          '<form class="crud">' +
+            '<div class="error"></div>' +
+            '<dl id="part-title-field">' +
+              '<dt><label for="part-title">Title</label></dt>' +
+              '<dd>' +
+                '<input type="text" id="part-title" name="part-title" value="' + part.title + '" autocomplete="false">' +
+              '</dd>' +
+            '</dl>' +
 
-                '<div class="modal-body">' +
-                  '<form class="crud">' +
-                    '<div class="error"></div>' +
-                    '<dl id="part-title-field">' +
-                      '<dt><label for="part-title">Title</label></dt>' +
-                      '<dd>' +
-                        '<input type="text" id="part-title" name="part-title" value="' + part.title + '" autocomplete="false">' +
-                      '</dd>' +
-                    '</dl>' +
+            '<dl id="part-source-field">' +
+              '<dt><label for="part-source">Source</label></dt>' +
+              '<dd>' +
+                '<input type="text" id="part-source" name="part-source" autocomplete="false">' +
+              '</dd>' +
+            '</dl>' +
 
-                    '<dl id="part-source-field">' +
-                      '<dt><label for="part-source">Source</label></dt>' +
-                      '<dd>' +
-                        '<input type="text" id="part-source" name="part-source" autocomplete="false">' +
-                      '</dd>' +
-                    '</dl>' +
+            '<dt></dt>' +
+            '<button type="submit" class="btn">Save Changes</button>' +
+          '</form>'),
 
-                    '<dt></dt>' +
-                    '<button type="submit" class="btn">Save Changes</button>' +
-                  '</form>' +
-                '</div>' +
-              '</div>' +
-            '</div>' +
-          '</div>'),
-
-        form = element.find('form'),
-
-        errorMessage = element.find('.error'),
-
-        btnCancel = element.find('.cancel'),
+        errorMessage = form.find('.error'),
 
         init = function() {
           // Populate form
           if (part.source)
-            element.find('#part-source').attr('value', part.source);
+            form.find('#part-source').attr('value', part.source);
 
           // Form submit handler
           form.submit(onSubmit);
-
-          // 'X' icon click handler
-          btnCancel.click(destroy);
-
-          // Attach element to DOM and make draggable
-          jQuery(document.body).append(element);
-          element.find('.modal-wrapper').draggable({ handle: '.modal-header' });
         },
 
         getValue = function(selector) {
@@ -73,20 +53,19 @@ require(['common/config'], function(Config) {
           jsRoutes.controllers.document.settings.SettingsController.updateFilepartMetadata(Config.documentId, part.id).ajax({
             data: { title: getValue('#part-title'), source: getValue('#part-source') }
           }).success(function() {
-            destroy();
+            self.destroy();
             window.location.reload(true);
           }).fail(function(error) {
             errorMessage.html(error.responseText);
           });
           return false;
-        },
-
-        destroy = function() {
-          element.remove();
         };
 
     init();
+
+    Modal.apply(this, [ 'Place Annotation', form ]);
   };
+  PartMetadataEditor.prototype = Object.create(Modal.prototype);
 
   jQuery(document).ready(function() {
 

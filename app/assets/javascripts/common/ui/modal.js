@@ -1,8 +1,9 @@
 define([], function() {
 
-  var BaseBulkEditor = function(title, body) {
+  var Modal = function(title, body) {
+    
     var element = jQuery(
-          '<div class="bulk-annotation-editor clicktrap">' +
+          '<div class="modal-clicktrap">' +
             '<div class="modal-wrapper">' +
               '<div class="modal">' +
                 '<div class="modal-header">' +
@@ -31,8 +32,10 @@ define([], function() {
         };
 
     init();
+
+    this.destroy = destroy;
   };
 
-  return BaseBulkEditor;
+  return Modal;
 
 });

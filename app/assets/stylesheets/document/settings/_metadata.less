@@ -1,32 +1,27 @@
-@import "../_modal.less";
+@import "../../_modal.less";
 
-.part-metadata-editor {
+.modal-wrapper {
+  width:560px;
+}
 
-  .modal-wrapper {
-    width:560px;
+.modal {
+  top:40%;
+  bottom:40%;
+  height:270px;
+  overflow:hidden;
+
+  .modal-header {
+    background-color:@blueish-white;
   }
 
-  .modal {
-    top:40%;
-    bottom:40%;
-    height:270px;
-    overflow:hidden;
+  .modal-body {
+    padding-top:30px;
+  }
 
-    .modal-header {
-      background-color:@blueish-white;
-    }
-
-    .modal-body {
-      padding-top:30px;
-    }
-
-    .error {
-      text-align:center;
-      color:@red-type;
-      font-size:15px;
-
-    }
-
+  .error {
+    text-align:center;
+    color:@red-type;
+    font-size:15px;
   }
 
 }

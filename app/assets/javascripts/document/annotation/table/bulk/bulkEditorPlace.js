@@ -1,9 +1,10 @@
 define([
-  'common/config',
-  'document/annotation/table/bulk/bulkEditorBase'
-], function(Config, BaseBulkEditor) {
+  'common/ui/modal',
+  'common/config'
+], function(Modal, Config) {
 
   var PlaceBulkEditor = function(metadata) {
+
     var options =
           '<option></option>' +
           metadata.fields.map(function(name, idx) {
@@ -74,9 +75,9 @@ define([
 
     form.submit(onSubmit);
 
-    BaseBulkEditor.apply(this, [ 'Place Annotation', form ]);
+    Modal.apply(this, [ 'Place Annotation', form ]);
   };
-  PlaceBulkEditor.prototype = Object.create(BaseBulkEditor.prototype);
+  PlaceBulkEditor.prototype = Object.create(Modal.prototype);
 
   return PlaceBulkEditor;
 
