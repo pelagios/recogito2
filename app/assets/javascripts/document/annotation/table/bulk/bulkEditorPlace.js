@@ -5,7 +5,9 @@ define([
 
   var PlaceBulkEditor = function(metadata) {
 
-    var options =
+    var self = this,
+
+        options =
           '<option></option>' +
           metadata.fields.map(function(name, idx) {
             return '<option value="' + idx + '">' + name + '</option>';
@@ -27,10 +29,13 @@ define([
               '<dt><label for="lon-column">Longitude column</label></dt>' +
               '<dd><select>' + options + '</select></dd>' +
             '</dl>' +
-
-            '<button type="submit" class="btn">Go</button>' +
-            '<button class="btn outline">Cancel</button>' +
+            '<div class="buttons">' +
+              '<button type="submit" class="btn">Go</button>' +
+              '<button class="btn outline cancel">Cancel</button>' +
+            '</div>' +
           '</form>'),
+
+        btnCancel = form.find('button.cancel'),
 
         onSubmit = function() {
           var undefinedIfEmpty = function(str) {
@@ -71,9 +76,15 @@ define([
 
           return false;
 
+        },
+
+        onCancel = function() {
+          self.destroy();
+          return false;
         };
 
     form.submit(onSubmit);
+    btnCancel.click(onCancel);
 
     Modal.apply(this, [ 'Place Annotation', form ]);
   };
