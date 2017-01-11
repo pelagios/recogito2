@@ -31,7 +31,7 @@ object TaskStatus extends Enumeration {
 class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) extends BaseService {
   
   def findById(uuid: UUID) = db.query { sql =>
-    sql.selectFrom(TASK).where(TASK.ID.equal(uuid)).fetchOne()
+    Option(sql.selectFrom(TASK).where(TASK.ID.equal(uuid)).fetchOne())
   }
   
   def findByDocument(documentId: String) = db.query { sql =>

@@ -1,7 +1,7 @@
-define([], function() {
+define(['common/hasEvents'], function(HasEvents) {
 
-  var Modal = function(title, body) {
-    
+  var Modal = function(title, body, opt_cssClass) {
+
     var element = jQuery(
           '<div class="modal-clicktrap">' +
             '<div class="modal-wrapper">' +
@@ -18,13 +18,11 @@ define([], function() {
         btnCancel = element.find('.cancel'),
 
         init = function() {
-          // 'X' icon click handler
+          element.find('.modal-body').append(body);
           btnCancel.click(destroy);
 
-          // Attach element to DOM and make draggable
-          jQuery(document.body).append(element);
-          element.find('.modal-body').append(body);
-          element.find('.modal-wrapper').draggable({ handle: '.modal-header' });
+          if (opt_cssClass)
+            element.find('.modal').addClass(opt_cssClass);
         },
 
         destroy = function() {
@@ -33,7 +31,18 @@ define([], function() {
 
     init();
 
+    this.element = element;
     this.destroy = destroy;
+
+    HasEvents.apply(this);
+  };
+  Modal.prototype = Object.create(HasEvents.prototype);
+
+  Modal.prototype.open = function() {
+    if (!jQuery.contains(document, this.element[0])) {
+      jQuery(document.body).append(this.element);
+      this.element.find('.modal-wrapper').draggable({ handle: '.modal-header' });
+    }
   };
 
   return Modal;

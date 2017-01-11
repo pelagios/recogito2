@@ -64,6 +64,8 @@ require([
     init();
 
     Modal.apply(this, [ 'Place Annotation', form ]);
+
+    self.open();
   };
   PartMetadataEditor.prototype = Object.create(Modal.prototype);
 

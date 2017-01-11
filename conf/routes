@@ -117,7 +117,7 @@ GET     /api/stats                                   controllers.api.StatsAPICon
 GET     /api/user                                    controllers.api.UserAPIController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 
 POST    /api/task                                    controllers.api.TaskAPIController.spawnTask
-GET     /api/task/:id                                controllers.api.TaskAPIController.queryProgress(id: java.util.UUID)
+GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings

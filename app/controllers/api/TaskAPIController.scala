@@ -5,7 +5,7 @@ import controllers.{ BaseAuthController, HasPrettyPrintJSON }
 import java.util.UUID
 import javax.inject.Inject
 import models.document.{ DocumentInfo, DocumentService }
-import models.task.TaskType
+import models.task.{ TaskType, TaskService, TaskRecordAggregate }
 import models.user.UserService
 import models.user.Roles._
 import play.api.Configuration
@@ -43,6 +43,7 @@ class TaskAPIController @Inject() (
     val documents: DocumentService,
     val users: UserService,
     val georesolution: GeoresolutionService,
+    val tasks: TaskService,
     implicit val system: ActorSystem,
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON {
@@ -69,9 +70,21 @@ class TaskAPIController @Inject() (
       case None => Future.successful(BadRequest(Json.parse("{ \"error\": \"missing task definition\" }")))
     }
   }
-  
-  def queryProgress(id: UUID) = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Ok
+    
+  def progressByDocument(id: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
+    documents.getExtendedInfo(id, Some(loggedIn.user.getUsername)).flatMap(_ match {
+      case Some((doc, accesslevel)) =>
+        if (accesslevel.canRead) {
+          tasks.findByDocument(id).map {
+            case Some(taskRecord) => jsonOk(Json.toJson(taskRecord))
+            case None => NotFound
+          }
+        } else {
+          Future.successful(Forbidden)
+        }
+        
+      case None => Future.successful(NotFound)
+    })
   }
   
 }

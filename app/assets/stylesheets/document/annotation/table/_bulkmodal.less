@@ -1,25 +1,58 @@
-.modal {
+@import "../../../_meter.less";
+
+.modal.wizard {
   height:330px;
+
+  .modal-body {
+    padding:30px;
+    text-align:center;
+
+    form.crud {
+
+      dt {
+        width:140px;
+        padding-right:10px;
+      }
+
+      .buttons {
+        padding-top:20px;
+        padding-left:135px;
+      }
+
+      button {
+        width:140px;
+      }
+
+    }
+
+  }
+
 }
 
-.modal-body {
-  padding:30px;
-  text-align:center;
+.modal.progress {
+  height:150px;
+  width:400px;
 
-  form.crud {
+  .cancel {
+    display:none;
+  }
 
-    dt {
-      width:140px;
-      padding-right:10px;
-    }
+  .modal-body {
+    padding:15px;
+    text-align:center;
 
-    .buttons {
-      padding-top:20px;
-      padding-left:135px;
-    }
+    p { margin:0 0 10px 0; }
 
-    button {
-      width:140px;
+    .meter {
+      height:18px;
+      width:340px;
+      margin:0 auto;
+      background-color:@blueish-white;
+
+      .bar {
+        background-color:@ocean;
+      }
+
     }
 
   }
