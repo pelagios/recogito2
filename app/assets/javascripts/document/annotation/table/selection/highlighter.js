@@ -21,7 +21,7 @@ define([
 
           row.__annotation = annotation;
           annotationIndex[annotation.annotation_id] = rowIdx;
-          dataView.updateItem(rowIdx, row);
+          dataView.updateItem(row.id, row);
         },
 
         initPage = function(annotations) {
