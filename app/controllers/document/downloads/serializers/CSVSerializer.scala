@@ -127,8 +127,7 @@ trait CSVSerializer extends BaseSerializer {
           val delimiter = guessDelimiter(header)        
           val headerFields = 
             header.asCsvReader[Seq[String]](delimiter, header = false).toIterator.next.get ++
-            // Additional columns added by Recogito
-            Seq(
+            Seq( // Additional columns added by Recogito
               "recogito_type",
               "recogito_uri",
               "recogito_lat",
