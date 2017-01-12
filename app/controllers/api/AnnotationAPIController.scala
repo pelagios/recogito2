@@ -2,6 +2,7 @@ package controllers.api
 
 import controllers._
 import controllers.api.image.ImageService
+import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.OptionalAuthElement
@@ -10,7 +11,7 @@ import models.annotation._
 import models.contribution._
 import models.document.{ DocumentService, DocumentInfo }
 import models.user.UserService
-import models.generated.tables.records.DocumentRecord
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.{ Configuration, Logger }
 import play.api.mvc.{ AnyContent, Request, Result }
@@ -103,7 +104,8 @@ class AnnotationAPIController @Inject() (
       with OptionalAuthElement
       with HasAnnotationValidation
       with HasPrettyPrintJSON
-      with HasTextSnippets {
+      with HasTextSnippets 
+      with HasCSVParsing {
 
   def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
 
@@ -198,30 +200,6 @@ class AnnotationAPIController @Inject() (
     }
   }
 
-  private def getTextAnnotationWithContext(doc: DocumentInfo, annotation: Annotation)(implicit request: Request[AnyContent]) = {
-    doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
-      case Some(part) => uploads.readTextfile(doc.ownerName, doc.id, part.getFile) map {
-          case Some(text) =>
-            val snippet = extractTextSnippet(text, annotation)
-            jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)))
-
-          case None =>
-            Logger.warn("No text content found for filepart " + annotation.annotates.filepartId)
-            InternalServerError
-        }
-
-      case None =>
-        // Annotation referenced a part ID that's not in the database
-        Logger.error("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
-        Future.successful(InternalServerError)
-      }
-  }
-
-  /** This may get more sophisticated in the future and include a URL to a clipped and rotated image snippet **/
-  private def getImageAnnotationWithContext(doc: DocumentInfo, annotation: Annotation)(implicit request: Request[AnyContent]) = {
-    Future.successful(jsonOk(Json.toJson(annotation)))
-  }
-
   def getImage(id: UUID) = AsyncStack { implicit request =>    
     val username = loggedIn.map(_.user.getUsername)
     
@@ -255,26 +233,57 @@ class AnnotationAPIController @Inject() (
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
+    
+    def getTextContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = 
+      uploads.readTextfile(doc.ownerName, doc.id, part.getFile) map {
+        case Some(text) =>
+          val snippet = extractTextSnippet(text, annotation)
+          Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)
+
+        case None =>
+          Logger.warn("No text content found for filepart " + annotation.annotates.filepartId)
+          JsNull
+      }
+    
+    def getDataContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = {
+      uploads.getDocumentDir(doc.ownerName, doc.id).map { dir =>
+        extractLine(new File(dir, part.getFile), annotation.anchor.substring(4).toInt).map(snippet => Json.toJson(snippet)) 
+      } getOrElse {
+        Logger.warn("No file content found for filepart " + annotation.annotates.filepartId)
+        Future.successful(JsNull)
+      }
+    }
+    
+    def getContext(doc: DocumentInfo, annotation: Annotation): Future[JsValue] = annotation.annotates.contentType match {
+      case t if t.isImage => Future.successful(JsNull)
+      
+      case t if t.isText | t.isData => doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
+        case Some(part) =>
+          if (t.isText) getTextContext(doc, part, annotation)
+          else getDataContext(doc, part, annotation)
+  
+        case None =>
+          // Annotation referenced a part ID that's not in the database
+          Logger.error("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
+          Future.successful(JsNull)
+      }
+
+      case _ =>
+        Logger.error("Annotation indicates unsupported content type " + annotation.annotates.contentType)
+        Future.successful(JsNull)
+    }
+        
     annotations.findById(id).flatMap {
       case Some((annotation, _)) => {
-
-        if (includeContext) {
+        if (includeContext) {          
           documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
             case Some((doc, accesslevel)) =>
-              if (accesslevel.canRead) {
-                val contentType = annotation.annotates.contentType
-                if (contentType.isText) {
-                  getTextAnnotationWithContext(doc, annotation)
-                } else if (contentType.isImage) {
-                  getImageAnnotationWithContext(doc, annotation)
-                } else {
-                  Logger.error("Annotation indicates unsupported content type " + annotation.annotates.contentType)
-                  Future.successful(InternalServerError)
-                }
-              } else {
+              if (accesslevel.canRead)
+                getContext(doc, annotation).map(context =>
+                  jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> context)))
+              else
                 Future.successful(ForbiddenPage)
-              }
-
+              
             case _ =>
               Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
               Future.successful(NotFoundPage)

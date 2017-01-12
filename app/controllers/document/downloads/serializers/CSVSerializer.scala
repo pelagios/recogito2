@@ -14,8 +14,9 @@ import storage.Uploads
 import models.ContentType
 import scala.io.Source
 import models.generated.tables.records.DocumentFilepartRecord
+import controllers.HasCSVParsing
 
-trait CSVSerializer extends BaseSerializer {
+trait CSVSerializer extends BaseSerializer with HasCSVParsing {
 
   private val EMPTY     = ""
   
@@ -123,18 +124,6 @@ trait CSVSerializer extends BaseSerializer {
     
     f.map { case (annotations, places) =>
       scala.concurrent.blocking {
-           
-        def guessDelimiter(line: String): Char = {
-          // This test is pretty trivial but seems to be applied elsewhere (see e.g.
-          // http://stackoverflow.com/questions/14693929/ruby-how-can-i-detect-intelligently-guess-the-delimiter-used-in-a-csv-file)
-          // Simply count the most-used candidate
-          val choices = Seq(',', ';', '\t', '|')
-          val ranked = choices
-            .map(char => (char, line.count(_ == char)))
-            .sortBy(_._2).reverse
-            
-          ranked.head._1
-        }
         
         def extendRow(row: List[String], index: Int): List[String] = {
           val anchor = "row:" + index

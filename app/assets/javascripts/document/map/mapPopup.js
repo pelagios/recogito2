@@ -97,6 +97,11 @@ define([
                     .getImage(annotation.annotation_id).absoluteURL() + '"></div>';
               },
 
+              createDataSnippet = function() {
+                console.log('data');
+                return '<table class="data-preview"></table>';
+              },
+
               currentCard = element.find('.snippet-text .card').first(),
 
               label = (currentAnnotationIdx + 1) + ' OF ' + annotations.length + ' ANNOTATIONS',
@@ -105,8 +110,11 @@ define([
                 'JUMP TO IMAGE' :
                 'JUMP TO TEXT',
 
-              snippet = (annotation.annotates.content_type.indexOf('TEXT') >= 0) ?
-                createTextSnippet() : createImageSnippet(),
+              snippet =
+                (annotation.annotates.content_type.indexOf('TEXT') >= 0) ?
+                  createTextSnippet() :
+                ((annotation.annotates.content_type.indexOf('IMAGE') >= 0) ?
+                  createImageSnippet() : createDataSnippet),
 
               newCard, moveCurrentTo;
 
