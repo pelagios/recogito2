@@ -55,7 +55,7 @@ define([
 
               onStopped = function(result) {
                 progressModal.destroy();
-                 location.reload(true);
+                location.reload(true);
               };
 
           progressModal.on('stopped', onStopped);

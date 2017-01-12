@@ -1,22 +1,27 @@
-define([
-  'common/ui/modal'
-], function(Modal) {
+define(['common/hasEvents'], function(HasEvents) {
 
-  var QUERY_INTERVAL_MS = 1000;
+  var POLL_INTERVAL_MS = 1000;
 
   var ProgressModal = function(documentId) {
     var self = this,
 
-        body = jQuery(
-          '<div>' +
-            '<p class="label">0%</p>' +
-            '<div class="meter">' +
-              '<div class="bar rounded" style="width:0"></div>' +
+        element = jQuery(
+          '<div class="modal-clicktrap">' +
+            '<div class="modal-wrapper">' +
+              '<div class="modal progress">' +
+                '<div class="modal-body">' +
+                  '<p class="label">0%</p>' +
+                  '<div class="meter">' +
+                    '<div class="bar rounded" style="width:0"></div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
             '</div>' +
           '</div>'),
 
-        label = body.find('.label'),
-        bar = body.find('.bar'),
+        label = element.find('.label'),
+
+        bar = element.find('.bar'),
 
         updateProgress = function(response) {
           var p = response.progress + '%';
@@ -34,14 +39,14 @@ define([
                 if (isStopped)
                   self.fireEvent('stopped', response);
                 else
-                  window.setTimeout(queryProgress, QUERY_INTERVAL_MS);
+                  window.setTimeout(queryProgress, POLL_INTERVAL_MS);
               },
 
               onFail = function(error) {
                 var isNotFound = error.status === 404;
                 if (isNotFound && retriesLeft > 0) {
                   retriesLeft -= 1;
-                  window.setTimeout(query, QUERY_INTERVAL_MS);
+                  window.setTimeout(query, POLL_INTERVAL_MS);
                 } else {
                   // TODO error popup
                   console.log(error);
@@ -55,19 +60,24 @@ define([
               };
 
           query();
+        },
+
+        open = function() {
+          jQuery(document.body).append(element);
+          element.find('.modal-wrapper').draggable({ handle: '.modal-header' });
+          queryProgress();
+        },
+
+        destroy = function() {
+          element.remove();
         };
 
-    this.queryProgress = queryProgress;
+    this.open = open;
+    this.destroy = destroy;
 
-    Modal.apply(this, [ 'Progress', body, 'progress' ]);
+    HasEvents.apply(this);
   };
-  ProgressModal.prototype = Object.create(Modal.prototype);
-
-  /** Extends the open method provided by base Modal **/
-  ProgressModal.prototype.open = function() {
-    Modal.prototype.open.call(this);
-    this.queryProgress();
-  };
+  ProgressModal.prototype = Object.create(HasEvents.prototype);
 
   return ProgressModal;
 
