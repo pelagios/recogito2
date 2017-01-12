@@ -4,33 +4,44 @@ require.config({
 });
 
 require([
-  'common/ui/modal',
   'common/config'
-], function(Modal, Config) {
+], function(Config) {
 
   var PartMetadataEditor = function(part) {
-    var self = this,
+    var element = jQuery(
+          '<div class="modal-clicktrap">' +
+            '<div class="modal-wrapper">' +
+              '<div class="modal">' +
+                '<div class="modal-header">' +
+                  '<h2>' + part.title + '</h2>' +
+                  '<button class="nostyle outline-icon cancel">&#xe897;</button>' +
+                '</div>' +
+                '<div class="modal-body">' +
+                  '<form class="crud">' +
+                    '<div class="error"></div>' +
+                    '<dl id="part-title-field">' +
+                      '<dt><label for="part-title">Title</label></dt>' +
+                      '<dd>' +
+                        '<input type="text" id="part-title" name="part-title" value="' + part.title + '" autocomplete="false">' +
+                      '</dd>' +
+                    '</dl>' +
 
-       form = jQuery(
-          '<form class="crud">' +
-            '<div class="error"></div>' +
-            '<dl id="part-title-field">' +
-              '<dt><label for="part-title">Title</label></dt>' +
-              '<dd>' +
-                '<input type="text" id="part-title" name="part-title" value="' + part.title + '" autocomplete="false">' +
-              '</dd>' +
-            '</dl>' +
+                    '<dl id="part-source-field">' +
+                      '<dt><label for="part-source">Source</label></dt>' +
+                      '<dd>' +
+                        '<input type="text" id="part-source" name="part-source" autocomplete="false">' +
+                      '</dd>' +
+                    '</dl>' +
 
-            '<dl id="part-source-field">' +
-              '<dt><label for="part-source">Source</label></dt>' +
-              '<dd>' +
-                '<input type="text" id="part-source" name="part-source" autocomplete="false">' +
-              '</dd>' +
-            '</dl>' +
+                    '<dt></dt>' +
+                    '<button type="submit" class="btn">Save Changes</button>' +
+                  '</form>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>'),
 
-            '<dt></dt>' +
-            '<button type="submit" class="btn">Save Changes</button>' +
-          '</form>'),
+        form = element.find('form'),
 
         errorMessage = form.find('.error'),
 
@@ -39,8 +50,16 @@ require([
           if (part.source)
             form.find('#part-source').attr('value', part.source);
 
-          // Form submit handler
           form.submit(onSubmit);
+
+          element.find('.cancel').click(destroy);
+
+          jQuery(document.body).append(element);
+          element.find('.modal-wrapper').draggable({ handle: '.modal-header' });
+        },
+
+        destroy = function() {
+          element.remove();
         },
 
         getValue = function(selector) {
@@ -53,7 +72,7 @@ require([
           jsRoutes.controllers.document.settings.SettingsController.updateFilepartMetadata(Config.documentId, part.id).ajax({
             data: { title: getValue('#part-title'), source: getValue('#part-source') }
           }).success(function() {
-            self.destroy();
+            destroy();
             window.location.reload(true);
           }).fail(function(error) {
             errorMessage.html(error.responseText);
@@ -62,12 +81,7 @@ require([
         };
 
     init();
-
-    Modal.apply(this, [ 'Place Annotation', form ]);
-
-    self.open();
   };
-  PartMetadataEditor.prototype = Object.create(Modal.prototype);
 
   jQuery(document).ready(function() {
 
