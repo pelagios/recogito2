@@ -55,8 +55,8 @@ class DownloadsController @Inject() (
   def downloadCSV(documentId: String, exportTables: Boolean) = AsyncStack { implicit request =>
     if (exportTables) {
       download(documentId, { doc =>
-        tablesToZIP(doc).map { zip =>
-          Ok.sendFile(zip).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
+        exportMergedTables(doc).map { case (file, filename) =>
+          Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + filename })
         }
       })
     } else {

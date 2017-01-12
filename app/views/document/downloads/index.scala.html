@@ -101,15 +101,27 @@
           } else { @if(doc.fileparts.exists(_.getContentType.startsWith("DATA"))) {
             <ul>
               <li>
-                <div class="description">
-                  <h3>Merged CSV</h3>
-                  <p>
-                    Your original spreadsheet, with Recogito's additional data appended as extra columns.
-                  </p>
-                </div>
-                <div class="button-container">
-                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
-                </div>
+                @if(doc.fileparts.filter(_.getContentType.startsWith("DATA")).size == 1) {
+                  <div class="description">
+                    <h3>Merged CSV</h3>
+                    <p>
+                      Your original spreadsheet, with Recogito's additional data appended as extra columns.
+                    </p>
+                  </div>
+                  <div class="button-container">
+                    <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
+                  </div>
+                } else {
+                  <div class="description">
+                    <h3>Merged CSVs</h3>
+                    <p>
+                      Your original spreadsheets, with Recogito's additional data appended as extra columns, packaged in a Zip file.
+                    </p>
+                  </div>
+                  <div class="button-container">
+                    <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> ZIP</a>
+                  </div>
+                }
               </li>
             </ul>
           } else {

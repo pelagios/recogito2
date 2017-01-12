@@ -1,7 +1,8 @@
 package controllers.document.downloads.serializers
 
-import java.io.File
+import java.io.{ BufferedInputStream, File, FileInputStream, FileOutputStream }
 import java.util.UUID
+import java.util.zip.{ ZipEntry, ZipOutputStream }
 import kantan.csv.ops._
 import kantan.codecs.Result.Success
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
@@ -12,6 +13,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 import storage.Uploads
 import models.ContentType
 import scala.io.Source
+import models.generated.tables.records.DocumentFilepartRecord
 
 trait CSVSerializer extends BaseSerializer {
 
@@ -77,7 +79,40 @@ trait CSVSerializer extends BaseSerializer {
   }
   
   /** Exports a ZIP of user-uploaded tables, with annotation info merged into the original CSVs **/ 
-  def tablesToZIP(doc: DocumentInfo)(implicit annotationService: AnnotationService, placeService: PlaceService, uploads: Uploads, ctx: ExecutionContext) = {
+  def exportMergedTables(
+    doc: DocumentInfo
+  )(
+    implicit annotationService: AnnotationService, 
+      placeService: PlaceService,
+      uploads: Uploads,
+      ctx: ExecutionContext): Future[(File, String)] = {
+    
+    def createZip(parts: Seq[(DocumentFilepartRecord, File)]): File = {
+      val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".zip"))
+      val zip = new ZipOutputStream(new FileOutputStream(tmp.file))
+      
+      parts.foreach { case (part, file) =>
+        val filename = 
+          if (part.getTitle.endsWith(".csv")) part.getTitle
+          else part.getTitle + ".csv"
+          
+        zip.putNextEntry(new ZipEntry(filename))
+        val in = new BufferedInputStream(new FileInputStream(file))
+        
+        var b = in.read()
+        while (b > -1) {
+          zip.write(b)
+          b = in.read()
+        }
+        
+        in.close()
+        zip.closeEntry()
+      }
+      
+      zip.close()
+      tmp.file
+    }
+    
     val fAnnotations = annotationService.findByDocId(doc.id)
     val fPlaces = placeService.listPlacesInDocument(doc.id)
 
@@ -120,10 +155,10 @@ trait CSVSerializer extends BaseSerializer {
         val tables =
           doc.fileparts
             .withFilter(part => ContentType.withName(part.getContentType).map(_.isData).getOrElse(false))
-            .map(part => new File(documentDir, part.getFile))
+            .map(part => (part, new File(documentDir, part.getFile)))
             
-        val outputFiles = tables.map { table =>   
-          val header = Source.fromFile(table).getLines.next
+        val outputFiles = tables.map { case (part, file) =>   
+          val header = Source.fromFile(file).getLines.next
           val delimiter = guessDelimiter(header)        
           val headerFields = 
             header.asCsvReader[Seq[String]](delimiter, header = false).toIterator.next.get ++
@@ -138,7 +173,7 @@ trait CSVSerializer extends BaseSerializer {
           
           var rowCounter = 0
   
-          val extendedRows = table.asCsvReader[List[String]](delimiter, header = true).map {
+          val extendedRows = file.asCsvReader[List[String]](delimiter, header = true).map {
             case Success(row) =>
               val extendedRow = extendRow(row, rowCounter)
               rowCounter += 1
@@ -152,10 +187,18 @@ trait CSVSerializer extends BaseSerializer {
           extendedRows.foreach(row => writer.write(row))
           writer.close()
           
-          tmp.file
+          (part, tmp.file)
         }
-      
-        outputFiles.head
+        
+        if (outputFiles.isEmpty)
+          // Can't ever happen from the UI
+          throw new RuntimeException("Attempt to export merged table from a non-table document")
+        else if (outputFiles.size == 1)
+          // Single table - export CSV directly
+          (outputFiles.head._2, doc.id + ".csv")
+        else
+          // Multiple tables - package into a Zip
+          (createZip(outputFiles), doc.id + ".zip")
       }
     }
   }
