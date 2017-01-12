@@ -47,5 +47,11 @@ trait BaseSerializer {
     import AnnotationBody._
     a.bodies.find(b => b.hasType == PERSON || b.hasType == PLACE )
   }
+  
+  protected def getCommentBodies(a: Annotation): Seq[AnnotationBody] =
+    a.bodies.filter(_.hasType == AnnotationBody.COMMENT)
+    
+  protected def getTagBodies(a: Annotation): Seq[AnnotationBody] =
+    a.bodies.filter(_.hasType == AnnotationBody.TAG)
 
 }

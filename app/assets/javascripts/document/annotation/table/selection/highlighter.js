@@ -25,9 +25,7 @@ define([
         },
 
         initPage = function(annotations) {
-          jQuery.each(annotations, function(idx, annotation) {
-            bindAnnotation(annotation);
-          });
+          annotations.forEach(bindAnnotation);
         },
 
         removeAnnotation = function(annotation) {

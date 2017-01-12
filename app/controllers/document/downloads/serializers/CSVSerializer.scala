@@ -25,16 +25,21 @@ trait CSVSerializer extends BaseSerializer {
         else if (a.annotates.contentType.isImage)
           getFirstTranscription(a)
         else None
+        
+      val placeTypes = maybePlace.map(_.placeTypes.map(_._1).mkString(","))
 
       Seq(a.annotationId.toString,
           quoteOrTranscription.getOrElse(EMPTY),
           a.anchor,
           firstEntity.map(_.hasType.toString).getOrElse(EMPTY),
           firstEntity.flatMap(_.uri).getOrElse(EMPTY),
-          maybePlace.map(_.titles.mkString(",")).getOrElse(EMPTY),
+          maybePlace.map(_.titles.mkString("|")).getOrElse(EMPTY),
           maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(EMPTY),
           maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY),
-          firstEntity.flatMap(_.status.map(_.value.toString)).getOrElse(EMPTY))
+          maybePlace.map(_.placeTypes.map(_._1).mkString(",")).getOrElse(EMPTY),
+          firstEntity.flatMap(_.status.map(_.value.toString)).getOrElse(EMPTY),
+          getTagBodies(a).flatMap(_.value).mkString("|"),
+          getCommentBodies(a).flatMap(_.value).mkString("|"))
     }
 
     // This way, futures start immediately, in parallel
@@ -49,7 +54,7 @@ trait CSVSerializer extends BaseSerializer {
 
     f.map { case (annotations, places) =>
       scala.concurrent.blocking {
-        val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "VERIFICATION_STATUS")
+        val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
         
         val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".csv"))
         val writer = tmp.file.asCsvWriter[Seq[String]](';', header)
@@ -62,5 +67,7 @@ trait CSVSerializer extends BaseSerializer {
       }
     }
   }
+  
+  
 
 }
