@@ -88,7 +88,7 @@
                 <div class="description">
                   <h3>TEI</h3>
                   <p>
-                    The annotated text in a basic TEI/XML serialization. Note: only place name annotations
+                    Annotated text in a basic TEI/XML serialization. Note: only place name annotations
                     are included at the moment. Also, overlapping annotations are filtered out as TEI does
                     not support them.
                   </p>
@@ -98,9 +98,23 @@
                 </div>
               </li>
             </ul>
+          } else { @if(doc.fileparts.exists(_.getContentType.startsWith("DATA"))) {
+            <ul>
+              <li>
+                <div class="description">
+                  <h3>Merged CSV</h3>
+                  <p>
+                    Your original spreadsheet, with Recogito's additional data appended as extra columns.
+                  </p>
+                </div>
+                <div class="button-container">
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
+                </div>
+              </li>
+            </ul>
           } else {
             <p class="no-options">No download options available</p>
-          }
+          }}
         </div>
       </div>
     </div>

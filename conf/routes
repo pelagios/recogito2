@@ -55,7 +55,7 @@ GET     /document/:id/map                            controllers.document.map.Ma
 GET     /document/:id/stats                          controllers.document.stats.StatsController.showDocumentStats(id: String)
 
 GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
-GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String)
+GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String, export_tables: Boolean ?= false)
 GET     /document/:id/downloads/ttl                  controllers.document.downloads.DownloadsController.downloadTTL(id: String)
 GET     /document/:id/downloads/rdf                  controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
 GET     /document/:id/downloads/jsonld               controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)

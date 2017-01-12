@@ -8,16 +8,19 @@ trait BaseSerializer {
   
   protected val TMP_DIR = System.getProperty("java.io.tmpdir")
 
-  private def sortByCharOffset(annotations: Seq[Annotation]) = {
+  private def sortByCharOffset(annotations: Seq[Annotation]) =
     annotations.sortWith { (a, b) =>
       a.anchor.substring(12).toInt < b.anchor.substring(12).toInt
     }
-  }
 
-  private def sortByXY(annotations: Seq[Annotation]) = {
+  private def sortByXY(annotations: Seq[Annotation]) =
     // TODO port nearest-neighbour sorting from Recogito v.1
     annotations
-  }
+  
+  private def sortByRow(annotations: Seq[Annotation]) =
+    annotations.sortWith { (a, b) =>
+      a.anchor.substring(4).toInt < b.anchor.substring(4).toInt
+    }
 
   /** Attempts to sort annotations by a sane mechanism, depending on content type.
     *
@@ -30,6 +33,7 @@ trait BaseSerializer {
     groupedByContentType.flatMap { case (cType, a) => cType match {
       case ContentType.TEXT_PLAIN => sortByCharOffset(a)
       case ContentType.IMAGE_UPLOAD | ContentType.IMAGE_IIIF => sortByXY(a)
+      case ContentType.DATA_CSV => sortByRow(a)
       case _ => {
         Logger.warn(s"Can't sort annotations of unsupported content type $cType")
         a

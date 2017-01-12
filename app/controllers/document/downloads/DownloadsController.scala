@@ -51,18 +51,29 @@ class DownloadsController @Inject() (
     })
   }
 
-  def downloadCSV(documentId: String) = AsyncStack { implicit request =>
-    def export(docInfo: DocumentInfo) = annotationsToCSV(documentId).map { csv =>
-      Ok.sendFile(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
-    } 
-    
-    download(documentId, export) 
+  /** Exports either 'plain' annotation CSV, or merges annotations with original DATA_* uploads, if any **/
+  def downloadCSV(documentId: String, exportTables: Boolean) = AsyncStack { implicit request =>
+    if (exportTables) {
+      download(documentId, { doc =>
+        tablesToZIP(doc).map { zip =>
+          Ok.sendFile(zip).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
+        }
+      })
+    } else {
+      download(documentId, { doc =>
+        annotationsToCSV(documentId).map { csv =>
+          Ok.sendFile(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
+        } 
+      })
+    }
   }
   
   private def downloadRDF(documentId: String, format: RDFFormat, extension: String) = AsyncStack { implicit request =>
-    def export(docInfo: DocumentInfo) = documentToRDF(docInfo, format).map(file => 
-      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + "." + extension }))
-    download(documentId, export)
+    download(documentId, { doc =>
+      documentToRDF(doc, format).map { file => 
+        Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + "." + extension })
+      }
+    })
   }
   
   def downloadTTL(documentId: String) = downloadRDF(documentId, RDFFormat.TTL, "ttl") 
@@ -70,17 +81,18 @@ class DownloadsController @Inject() (
   def downloadJSONLD(documentId: String) = downloadRDF(documentId, RDFFormat.JSONLD_PRETTY, "jsonld") 
 
   def downloadGeoJSON(documentId: String) = AsyncStack { implicit request =>
-    def export(docInfo: DocumentInfo) = placesToGeoJSON(documentId).map { featureCollection =>
-      Ok(Json.prettyPrint(Json.toJson(featureCollection)))
-        .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
-    }
-    
-    download(documentId, export)
+    download(documentId, { doc =>
+      placesToGeoJSON(documentId).map { featureCollection =>
+        Ok(Json.prettyPrint(Json.toJson(featureCollection)))
+          .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
+      }
+    })    
   }
   
   def downloadTEI(documentId: String) = AsyncStack { implicit request =>
-    def export(docInfo: DocumentInfo) = documentToTEI(docInfo).map(xml => Ok(xml))
-    download(documentId, export)
+    download(documentId, { doc =>
+      documentToTEI(doc).map(xml => Ok(xml))
+    })
   }
 
 }
