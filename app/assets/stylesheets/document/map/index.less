@@ -76,6 +76,7 @@
       position:relative;
       height:96px;
       z-index:0;
+      overflow:auto;
 
       .card {
         position:absolute;
@@ -102,6 +103,25 @@
 
         }
 
+      }
+
+    }
+
+    table.data-preview {
+
+
+      td {
+        width:180px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        font-style:normal;
+        font-family:PTSansNarrow;
+        font-size:14px;
+        padding:0 5px;
+        background-color:#fff;
+        margin:1px;
+        .rounded-corners(2px);
       }
 
     }

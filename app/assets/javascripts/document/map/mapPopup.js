@@ -98,8 +98,11 @@ define([
               },
 
               createDataSnippet = function() {
-                console.log('data');
-                return '<table class="data-preview"></table>';
+                var table = jQuery('<table class="data-preview"></table>');
+                jQuery.each(annotation.context, function(key, value) {
+                  table.append('<tr><td>' + key + '</td><td>' + value + '</td></tr>');
+                });
+                return table;
               },
 
               currentCard = element.find('.snippet-text .card').first(),
@@ -114,7 +117,7 @@ define([
                 (annotation.annotates.content_type.indexOf('TEXT') >= 0) ?
                   createTextSnippet() :
                 ((annotation.annotates.content_type.indexOf('IMAGE') >= 0) ?
-                  createImageSnippet() : createDataSnippet),
+                  createImageSnippet() : createDataSnippet()),
 
               newCard, moveCurrentTo;
 
@@ -128,7 +131,8 @@ define([
             fetchingSnippet = false;
           } else {
             scrolling = true;
-            newCard = jQuery('<div class="card">' + snippet + '</snippet>');
+            newCard = jQuery('<div class="card"></div>');
+            newCard.html(snippet);
 
             if (slideDirection === 'NEXT') {
               newCard.css('left', '100%');

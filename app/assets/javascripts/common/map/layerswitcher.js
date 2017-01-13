@@ -5,7 +5,7 @@ define(['common/hasEvents'], function(HasEvents) {
     var self = this,
 
         element = jQuery(
-          '<div class="clicktrap">' +
+          '<div class="modal-clicktrap">' +
             '<div class="modal-wrapper">' +
               '<div class="modal layerswitcher">' +
                 '<div class="modal-header">' +
