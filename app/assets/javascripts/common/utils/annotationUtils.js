@@ -28,18 +28,27 @@ define(function() {
     },
 
     /**
+     * Returns the first 'entity body' found in the annotation,
+     * i.e. the first body that's of PLACE, PERSON or EVENT type.
+     */
+    getFirstEntity : function(annotation) {
+      var t, i, len;
+      for (i=0, len=annotation.bodies.length; i<len; i++) {
+        t = annotation.bodies[i].type;
+        if (t === 'PLACE' || t === 'PERSON' || t === 'EVENT')
+          return annotation.bodies[i];
+      }
+    },
+
+    /**
      * Returns the 'entity type' indicated by the annotation.
      *
      * Note: this assumes that annotations generally can't have two different entity
      * types. If they do, only the first in the list of bodies is returned.
      */
     getEntityType : function(annotation) {
-      var t, i, len;
-      for (i=0, len=annotation.bodies.length; i<len; i++) {
-        t = annotation.bodies[i].type;
-        if (t === 'PLACE' || t === 'PERSON' || t === 'EVENT')
-          return t;
-      }
+      var firstEntity = this.getFirstEntity(annotation);
+      return firstEntity.type;
     },
 
     /**

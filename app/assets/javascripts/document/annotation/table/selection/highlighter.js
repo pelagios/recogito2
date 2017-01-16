@@ -1,7 +1,8 @@
 define([
   'common/utils/annotationUtils',
+  'common/utils/placeUtils',
   'document/annotation/common/selection/abstractHighlighter'
-], function(AnnotationUtils, AbstractHighlighter) {
+], function(AnnotationUtils, PlaceUtils, AbstractHighlighter) {
 
   var Highlighter = function(grid) {
 
@@ -60,23 +61,29 @@ define([
 
   /** SlickGrid Formatter for the 'annotation' cell **/
   Highlighter.CellFormatter = function(row, cell, val, columnDef, dataContext) {
-    var ICONS = {
-          'PLACE'  : '&#xf041;',
-          'PERSON' : '&#xf007;',
-          'EVENT'  : '&#xf005;'
-        },
-
-        getIcon = function(entityType) {
-          var icon = ICONS[entityType];
-          if (icon) return icon; else return '&#xf02b;';
-        };
-
     if (dataContext.__annotation) {
       var annotation = dataContext.__annotation,
-          entityType = AnnotationUtils.getEntityType(annotation),
-          cssClass = (entityType) ? 'annotation ' + entityType.toLowerCase() : 'annotation';
+          entityBody = AnnotationUtils.getFirstEntity(annotation),
 
-      return '<span class="' + cssClass + '" title="' + entityType + '">' + getIcon(entityType) + '</span>';
+          statusValues = AnnotationUtils.getStatus(annotation),
+
+          label = (function() {
+            var uri, label;
+            if (entityBody && entityBody.uri) {
+              uri = PlaceUtils.parseURI(entityBody.uri);
+              label = uri.shortcode + ':' + uri.id;
+              return '<span class="shortcode">' + label + '</span>';
+            } else {
+              return '&nbsp;';
+            }
+          })(),
+
+          entityType = entityBody.type,
+          cssClass = (entityType) ?
+            'annotation ' + entityType.toLowerCase() + ' ' + statusValues.join(' ') :
+            'annotation';
+
+      return '<span class="' + cssClass + '" title="' + entityType + '">' + label + '</span>';
     }
   };
 
