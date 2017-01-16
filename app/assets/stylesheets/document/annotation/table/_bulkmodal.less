@@ -1,13 +1,38 @@
 @import "../../../_meter.less";
 
 .modal.wizard {
-  height:330px;
+  height:580px;
+  width:640px;
 
   .modal-body {
-    padding:30px;
-    text-align:center;
+    padding:0;
+    background-color:@blueish-white;
+
+    .instructions {
+      margin:0;
+      padding:20px;
+      color:@grey-type;
+    }
 
     form.crud {
+
+      select {
+        width:280px;
+      }
+
+      #use-exclusive {
+        font-size:15px;
+        padding:5px 10px 20px 12px;
+
+        label:before {
+          font-size:14px;
+        }
+
+      }
+
+      dt, dd.info {
+        font-size:15px;
+      }
 
       dt {
         width:140px;
@@ -15,8 +40,9 @@
       }
 
       .buttons {
-        padding-top:20px;
-        padding-left:135px;
+        padding:14px 0 20px 150px;
+        background-color:#fff;
+        border-top:1px solid @lightgrey-border;
       }
 
       button {
