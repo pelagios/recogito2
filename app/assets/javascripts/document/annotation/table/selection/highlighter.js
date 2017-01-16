@@ -25,7 +25,9 @@ define([
         },
 
         initPage = function(annotations) {
+          dataView.beginUpdate();
           annotations.forEach(bindAnnotation);
+          dataView.endUpdate();
         },
 
         removeAnnotation = function(annotation) {
