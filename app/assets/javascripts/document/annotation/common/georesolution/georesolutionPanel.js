@@ -14,7 +14,7 @@ define([
 
         element = (function() {
             var el = jQuery(
-              '<div class="clicktrap">' +
+              '<div class="modal-clicktrap">' +
                 '<div class="modal-wrapper georesolution-wrapper">' +
                   '<div class="modal georesolution-panel">' +
                     '<div class="modal-header">' +

@@ -30,7 +30,7 @@ require([
 
   var App = function(results) {
 
-    var containerNode = document.getElementById('table-container'),
+    var contentNode = document.getElementById('table-container'),
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
@@ -72,8 +72,8 @@ require([
         selector = new SelectionHandler(grid, highlighter),
 
         editor = (Config.writeAccess) ?
-          new WriteEditor(containerNode, selector) :
-          new ReadEditor(containerNode),
+          new WriteEditor(contentNode, selector) :
+          new ReadEditor(contentNode),
 
         onBulkAnnotation = function(type) {
           var bulkEditor = (type === 'PLACE') ? new PlaceBulkEditor(results.meta) : false;
