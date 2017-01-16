@@ -48,7 +48,8 @@ define(function() {
      */
     getEntityType : function(annotation) {
       var firstEntity = this.getFirstEntity(annotation);
-      return firstEntity.type;
+      if (firstEntity)
+        return firstEntity.type;
     },
 
     /**

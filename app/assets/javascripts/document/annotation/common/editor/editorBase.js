@@ -94,7 +94,10 @@ define([
       this.sectionList.setAnnotation(selection.annotation);
       this.element.show();
       this.setPosition(selection.bounds);
-      window.location.hash = '#' + selection.annotation.annotation_id;
+      if (selection.annotation.annotation_id)
+        window.location.hash = '#' + selection.annotation.annotation_id;
+      else
+        window.location.hash = '';
     } else {
       // We allow this method to be called with no arg - in this case, close the editor
       this.close();
