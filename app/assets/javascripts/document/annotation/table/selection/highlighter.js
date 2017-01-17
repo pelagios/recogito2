@@ -16,6 +16,11 @@ define([
             return dataView.getItem(rowIdx).__annotation;
         },
 
+        hasAnnotations = function() {
+          console.log(annotationIndex);
+          return !jQuery.isEmptyObject(annotationIndex);
+        },
+
         bindAnnotation = function(annotation) {
           var rowIdx = parseInt(annotation.anchor.substring(4)),
               row = dataView.getItem(rowIdx);
@@ -50,6 +55,7 @@ define([
         };
 
     this.findById = findById;
+    this.hasAnnotations = hasAnnotations;
     this.initPage = initPage;
     this.refreshAnnotation = bindAnnotation;
     this.removeAnnotation = removeAnnotation;

@@ -50,8 +50,10 @@ define([
           jQuery('[data-scheme="' + scheme + '"]').addClass('active');
         };
 
-    initDropdownMenus();
     initColorscheme();
+
+    if (Config.writeAccess)
+      initDropdownMenus();
 
     this.setCurrentColorscheme = setCurrentColorscheme;
 

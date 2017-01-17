@@ -1,6 +1,7 @@
 define([
+  'common/config',
   'document/annotation/common/page/baseToolbar'
-], function(BaseToolbar) {
+], function(Config, BaseToolbar) {
 
   var Toolbar = function(rootNode) {
 
@@ -17,9 +18,16 @@ define([
 
             return false;
           });
+        },
+
+        disableAnnotationControls = function() {
+          jQuery('.bulk-annotation').addClass('disabled');
         };
 
-    initBulkMenu();
+    if (Config.writeAccess)
+      initBulkMenu();
+    else
+      disableAnnotationControls();
 
     BaseToolbar.apply(this, [ rootNode ]);
   };

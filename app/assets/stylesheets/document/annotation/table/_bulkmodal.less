@@ -2,7 +2,7 @@
 
 .modal.wizard {
   height:580px;
-  width:640px;
+  width:600px;
 
   .modal-body {
     padding:0;
@@ -53,6 +53,29 @@
         width:140px;
       }
 
+    }
+
+  }
+
+  .has-annotations {
+    position:absolute;
+    top:0;
+    width:100%;
+    height:100%;
+    background-color:fade(#fff, 85%);
+
+    p {
+      text-align:center;
+      color:@error-msg-type;
+      padding:10px 5px;
+      margin:180px 50px;
+      background:@error-msg-bg;
+      border:1px solid @error-msg-border;
+      .rounded-corners(2px);
+    }
+
+    a {
+      color:@error-msg-type;
     }
 
   }

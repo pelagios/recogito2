@@ -78,7 +78,9 @@ require([
           new ReadEditor(contentNode),
 
         onBulkAnnotation = function(type) {
-          var bulkEditor = (type === 'PLACE') ? new PlaceBulkEditor(results.meta) : false;
+          var bulkEditor = (type === 'PLACE') ?
+                new PlaceBulkEditor(results.meta, highlighter.hasAnnotations()) :
+                false;
         },
 
         onRowCountChanged = function(e, args) {
