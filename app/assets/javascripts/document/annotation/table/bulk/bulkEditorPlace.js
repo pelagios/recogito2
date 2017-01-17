@@ -80,7 +80,7 @@ define([
           '<div class="has-annotations">' +
             '<p>It is currently not possible to run automatic matching on '+
               'documents that already have annotations. Please delete ' +
-              'existing annotations the via the <a href="' +
+              'existing annotations via the <a href="' +
               jsRoutes.controllers.document.settings.SettingsController
                 .showDocumentSettings(Config.documentId, 'delete').absoluteURL() +
               '">document settings</a> first.</p>' +
