@@ -99,10 +99,35 @@ require([
           dataView.sort(comparator, args.sortAsc);
         },
 
+        /** Determines whether the table DIV should have overflow set to hidden or visible **/
+        setClipping = function(clip) {
+          var overflow = (clip) ? 'hidden' : 'visible';
+          contentNode.style.overflow = overflow;
+        },
+
         onScroll = function(e, args) {
-          var selection = selector.getSelection();
-          if (selection)
-            editor.setPosition(selection.bounds);
+          var selection = selector.getSelection(),
+              viewport = grid.getViewport(),
+
+              isSelectionVisible = function(selectedRows) {
+                var isVisible = false;
+                selectedRows.forEach(function(idx) {
+                  if (idx >= viewport.top && idx < viewport.bottom)
+                    isVisible = true;
+                });
+                return isVisible;
+              };
+
+          if (selection) {
+            if (isSelectionVisible(grid.getSelectedRows())) {
+              setClipping(false);
+
+            } else {
+              setClipping(true);
+            }
+
+                          editor.setPosition(selection.bounds);
+          }
         };
 
     toolbar.on('bulkAnnotation', onBulkAnnotation);
