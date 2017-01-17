@@ -83,7 +83,11 @@ object ContentType {
       case "jpg" | "jpeg" | "tif" | "tiff" | "png" =>
         if (VIPS_INSTALLED) Right(IMAGE_UPLOAD) else Left(new UnsupportedContentTypeException)
         
-      case "csv" => Right(DATA_CSV)
+      case "csv" => 
+        if (isReadableTextFile(file))
+          Right(DATA_CSV)
+        else
+          Left(new UnsupportedTextEncodingException)
 
       case _ => Left(new UnsupportedContentTypeException)
     }
