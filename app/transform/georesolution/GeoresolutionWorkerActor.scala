@@ -26,7 +26,7 @@ private[georesolution] class GeoresolutionWorkerActor(
   type T = Georesolvable
   
   import transform.TransformTaskMessages._ 
-  
+    
   def receive = {
 
     case Start => {
@@ -42,7 +42,7 @@ private[georesolution] class GeoresolutionWorkerActor(
         10.seconds)
         
       taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
-
+      
       try {
         val totalResolvablePlaces = parse().size
         resolve(document, part, parse(), totalResolvablePlaces, taskId)        

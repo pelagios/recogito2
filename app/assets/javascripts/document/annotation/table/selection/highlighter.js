@@ -17,7 +17,6 @@ define([
         },
 
         hasAnnotations = function() {
-          console.log(annotationIndex);
           return !jQuery.isEmptyObject(annotationIndex);
         },
 
