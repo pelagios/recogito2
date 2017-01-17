@@ -1,4 +1,7 @@
-define(['common/hasEvents'], function(HasEvents) {
+define([
+  'common/ui/alert',
+  'common/hasEvents'
+], function(Alert, HasEvents) {
 
   var POLL_INTERVAL_MS = 1000;
 
@@ -48,8 +51,7 @@ define(['common/hasEvents'], function(HasEvents) {
                   retriesLeft -= 1;
                   window.setTimeout(query, POLL_INTERVAL_MS);
                 } else {
-                  // TODO error popup
-                  console.log(error);
+                  new Alert(Alert.ERROR, 'Error', error);
                 }
               },
 

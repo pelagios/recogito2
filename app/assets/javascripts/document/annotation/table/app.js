@@ -4,6 +4,7 @@ require.config({
 });
 
 require([
+  'common/ui/alert',
   'common/api',
   'common/config',
   'document/annotation/common/editor/editorRead',
@@ -15,6 +16,7 @@ require([
   'document/annotation/table/selection/highlighter',
   'document/annotation/table/selection/selectionHandler'
 ], function(
+  Alert,
   API,
   Config,
   ReadEditor,
@@ -119,14 +121,12 @@ require([
               };
 
           if (selection) {
-            if (isSelectionVisible(grid.getSelectedRows())) {
+            if (isSelectionVisible(grid.getSelectedRows()))
               setClipping(false);
-
-            } else {
+            else
               setClipping(true);
-            }
 
-                          editor.setPosition(selection.bounds);
+            editor.setPosition(selection.bounds);
           }
         };
 
@@ -165,7 +165,9 @@ require([
         },
 
         onLoadError = function(error) {
-          // TODO implement
+          var title = 'Error',
+              message = 'There was an error loading the CSV file.',
+              alert = new Alert(Alert.ERROR, title, message);
         };
 
     loadIndicator.init(document.getElementById('table-container'));

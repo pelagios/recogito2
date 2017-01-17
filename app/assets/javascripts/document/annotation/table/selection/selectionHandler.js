@@ -33,9 +33,7 @@ define([
                         content_type: Config.contentType
                       },
                       anchor: 'row:' + rowIdx,
-                      bodies: [
-                        { type: 'QUOTE', value: '' /* TODO 'quote cell' value */ }
-                      ]
+                      bodies: []
                     };
 
                 return {

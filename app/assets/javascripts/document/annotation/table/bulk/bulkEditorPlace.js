@@ -1,8 +1,9 @@
 define([
+  'common/ui/alert',
   'common/ui/modal',
   'common/config',
   'document/annotation/table/bulk/progressModal'
-], function(Modal, Config, ProgressModal) {
+], function(Alert, Modal, Config, ProgressModal) {
 
   var PlaceBulkEditor = function(metadata) {
 
@@ -112,8 +113,7 @@ define([
             progressModal.open();
             self.destroy();
           }).fail(function(error) {
-            // TODO error popup
-            console.log(error);
+            new Alert(Alert.ERROR, 'Error', error);
           });
 
           return false;
