@@ -16,8 +16,8 @@ define([
             return dataView.getItem(rowIdx).__annotation;
         },
 
-        hasAnnotations = function() {
-          return !jQuery.isEmptyObject(annotationIndex);
+        isEmpty = function() {
+          return jQuery.isEmptyObject(annotationIndex);
         },
 
         bindAnnotation = function(annotation) {
@@ -25,7 +25,10 @@ define([
               row = dataView.getItem(rowIdx);
 
           row.__annotation = annotation;
-          annotationIndex[annotation.annotation_id] = rowIdx;
+
+          if (annotation.annotation_id)
+            annotationIndex[annotation.annotation_id] = rowIdx;
+
           dataView.updateItem(row.id, row);
         },
 
@@ -54,7 +57,7 @@ define([
         };
 
     this.findById = findById;
-    this.hasAnnotations = hasAnnotations;
+    this.isEmpty = isEmpty;
     this.initPage = initPage;
     this.refreshAnnotation = bindAnnotation;
     this.removeAnnotation = removeAnnotation;
@@ -68,6 +71,7 @@ define([
   Highlighter.CellFormatter = function(row, cell, val, columnDef, dataContext) {
     if (dataContext.__annotation) {
       var annotation = dataContext.__annotation,
+
           entityBody = AnnotationUtils.getFirstEntity(annotation),
 
           statusValues = AnnotationUtils.getStatus(annotation),
@@ -83,10 +87,11 @@ define([
             }
           })(),
 
-          entityType = entityBody.type,
+          entityType = (entityBody) ? entityBody.type : false,
+
           cssClass = (entityType) ?
             'annotation ' + entityType.toLowerCase() + ' ' + statusValues.join(' ') :
-            'annotation';
+            'annotation comment';
 
       return '<span class="' + cssClass + '" title="' + entityType + '">' + label + '</span>';
     }

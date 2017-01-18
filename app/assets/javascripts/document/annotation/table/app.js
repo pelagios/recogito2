@@ -32,7 +32,9 @@ require([
 
   var App = function(results) {
 
-    var contentNode = document.getElementById('table-container'),
+    var self = this,
+
+        contentNode = document.getElementById('table-container'),
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
@@ -78,9 +80,8 @@ require([
           new ReadEditor(contentNode),
 
         onBulkAnnotation = function(type) {
-          var bulkEditor = (type === 'PLACE') ?
-                new PlaceBulkEditor(results.meta, highlighter.hasAnnotations()) :
-                false;
+          if (type === 'PLACE')
+            new PlaceBulkEditor(results.meta, !highlighter.isEmpty());
         },
 
         onRowCountChanged = function(e, args) {
@@ -101,6 +102,39 @@ require([
               };
 
           dataView.sort(comparator, args.sortAsc);
+        },
+
+        reapplyAnnotation = function(annotationToReapply) {
+          var multiSelection = selector.getMultiSelection(),
+
+              cloneBodies = function(bodies) {
+                return bodies.map(function(body) {
+                  return jQuery.extend({}, body);
+                });
+              },
+
+              annotation;
+
+          if (multiSelection.length > 1)
+            for (var i=1, len=multiSelection.length; i<len; i++) {
+              annotation = multiSelection[i].annotation;
+
+              // TODO store on server!
+
+              // Copy bodies from, replacing original one
+              annotation.bodies = cloneBodies(annotationToReapply.bodies);
+              highlighter.refreshAnnotation(annotation);
+            }
+        },
+
+        onCreateAnnotation = function(selection) {
+          reapplyAnnotation(selection.annotation);
+          self.onCreateAnnotation(selection);
+        },
+
+        onUpdateAnnotation = function(annotation) {
+          reapplyAnnotation(annotation);
+          self.onUpdateAnnotation(annotation);
         },
 
         /** Determines whether the table DIV should have overflow set to hidden or visible **/
@@ -145,8 +179,8 @@ require([
 
     selector.on('select', editor.openSelection);
 
-    editor.on('createAnnotation', this.onCreateAnnotation.bind(this));
-    editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
+    editor.on('createAnnotation', onCreateAnnotation);
+    editor.on('updateAnnotation', onUpdateAnnotation);
     editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 
     jQuery(window).resize(function() { grid.resizeCanvas(); });

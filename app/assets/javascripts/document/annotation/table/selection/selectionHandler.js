@@ -11,9 +11,10 @@ define([
 
         leftViewPort = jQuery('.slick-viewport-left'),
 
-        currentSelection = false,
+        currentMultiSelection = false,
 
-        getFrozenRowElement = function() {
+        /** Returns the first (in terms of row index) cell of the selection **/
+        getFirstSelectedCell = function() {
           var selectedRow = grid.getActiveCellNode().closest('.slick-row.active'),
               isFrozenRow = selectedRow.parents('.slick-viewport-left').length > 0;
 
@@ -25,56 +26,66 @@ define([
         },
 
         onSelectedRowsChanged = function(e, args) {
-          var createNewSelection = function(rowIdx, cellDiv) {
+          var createNewSelection = function(row, cell, bounds) {
                 var annotationStub = {
                       annotates: {
                         document_id: Config.documentId,
                         filepart_id: Config.partId,
                         content_type: Config.contentType
                       },
-                      anchor: 'row:' + rowIdx,
+                      anchor: 'row:' + row.idx,
                       bodies: []
                     };
 
                 return {
                   isNew: true,
                   annotation: annotationStub,
-                  bounds: cellDiv.getBoundingClientRect(),
-                  cell: cellDiv
+                  bounds: bounds,
+                  cell: cell
                 };
               },
 
-              getExisingSelection = function(cellDiv, rowData) {
+              getExisingSelection = function(row, cell, bounds) {
                 return {
                   isNew: false,
-                  annotation: rowData.__annotation,
-                  bounds: cellDiv.getBoundingClientRect(),
-                  cell: cellDiv
+                  annotation: row.__annotation,
+                  bounds: bounds,
+                  cell: cell
                 };
               };
 
           if (args.rows.length > 0) {
+            var anchorCell = getFirstSelectedCell(),
 
-            // TODO support multi-select
+                bounds = anchorCell.getBoundingClientRect(),
 
-            var firstRowIdx = args.rows[0],
-                firstRowElement = getFrozenRowElement(),
-                firstRowData = dataView.getItem(firstRowIdx),
-                selection = (firstRowData.__annotation) ?
-                  getExisingSelection(firstRowElement, firstRowData) :
-                  createNewSelection(firstRowIdx, firstRowElement);
+                rowIndices = args.rows.map(function(str) { return parseInt(str); }).sort();
 
-            currentSelection = selection;
-            self.fireEvent('select', selection);
+            currentMultiSelection = rowIndices.map(function(idx) {
+              var row = dataView.getItem(idx);
+              return (row.__annotation) ?
+                getExisingSelection(row, anchorCell, bounds) :
+                createNewSelection(row, anchorCell, bounds);
+            });
+
+            self.fireEvent('select', currentMultiSelection[0]);
           }
         },
 
-        getSelection = function() {
-          if (currentSelection) {
+        getFirstSelected = function() {
+          var firstSelected;
+
+          if (currentMultiSelection) {
+            firstSelected = currentMultiSelection[0];
             // Client bounds may have changed in the meantime due to scrolling
-            currentSelection.bounds = currentSelection.cell.getBoundingClientRect();
-            return currentSelection;
+            firstSelected.cell = getFirstSelectedCell();
+            firstSelected.bounds = firstSelected.cell.getBoundingClientRect();
+            return firstSelected;
           }
+        },
+
+        getMultiSelection = function() {
+          return currentMultiSelection;
         },
 
         setSelection = function(selection) {
@@ -85,14 +96,16 @@ define([
         },
 
         clearSelection = function() {
-          currentSelection = false;
+          currentMultiSelection = false;
           grid.setSelectedRows([]);
         };
 
     grid.setSelectionModel(new Slick.RowSelectionModel());
     grid.onSelectedRowsChanged.subscribe(onSelectedRowsChanged);
 
-    this.getSelection = getSelection;
+    // This method is for general Recogito interop and expects one selection only
+    this.getSelection = getFirstSelected;
+    this.getMultiSelection = getMultiSelection;
     this.setSelection = setSelection;
     this.clearSelection = clearSelection;
 
