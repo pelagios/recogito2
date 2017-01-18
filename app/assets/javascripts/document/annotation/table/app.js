@@ -113,18 +113,35 @@ require([
                 });
               },
 
+              updatedAnnotations = [],
+
               annotation;
 
-          if (multiSelection.length > 1)
+          if (multiSelection.length > 1) {
             for (var i=1, len=multiSelection.length; i<len; i++) {
               annotation = multiSelection[i].annotation;
-
-              // TODO store on server!
 
               // Copy bodies from, replacing original one
               annotation.bodies = cloneBodies(annotationToReapply.bodies);
               highlighter.refreshAnnotation(annotation);
+              updatedAnnotations.push(annotation);
             }
+
+            // Bulk-update on server
+
+            // TODO activate load indicator
+
+            API.bulkUpsertAnnotations(updatedAnnotations)
+
+               .done(function(response) {
+                 // TODO refresh annotations
+                 // TODO clear load indicator
+               })
+
+               .fail(function(error) {
+                 // TODO load indicator: error message
+               });
+          }
         },
 
         onCreateAnnotation = function(selection) {

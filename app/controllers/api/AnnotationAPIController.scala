@@ -94,7 +94,7 @@ object AnnotationStatusStub extends HasDate {
 
 class AnnotationAPIController @Inject() (
     val config: Configuration,
-    val annotations: AnnotationService,
+    val annotationService: AnnotationService,
     val contributions: ContributionService,
     val documents: DocumentService,
     val users: UserService,
@@ -118,7 +118,7 @@ class AnnotationAPIController @Inject() (
         // Load annotations for specific doc part
         documents.findPartByDocAndSeqNo(id, seqNo).flatMap {
           case Some(filepart) =>
-            annotations.findByFilepartId(filepart.getId)
+            annotationService.findByFilepartId(filepart.getId)
               .map { annotations =>
                 // Join in places, if requested
                 jsonOk(Json.toJson(annotations.map(_._1)))
@@ -130,7 +130,7 @@ class AnnotationAPIController @Inject() (
 
       case (id, None) =>
         // Load annotations for entire doc
-        annotations.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
+        annotationService.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
     }
   }
 
@@ -156,54 +156,94 @@ class AnnotationAPIController @Inject() (
             Some(s.setBy.getOrElse(user)),
             s.setAt.getOrElse(now))))))
   }
-
-  def createAnnotation() = AsyncStack { implicit request =>
+  
+  /** Common boilerplate code for all API methods carrying JSON config payload **/
+  private def jsonOp[T](op: T => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]) = {
     request.body.asJson match {
       case Some(json) =>
-        Json.fromJson[AnnotationStub](json) match {
-          case s: JsSuccess[AnnotationStub] => {
-            // Fetch the associated document to check access privileges
-            documents.getDocumentRecord(s.get.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
-              case Some((document, accesslevel)) => {
-                if (accesslevel.canWrite) {
-                  val annotation = stubToAnnotation(s.get, loggedIn.map(_.user.getUsername).getOrElse("guest"))
-                  val f = for {
-                    (annotationStored, _, previousVersion) <- annotations.insertOrUpdateAnnotation(annotation)
-                    success <- if (annotationStored)
-                                 contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
-                               else
-                                 Future.successful(false)
-                  } yield success
-
-                  f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
-                } else {
-                  // No write permissions
-                  Future.successful(ForbiddenPage)
-                }
-              }
-
-              case None =>
-                Logger.warn("POST to /annotations but annotation points to unknown document: " + s.get.annotates.documentId)
-                Future.successful(NotFoundPage)
-            })
-          }
-
+        Json.fromJson[T](json) match {
+          case s: JsSuccess[T]  => op(s.get)
           case e: JsError =>
-            Logger.warn("POST to /annotations but invalid JSON: " + e.toString)
+            Logger.warn("Call to annotation API but invalid JSON: " + e.toString)
             Future.successful(BadRequest)
         }
-
       case None =>
-        Logger.warn("POST to /annotations but no JSON payload")
+        Logger.warn("Call to annotation API but no JSON payload")
         Future.successful(BadRequest)
-
     }
   }
+
+  def createAnnotation() = AsyncStack { implicit request => jsonOp[AnnotationStub] { annotationStub =>
+    // Fetch the associated document to check access privileges
+    documents.getDocumentRecord(annotationStub.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
+      case Some((document, accesslevel)) => {
+        if (accesslevel.canWrite) {
+          val annotation = stubToAnnotation(annotationStub, loggedIn.map(_.user.getUsername).getOrElse("guest"))
+          val f = for {
+            (annotationStored, _, previousVersion) <- annotationService.insertOrUpdateAnnotation(annotation)
+            success <- if (annotationStored)
+                         contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
+                       else
+                         Future.successful(false)
+          } yield success
+
+          f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
+        } else {
+          // No write permissions
+          Future.successful(Forbidden)
+        }
+      }
+
+      case None =>
+        Logger.warn("POST to /annotations but annotation points to unknown document: " + annotationStub.annotates.documentId)
+        Future.successful(NotFound)
+    })
+  }}
+  
+  def bulkUpsert() = AsyncStack { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
+    // We currently restrict to bulk upserts for a single document part only
+    val username = loggedIn.map(_.user.getUsername)
+    val documentIds = annotationStubs.map(_.annotates.documentId).distinct
+    val partIds = annotationStubs.map(_.annotates.filepartId).distinct    
+    
+    if (documentIds.size == 1 || partIds.size == 1) {
+      documents.getExtendedInfo(documentIds.head, username).flatMap {
+        case Some((doc, accesslevel)) =>
+          if (accesslevel.canWrite) {
+            doc.fileparts.find(_.getId == partIds.head) match {
+              case Some(filepart) =>
+                val annotations = annotationStubs.map(stub => stubToAnnotation(stub, username.getOrElse("guest")))
+                annotationService.insertOrUpdateAnnotations(annotations).map { failed =>
+                  if (failed.size == 0)
+                    // TODO add username and timestamp
+                    jsonOk(Json.parse("{ \"foo\":\"bar\" }"))
+                  else
+                    InternalServerError
+                }
+              
+              case None =>
+                Logger.warn("Bulk upsert with invalid content: filepart not in document: " + documentIds.head + "/" + partIds.head)
+                Future.successful(BadRequest)
+            }
+          } else {
+            // No write permissions
+            Future.successful(Forbidden)
+          }
+        
+        case None =>
+          Logger.warn("Bulk upsert request points to unknown document: " + documentIds.head)
+          Future.successful(NotFound)
+      }
+    } else {
+      Logger.warn("Bulk upsert request for multiple document parts")
+      Future.successful(BadRequest)
+    }
+  }}
 
   def getImage(id: UUID) = AsyncStack { implicit request =>    
     val username = loggedIn.map(_.user.getUsername)
     
-    annotations.findById(id).flatMap {
+    annotationService.findById(id).flatMap {
       case Some((annotation, _)) =>
         val docId = annotation.annotates.documentId
         val partId = annotation.annotates.filepartId
@@ -273,7 +313,7 @@ class AnnotationAPIController @Inject() (
         Future.successful(JsNull)
     }
         
-    annotations.findById(id).flatMap {
+    annotationService.findById(id).flatMap {
       case Some((annotation, _)) => {
         if (includeContext) {          
           documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
@@ -316,7 +356,7 @@ class AnnotationAPIController @Inject() (
     )
 
   def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>
-    annotations.findById(id).flatMap {
+    annotationService.findById(id).flatMap {
       case Some((annotation, version)) =>
         // Fetch the associated document
         documents.getDocumentRecord(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
@@ -324,7 +364,7 @@ class AnnotationAPIController @Inject() (
             if (accesslevel.canWrite) {
               val user = loggedIn.map(_.user.getUsername).getOrElse("guest")
               val now = DateTime.now
-              annotations.deleteAnnotation(id, user, now).flatMap {
+              annotationService.deleteAnnotation(id, user, now).flatMap {
                 case Some(annotation) =>
                   contributions.insertContribution(createDeleteContribution(annotation, document, user, now)).map(success =>
                     if (success) Status(200) else InternalServerError)

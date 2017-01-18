@@ -102,6 +102,8 @@ GET     /api/annotation/:id.jpg                      controllers.api.AnnotationA
 GET     /api/annotation/:id                          controllers.api.AnnotationAPIController.getAnnotation(id: java.util.UUID, context: Boolean ?= false)
 DELETE  /api/annotation/:id                          controllers.api.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
 
+POST    /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkUpsert
+
 GET     /api/document/:id/annotations                controllers.api.AnnotationAPIController.listAnnotationsInDocument(id: String)
 GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationAPIController.listAnnotationsInPart(id: String, part: Int)
 

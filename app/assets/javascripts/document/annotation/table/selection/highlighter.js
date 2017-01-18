@@ -48,7 +48,8 @@ define([
 
             delete annotationIndex[annotationId];
             delete row.__annotation;
-            dataView.updateItem(rowIdx, row);
+            
+            dataView.updateItem(row.id, row);
           }
         },
 
