@@ -6,14 +6,18 @@ define([
 
   var Highlighter = function(grid) {
 
-    var annotationIndex = {}, // To keep track of annotationId -> rowIdx concordances
+    var dataView = grid.getData(),
 
-        dataView = grid.getData(),
+        // To keep track of annotationId -> rowId concordances
+        annotationIndex = {},
 
-        findById = function(id) {
-          var rowIdx = annotationIndex[id];
-          if (rowIdx)
-            return dataView.getItem(rowIdx).__annotation;
+        // To keep track of row offset -> rowId concordances
+        rowIndex = {},
+
+        findById = function(annotationId) {
+          var rowId = annotationIndex[annotationId];
+          if (rowId)
+            return dataView.getItemById(rowId).__annotation;
         },
 
         isEmpty = function() {
@@ -21,18 +25,27 @@ define([
         },
 
         bindAnnotation = function(annotation) {
-          var rowIdx = parseInt(annotation.anchor.substring(4)),
-              row = dataView.getItem(rowIdx);
+          var rowOffset = parseInt(annotation.anchor.substring(4)),
+              rowId = rowIndex[rowOffset],
+              row = dataView.getItemById(rowId);
 
           row.__annotation = annotation;
 
           if (annotation.annotation_id)
-            annotationIndex[annotation.annotation_id] = rowIdx;
+            annotationIndex[annotation.annotation_id] = rowId;
 
-          dataView.updateItem(row.id, row);
+          dataView.updateItem(rowId, row);
         },
 
         initPage = function(annotations) {
+          var initRowIndex = function() {
+                dataView.getItems().forEach(function(row, idx) {
+                  rowIndex[idx] = row.id;
+                });
+              };
+
+          initRowIndex();
+
           dataView.beginUpdate();
           annotations.forEach(bindAnnotation);
           dataView.endUpdate();
@@ -40,16 +53,16 @@ define([
 
         removeAnnotation = function(annotation) {
           var annotationId = annotation.annotation_id,
-              rowIdx = annotationIndex[annotationId],
+              rowId = annotationIndex[annotationId],
               row;
 
-          if (rowIdx) {
-            row = dataView.getItem(rowIdx);
+          if (rowId) {
+            row = dataView.getItemById(rowId);
 
             delete annotationIndex[annotationId];
             delete row.__annotation;
-            
-            dataView.updateItem(row.id, row);
+
+            dataView.updateItem(rowId, row);
           }
         },
 
