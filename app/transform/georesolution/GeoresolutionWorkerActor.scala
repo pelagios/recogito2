@@ -71,8 +71,8 @@ private[georesolution] class GeoresolutionWorkerActor(
         if (toponym.size > 0) {
           val coord =
             if (hasCoordHint) {
-              val lat = line(latColumn.get).trim()
-              val lon = line(lonColumn.get).trim()
+              val lat = line(latColumn.get).trim().replace(",", ".")
+              val lon = line(lonColumn.get).trim().replace(",", ".")
               Try(new Coordinate(lon.toDouble, lat.toDouble)) match {
                 case scala.util.Success(pt) => Some(pt)
                 case _ => None
