@@ -32,13 +32,13 @@ trait GeoJSONSerializer extends BaseSerializer {
         }
         
         val placeURIs = annotationsOnThisPlace.flatMap(_.bodies).filter(_.hasType == AnnotationBody.PLACE).flatMap(_.uri)
-          
+        val referencedRecords = place.isConflationOf.filter(g => placeURIs.contains(g.uri))
+        
         place.representativeGeometry.map { geometry => 
           GeoJSONFeature(
             geometry,
-            place.titles.distinct,
-            // Keep only records explicitly referenced in the annotations
-            place.isConflationOf.filter(g => placeURIs.contains(g.uri)),
+            referencedRecords.map(_.title).distinct,
+            referencedRecords,
             annotationsOnThisPlace
           )
         }
@@ -74,6 +74,7 @@ object GeoJSONFeature extends HasGeometry {
     (JsPath \ "properties").write[JsObject] and
     (JsPath \ "uris").write[Seq[String]] and
     (JsPath \ "titles").write[Seq[String]] and
+    (JsPath \ "names").writeNullable[Seq[String]] and
     (JsPath \ "place_types").writeNullable[Seq[String]] and
     (JsPath \ "source_gazetteers").write[Seq[String]] and
     (JsPath \ "quotes").writeNullable[Seq[String]] and
@@ -88,6 +89,7 @@ object GeoJSONFeature extends HasGeometry {
       ),
       f.gazetteerRecords.map(_.uri),
       f.gazetteerRecords.map(_.title),
+      toOptSeq(f.gazetteerRecords.flatMap(_.names.map(_.name))),
       toOptSeq(f.gazetteerRecords.flatMap(_.placeTypes)),
       f.gazetteerRecords.map(_.sourceGazetteer.name),
       toOptSeq(f.quotes),

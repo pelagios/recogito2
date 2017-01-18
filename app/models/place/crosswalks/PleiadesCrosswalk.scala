@@ -116,7 +116,7 @@ object PleiadesRecord extends HasGeometry {
     (JsPath \ "names").readNullable[Seq[PleiadesName]].map(_.getOrElse(Seq.empty[PleiadesName])) and
     (JsPath \ "features").readNullable[Seq[Feature]].map(_.getOrElse(Seq.empty[Feature])) and
     (JsPath \ "reprPoint").readNullable[Coordinate] and
-    (JsPath \ "place_types").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String]))
+    (JsPath \ "placeTypes").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String]))
   )(PleiadesRecord.apply _)
   
 }
