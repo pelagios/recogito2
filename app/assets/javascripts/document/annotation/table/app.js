@@ -127,19 +127,17 @@ require([
               updatedAnnotations.push(annotation);
             }
 
-            // Bulk-update on server
-
-            // TODO activate load indicator
-
+            // TODO there might be a race condition for the indicator when
+            // TODO the successful storage of the first annotation overwrites the indication
+            // TODO of the bulk operation
+            self.header.showStatusSaving();
             API.bulkUpsertAnnotations(updatedAnnotations)
-
-               .done(function(response) {
-                 // TODO refresh annotations
-                 // TODO clear load indicator
+               .done(function(annotations) {
+                 annotations.forEach(highlighter.refreshAnnotation);
+                 self.header.showStatusSaved();
                })
-
                .fail(function(error) {
-                 // TODO load indicator: error message
+                 self.header.showSaveError(error);
                });
           }
         },

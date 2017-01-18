@@ -216,7 +216,7 @@ class AnnotationAPIController @Inject() (
                 annotationService.insertOrUpdateAnnotations(annotations).map { failed =>
                   if (failed.size == 0)
                     // TODO add username and timestamp
-                    jsonOk(Json.parse("{ \"foo\":\"bar\" }"))
+                    jsonOk(Json.toJson(annotations))
                   else
                     InternalServerError
                 }
