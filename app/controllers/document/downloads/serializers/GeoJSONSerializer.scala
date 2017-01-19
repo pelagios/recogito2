@@ -6,12 +6,10 @@ import java.io.File
 import models.{ ContentType, HasGeometry }
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.DocumentInfo
-import models.place._
-import org.joda.time.DateTime
+import models.place.{ Place, PlaceService, GazetteerRecord }
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
-import scala.language.implicitConversions
 import storage.{ ES, Uploads }
 
 trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
@@ -49,16 +47,15 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         val referencedRecords = place.isConflationOf.filter(g => placeURIs.contains(g.uri))
         
         place.representativeGeometry.map { geometry => 
-          GeoJSONFeature(
+          ReferencedPlaceFeature(
             geometry,
-            referencedRecords.map(_.title).distinct,
             referencedRecords,
             annotationsOnThisPlace
           )
         }
       }
 
-      Json.toJson(GeoJSONFeatureCollection(features))      
+      Json.toJson(GeoJSONFeatureCollection(features)) 
     }
   }
   
@@ -68,30 +65,23 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
       placeService: PlaceService, 
       uploads: Uploads,
       ctx: ExecutionContext) = exportMergedDocument(doc, { case (annotations, places, documentDir) =>
-        
-      val now = new DateTime()
-      
+
       def rowToFeature(row: List[String], index: Int) = {
         val anchor = "row:" + index
         val maybeAnnotation = annotations.find(_.anchor == anchor)
         val matches = maybeAnnotation.map(annotation => findGazetteerRecords(annotation, places)).getOrElse(Seq.empty[GazetteerRecord])
         
-        GazetteerRecord(
+        /** TODO build record from mapping config **/
+        
+        GazetteerRecordFeature(
+          row(0), // ID
           "http://www.example.com/" + row(0),
-          Gazetteer(doc.title),
-          now, // last sync
-          None, // last change
-          row(1),
-          Seq.empty[Description],
-          Seq.empty[Name],
-          None, // Geometry
-          None, // representativePoint: Option[Coordinate],
-          None, //   temporalBounds: Option[TemporalBounds],
-          Seq.empty[String], //  placeTypes: Seq[String],
-          None, // countryCode: Option[CountryCode],
-          None, //  population: Option[Long],
-          matches.map(_.uri),
-          Seq.empty[String] // exactMatches: Seq[String]
+          row(1), // Title
+          Seq.empty[String], // names
+          None, // geometry
+          None, // description
+          None, // country code
+          matches.map(_.uri)
         )
       }
       
@@ -108,30 +98,18 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         }).toList.flatten
       }
       
-      Json.toJson(features)
+      Json.toJson(GeoJSONFeatureCollection(features))
   })
   
 }
 
-case class GeoJSONFeature(geometry: Geometry, titles: Seq[String], gazetteerRecords: Seq[GazetteerRecord], annotations: Seq[Annotation]) {
-  
-  private val bodies = annotations.flatMap(_.bodies)
-  
-  private def bodiesOfType(t: AnnotationBody.Type) = bodies.filter(_.hasType == t)
-  
-  val quotes = bodiesOfType(AnnotationBody.QUOTE).flatMap(_.value)
-  
-  val comments = bodiesOfType(AnnotationBody.COMMENT).flatMap(_.value)
-  
-  val tags = bodiesOfType(AnnotationBody.TAG).flatMap(_.value)
-  
-}
+sealed trait GeoJSONFeature
 
 object GeoJSONFeature extends HasGeometry {
-
-  private def toOptSeq[T](s: Seq[T]) = if (s.isEmpty) None else Some(s)
   
-  implicit val geoJSONFeatureWrites: Writes[GeoJSONFeature] = (
+  def toOptSeq[T](s: Seq[T]) = if (s.isEmpty) None else Some(s)
+  
+  implicit val referencedPlaceFeatureWrites: Writes[ReferencedPlaceFeature] = (
     (JsPath \ "type").write[String] and
     (JsPath \ "geometry").write[Geometry] and
     (JsPath \ "properties").write[JsObject] and
@@ -161,15 +139,74 @@ object GeoJSONFeature extends HasGeometry {
     )
   )
   
+  implicit val gazetteerRecordFeatureWrites: Writes[GazetteerRecordFeature] = (
+    (JsPath \ "type").write[String] and
+    (JsPath \ "id").write[String] and
+    (JsPath \ "uri").write[String] and
+    (JsPath \ "geometry").writeNullable[Geometry] and
+    (JsPath \ "names").writeNullable[Seq[JsObject]] and
+    (JsPath \ "links").writeNullable[JsObject]
+  )(f => (
+      "Feature",
+      f.id,
+      f.uri,
+      f.geometry,
+      toOptSeq(f.names.map(name => Json.obj("name" -> name))),
+      {
+        if (f.closeMatches.isEmpty) None
+        else Some(Json.obj("close_matches" -> f.closeMatches))
+      }
+    )
+  )
+  
 }
 
-case class GeoJSONFeatureCollection(features: Seq[GeoJSONFeature])
+/** Feature representing references to a place in a document **/ 
+case class ReferencedPlaceFeature(
+  geometry         : Geometry,
+  gazetteerRecords : Seq[GazetteerRecord],
+  annotations      : Seq[Annotation]
+) extends GeoJSONFeature {
+  
+  private val bodies = annotations.flatMap(_.bodies)
+  
+  private def bodiesOfType(t: AnnotationBody.Type) = bodies.filter(_.hasType == t)
+
+  val titles = gazetteerRecords.map(_.title).distinct
+  
+  val quotes = bodiesOfType(AnnotationBody.QUOTE).flatMap(_.value)
+  
+  val comments = bodiesOfType(AnnotationBody.COMMENT).flatMap(_.value)
+  
+  val tags = bodiesOfType(AnnotationBody.TAG).flatMap(_.value)
+  
+}
+
+/** Feature representing a CSV gazetteer record **/
+case class GazetteerRecordFeature(
+  id           : String,
+  uri          : String,
+  title        : String,
+  names        : Seq[String],
+  geometry     : Option[Geometry],
+  description  : Option[String],
+  countryCode  : Option[String],
+  closeMatches : Seq[String]
+) extends GeoJSONFeature
+
+// TODO document metadata
+case class GeoJSONFeatureCollection[T <: GeoJSONFeature](features: Seq[T])
 
 object GeoJSONFeatureCollection {
   
-  implicit val geoJSONFeatureCollectionWrites: Writes[GeoJSONFeatureCollection] = (
+  implicit val referencedPlaceCollectionWrites: Writes[GeoJSONFeatureCollection[ReferencedPlaceFeature]] = (
     (JsPath \ "type").write[String] and
-    (JsPath \ "features").write[Seq[GeoJSONFeature]]
+    (JsPath \ "features").write[Seq[ReferencedPlaceFeature]]
+  )(fc => ("FeatureCollection", fc.features))
+  
+  implicit val gazetteerRecordCollectionWrites: Writes[GeoJSONFeatureCollection[GazetteerRecordFeature]] = (
+    (JsPath \ "type").write[String] and
+    (JsPath \ "features").write[Seq[GazetteerRecordFeature]]
   )(fc => ("FeatureCollection", fc.features))
   
 }
