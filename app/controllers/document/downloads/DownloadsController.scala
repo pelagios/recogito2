@@ -53,19 +53,16 @@ class DownloadsController @Inject() (
 
   /** Exports either 'plain' annotation CSV, or merges annotations with original DATA_* uploads, if any **/
   def downloadCSV(documentId: String, exportTables: Boolean) = AsyncStack { implicit request =>
-    if (exportTables) {
-      download(documentId, { doc =>
+    download(documentId, { doc =>
+      if (exportTables)
         exportMergedTables(doc).map { case (file, filename) =>
           Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + filename })
         }
-      })
-    } else {
-      download(documentId, { doc =>
+      else
         annotationsToCSV(documentId).map { csv =>
           Ok.sendFile(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
-        } 
-      })
-    }
+        }
+    })
   }
   
   private def downloadRDF(documentId: String, format: RDFFormat, extension: String) = AsyncStack { implicit request =>
@@ -80,13 +77,17 @@ class DownloadsController @Inject() (
   def downloadRDFXML(documentId: String) = downloadRDF(documentId, RDFFormat.RDFXML, "rdf.xml") 
   def downloadJSONLD(documentId: String) = downloadRDF(documentId, RDFFormat.JSONLD_PRETTY, "jsonld") 
 
-  def downloadGeoJSON(documentId: String) = AsyncStack { implicit request =>
+  def downloadGeoJSON(documentId: String, asGazetteer: Boolean) = AsyncStack { implicit request =>
     download(documentId, { doc =>
-      placesToGeoJSON(documentId).map { featureCollection =>
-        Ok(Json.prettyPrint(Json.toJson(featureCollection)))
+      val f = 
+        if (asGazetteer) exportGeoJSONGazetteer(doc)
+        else placesToGeoJSON(documentId)
+        
+      f.map { featureCollection =>
+        Ok(Json.prettyPrint(featureCollection))
           .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
       }
-    })    
+    })
   }
   
   def downloadTEI(documentId: String) = AsyncStack { implicit request =>

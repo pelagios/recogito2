@@ -114,82 +114,64 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
       tmp.file
     }
     
-    val fAnnotations = annotationService.findByDocId(doc.id)
-    val fPlaces = placeService.listPlacesInDocument(doc.id)
-
-    val f = for {
-      annotations <- fAnnotations
-      places <- fPlaces
-    } yield (annotations.map(_._1), places.items.map(_._1))
-    
-    f.map { case (annotations, places) =>
-      scala.concurrent.blocking {
+    exportMergedDocument[(File, String)](doc, { case (annotations, places, documentDir) =>
+      
+      def extendRow(row: List[String], index: Int): List[String] = {
+        val anchor = "row:" + index
+        val maybeAnnotation = annotations.find(_.anchor == anchor)
         
-        def extendRow(row: List[String], index: Int): List[String] = {
-          val anchor = "row:" + index
-          val maybeAnnotation = annotations.find(_.anchor == anchor)
-          
-          val maybeFirstEntity = maybeAnnotation.flatMap(getFirstEntityBody(_))
-          val maybePlace = maybeFirstEntity.flatMap(body => findPlace(body, places))
-          
-          row ++ Seq(
-            maybeFirstEntity.map(_.hasType.toString).getOrElse(EMPTY),
-            maybeFirstEntity.flatMap(_.uri).getOrElse(EMPTY),
-            maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(EMPTY),
-            maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY)
-          )
-        }
+        val maybeFirstEntity = maybeAnnotation.flatMap(getFirstEntityBody(_))
+        val maybePlace = maybeFirstEntity.flatMap(body => findPlace(body, places))
         
-        val documentDir = uploads.getDocumentDir(doc.owner.getUsername, doc.id).get
-        val tables =
-          doc.fileparts
-            .withFilter(part => ContentType.withName(part.getContentType).map(_.isData).getOrElse(false))
-            .map(part => (part, new File(documentDir, part.getFile)))
-            
-        val outputFiles = tables.map { case (part, file) =>   
-          val header = Source.fromFile(file).getLines.next
-          val delimiter = guessDelimiter(header)        
-          val headerFields = 
-            header.asCsvReader[Seq[String]](delimiter, header = false).toIterator.next.get ++
-            Seq( // Additional columns added by Recogito
-              "recogito_type",
-              "recogito_uri",
-              "recogito_lat",
-              "recogito_lon")
-       
-          val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".csv"))
-          val writer = tmp.file.asCsvWriter[Seq[String]](delimiter, headerFields)
-          
-          var rowCounter = 0
-  
-          val extendedRows = file.asCsvReader[List[String]](delimiter, header = true).map {
-            case Success(row) =>
-              val extendedRow = extendRow(row, rowCounter)
-              rowCounter += 1
-              extendedRow
-              
-            case _ => 
-              rowCounter += 1
-              Seq.empty[String]
-          }
-          
-          extendedRows.foreach(row => writer.write(row))
-          writer.close()
-          
-          (part, tmp.file)
-        }
-        
-        if (outputFiles.isEmpty)
-          // Can't ever happen from the UI
-          throw new RuntimeException("Attempt to export merged table from a non-table document")
-        else if (outputFiles.size == 1)
-          // Single table - export CSV directly
-          (outputFiles.head._2, doc.id + ".csv")
-        else
-          // Multiple tables - package into a Zip
-          (createZip(outputFiles), doc.id + ".zip")
+        row ++ Seq(
+          maybeFirstEntity.map(_.hasType.toString).getOrElse(EMPTY),
+          maybeFirstEntity.flatMap(_.uri).getOrElse(EMPTY),
+          maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(EMPTY),
+          maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY)
+        )
       }
-    }
+            
+      val tables =
+        doc.fileparts
+          .withFilter(part => ContentType.withName(part.getContentType).map(_.isData).getOrElse(false))
+          .map(part => (part, new File(documentDir, part.getFile)))
+          
+      val outputFiles = tables.map { case (part, file) =>   
+        val header = Source.fromFile(file).getLines.next
+        val delimiter = guessDelimiter(header)        
+        val headerFields = 
+          header.asCsvReader[Seq[String]](delimiter, header = false).toIterator.next.get ++
+          Seq( // Additional columns added by Recogito
+            "recogito_type",
+            "recogito_uri",
+            "recogito_lat",
+            "recogito_lon")
+     
+        val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".csv"))
+        val writer = tmp.file.asCsvWriter[Seq[String]](delimiter, headerFields)
+        
+        parseCSV(file, delimiter, header = true, { case (row, idx) =>
+          extendRow(row, idx)
+        }).foreach { _ match {
+          case Some(row) => writer.write(row)
+          case None => writer.write(Seq.empty[String])
+        }}
+        
+        writer.close()
+        
+        (part, tmp.file)
+      }
+      
+      if (outputFiles.isEmpty)
+        // Can't ever happen from the UI
+        throw new RuntimeException("Attempt to export merged table from a non-table document")
+      else if (outputFiles.size == 1)
+        // Single table - export CSV directly
+        (outputFiles.head._2, doc.id + ".csv")
+      else
+        // Multiple tables - package into a Zip
+        (createZip(outputFiles), doc.id + ".zip")
+    })
   }
 
 }

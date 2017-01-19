@@ -2,6 +2,7 @@ package controllers
 
 import java.io.File
 import kantan.csv.ops._
+import kantan.codecs.Result.Success
 import models.annotation.Annotation
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
@@ -18,6 +19,11 @@ trait HasCSVParsing {
       .sortBy(_._2).reverse
       
     ranked.head._1
+  }
+  
+  protected def guessDelimiter(file: File): Char = {
+    val header = Source.fromFile(file).getLines.next
+    guessDelimiter(header)     
   }
   
   protected def extractLine(file: File, rowIdx: Int)(implicit ctx: ExecutionContext): Future[Map[String, String]] = Future {
@@ -38,6 +44,22 @@ trait HasCSVParsing {
       
       headerFields.zip(lineFields).toMap
     }
+  }
+  
+  protected def parseCSV[T](file: File, delimiter: Char, header: Boolean, op: (List[String], Int) => T) = {
+    var rowCounter = 0
+    
+    file.asCsvReader[List[String]](delimiter, header).map {
+      case Success(row) =>
+        val t = Some(op(row, rowCounter))
+        rowCounter += 1
+        t
+        
+      case _ => 
+        rowCounter += 1
+        None
+    }
+    
   }
   
 }

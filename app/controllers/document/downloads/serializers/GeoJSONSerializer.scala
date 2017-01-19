@@ -1,16 +1,32 @@
 package controllers.document.downloads.serializers
 
 import com.vividsolutions.jts.geom.Geometry
-import models.HasGeometry
+import controllers.HasCSVParsing
+import java.io.File
+import kantan.csv.ops._
+import kantan.codecs.Result.Success
+import models.{ ContentType, HasGeometry }
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import models.place.{ GazetteerRecord, PlaceService }
+import models.document.DocumentInfo
+import models.place._
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import scala.language.implicitConversions
-import storage.ES
+import storage.{ ES, Uploads }
 
-trait GeoJSONSerializer extends BaseSerializer {
+trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
+  
+  private def findGazetteerRecords(annotation: Annotation, places: Seq[Place]): Seq[GazetteerRecord] = {
+    val placeBodies = annotation.bodies.filter(_.hasType == AnnotationBody.PLACE)
+    val placeURIs = placeBodies.flatMap(_.uri)
+    
+    placeURIs.flatMap { uri =>
+      val maybePlace = places.find(_.uris.contains(uri))
+      maybePlace.flatMap(_.isConflationOf.find(_.uri == uri))
+    }
+  }
 
   def placesToGeoJSON(documentId: String)(implicit placeService: PlaceService, annotationService: AnnotationService, ctx: ExecutionContext) = {
     val fAnnotations = annotationService.findByDocId(documentId, 0, ES.MAX_SIZE)
@@ -44,10 +60,59 @@ trait GeoJSONSerializer extends BaseSerializer {
         }
       }
 
-      GeoJSONFeatureCollection(features)      
+      Json.toJson(GeoJSONFeatureCollection(features))      
     }
   }
-
+  
+  def exportGeoJSONGazetteer(
+      doc: DocumentInfo
+  )(implicit annotationService: AnnotationService,
+      placeService: PlaceService, 
+      uploads: Uploads,
+      ctx: ExecutionContext) = exportMergedDocument(doc, { case (annotations, places, documentDir) =>
+        
+      val now = new DateTime()
+      
+      def rowToFeature(row: List[String], index: Int) = {
+        val anchor = "row:" + index
+        val maybeAnnotation = annotations.find(_.anchor == anchor)
+        val matches = maybeAnnotation.map(annotation => findGazetteerRecords(annotation, places)).getOrElse(Seq.empty[GazetteerRecord])
+        
+        GazetteerRecord(
+          "http://www.example.com/" + row(0),
+          Gazetteer(doc.title),
+          now, // last sync
+          None, // last change
+          row(1),
+          Seq.empty[Description],
+          Seq.empty[Name],
+          None, // Geometry
+          None, // representativePoint: Option[Coordinate],
+          None, //   temporalBounds: Option[TemporalBounds],
+          Seq.empty[String], //  placeTypes: Seq[String],
+          None, // countryCode: Option[CountryCode],
+          None, //  population: Option[Long],
+          matches.map(_.uri),
+          Seq.empty[String] // exactMatches: Seq[String]
+        )
+      }
+      
+      val tables =
+        doc.fileparts
+          .withFilter(part => ContentType.withName(part.getContentType).map(_.isData).getOrElse(false))
+          .map(part => (part, new File(documentDir, part.getFile)))
+          
+      val features = tables.flatMap { case (part, file) =>
+        val delimiter = guessDelimiter(file)
+        
+        parseCSV(file, delimiter, header = true, { case (row, idx) =>
+          rowToFeature(row, idx)
+        }).toList.flatten
+      }
+      
+      Json.toJson(features)
+  })
+  
 }
 
 case class GeoJSONFeature(geometry: Geometry, titles: Seq[String], gazetteerRecords: Seq[GazetteerRecord], annotations: Seq[Annotation]) {

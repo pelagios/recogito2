@@ -1,8 +1,13 @@
 package controllers.document.downloads.serializers
 
+import java.io.File
 import models.ContentType
-import models.annotation.{ Annotation, AnnotationBody }
+import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import models.place.{ GazetteerRecord, Place, PlaceService }
 import play.api.Logger
+import scala.concurrent.ExecutionContext
+import storage.{ ES, Uploads }
+import models.document.DocumentInfo
 
 trait BaseSerializer {
   
@@ -57,5 +62,26 @@ trait BaseSerializer {
     
   protected def getTagBodies(a: Annotation): Seq[AnnotationBody] =
     a.bodies.filter(_.hasType == AnnotationBody.TAG)
-
+  
+  protected def exportMergedDocument[T](
+    doc: DocumentInfo,
+    fn: (Seq[Annotation], Seq[Place], File) => T
+  )(implicit placeService: PlaceService, annotationService: AnnotationService, uploads: Uploads, ctx: ExecutionContext) = {
+    
+    val fAnnotations = annotationService.findByDocId(doc.id, 0, ES.MAX_SIZE)
+    val fPlaces = placeService.listPlacesInDocument(doc.id, 0, ES.MAX_SIZE)
+    
+    val f = for {
+      annotations <- fAnnotations
+      places <- fPlaces
+    } yield (annotations.map(_._1), places.items.map(_._1))
+    
+    f.map { case (annotations, places) =>
+      scala.concurrent.blocking {
+        val documentDir = uploads.getDocumentDir(doc.owner.getUsername, doc.id).get
+        fn(annotations, places, documentDir)
+      }
+    }
+  }
+    
 }
