@@ -100,8 +100,8 @@
             </ul>
           } else { @if(doc.fileparts.exists(_.getContentType.startsWith("DATA"))) {
             <ul>
-              <li>
-                @if(doc.fileparts.filter(_.getContentType.startsWith("DATA")).size == 1) {
+              @if(doc.fileparts.filter(_.getContentType.startsWith("DATA")).size == 1) {
+                <li>
                   <div class="description">
                     <h3>Merged CSV</h3>
                     <p>
@@ -111,7 +111,9 @@
                   <div class="button-container">
                     <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
                   </div>
-                } else {
+                </li>
+              } else {
+                <li>
                   <div class="description">
                     <h3>Merged CSVs</h3>
                     <p>
@@ -121,7 +123,22 @@
                   <div class="button-container">
                     <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> ZIP</a>
                   </div>
-                }
+                </li>
+              }
+
+              <li class="two-buttons">
+                <div class="description">
+                  <h3>Pelagios Gazetteer GeoJSON</h3>
+                  <p>
+                    Converts your original spreadsheet and annotations to GeoJSON, following
+                    the conventions on encoding gazetteers in GeoJSON. <u>A field mapping
+                    must be configured before running the conversion.</u>
+                  </p>
+                </div>
+                <div class="button-container">
+                  <a href="#" class="btn orange small settings"><span class="icon">&#xf0ad;</span> Settings</a>
+                  <a href="#" class="btn small disabled"><span class="icon">&#xf019;</span> GeoJSON</a>
+                </div>
               </li>
             </ul>
           } else {

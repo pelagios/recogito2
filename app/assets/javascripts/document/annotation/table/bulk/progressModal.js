@@ -51,7 +51,7 @@ define([
                   retriesLeft -= 1;
                   window.setTimeout(query, POLL_INTERVAL_MS);
                 } else {
-                  new Alert(Alert.ERROR, 'Error', error);
+                  new Alert(Alert.ERROR, 'Error', error.responseText);
                 }
               },
 
