@@ -4,7 +4,6 @@ import java.io.{ BufferedInputStream, File, FileInputStream, FileOutputStream }
 import java.util.UUID
 import java.util.zip.{ ZipEntry, ZipOutputStream }
 import kantan.csv.ops._
-import kantan.codecs.Result.Success
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.DocumentInfo
 import models.place.{ Place, PlaceService }

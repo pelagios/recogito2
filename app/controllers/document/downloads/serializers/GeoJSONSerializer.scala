@@ -3,8 +3,6 @@ package controllers.document.downloads.serializers
 import com.vividsolutions.jts.geom.Geometry
 import controllers.HasCSVParsing
 import java.io.File
-import kantan.csv.ops._
-import kantan.codecs.Result.Success
 import models.{ ContentType, HasGeometry }
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.DocumentInfo
