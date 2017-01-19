@@ -7,6 +7,7 @@ require.config({
     { name : 'document/annotation/image/app' },
     { name : 'document/annotation/table/app' },
     { name : 'document/annotation/text/app' },
+    { name : 'document/downloads/app' },
     { name : 'document/map/app' },
     { name : 'document/settings/delete' },
     { name : 'document/settings/metadata' },
