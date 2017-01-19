@@ -12,12 +12,17 @@ import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import storage.{ ES, Uploads }
 
+case class FieldMapping(mappings: Map[String, Int]) {
+  
+}
+
 trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
   
   private def findGazetteerRecords(annotation: Annotation, places: Seq[Place]): Seq[GazetteerRecord] = {
-    val placeBodies = annotation.bodies.filter(_.hasType == AnnotationBody.PLACE)
-    val placeURIs = placeBodies.flatMap(_.uri)
-    
+    val placeURIs = annotation.bodies
+      .filter(_.hasType == AnnotationBody.PLACE)
+      .flatMap(_.uri)
+      
     placeURIs.flatMap { uri =>
       val maybePlace = places.find(_.uris.contains(uri))
       maybePlace.flatMap(_.isConflationOf.find(_.uri == uri))
@@ -35,7 +40,6 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
     
     f.map { case (annotations, places) =>
       val placeAnnotations = annotations.filter(_.bodies.map(_.hasType).contains(AnnotationBody.PLACE))
-        
       val features = places.items.flatMap { case (place, _) =>        
         val annotationsOnThisPlace = placeAnnotations.filter { a =>
           // All annotations that include place URIs of this place
@@ -46,13 +50,8 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         val placeURIs = annotationsOnThisPlace.flatMap(_.bodies).filter(_.hasType == AnnotationBody.PLACE).flatMap(_.uri)
         val referencedRecords = place.isConflationOf.filter(g => placeURIs.contains(g.uri))
         
-        place.representativeGeometry.map { geometry => 
-          ReferencedPlaceFeature(
-            geometry,
-            referencedRecords,
-            annotationsOnThisPlace
-          )
-        }
+        place.representativeGeometry.map(geometry => 
+          ReferencedPlaceFeature(geometry, referencedRecords, annotationsOnThisPlace))
       }
 
       Json.toJson(GeoJSONFeatureCollection(features)) 
@@ -71,7 +70,7 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         val maybeAnnotation = annotations.find(_.anchor == anchor)
         val matches = maybeAnnotation.map(annotation => findGazetteerRecords(annotation, places)).getOrElse(Seq.empty[GazetteerRecord])
         
-        /** TODO build record from mapping config **/
+        /** TODO build record from field mapping config **/
         
         GazetteerRecordFeature(
           row(0), // ID
@@ -91,11 +90,8 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
           .map(part => (part, new File(documentDir, part.getFile)))
           
       val features = tables.flatMap { case (part, file) =>
-        val delimiter = guessDelimiter(file)
-        
-        parseCSV(file, delimiter, header = true, { case (row, idx) =>
-          rowToFeature(row, idx)
-        }).toList.flatten
+        parseCSV(file, guessDelimiter(file), header = true, { case (row, idx) =>
+          rowToFeature(row, idx) }).toList.flatten
       }
       
       Json.toJson(GeoJSONFeatureCollection(features))
@@ -168,16 +164,12 @@ case class ReferencedPlaceFeature(
   annotations      : Seq[Annotation]
 ) extends GeoJSONFeature {
   
-  private val bodies = annotations.flatMap(_.bodies)
-  
+  private val bodies = annotations.flatMap(_.bodies) 
   private def bodiesOfType(t: AnnotationBody.Type) = bodies.filter(_.hasType == t)
 
   val titles = gazetteerRecords.map(_.title).distinct
-  
   val quotes = bodiesOfType(AnnotationBody.QUOTE).flatMap(_.value)
-  
   val comments = bodiesOfType(AnnotationBody.COMMENT).flatMap(_.value)
-  
   val tags = bodiesOfType(AnnotationBody.TAG).flatMap(_.value)
   
 }
