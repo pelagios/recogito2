@@ -13,14 +13,13 @@ require([
         body = jQuery(
           '<div>' +
             '<form class="crud">' +
-              '<p class="instructions">Configure the spreadsheet columns that ' +
-                'correspond to gazetteer properties. Unmapped columns will be exported as ' +
-                'generic GeoJSON properties.</p>' +
+              '<p class="instructions">Configure the columns that correspond to gazetteer ' +
+                'properties. Unmapped columns will be exported as generic GeoJSON properties.</p>' +
 
               // TODO base URL
 
               '<dl id="id">' +
-                '<dt><label for="id">ID</label></dt>' +
+                '<dt><label for="id">Unique ID</label></dt>' +
                 '<dd><select>' + '</select></dd>' +
                 '<dd class="info">Required</dd>' +
               '</dl>' +
@@ -53,7 +52,7 @@ require([
               '</dl>' +
 
               // TODO geometry
-              
+
               /*
               '<dl class="lat">' +
                 '<dt><label for="lat">Latitude</label></dt>' +
@@ -69,7 +68,7 @@ require([
               */
 
               '<div class="buttons">' +
-                '<button type="submit" class="btn">Go</button>' +
+                '<button type="submit" class="btn">OK</button>' +
                 '<button class="btn outline cancel">Cancel</button>' +
               '</div>' +
             '</form>' +
@@ -84,7 +83,7 @@ require([
           return false;
         };
 
-    Modal.apply(this, [ 'Settings', body, 'settings' ]);
+    Modal.apply(this, [ 'Gazetteer Export Settings', body, 'settings' ]);
 
     init();
     self.open();
