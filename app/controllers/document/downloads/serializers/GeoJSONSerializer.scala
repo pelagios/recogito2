@@ -2,6 +2,7 @@ package controllers.document.downloads.serializers
 
 import com.vividsolutions.jts.geom.Geometry
 import controllers.HasCSVParsing
+import controllers.document.downloads.FieldMapping
 import java.io.File
 import models.{ ContentType, HasGeometry }
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
@@ -12,20 +13,19 @@ import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import storage.{ ES, Uploads }
 
-case class FieldMapping(mappings: Map[String, Int]) {
-  
-}
-
 trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
   
   private def findGazetteerRecords(annotation: Annotation, places: Seq[Place]): Seq[GazetteerRecord] = {
+    // Place URIs in this annotation
     val placeURIs = annotation.bodies
       .filter(_.hasType == AnnotationBody.PLACE)
       .flatMap(_.uri)
-      
+            
     placeURIs.flatMap { uri =>
-      val maybePlace = places.find(_.uris.contains(uri))
-      maybePlace.flatMap(_.isConflationOf.find(_.uri == uri))
+      places.find(_.uris.contains(uri))
+        .map(_.isConflationOf)
+        .getOrElse(Seq.empty[GazetteerRecord])
+        .filter(_.uri == uri)      
     }
   }
 
@@ -59,7 +59,8 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
   }
   
   def exportGeoJSONGazetteer(
-      doc: DocumentInfo
+      doc: DocumentInfo,
+      fieldMapping: FieldMapping
   )(implicit annotationService: AnnotationService,
       placeService: PlaceService, 
       uploads: Uploads,
@@ -70,16 +71,16 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         val maybeAnnotation = annotations.find(_.anchor == anchor)
         val matches = maybeAnnotation.map(annotation => findGazetteerRecords(annotation, places)).getOrElse(Seq.empty[GazetteerRecord])
         
-        /** TODO build record from field mapping config **/
+        val id = row(fieldMapping.FIELD_ID)
         
         GazetteerRecordFeature(
-          row(0), // ID
-          "http://www.example.com/" + row(0),
-          row(1), // Title
-          Seq.empty[String], // names
+          id,
+          fieldMapping.BASE_URL + id,
+          row(fieldMapping.FIELD_TITLE),
+          fieldMapping.FIELDS_NAME.map(idx => row(idx)),
           None, // geometry
-          None, // description
-          None, // country code
+          fieldMapping.FIELD_DESCRIPTION.map(row(_)),
+          fieldMapping.FIELD_COUNTRY.map(row(_)),
           matches.map(_.uri)
         )
       }

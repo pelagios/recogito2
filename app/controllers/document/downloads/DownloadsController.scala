@@ -20,6 +20,19 @@ import play.api.libs.streams.Streams
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
 
+case class FieldMapping(
+  
+  // TODO normalize URL
+    
+  // TODO how to deal with geometry? Support WKT + lat/lon in separate columns?
+  
+  BASE_URL          : String,
+  FIELD_ID          : Int,
+  FIELD_TITLE       : Int,
+  FIELD_DESCRIPTION : Option[Int],
+  FIELD_COUNTRY     : Option[Int],
+  FIELDS_NAME       : Seq[Int])
+
 class DownloadsController @Inject() (
     val config: Configuration,
     val users: UserService,
@@ -79,8 +92,18 @@ class DownloadsController @Inject() (
 
   def downloadGeoJSON(documentId: String, asGazetteer: Boolean) = AsyncStack { implicit request =>
     download(documentId, { doc =>
+      
+      /** DUMMY! Replace with real mapping, POSTed from user **/
+      val fieldMapping = FieldMapping(
+        "http://www.example.com/",
+        0,
+        1,
+        None,
+        None,
+        Seq.empty[Int])
+      
       val f = 
-        if (asGazetteer) exportGeoJSONGazetteer(doc)
+        if (asGazetteer) exportGeoJSONGazetteer(doc, fieldMapping)
         else placesToGeoJSON(documentId)
         
       f.map { featureCollection =>
