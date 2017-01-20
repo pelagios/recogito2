@@ -137,7 +137,6 @@ define([
           });
 
           return false;
-
         },
 
         onCancel = function() {

@@ -3,11 +3,31 @@
   width:620px;
 }
 
+.modal-header.validation-error {
+  border-bottom-color:@error-msg-border;
+}
+
 .modal-body {
   padding:0;
   background-color:@blueish-white;
 
   form.crud {
+
+    .validation-error {
+      padding:8px 15px;
+      font-size:16px;
+      color:@error-msg-type;
+      background-color:@error-msg-bg;
+      border-width:0  0 1px 0;
+      border-style:solid;
+      border-color:@error-msg-border;
+
+      .icon {
+        font-size:14px;
+        padding-right:3px;
+      }
+
+    }
 
     .instructions {
       margin:0;
