@@ -34,4 +34,18 @@ case class DocumentInfo(document: DocumentRecord, fileparts: Seq[DocumentFilepar
   
   lazy val isPublic: Boolean = document.getIsPublic
   
+  /** Convenience methods for filepart access **/
+  
+  lazy val textParts = fileparts.filter(_.getContentType.startsWith("TEXT"))
+  
+  lazy val hasTextParts = textParts.size > 0
+  
+  lazy val imageParts = fileparts.filter(_.getContentType.startsWith("TEXT"))
+  
+  lazy val hasImageParts = imageParts.size > 0
+  
+  lazy val dataParts = fileparts.filter(_.getContentType.startsWith("DATA"))
+  
+  lazy val hasDataParts = dataParts.size > 0
+  
 }
