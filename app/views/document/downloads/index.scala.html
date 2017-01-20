@@ -149,7 +149,7 @@
                 <div class="button-container">
                   <a href="#" class="btn orange small settings"><span class="icon">&#xf06a;</span> Settings</a>
                   <form action="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id, true)" method="POST">
-                    <input type="hidden" name="settings-json" />
+                    <input type="hidden" id="json" name="json" />
                     <button type="submit" class="btn small download" disabled="true"><span class="icon">&#xf019;</span> GeoJSON</button>
                   </form>
                 </div>

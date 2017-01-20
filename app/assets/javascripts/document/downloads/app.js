@@ -15,7 +15,7 @@ require([
     var settings = (jQuery.isPlainObject(strOrObj)) ? strOrObj : JSON.parse(strOrObj),
 
         isValid = function() {
-          return settings.id && settings.title;
+          return settings.id !== undefined && settings.title !== undefined;
         },
 
         asObj = function() {
@@ -103,7 +103,7 @@ require([
         restoreSettings = function() {
           var setIfDefined = function(key, input) {
                 var val = opt_settings.get(key);
-                if (val)
+                if (val !== undefined)
                   input.val(val);
               };
 
@@ -118,17 +118,17 @@ require([
 
         /** Persists the current settings to the local store **/
         getSettings = function() {
-          var undefinedIfEmpty = function(str) {
+          var parseNumber = function(str) {
                 if (str.trim().length === 0) return undefined;
-                else return str;
+                else return parseInt(str);
               };
 
           return new Settings({
-            'id': undefinedIfEmpty(body.find('#id select').val()),
-            'title': undefinedIfEmpty(body.find('#title select').val()),
-            'name': undefinedIfEmpty(body.find('.name select').val()),
-            'description': undefinedIfEmpty(body.find('#description select').val()),
-            'country': undefinedIfEmpty(body.find('#country select').val())
+            'id': parseNumber(body.find('#id select').val()),
+            'title': parseNumber(body.find('#title select').val()),
+            'name': parseNumber(body.find('.name select').val()),
+            'description': parseNumber(body.find('#description select').val()),
+            'country': parseNumber(body.find('#country select').val())
           });
         },
 
@@ -177,6 +177,8 @@ require([
         dataURL = jsRoutes.controllers.document.DocumentController
           .getDataTable(Config.documentId, Config.dataPartSequenceNo[0], CSV_SNIPPET_SIZE).absoluteURL(),
 
+        payloadField = jQuery('.gazetteer #json'),
+
         btnSettings = jQuery('.gazetteer .settings'),
         btnDownload = jQuery('.gazetteer .download'),
 
@@ -200,6 +202,7 @@ require([
             btnSettings.find('.icon').html('&#xf00c;');
 
             btnDownload.prop('disabled', false);
+            payloadField.val(settings.asString());
           }
         },
 

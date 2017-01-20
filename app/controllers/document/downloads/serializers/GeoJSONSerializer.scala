@@ -75,9 +75,9 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         
         GazetteerRecordFeature(
           id,
-          fieldMapping.BASE_URL + id,
+          fieldMapping.BASE_URL.getOrElse("http://www.example.com/") + id,
           row(fieldMapping.FIELD_TITLE),
-          fieldMapping.FIELDS_NAME.map(idx => row(idx)),
+          fieldMapping.FIELDS_NAME.map(idx => Seq(row(idx))).getOrElse(Seq.empty[String]),
           None, // geometry
           fieldMapping.FIELD_DESCRIPTION.map(row(_)),
           fieldMapping.FIELD_COUNTRY.map(row(_)),
@@ -140,6 +140,7 @@ object GeoJSONFeature extends HasGeometry {
     (JsPath \ "type").write[String] and
     (JsPath \ "id").write[String] and
     (JsPath \ "uri").write[String] and
+    (JsPath \ "title").write[String] and
     (JsPath \ "geometry").writeNullable[Geometry] and
     (JsPath \ "names").writeNullable[Seq[JsObject]] and
     (JsPath \ "links").writeNullable[JsObject]
@@ -147,6 +148,7 @@ object GeoJSONFeature extends HasGeometry {
       "Feature",
       f.id,
       f.uri,
+      f.title,
       f.geometry,
       toOptSeq(f.names.map(name => Json.obj("name" -> name))),
       {

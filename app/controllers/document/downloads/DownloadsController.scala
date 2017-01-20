@@ -11,8 +11,10 @@ import models.document.{ DocumentInfo, DocumentService }
 import models.place.PlaceService
 import models.user.UserService
 import org.apache.jena.riot.RDFFormat
-import play.api.Configuration
-import play.api.libs.json.Json
+import play.api.{ Configuration, Logger }
+import play.api.libs.json._
+import play.api.libs.json.Reads._
+import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.Enumerator
 import play.api.mvc.{ AnyContent, Result }
 import play.api.http.HttpEntity
@@ -26,12 +28,25 @@ case class FieldMapping(
     
   // TODO how to deal with geometry? Support WKT + lat/lon in separate columns?
   
-  BASE_URL          : String,
+  BASE_URL          : Option[String],
   FIELD_ID          : Int,
   FIELD_TITLE       : Int,
+  FIELDS_NAME       : Option[Int],
   FIELD_DESCRIPTION : Option[Int],
-  FIELD_COUNTRY     : Option[Int],
-  FIELDS_NAME       : Seq[Int])
+  FIELD_COUNTRY     : Option[Int])
+  
+object FieldMapping {
+  
+  implicit val fieldMappingReads: Reads[FieldMapping] = (
+    (JsPath \ "base_url").readNullable[String] and
+    (JsPath \ "id").read[Int] and
+    (JsPath \ "title").read[Int] and
+    (JsPath \ "name").readNullable[Int] and
+    (JsPath \ "description").readNullable[Int] and
+    (JsPath \ "country").readNullable[Int]
+  )(FieldMapping.apply _)
+  
+}
 
 class DownloadsController @Inject() (
     val config: Configuration,
@@ -92,23 +107,27 @@ class DownloadsController @Inject() (
 
   def downloadGeoJSON(documentId: String, asGazetteer: Boolean) = AsyncStack { implicit request =>
     download(documentId, { doc =>
-      
-      /** DUMMY! Replace with real mapping, POSTed from user **/
-      val fieldMapping = FieldMapping(
-        "http://www.example.com/",
-        0,
-        1,
-        None,
-        None,
-        Seq.empty[Int])
-      
-      val f = 
-        if (asGazetteer) exportGeoJSONGazetteer(doc, fieldMapping)
-        else placesToGeoJSON(documentId)
-        
-      f.map { featureCollection =>
-        Ok(Json.prettyPrint(featureCollection))
-          .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
+      request.body.asFormUrlEncoded.flatMap(_.get("json").flatMap(_.headOption)) match {
+        case Some(str) =>
+          Json.fromJson[FieldMapping](Json.parse(str)) match {
+            case result: JsSuccess[FieldMapping] =>
+              val f = 
+                if (asGazetteer) exportGeoJSONGazetteer(doc, result.get)
+                else placesToGeoJSON(documentId)
+                
+              f.map { featureCollection =>
+                Ok(Json.prettyPrint(featureCollection))
+                  .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
+              }
+              
+            case error: JsError =>
+              Logger.warn("Attempt to download gazetteer but field mapping invalid: " + str + "\n" + error)
+              Future.successful(BadRequest)
+          }
+          
+        case None =>
+          Logger.warn("Attempt to download gazetteer without field mapping payload")
+          Future.successful(BadRequest)
       }
     })
   }
