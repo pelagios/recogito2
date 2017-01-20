@@ -191,7 +191,8 @@ require([
         dataURL = jsRoutes.controllers.document.DocumentController
           .getDataTable(Config.documentId, Config.dataPartSequenceNo[0], CSV_SNIPPET_SIZE).absoluteURL(),
 
-        btnSettings = jQuery('.settings'),
+        btnSettings = jQuery('.gazetteer .settings'),
+        btnDownload = jQuery('.gazetteer .download'),
 
         fields = [], // to be populated from the CSV snippet
 
@@ -207,10 +208,12 @@ require([
         },
 
         refreshSettingsButton = function(settings) {
-          if (settings.isValid()) {
+          if (settings && settings.isValid()) {
             btnSettings.removeClass('orange');
             btnSettings.addClass('outline');
             btnSettings.find('.icon').html('&#xf00c;');
+
+            btnDownload.removeClass('disabled');
           }
         },
 

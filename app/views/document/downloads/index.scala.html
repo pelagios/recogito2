@@ -137,7 +137,7 @@
                 </li>
               }
 
-              <li class="two-buttons">
+              <li class="two-buttons gazetteer">
                 <div class="description">
                   <h3>Pelagios Gazetteer GeoJSON</h3>
                   <p>
@@ -148,7 +148,7 @@
                 </div>
                 <div class="button-container">
                   <a href="#" class="btn orange small settings"><span class="icon">&#xf06a;</span> Settings</a>
-                  <a @*href="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id, true)"*@ class="btn small disabled"><span class="icon">&#xf019;</span> GeoJSON</a>
+                  <a @*href="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id, true)"*@ class="btn small disabled download"><span class="icon">&#xf019;</span> GeoJSON</a>
                 </div>
               </li>
             </ul>
