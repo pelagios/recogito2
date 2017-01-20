@@ -11,6 +11,7 @@ import play.api.Configuration
 import play.api.mvc.Action
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
+import scala.io.Source
 
 class DocumentController @Inject() (
     val config: Configuration,
@@ -93,7 +94,7 @@ class DocumentController @Inject() (
     })
   }
   
-  def getDataTable(docId: String, partNo: Int) = AsyncStack { implicit request =>
+  def getDataTable(docId: String, partNo: Int, lines: Option[Int]) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (document, currentPart, accesslevel) =>
       Future {
@@ -101,7 +102,15 @@ class DocumentController @Inject() (
           val documentDir = uploads.getDocumentDir(document.owner.getUsername, document.id).get
           val file = new File(documentDir, currentPart.getFile)
           if (file.exists)
-            Ok.sendFile(file)
+            lines match {
+              case Some(limit) =>
+                Ok(Source.fromFile(file).getLines().take(limit).mkString("\n"))
+                  .as("text/csv")
+                  .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + currentPart.getId + "." + limit + ".csv" })
+                
+              case None =>
+                Ok.sendFile(file)
+            }
           else
             NotFound
         }

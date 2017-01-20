@@ -85,7 +85,7 @@ DELETE  /document/:id/settings/delete-annotations    controllers.document.settin
 GET     /document/:id/part/:partNo/manifest          controllers.document.DocumentController.getImageManifest(id: String, partNo: Int)
 GET     /document/:id/part/:partNo/tiles/*path       controllers.document.DocumentController.getImageTile(id: String, partNo: Int, path: String)
 GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
-GET     /document/:id/part/:partNo/data              controllers.document.DocumentController.getDataTable(id: String, partNo: Int)
+GET     /document/:id/part/:partNo/data              controllers.document.DocumentController.getDataTable(id: String, partNo: Int, lines: Option[Int] ?= None)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document and part base paths
