@@ -12,9 +12,16 @@
     @views.html.document.standardMeta(doc, annotationCount)
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/downloads/index.css")"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
-     @if(doc.hasDataParts) {
+    @if(doc.hasDataParts) {
       <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>
+      <script src="@routes.WebJarAssets.at(webjars.locate("papaparse.min.js"))"></script>
       <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/downloads/app.js")"></script>
+      <script>
+        window.config = {
+          documentId: '@doc.id',
+          dataPartSequenceNo: [ @doc.dataParts.map(_.getSequenceNo).mkString(",") ]
+        }
+      </script>
     }
   </head>
   <body>
@@ -150,6 +157,12 @@
           }}
         </div>
       </div>
+
+      @if(doc.hasDataParts) {
+        @helper.javascriptRouter("jsRoutes")(
+          controllers.document.routes.javascript.DocumentController.getDataTable
+        )
+      }
     </div>
   </body>
 </html>

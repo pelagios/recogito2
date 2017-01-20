@@ -4,11 +4,18 @@ require.config({
 });
 
 require([
-  'common/ui/modal'
-], function(Modal) {
+  'common/ui/modal',
+  'common/config'
+], function(Modal, Config) {
 
-  var SettingsModal = function() {
+  var SettingsModal = function(fields) {
     var self = this,
+
+        options =
+          '<option></option>' + // Empty option
+          fields.map(function(name, idx) {
+            return '<option value="' + idx + '">' + name + '</option>';
+          }).join(''),
 
         body = jQuery(
           '<div>' +
@@ -20,19 +27,19 @@ require([
 
               '<dl id="id">' +
                 '<dt><label for="id">Unique ID</label></dt>' +
-                '<dd><select>' + '</select></dd>' +
+                '<dd><select>' + options + '</select></dd>' +
                 '<dd class="info">Required</dd>' +
               '</dl>' +
 
               '<dl id="title">' +
                 '<dt><label for="title">Title</label></dt>' +
-                '<dd><select>' + '</select></dd>' +
+                '<dd><select>' + options + '</select></dd>' +
                 '<dd class="info">Required</dd>' +
               '</dl>' +
 
               '<dl class="name">' +
                 '<dt><label>Name</label></dt>' +
-                '<dd><select>' + '</select></dd>' +
+                '<dd><select>' + options + '</select></dd>' +
               '</dl>' +
 
               '<dl class="add-name">' +
@@ -43,12 +50,12 @@ require([
 
               '<dl id="description">' +
                 '<dt><label for="title">Description</label></dt>' +
-                '<dd><select>' + '</select></dd>' +
+                '<dd><select>' + options + '</select></dd>' +
               '</dl>' +
 
               '<dl id="country">' +
                 '<dt><label for="country">Country Code</label></dt>' +
-                '<dd><select>' + '</select></dd>' +
+                '<dd><select>' + options + '</select></dd>' +
               '</dl>' +
 
               // TODO geometry
@@ -92,14 +99,37 @@ require([
 
   jQuery(document).ready(function() {
 
-    var btnSettings = jQuery('.settings'),
+        // We only need the header fields, but fetch first 5 so that
+        // Papa Parse can do proper delimiter guessing
+    var CSV_SNIPPET_SIZE = 5,
+
+        // For lack of a better option, we pull header fields from the first part *only*,
+        // It's in the responsibility of the user if they want deal with a mix of tables with
+        // different schemas. Recogito will only support the base case.
+        dataURL = jsRoutes.controllers.document.DocumentController
+          .getDataTable(Config.documentId, Config.dataPartSequenceNo[0], CSV_SNIPPET_SIZE).absoluteURL(),
+
+        btnSettings = jQuery('.settings'),
+
+        fields = [], // to be populated from the CSV snippet
+
+        init = function(csv) {
+          fields = csv.meta.fields;
+          btnSettings.click(openSettings);
+        },
 
         openSettings = function() {
-          new SettingsModal();
+          new SettingsModal(fields);
           return false;
         };
 
-    btnSettings.click(openSettings);
+    Papa.parse(dataURL, {
+      download : true,
+      header   : true, // TODO can we make this configurable through extra table meta?
+
+      // TODO we're not doing an error handling at the moment, but just settings unpopulated
+      complete : init
+    });
 
   });
 
