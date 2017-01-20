@@ -72,9 +72,6 @@ class TaskAPIController @Inject() (
   }
     
   def progressByDocument(id: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
-    
-    play.api.Logger.info(loggedIn.user.toString)
-    
     documents.getExtendedInfo(id, Some(loggedIn.user.getUsername)).flatMap(_ match {
       case Some((doc, accesslevel)) =>
         if (accesslevel.canRead) {

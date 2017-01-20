@@ -221,7 +221,7 @@ class UploadController @Inject() (
   /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
   def queryTaskProgress(username: String, docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
 
-    // taskService.findByDocumentAndTaskType(NERService.TASK_NER.toString, documentId)
+    play.api.Logger.info(loggedIn.toString)
     
     documents.getDocumentRecord(docId, Some(username)).flatMap(_ match {
       // Make sure only users with read access can see the progress

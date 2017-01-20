@@ -71,11 +71,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     }
   }
   
-  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel = {
-    
-    play.api.Logger.info("user: " + forUser)
-    play.api.Logger.info("owner: " + document.getOwner)
-    
+  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel =
     forUser match {      
       case Some(user) if (document.getOwner == user) =>
         DocumentAccessLevel.OWNER
@@ -92,7 +88,6 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       case None =>
         if (document.getIsPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
     }
-  }
   
   /** Creates a new DocumentRecord from an UploadRecord **/
   private[models] def createDocumentFromUpload(upload: UploadRecord) =
