@@ -60,6 +60,7 @@ GET     /document/:id/downloads/ttl                  controllers.document.downlo
 GET     /document/:id/downloads/rdf                  controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
 GET     /document/:id/downloads/jsonld               controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)
 GET     /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+POST    /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
 GET     /document/:id/downloads/tei                  controllers.document.downloads.DownloadsController.downloadTEI(id: String)
 
 GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)

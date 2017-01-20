@@ -91,20 +91,6 @@ require([
 
               // TODO geometry
 
-              /*
-              '<dl class="lat">' +
-                '<dt><label for="lat">Latitude</label></dt>' +
-                '<dd><select>' + '</select></dd>' +
-                '<dd class="info"></dd>' +
-              '</dl>' +
-
-              '<dl class="lon">' +
-                '<dt><label for="lon">Longitude</label></dt>' +
-                '<dd><select>' + '</select></dd>' +
-                '<dd class="info"></dd>' +
-              '</dl>' +
-              */
-
               '<div class="buttons">' +
                 '<button type="submit" class="btn">OK</button>' +
                 '<button class="btn outline cancel">Cancel</button>' +
@@ -213,7 +199,7 @@ require([
             btnSettings.addClass('outline');
             btnSettings.find('.icon').html('&#xf00c;');
 
-            btnDownload.removeClass('disabled');
+            btnDownload.prop('disabled', false);
           }
         },
 
