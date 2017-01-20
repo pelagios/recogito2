@@ -89,7 +89,17 @@ require([
                 '<dd><select>' + options + '</select></dd>' +
               '</dl>' +
 
-              // TODO geometry
+              '<dl id="latitude">' +
+                '<dt><label for="latitude">Latitude</label></dt>' +
+                '<dd><select>' + options + '</select></dd>' +
+              '</dl>' +
+
+              '<dl id="longitude">' +
+                '<dt><label for="longitude">Longitude</label></dt>' +
+                '<dd><select>' + options + '</select></dd>' +
+              '</dl>' +
+
+              // TODO advanced geometry
 
               '<div class="buttons">' +
                 '<button type="submit" class="btn">OK</button>' +
@@ -113,6 +123,8 @@ require([
             setIfDefined('name', body.find('.name select'));
             setIfDefined('description', body.find('#description select'));
             setIfDefined('country', body.find('#country select'));
+            setIfDefined('latitude', body.find('#latitude select'));
+            setIfDefined('longitude', body.find('#longitude select'));
           }
         },
 
@@ -128,7 +140,9 @@ require([
             'title': parseNumber(body.find('#title select').val()),
             'name': parseNumber(body.find('.name select').val()),
             'description': parseNumber(body.find('#description select').val()),
-            'country': parseNumber(body.find('#country select').val())
+            'country': parseNumber(body.find('#country select').val()),
+            'latitude': parseNumber(body.find('#latitude select').val()),
+            'longitude': parseNumber(body.find('#longitude select').val())
           });
         },
 

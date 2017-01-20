@@ -33,7 +33,9 @@ case class FieldMapping(
   FIELD_TITLE       : Int,
   FIELDS_NAME       : Option[Int],
   FIELD_DESCRIPTION : Option[Int],
-  FIELD_COUNTRY     : Option[Int])
+  FIELD_COUNTRY     : Option[Int],
+  FIELD_LATITUDE    : Option[Int],
+  FIELD_LONGITUDE   : Option[Int])
   
 object FieldMapping {
   
@@ -43,7 +45,9 @@ object FieldMapping {
     (JsPath \ "title").read[Int] and
     (JsPath \ "name").readNullable[Int] and
     (JsPath \ "description").readNullable[Int] and
-    (JsPath \ "country").readNullable[Int]
+    (JsPath \ "country").readNullable[Int] and
+    (JsPath \ "latitude").readNullable[Int] and
+    (JsPath \ "longitude").readNullable[Int]
   )(FieldMapping.apply _)
   
 }

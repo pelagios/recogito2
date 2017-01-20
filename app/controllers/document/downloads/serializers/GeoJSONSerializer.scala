@@ -1,6 +1,6 @@
 package controllers.document.downloads.serializers
 
-import com.vividsolutions.jts.geom.Geometry
+import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
 import controllers.HasCSVParsing
 import controllers.document.downloads.FieldMapping
 import java.io.File
@@ -8,6 +8,7 @@ import models.{ ContentType, HasGeometry }
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.DocumentInfo
 import models.place.{ Place, PlaceService, GazetteerRecord }
+import org.geotools.geometry.jts.JTSFactoryFinder
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
@@ -65,6 +66,10 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
       placeService: PlaceService, 
       uploads: Uploads,
       ctx: ExecutionContext) = exportMergedDocument(doc, { case (annotations, places, documentDir) =>
+        
+      val factory = JTSFactoryFinder.getGeometryFactory()
+      
+      def toDouble(str: String) = str.trim().replace(",", ".").toDouble
 
       def rowToFeature(row: List[String], index: Int) = {
         val anchor = "row:" + index
@@ -73,12 +78,19 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         
         val id = row(fieldMapping.FIELD_ID)
         
+        val geometry = (fieldMapping.FIELD_LATITUDE, fieldMapping.FIELD_LONGITUDE) match {
+          case (Some(lat), Some(lon)) =>
+            Some(factory.createPoint(new Coordinate(toDouble(row(lon)), toDouble(row(lat)))))
+            
+          case _ => None
+        }
+        
         GazetteerRecordFeature(
           id,
           fieldMapping.BASE_URL.getOrElse("http://www.example.com/") + id,
           row(fieldMapping.FIELD_TITLE),
           fieldMapping.FIELDS_NAME.map(idx => Seq(row(idx))).getOrElse(Seq.empty[String]),
-          None, // geometry
+          geometry,
           fieldMapping.FIELD_DESCRIPTION.map(row(_)),
           fieldMapping.FIELD_COUNTRY.map(row(_)),
           matches.map(_.uri)
