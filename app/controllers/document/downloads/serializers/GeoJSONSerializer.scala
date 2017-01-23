@@ -154,6 +154,7 @@ object GeoJSONFeature extends HasGeometry {
     (JsPath \ "uri").write[String] and
     (JsPath \ "title").write[String] and
     (JsPath \ "geometry").writeNullable[Geometry] and
+    (JsPath \ "properties").write[JsObject] and
     (JsPath \ "names").writeNullable[Seq[JsObject]] and
     (JsPath \ "links").writeNullable[JsObject]
   )(f => (
@@ -162,6 +163,7 @@ object GeoJSONFeature extends HasGeometry {
       f.uri,
       f.title,
       f.geometry,
+      Json.obj(),
       toOptSeq(f.names.map(name => Json.obj("name" -> name))),
       {
         if (f.closeMatches.isEmpty) None
