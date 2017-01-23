@@ -346,7 +346,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
         
           case Some(loggedIn) =>
             q.from(DOCUMENT)
-              .where(DOCUMENT.OWNER.equal(owner).and(
+              .where(DOCUMENT.OWNER.equalIgnoreCase(owner).and(
                 DOCUMENT.ID.in(sql.select(SHARING_POLICY.DOCUMENT_ID).from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(loggedIn)))
                   .or(DOCUMENT.IS_PUBLIC.equal(true))))
                  

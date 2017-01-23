@@ -32,12 +32,12 @@ class MyRecogitoController @Inject() (
   private def isSortingByIndex(sortBy: Option[String]) =
     sortBy.map(fieldname => INDEX_SORT_PROPERTIES.contains(fieldname.toLowerCase)).getOrElse(false)
 
-  private def renderPublicProfile(owner: String, loggedInUser: Option[UserRecord])(implicit request: RequestHeader) = {
-    val fOwnerWithRoles = users.findByUsernameIgnoreCase(owner)
+  private def renderPublicProfile(usernameInPath: String, loggedInUser: Option[UserRecord])(implicit request: RequestHeader) = {
+    val fOwnerWithRoles = users.findByUsernameIgnoreCase(usernameInPath)
     
     // TODO add pagination and sorting options
     
-    val fDocs = documents.findAccessibleDocuments(owner, loggedInUser.map(_.getUsername), 0, 100)
+    val fDocs = documents.findAccessibleDocuments(usernameInPath, loggedInUser.map(_.getUsername), 0, 100)
     
     val f = for {
       ownerWithRoles <- fOwnerWithRoles
