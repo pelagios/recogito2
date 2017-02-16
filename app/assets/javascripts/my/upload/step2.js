@@ -129,7 +129,7 @@ require(['common/config'], function(Config) {
         clickable: '#choose-file',
         createImageThumbnails: false,
         dictRemoveFile: '',
-        maxFilesize:200,
+        maxFilesize:500,
         previewsContainer: document.getElementById('uploaded-now'),
         previewTemplate: previewTemplate,
 
