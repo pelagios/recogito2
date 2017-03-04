@@ -96,10 +96,8 @@ define([
       this.setPosition(selection.bounds);
       if (selection.annotation.annotation_id)
         history.pushState(null, null, '#' + selection.annotation.annotation_id);
-        // window.location.hash = '#' + selection.annotation.annotation_id;
       else
         history.pushState(null, null, window.location.pathname);
-        // window.location.hash = '';
     } else {
       // We allow this method to be called with no arg - in this case, close the editor
       this.close();
@@ -130,7 +128,6 @@ define([
   EditorBase.prototype.close = function() {
     if (this.isOpen()) {
       history.pushState(null, null, window.location.pathname);
-      // window.location.hash = '';
       this.clear();
       this.element.hide();
     }
