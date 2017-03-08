@@ -193,7 +193,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
           must (
             nestedQuery("annotates").query(termQuery("annotates.document_id" -> documentId)) 
           ) filter (
-            rangeQuery("last_modified_at").from(formatDate(after))
+            rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
           )
         }
       } limit ES.MAX_SIZE

@@ -60,7 +60,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
           must (
             nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
           ) filter (
-            rangeQuery("last_modified_at").from(formatDate(after))
+            rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
           )
         }
       } aggs {
@@ -97,7 +97,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
           must (
             nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
           ) filter (
-            rangeQuery("last_modified_at").from(formatDate(after))
+            rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
           )
         } 
       } limit ES.MAX_SIZE
