@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
   filters,
 
   "com.nrinaudo" %% "kantan.csv" % "0.1.15",
-  "com.sksamuel.elastic4s" %% "elastic4s-streams" % "1.7.6",
+  "com.sksamuel.elastic4s" %% "elastic4s-streams" % "2.4.0",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
   "com.typesafe.play" %% "play-mailer" % "5.0.0",

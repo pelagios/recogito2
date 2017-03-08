@@ -1,11 +1,11 @@
 package storage
 
 import com.google.inject.AbstractModule
-import com.sksamuel.elastic4s.ElasticClient
+import com.sksamuel.elastic4s.{ ElasticClient, ElasticsearchClientUri }
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
 import javax.inject.{ Inject, Singleton }
-import org.elasticsearch.common.settings.ImmutableSettings
+import org.elasticsearch.common.settings.Settings
 import play.api.{ Configuration, Logger }
 import play.api.inject.ApplicationLifecycle
 import scala.io.Source
@@ -39,7 +39,7 @@ object ES extends ElasticSearchSanitizer {
   val VISIT              = "visit"
   
   // Maximum response size in ES
-  val MAX_SIZE           = 2147483647
+  val MAX_SIZE           = 10000
 
   // Max. number of retries to do in case of failed imports
   val MAX_RETRIES        = 10
@@ -60,7 +60,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
       case None => new File("index")
     }
     
-    val remoteClient = ElasticClient.remote("localhost", 9300)
+    val remoteClient = ElasticClient.transport(ElasticsearchClientUri("localhost", 9300))
     
     // Just fetch cluster stats to see if there's a cluster at all
     Try(
@@ -76,7 +76,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
       case Failure(_) => {
         // No ES cluster available - instantiate a local client
         val settings =
-          ImmutableSettings.settingsBuilder()
+          Settings.settingsBuilder()
             .put("http.enabled", true)
             .put("path.home", home.getAbsolutePath)
         

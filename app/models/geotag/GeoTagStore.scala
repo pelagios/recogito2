@@ -11,7 +11,7 @@ import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ Future, ExecutionContext }
-import scala.language.postfixOps
+import scala.language.{ postfixOps, reflectiveCalls }
 import storage.{ ES, HasES }
 
 trait GeoTagStore extends PlaceStore {

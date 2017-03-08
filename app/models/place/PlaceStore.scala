@@ -1,7 +1,7 @@
 package models.place
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit, SearchType }
+import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.source.Indexable
 import com.vividsolutions.jts.geom.Coordinate
 import models.Page
@@ -12,7 +12,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 import scala.concurrent.{ Future, ExecutionContext }
-import scala.language.postfixOps
+import scala.language.{ postfixOps, reflectiveCalls }
 import storage.{ ES, HasES }
 import models.geotag.GeoTagStore
 
@@ -70,14 +70,14 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
     self.es.client execute {
       search in ES.RECOGITO / ES.PLACE aggs (
         aggregation nested("by_source_gazetteer") path "is_conflation_of" aggs (
-          aggregation terms "source_gazetteer" field "is_conflation_of.source_gazetteer" size Int.MaxValue
+          aggregation terms "source_gazetteer" field "is_conflation_of.source_gazetteer" size ES.MAX_SIZE
         )
       ) limit 0
     } map { response =>
-      response.getAggregations.get("by_source_gazetteer").asInstanceOf[Nested]
+      response.aggregations.get("by_source_gazetteer").asInstanceOf[Nested]
               .getAggregations.get("source_gazetteer").asInstanceOf[Terms]
               .getBuckets.asScala
-              .map(_.getKey)
+              .map(_.getKeyAsString)
     }
 
   override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
@@ -216,7 +216,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
     // Initial search request
     self.es.client execute {
       search in ES.RECOGITO / ES.PLACE query
-        nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.source_gazetteer" -> gazetteer)) searchType SearchType.Scan scroll "1m"
+        nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.source_gazetteer" -> gazetteer)) scroll "1m"
     } map { response =>
       processOneBatch(response.getScrollId)
     }

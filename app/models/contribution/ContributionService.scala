@@ -5,16 +5,17 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.source.Indexable
 import javax.inject.{ Inject, Singleton }
 import models.{ HasDate, Page }
-import org.elasticsearch.search.aggregations.bucket.filter.Filter
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram
+import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.elasticsearch.search.aggregations.bucket.nested.Nested
+import org.elasticsearch.search.aggregations.bucket.histogram.{ DateHistogramInterval, InternalHistogram }
 import org.elasticsearch.search.sort.SortOrder
 import org.joda.time.{ DateTime, DateTimeZone }
 import play.api.Logger
 import play.api.libs.json.{ JsSuccess, Json }
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.language.reflectiveCalls
 import storage.ES
 
 @Singleton
@@ -113,7 +114,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       get id id from ES.RECOGITO / ES.CONTRIBUTION
     } map { response =>
       if (response.isExists) {
-        Json.fromJson[Contribution](Json.parse(response.getSourceAsString)) match {
+        Json.fromJson[Contribution](Json.parse(response.sourceAsString)) match {
           case JsSuccess(contribution, _) =>
             Some(contribution, response.getId)
           case _ =>
@@ -129,10 +130,14 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   def deleteHistoryAfter(documentId: String, after: DateTime): Future[Boolean] = {
     
     def findContributionsAfter() = es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION query filteredQuery query {
-        nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
-      } postFilter {
-        rangeFilter("made_at").gt(formatDate(after))
+      search in ES.RECOGITO / ES.CONTRIBUTION query {
+        bool {
+          must (
+            nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
+          ) filter (
+            rangeQuery("made_at").from(formatDate(after)).includeLower(false)
+          )
+        }
       } limit ES.MAX_SIZE
     } map { _.getHits.getHits }
 
@@ -185,7 +190,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   }
 
   /** Returns the system-wide contribution stats **/
-  def getGlobalStats() =
+  def getGlobalStats(): Future[ContributionStats] =
     es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION aggs (
         aggregation terms "by_user" field "made_by",
@@ -193,30 +198,30 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         aggregation nested("by_item_type") path "affects_item" aggs (
           aggregation terms "item_type" field "affects_item.item_type"
         ),
-        aggregation filter "contribution_history" filter (rangeFilter("made_at") from "now-30d") aggs (
-           aggregation datehistogram "last_30_days" field "made_at" minDocCount 0 interval DateHistogram.Interval.DAY
+        aggregation filter "contribution_history" filter (rangeQuery("made_at") from "now-30d") aggs (
+           aggregation datehistogram "last_30_days" field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
         )
       ) limit 0
     } map { response =>
-      val byUser = response.getAggregations.get("by_user").asInstanceOf[Terms]
-      val byAction = response.getAggregations.get("by_action").asInstanceOf[Terms]
-      val byItemType = response.getAggregations.get("by_item_type").asInstanceOf[Nested]
+      val byUser = response.aggregations.get("by_user").asInstanceOf[Terms]
+      val byAction = response.aggregations.get("by_action").asInstanceOf[Terms]
+      val byItemType = response.aggregations.get("by_item_type").asInstanceOf[Nested]
         .getAggregations.get("item_type").asInstanceOf[Terms]
-      val contributionHistory = response.getAggregations.get("contribution_history").asInstanceOf[Filter]
-        .getAggregations.get("last_30_days").asInstanceOf[DateHistogram]
-
+      
+      val contributionHistory = response.aggregations.get("contribution_history").asInstanceOf[InternalFilter]
+        .getAggregations.get("last_30_days").asInstanceOf[InternalHistogram[InternalHistogram.Bucket]]
+        
       ContributionStats(
         response.getTookInMillis,
         response.getHits.getTotalHits,
         byUser.getBuckets.asScala.map(bucket =>
-          (bucket.getKey, bucket.getDocCount)),
+          (bucket.getKeyAsString, bucket.getDocCount)),
         byAction.getBuckets.asScala.map(bucket =>
-          (ContributionAction.withName(bucket.getKey), bucket.getDocCount)),
+          (ContributionAction.withName(bucket.getKeyAsString), bucket.getDocCount)),
         byItemType.getBuckets.asScala.map(bucket =>
-          (ItemType.withName(bucket.getKey), bucket.getDocCount)),
+          (ItemType.withName(bucket.getKeyAsString), bucket.getDocCount)),
         contributionHistory.getBuckets.asScala.map(bucket =>
-          (new DateTime(bucket.getKeyAsDate.getMillis, DateTimeZone.UTC), bucket.getDocCount))
-      )
+          (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
     }
 
 }
