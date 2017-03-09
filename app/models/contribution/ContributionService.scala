@@ -176,8 +176,13 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       if (hits.size > 0) {
         es.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
-        } map {
-          !_.hasFailures
+        } map { response =>
+          if (response.hasFailures)
+            Logger.error("Failures while deleting contributions: " + response.failureMessage)
+            
+          // TODO retry failures?
+            
+          !response.hasFailures          
         } recover { case t: Throwable =>
           t.printStackTrace()
           false

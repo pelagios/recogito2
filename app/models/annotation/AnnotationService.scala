@@ -157,8 +157,13 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       if (annotationsAndVersions.size > 0) {
         es.client execute {
           bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId from ES.RECOGITO / ES.ANNOTATION } )
-        } map {
-          !_.hasFailures
+        } map { response =>
+          if (response.hasFailures)
+            Logger.error("Failures while deleting annotations: " + response.failureMessage)
+            
+          // TODO retry failures?
+            
+          !response.hasFailures
         } recover { case t: Throwable =>
           t.printStackTrace()
           false
