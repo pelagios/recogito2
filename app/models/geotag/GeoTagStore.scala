@@ -21,13 +21,13 @@ trait GeoTagStore extends PlaceStore {
 
   /** Inserts or updates geotags for an annotation **/
   def insertOrUpdateGeoTagsForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean]
-  
+
   /** Re-writes GeoTags after an update to the place store **/
   def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean]
 
   /** Deletes the geotags for a specific annotation ID **/
   def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean]
-  
+
   /** Deletes the geotags for a specific document **/
   def deleteGeoTagsByDocId(documentId: String)(implicit context: ExecutionContext): Future[Boolean]
 
@@ -48,9 +48,13 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     override def json(link: GeoTag): String = Json.stringify(Json.toJson(link))
   }
 
-  implicit object GeoTagHitAs extends HitAs[(String, GeoTag)] {
-    override def as(hit: RichSearchHit): (String, GeoTag) =
-      (hit.id, Json.fromJson[GeoTag](Json.parse(hit.sourceAsString)).get)
+  implicit object GeoTagHitAs extends HitAs[(GeoTag, String, String)] {
+    override def as(hit: RichSearchHit): (GeoTag, String, String) = {
+      val id = hit.id
+      val parent = hit.field("_parent").value[String]
+      val geoTag = Json.fromJson[GeoTag](Json.parse(hit.sourceAsString)).get
+      (geoTag, id, parent)
+    }
   }
 
   override def totalGeoTags()(implicit context: ExecutionContext): Future[Long] =
@@ -60,11 +64,11 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
   /** Helper used by insertOrUpdate method to build the geotags from the annotation bodies **/
   private def buildGeoTags(annotation: Annotation)(implicit context: ExecutionContext): Future[Seq[(GeoTag, String)]] = {
-    
+
     def getToponyms(annotation: Annotation): Seq[String] =
       annotation.bodies
         .withFilter(b => b.hasType == AnnotationBody.QUOTE || b.hasType == AnnotationBody.TRANSCRIPTION)
-        .flatMap(_.value) 
+        .flatMap(_.value)
 
     def createGeoTag(annotation: Annotation, placeBody: AnnotationBody) =
       GeoTag(
@@ -100,8 +104,10 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     def insertGeoTags(tags: Seq[(GeoTag, String)]): Future[Boolean] = {
       es.client execute {
         bulk ( tags.map(tag => index into ES.RECOGITO / ES.GEOTAG source tag._1 parent tag._2) )
-      } map {
-        !_.hasFailures
+      } map { response =>
+        if (response.hasFailures)
+          Logger.error("Failures while inserting geotags: " + response.failureMessage)
+        !response.hasFailures
       } recover { case t: Throwable =>
         t.printStackTrace()
         false
@@ -121,7 +127,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       false
     }
   }
-    
+
   def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean] = {
 
     def getTagsForPlaces(places: Seq[Place]) = es.client execute {
@@ -132,81 +138,82 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
           )
         }
       }
-    } map { _.as[(String, GeoTag)].toSeq }
+    } map { _.as[(GeoTag, String, String)].toSeq }
 
     // TODO Users may have changed the link in the meantime - use optimistic locking, re-run failures
-    def rewriteOne(id: String, tag: GeoTag) = {
+    def rewriteOne(tag: GeoTag, id: String) = {
       val newParent = placesAfterUpdate.find { _.uris.contains(tag.gazetteerUri) }.get
       es.client execute {
         update id id in ES.RECOGITO / ES.GEOTAG source tag parent newParent.id docAsUpsert
       } map { _.isCreated }
     }
-    
+
     if (placesBeforeUpdate.size > 0)
-      getTagsForPlaces(placesBeforeUpdate).flatMap { case idsAndTags =>
-        if (idsAndTags.size > 0) {
-          val fSuccesses = Future.sequence(idsAndTags.map { case (id, tag) => rewriteOne(id, tag) })
+      getTagsForPlaces(placesBeforeUpdate).flatMap { case tags =>
+        if (tags.size > 0) {
+          val fSuccesses = Future.sequence(tags.map { case (tag, id, parent) => rewriteOne(tag, id) })
           fSuccesses.map { _.exists { _ == false } }
         } else {
           // Nothing to update
           Future.successful(true)
         }
-      }      
+      }
     else
       // No need to update any GeoTags if no existing places were affected by the import
       Future.successful(true)
   }
-  
+
   /** Helper to bulk-delete a list of GeoTags **/
-  private def bulkDelete(ids: Seq[String])(implicit context: ExecutionContext): Future[Boolean] =
-    if (ids.isEmpty) {
+  private def bulkDelete(idsAndParents: Seq[(String, String)])(implicit context: ExecutionContext): Future[Boolean] =
+    if (idsAndParents.isEmpty) {
       // Nothing to delete
       Future.successful(true)
     } else {
       es.client execute {
-        bulk ( ids.map { tagId => delete id tagId from ES.RECOGITO / ES.GEOTAG } )
+        bulk ( idsAndParents.map { case (tagId, parentId) => delete id tagId from ES.RECOGITO / ES.GEOTAG parent parentId } )
       } map { response =>
         if (response.hasFailures)
           Logger.error("Failures while deleting geotags: " + response.failureMessage)
-            
-        // TODO retry failures?
-            
         !response.hasFailures
       } recover { case t: Throwable =>
         t.printStackTrace()
         false
       }
     }
-  
+
   /** Helper method that retrieves geotags for an annotation along with their internal _id field **/
-  private def findGeoTagsByAnnotationWithId(annotationId: String)(implicit context: ExecutionContext): Future[Seq[(String, GeoTag)]] =
+  private def findGeoTagsByAnnotationWithIdAndParent(annotationId: String)(implicit context: ExecutionContext): Future[Seq[(GeoTag, String, String)]] =
     es.client execute {
       search in ES.RECOGITO / ES.GEOTAG query {
         termQuery("annotation_id", annotationId)
       }
-    } map { _.as[(String, GeoTag)].toSeq }
+    } map { _.as[(GeoTag, String, String)].toSeq }
 
   /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
   override def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
-    findGeoTagsByAnnotationWithId(annotationId.toString).flatMap { idsAndTags =>
-      bulkDelete(idsAndTags.map(_._1))
-    }    
-    
+    findGeoTagsByAnnotationWithIdAndParent(annotationId.toString).flatMap { tags =>
+      bulkDelete(tags.map(t => (t._2, t._3)))
+    }
+
   override def deleteGeoTagsByDocId(documentId: String)(implicit context: ExecutionContext): Future[Boolean] = {
-    
+
     def findIdsForDoc(documentId: String) =
       es.client execute {
         search in ES.RECOGITO / ES.GEOTAG query {
           termQuery("document_id" -> documentId)
         }
-      } map { _.getHits.getHits.map(_.id) }
+      } map { response =>
+        val id = response.getHits.getHits.map(_.id)
+        val parent = response.getHits.getHits.map(_.field("_parent").getValue.toString)
+        id.zip(parent)
+      }
 
-    
+
     findIdsForDoc(documentId).flatMap(bulkDelete(_))
   }
-    
+
   override def findGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Seq[GeoTag]] =
-    findGeoTagsByAnnotationWithId(annotationId.toString).map(_.map(_._2))
+    findGeoTagsByAnnotationWithIdAndParent(annotationId.toString).map(_.map(_._1))
 
   override def listPlacesInDocument(docId: String, offset: Int, limit: Int)(implicit context: ExecutionContext) =
     es.client execute {

@@ -160,9 +160,6 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         } map { response =>
           if (response.hasFailures)
             Logger.error("Failures while deleting annotations: " + response.failureMessage)
-            
-          // TODO retry failures?
-            
           !response.hasFailures
         } recover { case t: Throwable =>
           t.printStackTrace()

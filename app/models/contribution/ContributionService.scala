@@ -64,7 +64,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         }
       }
     }
-    
+
   def getMostRecent(n: Int): Future[Seq[Contribution]] =
     es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION sort (
@@ -86,28 +86,28 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       val contributionsWithId = response.as[(Contribution, String)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, contributionsWithId)
     }
-    
+
   /** Shorthand to get the most recent contribution to the given document **/
   def getLastContribution(documentId: String) =
     getHistory(documentId, 0, 1).map(_.items.headOption.map(_._1))
-    
+
   private def sortByField[B](docIds: Seq[String], sortOrder: models.SortOrder, offset: Int, limit: Int, field: Option[Contribution] => B)(implicit ordering: Ordering[B]) =
-    Future.sequence(docIds.map(id => getLastContribution(id).map(contribution => (id, contribution)))).map { idsAndContributions => 
+    Future.sequence(docIds.map(id => getLastContribution(id).map(contribution => (id, contribution)))).map { idsAndContributions =>
       val sorted = idsAndContributions.sortBy(t => field(t._2)).map(_._1).reverse
       if (sortOrder == models.SortOrder.ASC)
         sorted.drop(offset).take(limit)
       else
         sorted.dropRight(offset).takeRight(limit).reverse
-    }    
-      
+    }
+
   /** Sorts the given list of document IDs by the time of last modification **/
   def sortDocsByLastModifiedAt(docIds: Seq[String], sortOrder: models.SortOrder, offset: Int, limit: Int) =
     sortByField(docIds, sortOrder, offset, limit, { c => c.map(_.madeAt.getMillis) })
-    
+
   /** Sorts the given list of document IDs by the last modifying user **/
   def sortDocsByLastModifiedBy(docIds: Seq[String], sortOrder: models.SortOrder, offset: Int, limit: Int) =
     sortByField(docIds, sortOrder, offset, limit, { c => c.map(_.madeBy) })
-  
+
   /** Retrieves a contribution by its ElasticSearch ID **/
   def findById(id: String): Future[Option[(Contribution, String)]] =
     es.client execute {
@@ -128,7 +128,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
 
   /** Deletes the contribution history after a given timestamp **/
   def deleteHistoryAfter(documentId: String, after: DateTime): Future[Boolean] = {
-    
+
     def findContributionsAfter() = es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query {
         bool {
@@ -157,7 +157,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       }
     }
   }
-  
+
   /** Deletes the complete contribution history.
     *
     * Note that this method will leave the annotation history index untouched. I.e.
@@ -165,13 +165,13 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     * delete the annotations and annotation versions.
     */
   def deleteHistory(documentId: String): Future[Boolean] = {
-    
+
     def findContributions() = es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query {
         nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
       } limit ES.MAX_SIZE
     } map { _.getHits.getHits }
-    
+
     findContributions.flatMap { hits =>
       if (hits.size > 0) {
         es.client execute {
@@ -179,14 +179,11 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         } map { response =>
           if (response.hasFailures)
             Logger.error("Failures while deleting contributions: " + response.failureMessage)
-            
-          // TODO retry failures?
-            
           !response.hasFailures          
         } recover { case t: Throwable =>
           t.printStackTrace()
           false
-        }       
+        }
       } else {
         // Nothing to delete
         Future.successful(true)
@@ -212,10 +209,10 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       val byAction = response.aggregations.get("by_action").asInstanceOf[Terms]
       val byItemType = response.aggregations.get("by_item_type").asInstanceOf[Nested]
         .getAggregations.get("item_type").asInstanceOf[Terms]
-      
+
       val contributionHistory = response.aggregations.get("contribution_history").asInstanceOf[InternalFilter]
         .getAggregations.get("last_30_days").asInstanceOf[InternalHistogram[InternalHistogram.Bucket]]
-        
+
       ContributionStats(
         response.getTookInMillis,
         response.getHits.getTotalHits,

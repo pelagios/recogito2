@@ -99,7 +99,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
           ) filter (
             rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
           )
-        } 
+        }
       } limit ES.MAX_SIZE
     } map { _.getHits.getHits }
 
@@ -135,9 +135,6 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
         } map { response =>
           if (response.hasFailures)
             Logger.error("Failures while deleting annotation versions: " + response.failureMessage)
-            
-          // TODO retry failures?
-            
           !response.hasFailures
         } recover { case t: Throwable =>
           t.printStackTrace()
