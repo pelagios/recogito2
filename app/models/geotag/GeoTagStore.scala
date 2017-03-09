@@ -165,8 +165,13 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     } else {
       es.client execute {
         bulk ( ids.map { tagId => delete id tagId from ES.RECOGITO / ES.GEOTAG } )
-      } map {
-        !_.hasFailures
+      } map { response =>
+        if (response.hasFailures)
+          Logger.error("Failures while deleting geotags: " + response.failureMessage)
+            
+        // TODO retry failures?
+            
+        !response.hasFailures
       } recover { case t: Throwable =>
         t.printStackTrace()
         false
