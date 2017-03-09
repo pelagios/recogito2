@@ -202,12 +202,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         search in ES.RECOGITO / ES.GEOTAG query {
           termQuery("document_id" -> documentId)
         }
-      } map { response =>
-        val id = response.getHits.getHits.map(_.id)
-        val parent = response.getHits.getHits.map(_.field("_parent").getValue.toString)
-        id.zip(parent)
-      }
-
+      } map { _.as[(GeoTag, String, String)].map(t => (t._2, t._3)) }
 
     findIdsForDoc(documentId).flatMap(bulkDelete(_))
   }
