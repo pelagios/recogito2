@@ -132,8 +132,13 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
       if (hits.size > 0) {
         es.client execute {
           bulk (hits.map(h => delete id h.getId from ES.RECOGITO / ES.ANNOTATION_HISTORY))
-        } map {
-          !_.hasFailures
+        } map { response =>
+          if (response.hasFailures)
+            Logger.error("Failures while deleting annotation versions: " + response.failureMessage)
+            
+          // TODO retry failures?
+            
+          !response.hasFailures
         } recover { case t: Throwable =>
           t.printStackTrace()
           false
