@@ -48,10 +48,10 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
   docs](https://www.playframework.com/documentation/2.5.x/Production)
 * Be sure to set a random application secret in `conf/application.conf`. Play includes a utility
   to generate one for you - type `activator playGenerateSecret`.
-* Production deployment requires and ElasticSearch installation. (Recogito will automatically
-  create an embedded ElasticSearch index if cannot find a running cluster. However we strictly
-  recommend this only for development purposes!) For the time being, we recommend to stick to
-  [ElasticSearch version 1.7](https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-5).
+* Production deployment requires an installation of
+  [ElasticSearch v2.4.4](https://www.elastic.co/downloads/past-releases/elasticsearch-2-4-4).
+  (Recogito will automatically create an embedded ElasticSearch index if cannot find a running
+  cluster. However we strictly recommend this only for development purposes!).
 * Last but not least: another reminder to remove the default 'recogito' admin user - or at least
   change its password!
 

@@ -47,7 +47,7 @@ recogito.email.key = "my secret key"
 # By convention, the default datasource is named `default`
 #
 db.default.driver="org.postgresql.Driver"
-db.default.url="jdbc:postgresql://localhost/recogito2"
+db.default.url="jdbc:postgresql://localhost/recogito"
 db.default.username="postgres-username-goes-here"
 db.default.password="postgres-password-goes-here"
 
