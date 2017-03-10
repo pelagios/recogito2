@@ -1,0 +1,40 @@
+@font-face {
+  font-family:'PTSansNarrow';
+  src:url('PT_Sans-Narrow-Web-Regular.ttf');
+  font-weight:normal;
+  font-style:normal;
+}
+
+html, body {
+  background-color:#ecf0f1;
+  width:100%;
+  height:100%;
+  text-align:center;
+  font-family:PTSansNarrow;
+  margin:0;
+  padding:0;
+}
+
+.outer {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:100%;
+  text-align:center;
+}
+
+.inner {
+  text-align:left;
+  display:inline-block;
+  color:#3f3f3f;
+
+  h1, p {
+    margin:0;
+    padding:0;
+  }
+
+  h1 { font-size:38px; }
+
+  p { font-size:19px; }
+
+}
