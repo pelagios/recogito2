@@ -2,23 +2,23 @@ package controllers
 
 import eu.bitwalker.useragentutils.UserAgent
 import models.visit._
+import models.ContentType
 import models.document.DocumentAccessLevel
-import models.generated.tables.records.DocumentRecord
+import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import org.joda.time.DateTime
 import play.api.mvc.{ AnyContent, RequestHeader }
 import play.api.http.HeaderNames
-import org.joda.time.DateTime
-import models.generated.tables.records.DocumentFilepartRecord
-import models.ContentType
+import scala.concurrent.Future
 
 trait HasVisitLogging {
-  
+    
   /** Common code for logging a visit **/
   private def log(
       doc: Option[DocumentRecord],
       part: Option[DocumentFilepartRecord],
       responseFormat: String,
       accesslevel: Option[DocumentAccessLevel]
-    )(implicit request: RequestHeader, visitService: VisitService) = {
+    )(implicit request: RequestHeader, visitService: VisitService): Future[Unit] = {
     
     val userAgentHeader = request.headers.get(HeaderNames.USER_AGENT)
     val userAgent = userAgentHeader.map(ua => UserAgent.parseUserAgentString(ua))
@@ -31,7 +31,7 @@ trait HasVisitLogging {
       part.flatMap(pt => ContentType.withName(pt.getContentType))
     ))
     
-    visitService.insertVisit(Visit(
+    val visit = Visit(
       request.uri,
       request.headers.get(HeaderNames.REFERER),
       DateTime.now(),
@@ -44,8 +44,12 @@ trait HasVisitLogging {
       ),
       responseFormat,
       item,
-      accesslevel
-    ))    
+      accesslevel)
+    
+    if (HasVisitLogging.isBot(visit))
+      Future.successful(())
+    else
+      visitService.insertVisit(visit)    
   }
   
   def logPageView()(implicit request: RequestHeader, visitService: VisitService) =
@@ -62,4 +66,14 @@ trait HasVisitLogging {
       log(Some(doc), None, responseFormat, None)
      
     
+}
+
+object HasVisitLogging {
+  
+  // If one of these keywords appears in the UA header, treat as bot
+  private val USER_AGENT_EXCLUDES = Set("uptimerobot")
+   
+  def isBot(visit: Visit) =
+    USER_AGENT_EXCLUDES.find(visit.client.userAgent.contains(_)).isDefined
+  
 }
