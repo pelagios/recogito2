@@ -81,6 +81,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
       val extension = title.substring(title.lastIndexOf('.'))
       val file = new File(uploads.PENDING_UPLOADS_DIR, id.toString + extension)
       filepart.ref.moveTo(file)
+      file.setReadable(true, false)
       
       ContentType.fromFile(file) match {
         case Right(contentType) => {
