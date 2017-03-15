@@ -40,6 +40,8 @@ class ResetPasswordController @Inject() (
         |Cheers,
         |the Recogito Team""".stripMargin
     
+    // TODO this now hard-wires "noreply@pelagios.org" as reply address
+    // TODO see if we can take this directly from the config file instead
     val email = Email(
       "Your Recogito password was reset",
       "Recogito Team <noreply@pelagios.org>",
