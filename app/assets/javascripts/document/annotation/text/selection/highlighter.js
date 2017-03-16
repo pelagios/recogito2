@@ -222,6 +222,7 @@ define([
               spans = wrapRange(range);
             } else {
               // Fast rendering through Rangy's API
+              console.log(annotation);
               setNonOverlappingRange(range, anchor, quote.length);
               classApplier.applyToRange(range);
               spans = [ range.getNodes()[0].parentElement ];
