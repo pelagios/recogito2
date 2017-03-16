@@ -190,8 +190,9 @@ define([
               },
 
               setNonOverlappingRange = function(range, offset, length) {
-                var positions = calculateDomPositionWithin(textNodes, [ offset, offset + length ]),
-                    startNode = positions[0].node,
+                var positions = calculateDomPositionWithin(textNodes, [ offset, offset + length ]);
+                console.log(positions);
+                var startNode = positions[0].node,
                     startOffset = positions[0].offset,
                     endNode = positions[1].node,
                     endOffset = positions[1].offset;
