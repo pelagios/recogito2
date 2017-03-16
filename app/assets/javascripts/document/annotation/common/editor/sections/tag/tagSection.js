@@ -8,6 +8,7 @@ define([
       ANIM_DURATION = 150;
 
   var TagSection = function(parent, annotation) {
+
     var element = (Config.writeAccess) ? jQuery(
           '<div class="section tags">' +
             '<ul></ul>' +
@@ -31,7 +32,7 @@ define([
               },
 
               tag = (charsOrTag.type) ? charsOrTag :
-                { type: 'TAG', last_modified_by: Config.me, value: charsOrTag.trim() },  
+                { type: 'TAG', last_modified_by: Config.me, value: charsOrTag.trim() },
 
               li = jQuery('<li><span class="label">' + escapeHtml(tag.value) + '</span>' +
                 '<span class="delete"><span class="icon">&#xf014;</span></span></li>');
@@ -121,10 +122,19 @@ define([
           }
         },
 
+        /** Tags that are currently in 'draft' in the edit field **/
+        getDraftTags = function() {
+          var str = textarea.text().trim(); //.split(',');
+          if (str)
+            return str.split(',');
+          else
+            return [];
+        },
+
         /** Text entry field: new tags are created on ENTER **/
         onKeyDown = function(e) {
           if (e.keyCode === 13) {
-            var tags = textarea.text().split(',');
+            var tags = getDraftTags();
             jQuery.each(tags, function(idx, chars) {
               addTag(chars.trim());
             });
@@ -136,11 +146,13 @@ define([
 
         /** @override **/
         hasChanged = function() {
-          return queuedUpdates.length > 0;
+          return queuedUpdates.length > 0 || getDraftTags().length > 0;
         },
 
         /** @override **/
         commit = function() {
+          // Add draft tags to the queue as well
+          getDraftTags().forEach(addTag);
           jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
         },
 
