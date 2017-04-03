@@ -114,8 +114,8 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
     for {
       (placesBefore, placesAfter) <- conflateAffectedPlaces(GazetteerRecord.normalize(record))
       failedUpdates <- storeUpdatedPlaces(placesAfter)
-      failedDeletes <- if (failedUpdates.isEmpty) deleteMergedPlaces(placesBefore, placesAfter) else Future.successful(Seq.empty[String])
-      geotagRewriteSuccessful <- if (failedDeletes.isEmpty) rewriteGeoTags(placesBefore.map(_._1), placesAfter) else Future.successful(false)
+      geotagRewriteSuccessful <- if (failedUpdates.isEmpty) rewriteGeoTags(placesBefore.map(_._1), placesAfter) else Future.successful(false)
+      failedDeletes <- if (geotagRewriteSuccessful) deleteMergedPlaces(placesBefore, placesAfter) else Future.successful(Seq.empty[String])
     } yield failedUpdates.isEmpty && failedDeletes.isEmpty && geotagRewriteSuccessful
   }
 
@@ -126,7 +126,7 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
         try {
           (record, Await.result(importRecord(record), 5.seconds))
         } catch { case t: Throwable =>
-          // t.printStackTrace()
+          t.printStackTrace()
           play.api.Logger.warn(t.getMessage)
           (record, false)
         }

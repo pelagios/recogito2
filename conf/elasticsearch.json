@@ -1,5 +1,5 @@
 {
-  "analysis" :{
+  "analysis" : {
     "analyzer": {
       "lowercase_keyword" : {
         "type" : "custom",
@@ -7,5 +7,11 @@
         "filter" : [ "lowercase" ]
       }
     }
+  },
+  "index" : {
+    "translog": {
+      "durability": "async",
+      "sync_interval": "1s"
+     }
   }
 }

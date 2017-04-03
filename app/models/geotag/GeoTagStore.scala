@@ -142,10 +142,19 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     // TODO Users may have changed the link in the meantime - use optimistic locking, re-run failures
     def rewriteOne(tag: GeoTag, id: String) = {
-      val newParent = placesAfterUpdate.find { _.uris.contains(tag.gazetteerUri) }.get
-      es.client execute {
-        update id id in ES.RECOGITO / ES.GEOTAG source tag parent newParent.id docAsUpsert
-      } map { _.isCreated }
+      val oldParent = placesBeforeUpdate.find(_.uris.contains(tag.gazetteerUri)).get
+      val newParent = placesAfterUpdate.find(_.uris.contains(tag.gazetteerUri)).get
+      if (oldParent.id != newParent.id) {
+        Logger.info("Rewriting geotag")
+        es.client execute {
+          bulk (
+            delete id id from ES.RECOGITO / ES.GEOTAG parent oldParent.id, 
+            index into ES.RECOGITO / ES.GEOTAG source tag parent newParent.id id id
+          )
+        } map { !_.hasFailures }
+      } else {
+        Future.successful(true)
+      }
     }
 
     if (placesBeforeUpdate.size > 0)
