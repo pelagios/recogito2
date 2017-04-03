@@ -68,7 +68,7 @@ case class Place (
 }
 
 object Place extends HasGeometry {
-  
+    
   implicit val placeFormat: Format[Place] = (
     (JsPath \ "id").format[String] and
     (JsPath \ "representative_geometry").formatNullable[Geometry] and

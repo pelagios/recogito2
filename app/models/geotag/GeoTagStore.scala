@@ -1,7 +1,7 @@
 package models.geotag
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
+import com.sksamuel.elastic4s.{ HitAs, RichSearchHit, RichSearchResponse }
 import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
 import models.Page
@@ -129,47 +129,75 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   }
 
   def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean] = {
-
-    def getTagsForPlaces(places: Seq[Place]) = es.client execute {
-      search in ES.RECOGITO / ES.GEOTAG query {
-        bool {
-          should (
-            places.map { place => hasParentQuery(ES.PLACE).query { termQuery("id", place.id) } }
-          )
-        }
+    
+    def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
+      es.client execute {
+        search scroll scrollId keepAlive "5m"
       }
-    } map { _.as[(GeoTag, String, String)].toSeq }
 
-    // TODO Users may have changed the link in the meantime - use optimistic locking, re-run failures
-    def rewriteOne(tag: GeoTag, id: String) = {
+    def rewriteOne(tag: GeoTag, id: String, parent: String) = {
       val oldParent = placesBeforeUpdate.find(_.uris.contains(tag.gazetteerUri)).get
       val newParent = placesAfterUpdate.find(_.uris.contains(tag.gazetteerUri)).get
       if (oldParent.id != newParent.id) {
-        Logger.info("Rewriting geotag")
+        Logger.debug("Rewriting geotag reference: " + tag.gazetteerUri)
+        
+        /*
+        Logger.debug("  from "  + oldParent.id + " to " + newParent.id)
+        Logger.debug("  was " + placesBeforeUpdate.size + " places before and " + placesAfterUpdate.size + " after update")
+        
+        Logger.debug("  places before: " + placesBeforeUpdate.map(_.uris.mkString("\n")))
+        Logger.debug("  places after: " + placesAfterUpdate.map(_.uris.mkString("\n")))
+        */
+        
         es.client execute {
           bulk (
-            delete id id from ES.RECOGITO / ES.GEOTAG parent oldParent.id, 
-            index into ES.RECOGITO / ES.GEOTAG source tag parent newParent.id id id
+            delete id id from ES.RECOGITO / ES.GEOTAG parent parent, 
+            index into ES.RECOGITO / ES.GEOTAG source tag parent newParent.id
           )
         } map { !_.hasFailures }
       } else {
+        // Logger.info("no rewrite")
         Future.successful(true)
       }
     }
+    
+    def rewriteBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] = {
+       val total = response.totalHits
+       val tags = response.as[(GeoTag, String, String)].toSeq
+       
+       if (tags.isEmpty) {
+         Future.successful(true)
+       } else {
+         val fSuccesses = Future.sequence(tags.map { case (tag, id, parent) => rewriteOne(tag, id, parent) })
+         fSuccesses.flatMap { successes =>
+           val success = !successes.exists(_ == false)
+           val rewrittenTags = cursor + tags.size
+           if (rewrittenTags < total)
+             fetchNextBatch(response.scrollId).flatMap { response =>
+               rewriteBatch(response, rewrittenTags).map { _ && success }
+             }
+           else
+             Future.successful(success)
+         }
+       }
+    }
 
-    if (placesBeforeUpdate.size > 0)
-      getTagsForPlaces(placesBeforeUpdate).flatMap { case tags =>
-        if (tags.size > 0) {
-          val fSuccesses = Future.sequence(tags.map { case (tag, id, parent) => rewriteOne(tag, id) })
-          fSuccesses.map { _.exists { _ == false } }
-        } else {
-          // Nothing to update
-          Future.successful(true)
-        }
+    if (placesBeforeUpdate.size > 0) {
+      es.client execute {
+        search in ES.RECOGITO / ES.GEOTAG query {
+          bool {
+            should (
+              placesBeforeUpdate.map { place => hasParentQuery(ES.PLACE).query { termQuery("id", place.id) } }
+            )
+          }
+        } limit 50 scroll "5m"
+      } flatMap {
+        rewriteBatch(_)
       }
-    else
+    } else {
       // No need to update any GeoTags if no existing places were affected by the import
       Future.successful(true)
+    }
   }
 
   /** Helper to bulk-delete a list of GeoTags **/

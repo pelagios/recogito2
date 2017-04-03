@@ -39,10 +39,12 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
       else
         Some(TemporalBounds.computeUnion(bounds))
 
+    val (representativeGeometry, representativePoint) = GazetteerRecord.getPreferredLocation(allRecords)
+    
     Place(
       definingPlace.map(_.id).getOrElse(normalizedRecord.uri),
-      definingPlace.map(_.representativeGeometry).getOrElse(normalizedRecord.geometry), // TODO implement rules for preferred geometry
-      definingPlace.map(_.representativePoint).getOrElse(normalizedRecord.representativePoint), // TODO implement rules for preferred point
+      representativeGeometry,
+      representativePoint,
       temporalBoundsUnion((places.map(_.temporalBoundsUnion) :+ normalizedRecord.temporalBounds).flatten),
       allRecords
     )
@@ -73,6 +75,9 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
       getAffectedPlaces(normalizedRecord).map(p => {
         // Sorted affected places by no. of gazetteer records
         val affectedPlaces = p.sortBy(- _._1.isConflationOf.size)
+        
+        if (affectedPlaces.size > 1)
+          Logger.info("Merging places " + affectedPlaces.map(_._1.id).mkString(", "))
 
         val affectedRecords =
           affectedPlaces

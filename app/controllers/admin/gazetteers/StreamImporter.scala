@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 
 class StreamImporter(implicit materializer: Materializer) {
   
-  private val BATCH_SIZE = 200
+  private val BATCH_SIZE = 100
   
   private val decider: Supervision.Decider = {    
     case t: Throwable => 

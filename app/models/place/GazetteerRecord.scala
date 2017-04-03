@@ -79,6 +79,37 @@ case class GazetteerRecord (
 
 object GazetteerRecord extends HasDate with HasGeometry with HasNullableSeq {
   
+  /** A set of conventions to select reasonable 'representative geometry' for a place.
+    *
+    * Note: this will likely never be perfect, and always be a bit of a hack. Thoughts &
+    * ideas for improvement welcome!  
+    */
+  def getPreferredLocation(records: Seq[GazetteerRecord]): (Option[Geometry], Option[Coordinate]) = {    
+    // Rule 1: prefer DARE for representative point
+    val dareRecord = 
+      records.filter(_.uri.contains("dare.ht.lu.se/places")).headOption
+      
+    val representativePoint = dareRecord.flatMap(_.representativePoint) match {
+      case Some(point) =>
+        Some(point) // Use DARE
+        
+      case None =>
+        records.flatMap(_.representativePoint).headOption // Use first Available
+    }
+     
+    // Rule 2: select the most high-res geometry, but fall back to DARE if it's a point
+    val representativeGeometry = records.flatMap(_.geometry)
+      .sortBy(_.getCoordinates().size).reverse
+      .headOption.map { geom =>
+        if (geom.getCoordinates.size == 1)
+          dareRecord.flatMap(_.geometry).getOrElse(geom)
+        else
+          geom
+      }
+      
+    (representativeGeometry, representativePoint)    
+  }
+  
   /** Utility method to normalize a URI to a standard format
     * 
     * Removes '#this' suffixes (used by Pleiades) and, by convention, trailing slashes. 
