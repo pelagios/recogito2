@@ -95,8 +95,8 @@ require([
                 marker;
 
             if (place.representative_point && annotations.length > 0) {
-              marker = (place.representative_geometry.type === 'Point') ?
-                createPointMarker(place) : createShapeMarker(place);
+              marker = (place.representative_geometry && place.representative_geometry.type !== 'Point') ?
+                createShapeMarker(place) : createPointMarker(place);
               marker.addTo(markerLayer);
               marker.place = place; // TODO Hack! Clean this up
               marker.on('click', function() {
