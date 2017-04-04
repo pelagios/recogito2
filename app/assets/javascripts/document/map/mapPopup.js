@@ -7,7 +7,7 @@ define([
 
   var SLIDE_DURATION = 250;
 
-  var MapPopup = function(latlng, place, annotations) {
+  var MapPopup = function(marker, place, annotations) {
 
     var element = jQuery(
           '<div class="popup">' +
@@ -243,7 +243,7 @@ define([
 
         addTo = function(map) {
           render();
-          L.popup().setLatLng(latlng).setContent(element[0]).openOn(map);
+          marker.bindPopup(element[0]).openPopup();
         };
 
     this.addTo = addTo;

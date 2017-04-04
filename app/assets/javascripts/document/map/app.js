@@ -20,6 +20,16 @@ require([
 
       STROKE_COLOR = '#006d2c',
 
+      POINT_STYLE = {
+        color       : STROKE_COLOR,
+        fillColor   : FILL_COLOR,
+        opacity     : 1,
+        weight      : 1.5,
+        fillOpacity : 1
+      },
+
+      SHAPE_STYLE = jQuery.extend({}, POINT_STYLE, { fillOpacity: 0.5 }),
+
       TOUCH_DISTANCE_THRESHOLD = 18;
 
   jQuery(document).ready(function() {
@@ -66,31 +76,31 @@ require([
         },
 
         onPlacesLoaded = function(response) {
+
+          var createPointMarker = function(place) {
+                // The epic struggle between Leaflet vs. GeoJSON
+                var latlng = [place.representative_point[1], place.representative_point[0]],
+                    markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
+                    style = jQuery.extend({}, POINT_STYLE, { radius: markerSize });
+
+                return L.circleMarker(latlng, style);
+              },
+
+              createShapeMarker = function(place) {
+                return L.geoJson(place.representative_geometry, SHAPE_STYLE);
+              };
+
           jQuery.each(response.items, function(idx, place) {
-            /*
-            if (place.representative_geometry && (
-              place.representative_geometry.type === 'Polygon' || place.representative_geometry.type === 'MultiPolygon'
-            )) {
+            var annotations = getAnnotationsForPlace(place),
+                marker;
 
-              L.geoJson(place.representative_geometry).addTo(markerLayer);
-
-            } else */ if (place.representative_point) {
-              // The epic battle between Leaflet vs. GeoJSON
-              var latlng = [ place.representative_point[1], place.representative_point[0] ],
-                  markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
-                  marker = L.circleMarker(latlng, {
-                    color       : STROKE_COLOR,
-                    fillColor   : FILL_COLOR,
-                    opacity     : 1,
-                    fillOpacity : 1,
-                    weight      : 1.5,
-                    radius: markerSize
-                  }).addTo(markerLayer);
-
+            if (place.representative_point && annotations.length > 0) {
+              marker = (place.representative_geometry.type === 'Point') ?
+                createPointMarker(place) : createShapeMarker(place);
+              marker.addTo(markerLayer);
               marker.place = place; // TODO Hack! Clean this up
-
               marker.on('click', function() {
-                var popup = new MapPopup(latlng, place, getAnnotationsForPlace(place));
+                var popup = new MapPopup(marker, place, getAnnotationsForPlace(place));
                 map.add(popup);
               });
             }
