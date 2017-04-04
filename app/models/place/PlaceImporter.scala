@@ -79,15 +79,22 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
         if (affectedPlaces.size > 1)
           Logger.info("Merging places " + affectedPlaces.map(_._1.id).mkString(", "))
 
-        val affectedRecords =
-          affectedPlaces
-            .flatMap(_._1.isConflationOf) // all gazetteer records contained in the affected places
-            .filter(_.uri != record.uri) // This record might update to an existing record!
-
-        val conflated = conflate(affectedRecords :+ normalizedRecord)
+        val records = {
+          // All records contained in affectedPlaces
+          val affectedRecords = affectedPlaces.flatMap(_._1.isConflationOf) 
+          
+          // This record might update an existing one - find out where it is in the list
+          val replaceIdx = affectedRecords.indexWhere(_.uri == normalizedRecord.uri)
+          if (replaceIdx < 0)
+            // Nope, the record is new - just append
+            affectedRecords :+ normalizedRecord
+          else
+            // Replace the old version in the list
+            affectedRecords.patch(replaceIdx, Seq(normalizedRecord), 1)              
+        }
 
         // Pass back places before and after conflation
-        (affectedPlaces, conflated)
+        (affectedPlaces, conflate(records))
       })
     }
 
@@ -142,8 +149,11 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
         Logger.warn(failedRecords.size + " gazetteer records failed to import - retrying")
         importRecords(failedRecords, retries - 1)
       } else {
-        if (failedRecords.size > 0) Logger.error(failedRecords.size + " gazetteer records failed without recovery")
-        else Logger.info("No failed imports")
+        if (failedRecords.size > 0)
+          Logger.error(failedRecords.size + " gazetteer records failed without recovery: " + failedRecords.map(_.uri).mkString(", "))
+        else
+          Logger.info("No failed imports")
+          
         Future.successful(failedRecords)
       }
     }

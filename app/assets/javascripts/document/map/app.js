@@ -68,13 +68,13 @@ require([
         onPlacesLoaded = function(response) {
           jQuery.each(response.items, function(idx, place) {
             /*
-            if (place.representative_geometry && place.representative_geometry.type === 'Polygon') {
+            if (place.representative_geometry && (
+              place.representative_geometry.type === 'Polygon' || place.representative_geometry.type === 'MultiPolygon'
+            )) {
 
               L.geoJson(place.representative_geometry).addTo(markerLayer);
 
-            } else */
-
-            if (place.representative_point) {
+            } else */ if (place.representative_point) {
               // The epic battle between Leaflet vs. GeoJSON
               var latlng = [ place.representative_point[1], place.representative_point[0] ],
                   markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
