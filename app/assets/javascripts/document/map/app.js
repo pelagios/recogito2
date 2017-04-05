@@ -94,7 +94,7 @@ require([
             var annotations = getAnnotationsForPlace(place),
                 marker;
 
-            if (place.representative_point && annotations.length > 0) {
+            if ((place.representative_point || place.representative_geometry) && annotations.length > 0) {
               marker = (place.representative_geometry && place.representative_geometry.type !== 'Point') ?
                 createShapeMarker(place) : createPointMarker(place);
               marker.addTo(markerLayer);

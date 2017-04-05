@@ -140,15 +140,6 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       val newParent = placesAfterUpdate.find(_.uris.contains(tag.gazetteerUri)).get
       if (oldParent.id != newParent.id) {
         Logger.debug("Rewriting geotag reference: " + tag.gazetteerUri)
-        
-        /*
-        Logger.debug("  from "  + oldParent.id + " to " + newParent.id)
-        Logger.debug("  was " + placesBeforeUpdate.size + " places before and " + placesAfterUpdate.size + " after update")
-        
-        Logger.debug("  places before: " + placesBeforeUpdate.map(_.uris.mkString("\n")))
-        Logger.debug("  places after: " + placesAfterUpdate.map(_.uris.mkString("\n")))
-        */
-        
         es.client execute {
           bulk (
             delete id id from ES.RECOGITO / ES.GEOTAG parent parent, 
@@ -156,7 +147,6 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
           )
         } map { !_.hasFailures }
       } else {
-        // Logger.info("no rewrite")
         Future.successful(true)
       }
     }
