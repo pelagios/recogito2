@@ -1,7 +1,7 @@
 package models.place.crosswalks
 
 import com.vividsolutions.jts.geom.Coordinate
-import models.HasGeometry
+import models.{ HasGeometry, HasNullableSeq }
 import models.place.{ CountryCode, Description, Gazetteer, GazetteerRecord, Name }
 import org.joda.time.DateTime
 import play.api.libs.json._
@@ -27,7 +27,7 @@ object GeoNamesCrosswalk extends BaseGeoJSONCrosswalk {
       Seq.empty[String], // place types
       geonames.countryCode.map(c => CountryCode(c.toUpperCase)),
       geonames.population,
-      Seq.empty[String], // closeMatches
+      geonames.closeMatches,
       Seq.empty[String]  // exactMatches
     )
   })
@@ -37,8 +37,6 @@ object GeoNamesCrosswalk extends BaseGeoJSONCrosswalk {
 case class GeoNamesRecord(
 
   uri: String,
-
-  // TODO lastChangedAt
   
   title: String,
   
@@ -52,13 +50,15 @@ case class GeoNamesRecord(
   
   countryCode: Option[String],
   
-  population: Option[Long]
+  population: Option[Long],
+  
+  closeMatches: Seq[String]
     
 )
 
 object GeoNamesRecord extends HasGeometry {
   
-  implicit val pleiadesRecordReads: Reads[GeoNamesRecord] = (
+  implicit val geonamesRecordReads: Reads[GeoNamesRecord] = (
     (JsPath \ "uri").read[String] and
     (JsPath \ "title").read[String] and
     (JsPath \ "description").readNullable[String] and
@@ -66,7 +66,8 @@ object GeoNamesRecord extends HasGeometry {
     (JsPath \ "features").readNullable[Seq[Feature]].map(_.getOrElse(Seq.empty[Feature])) and
     (JsPath \ "reprPoint").readNullable[Coordinate] and
     (JsPath \ "country_code").readNullable[String] and
-    (JsPath \ "population").readNullable[Long]
+    (JsPath \ "population").readNullable[Long] and
+    (JsPath \ "close_matches").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String]))
   )(GeoNamesRecord.apply _)
   
 }
