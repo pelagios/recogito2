@@ -1,6 +1,6 @@
 package models.place
 
-import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
+import com.vividsolutions.jts.geom.{ Coordinate, Geometry, GeometryFactory }
 import models.{ HasDate, HasGeometry, HasNullableSeq, HasNullableBoolean }
 import org.joda.time.DateTime
 import play.api.libs.json._
@@ -79,6 +79,8 @@ case class GazetteerRecord (
 
 object GazetteerRecord extends HasDate with HasGeometry with HasNullableSeq {
   
+  private val factory = new GeometryFactory()
+  
   /** A set of conventions to select reasonable 'representative geometry' for a place.
     *
     * Note: this will likely never be perfect, and always be a bit of a hack. Thoughts &
@@ -106,8 +108,26 @@ object GazetteerRecord extends HasDate with HasGeometry with HasNullableSeq {
         else
           geom
       }
+    
+    val (geom, point) = (representativeGeometry, representativePoint) match {
+      case (Some(g), Some(pt)) =>
+        // Both defined - we're fine
+        (Some(g), Some(pt))
+        
+      case (None, None) =>
+        // Nothing defined - fair enough
+        (None, None)
+        
+      case (Some(g), None) =>
+        // Only geometry - use centroid for point
+        (Some(g), Some(g.getCentroid.getCoordinate))
+        
+      case (None, Some(pt)) =>
+        // Only point - add a point geometry
+        (Some(factory.createPoint(pt)), Some(pt))
+    }
       
-    (representativeGeometry, representativePoint)    
+    (geom, point)    
   }
   
   /** Utility method to normalize a URI to a standard format
