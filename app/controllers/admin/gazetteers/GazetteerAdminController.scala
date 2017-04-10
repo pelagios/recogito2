@@ -13,6 +13,7 @@ import java.io.FileInputStream
 import models.place.crosswalks.PleiadesCrosswalk
 import models.place.crosswalks.GeoNamesCrosswalk
 import models.place.crosswalks.PelagiosRDFCrosswalk
+import models.place.crosswalks.PelagiosGeoJSONCrosswalk
 
 class GazetteerAdminController @Inject() (
     val config: Configuration,
@@ -38,6 +39,7 @@ class GazetteerAdminController @Inject() (
   
         
         /** TEMPORARY HACK **/
+        
         if (formData.filename.contains(".ttl")) {
           Logger.info("Importing Pelagios RDF/TTL dump")
           val importer = new DumpImporter()          
@@ -50,6 +52,10 @@ class GazetteerAdminController @Inject() (
           Logger.info("Using GeoNames crosswalk")
           val importer = new StreamImporter()
           importer.importPlaces(new FileInputStream(formData.ref.file), GeoNamesCrosswalk.fromJson)(places, ctx)
+        } else if (formData.filename.endsWith("json")) {
+          Logger.info("Importing Pelagios GeoJSON FeatureCollection")
+          val importer = new DumpImporter()
+          importer.importDump(formData.ref.file, formData.filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(formData.filename))(places, ctx)
         }
 
         /** TEMPORARY HACK **/
