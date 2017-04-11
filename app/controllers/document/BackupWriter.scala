@@ -26,10 +26,10 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     val md = MessageDigest.getInstance(ALGORITHM)    
     val in = new DigestInputStream(new BufferedInputStream(inputStream), md)
     
-    var b = in.read()
-    while (b > -1) {
-      zip.write(b)
-      b = in.read()
+    var buffer = new Array[Byte](1024)
+    in.read(buffer)    
+    while (in.read(buffer) > -1) {
+      zip.write(buffer)
     }
 
     in.close()
