@@ -20,15 +20,19 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
   
   private val TMP = System.getProperty("java.io.tmpdir")
   
+  private val BUFFER_SIZE = 2048
+  
   private def writeToZip(inputStream: InputStream, filename: String, zip: ZipOutputStream) = {
     zip.putNextEntry(new ZipEntry(filename))
      
     val md = MessageDigest.getInstance(ALGORITHM)    
     val in = new DigestInputStream(new BufferedInputStream(inputStream), md)
-    
-    var buffer = new Array[Byte](2048)
-    while (in.read(buffer) > -1) {
-      zip.write(buffer)
+
+    var data= new Array[Byte](BUFFER_SIZE)
+    var count: Int = 0
+
+    while ({ count = in.read(data, 0, BUFFER_SIZE); count } > -1) {
+      zip.write(data, 0, count)
     }
 
     in.close()
