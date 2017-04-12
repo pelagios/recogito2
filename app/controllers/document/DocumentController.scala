@@ -36,6 +36,7 @@ class DocumentController @Inject() (
       val tileFolder = new File(documentDir, foldername)
 
       val file = new File(tileFolder, filepath)
+      play.api.Logger.info("Retrieving: " + file.getAbsolutePath)
       if (file.exists)
         Some(file)
       else
