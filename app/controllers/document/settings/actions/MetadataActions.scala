@@ -59,7 +59,7 @@ trait MetadataActions { self: SettingsController =>
       "title" -> nonEmptyText,
       "author" -> optional(text),
       "date_freeform" -> optional(text),
-      "description" -> optional(text(maxLength=256)),
+      "description" -> optional(text(maxLength=1024)),
       "language" -> optional(text.verifying("2- or 3-digit ISO language code required", { t => t.size > 1 && t.size < 4 })),
       "source" -> optional(text),
       "edition" -> optional(text),
