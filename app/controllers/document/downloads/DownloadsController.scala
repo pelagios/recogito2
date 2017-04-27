@@ -110,29 +110,40 @@ class DownloadsController @Inject() (
   def downloadJSONLD(documentId: String) = downloadRDF(documentId, RDFFormat.JSONLD_PRETTY, "jsonld") 
 
   def downloadGeoJSON(documentId: String, asGazetteer: Boolean) = AsyncStack { implicit request =>
-    download(documentId, { doc =>
-      request.body.asFormUrlEncoded.flatMap(_.get("json").flatMap(_.headOption)) match {
-        case Some(str) =>
-          Json.fromJson[FieldMapping](Json.parse(str)) match {
-            case result: JsSuccess[FieldMapping] =>
-              val f = 
-                if (asGazetteer) exportGeoJSONGazetteer(doc, result.get)
-                else placesToGeoJSON(documentId)
-                
-              f.map { featureCollection =>
-                Ok(Json.prettyPrint(featureCollection))
-                  .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
-              }
-              
-            case error: JsError =>
-              Logger.warn("Attempt to download gazetteer but field mapping invalid: " + str + "\n" + error)
-              Future.successful(BadRequest)
-          }
-          
-        case None =>
-          Logger.warn("Attempt to download gazetteer without field mapping payload")
-          Future.successful(BadRequest)
+    
+    // Standard GeoJSON download
+    def downloadPlaces() =
+      placesToGeoJSON(documentId).map { featureCollection =>
+        Ok(Json.prettyPrint(featureCollection))
+          .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
       }
+    
+    // Places + spreadsheet info, according to Pelagios gazetteer GeoJSON conventions
+    def downloadGazetteer(doc: DocumentInfo) = request.body.asFormUrlEncoded.flatMap(_.get("json").flatMap(_.headOption)) match {
+      case Some(str) =>
+        Json.fromJson[FieldMapping](Json.parse(str)) match {
+          case result: JsSuccess[FieldMapping] =>
+            exportGeoJSONGazetteer(doc, result.get).map { featureCollection =>
+              Ok(Json.prettyPrint(featureCollection))
+                .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".json" })
+            }
+              
+          case error: JsError =>
+            Logger.warn("Attempt to download gazetteer but field mapping invalid: " + str + "\n" + error)
+            Future.successful(BadRequest)
+        }
+          
+      case None =>
+        Logger.warn("Attempt to download gazetteer without field mapping payload")
+        Future.successful(BadRequest)
+    }
+
+    
+    download(documentId, { doc =>
+      if (asGazetteer)
+        downloadGazetteer(doc)
+      else
+        downloadPlaces
     })
   }
   
