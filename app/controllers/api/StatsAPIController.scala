@@ -9,6 +9,7 @@ import models.user.UserService
 import models.user.Roles._
 import models.visit.VisitService
 import play.api.Configuration
+import play.api.mvc.Action
 import play.api.libs.json.{ Json, JsObject }
 import scala.concurrent.ExecutionContext
 
@@ -25,6 +26,28 @@ class StatsAPIController @Inject() (
   // TODO should this be in the settings controller?
   def getContributionHistory(documentId: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     contributions.getHistory(documentId, offset, size).map(contributions => jsonOk(Json.toJson(contributions)))
+  }
+  
+  // TODO should this be in the landing page controller?
+  def getRightNowStats() = Action.async { implicit request =>
+    
+    val fAnnotations = annotations.countTotal()
+    val fEditsToday = contributions.countToday()
+    val fUsers = users.countUsers()
+    
+    val f = for {
+      annotations <- fAnnotations
+      editsToday <- fEditsToday
+      users <- fUsers
+    } yield (annotations, editsToday, users)
+    
+    f.map { case (annotations, editsToday, users) =>
+      jsonOk(Json.obj(
+        "annotations" -> annotations,
+        "edits_today" -> editsToday,
+        "users" -> users
+      ))
+    }
   }
 
   // TODO does this mix concerns too much?

@@ -190,6 +190,15 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       }
     }
   }
+  
+  def countToday() = 
+    es.client execute {
+      search in ES.RECOGITO / ES.CONTRIBUTION query {
+        constantScoreQuery {
+          filter(rangeQuery("made_at") from "now/d")
+        }
+      } size 0
+    } map { _.totalHits }
 
   /** Returns the system-wide contribution stats **/
   def getGlobalStats(): Future[ContributionStats] =

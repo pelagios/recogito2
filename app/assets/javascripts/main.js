@@ -14,6 +14,7 @@ require.config({
     { name : 'document/settings/history' },
     { name : 'document/settings/sharing' },
     { name : 'help/tutorial'},
+    { name : 'landing/index' },
     { name : 'my/settings/account' },
     { name : 'my/upload/step1' },
     { name : 'my/upload/step2' },
