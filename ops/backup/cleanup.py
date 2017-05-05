@@ -31,7 +31,7 @@ def cleanupESSnapshots():
         age = getAgeDays(name[8:])
         if age > 7:
             print 'Deleting snapshot ' + name + ' (' + str(age) + ' days old)'
-            requests.delete('http://localhost:9400/_snapshot/recogito/' + name)
+            requests.delete('http://localhost:9200/_snapshot/recogito/' + name)
 
 cleanupLogfiles()
 cleanupPGDumps()
