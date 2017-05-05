@@ -107,7 +107,7 @@ require([
                 field.html(Formatting.formatNumber(num));
               };
 
-          jsRoutes.controllers.api.StatsAPIController.getDashboardStats().ajax().done(function(stats) {
+          jsRoutes.controllers.admin.AdminController.getStats().ajax().done(function(stats) {
             fillNumber(totalEdits, stats.contribution_stats.total_contributions);
             fillNumber(totalAnnotations, stats.total_annotations);
             fillNumber(registeredUsers, stats.total_users);

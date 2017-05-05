@@ -1,6 +1,5 @@
 package controllers.document.settings.actions
 
-import controllers.HasPrettyPrintJSON
 import controllers.document.settings.SettingsController
 import models.document.DocumentAccessLevel
 import models.generated.tables.records.SharingPolicyRecord
@@ -27,7 +26,7 @@ object CollaboratorStub {
   
 }
 
-trait SharingActions extends HasPrettyPrintJSON { self: SettingsController =>
+trait SharingActions { self: SettingsController =>
     
   def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { doc =>

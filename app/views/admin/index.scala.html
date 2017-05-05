@@ -71,7 +71,7 @@
     </div> <!-- .content -->
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.api.routes.javascript.StatsAPIController.getDashboardStats,
+      controllers.admin.routes.javascript.AdminController.getStats,
       controllers.document.annotation.routes.javascript.AnnotationController.resolveAnnotationView
     )
   </body>

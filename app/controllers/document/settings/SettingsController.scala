@@ -1,6 +1,6 @@
 package controllers.document.settings
 
-import controllers.{ BaseAuthController, WebJarAssets }
+import controllers.{ BaseAuthController, HasPrettyPrintJSON, WebJarAssets }
 import controllers.document.settings.actions._
 import javax.inject.{ Inject, Singleton }
 import models.annotation.AnnotationService
@@ -33,7 +33,8 @@ class SettingsController @Inject() (
       with HistoryActions
       with BackupActions
       with DeleteActions
-      with I18nSupport {
+      with I18nSupport
+      with HasPrettyPrintJSON {
 
   def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { doc =>
