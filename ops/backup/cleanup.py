@@ -25,7 +25,7 @@ def cleanupPGDumps():
     cleanupFiles('/mnt/data/recogito/backup/postgresql/backup*')
 
 def cleanupESSnapshots():
-    r = requests.get('http://localhost:9400/_snapshot/recogito/_all')
+    r = requests.get('http://localhost:9200/_snapshot/recogito/_all')
     for snapshot in json.loads(r.text)['snapshots']:
         name = snapshot['snapshot']
         age = getAgeDays(name[8:])
