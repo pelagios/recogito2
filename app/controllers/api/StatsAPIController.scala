@@ -24,11 +24,6 @@ class StatsAPIController @Inject() (
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON {
 
-  // TODO should this be in the settings controller?
-  def getContributionHistory(documentId: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    contributions.getHistory(documentId, offset, size).map(contributions => jsonOk(Json.toJson(contributions)))
-  }
-
   // TODO does this mix concerns too much?
   def getDashboardStats() = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     

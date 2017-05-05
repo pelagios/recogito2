@@ -15,8 +15,8 @@
   <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/history.js")"></script>
 
   @helper.javascriptRouter("jsRoutes")(
-    controllers.api.routes.javascript.StatsAPIController.getContributionHistory,
     controllers.document.annotation.routes.javascript.AnnotationController.resolveAnnotationView,
+    controllers.document.settings.routes.javascript.SettingsController.getContributionHistory,
     controllers.document.settings.routes.javascript.SettingsController.rollbackByTime
   )
 }

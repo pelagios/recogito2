@@ -30,7 +30,7 @@ class SettingsController @Inject() (
   ) extends BaseAuthController(config, documents, users)
       with MetadataActions
       with SharingActions
-      with RollbackActions
+      with HistoryActions
       with BackupActions
       with DeleteActions
       with I18nSupport {

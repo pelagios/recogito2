@@ -2,9 +2,14 @@ package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
 import models.user.Roles._
+import play.api.libs.json.Json
 import scala.concurrent.Future
 
-trait RollbackActions { self: SettingsController =>
+trait HistoryActions { self: SettingsController =>
+  
+  def getContributionHistory(documentId: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+    contributions.getHistory(documentId, offset, size).map(contributions => jsonOk(Json.toJson(contributions)))
+  }
 
   def rollbackByTime(documentId: String, contributionId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.user.getUsername, { _ =>

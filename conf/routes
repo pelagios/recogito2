@@ -73,6 +73,7 @@ PUT     /document/:id/settings/public                controllers.document.settin
 PUT     /document/:id/settings/collaborator          controllers.document.settings.SettingsController.addCollaborator(id: String)
 DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
 GET     /document/:id/settings/collaborator/search   controllers.document.settings.SettingsController.searchUsers(id: String, q: String)
+GET     /document/:id/settings/history.json          controllers.document.settings.SettingsController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
 POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String, contributionId: String)
 GET     /document/:id/settings/zip-export            controllers.document.settings.SettingsController.exportAsZip(id: String)
 DELETE  /document/:id/settings/delete                controllers.document.settings.SettingsController.deleteDocument(id: String)
@@ -114,7 +115,6 @@ GET     /api/document/:id/places                     controllers.api.PlaceAPICon
 GET     /api/place/search                            controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
 GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
 
-GET     /api/stats/document/:id/history              controllers.api.StatsAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
 GET     /api/stats                                   controllers.api.StatsAPIController.getDashboardStats()
 
 GET     /api/user                                    controllers.api.UserAPIController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
