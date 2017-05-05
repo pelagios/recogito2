@@ -195,7 +195,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query {
         constantScoreQuery {
-          filter(rangeQuery("made_at") from "now/d")
+          filter(rangeQuery("made_at") from "now-24h")
         }
       } size 0
     } map { _.totalHits }

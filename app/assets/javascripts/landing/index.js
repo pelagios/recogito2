@@ -16,6 +16,8 @@ require([], function() {
         format = function(num) {
           if (num > 10000)
             return Math.round(num / 1000) + 'K';
+          else if (num > 1000)
+            return Math.floor(num / 1000) + ',' + (num % 1000);
           else
             return num;
         },
