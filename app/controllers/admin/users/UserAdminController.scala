@@ -1,14 +1,17 @@
 package controllers.admin.users
 
-import controllers.BaseAuthController
+import controllers.{ BaseAuthController, HasPrettyPrintJSON }
 import javax.inject.{ Inject, Singleton }
+import models.{ HasDate, SortOrder }
 import models.document.DocumentService
 import models.user.Roles._
 import models.user.UserService
+import org.joda.time.DateTime
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 import controllers.WebJarAssets
 import play.api.Configuration
+import play.api.libs.json.Json
 
 @Singleton
 class UserAdminController @Inject() (
@@ -17,12 +20,13 @@ class UserAdminController @Inject() (
     val users: UserService,
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarAssets
-  ) extends BaseAuthController(config, documents, users) {
+  ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON with HasDate {
 
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.users.index())
   }
 
+  /*
   def showDetails(username: String) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     users.findByUsername(username).flatMap(_ match {
 
@@ -33,6 +37,21 @@ class UserAdminController @Inject() (
       case None => Future.successful(NotFoundPage)
 
     })
+  }
+  */
+  
+  def listUsers(offset: Int, size: Int, sortBy: Option[String], sortOrder: Option[String]) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+    users.listUsers(offset, size, sortBy, sortOrder.flatMap(o => SortOrder.fromString(o))).map { userList =>
+      jsonOk(Json.toJson(userList.map { user =>
+        Json.obj(
+          "username" -> user.getUsername,
+          "email" -> users.decrypt(user.getEmail),
+          "member_since" -> formatDate(new DateTime(user.getMemberSince.getTime)),
+          "real_name" -> user.getRealName,
+          "quota" -> user.getQuotaMb.toInt
+        )
+      }))
+    }
   }
 
 }

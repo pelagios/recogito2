@@ -12,7 +12,7 @@ require([], function(Formatting) {
         loadData = function(filter) {
           var offset = (filter.pageIndex - 1) * filter.pageSize;
 
-          return jsRoutes.controllers.api.UserAPIController.listUsers(
+          return jsRoutes.controllers.admin.users.UserAdminController.listUsers(
             offset, filter.pageSize, filter.sortField, filter.sortOrder
           ).ajax().then(function(response) {
             return {

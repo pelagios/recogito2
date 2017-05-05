@@ -35,7 +35,8 @@ GET     /admin/gazetteers                            controllers.admin.gazetteer
 POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
 DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 
-GET     /admin/users/:username                       controllers.admin.users.UserAdminController.showDetails(username)
+# GET     /admin/users/:username                       controllers.admin.users.UserAdminController.showDetails(username)
+GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 GET     /admin/users                                 controllers.admin.users.UserAdminController.index
 
 GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
@@ -115,8 +116,6 @@ GET     /api/document/:id/places                     controllers.api.PlaceAPICon
 
 GET     /api/place/search                            controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
 GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
-
-GET     /api/user                                    controllers.api.UserAPIController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 
 POST    /api/task                                    controllers.api.TaskAPIController.spawnTask
 GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)
