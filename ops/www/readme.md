@@ -1,3 +1,3 @@
-HTML pages to use for:
-- error pages in the frontend Proxy Web server (NGINX, etc.)
-- information about Recogito 1 deprecation
+HTML pages to use as:
+- error pages in the frontend proxy Web server (NGINX, etc.)
+- info about Recogito 1 deprecation
