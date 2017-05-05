@@ -115,7 +115,6 @@ GET     /api/place/search                            controllers.api.PlaceAPICon
 GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
 
 GET     /api/stats/document/:id/history              controllers.api.StatsAPIController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
-GET     /api/stats/rightnow                          controllers.api.StatsAPIController.getRightNowStats()
 GET     /api/stats                                   controllers.api.StatsAPIController.getDashboardStats()
 
 GET     /api/user                                    controllers.api.UserAPIController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
@@ -150,14 +149,15 @@ GET     /:username/upload/cancel                     controllers.my.UploadContro
 GET     /:username/upload/progress/:docId            controllers.my.UploadController.queryTaskProgress(username: String, docId: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Application root
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /stats.json                                  controllers.landing.LandingController.getStats()
+GET     /                                            controllers.landing.LandingController.index
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my                                          controllers.my.MyRecogitoController.my
 GET     /:username                                   controllers.my.MyRecogitoController.index(username: String, tab: Option[String], p: Option[Int], sortby: Option[String], order: Option[String])
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Application root
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-GET     /                                            controllers.landing.LandingController.index

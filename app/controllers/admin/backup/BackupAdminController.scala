@@ -3,7 +3,7 @@ package controllers.admin.backup
 import akka.actor.ActorSystem
 import controllers.{ BaseAuthController, WebJarAssets }
 import controllers.document.BackupReader
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.ContentType
 import models.annotation.AnnotationService
 import models.document.DocumentService
@@ -13,7 +13,8 @@ import models.user.Roles._
 import play.api.Configuration
 import scala.concurrent.{ ExecutionContext, Future }
 import transform.tiling.TilingService
-  
+
+@Singleton
 class BackupAdminController @Inject() (
     val config: Configuration,
     val users: UserService,

@@ -26,6 +26,7 @@ case class UploadSuccess(contentType: String)
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)
 
+@Singleton
 class UploadController @Inject() (
     val config: Configuration,
     val documents: DocumentService,

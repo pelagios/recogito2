@@ -4,7 +4,7 @@ import controllers._
 import controllers.api.image.ImageService
 import java.io.File
 import java.util.UUID
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.{ ContentType, HasDate }
 import models.annotation._
@@ -92,6 +92,7 @@ object AnnotationStatusStub extends HasDate {
 
 }
 
+@Singleton
 class AnnotationAPIController @Inject() (
     val config: Configuration,
     val annotationService: AnnotationService,

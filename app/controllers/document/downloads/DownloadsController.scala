@@ -4,7 +4,7 @@ import akka.util.ByteString
 import akka.stream.scaladsl.Source
 import controllers.{ BaseOptAuthController, WebJarAssets }
 import controllers.document.downloads.serializers._
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.stackc.RequestWithAttributes
 import models.annotation.AnnotationService
 import models.document.{ DocumentInfo, DocumentService }
@@ -52,6 +52,7 @@ object FieldMapping {
   
 }
 
+@Singleton
 class DownloadsController @Inject() (
     val config: Configuration,
     val users: UserService,

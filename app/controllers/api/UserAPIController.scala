@@ -1,6 +1,6 @@
 package controllers.api
 
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.auth.AuthElement
 import controllers.{ BaseController, HasPrettyPrintJSON }
 import models.SortOrder
@@ -14,6 +14,7 @@ import models.HasDate
 import org.joda.time.DateTime
 import play.api.libs.json.JsNumber
 
+@Singleton
 class UserAPIController @Inject() (
     val config: Configuration,
     val users: UserService,

@@ -1,11 +1,12 @@
 package controllers.help
 
 import controllers.{ HasVisitLogging, WebJarAssets }
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.visit.VisitService
 import play.api.mvc.{ Action, Controller, RequestHeader }
 import play.twirl.api.HtmlFormat
 
+@Singleton
 class HelpController @Inject() (
     implicit val visits: VisitService,
     implicit val webjars: WebJarAssets

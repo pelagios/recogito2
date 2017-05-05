@@ -191,7 +191,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     }
   }
   
-  def countToday() = 
+  def countLast24hrs() = 
     es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query {
         constantScoreQuery {

@@ -1,7 +1,7 @@
 package controllers.document.map
 
 import controllers.{ BaseOptAuthController, HasVisitLogging, WebJarAssets }
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.document.DocumentService
 import models.annotation.AnnotationService
 import models.user.UserService
@@ -11,6 +11,7 @@ import play.api.Configuration
 import scala.concurrent.{ ExecutionContext, Future }
 import controllers.WebJarAssets
 
+@Singleton
 class MapController @Inject() (
     val config: Configuration,
     val annotations: AnnotationService,

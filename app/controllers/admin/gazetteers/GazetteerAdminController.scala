@@ -2,7 +2,7 @@ package controllers.admin.gazetteers
 
 import akka.stream.Materializer
 import controllers.{ BaseAuthController, WebJarAssets }
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.document.DocumentService
 import models.place.PlaceService
 import models.user.UserService
@@ -15,6 +15,7 @@ import models.place.crosswalks.GeoNamesCrosswalk
 import models.place.crosswalks.PelagiosRDFCrosswalk
 import models.place.crosswalks.PelagiosGeoJSONCrosswalk
 
+@Singleton
 class GazetteerAdminController @Inject() (
     val config: Configuration,
     val documents: DocumentService,

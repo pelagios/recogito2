@@ -2,7 +2,7 @@ package controllers.document.settings
 
 import controllers.{ BaseAuthController, WebJarAssets }
 import controllers.document.settings.actions._
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.annotation.AnnotationService
 import models.contribution.ContributionService
 import models.document.{ DocumentService, DocumentInfo, DocumentAccessLevel }
@@ -16,6 +16,7 @@ import play.api.libs.json.{ Json, JsSuccess, JsError, Reads }
 import scala.concurrent.{ Future, ExecutionContext }
 import storage.Uploads
 
+@Singleton
 class SettingsController @Inject() (
     val config: Configuration,
     val users: UserService,

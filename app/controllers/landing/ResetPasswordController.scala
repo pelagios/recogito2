@@ -1,6 +1,6 @@
 package controllers.landing
 
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.user.UserService
 import models.generated.tables.records.UserRecord
 import play.api.data.Form
@@ -12,6 +12,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 case class ResetPasswordData(email: String)
 
+@Singleton
 class ResetPasswordController @Inject() (
     val users: UserService,
     val messagesApi: MessagesApi,

@@ -1,12 +1,13 @@
 package controllers.admin
 
 import controllers.{ BaseAuthController, WebJarAssets }
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.document.DocumentService
 import models.user.UserService
 import models.user.Roles._
 import play.api.Configuration
 
+@Singleton
 class AdminController @Inject() (
     val config: Configuration,
     val documents: DocumentService,

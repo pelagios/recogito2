@@ -2,7 +2,7 @@ package controllers.api
 
 import com.vividsolutions.jts.geom.Coordinate
 import controllers.{ BaseOptAuthController, HasPrettyPrintJSON }
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.document.DocumentService
 import models.place.PlaceService
 import models.user.UserService
@@ -13,6 +13,7 @@ import play.api.mvc.Action
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.util.{ Try, Success, Failure }
 
+@Singleton
 class PlaceAPIController @Inject() (
     val config: Configuration,
     val documents: DocumentService,

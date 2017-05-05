@@ -23,10 +23,10 @@ require([], function() {
         },
 
         refreshStats = function() {
-          jsRoutes.controllers.api.StatsAPIController.getRightNowStats().ajax()
+          jsRoutes.controllers.landing.LandingController.getStats().ajax()
             .done(function(response) {
               annotationsEl.html(format(response.annotations));
-              editsEl.html(format(response.edits_today));
+              editsEl.html(format(response.edits));
               usersEl.html(format(response.users));
 
               window.setTimeout(function() { refreshStats(); }, 5000);

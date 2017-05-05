@@ -1,7 +1,7 @@
 package controllers.admin.users
 
 import controllers.BaseAuthController
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.document.DocumentService
 import models.user.Roles._
 import models.user.UserService
@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext
 import controllers.WebJarAssets
 import play.api.Configuration
 
+@Singleton
 class UserAdminController @Inject() (
     val config: Configuration,
     val documents: DocumentService,

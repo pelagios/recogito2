@@ -4,7 +4,7 @@ import controllers.{ HasConfig, HasUserService, Security }
 import java.io.FileInputStream
 import java.sql.Timestamp
 import java.util.{ Date, UUID }
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.auth.{ AuthElement, Login }
 import models.ContentType
 import models.annotation.{ Annotation, AnnotationService }
@@ -23,6 +23,7 @@ import scala.concurrent.duration._
 
 case class SignupData(username: String, email: String, password: String)
 
+@Singleton
 class SignupController @Inject() (
     val config: Configuration,
     val users: UserService,
@@ -41,7 +42,7 @@ class SignupController @Inject() (
   // We use usernames as first-level URL elements, therefore some are prohibited (cf. routes file)
   private val RESERVED_NAMES =
     Set("admin", "api", "assets", "document", "favicon.ico", "guest", "help", "login", "logout",
-        "pelagios", "recogito", "reset_password", "signup", "settings", "webjars")
+        "pelagios", "recogito", "reset_password", "signup", "settings", "stats.json", "webjars")
 
   private val isNotReserved: Constraint[String] = Constraint("constraints.notreserved")({ username =>
     if (RESERVED_NAMES.contains(username.toLowerCase))

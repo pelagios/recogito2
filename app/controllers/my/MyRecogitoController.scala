@@ -1,7 +1,7 @@
 package controllers.my
 
 import controllers.{ BaseController, Security, WebJarAssets }
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.{ Page, SortOrder }
 import models.annotation.AnnotationService
@@ -14,6 +14,7 @@ import play.api.mvc.RequestHeader
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
 
+@Singleton
 class MyRecogitoController @Inject() (
     val annotations: AnnotationService,
     val contributions: ContributionService,

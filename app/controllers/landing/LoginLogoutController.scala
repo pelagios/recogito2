@@ -1,7 +1,7 @@
 package controllers.landing
 
 import controllers.{ HasConfig, HasUserService, Security }
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.auth.{ AuthElement, LoginLogout }
 import models.document.DocumentService
 import models.user.UserService
@@ -14,6 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 case class LoginData(usernameOrPassword: String, password: String)
 
+@Singleton
 class LoginLogoutController @Inject() (    
     val config: Configuration,
     val users: UserService,

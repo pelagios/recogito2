@@ -3,7 +3,7 @@ package controllers.api
 import akka.actor.ActorSystem
 import controllers.{ BaseAuthController, HasPrettyPrintJSON }
 import java.util.UUID
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.document.{ DocumentInfo, DocumentService }
 import models.task.{ TaskType, TaskService, TaskRecordAggregate }
 import models.user.UserService
@@ -38,6 +38,7 @@ object TaskDefinition {
 
 }
 
+@Singleton
 class TaskAPIController @Inject() (
     val config: Configuration,
     val documents: DocumentService,

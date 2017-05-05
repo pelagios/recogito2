@@ -2,7 +2,7 @@ package controllers.document
 
 import controllers.BaseOptAuthController
 import java.io.File
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.ContentType
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
@@ -13,6 +13,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
 import scala.io.Source
 
+@Singleton
 class DocumentController @Inject() (
     val config: Configuration,
     val documents: DocumentService,

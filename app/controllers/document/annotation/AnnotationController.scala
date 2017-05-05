@@ -2,7 +2,7 @@ package controllers.document.annotation
 
 import controllers.{ BaseOptAuthController, WebJarAssets }
 import java.util.UUID
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 import models.ContentType
 import models.annotation.AnnotationService
 import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
@@ -15,6 +15,7 @@ import storage.Uploads
 import controllers.HasVisitLogging
 import models.visit.VisitService
 
+@Singleton
 class AnnotationController @Inject() (
     val config: Configuration,
     val annotations: AnnotationService,
