@@ -191,11 +191,17 @@ define([
         },
 
         render = function() {
+
+          console.log(place, annotations, distinctURIs);
+
           renderTitle();
 
           jQuery.each(distinctURIs, function(idx, uri) {
-            var record = PlaceUtils.getRecord(place, uri),
-                recordId = PlaceUtils.parseURI(record.uri),
+            var record = PlaceUtils.getRecord(place, uri);
+
+            console.log(record);
+
+            var recordId = PlaceUtils.parseURI(record.uri),
                 tr = jQuery(
                   '<tr data-uri="' + record.uri + '">' +
                     '<td class="record-id">' +
