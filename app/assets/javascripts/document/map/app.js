@@ -36,7 +36,9 @@ require([
 
     var map = new Map(jQuery('.map')),
 
-        markerLayer = L.layerGroup(),
+        pointMarkerLayer = L.layerGroup(),
+
+        regionMarkerLayer = L.layerGroup(),
 
         /** Lookup table { gazetteerUri -> [ annotation] } **/
         annotationsByGazetteerURI = {},
@@ -83,11 +85,11 @@ require([
                     markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
                     style = jQuery.extend({}, POINT_STYLE, { radius: markerSize });
 
-                return L.circleMarker(latlng, style);
+                return L.circleMarker(latlng, style).addTo(pointMarkerLayer);
               },
 
               createShapeMarker = function(place) {
-                return L.geoJson(place.representative_geometry, SHAPE_STYLE);
+                return L.geoJson(place.representative_geometry, SHAPE_STYLE).addTo(regionMarkerLayer);
               };
 
           jQuery.each(response.items, function(idx, place) {
@@ -97,13 +99,16 @@ require([
             if ((place.representative_point || place.representative_geometry) && annotations.length > 0) {
               marker = (place.representative_geometry && place.representative_geometry.type !== 'Point') ?
                 createShapeMarker(place) : createPointMarker(place);
-              marker.addTo(markerLayer);
               marker.place = place; // TODO Hack! Clean this up
               marker.on('click', function() {
                 var popup = new MapPopup(marker, place, getAnnotationsForPlace(place));
                 map.add(popup);
               });
             }
+          });
+
+          pointMarkerLayer.getLayers().forEach(function(layer) {
+            layer.bringToFront();
           });
         },
 
@@ -147,9 +152,12 @@ require([
         selectNearest = function(latlng, maxDistance) {
           var xy = map.leafletMap.latLngToContainerPoint(latlng),
               nearest = { distSq: 9007199254740992 }, // Distance to nearest initialied with Integer.MAX
-              nearestXY, distPx;
+              nearestXY, distPx,
 
-          jQuery.each(markerLayer.getLayers(), function(idx, marker) {
+              // TODO need a good strategy to deal with point vs. region markers
+              markers = pointMarkerLayer.getLayers().concat(regionMarkerLayer.getLayers());
+
+          markers.forEach(function (marker) {
             var markerLatLng = marker.getBounds().getCenter(),
                 distSq =
                   Math.pow(latlng.lat - markerLatLng.lat, 2) +
@@ -174,7 +182,8 @@ require([
           }
         };
 
-    map.add(markerLayer);
+    map.add(regionMarkerLayer);
+    map.add(pointMarkerLayer);
 
     map.leafletMap.on('click', function(e) {
       selectNearest(e.latlng, TOUCH_DISTANCE_THRESHOLD);
