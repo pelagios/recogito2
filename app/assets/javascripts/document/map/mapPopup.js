@@ -65,9 +65,13 @@ define([
           var distinctURIs = [];
 
           jQuery.each(annotations, function(i, a) {
-            var placeBodies = AnnotationUtils.getBodiesOfType(a, 'PLACE');
+            var placeURIs = PlaceUtils.getURIs(place),
+                placeBodies = AnnotationUtils.getBodiesOfType(a, 'PLACE');
+
+            // Important: not all PLACE bodies in the annotation necessarily
+            // refer to this place!
             jQuery.each(placeBodies, function(j, b) {
-              if (b.uri && distinctURIs.indexOf(b.uri) < 0)
+              if (b.uri && placeURIs.indexOf(b.uri) > -1 && distinctURIs.indexOf(b.uri) < 0)
                 distinctURIs.push(b.uri);
             });
           });
@@ -191,17 +195,10 @@ define([
         },
 
         render = function() {
-
-          console.log(place, annotations, distinctURIs);
-
           renderTitle();
-
           jQuery.each(distinctURIs, function(idx, uri) {
-            var record = PlaceUtils.getRecord(place, uri);
-
-            console.log(record);
-
-            var recordId = PlaceUtils.parseURI(record.uri),
+            var record = PlaceUtils.getRecord(place, uri),
+                recordId = PlaceUtils.parseURI(record.uri),
                 tr = jQuery(
                   '<tr data-uri="' + record.uri + '">' +
                     '<td class="record-id">' +
