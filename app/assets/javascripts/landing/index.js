@@ -14,12 +14,20 @@ require([], function() {
         usersEl = widget.find('.users h3'),
 
         format = function(num) {
-          if (num > 10000)
+          if (num > 10000) {
             return Math.round(num / 1000) + 'K';
-          else if (num > 1000)
-            return Math.floor(num / 1000) + ',' + (num % 1000);
-          else
+          } else if (num > 1000) {
+            var t = Math.floor(num / 1000);
+            var h = num % 1000;
+            if (h > 99)
+              return t + ',' + h;
+            else if (h > 9)
+              return t + ',0' + h;
+            else
+              return t + ',00' + h;
+          } else {
             return num;
+          }
         },
 
         refreshStats = function() {
