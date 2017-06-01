@@ -34,6 +34,8 @@ case class DocumentInfo(document: DocumentRecord, fileparts: Seq[DocumentFilepar
   
   lazy val isPublic: Boolean = document.getIsPublic
   
+  lazy val attribution: Option[String] = Option(document.getAttribution)
+  
   /** Convenience methods for filepart access **/
   
   lazy val textParts = fileparts.filter(_.getContentType.startsWith("TEXT"))

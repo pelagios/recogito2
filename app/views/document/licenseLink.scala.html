@@ -1,9 +1,9 @@
-@(license: models.document.License)
+@(license: models.document.License, attribution: Option[String])
 @if(license.isCC) {
   <span class="icon">&#xf25e;</span>
   @license.uri match {
     case Some(uri) => {
-      <a href="@uri" target="_blank">@license.acronym</a> }
+      <a class="license" href="@uri" target="_blank">@license.acronym</a> }
 
     case None => {
       <span>@license.acronym</span> }
@@ -14,4 +14,8 @@
 } else {
   <span class="icon">&#xf1f9;</span>
   <span>Copyrighted content. No reuse without permission.</span>
-}}
+}}<!--
+
+-->@if(attribution.isDefined) {
+  <a class="attribution" href="#attribution">License information</a>
+}
