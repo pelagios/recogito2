@@ -14,13 +14,17 @@ define([], function() {
         btnShow = el.find('.show'),
         btnHide = popup.find('.hide'),
 
-        clicktrap = popup.find('.clicktrap'),
+        modal = popup.find('.attribution-modal'),
 
         init = function() {
           // Remove the original text span
           el.find('.text').remove();
           btnShow.click(show);
           btnHide.click(hide);
+
+          // Click on clicktrap should close, but click on modal should do nothing
+          modal.click(function() { return false; });
+          popup.click(hide);
         },
 
         show = function() {
