@@ -17,5 +17,8 @@
 }}<!--
 
 -->@if(attribution.isDefined) {
-  <a class="attribution" href="#attribution">License information</a>
+  <span class="attribution">
+    <a class="show" href="#attribution">License information</a>
+    <span class="text">@attribution.get</span>
+  </span>
 }

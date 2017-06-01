@@ -132,11 +132,6 @@
       text-decoration:none;
     }
 
-    a.attribution {
-      color:@ocean;
-      padding-left:3px;
-    }
-
     .icon {
       position:relative;
       font-size:14px;
@@ -151,3 +146,40 @@
   }
 
 } /** .header-infobox **/
+
+.attribution {
+
+  .show {
+    color:@ocean;
+    padding-left:3px;
+  }
+
+  .text {
+    display:none;
+  }
+
+  .modal-wrapper {
+    max-width:480px;
+  }
+
+  .attribution-modal {
+    position:absolute;
+    top:120px;
+    width:100%;
+    text-align:center;
+    background-color:#fff;
+    .rounded-corners(4px);
+    .box-shadow(2px, 2px, 42px, rgba(0, 0, 0, 0.4));
+    padding:25px 40px 20px 40px;
+
+    .hide {
+      position:absolute;
+      top:10px;
+      right:7px;
+      color:@lightblue-type;
+      font-size:18px;
+    }
+
+  }
+
+}

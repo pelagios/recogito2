@@ -1,4 +1,7 @@
-define(['common/config'], function(Config) {
+define([
+  'common/config',
+  'document/annotation/common/page/attribution'
+], function(Config, Attribution) {
 
   // Duration for showing the 'Save OK'/save error status info
   var SHOW_RESPONSE_STATUS_FOR_MS = 5000;
@@ -7,6 +10,7 @@ define(['common/config'], function(Config) {
 
     var annotationCountEl = jQuery('.quick-stats .annotations'),
         contributorsEl = jQuery('.quick-stats .contributors'),
+        attributionEl = jQuery('.attribution'),
 
         saveMessageEl = (function() {
           var el = jQuery('<div class="save-msg"></div>');
@@ -83,6 +87,9 @@ define(['common/config'], function(Config) {
           clearMessageFadeTimer();
           saveMessageEl.html('<span class="save-error">Error saving annotation. Try refreshing the page.</span>');
         };
+
+    // Instantiate attribution popup if attribution text exists
+    if (attributionEl.length > 0) new Attribution(attributionEl);
 
     this.incrementAnnotationCount = incrementAnnotationCount;
     this.updateContributorInfo = updateContributorInfo;
