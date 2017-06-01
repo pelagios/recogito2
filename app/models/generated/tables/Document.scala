@@ -118,6 +118,11 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	val IS_PUBLIC : TableField[DocumentRecord, Boolean] = createField("is_public", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), "")
 
 	/**
+	 * The column <code>public.document.attribution</code>.
+	 */
+	val ATTRIBUTION : TableField[DocumentRecord, String] = createField("attribution", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * Create a <code>public.document</code> table reference
 	 */
 	def this() = {

@@ -4,7 +4,6 @@
 package models.generated.tables
 
 
-import java.lang.Boolean
 import java.lang.Class
 import java.lang.Integer
 import java.lang.String
@@ -65,12 +64,12 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	/**
 	 * The column <code>public.user.password_hash</code>.
 	 */
-	val PASSWORD_HASH : TableField[UserRecord, String] = createField("password_hash", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+	val PASSWORD_HASH : TableField[UserRecord, String] = createField("password_hash", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>public.user.salt</code>.
 	 */
-	val SALT : TableField[UserRecord, String] = createField("salt", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+	val SALT : TableField[UserRecord, String] = createField("salt", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>public.user.member_since</code>.
@@ -98,11 +97,6 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	val QUOTA_MB : TableField[UserRecord, Integer] = createField("quota_mb", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
 
 	/**
-	 * The column <code>public.user.active</code>.
-	 */
-	val ACTIVE : TableField[UserRecord, Boolean] = createField("active", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), "")
-
-	/**
 	 * Create a <code>public.user</code> table reference
 	 */
 	def this() = {
@@ -125,7 +119,7 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	}
 
 	override def getKeys : List[ UniqueKey[UserRecord] ] = {
-		return Arrays.asList[ UniqueKey[UserRecord] ](Keys.USER_PKEY, Keys.USER_EMAIL_KEY)
+		return Arrays.asList[ UniqueKey[UserRecord] ](Keys.USER_PKEY)
 	}
 
 	override def as(alias : String) : User = {

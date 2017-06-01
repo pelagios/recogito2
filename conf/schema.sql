@@ -8,8 +8,7 @@ CREATE TABLE "user" (
   real_name TEXT,
   bio TEXT,
   website TEXT,
-  quota_mb INT NOT NULL DEFAULT 200,
-  active BOOLEAN NOT NULL DEFAULT TRUE
+  quota_mb INT NOT NULL DEFAULT 200
 );
 
 CREATE TABLE user_role (
@@ -59,7 +58,8 @@ CREATE TABLE document (
   source TEXT,
   edition TEXT,
   license TEXT,
-  is_public BOOLEAN NOT NULL DEFAULT FALSE
+  is_public BOOLEAN NOT NULL DEFAULT FALSE,
+  attribution TEXT
 );
 
 CREATE TABLE document_filepart (
