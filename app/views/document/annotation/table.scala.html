@@ -53,6 +53,10 @@
         &nbsp; &centerdot; &nbsp;
         <span class="icon">&#xf0c0;</span>
         <span class="contributors">No Other Contributors</span>
+        @if(doc.license.isDefined) {
+          &nbsp; &centerdot; &nbsp;
+          @views.html.document.licenseLink(doc.license.get)
+        }
       </p>
     </div> <!-- .header-infobox -->
 
