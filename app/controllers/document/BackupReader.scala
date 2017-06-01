@@ -72,7 +72,8 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         (json \ "edition").asOpt[String].getOrElse(null),
         (json \ "license").asOpt[String].getOrElse(null),
         // Default to 'false'
-        (json \ "is_public").asOpt[Boolean].getOrElse(false).asInstanceOf[Boolean])
+        (json \ "is_public").asOpt[Boolean].getOrElse(false).asInstanceOf[Boolean],
+        (json \ "attribution").asOpt[String].getOrElse(null))
     }
     
     def parseFilepartMetadata(documentId: String, json: JsValue) =

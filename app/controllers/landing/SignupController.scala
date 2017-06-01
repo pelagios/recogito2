@@ -104,7 +104,8 @@ class SignupController @Inject() (
       null,
       null,
       null,
-      false)
+      false,
+      null)
     
     val filepart = new DocumentFilepartRecord(
       UUID.randomUUID(),

@@ -104,7 +104,8 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
           upload.getSource,
           upload.getEdition,
           upload.getLicense,
-          false)
+          false,
+          null)
   
   /** Imports document and filepart records to DB, and filepart content to user dir **/
   def importDocument(document: DocumentRecord, fileparts: Seq[(DocumentFilepartRecord, InputStream)]) = db.withTransaction { sql =>

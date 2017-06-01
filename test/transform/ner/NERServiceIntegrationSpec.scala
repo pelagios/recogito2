@@ -39,10 +39,10 @@ class NERServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSend
 
     // Two test documents
     val document1 =
-      new DocumentRecord("hcylkmacy4xgkb", "rainer", now, "A short test doc", null, null, null, null, null, null, null, null, false)
+      new DocumentRecord("hcylkmacy4xgkb", "rainer", now, "A short test doc", null, null, null, null, null, null, null, null, false, null)
 
     val document2 =
-      new DocumentRecord("98muze1cl3saib", "rainer", now, "A long test doc", null, null, null, null, null, null, null, null, false)
+      new DocumentRecord("98muze1cl3saib", "rainer", now, "A long test doc", null, null, null, null, null, null, null, null, false, null)
 
     val parts1 = (1 to 5).map(n =>
       new DocumentFilepartRecord(UUID.randomUUID, "hcylkmacy4xgkb", "text-for-ner-0" + n + ".txt", ContentType.TEXT_PLAIN.toString, "text-for-ner-0" + n + ".txt", 0, null))

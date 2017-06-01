@@ -55,7 +55,7 @@ class UserService @Inject() (
   def insertUser(username: String, email: String, password: String) = db.withTransaction { sql =>
     val salt = randomSalt()
     val user = new UserRecord(username, encrypt(email), computeHash(salt + password), salt,
-      new Timestamp(new Date().getTime), null, null, null, DEFAULT_QUOTA, true)
+      new Timestamp(new Date().getTime), null, null, null, DEFAULT_QUOTA)
     sql.insertInto(USER).set(user).execute()
     user
   }

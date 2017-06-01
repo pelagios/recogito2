@@ -37,7 +37,8 @@ class HasAnnotationValidationSpec extends Specification {
     null,
     null,
     null,
-    false)
+    false,
+    null)
     
   val annotationBefore = loadAnnotation("text-annotation.json")
   
