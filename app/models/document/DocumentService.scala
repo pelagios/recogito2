@@ -105,7 +105,8 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
           upload.getEdition,
           upload.getLicense,
           false,
-          null)
+          null // TODO attribution
+    )
   
   /** Imports document and filepart records to DB, and filepart content to user dir **/
   def importDocument(document: DocumentRecord, fileparts: Seq[(DocumentFilepartRecord, InputStream)]) = db.withTransaction { sql =>
@@ -131,7 +132,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   /** Updates the user-defined metadata fields **/
   def updateMetadata(docId: String, title: String, author: Option[String], dateFreeform: Option[String], 
     description: Option[String], language: Option[String], source: Option[String], edition: Option[String],
-    license: Option[String]): Future[Boolean] = db.withTransaction { sql =>  
+    license: Option[String], attribution: Option[String]): Future[Boolean] = db.withTransaction { sql =>  
 
     // If the update sets the document to a non-open license, make sure is_public is set to false
     val hasNonOpenLicense = license.map(acronym =>
@@ -146,6 +147,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       .set(DOCUMENT.SOURCE, optString(source))
       .set(DOCUMENT.EDITION, optString(edition))
       .set(DOCUMENT.LICENSE, optString(license))
+      .set(DOCUMENT.ATTRIBUTION, optString(attribution))
       
     val rowsAffected =
       if (hasNonOpenLicense)

@@ -28,7 +28,9 @@ case class DocumentMetadata(
 
   edition: Option[String],
 
-  license: Option[String]
+  license: Option[String],
+  
+  attribution: Option[String]
 
 )
 
@@ -63,7 +65,8 @@ trait MetadataActions { self: SettingsController =>
       "language" -> optional(text.verifying("2- or 3-digit ISO language code required", { t => t.size > 1 && t.size < 4 })),
       "source" -> optional(text),
       "edition" -> optional(text),
-      "license" -> optional(text)
+      "license" -> optional(text),
+      "attribution" -> optional(text)
     )(DocumentMetadata.apply)(DocumentMetadata.unapply)
   )
 
@@ -76,8 +79,8 @@ trait MetadataActions { self: SettingsController =>
       Option(doc.getLanguage),
       Option(doc.getSource),
       Option(doc.getEdition),
-      Option(doc.getLicense)))
-
+      Option(doc.getLicense),
+      Option(doc.getAttribution)))
   }
 
   def updateDocumentMetadata(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
@@ -88,7 +91,7 @@ trait MetadataActions { self: SettingsController =>
         
         f =>
           documents.updateMetadata(
-            docId, f.title, f.author, f.dateFreeform, f.description, f.language, f.source, f.edition, f.license
+            docId, f.title, f.author, f.dateFreeform, f.description, f.language, f.source, f.edition, f.license, f.attribution
           ).map { success => 
            if (success)
               Redirect(controllers.document.settings.routes.SettingsController.showDocumentSettings(docId, Some("metadata")))

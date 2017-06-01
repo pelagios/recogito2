@@ -35,9 +35,8 @@
             </select>
           </dd>
         </dl>
-
-        <!-- TODO Attribution text -->
-
+        @helper.textarea(metadataForm("attribution"), args = '_label -> "Attribution", '_help -> "", 'autocomplete -> "false",
+          'placeholder -> "Extra attribution statement or license information")
         <dt></dt>
         <dd>
           <button type="submit" class="btn"/>Save Changes</button>
