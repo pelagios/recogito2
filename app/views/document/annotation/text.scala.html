@@ -47,6 +47,10 @@
         &nbsp; &centerdot; &nbsp;
         <span class="icon">&#xf0c0;</span>
         <span class="contributors">No Other Contributors</span>
+        @if(doc.license.isDefined) {
+          &nbsp; &centerdot; &nbsp;
+          @views.html.document.licenseLink(doc.license.get)
+        }
       </p>
     </div> <!-- .header-infobox -->
 
@@ -77,37 +81,6 @@
           </ul>
         </li>
       </ul> <!-- .menu -->
-
-      <!-- h3>ANNOTATION MODE:</h3>
-      <ul class="annotation-mode">
-        <li data-mode="NORMAL" class="active">
-          <span class="tool-label">NORMAL</span>
-        </li>
-        <li class="quick has-sub-options">
-          <span class="tool-label">QUICK</span>
-          <div class="dropdown" style="display:none;">
-            <ul>
-              <li data-mode="QUICK" data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
-              <li data-mode="QUICK" data-type="PERSON" class="disabled"><span class="icon">&#xf007;</span> Persons</li>
-              <li data-mode="QUICK" data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
-            </ul>
-          </div>
-        </li -->
-        <!--
-        <li data-mode="BULK">
-          <span class="tool-label">BULK</span>
-        </li>
-      </ul>
-
-      <h3>COLOR:</h3>
-      <ul class="color-scheme">
-        <li data-scheme="BY_TYPE">
-          <span class="tool-label">BY ENTITY TYPE</span>
-        </li>
-        <li data-scheme="BY_STATUS">
-          <span class="tool-label">BY VERIFICATION STATUS</span>
-        </li>
-      </ul> -->
     </div> <!-- .header-toolbar -->
 
     <div class="sidebar">

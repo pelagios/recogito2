@@ -2,41 +2,46 @@ package models.document
 
 import java.net.URI
 
-sealed trait License { val name: String; val acronym: String; val uri: Option[URI]; val isOpen: Boolean }
+sealed trait License { val name: String; val acronym: String; val uri: Option[URI]; val isOpen: Boolean; val isCC: Boolean }
 
 case object CC0 extends License { 
   val name    = "CC0 1.0 Universal (CC0 1.0)"
-  val acronym = "CC0"
+  val acronym = "CC0 1.0"
   val uri     = Some(new URI("http://creativecommons.org/publicdomain/zero/1.0/"))
   val isOpen  = true
+  val isCC    = true
 }
 
 case object CC_BY extends License {
   val name    = "CC Attribution 4.0 International (CC BY 4.0)"
-  val acronym = "CC BY"
+  val acronym = "CC BY 4.0"
   val uri     = Some(new URI("http://creativecommons.org/licenses/by/4.0/"))
   val isOpen  = true
+  val isCC    = true
 }
 
 case object CC_BY_SA extends License {
   val name    = "CC Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)"
-  val acronym = "CC BY-SA"
+  val acronym = "CC BY-SA 4.0"
   val uri     = Some(new URI("http://creativecommons.org/licenses/by-sa/4.0/"))
   val isOpen  = true
+  val isCC    = true
 }
 
 case object CC_BY_NC extends License {
   val name    = "CC Attribution-NonCommerical 4.0 International (CC BY-NC 4.0)"
-  val acronym = "CC BY-NC"
+  val acronym = "CC BY-NC 4.0"
   val uri     = Some(new URI("http://creativecommons.org/licenses/by-nc/4.0/"))
   val isOpen  = true
+  val isCC    = true
 }
 
 case object CC_BY_NC_SA extends License {
   val name    = "CC Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)"
-  val acronym = "CC BY-NC-SA"
+  val acronym = "CC BY-NC-SA 4.0"
   val uri     = Some(new URI("http://creativecommons.org/licenses/by-nc-sa/4.0/"))
   val isOpen  = true
+  val isCC    = true
 }
 
 case object OUT_OF_COPYRIGHT extends License {
@@ -44,6 +49,7 @@ case object OUT_OF_COPYRIGHT extends License {
   val acronym = "OUT OF COPYRIGHT"
   val uri     = None
   val isOpen  = true
+  val isCC    = false
 }
 
 case object IN_COPYRIGHT extends License {
@@ -51,6 +57,7 @@ case object IN_COPYRIGHT extends License {
   val acronym = "IN COPYRIGHT"
   val uri     = None
   val isOpen  = false
+  val isCC    = false
 }
 
 case object OTHER extends License {
@@ -58,13 +65,7 @@ case object OTHER extends License {
   val acronym = "OTHER"
   val uri     = None
   val isOpen  = false
-}
-
-case object DONT_KNOW extends License {
-  val name    = "I don't know"
-  val acronym = "DONT_KNOW"
-  val uri     = None
-  val isOpen  = false
+  val isCC    = false
 }
 
 object License {
@@ -77,8 +78,7 @@ object License {
     CC_BY_NC_SA,
     OUT_OF_COPYRIGHT,
     IN_COPYRIGHT,
-    OTHER,
-    DONT_KNOW
+    OTHER
   ) 
   
   def fromAcronym(acronym: String) = values.find(_.acronym == acronym)

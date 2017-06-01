@@ -1,0 +1,18 @@
+@(license: models.document.License)
+@if(license.isCC) {
+  <span class="icon">&#xf25e;</span>
+  @license.uri match {
+    case Some(uri) => {
+      <a href="@uri" target="_blank">@license.acronym</a> }
+
+    case None => {
+      <span>@license.acronym</span> }
+  }
+
+} else { @if(license.isOpen) {
+  <span class="icon">&#xf25e;</span>
+  <span>Out of copyright</span>
+} else {
+  <span class="icon">&#xf1f9;</span>
+  <span>Copyrighted content. No reuse without permission.</span>
+}}
