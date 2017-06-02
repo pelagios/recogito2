@@ -1,6 +1,7 @@
 require.config({
   baseUrl: "/assets/javascripts/",
-  fileExclusionRegExp: /^lib$/
+  fileExclusionRegExp: /^lib$/,
+  paths: { marked: '/webjars/marked/0.3.6/marked.min' }
 });
 
 require([

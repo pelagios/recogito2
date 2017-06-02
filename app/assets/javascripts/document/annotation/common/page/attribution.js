@@ -1,4 +1,4 @@
-define([], function() {
+define(['marked'], function(marked) {
 
   var Attribution = function(el) {
     var popup = jQuery(
@@ -6,7 +6,7 @@ define([], function() {
             '<div class="modal-wrapper">' +
               '<div class="attribution-modal">' +
                 '<button class="nostyle outline-icon hide">&#xe897;</button>' +
-                  '<span>' + el.find('.text').html() + '</span>' +
+                  '<span>' + marked(el.find('.text').html()) + '</span>' +
                 '</div>' +
               '</div>' +
             '</div>').appendTo(document.body).hide(),

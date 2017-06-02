@@ -1,4 +1,4 @@
-@(license: models.document.License, attribution: Option[String])
+@(license: models.document.License, attribution: Option[String])(implicit webjars: WebJarAssets)
 @if(license.isCC) {
   <span class="icon">&#xf25e;</span>
   @license.uri match {

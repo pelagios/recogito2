@@ -159,17 +159,28 @@
   }
 
   .modal-wrapper {
-    max-width:480px;
+    max-width:540px;
   }
 
   .attribution-modal {
     position:absolute;
     top:120px;
     width:100%;
+    font-family:"Times New Roman", Times, serif;
+    font-size:17px;
     background-color:#fff;
     .rounded-corners(4px);
     .box-shadow(2px, 2px, 42px, rgba(0, 0, 0, 0.4));
-    padding:25px 40px;
+    padding:35px 40px 25px 40px;
+
+    p {
+      margin:0 0 20px 0;
+      padding:0;
+    }
+
+    a {
+      color:@ocean;
+    }
 
     .hide {
       position:absolute;
