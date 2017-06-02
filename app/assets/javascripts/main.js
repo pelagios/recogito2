@@ -1,6 +1,7 @@
 require.config({
   baseUrl : "/assets/javascripts",
   fileExclusionRegExp : /^lib$/,
+  paths: { marked: '../../../web-modules/main/webjars/lib/marked/marked.min' },
   modules : [
     { name : 'admin/dashboard' },
     { name : 'admin/users' },
