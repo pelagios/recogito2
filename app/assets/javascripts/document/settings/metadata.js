@@ -9,7 +9,7 @@ require([
 
   var PartMetadataEditor = function(part) {
     var element = jQuery(
-          '<div class="modal-clicktrap">' +
+          '<div class="clicktrap">' +
             '<div class="modal-wrapper">' +
               '<div class="modal">' +
                 '<div class="modal-header">' +

@@ -3,7 +3,7 @@ define(['common/hasEvents'], function(HasEvents) {
   var Modal = function(title, body, opt_cssClass) {
 
     var element = jQuery(
-          '<div class="modal-clicktrap">' +
+          '<div class="clicktrap">' +
             '<div class="modal-wrapper">' +
               '<div class="modal">' +
                 '<div class="modal-header">' +
