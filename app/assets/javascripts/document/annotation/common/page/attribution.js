@@ -22,8 +22,14 @@ define(['marked'], function(marked) {
           btnShow.click(show);
           btnHide.click(hide);
 
-          // Click on clicktrap should close, but click on modal should do nothing
-          modal.click(function() { return false; });
+          // Click on clicktrap should close the popup, but click on modal
+          // should do nothing except open links in new window
+          modal.click(function(e) {
+            var target = jQuery(e.target).closest('a');
+            if (target.length > 0)
+              window.open(target.attr('href'));
+            return false;
+          });
           popup.click(hide);
         },
 
