@@ -29,7 +29,8 @@
         partId: '@currentPart.getId',
         partSequenceNo: @currentPart.getSequenceNo,
         contentType: '@currentPart.getContentType',
-        writeAccess: @accessLevel.canWrite
+        writeAccess: @accessLevel.canWrite,
+        isAdmin: @accessLevel.isAdmin
       }
     </script>
   </head>

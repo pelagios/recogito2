@@ -62,7 +62,7 @@ define([
           element.css('z-index', 10000 - element.index());
         };
 
-    if (Config.writeAccess && annotationBody.last_modified_by === Config.me)
+    if (Config.isAdmin || (Config.writeAccess && annotationBody.last_modified_by === Config.me))
       enableEditDropdown();
     else
       element.find('.edit').hide();

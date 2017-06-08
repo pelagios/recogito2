@@ -21,6 +21,7 @@ define([
           '</div>');
 
     parent.append(element);
+    
     EditableTextSection.apply(this, [ element, commentBody ]);
   };
   CommentSection.prototype = Object.create(EditableTextSection.prototype);
