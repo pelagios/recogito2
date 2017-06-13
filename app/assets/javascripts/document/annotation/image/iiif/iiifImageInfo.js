@@ -43,15 +43,27 @@ define(['common/ui/alert'], function(Alert) {
             return id;
           else if (host && identifier)
             return host + identifier;
+        },
+
+        computeResolutions = function(width, height, tilesize) {
+          var resolutions = [], r_ = 1;
+          while (Math.max(width, height) / r_ > tilesize) {
+            resolutions.push(r_);
+            r_ *= 2;
+          }
+          return resolutions;
         };
 
     this.width = json.width;
     this.height = json.height;
     this.baseUrl = getURL();
     this.tiles = (json.tiles || [{}])[0];
-    this.resolutions = json.scale_factors || this.tiles.scaleFactors || [ 1, 2, 4, 8, 16 ];
+    this.resolutions = json.scale_factors || this.tiles.scaleFactors || [];
     this.extension = (json.formats || [])[0];
-    this.tileSize = json.tile_width || this.tiles.width || undefined;
+    this.tileSize = json.tile_width || this.tiles.width || 256;
+
+    if (this.resolutions.length === 0)
+      this.resolutions = computeResolutions(this.width, this.height, this.tileSize);
 
     if (!this.width || !this.height || !this.baseUrl)
       new Alert(Alert.ERROR, 'Invalid Manifest', 'Could not open the IIIF image. The manifest appears to be invalid.');
