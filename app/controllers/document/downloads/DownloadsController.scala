@@ -150,7 +150,7 @@ class DownloadsController @Inject() (
   
   def downloadTEI(documentId: String) = AsyncStack { implicit request =>
     download(documentId, { doc =>
-      documentToTEI(doc).map(xml => Ok(xml))
+      documentToTEI(doc).map(xml => Ok(xml).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".tei.xml" }))
     })
   }
 
