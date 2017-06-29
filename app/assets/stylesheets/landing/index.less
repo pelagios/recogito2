@@ -1,4 +1,9 @@
 @import "../_globals.less";
+@import "index/_jumbotron.less";
+@import "index/_tiles.less";
+@import "index/_rightnow.less";
+@import "index/_testimonials.less";
+@import "index/_partnerlogos.less";
 
 @body-width:980px;
 @body-width-narrow:880px;
@@ -68,73 +73,6 @@ h3 {
 
 }
 
-.jumbotron {
-  width:100%;
-  height:490px;
-  background-image: url("/assets/images/egerton_ms_73.jpg");
-  background-position:center top;
-  color:#fff;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.25),0 1px 7px rgba(0,0,0,0.65);
-}
-
-.jumbotron-left {
-  padding-top:90px;
-  margin-right:400px;
-
-  h2 {
-    margin:0;
-    font-family:Merriweather;
-    font-size:34px;
-    line-height:48px;
-    font-weight:400;
-  }
-
-  p {
-    font-family:OpenSans;
-    font-size:19px;
-    line-height:30px;
-  }
-
-  a {
-    color:#fff;
-    font-size:19px;
-    font-family:Merriweather;
-    text-decoration:none;
-  }
-
-}
-
-.jumbotron-right {
-  position:absolute;
-  width:300px;
-  top:90px;
-  right:0;
-  text-align:center;
-
-  a {
-    text-decoration:none;
-    color:darken(#fff, 20%);
-  }
-
-  input, button {
-    .rounded-corners(4px);
-    width:300px;
-    padding:12px 15px;
-    margin:7px 0;
-  }
-
-  button, button:hover {
-    font-size:19px;
-    border-color:darken(@ocean, 6%);
-  }
-
-  input:-webkit-autofill {
-    -webkit-box-shadow:0 0 0px 1000px white inset;
-    -webkit-text-fill-color:#525252 !important;
-  }
-
-}
-
 .columns::after {
   content:'';
   display:block;
@@ -167,58 +105,6 @@ h3 {
   width:75%;
 }
 
-.recogito-rightnow {
-  color:@grey-type;
-  text-align:center;
-  padding:50px 0 40px;
-
-  h3, p {
-    margin:0;
-    padding:0;
-  }
-
-  .rn-title {
-    padding:40px 0 20px 0;
-
-    .outline-icon {
-      font-size:48px;
-    }
-
-    h2 {
-      font-size:20px;
-      line-height:16px;
-    }
-
-  }
-
-  .rn-widget {
-    position:relative;
-    margin:20px auto;
-    padding:0;
-    width:490px;
-    .rounded-corners(4px);
-    border:1px solid @lightgrey-border;
-
-    h3 {
-      line-height:38px;
-      font-size:40px;
-    }
-
-    .rn-segment {
-      display:inline-block;
-      padding:20px 0;
-      width:160px;
-      border-right:1px solid @lightgrey-border;
-    }
-
-    .rn-segment:last-child {
-      border:none;
-    }
-
-  }
-
-}
-
 .featurette.inner {
   margin:0 auto;
   padding: 10px 0;
@@ -235,81 +121,6 @@ h3 {
 
   a { color:@lightgrey-type; }
   a:hover { color:@lightgrey-type-hover; }
-
-}
-
-.tile-block {
-  border-style:solid;
-  border-color:@lightgrey-border;
-  border-width:1px 0;
-  background-color:@blueish-white-hi;
-
-  .tile {
-    border-left:1px solid @lightgrey-border;
-    padding:50px 20px;
-    text-align:center;
-  }
-
-  .tile:first-child {
-    border:none;
-  }
-
-  h3 {
-    font-size:20px;
-  }
-
-  p {
-    color:@grey-type;
-  }
-
-  .outline-icon {
-    font-size:65px;
-    line-height:45px;
-    color:@grey-type;
-    padding-bottom:40px;
-  }
-
-}
-
-.partner-logos {
-  padding:50px 0;
-
-  a {
-    text-decoration:none;
-    display:inline-block;
-    vertical-align:middle;
-    margin:0 50px;
-    @media (min-width:1025px) { margin:0 60px; }
-  }
-
-  a:first-child { margin-left:25px; }
-  a:last-child { margin-right:25px; }
-
-  .ait {
-    width:169px;
-    height:53px;
-    padding-top:10px;
-  }
-
-  .lancaster {
-    width:142px;
-    height:46px;
-    padding-top:8px;
-  }
-
-  .ou {
-    width:74px;
-    height:51px;
-    @media (min-width:1025px) {
-      margin:0 16px 0 28px;
-    }
-  }
-
-  .mellon {
-    width:134px;
-    height:63px;
-    padding-top:4px;
-  }
 
 }
 

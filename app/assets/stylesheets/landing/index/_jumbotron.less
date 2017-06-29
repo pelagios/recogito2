@@ -1,0 +1,66 @@
+.jumbotron {
+  width:100%;
+  height:490px;
+  background-image: url("/assets/images/egerton_ms_73.jpg");
+  background-position:center top;
+  color:#fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.25),0 1px 7px rgba(0,0,0,0.65);
+}
+
+.jumbotron-left {
+  padding-top:90px;
+  margin-right:400px;
+
+  h2 {
+    margin:0;
+    font-family:Merriweather;
+    font-size:34px;
+    line-height:48px;
+    font-weight:400;
+  }
+
+  p {
+    font-family:OpenSans;
+    font-size:19px;
+    line-height:30px;
+  }
+
+  a {
+    color:#fff;
+    font-size:19px;
+    font-family:Merriweather;
+    text-decoration:none;
+  }
+
+}
+
+.jumbotron-right {
+  position:absolute;
+  width:300px;
+  top:90px;
+  right:0;
+  text-align:center;
+
+  a {
+    text-decoration:none;
+    color:darken(#fff, 20%);
+  }
+
+  input, button {
+    .rounded-corners(4px);
+    width:300px;
+    padding:12px 15px;
+    margin:7px 0;
+  }
+
+  button, button:hover {
+    font-size:19px;
+    border-color:darken(@ocean, 6%);
+  }
+
+  input:-webkit-autofill {
+    -webkit-box-shadow:0 0 0px 1000px white inset;
+    -webkit-text-fill-color:#525252 !important;
+  }
+
+}
