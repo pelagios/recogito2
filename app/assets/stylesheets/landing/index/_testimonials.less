@@ -13,7 +13,7 @@
     margin:0 auto;
     text-align:left;
 
-    .quote {
+    span {
       display:block;
     }
 
@@ -25,12 +25,17 @@
       content:'\201d';
     }
 
-    .by {
-
+    .by, .affiliation {
+      font-family:OpenSans;
+      text-align:right;
     }
 
-    .affiliation {
+    .by {
+      padding-top:10px;
+    }
 
+    .by::before {
+      content:'\2014';
     }
 
   }
