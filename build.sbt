@@ -53,6 +53,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "openlayers" % "3.13.0",
   "org.webjars" % "papa-parse" % "4.1.0-1",
   "org.webjars" % "requirejs" % "2.1.22",
+  "org.webjars" % "slick" % "1.6.0",
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "velocity" % "1.1.0",
   "org.webjars.bower" % "marked" % "0.3.6",
