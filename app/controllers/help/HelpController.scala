@@ -16,14 +16,15 @@ class HelpController @Inject() (
     logPageView()
     Ok(template)
   }
-  
+
   def index = Action { Redirect(routes.HelpController.showTutorial()) }
 
   def showTutorial  = Action { implicit request => result(views.html.help.tutorial()) }
-  
+
   def showLocalizedTutorial(lang: String) = Action { implicit request =>
     lang.toUpperCase match {
-      case "ES" => result(views.html.help.tutorial_es()) 
+      case "DE" => result(views.html.help.tutorial_de())
+      case "ES" => result(views.html.help.tutorial_es())
       case _ => NotFound(views.html.error404())
     }
   }

@@ -1,0 +1,274 @@
+@()(implicit request: RequestHeader, webjars: WebJarAssets)
+@_layout("Recogito in 10 Minuten", "Ein kurzes Tutorial zu den wichtigsten Funktionen von Recogito. Lerne wie man Annotationen erstellt, Orte identifiziert, und Dokumente mit anderen teilt.", "tutorial.css") {
+  <h1>10 Minute Tutorial</h1>
+  <span class="sub-title"><span class="icon">&#xf017;</span> A Quick Introduction to Recogito</span>
+} {
+  <div class="toc-wrapper">
+    <div class="toc">
+      <ul>
+        <li><a href="#what">What is Recogito?</a></li>
+        <li><a href="#upload">Upload a Document</a></li>
+        <li><a href="#annotations">Create Annotations</a></li>
+        <li><a href="#map">Identify and Map Places</a></li>
+        <li><a href="#export">Export Your Data</a></li>
+        <li><a href="#invite">Invite Other Users</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="article">
+    <div class="inner">
+      <p>
+        This quick tutorial will give you an overview of Recogito's most important features.
+        <strong>You will learn how to:</strong>
+      </p>
+      <ul>
+        <li>Upload texts and images</li>
+        <li>Create annotations</li>
+        <li>Identify and map places in your documents</li>
+        <li>Export your data in order to re-use it outside of Recogito</li>
+        <li>Invite other users to work with you</li>
+      </ul>
+
+      <h2 id="what">What is Recogito?</h2>
+
+      <p>
+        Recogito is an online platform for collaborative document annotation. It is
+        maintained by <a href="http://commons.pelagios.org" target="_blank">Pelagios Commons</a>,
+        a Digital Humanities initiative aiming to foster better linkages between online
+        resources documenting the past.
+      </p>
+
+      <p>
+        Recogito provides a personal workspace where you can upload, collect and organize
+        your source materials - texts, images and tabular data - and collaborate in their
+        annotation and interpretation. Recogito helps you to make your work more
+        visible on the Web more easily, and to expose the results of your research
+        as Open Data.
+      </p>
+
+      <p>
+        This tutorial will teach you the essentials of working with Recogito. To complete it,
+        you need a <a href="http://recogito.pelagios.org/signup" target="_blank">Recogito
+        account</a>, and two sample documents: a plain .txt file with some text, and an image file.
+      </p>
+
+      <p class="tip">
+        Tip: Open this tutorial in a separate browser window (or tab) so you can see it
+        while you complete the steps.
+      </p>
+
+      <h2 id="upload">Step 1. Upload a Document</h2>
+
+      <p>
+        <strong>Documents</strong> are used to organize your materials in Recogito. Each document
+        can consist of multiple files. But for now, we are just going to upload a document
+        consisting of a single text file.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/new-document.png")">
+      </p>
+
+      <p>
+        Click <strong>New Document</strong>.
+      </p>
+
+      <h3>To upload a new text document</h3>
+      <ol>
+        <li>Enter a title for your document and click <strong>Next</strong>.</li>
+        <li>Upload your text file. You can either click <strong>Choose a File to Attach</strong>
+          and select it in the file browser, or you can drag and drop it into the upload area with
+          your mouse.</li>
+        <li>Recogito can run <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank">Named
+          Entity Recognition (NER)</a> on your text. This means it will attempt to identify and
+          pre-annotate places and persons automatically. Check <strong>Apply automatic
+          annotation</strong> and click <strong>Next</strong>.</li>
+      </ol>
+
+      <p>
+        Depending on the length of your text, NER may take a while. Once completed, click
+        <strong>Done</strong>. Congratulations! You have imported your first document
+        into your workspace.
+      </p>
+
+      <h3>To upload a new image document</h3>
+      <p>
+        Repeat the steps above to create another document from your image file. In the last upload
+        step, Recogito may take few seconds to convert your image into a <strong>zoomable
+        image</strong>. But more on that later.
+      </p>
+
+      <h2 id="annotations">Step 2. Create Annotations</h2>
+      <p>
+        Open your text document by double-clicking it in the list. This will take you to the
+        <strong>annotation view</strong>.
+      </p>
+
+      <h3>To create a text annotation</h3>
+      <p>
+        Select text like you would in any word processing tool: either by clicking and
+        dragging with your mouse, or by double clicking a word. You can add text
+        comments and tags, as well as identify the selected text as a
+        <strong>Place</strong>, <strong>Person</strong> or <strong>Event</strong>. (We will learn
+        more about how to deal with places in a minute.)
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/annotation-view.png")">
+      </p>
+
+      <p>
+        Try experimenting with the annotation editor. You can change or delete each part of an
+        annotation seperately, after you have created it. (To delete a tag, click on it first
+        to get a delete button.) Deleting all parts of an annotation will also remove the highlight
+        from the text.
+      </p>
+
+      <h3>To create an image annotation</h3>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/image-controls.png")" class="inline right">
+        Open your image document. Recogito has a <strong>zoomable view</strong> so you can
+        navigate even highest-resolution images easily. Zoom using your mousewheel or
+        the <span class="key">+</span> <span class="key">-</span> buttons in the upper right
+        corner. On touch devices you can also use a &quot;pinch&quot; gesture. Pan by dragging and
+        releasing the image.
+      </p>
+
+      <p>
+        You can <strong>rotate</strong> the image at arbitrary angles. On a desktop computer,
+        hold <span class="key">SHIFT</span> + <span class="key">Alt</span> while dragging with your
+        mouse. On touch devices, use a pinch gesture. Use the button with the single arrow
+        <span class="key icon">&#xf176;</span> to quickly rotate the image back to its
+        original orientation.
+      </p>
+
+      <p>
+        Let's create our first image annotation. In the toolbar, there is a drop-down menu where you
+        can switch between Recogito's different selection modes: Point, Rectangle and Tilted Box.
+        Select <strong>Point</strong> and create an annotation by clicking somewhere in your image.
+        Switch back to <strong>Move</strong> to resume standard image navigation.
+      </p>
+
+      <p>
+        Now try annotating an area: pick the <strong>Rectangle</strong> tool. Click once to
+        select the starting corner of the area. Then click again for the opposite corner.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/tilted-box.gif")">
+      </p>
+
+      <p>
+        The <strong>Tilted Box</strong> tool may take a bit more practice: select it from the menu.
+        Click <strong>and hold</strong> the mouse button to draw the baseline of the box. Then release
+        the mouse button. Move the mouse to define the height of the box, and click when you are
+        happy with the height.
+      </p>
+
+      <p class="tip">
+        Tip: the Tilted Box tool is especially useful for annotating labels in maps. Because
+        there is an explicit <strong>baseline</strong>, the data you generate
+        will also retain information about the <strong>orientation</strong> of the label.
+      </p>
+
+      <h2 id="map">Step 3. Identify and Map Places</h2>
+
+      <p>
+        You already know how to annotate a word or phrase in a document, and identify it as a
+        reference to a place. Now let's assign this reference to a
+        <a href="@controllers.help.routes.HelpController.showFAQ()#what-is-a-gazetteer">gazetteer</a>,
+        so that Recogito can plot it on the map.
+      </p>
+
+      <p>
+        Click <strong>Place</strong> in the annotation editor. Recogito will attempt to
+        provide an automatic suggestion from
+        <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">its
+        supported gazetteers</a>. You can either <strong>confirm</strong> this suggestion, or
+        try to find a better match in the gazetteer search. If you can't find a suitable match,
+        you also have the option to <strong>flag</strong> this reference, as an indication that
+        no suitable match was available.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/create-text-annotation.gif")">
+      </p>
+
+      <p>
+        To speed up your work, Recogito will automatically search the text for identical phrases
+        and give you the option to <strong>re-apply</strong> the gazetteer assignment to all
+        other matches.
+      </p>
+
+      <h2 id="export">Step 4. Export Your Data</h2>
+
+      <p>
+        Select the <span class="outline-icon">&#xe875;</span> icon in the main navigation bar.
+        This will take you to the available <strong>export options</strong> for your document. In
+        addition to the options listed on this page, you can also download a <strong>backup
+        package</strong> of your work from the <span class="outline-icon">&#xe8c9;</span> document
+        settings page. We recommend to download backups for archiving and as an added security measure.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/export.png")">
+      </p>
+
+      <h2 id="invite">Step 5. Invite Other Users</h2>
+
+      <p>
+        In this final step we are going to learn how you can share your documents with other
+        users on Recogito, so that you can work as a team. Select the
+        <span class="outline-icon">&#xe8c9;</span> icon in the main navigation bar. This will
+        take you to the <strong>Document Settings</strong> page. In the left sidebar,
+        select <strong>Sharing</strong>.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/share.gif")">
+      </p>
+
+      <p>
+        Use the search field at the bottom of the <strong>Collaborators</strong> box to grant a user
+        access to your document. You can choose between different levels of access:
+      </p>
+
+      <ul>
+        <li><strong>Read</strong> allows users to view document and annotations, but not add
+          annotations and comments themselves.</li>
+
+        <li><strong>Write</strong> allows users to view and annotate the document.</li>
+
+        <li><strong>Admin</strong> provides write access, and additionally allows users to
+          edit document metadata, invite other collaborators, and perform administrative
+          actions like downloading backups.</li>
+      </ul>
+
+      <h2>Congratulations!</h2>
+
+      <p>
+        You have successfully made your way through Recogito's most important features.
+        By completing this tutorial, you have learned to:
+      </p>
+
+      <ul>
+        <li>upload documents</li>
+        <li>create annotations on texts and images</li>
+        <li>map place references to gazetteers</li>
+        <li>export your data to different formats</li>
+        <li>invite other users to work with you</li>
+      </ul>
+
+      <p>
+        If you want to learn more and get in touch with our user community, please visit the
+        <a href="http://commons.pelagios.org/groups/recogito-users/" target="_blank">Recogito Users
+        Forum</a>.
+      </p>
+    </div>
+  </div>
+
+  <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/help/tutorial.js")"></script>
+}
