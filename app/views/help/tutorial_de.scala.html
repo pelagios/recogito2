@@ -1,17 +1,17 @@
 @()(implicit request: RequestHeader, webjars: WebJarAssets)
 @_layout("Recogito in 10 Minuten", "Ein kurzes Tutorial zu den wichtigsten Funktionen von Recogito. Lerne wie man Annotationen erstellt, Orte identifiziert, und Dokumente mit anderen teilt.", "tutorial.css") {
-  <h1>10 Minute Tutorial</h1>
-  <span class="sub-title"><span class="icon">&#xf017;</span> A Quick Introduction to Recogito</span>
+  <h1>10 Minuten Tutorial</h1>
+  <span class="sub-title"><span class="icon">&#xf017;</span> Eine kurze Einf&uuml;hrung in Recogito</span>
 } {
   <div class="toc-wrapper">
     <div class="toc">
       <ul>
-        <li><a href="#what">What is Recogito?</a></li>
-        <li><a href="#upload">Upload a Document</a></li>
-        <li><a href="#annotations">Create Annotations</a></li>
-        <li><a href="#map">Identify and Map Places</a></li>
-        <li><a href="#export">Export Your Data</a></li>
-        <li><a href="#invite">Invite Other Users</a></li>
+        <li><a href="#what">Was ist Recogito?</a></li>
+        <li><a href="#upload">Dokumente hochladen</a></li>
+        <li><a href="#annotations">Annotationen erstellen</a></li>
+        <li><a href="#map">Orte identizieren</a></li>
+        <li><a href="#export">Daten exportieren</a></li>
+        <li><a href="#invite">Andere Benutzer einladen</a></li>
       </ul>
     </div>
   </div>
@@ -19,46 +19,53 @@
   <div class="article">
     <div class="inner">
       <p>
-        This quick tutorial will give you an overview of Recogito's most important features.
-        <strong>You will learn how to:</strong>
+        Dieses kurze Tutorial bietet einen &Uuml;berblick &uuml;ber die
+        wichtigsten Funktionen von Recogito:
       </p>
       <ul>
-        <li>Upload texts and images</li>
-        <li>Create annotations</li>
-        <li>Identify and map places in your documents</li>
-        <li>Export your data in order to re-use it outside of Recogito</li>
-        <li>Invite other users to work with you</li>
+        <li>Hochladen von Texten und Bildern</li>
+        <li>Erstellen von Annotationen</li>
+        <li>Identifizieren von Orten in deinen Dokumenten</li>
+        <li>Exportieren deiner Daten um sie ausserhalb von Recogito
+          zu verwenden</li>
+        <li>Einladen von anderen Benutzern, um gemeinsam an
+          Dokumenten zu arbeiten</li>
       </ul>
 
-      <h2 id="what">What is Recogito?</h2>
+      <h2 id="what">Was ist Recogito?</h2>
 
       <p>
-        Recogito is an online platform for collaborative document annotation. It is
-        maintained by <a href="http://commons.pelagios.org" target="_blank">Pelagios Commons</a>,
-        a Digital Humanities initiative aiming to foster better linkages between online
-        resources documenting the past.
+        Recogito ist eine Online-Plattform f&uuml;r kollaboratives
+        Annotieren. Es wird von
+        <a href="http://commons.pelagios.org" target="_blank">Pelagios Commons</a>
+        betrieben, einer Digital Humanities Initiative mit dem Ziel
+        geschichtswissenschaftliche Daten besser zu Vernetzen.
       </p>
 
       <p>
-        Recogito provides a personal workspace where you can upload, collect and organize
-        your source materials - texts, images and tabular data - and collaborate in their
-        annotation and interpretation. Recogito helps you to make your work more
-        visible on the Web more easily, and to expose the results of your research
-        as Open Data.
+        Recogito bietet einen pers&ouml;nlichen Arbeitsplatz auf den
+        Quelldokumente - Texte, Bilder und tabellarische Daten - hochgeladen
+        werden k&ouml;nnen um sie gemeinsam mit anderen Benutzern zu annotieren
+        und zu interpretiertieren. Recogito hilft dir dabei, deine Arbeit
+        auf dem Web sichtbar zu machen, und deine Forschungsergebnisse ohne
+        grossen Aufwand als Open Data bereitzustellen.
       </p>
 
       <p>
-        This tutorial will teach you the essentials of working with Recogito. To complete it,
-        you need a <a href="http://recogito.pelagios.org/signup" target="_blank">Recogito
-        account</a>, and two sample documents: a plain .txt file with some text, and an image file.
+        Dieses Tutorial vermittelt die Grundlagen der Arbeit mit Recogito. Um
+        es zu durchzuarbeiten ben&ouml;tigst du einen
+        <a href="http://recogito.pelagios.org/signup" target="_blank">Recogito
+        Benutzeraccount</a> und zwei Beispieldokumente: eine Textdatei (.txt)
+        und ein Bild im JPEG, TIFF oder PNG Format.
       </p>
 
       <p class="tip">
-        Tip: Open this tutorial in a separate browser window (or tab) so you can see it
-        while you complete the steps.
+        Tipp: &Ouml;ffne dieses Tutorial in einem separaten Browserfenster
+        (oder Tab) damit du es sehen kannst, w&auml;hrend du dich durch
+        die einzelnen Schritte arbeitest.
       </p>
 
-      <h2 id="upload">Step 1. Upload a Document</h2>
+      <h2 id="upload">Schritt 1. Dokumente Hochladen</h2>
 
       <p>
         <strong>Documents</strong> are used to organize your materials in Recogito. Each document
