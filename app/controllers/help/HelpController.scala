@@ -17,12 +17,19 @@ class HelpController @Inject() (
     Ok(template)
   }
   
-  def index         = Action { Redirect(routes.HelpController.showTutorial()) }
-
-  def showAbout     = Action { implicit request => result(views.html.help.about()) }
-
-  def showFAQ       = Action { implicit request => result(views.html.help.faq())   }
+  def index = Action { Redirect(routes.HelpController.showTutorial()) }
 
   def showTutorial  = Action { implicit request => result(views.html.help.tutorial()) }
+  
+  def showLocalizedTutorial(lang: String) = Action { implicit request =>
+    lang.toUpperCase match {
+      case "ES" => result(views.html.help.tutorial_es()) 
+      case _ => NotFound(views.html.error404())
+    }
+  }
+
+  def showFAQ = Action { implicit request => result(views.html.help.faq()) }
+
+  def showAbout = Action { implicit request => result(views.html.help.about()) }
 
 }

@@ -27,6 +27,9 @@ GET     /help/faq                                    controllers.help.HelpContro
 GET     /help/tutorial                               controllers.help.HelpController.showTutorial
 GET     /help                                        controllers.help.HelpController.index
 
+# Localized versions
+GET     /help/:lang/tutorial                         controllers.help.HelpController.showLocalizedTutorial(lang: String)
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Administration area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,0 +1,273 @@
+@()(implicit request: RequestHeader, webjars: WebJarAssets)
+@_layout("Tutorial de 10 minutos", "A quick tutorial of Recogito's most important features. Learn how to create annotations, map places and share your work with others.", "tutorial.css") {
+  <h1>Tutorial de 10 minutos</h1>
+  <span class="sub-title"><span class="icon">&#xf017;</span> Rápida introducción a Recogito</span>
+} {
+  <div class="toc-wrapper">
+    <div class="toc">
+      <ul>
+        <li><a href="#what">Que es Recogito?</a></li>
+        <li><a href="#upload">Subir archivo</a></li>
+        <li><a href="#annotations">Crear anotaciones</a></li>
+        <li><a href="#map">Identificar y asignar lugares</a></li>
+        <li><a href="#export">Exportar tus datos</a></li>
+        <li><a href="#invite">Invitar otros usuarios</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="article">
+    <div class="inner">
+      <p>
+        Este tutorial otorga una visión general de las características más importantes de Recogito.
+      </p>
+      <ul>
+        <li>Subir textos e imágenes</li>
+        <li>Crear anotaciones</li>
+        <li>Identificar y asignar lugar en tus documentos</li>
+        <li>Exportar tus datos para ser utilizados fuera de Recogito</li>
+        <li>Invitar a otros usuarios para colaborar contigo</li>
+      </ul>
+
+      <h2 id="what">¿Qué es Recogito?</h2>
+
+      <p>
+        Recogito es una plataforma en línea de documentos colaborativos. Es mantenida por
+        <a href="http://commons.pelagios.org" target="_blank">Pelagios Commons</a>, una iniciativa
+        de Humanidades Digitales con el objetivo de fomentar mejores vínculos entre recursos en
+        línea documentando el pasado.
+      </p>
+
+      <p>
+        Recogito ofrece un espacio personal de trabajo donde se puede cargar, recopilar y
+        organizar materiales fuentes -textos, imágenes y datos tabulares- y colaborar en
+        anotaciones e interpretaciones. Recogito le ayuda a hacer su trabajo más visible en la
+        Webcon más facilidad, y a publicar los resultados de su investigación como Dato Abierto.
+      </p>
+
+      <p>
+        Este tutorial enseñará lo esencial para trabajar con Recogito. Para completar esto,
+        necesita una <a href="http://recogito.pelagios.org/signup" target="_blank">cuenta en
+        Recogito</a>, y dos documentos de muestra: un archivo .txt simple con algún texto y
+        un archivo de imagen.
+      </p>
+
+      <p class="tip">
+        Tip: Abra este tutorial en una ventana o pestaña del explorador mientras
+        completa los pasos.
+      </p>
+
+      <h2 id="upload">Paso 1. Cargar un documento</h2>
+
+      <p>
+        <strong>Documents</strong> se utiliza para organizar sus materiales en Recogito. Cada
+        documento puede contener varios archivos. Pero por ahora, sólo vamos a cargar un documento
+        que consista en un archivo de texto simple.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/new-document.png")">
+      </p>
+
+      <p>
+        Clica en <strong>New Document</strong>.
+      </p>
+
+      <h3>Para cargar un documento de texto nuevo</h3>
+      <ol>
+        <li>Ingresa un título para su nuevo documento y clica en <strong>Next</strong>.</li>
+        <li>Cargue el archivo de texto. Puede hacer clic en <strong>Choose a File to Attach</strong>
+          y seleccionarlo en el buscador de archivos, o puede arrastrarlo y soltarlo en el área de
+          carga con el ratón.</li>
+        <li>Recogito puede ejecutar el
+          <a href="https://es.wikipedia.org/wiki/Reconocimiento_de_entidades_nombradas" target="_blank">Reconocimiento
+          de Entidades Nominales (NER)</a> en su texto. Significando que intentará identificar y
+          pre-anotar lugares y personas automáticamente. Marque <strong>Apply automatic
+          annotation</strong> y haga clic en <strong>Next</strong>.</li>
+      </ol>
+
+      <p>
+        Dependiendo de la longitud de su texto, NER puede tomar un tiempo. Una vez completado,
+        haga clic en <strong>Done</strong>. ¡Felicitaciones! Ha importado su primer documento en
+        su área de trabajo.
+      </p>
+
+      <h3>Para cargar una nueva imagen</h3>
+      <p>
+        Repeta los pasos anteriores para crear otro documento a partir de su archivo de imagen. En
+        el último paso de carga, Recogito puede tardar unos segundos en convertir su imagen en
+        una imagen con zoom.
+      </p>
+
+      <h2 id="annotations">Paso 2: Crear anotaciones</h2>
+      <p>
+        Abra su documento de texto con un doble click en la lista. Esto lo llevará a la <strong>Vista
+        de Anotaciones</strong> (annotation view).
+      </p>
+
+      <h3>Para crear una anotación de texto</h3>
+      <p>
+        Seleccione un texto como lo haría en cualquier procesador de texto: haciendo clic y
+        arrastrando con el ratón o haciendo doble clic en una palabra. Puede agregar comentarios
+        y etiquetas, así como identificar el texto seleccionado como <strong>Lugar</strong>,
+        <strong>Persona</strong> o <strong>Evento</strong>. (Aprenderemos más sobre cómo tratar
+        con los lugares en un minuto.)
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/annotation-view.png")">
+      </p>
+
+      <p>
+        Trate de experimentar con el editor de anotaciones. Puede cambiar o eliminar cualquier
+        parte de una anotación por separado, luego de hacerla creada. (Para eliminar una etiqueta,
+        haga clic primero en ella para que aparezca el botón de eliminación). Eliminando todas
+        las partes de una anotación puede también remover el resaltado de los textos.
+      </p>
+
+      <h3>Para crear una anotación de imagen</h3>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/image-controls.png")" class="inline right">
+        Abra su imagen documento. Recogito tiene una <strong>vista ampliable</strong> para que
+        pueda navegar más fácilmente en una imagen de mayor resolución. Acerque o aleje usando la
+        rueda del ratón o los botones <span class="key">+</span> o <span class="key">-</span>
+        ubicados en la esquina superior. En los dispositivos táctiles puede usar un
+        &quot;pellizco&quot;. Una panorámica se obtiene arrastrando y soltando la imagen.
+      </p>
+
+      <p>
+        Puede <strong>rotar</strong> la imagen dentro de ángulos arbitrarios. En una pc de
+        escritorio si mantiene apretado <span class="key">SHIFT</span> + <span class="key">ALT</span>
+        mientras arrastra con el ratón. En un dispositivo táctil, use el pellizco. Utilice el botón
+        con la flecha simple <span class="key icon">&#xf176;</span> para girar rápidamente la
+        imagen volviendo a la orientación original.
+      </p>
+
+      <p>
+        Vamos a crear nuestra primera anotación en la imagen. En la barra de herramientas, hay
+        un menú desplegable donde puedes alternar entre dos modos de selección
+        diferentes de Recogito: <strong>Punto</strong>, <strong>Rectángulo</strong> y
+        <strong>Cuadro inclinado</strong>. Selecciona Punto (<strong>Point</strong>) y crea una
+        anotación clikeando en algún lugar de tu imagen. Cambia a Mover (<strong>Move</strong>)
+        para volver a la navegación de la imagen.
+      </p>
+
+      <p>
+        Ahora trata de anotar en un área: selecciona la herramienta de Rectángulo (<strong>Rectangle</strong>).
+        Has clic para seleccionar la esquina inicial del área. Luego has clic en el ángulo opuesto.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/tilted-box.gif")">
+      </p>
+
+      <p>
+        La herramienta Cuadro Inclinado (<strong>Tilted Box</strong>) puede necesitar un poco más
+        de práctica: selecciónala desde el menú. Has clic <strong>y mantén presionado</strong> el
+        botón del ratón para dibujar la línea base del cuadro. Luego, suelta el botón del ratón.
+        Mueve el ratón para definir la altura del cuadro, y has clic cuando sea la necesaria.
+      </p>
+
+      <p class="tip">
+        Tip: la herramienta Cuadro Inclinado es especialmente útil para anotar etiquetas en los
+        mapas. Porque existe una <strong>línea de base</strong> explícita, los datos generados
+        conservarán información sobre la <strong>orientación</strong> de la etiqueta.
+      </p>
+
+      <h2 id="map">Paso 3: Identificar y ubicar lugares</h2>
+
+      <p>
+        Ya sabe como realizar anotaciones de palabras o frases en un documento, e identificarla
+        como referencia a un lugar. Ahora vamos a asignar esta referencia a un diccionario
+        geográfico para que Recogito pueda trazarlo en el mapa.
+      </p>
+
+      <p>
+        Haga clic en el editor de anotaciones. Recogito intentará proporcionar una sugerencia
+        automática a partir de sus índices geográficos. Ud. puede <strong>confirmar</strong> la
+        sugerencia o tratar de hallar una coincidencia mejor en el buscador de índices geográficos.
+        Si no encuentra una adecuada, también tiene la opción de marcar esta referencia, como
+        una indicación de que no había una coincidente.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/create-text-annotation.gif")">
+      </p>
+
+      <p>
+        Para acelerar su trabajo, Recogito buscará automáticamente en el texto, frases idénticas,
+        y le dará la opción de aplicar la asignación a todas las coincidencias.
+      </p>
+
+      <h2 id="export">Paso 4: Exportar tus datos</h2>
+
+      <p>
+        Seleccione el icono <span class="outline-icon">&#xe875;</span> en la barra principal de
+        navegación. Esto lo llevará a las <strong>opciones de exportación disponibles</strong> para
+        su documento. Además de las opciones que aparecen en la página, puede descargar una
+        <strong>copia de seguridad</strong> de su trabajo desde la página de configuración
+        <span class="outline-icon">&#xe8c9;</span> del documento. Nosotros recomendamos descargar
+        copias de seguridad para archivar y como adicional de seguridad.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/export.png")">
+      </p>
+
+      <h2 id="invite">Paso 5: Invitar otros usuarios</h2>
+
+      <p>
+        En paso final aprenderemos como compartir sus documentos con otros usuarios de Recogito,
+        para que pueda trabajar en equipo. Seleccione el icono <span class="outline-icon">&#xe8c9;</span>
+        en la barra principal de navegación. Esto lo llevará a la página de
+        <strong>Configuración del Documento</strong>. A la izquierda de la barra de herramientas
+        seleccione <strong>Compartir</strong>.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/share.gif")">
+      </p>
+
+      <p>
+        Utilice el campo de búsqueda en la parte inferior del cuadro <strong>Colaboradores</strong>
+        para dar acceso a un usuario en su documento. Puede elegir entre diferentes niveles de acceso:
+      </p>
+
+      <ul>
+        <li><strong>Leer</strong> permite a los usuarios ver documentos y anotaciones, pero no
+          añadir anotaciones y comentarios.</li>
+
+        <li><strong>Escribir</strong> permite a los usuarios ver y anotar el documento.</li>
+
+        <li><strong>Admin</strong> proporciona acceso de escritura y además permite a los usuarios
+          editar metadatos de documentos, invitar a otros colaboradores y realizar acciones
+          administrativas como descargar copias de seguridad.</li>
+      </ul>
+
+      <h2>Felicitaciones!</h2>
+
+      <p>
+        Ha recorrido las características más importantes de Recogito. Completando el
+        tutorial, ud. Ha aprendido a:
+      </p>
+
+      <ul>
+        <li>Cargar documentos</li>
+        <li>Crear anotaciones en textos e imágenes.</li>
+        <li>Ubicar las referencias en los diccionarios geográficos.</li>
+        <li>Exportar sus datos en diferentes formatos</li>
+        <li>Invitar a otros usuarios a trabajar con ud. </li>
+      </ul>
+
+      <p>
+        Si quiere aprender mas y estar en  contacto con otros usuarios de nuestra comunidad, visite
+        <a href="http://commons.pelagios.org/groups/recogito-users/" target="_blank">Recogito Users
+        Forum</a>.
+      </p>
+    </div>
+  </div>
+
+  <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/help/tutorial.js")"></script>
+}

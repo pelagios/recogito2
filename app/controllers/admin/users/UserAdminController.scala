@@ -25,20 +25,6 @@ class UserAdminController @Inject() (
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.users.index())
   }
-
-  /*
-  def showDetails(username: String) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
-    users.findByUsername(username).flatMap(_ match {
-
-      case Some(user) =>
-        documents.findByOwner(username).map(documents =>
-          Ok(views.html.admin.users.details(user, documents)))
-
-      case None => Future.successful(NotFoundPage)
-
-    })
-  }
-  */
   
   def listUsers(offset: Int, size: Int, sortBy: Option[String], sortOrder: Option[String]) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
     users.listUsers(offset, size, sortBy, sortOrder.flatMap(o => SortOrder.fromString(o))).map { userList =>
