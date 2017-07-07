@@ -10,7 +10,7 @@ require(['common/ui/behavior'], function(Behavior) {
         maxScroll = jQuery('.page-header').outerHeight() + jQuery('.article-heading').outerHeight();
 
     Behavior.makeElementSticky(element, maxScroll);
-    Behavior.animateAnchorNav(element);
+    Behavior.animateAnchorNav(element.find('ul.internal'));
   });
 
 });
