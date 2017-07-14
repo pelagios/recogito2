@@ -18,14 +18,20 @@
         <h3>This tutorial in</h3>
         <ul>
           <li>
-            <li>
-              <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("de")">
-                <img src="@routes.Assets.versioned("images/flags/de.png")"> Deutsch
-              </a>
-            </li>
-            
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("de")">
+              <img src="@routes.Assets.versioned("images/flags/de.png")"> Deutsch
+            </a>
+          </li>
+
+          <li>
             <a href="@controllers.help.routes.HelpController.showTutorial()">
               <img src="@routes.Assets.versioned("images/flags/en_uk.png")"> English
+            </a>
+          </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("it")">
+              <img src="@routes.Assets.versioned("images/flags/en_it.png")"> Italiano
             </a>
           </li>
         </ul>
