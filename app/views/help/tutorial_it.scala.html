@@ -1,0 +1,308 @@
+@()(implicit request: RequestHeader, webjars: WebJarAssets)
+@_layout("Recogito in 10 Minutes", "A quick tutorial of Recogito's most important features. Learn how to create annotations, map places and share your work with others.", "tutorial.css") {
+  <h1>Tutorial in 10 minuti</h1>
+  <span class="sub-title"><span class="icon">&#xf017;</span> Breve introduzione a Recogito</span>
+} {
+  <div class="toc-wrapper">
+    <div class="toc">
+      <ul class="internal">
+        <li><a href="#what">What is Recogito?</a></li>
+        <li><a href="#upload">Upload a Document</a></li>
+        <li><a href="#annotations">Create Annotations</a></li>
+        <li><a href="#map">Identify and Map Places</a></li>
+        <li><a href="#export">Export Your Data</a></li>
+        <li><a href="#invite">Invite Other Users</a></li>
+      </ul>
+
+      <div class="localized-versions">
+        <h3>This tutorial in</h3>
+        <ul>
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("de")">
+              <img src="@routes.Assets.versioned("images/flags/de.png")"> Deutsch
+            </a>
+          </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("es")">
+              <img src="@routes.Assets.versioned("images/flags/es.png")"> Espa&ntilde;ol
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="article">
+    <div class="inner">
+      <p>
+        Questo breve tutorial fornirà un'introduzione alle caratteristiche più importanti di Recogito.
+        Imparerete a:
+      </p>
+      <ul>
+        <li>Caricare testi e immagini</li>
+        <li>Creare annotazioni</li>
+        <li>Identificare e mappare luoghi nei vostri documenti</li>
+        <li>Esportare i dati per riutilizzarli al di fuori di Recogito</li>
+        <li>Invitare altri utenti a collaborare</li>
+      </ul>
+
+      <h2 id="what">Cos'è Recogito?</h2>
+
+      <p>
+        Recogito è una piattaforma online per l'annotazione collaborativa di documenti. E' gestito
+        da <a href="http://commons.pelagios.org" target="_blank">Pelagios Commons</a>, una
+        iniziativa nelle Digital Humanities che mira a migliorare la collaborazione fra risorse
+        online relative al passato.
+      </p>
+
+      <p>
+        Recogito offre un'interfaccia utente dove si possono caricare, mettere insieme e
+        organizzare le fonti - testi, immagini e tabelle - e collaborare a progetti di annotazione
+        e interpretazione. Recogito consente di rendere il proprio lavoro più visibile sul Web
+        più facilmente, e di esporre i risultati della propria ricerca sotto forma di Open Data.
+      </p>
+
+      <p>
+        Questo tutorial vi introdurrà agli aspetti essenziali del lavoro con Recogito. Per
+        seguirlo, avrete bisogno di
+        un <a href="http://recogito.pelagios.org/signup" target="_blank">Account Recogito</a>, e di
+        due documenti sample: un file di testo .txt e un file immagine.
+      </p>
+
+      <p class="tip">
+        Suggerimento: Aprite questo tutorial in una finestra separata del browser, per poterlo
+        seguire passo passo mentre portate a termine i vari passaggi.
+      </p>
+
+      <h2 id="upload">Step 1. Caricare un documento</h2>
+
+      <p>
+        I Documenti sono i file utilizzati per organizzare i materiali all'interno dell'Account in
+        Recogito. Ogni documento può consistere in varie tipologie di files, ma per ora ci
+        limiteremo a caricare un semplice file di testo.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/new-document.png")">
+      </p>
+
+      <p>
+        Cliccate su <strong>New Document</strong>.
+      </p>
+
+      <h3>Come caricare un documento di testo</h3>
+      <ol>
+        <li>Inserite un titolo per il vostro documento e cliccate <strong>Next</strong>.</li>
+        <li>Caricate il vostro file di testo. Potete cliccare su <strong>Choose a File to Attach</strong>
+          (scegli un file da allegare) e selezionarlo dal browser, oppure trascinare con il mouse
+          il file nella area di caricamento.</li>
+
+        <li>Recogito può applicare la Named Entity Recognition (NER) al testo. Questo significa
+          che il programma cercherò di identificare e pre-annotare nomi di luoghi e persone
+          automaticamente. Spuntate la casella <strong>Apply automatic annotation</strong> e
+          cliccate <strong>Next</strong></li>
+      </ol>
+
+      <p>
+        A seconda della lunghezza del testo, la NER potrebbe impiegare un po' di tempo. Una volta
+        completato il processo, cliccate su <strong>Done</strong>. Congratulazioni! Avete importato il
+        vostro primo documento nel vostro workspace.
+      </p>
+
+      <h3>Come caricare un documento immagine </h3>
+      <p>
+        Ripetete i passaggi elencati sopra per creare un altro documento dal vostro file immagine.
+        Nello step finale, Recogito potrebbe impiegare alcuni secondi per convertire l'immagine
+        in un formato ridimensionabile. Torneremo su questo in seguito.
+      </p>
+
+      <h2 id="annotations">Step 2. Annotare un documento</h2>
+      <p>
+        Aprite il vostro documento di testo facendo doppio click nella lista dei documenti. Questo
+        aprirà la vista annotazione (annotation view).
+      </p>
+
+      <h3>Creare un'annotazione di testo</h3>
+      <p>
+        Selezionate la stringa di testo, come fareste in qualunque strumento di scrittura: potete
+        cliccare e trascinare il cursore, o fare doppio click sulla parola che vi interessa.
+        Potete aggiungere <strong>commenti</strong> o <strong>tags</strong>, e assegnare
+        all'annotazione la categoria di <strong>Luogo</strong> (Place), <strong>Persona</strong>
+        (Person), o <strong>Evento</strong> (Event). (Impareremo di più su come gestire i nomi di
+        luogo nel prossimo paragrafo).
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/annotation-view.png")">
+      </p>
+
+      <p>
+        Fate degli esperimenti con varie forme di annotazione. Potete cambiare o cancellare
+        ciascun componente dell'annotazione separatamente, una volta creato. Per cancellare un
+        tag, dovete prima cliccare su di esso, il click crea un bottone di eliminazione che
+        potrete poi selezionare. Eliminando tutte le componenti di un'annotazione, anche
+        l'annotazione stessa effettuata sul testo verrà eliminata automaticamente.
+      </p>
+
+      <h3>Creare un'annotazione su un'immagine</h3>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/image-controls.png")" class="inline right">
+        Aprite il vostro documento di immagine. Recogito ha una vista zoomabile, che potete usare
+        per muovervi più facilmente con immagini in alta risoluzione. Zoomate usando la rotella
+        del mouse o cliccando sui bottoni <span class="key">+</span> e <span class="key">-</span>
+        che trovate nell'angolo in alto a destra. Su dispositivi touch potete anche zoomare con due
+        dita. Potete azionare la vista panoramica trascinando e rilasciando l'immagine.
+      </p>
+
+      <p>
+        Potete ruotare l'immagine con angolazioni arbitrarie. Sul computer, premete
+        contemporaneamente <span class="key">SHIFT</span> e <span class="key">ALT</span> mentre
+        trascinate l'immagine con il mouse all'angolazione desiderata. Su dispositivi
+        touch usate il comando a zoom a due dita. Usate il bottone con la freccia in alto
+        <span class="key icon">&#xf176;</span> per ruotare velocemente l'immagine e farla tornare
+        alla sua angolazione originale.
+      </p>
+
+      <p>
+        Cerchiamo dunque di creare la prima annotazione su immagine. Nella barra degli strumenti,
+        trovate un menu a tendina dove potete cambiare le varie modalità di selezione di Recogito:
+        <strong>Punto</strong> (Point), <strong>Rettangolo</strong> (Rectangle) e <strong>Riquadro
+        inclinato</strong> (Tilted Box).
+      </p>
+
+      <p>
+        Selezionate <strong>Punto</strong> e create un'annotazione cliccando su un punto
+        dell'immagine. Tornate alla vista <strong>Selezione</strong> (Move) per ripristinare la
+        navigazione normale nell'immagine.
+      </p>
+
+      <p>
+        Ora provate ad annotare un'area nell'immagine: cliccate sul selettore
+        <strong>Rettangolo</strong> (Rectangle). Cliccate una volta per selezionare l'angolo
+        di partenza dell'area, e cliccate di nuovo per chiudere il rettangolo nell'angolo opposto.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/tilted-box.gif")">
+      </p>
+
+      <p>
+        Il <strong>Riquadro inclinato</strong> (Tilted Box) potrebbe richiedere un po' più di
+        pratica: selezionatelo dal menu a tendina in alto, cliccate e <strong>mantenete
+        attivo</strong> il tasto del mouse, per disegnare la linea di base del riquadro. Rilasciate
+        il tasto del mouse. Muovete il cursore per definire l'altezza del riquadro cosí
+        generato, e cliccate quando avete terminato.
+      </p>
+
+      <p class="tip">
+        Suggerimento: l'opzione <strong>Riquadro inclinato</strong> è utile soprattutto per
+        annotare parti di mappe, perchè consente di creare una linea di base specificamente
+        orientata nel verso desiderato, e i dati generati dall'annotazione ne manterranno
+        l'orientamento scelto.
+      </p>
+
+      <h2 id="map">Step 3. Identificare e mappare i luoghi</h2>
+
+      <p>
+        A questo punto sapete già come annotare una parola o frase in un documento, e identificarlo
+        come riferimento a un luogo. Ora è il momento di assegnarlo a un atlante online, o
+        <a href="@controllers.help.routes.HelpController.showFAQ()#what-is-a-gazetteer">gazetteer</a>,
+        in modo che Recogito possa rappresentarlo in una mappa.
+      </p>
+
+      <p>
+        Cliccate su <strong>Place</strong> nell'editor. Recogito cercherà dapprima di offrire un
+        suggerimento automatico ricavato da uno dei
+        <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">gazzetteer
+        supportati</a>. Potete <strong>confermare</strong> il suggerimento cliccando su
+        <strong>Confirm</strong>, oppure cercare di trovare una corrispondenza migliore
+        nella finestra di ricerca (gazetteer search). Se non è possibile trovare una corrispondenza
+        adeguata, potete anche apporre un <strong>flag</strong> sull'annotazione all'interno della
+        finestra di ricerca.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/create-text-annotation.gif")">
+      </p>
+
+      <p>
+        Per accelerare il lavoro, Recogito ricercherà automaticamente nel vostro documento tutte
+        le stringhe di testo identiche a quelle appena annotate, e offrirà l'opzione per
+        <strong>ri-applicare</strong> sia l'annotazione sia la prescelta corrispondenza al
+        gazzetteer.
+      </p>
+
+      <h2 id="export">Step 4. Esportare i dati</h2>
+
+      <p>
+        Selezionate la icona di download <span class="outline-icon">&#xe875;</span>
+        nella barra di navigazione principale. Questo aprirà la finestra delle <strong>opzioni di
+        esportazione</strong> disponibili per il vostro documento. Oltre alle opzioni elencate su
+        questa pagina, potete anche scaricare un <strong>pacchetto di backup</strong> dalla pagina
+        delle impostazioni (<strong>document settings</strong>), indicata con l'icona
+        <span class="outline-icon">&#xe8c9;</span>. Raccomandiamo di effettuare in questo modo dei
+        backup a scopo di archivio e come misura di sicurezza aggiuntiva.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/export.png")">
+      </p>
+
+      <h2 id="invite">Step 5. Invitare collaboratori</h2>
+
+      <p>
+        In questa fase finale impareremo come condividere i documenti con altri utenti su Recogito,
+        per lavorare a progetti collaborativi. Nell'editor del documento, selezionate la icona
+        delle impostazioni <span class="outline-icon">&#xe8c9;</span> nella barra di navigazione
+        principale. Si aprirà la pagina delle Impostazioni. Nella barra a sinistra, cliccate
+        su <strong>Sharing</strong> (condivisione).
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/share.gif")">
+      </p>
+
+      <p>
+        Usate il campo di ricerca in fondo al riquadro dei <strong>Collaboratori</strong> per dare
+        accesso al vostro documento a uno o più altri utenti. Potete selezionare diversi livelli
+        di accesso:
+      </p>
+
+      <ul>
+        <li><strong>Read</strong> consente agli utenti di visualizzare documento e annotazioni,
+          ma non di aggiungerne altre o di commentare.</li>
+
+        <li><strong>Write</strong> consente agli utenti di vedere ed annotare.</li>
+
+        <li><strong>Admin</strong> fornisce accesso di scrittura e lettura, e consente anche di
+          modificare i metadati del documento, invitare altri collaboratori, ed effettuare tutte
+          le azioni da amministratore (ad esempio, scaricare i dati di backup).</li>
+      </ul>
+
+      <h2>Congratulazioni!</h2>
+
+      <p>
+        Avete completato con successo il tour di Recogito. Avete imparato a:
+      </p>
+
+      <ul>
+        <li>Caricare documenti</li>
+        <li>Creare annotazioni su testi e immagini</li>
+        <li>Mappare i luoghi e associarli ad atlanti online</li>
+        <li>Esportare i dati in diversi formati</li>
+        <li>Invitare altri utenti a collaborare</li>
+      </ul>
+
+      <p>
+        Se volete imparare di più o conoscere la nostra community, visitate il
+        <a href="http://commons.pelagios.org/groups/recogito-users/" target="_blank">Forum degli
+        Utenti di Recogito</a> (in inglese). 
+      </p>
+    </div>
+  </div>
+
+  <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/help/tutorial.js")"></script>
+}
