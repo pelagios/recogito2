@@ -25,6 +25,7 @@ class HelpController @Inject() (
     lang.toUpperCase match {
       case "DE" => result(views.html.help.tutorial_de())
       case "ES" => result(views.html.help.tutorial_es())
+      case "IT" => result(views.html.help.tutorial_it())
       case _ => NotFound(views.html.error404())
     }
   }
