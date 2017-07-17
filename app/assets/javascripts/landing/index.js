@@ -44,7 +44,7 @@ require([], function() {
     // Activate the carousel
     jQuery('.testimonials .inner').slick({
       autoplay      : true,
-      autoplaySpeed : 1000,
+      autoplaySpeed : 12000,
       pauseOnHover  : true
     });
 

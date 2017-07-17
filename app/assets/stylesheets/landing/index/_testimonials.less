@@ -1,21 +1,29 @@
 .testimonials {
-  padding:40px 0;
+  padding:45px 0;
   background-color:@ocean;
   color:#fff;
   line-height:30px;
-  text-align:center;
+  height:200px;
+  overflow:hidden;
 
   .inner {
-    max-width:700px;
+    max-width:800px;
   }
 
   .testimonial {
     font-family:Merriweather;
     font-weight:400;
+    padding:0 60px;
     font-style:italic;
-    padding:0 30px;
     margin:0 auto;
     text-align:left;
+
+    .aligner {
+      height:200px;
+      display:flex;
+      justify-content:center;
+      flex-direction:column;
+    }
 
     span {
       display:block;
@@ -35,7 +43,7 @@
     }
 
     .by {
-      padding-top:10px;
+      padding-top:20px;
     }
 
     .by::before {
