@@ -9,7 +9,10 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
 ## Prerequisites
 
 * Java 8 JDK
-* [Play Framework v2.5.0](https://www.playframework.com/download)
+* Typesafe Activator 1.3.12. __Note:__ as of May 2017, Activator (the build framework used previously
+  by Play) has been discontinued. I have yet to migrate everything to the proper new process (which
+  uses the SBT build tool). In the mean time, please download the final Activator release from
+  https://downloads.typesafe.com/typesafe-activator/1.3.12/typesafe-activator-1.3.12.zip
 * PostgreSQL DB
 * To use image annotation, you need to have the [vips](http://www.vips.ecs.soton.ac.uk/) image
   processing system installed. If vips is not available on the command line, Recogito is set to
