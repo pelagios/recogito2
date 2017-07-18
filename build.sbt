@@ -10,7 +10,8 @@ scalacOptions ++= Seq("-feature")
 
 resolvers ++= Seq(
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-  "Open Source Geospatial Foundation Repository" at "http://download.osgeo.org/webdav/geotools/"
+  "Open Source Geospatial Foundation Repository" at "http://download.osgeo.org/webdav/geotools/",
+  "http://maven.geotoolkit.org/" at "http://maven.geotoolkit.org/"
 )
 
 libraryDependencies ++= Seq(
