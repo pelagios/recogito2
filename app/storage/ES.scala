@@ -12,6 +12,7 @@ import scala.io.Source
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{ Try, Success, Failure }
+import scala.concurrent.Await
 
 /** Binding ES as eager singleton, so we can start & stop properly **/
 class ESModule extends AbstractModule {
@@ -66,11 +67,11 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
     
     // Just fetch cluster stats to see if there's a cluster at all
     Try(
-      remoteClient execute {
+      Await.result(remoteClient execute {
         get cluster stats
-      }
+      }, 3.seconds)
     ) match {
-      case Success(_) => {
+      case Success(a) => {
         Logger.info("Joining ElasticSearch cluster")
         remoteClient 
       }
