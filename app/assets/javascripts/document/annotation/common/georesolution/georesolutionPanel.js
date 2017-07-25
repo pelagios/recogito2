@@ -297,6 +297,8 @@ define([
 
             clear();
             search();
+
+            searchInput.get(0).focus();
           },
 
           close = function() {
