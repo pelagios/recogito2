@@ -62,6 +62,7 @@ define([
               '</div>');
 
             el.find('.wait-for-next').hide();
+            el.find('.modal-wrapper').draggable({ handle: '.modal-header' });
             el.hide();
             jQuery(document.body).append(el);
             return el;
