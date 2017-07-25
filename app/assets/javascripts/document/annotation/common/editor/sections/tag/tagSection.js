@@ -139,7 +139,6 @@ define([
               addTag(chars.trim());
             });
             textarea.empty();
-            textarea.blur();
             return false;
           }
         },
