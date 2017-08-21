@@ -10,7 +10,7 @@ define([
   'common/config'
 ], function(ErrorCard, NoMatchCard, StandardCard, MiniMap, Section, Formatting, PlaceUtils, API, Config) {
 
-  var PlaceSection = function(parent, placeBody, toponym) {
+  var PlaceSection = function(parent, placeBody, opt_toponym) {
     var self = this,
 
         element = (function() {
@@ -152,7 +152,7 @@ define([
           if (placeBody.uri)
             // Resolve the URI contained in the annotation body
             fillFromURI(placeBody.uri, placeBody.status, lastModified);
-          else if (placeBody.status.value === 'UNVERIFIED')
+          else if (opt_toponym && placeBody.status.value === 'UNVERIFIED')
             // No URI - if the annotation is still UNVERIFIED, fetch a suggestion
             fillFromToponym(toponym, placeBody.status, lastModified);
           else

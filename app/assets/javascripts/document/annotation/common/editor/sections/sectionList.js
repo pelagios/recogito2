@@ -55,7 +55,6 @@ define([
             initTranscriptionSections(transcriptionBodies);
 
           jQuery.each(placeBodies, function(idx, placeBody) {
-            // TODO what about toponym arg?
             initPlaceSection(placeBody); });
 
           jQuery.each(personBodies, function(idx, personBody) {
@@ -142,8 +141,8 @@ define([
             return storedTranscriptions[storedTranscriptions.length - 1];
         },
 
-        initPlaceSection = function(placeBody, toponym) {
-          var placeSection = new PlaceSection(centerSectionEl, placeBody, toponym);
+        initPlaceSection = function(placeBody, opt_toponym) {
+          var placeSection = new PlaceSection(centerSectionEl, placeBody, opt_toponym);
           forwardEvent(placeSection, 'change'); // Georesolution change needs to be handled by editor
           handleDelete(placeSection);
           sections.push(placeSection);
