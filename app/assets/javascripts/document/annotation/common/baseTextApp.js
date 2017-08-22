@@ -9,9 +9,7 @@ define([
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
-  'document/annotation/text/selection/highlighter',
-  'document/annotation/text/selection/phraseAnnotator',
-  'document/annotation/text/selection/selectionHandler'
+  'document/annotation/text/selection/phraseAnnotator'
 ], function(
   Alert,
   Formatting,
@@ -23,11 +21,9 @@ define([
   LoadIndicator,
   BaseApp,
   Toolbar,
-  Highlighter,
-  PhraseAnnotator,
-  SelectionHandler) {
+  PhraseAnnotator) {
 
-  var App = function() {
+  var App = function(contentNode, highlighter, selector) {
 
     var self = this,
 
@@ -35,15 +31,9 @@ define([
 
         containerNode = document.getElementById('main'),
 
-        contentNode = document.getElementById('content'),
-
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
-        highlighter = new Highlighter(contentNode),
-
         phraseAnnotator = new PhraseAnnotator(contentNode, highlighter),
-
-        selector = new SelectionHandler(contentNode, highlighter),
 
         editor = (Config.writeAccess) ?
           new WriteEditor(containerNode, selector) :

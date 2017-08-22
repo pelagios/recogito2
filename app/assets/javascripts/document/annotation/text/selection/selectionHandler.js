@@ -36,25 +36,6 @@ define([
           return range;
         },
 
-        rangeToAnnotationStub = function(selectedRange) {
-          var rangeBefore = rangy.createRange();
-          // A helper range from the start of the contentNode to the start of the selection
-          rangeBefore.setStart(rootNode, 0);
-          rangeBefore.setEnd(selectedRange.startContainer, selectedRange.startOffset);
-
-          return {
-            annotates: {
-              document_id: Config.documentId,
-              filepart_id: Config.partId,
-              content_type: Config.contentType
-            },
-            anchor: 'char-offset:' + rangeBefore.toString().length,
-            bodies: [
-              { type: 'QUOTE', value: selectedRange.toString() }
-            ]
-          };
-        },
-
         /** Helper that clears the visible selection by 'unwrapping' the created span elements **/
         clearSelection = function() {
           currentSelection = false;
@@ -112,7 +93,7 @@ define([
                selection.getRangeAt(0).toString().trim().length > 0) {
 
              selectedRange = trimRange(selection.getRangeAt(0));
-             annotation = rangeToAnnotationStub(selectedRange);
+             annotation = self.rangeToAnnotationStub(selectedRange);
              bounds = selectedRange.nativeRange.getBoundingClientRect();
              spans = highlighter.wrapRange(selectedRange);
              jQuery.each(spans, function(idx, span) { span.className = 'selection'; });
@@ -170,14 +151,34 @@ define([
     jQuery(rootNode).mouseup(onMouseup);
     jQuery(document.body).keydown(onKeyDown);
 
+    this.rootNode = rootNode;
     this.clearSelection = clearSelection;
     this.getSelection = getSelection;
     this.setSelection = setSelection;
-    this.rangeToAnnotationStub = rangeToAnnotationStub;
 
     AbstractSelectionHandler.apply(this);
   };
   SelectionHandler.prototype = Object.create(AbstractSelectionHandler.prototype);
+
+  /** We make this method overide-able for the sake of the TEI implementation **/
+  SelectionHandler.prototype.rangeToAnnotationStub = function(selectedRange) {
+    var rangeBefore = rangy.createRange();
+    // A helper range from the start of the contentNode to the start of the selection
+    rangeBefore.setStart(this.rootNode, 0);
+    rangeBefore.setEnd(selectedRange.startContainer, selectedRange.startOffset);
+
+    return {
+      annotates: {
+        document_id: Config.documentId,
+        filepart_id: Config.partId,
+        content_type: Config.contentType
+      },
+      anchor: 'char-offset:' + rangeBefore.toString().length,
+      bodies: [
+        { type: 'QUOTE', value: selectedRange.toString() }
+      ]
+    };
+  };
 
   return SelectionHandler;
 
