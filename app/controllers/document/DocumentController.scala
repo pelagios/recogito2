@@ -44,6 +44,11 @@ class DocumentController @Inject() (
     }
   }
 
+  /** Gets the image manifest for the given document part.
+    * - for uploaded images, returns the Zoomify ImageProperties.xml file
+    * - for IIIF, returns a redirect to the original location of the IIIF info.json   
+    * - in case the document is not an image, returns a BadRequest   
+    */
   def getImageManifest(docId: String, partNo: Int) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
@@ -59,12 +64,13 @@ class DocumentController @Inject() (
           Future.successful(Redirect(currentPart.getFile))
           
         case _ =>
-          Future.successful(InternalServerError)
+          Future.successful(BadRequest)
           
       }
     })
   }
 
+  /** Returns the image tile at the given relative file path for the specified document part **/
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
@@ -75,6 +81,7 @@ class DocumentController @Inject() (
     })
   }
 
+  /** Returns a thumbnail file for the given document part **/
   def getThumbnail(docId: String, partNo: Int) = AsyncStack { implicit request =>
     
     import models.ContentType._
@@ -95,7 +102,8 @@ class DocumentController @Inject() (
     })
   }
   
-  def getDataTable(docId: String, partNo: Int, lines: Option[Int]) = AsyncStack { implicit request =>
+  /** Gets the raw content for the given document part **/
+  def getRaw(docId: String, partNo: Int, lines: Option[Int]) = AsyncStack { implicit request =>
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(docId, partNo, maybeUser, { case (document, currentPart, accesslevel) =>
       Future {

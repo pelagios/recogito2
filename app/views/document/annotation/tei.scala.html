@@ -11,22 +11,17 @@
     <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     @views.html.document.standardMeta(doc, annotationCount, Some(currentPart), None)
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/table/index.css")"/>
-    <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/table/colorByType.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/tei/index.css")"/>
+    <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
-    <link rel="stylesheet" href="@routes.Assets.versioned("vendor/slick.grid.css")"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("leaflet.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>
-    <script src="@routes.Assets.versioned("vendor/jquery.mousewheel.min.js")"></script>
-    <script src="@routes.Assets.versioned("vendor/jquery.event.drag-2.2.js")"></script>
-    <script src="@routes.Assets.versioned("vendor/slick.core.js")"></script>
-    <script src="@routes.Assets.versioned("vendor/slick.grid.js")"></script>
-    <script src="@routes.Assets.versioned("vendor/slick.dataview.js")"></script>
-    <script src="@routes.Assets.versioned("vendor/slick.rowselectionmodel.js")"></script>
     <script src="@routes.WebJarAssets.at(webjars.locate("jquery.timeago.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("papaparse.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/table/app.js")"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("rangy-core.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("rangy-classapplier.min.js"))"></script>
+    <script src="@routes.Assets.versioned("vendor/CETEI.js")"></script>
+    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/tei/app.js")"></script>
     <script>
       window.config = {
         @if(currentUser.isDefined) { me: '@currentUser.get.getUsername', }
@@ -63,15 +58,17 @@
 
     <div class="header-toolbar">
       <ul class="menu">
-        <li class="group bulk-annotation">
+        <li class="group annotation-mode">
+          <h3>ANNOTATION MODE:</h3>
           <ul>
-            <li class="has-submenu">
-              <span class="label">AUTOMATIC MATCHING</span>
+            <li data-mode="NORMAL" class="active"><span class="label">NORMAL</span></li>
+            <li class="quick has-submenu">
+              <span class="label">QUICK</span>
               <div class="submenu" style="display:none;">
                 <ul>
-                  <li data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
-                  <li data-type="PERSON" class="disabled"><span class="icon">&#xf007;</span> Persons</li>
-                  <li data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
+                  <li data-mode="QUICK" data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
+                  <li data-mode="QUICK" data-type="PERSON"><span class="icon">&#xf007;</span> Persons</li>
+                  <li data-mode="QUICK" data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
                 </ul>
               </div>
             </li>
@@ -108,22 +105,14 @@
       </ul>
     </div> <!-- .sidebar -->
 
-    <div id="main">
-      <div id="table-container">
-        <div id="table"></div>
-      </div>
-    </div>
+    <div id="main"><div id="content"></div></div>
 
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
       controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
-      controllers.api.routes.javascript.AnnotationAPIController.bulkUpsert,
       controllers.api.routes.javascript.AnnotationAPIController.deleteAnnotation,
       controllers.api.routes.javascript.PlaceAPIController.findPlaceByURI,
       controllers.api.routes.javascript.PlaceAPIController.searchPlaces,
-      controllers.api.routes.javascript.TaskAPIController.spawnTask,
-      controllers.api.routes.javascript.TaskAPIController.progressByDocument,
-      controllers.document.settings.routes.javascript.SettingsController.showDocumentSettings,
       controllers.document.routes.javascript.DocumentController.getRaw
     )
   </body>

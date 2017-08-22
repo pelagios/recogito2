@@ -58,9 +58,9 @@ abstract class BaseOptAuthController(
       partNo: Int,
       maybeUser: Option[UserRecord],
       response: (DocumentInfo, DocumentFilepartRecord, DocumentAccessLevel) => Future[Result]
-    )(implicit ctx: ExecutionContext) = {
+    )(implicit ctx: ExecutionContext, request: Request[AnyContent]) = {
     
-    documentResponse(documentId, maybeUser, { case (doc, accesslevel) =>
+    documentReadResponse(documentId, maybeUser, { case (doc, accesslevel) =>
       doc.fileparts.find(_.getSequenceNo == partNo) match {
         case None => Future.successful(NotFoundPage)
         case Some(part) => response(doc, part, accesslevel)

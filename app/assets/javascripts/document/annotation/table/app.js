@@ -210,7 +210,7 @@ require([
   /** On page load, fetch and parse the CSV and instantiate the app **/
   jQuery(document).ready(function() {
     var dataURL = jsRoutes.controllers.document.DocumentController
-          .getDataTable(Config.documentId, Config.partSequenceNo).absoluteURL(),
+          .getRaw(Config.documentId, Config.partSequenceNo).absoluteURL(),
 
         onLoadComplete = function(results) {
           new App(results);

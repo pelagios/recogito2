@@ -62,34 +62,29 @@ object ContentType {
   /** TODO analyze based on the actual file, not just the extension! **/
   def fromFile(file: File): Either[Exception, ContentType] = {
     
-    def isReadableTextFile(file: File) =
+    def getIfReadableTextFile(file: File, cType: ContentType): Either[Exception, ContentType] =
       try {
         Source.fromFile(file).getLines.mkString("\n")
-        true
+        Right(cType)
       } catch { 
-        case t: java.nio.charset.MalformedInputException => false
+        case t: java.nio.charset.MalformedInputException => Left(new UnsupportedTextEncodingException)
         case t: Throwable => throw t
       }
     
     val extension = file.getName.substring(file.getName.lastIndexOf('.') + 1).toLowerCase
     extension match {
-      case "txt" =>
-        // Make sure the file has a readable encoding
-        if (isReadableTextFile(file))
-          Right(TEXT_PLAIN)
-        else
-          Left(new UnsupportedTextEncodingException)
+      
+      case "txt" => getIfReadableTextFile(file, TEXT_PLAIN)
+        
+      // case "xml" => getIfReadableTextFile(file, TEXT_TEIXML)
+        
+      case "csv" => getIfReadableTextFile(file, DATA_CSV)
 
       case "jpg" | "jpeg" | "tif" | "tiff" | "png" =>
         if (VIPS_INSTALLED) Right(IMAGE_UPLOAD) else Left(new UnsupportedContentTypeException)
         
-      case "csv" => 
-        if (isReadableTextFile(file))
-          Right(DATA_CSV)
-        else
-          Left(new UnsupportedTextEncodingException)
-
       case _ => Left(new UnsupportedContentTypeException)
+      
     }
 
   }

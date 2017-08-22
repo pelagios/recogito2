@@ -79,28 +79,36 @@ class AnnotationController @Inject() (
     )(implicit request: RequestHeader) = {
     
     logDocumentView(doc.document, Some(currentPart), accesslevel)
+    
+    // Needed in any case - start now (val)
+    val fCountAnnotations = annotations.countByDocId(doc.id)
+    
+    // Needed only for Text and TEI - start on demand (def)
+    def fReadTextfile() = uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile) 
       
     ContentType.withName(currentPart.getContentType) match {
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
-        annotations.countByDocId(doc.id).map(annotationCount =>
-          Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, annotationCount)))
+        fCountAnnotations.map(c => Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c)))
           
       case Some(ContentType.TEXT_PLAIN) =>
-        uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile) flatMap {
+        fReadTextfile() flatMap {
           case Some(content) =>
-            annotations.countByDocId(doc.id).map(annotationCount =>
-              Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, annotationCount, content)))
+            fCountAnnotations.map(c => Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, c, content)))
 
           case None =>
             // Filepart found in DB, but not file on filesystem
             Logger.error("Filepart recorded in the DB is missing on the filesystem: " + doc.ownerName + ", " + doc.id)
             Future.successful(InternalServerError)
         }
+      
+      case Some(ContentType.TEXT_TEIXML) =>
+        fCountAnnotations.map(c =>
+          // TODO need to load the text, so we can render an OG/TC preview snippet 
+          Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, c)))
         
       case Some(ContentType.DATA_CSV) =>
-        annotations.countByDocId(doc.id).map(annotationCount =>
-          Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, annotationCount)))
+        fCountAnnotations.map(c => Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, c)))
 
       case _ =>
         // Unknown content type in DB, or content type we don't have an annotation view for - should never happen

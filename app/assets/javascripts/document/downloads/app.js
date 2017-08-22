@@ -189,7 +189,7 @@ require([
         // It's in the responsibility of the user if they want deal with a mix of tables with
         // different schemas. Recogito will only support the base case.
         dataURL = jsRoutes.controllers.document.DocumentController
-          .getDataTable(Config.documentId, Config.dataPartSequenceNo[0], CSV_SNIPPET_SIZE).absoluteURL(),
+          .getRaw(Config.documentId, Config.dataPartSequenceNo[0], CSV_SNIPPET_SIZE).absoluteURL(),
 
         payloadField = jQuery('.gazetteer #json'),
 
