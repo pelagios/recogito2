@@ -11,13 +11,20 @@ define([
    */
   var TEISelectionHandler = function(rootNode, highlighter) {
 
-    var rangeToAnnotationStub = function(selectedRange) {
-          var rangeBefore = rangy.createRange();
-          // A helper range from the start of the contentNode to the start of the selection
-          rangeBefore.setStart(rootNode, 0);
-          rangeBefore.setEnd(selectedRange.startContainer, selectedRange.startOffset);
+        /** XPath segment where the TEI document starts **/
+    var pathStart = rootNode.nodeName.toLowerCase() + "[@id='" + rootNode.id + "']",
 
-          // TODO use XPath expression instead of char-offset
+        /**
+         * Helper that transforms the CETEIcean-specific DOM XPath to a
+         * normalized XPath with the TEI document only.
+         */
+        toTEIPath = function(domPath) {
+          return '/' + domPath.slice(domPath.indexOf(pathStart) + 1).join('/').replace(/tei-/g, '');
+        },
+
+        rangeToAnnotationStub = function(selectedRange) {
+          var xpath = XPath.getXPath(selectedRange.startContainer),
+              teiPath = toTEIPath(xpath) + ':offset=' + selectedRange.startOffset;
 
           return {
             annotates: {
@@ -25,7 +32,7 @@ define([
               filepart_id: Config.partId,
               content_type: Config.contentType
             },
-            anchor: 'char-offset:' + rangeBefore.toString().length,
+            anchor: teiPath,
             bodies: [
               { type: 'QUOTE', value: selectedRange.toString() }
             ]
