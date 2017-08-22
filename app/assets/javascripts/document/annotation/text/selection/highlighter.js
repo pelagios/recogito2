@@ -240,8 +240,6 @@ define([
          * CSS classes, and attaching the annotation object to the elements.
          */
         convertSelectionToAnnotation = function(selection) {
-          var anchor = selection.annotation.anchor.substr(12);
-
           updateStyles(selection.annotation, selection.spans);
 
           // Add a marker class, so we can quickly retrieve all SPANs linked

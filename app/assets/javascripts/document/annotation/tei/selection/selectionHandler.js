@@ -5,9 +5,9 @@ define([
 ], function(Config, XPath, TextSelectionHandler) {
 
   /**
-   * The TEISelectionHandler is completely identical to the standard text
-   * selection handler, except that it overrides the rangeToAnnotationStub
-   * method, so that anchors are expressed using XPath, rather than through char-offset.
+   * The TEISelectionHandler is identical to the standard text SelectionHandler, except
+   * that it overrides the .rangeToAnnotationStub method, so that anchors are expressed
+   * using XPath, rather than through char-offset.
    */
   var TEISelectionHandler = function(rootNode, highlighter) {
 
@@ -39,9 +39,9 @@ define([
           };
         };
 
-    this.rangeToAnnotationStub = rangeToAnnotationStub;
-
     TextSelectionHandler.apply(this, [ rootNode, highlighter ]);
+    
+    this.rangeToAnnotationStub = rangeToAnnotationStub;
   };
   TEISelectionHandler.prototype = Object.create(TextSelectionHandler.prototype);
 
