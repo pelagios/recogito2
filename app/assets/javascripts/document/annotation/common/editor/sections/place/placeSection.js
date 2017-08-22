@@ -154,7 +154,7 @@ define([
             fillFromURI(placeBody.uri, placeBody.status, lastModified);
           else if (opt_toponym && placeBody.status.value === 'UNVERIFIED')
             // No URI - if the annotation is still UNVERIFIED, fetch a suggestion
-            fillFromToponym(toponym, placeBody.status, lastModified);
+            fillFromToponym(opt_toponym, placeBody.status, lastModified);
           else
             renderNoMatchCard(placeBody.status, lastModified);
         };
