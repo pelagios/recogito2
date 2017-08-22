@@ -40,7 +40,7 @@ define([
         };
 
     TextSelectionHandler.apply(this, [ rootNode, highlighter ]);
-    
+
     this.rangeToAnnotationStub = rangeToAnnotationStub;
   };
   TEISelectionHandler.prototype = Object.create(TextSelectionHandler.prototype);

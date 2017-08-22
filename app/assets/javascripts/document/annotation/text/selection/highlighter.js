@@ -231,7 +231,6 @@ define([
             updateStyles(annotation, spans);
             bindToElements(annotation, spans);
             return bounds;
-
           }, false);
         },
 
