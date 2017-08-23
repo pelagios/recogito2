@@ -12,18 +12,36 @@ define([
     var self = this,
 
         getDOMPosition = function(path) {
+
           var offsetIdx = path.indexOf('::'),
 
-              // CETEIcean-specific: prefix all path elements with 'tei-' - except the last text()!
-              normalized =
-                path.substring(0, offsetIdx)
-                  .replace(/\//g, '/tei-')
-                  .replace('tei-text()', 'text()');
+              // CETEIcean-specific: prefix all path elements with 'tei-'!
+              normalized = path.substring(0, offsetIdx).replace(/\//g, '/tei-'),
 
-              node = document.evaluate(normalized.substring(1),
-                rootNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+              parentNode = document.evaluate(normalized.substring(1),
+                rootNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
 
-              offset = parseInt(path.substring(offsetIdx + 2));
+              node = parentNode.firstChild,
+
+              offset = parseInt(path.substring(offsetIdx + 2)),
+
+              reanchor = function() {
+                var it = document.createNodeIterator(parentNode, NodeFilter.SHOW_TEXT),
+                    currentNode = it.nextNode(),
+                    stop = false;
+
+                do {
+                  if (currentNode.length < offset) {
+                    offset -= currentNode.length;
+                  } else {
+                    node = currentNode;
+                    stop = false;
+                  }
+                  currentNode = it.nextNode();
+                } while (currentNode || stop);
+              };
+
+          if (offset > node.length) reanchor();
 
           return { node: node, offset: offset };
         },
@@ -48,17 +66,12 @@ define([
 
                 range = rangy.createRange(), spans;
 
-            try {
-              range.setStart(fromPosition.node, fromPosition.offset);
-              range.setEnd(toPosition.node, toPosition.offset);
+            range.setStart(fromPosition.node, fromPosition.offset);
+            range.setEnd(toPosition.node, toPosition.offset);
 
-              spans = self.wrapRange(range);
-              self.updateStyles(annotation, spans);
-              self.bindToElements(annotation, spans);
-            } catch (e) {
-              // TODO this happens on overlaps - figure out a solution!
-              console.log('Could not render range');
-            }
+            spans = self.wrapRange(range);
+            self.updateStyles(annotation, spans);
+            self.bindToElements(annotation, spans);
           });
         };
 

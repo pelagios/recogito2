@@ -34,6 +34,8 @@ define([
               endDOMPath = XPath.getXPath(selectedRange.endContainer),
               endTEIPath = toTEIPath(endDOMPath) + '::' + selectedRange.endOffset;
 
+          // TODO change toTEIPath - currently the removal of non-TEI nodes will break the offset!
+
           return {
             annotates: {
               document_id: Config.documentId,
