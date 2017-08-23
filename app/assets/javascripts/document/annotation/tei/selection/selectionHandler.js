@@ -23,8 +23,11 @@ define([
         },
 
         rangeToAnnotationStub = function(selectedRange) {
-          var xpath = XPath.getXPath(selectedRange.startContainer),
-              teiPath = toTEIPath(xpath) + ':offset=' + selectedRange.startOffset;
+          var startDOMPath = XPath.getXPath(selectedRange.startContainer),
+              startTEIPath = toTEIPath(startDOMPath) + '::' + selectedRange.startOffset,
+
+              endDOMPath = XPath.getXPath(selectedRange.endContainer),
+              endTEIPath = toTEIPath(endDOMPath) + '::' + selectedRange.endOffset;
 
           return {
             annotates: {
@@ -32,7 +35,7 @@ define([
               filepart_id: Config.partId,
               content_type: Config.contentType
             },
-            anchor: teiPath,
+            anchor: 'from=' + startTEIPath + ';to=' + endTEIPath,
             bodies: [
               { type: 'QUOTE', value: selectedRange.toString() }
             ]

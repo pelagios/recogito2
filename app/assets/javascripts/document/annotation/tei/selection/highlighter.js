@@ -11,39 +11,49 @@ define([
 
     var self = this,
 
-        getDOMPositions = function(anchor, quote) {
-          var offsetIdx = anchor.indexOf(':offset'),
+        getDOMPosition = function(path) {
+          var offsetIdx = path.indexOf('::'),
 
+              // CETEIcean-specific: prefix all path elements with 'tei-' - except the last text()!
               normalized =
-                anchor.substring(0, offsetIdx).replace(/\//g, '/tei-');
+                path.substring(0, offsetIdx)
+                  .replace(/\//g, '/tei-')
+                  .replace('tei-text()', 'text()');
 
-              startNode = document.evaluate(normalized.substring(1),
+              node = document.evaluate(normalized.substring(1),
                 rootNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
-              startOffset = parseInt(anchor.substring(offsetIdx + 8));
+              offset = parseInt(path.substring(offsetIdx + 2));
 
-          return [ { node: startNode, offset: startOffset } ];
+          return { node: node, offset: offset };
         },
 
         /** Only called from outside, so we can override directly in here **/
         initPage = function(annotations) {
           annotations.forEach(function(annotation) {
             var quote = AnnotationUtils.getQuote(annotation),
-                positions = getDOMPositions(annotation.anchor, quote),
-                range = rangy.createRange(),
-                spans;
 
-            console.log(positions[0]);
+                paths = annotation.anchor.split(';'),
 
-            // range.setStart(positions[0].node, positions[0].offset);
-            // range.setEnd(positions[1].node, positions[1].offset);
+                fromPath = paths.find(function(p) {
+                  return p.indexOf('from=') === 0;
+                }).substring(5),
 
-            /*
+                toPath = paths.find(function(p) {
+                  return p.indexOf('to=') === 0;
+                }).substring(3),
+
+                fromPosition = getDOMPosition(fromPath),
+                toPosition = getDOMPosition(toPath),
+
+                range = rangy.createRange(), spans;
+
+            range.setStart(fromPosition.node, fromPosition.offset);
+            range.setEnd(toPosition.node, toPosition.offset);
+
             spans = self.wrapRange(range);
-
             self.updateStyles(annotation, spans);
             self.bindToElements(annotation, spans);
-            */
           });
         };
 

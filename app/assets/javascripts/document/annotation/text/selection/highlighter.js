@@ -339,6 +339,7 @@ define([
             return { annotation: annotation, bounds: spans[0].getBoundingClientRect() };
         };
 
+    this.bindToElements = bindToElements;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.getAnnotationsAt = getAnnotationsAt;
     this.getAnnotationBefore = getAnnotationBefore;
@@ -347,6 +348,7 @@ define([
     this.initPage = initPage;
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
+    this.updateStyles = updateStyles;
     this.wrapRange = wrapRange;
 
     AbstractHighlighter.apply(this);
