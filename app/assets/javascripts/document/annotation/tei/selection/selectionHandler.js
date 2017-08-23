@@ -19,7 +19,12 @@ define([
          * normalized XPath with the TEI document only.
          */
         toTEIPath = function(domPath) {
-          return '/' + domPath.slice(domPath.indexOf(pathStart) + 1).join('/').replace(/tei-/g, '');
+          // Remove all refs to non-TEI nodes (i.e. those added by the Recogito view)
+          var teiPath = domPath.slice(domPath.indexOf(pathStart) + 1).filter(function(p) {
+                return p.indexOf('tei-') === 0 || p.indexOf('text()') === 0;
+              });
+
+          return '/' + teiPath.join('/').replace(/tei-/g, '');
         },
 
         rangeToAnnotationStub = function(selectedRange) {

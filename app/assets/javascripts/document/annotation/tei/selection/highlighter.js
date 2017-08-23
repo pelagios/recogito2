@@ -48,12 +48,17 @@ define([
 
                 range = rangy.createRange(), spans;
 
-            range.setStart(fromPosition.node, fromPosition.offset);
-            range.setEnd(toPosition.node, toPosition.offset);
+            try {
+              range.setStart(fromPosition.node, fromPosition.offset);
+              range.setEnd(toPosition.node, toPosition.offset);
 
-            spans = self.wrapRange(range);
-            self.updateStyles(annotation, spans);
-            self.bindToElements(annotation, spans);
+              spans = self.wrapRange(range);
+              self.updateStyles(annotation, spans);
+              self.bindToElements(annotation, spans);
+            } catch (e) {
+              // TODO this happens on overlaps - figure out a solution!
+              console.log('Could not render range');
+            }
           });
         };
 
