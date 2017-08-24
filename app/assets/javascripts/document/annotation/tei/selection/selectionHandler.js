@@ -19,16 +19,31 @@ define([
          * normalized XPath with the TEI document only.
          */
         toTEIPaths = function(startPath, endPath, selectedRange) {
-              // Computes the char offset from the end of the XPATH to the given DOM node/offset
-          var getOffsetTo = function(node, offset) {
-                var range = rangy.createRange();
-                range.setStart(selectedRange.startContainer.parentNode, 0);
-                range.setEnd(node, offset);
-                return range.toString().length;
+              // For a given node, returns the closest parent that is a TEI element
+          var getClosestTEIParent = function(node) {
+                var parent = node.parentNode;
+                if (parent.nodeName.toLowerCase().indexOf('tei-') === 0)
+                  return parent;
+                else
+                  return getClosestTEIParent(parent);
               },
 
-              startOffset = getOffsetTo(selectedRange.startContainer, selectedRange.startOffset),
-              endOffset = getOffsetTo(selectedRange.endContainer, selectedRange.endOffset),
+              // Helper to compute char offsets between end of XPATH and given selection bound
+              getOffsetFromTo = function(fromNode, toNode, toOffset) {
+                var range = rangy.createRange();
+                range.setStart(fromNode, 0);
+                range.setEnd(toNode, toOffset);
+                return range.toString().length;
+              },
+              startOffset = getOffsetFromTo(
+                getClosestTEIParent(selectedRange.startContainer),
+                selectedRange.startContainer,
+                selectedRange.startOffset),
+
+              endOffset = getOffsetFromTo(
+                getClosestTEIParent(selectedRange.endContainer),
+                selectedRange.endContainer,
+                selectedRange.endOffset),
 
               // Removes all refs to non-TEI nodes (i.e. those added by the Recogito view)
               fixPath = function(path) {
