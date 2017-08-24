@@ -28,17 +28,17 @@ define([
               reanchor = function() {
                 var it = document.createNodeIterator(parentNode, NodeFilter.SHOW_TEXT),
                     currentNode = it.nextNode(),
-                    stop = false;
+                    run = true;
 
                 do {
                   if (currentNode.length < offset) {
                     offset -= currentNode.length;
                   } else {
                     node = currentNode;
-                    stop = false;
+                    run = false;
                   }
                   currentNode = it.nextNode();
-                } while (currentNode || stop);
+                } while (currentNode && run);
               };
 
           if (offset > node.length) reanchor();

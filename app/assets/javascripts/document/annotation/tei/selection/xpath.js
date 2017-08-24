@@ -34,6 +34,7 @@ define([], function() {
       if(node.nodeType == 1) {
         path.push(node.nodeName.toLowerCase() + (node.id ? "[@id='"+node.id+"']" : count > 0 ? "["+count+"]" : ''));
       }
+
       return path;
     }
 

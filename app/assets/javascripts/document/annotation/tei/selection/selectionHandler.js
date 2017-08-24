@@ -18,23 +18,38 @@ define([
          * Helper that transforms the CETEIcean-specific DOM XPath to a
          * normalized XPath with the TEI document only.
          */
-        toTEIPath = function(domPath) {
-          // Remove all refs to non-TEI nodes (i.e. those added by the Recogito view)
-          var teiPath = domPath.slice(domPath.indexOf(pathStart) + 1).filter(function(p) {
-                return p.indexOf('tei-') === 0 || p.indexOf('text()') === 0;
-              });
+        toTEIPaths = function(startPath, endPath, selectedRange) {
+              // Computes the char offset from the end of the XPATH to the given DOM node/offset
+          var getOffsetTo = function(node, offset) {
+                var range = rangy.createRange();
+                range.setStart(selectedRange.startContainer.parentNode, 0);
+                range.setEnd(node, offset);
+                return range.toString().length;
+              },
 
-          return '/' + teiPath.join('/').replace(/tei-/g, '');
+              startOffset = getOffsetTo(selectedRange.startContainer, selectedRange.startOffset),
+              endOffset = getOffsetTo(selectedRange.endContainer, selectedRange.endOffset),
+
+              // Removes all refs to non-TEI nodes (i.e. those added by the Recogito view)
+              fixPath = function(path) {
+                return path.slice(path.indexOf(pathStart) + 1).reduce(function(xpath, p) {
+                         if (p.indexOf('tei-') === 0)
+                           return xpath + '/' + p.substring(4);
+                         else
+                           return xpath;
+                       }, '');
+              },
+
+              startTEIPath = fixPath(startPath) + '::' + startOffset,
+              endTEIPath = fixPath(endPath) + '::' + endOffset;
+
+          return 'from=' + startTEIPath + ';to=' + endTEIPath;
         },
 
         rangeToAnnotationStub = function(selectedRange) {
           var startDOMPath = XPath.getXPath(selectedRange.startContainer),
-              startTEIPath = toTEIPath(startDOMPath) + '::' + selectedRange.startOffset,
-
               endDOMPath = XPath.getXPath(selectedRange.endContainer),
-              endTEIPath = toTEIPath(endDOMPath) + '::' + selectedRange.endOffset;
-
-          // TODO change toTEIPath - currently the removal of non-TEI nodes will break the offset!
+              teiPaths = toTEIPaths(startDOMPath, endDOMPath, selectedRange);
 
           return {
             annotates: {
@@ -42,7 +57,7 @@ define([
               filepart_id: Config.partId,
               content_type: Config.contentType
             },
-            anchor: 'from=' + startTEIPath + ';to=' + endTEIPath,
+            anchor: teiPaths,
             bodies: [
               { type: 'QUOTE', value: selectedRange.toString() }
             ]
