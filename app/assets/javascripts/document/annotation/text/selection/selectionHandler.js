@@ -10,32 +10,6 @@ define([
 
         currentSelection = false,
 
-        trimRange = function(range) {
-          var quote = range.toString(),
-              leadingSpaces = 0,
-              trailingSpaces = 0;
-
-          // Strip & count leading whitespace, adjust range
-          while (quote.substring(0, 1) === ' ') {
-            leadingSpaces += 1;
-            quote = quote.substring(1);
-          }
-
-          if (leadingSpaces > 0)
-            range.setStart(range.startContainer, range.startOffset + leadingSpaces);
-
-          // Strip & count trailing whitespace, adjust range
-          while (quote.substring(quote.length - 1) === ' ') {
-            trailingSpaces += 1;
-            quote = quote.substring(0, quote.length - 1);
-          }
-
-          if (trailingSpaces > 0)
-            range.setEnd(range.endContainer, range.endOffset - trailingSpaces);
-
-          return range;
-        },
-
         /** Helper that clears the visible selection by 'unwrapping' the created span elements **/
         clearSelection = function() {
           currentSelection = false;
@@ -92,7 +66,7 @@ define([
                selection.rangeCount == 1 &&
                selection.getRangeAt(0).toString().trim().length > 0) {
 
-             selectedRange = trimRange(selection.getRangeAt(0));
+             selectedRange = self.trimRange(selection.getRangeAt(0));
              annotation = self.rangeToAnnotationStub(selectedRange);
              bounds = selectedRange.nativeRange.getBoundingClientRect();
              spans = highlighter.wrapRange(selectedRange);
@@ -178,6 +152,33 @@ define([
         { type: 'QUOTE', value: selectedRange.toString() }
       ]
     };
+  };
+
+  /** We make this method overide-able for the sake of the TEI implementation **/
+  SelectionHandler.prototype.trimRange = function(range) {
+    var quote = range.toString(),
+        leadingSpaces = 0,
+        trailingSpaces = 0;
+
+    // Strip & count leading whitespace, adjust range
+    while (quote.substring(0, 1) === ' ') {
+      leadingSpaces += 1;
+      quote = quote.substring(1);
+    }
+
+    if (leadingSpaces > 0)
+      range.setStart(range.startContainer, range.startOffset + leadingSpaces);
+
+    // Strip & count trailing whitespace, adjust range
+    while (quote.substring(quote.length - 1) === ' ') {
+      trailingSpaces += 1;
+      quote = quote.substring(0, quote.length - 1);
+    }
+
+    if (trailingSpaces > 0)
+      range.setEnd(range.endContainer, range.endOffset - trailingSpaces);
+
+    return range;
   };
 
   return SelectionHandler;
