@@ -2,7 +2,7 @@ name := """recogito2"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.11"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
   cache,
   filters,
 
-  "com.nrinaudo" %% "kantan.csv" % "0.1.15",
+  "com.nrinaudo" %% "kantan.csv" % "0.2.1",
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "2.4.0",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",

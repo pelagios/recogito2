@@ -3,7 +3,9 @@ package controllers.document.downloads.serializers
 import java.io.{ BufferedInputStream, File, FileInputStream, FileOutputStream }
 import java.util.UUID
 import java.util.zip.{ ZipEntry, ZipOutputStream }
+import kantan.csv.CsvConfiguration
 import kantan.csv.ops._
+import kantan.csv.engine._
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.DocumentInfo
 import models.place.{ Place, PlaceService }
@@ -14,6 +16,8 @@ import models.ContentType
 import scala.io.Source
 import models.generated.tables.records.DocumentFilepartRecord
 import controllers.HasCSVParsing
+import kantan.csv.CsvConfiguration.QuotePolicy
+import kantan.csv.CsvConfiguration.Header
 
 trait CSVSerializer extends BaseSerializer with HasCSVParsing {
 
@@ -67,7 +71,8 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
         val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
         
         val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".csv"))
-        val writer = tmp.file.asCsvWriter[Seq[String]](';', header)
+        val config = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(header))
+        val writer = tmp.file.asCsvWriter[Seq[String]](config)
         
         val tupled = sort(annotations.map(_._1)).map(a => serializeOne(a, places))
         tupled.foreach(t => writer.write(t))
@@ -137,9 +142,10 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
           
       val outputFiles = tables.map { case (part, file) =>   
         val header = Source.fromFile(file).getLines.next
-        val delimiter = guessDelimiter(header)        
+        val delimiter = guessDelimiter(header)       
+        val headerConfig = CsvConfiguration(delimiter, '"', QuotePolicy.WhenNeeded, Header.None)
         val headerFields = 
-          header.asCsvReader[Seq[String]](delimiter, header = false).toIterator.next.get ++
+          header.asCsvReader[Seq[String]](headerConfig).toIterator.next.get ++
           Seq( // Additional columns added by Recogito
             "recogito_type",
             "recogito_uri",
@@ -147,7 +153,8 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
             "recogito_lon")
      
         val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".csv"))
-        val writer = tmp.file.asCsvWriter[Seq[String]](delimiter, headerFields)
+        val writerConfig = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(headerFields))
+        val writer = tmp.file.asCsvWriter[Seq[String]](writerConfig)
         
         parseCSV(file, delimiter, header = true, { case (row, idx) =>
           extendRow(row, idx)
