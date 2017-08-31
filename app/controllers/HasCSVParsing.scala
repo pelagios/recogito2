@@ -1,6 +1,8 @@
 package controllers
 
 import java.io.File
+import kantan.csv.CsvConfiguration
+import kantan.csv.CsvConfiguration.{ Header, QuotePolicy }
 import kantan.csv.ops._
 import kantan.codecs.Result.Success
 import models.annotation.Annotation
@@ -38,18 +40,20 @@ trait HasCSVParsing {
           .next()
           
       val delimiter = guessDelimiter(header)
-      
-      val headerFields = header.asCsvReader[Seq[String]](delimiter, header = false).toIterator.next.get
-      val lineFields = line.asCsvReader[Seq[String]](delimiter, header = false).toIterator.next.get
+      val config = CsvConfiguration(delimiter, '"', QuotePolicy.WhenNeeded, Header.None)
+      val headerFields = header.asCsvReader[Seq[String]](config).toIterator.next.get
+      val lineFields = line.asCsvReader[Seq[String]](config).toIterator.next.get
       
       headerFields.zip(lineFields).toMap
     }
   }
   
   protected def parseCSV[T](file: File, delimiter: Char, header: Boolean, op: (List[String], Int) => T) = {
+    val h = if (header) Header.Implicit else Header.None
+    val config = CsvConfiguration(delimiter, '"', QuotePolicy.WhenNeeded, h)
     var rowCounter = 0
     
-    file.asCsvReader[List[String]](delimiter, header).map {
+    file.asCsvReader[List[String]](config).map {
       case Success(row) =>
         val t = Some(op(row, rowCounter))
         rowCounter += 1

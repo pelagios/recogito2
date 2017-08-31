@@ -3,6 +3,8 @@ package transform.georesolution
 import akka.actor.Actor
 import com.vividsolutions.jts.geom.Coordinate
 import java.io.File
+import kantan.csv.CsvConfiguration
+import kantan.csv.CsvConfiguration.{ Header, QuotePolicy }
 import kantan.csv.ops._
 import kantan.codecs.Result.Success
 import models.annotation.AnnotationService
@@ -57,14 +59,15 @@ private[georesolution] class GeoresolutionWorkerActor(
   }
   
   private def parse() = {
-    val delimiter = args.get("delimiter").map(_.charAt(0)).getOrElse(',')    
+    val delimiter = args.get("delimiter").map(_.charAt(0)).getOrElse(',')
+    val config = CsvConfiguration(delimiter, '"', QuotePolicy.WhenNeeded, Header.Implicit)
     val toponymColumn = args.get("toponym_column").get.toInt // Must be set - if not, fail
     
     val latColumn = args.get("lat_column").map(_.toInt)
     val lonColumn = args.get("lon_column").map(_.toInt)
     val hasCoordHint = latColumn.isDefined && lonColumn.isDefined
     
-    new File(documentDir, part.getFile).asCsvReader[List[String]](delimiter, header = true).map {
+    new File(documentDir, part.getFile).asCsvReader[List[String]](config).map {
       case Success(line) =>
         val toponym = line(toponymColumn).trim()
         
