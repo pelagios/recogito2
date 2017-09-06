@@ -20,6 +20,7 @@ libraryDependencies ++= Seq(
   filters,
 
   "com.nrinaudo" %% "kantan.csv" % "0.2.1",
+  "com.nrinaudo" %% "kantan.csv-commons" % "0.2.1",
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "2.4.0",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
   "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",

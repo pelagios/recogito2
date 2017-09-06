@@ -7,6 +7,7 @@ import java.util.zip.{ ZipEntry, ZipOutputStream }
 import kantan.csv.CsvConfiguration
 import kantan.csv.CsvConfiguration.{ Header, QuotePolicy }
 import kantan.csv.ops._
+import kantan.csv.engine.commons._
 import models.ContentType
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.DocumentInfo
