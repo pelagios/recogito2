@@ -2,9 +2,10 @@ define(['common/ui/countries'], function(Countries) {
 
   // TODO fetch this information from the server, so we can feed it from the DB
   var KNOWN_GAZETTEERS = [
-        { shortcode: 'pleiades', url_patterns: [ 'http://pleiades.stoa.org/places/' ], color: '#1f77b4' },
+        { shortcode: 'chgis', url_patterns: [ 'http://maps.cga.harvard.edu/tgaz/placename/hvd_' ], color: '#9467bd' },
         { shortcode: 'dare', url_patterns: [ 'http://dare.ht.lu.se/places/' ], color: '#ff7f0e' },
         { shortcode: 'geonames', url_patterns: ['http://sws.geonames.org/'], color: '#2ca02c' },
+        { shortcode: 'pleiades', url_patterns: [ 'http://pleiades.stoa.org/places/' ], color: '#1f77b4' },
         { shortcode: 'dpp', url_patterns: [ 'http://dpp.oeaw.ac.at/places/dpp_places.xls#' ], color: '#efca10' }
       ],
 
