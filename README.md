@@ -43,7 +43,7 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
   need to be logged in with a user that has administrator privileges (e.g. the default 'recogito').
 * __WARNING__ the admin pages are work in progress. Don't expect any fancy functionality or styling
   there yet! Importing gazetteers can take a while, and there is no progress display yet. Bear with
-  us. You can track progress through Recogito's JSON Place API at [http://localhost:9000/api/places/search?q=*&pretty=true](http://localhost:9000/api/places/search?q=*&pretty=true)
+  us. You can track progress through Recogito's JSON Place API at [http://localhost:9000/api/place/search?q=*&pretty=true](http://localhost:9000/api/place/search?q=*&pretty=true)
 * It's not possible to upload controlled vocabularies for persons, periods or events yet.
 
 ## Running in production
