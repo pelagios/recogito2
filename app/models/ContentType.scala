@@ -76,7 +76,7 @@ object ContentType {
       
       case "txt" => getIfReadableTextFile(file, TEXT_PLAIN)
         
-      // case "xml" => getIfReadableTextFile(file, TEXT_TEIXML)
+      case "xml" => getIfReadableTextFile(file, TEXT_TEIXML)
         
       case "csv" => getIfReadableTextFile(file, DATA_CSV)
 
