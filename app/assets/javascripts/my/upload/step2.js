@@ -30,7 +30,8 @@ require(['common/config'], function(Config) {
           var uploadsInList = jQuery('.dz-preview'),
               textUploads = jQuery.grep(uploadsInList, function(el) {
                 var contentType = jQuery(el).data('type');
-                return contentType && contentType.indexOf('TEXT_') === 0;
+                // Note: we don't currently support NER for TEI text
+                return contentType && contentType.indexOf('TEXT_PLAIN') === 0;
               });
 
           return textUploads.length > 0;
@@ -87,7 +88,7 @@ require(['common/config'], function(Config) {
           var uploadDiv = jQuery(e.target).closest('.dz-preview'),
               filename = (e.name) ? e.name : uploadDiv.find('.dz-filename').text();
 
-          jsRoutes.controllers.my.upload.UploadController.deleteFilepart(Config.owner, filename).ajax({
+          jsRoutes.controllers.my.UploadController.deleteFilepart(Config.owner, filename).ajax({
             success: function(result) {
               uploadDiv.remove();
               refresh();

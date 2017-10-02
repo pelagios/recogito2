@@ -20,6 +20,7 @@ import play.api.libs.functional.syntax._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.implicitConversions
 import transform.ner.NERService
+import transform.tei.TEIParserService
 import transform.tiling.TilingService
 
 case class UploadSuccess(contentType: String)
@@ -34,6 +35,7 @@ class UploadController @Inject() (
     val taskService: TaskService,
     val uploads: UploadService,
     val tilingService: TilingService,
+    val teiParserService: TEIParserService,
     val nerService: NERService,
     val messagesApi: MessagesApi,
     implicit val webjars: WebJarAssets,
@@ -181,6 +183,8 @@ class UploadController @Inject() (
           uploads.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
             // We'll forward a list of the running processing tasks to the view, so it can show progress
             val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]
+            
+            // TODO this bit should be cleaned up
 
             // Apply NER if requested
             val applyNER = checkParamValue("apply-ner", "on")
@@ -194,6 +198,13 @@ class UploadController @Inject() (
             if (imageParts.size > 0) {
               tilingService.spawnTask(doc, imageParts)
               runningTasks.append(TilingService.TASK_TYPE)
+            }
+            
+            // Parse TEI
+            val teiParts = docParts.filter(_.getContentType.equals(ContentType.TEXT_TEIXML.toString))
+            if (teiParts.size > 0) {
+              teiParserService.spawnTask(doc, teiParts)
+              runningTasks.append(TEIParserService.TASK_TYPE)              
             }
 
             Ok(views.html.my.upload.step3(usernameInPath, doc, docParts, runningTasks))
