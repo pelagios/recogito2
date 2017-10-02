@@ -37,6 +37,8 @@ private[tei] class TEIParserWorkerActor(
         
         // TODO import annotations to index
         
+        // play.api.Logger.info("Completed.")
+        
         taskService.setCompleted(taskId)
         origSender ! Stopped
       } recover { case t: Throwable =>
