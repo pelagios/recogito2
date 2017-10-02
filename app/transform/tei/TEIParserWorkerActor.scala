@@ -2,16 +2,19 @@ package transform.tei
 
 import akka.actor.Actor
 import java.io.File
+import models.annotation.AnnotationService
 import models.generated.tables.records.DocumentRecord
 import models.generated.tables.records.DocumentFilepartRecord
 import models.task.{ TaskService, TaskStatus }
 import scala.concurrent.{ Await, ExecutionContext } 
 import scala.concurrent.duration._
+import play.api.Logger
 
 private[tei] class TEIParserWorkerActor(
     document: DocumentRecord,
     part: DocumentFilepartRecord,
     documentDir: File,
+    annotationService: AnnotationService,
     taskService: TaskService,
     implicit val ctx: ExecutionContext) extends Actor {
   
@@ -33,20 +36,23 @@ private[tei] class TEIParserWorkerActor(
         
       taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
       
-      TEIParserService.extractEntities(new File(documentDir, part.getFile)).map { entities =>
-        
-        // TODO import annotations to index
-        
-        play.api.Logger.info("Completed.")
-        entities.foreach { e => play.api.Logger.info(e.toString) }
-        
-        taskService.setCompleted(taskId)
-        origSender ! Stopped
-      } recover { case t: Throwable =>
-        t.printStackTrace
-        taskService.setFailed(taskId, Some(t.getMessage))
-        origSender ! Stopped 
-      }
+      TEIParserService.extractEntities(part, new File(documentDir, part.getFile))
+        .flatMap(annotationService.insertOrUpdateAnnotations(_)).map { failed =>
+          if (failed.size == 0) {
+            taskService.setCompleted(taskId)
+          } else {
+            val msg = "Failed to store " + failed.size + " annotations"
+            Logger.warn(msg)
+            failed.foreach(a => Logger.warn(a.toString))
+            taskService.setFailed(taskId, Some(msg))
+          }
+            
+          origSender ! Stopped
+        } recover { case t: Throwable =>
+          t.printStackTrace
+          taskService.setFailed(taskId, Some(t.getMessage))
+          origSender ! Stopped 
+        }
     }
 
   }

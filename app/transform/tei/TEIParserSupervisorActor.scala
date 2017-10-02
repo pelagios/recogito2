@@ -3,6 +3,7 @@ package transform.tei
 import akka.actor.Props
 import java.io.File
 import models.ContentType
+import models.annotation.AnnotationService
 import models.task.TaskService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.ExecutionContext
@@ -13,6 +14,7 @@ private[tei] class TEIParserSupervisorActor(
     document   : DocumentRecord,
     parts      : Seq[DocumentFilepartRecord],
     documentDir: File,
+    annotations: AnnotationService,
     taskService: TaskService,
     keepalive  : FiniteDuration,
     ctx        : ExecutionContext
@@ -36,6 +38,7 @@ private[tei] class TEIParserSupervisorActor(
           document,
           part,
           dir,
+          annotations,
           taskService,
           ctx),
         name = "tei.doc." + document.getId + ".part." + part.getId))

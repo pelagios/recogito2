@@ -2,11 +2,14 @@ package transform.tei
 
 import akka.actor.{ ActorSystem, Props }
 import java.io.File
+import java.util.UUID
 import javax.inject.{ Inject, Singleton }
-import models.annotation.AnnotationBody
+import models.annotation._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.task.{ TaskType, TaskService }
+import org.joda.time.DateTime
 import org.joox.JOOX._
+import org.w3c.dom.Node
 import scala.collection.JavaConversions._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
@@ -15,30 +18,56 @@ import storage.Uploads
 import transform.{ TransformService, TransformTaskMessages }
 import java.io.FileInputStream
 import java.io.PrintWriter
-import org.w3c.dom.Node
-
-case class TEIEntity(entityType: AnnotationBody.Type, quote: String, ref: Option[String], anchor: String)
+import models.ContentType
 
 object TEIParserService {
   
   val TASK_TYPE = TaskType("TEI_PARSING")
   
-  /** XPath will have a form like:
-    *
-    *    /TEI[1]/text[1]/body[1]/div[1]/p[1]/placeName[1]
-    *
-    * We need to remove the last segment (because it will be removed from the
-    * DOM) and add the character offset.
-    *  
-    */
-  private[tei] def toAnchor(xpath: String, fromOffset: Int, toOffset: Int) = {
-    val path = xpath.substring(0, xpath.lastIndexOf('/')).toLowerCase
+  private def toAnnotation(part: DocumentFilepartRecord, entityType: AnnotationBody.Type, quote: String, ref: Option[String], anchor: String) = {
+    val now = DateTime.now
     
-    // TODO just a temporary hack
-    "from=" + path + "::" + fromOffset + ";to=" + path + "::" + toOffset 
+    Annotation(
+      UUID.randomUUID,
+      UUID.randomUUID,     
+      AnnotatedObject(
+        part.getDocumentId,
+        part.getId,
+        ContentType.TEXT_TEIXML),
+      Seq.empty[String], // contributors    
+      anchor,
+      None, // lastModifiedBy
+      now, // lastModifiedAt
+      Seq(
+        AnnotationBody(
+          AnnotationBody.QUOTE,
+          None,  // lastModifiedBy
+          now,   // lastModifiedAt
+          Some(quote),
+          None,  // uri
+          None), // status
+          
+        AnnotationBody(
+          entityType,
+          None, // lastModifiedBy
+          now,  // lastModifiedAt
+          None, // value
+          ref,
+          Some(AnnotationStatus(
+            AnnotationStatus.VERIFIED,
+            None,   // setBy
+            now))) // setAt          
+      )
+    )
   }
   
-  def extractEntities(file: File, replaceOriginalFile: Boolean = true)(implicit ctx: ExecutionContext): Future[Seq[TEIEntity]] = Future {
+  def extractEntities(part: DocumentFilepartRecord, file: File, replaceOriginalFile: Boolean = true)(implicit ctx: ExecutionContext): Future[Seq[Annotation]] = Future {
+    
+    def toAnchor(xpath: String, fromOffset: Int, toOffset: Int) = {
+      val path = xpath.substring(0, xpath.lastIndexOf('/')).toLowerCase
+      "from=" + path + "::" + fromOffset + ";to=" + path + "::" + toOffset 
+    }
+    
     // JOOX uses mutable data structures - create a working copy
     val teiXML = $(file).document()
     
@@ -58,7 +87,7 @@ object TEIParserService {
 
       // Convert to standoff annotation and remove from XML DOM
       $(el).replaceWith(text)   
-      TEIEntity(AnnotationBody.PLACE, text, ref, anchor)  
+      toAnnotation(part, AnnotationBody.PLACE, text, ref, anchor)
     }
     
     if (replaceOriginalFile)
@@ -73,7 +102,7 @@ object TEIParserService {
 }
 
 @Singleton
-class TEIParserService @Inject() (uploads: Uploads, taskService: TaskService, ctx: ExecutionContext) extends TransformService {
+class TEIParserService @Inject() (uploads: Uploads, annotationService: AnnotationService, taskService: TaskService, ctx: ExecutionContext) extends TransformService {
 
   override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String])(implicit system: ActorSystem): Unit =
     spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get, 10.minutes)
@@ -90,6 +119,7 @@ class TEIParserService @Inject() (uploads: Uploads, taskService: TaskService, ct
         document,
         parts,
         sourceFolder,
+        annotationService,
         taskService,
         keepalive,
         ctx),
