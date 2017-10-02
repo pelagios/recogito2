@@ -18,7 +18,7 @@ class TEIParserServiceSpec extends Specification {
     
   "The NER parse function" should {
     
-    val entities = Await.result(TEIParserService.extractEntities(TEST_TEI), 60 seconds)
+    val entities = Await.result(TEIParserService.extractEntities(TEST_TEI, false), 60 seconds)
     
     // TODO implement
     "just work" in {

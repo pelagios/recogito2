@@ -33,11 +33,12 @@ private[tei] class TEIParserWorkerActor(
         
       taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
       
-      TEIParserService.extractEntities(new File(documentDir, part.getFile)).map { annotations =>
+      TEIParserService.extractEntities(new File(documentDir, part.getFile)).map { entities =>
         
         // TODO import annotations to index
         
-        // play.api.Logger.info("Completed.")
+        play.api.Logger.info("Completed.")
+        entities.foreach { e => play.api.Logger.info(e.toString) }
         
         taskService.setCompleted(taskId)
         origSender ! Stopped

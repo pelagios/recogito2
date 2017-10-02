@@ -14,32 +14,59 @@ import scala.xml.XML
 import storage.Uploads
 import transform.{ TransformService, TransformTaskMessages }
 import java.io.FileInputStream
+import java.io.PrintWriter
+import org.w3c.dom.Node
 
-case class TEIEntity(entityType: AnnotationBody.Type, quote: String, xpath: String)
+case class TEIEntity(entityType: AnnotationBody.Type, quote: String, ref: Option[String], anchor: String)
 
 object TEIParserService {
   
   val TASK_TYPE = TaskType("TEI_PARSING")
   
-  def extractEntities(file: File)(implicit ctx: ExecutionContext): Future[Seq[TEIEntity]] = Future {
-    val teiBefore = $(file).document()
+  /** XPath will have a form like:
+    *
+    *    /TEI[1]/text[1]/body[1]/div[1]/p[1]/placeName[1]
+    *
+    * We need to remove the last segment (because it will be removed from the
+    * DOM) and add the character offset.
+    *  
+    */
+  private[tei] def toAnchor(xpath: String, fromOffset: Int, toOffset: Int) = {
+    val path = xpath.substring(0, xpath.lastIndexOf('/')).toLowerCase
     
+    // TODO just a temporary hack
+    "from=" + path + "::" + fromOffset + ";to=" + path + "::" + toOffset 
+  }
+  
+  def extractEntities(file: File, replaceOriginalFile: Boolean = true)(implicit ctx: ExecutionContext): Future[Seq[TEIEntity]] = Future {
     // JOOX uses mutable data structures - create a working copy
-    val teiAfter = $(file).document()
+    val teiXML = $(file).document()
     
-    val places = $(teiAfter).find("placeName").get.map { el =>
-      val text = el.getTextContent
+    val places = $(teiXML).find("placeName").get.map { el =>
       val xpath = $(el).xpath
+      val text = el.getTextContent
+      val offset = el.getPreviousSibling match { 
+        case n if n.getNodeType == Node.TEXT_NODE => n.getTextContent.size
+        case _ => 0
+      }
+      val anchor = toAnchor(xpath, offset, offset + text.size)
       
-      $(el).replaceWith(text)
-      
-      TEIEntity(AnnotationBody.PLACE, text, xpath)
+      val ref = el.getAttribute("ref") match {
+        case s if s.isEmpty => None
+        case s => Some(s)
+      }
+
+      // Convert to standoff annotation and remove from XML DOM
+      $(el).replaceWith(text)   
+      TEIEntity(AnnotationBody.PLACE, text, ref, anchor)  
     }
     
-    // TODO repeat for personName
-    play.api.Logger.info($(teiAfter).toString)
-    
-      
+    if (replaceOriginalFile)
+      new PrintWriter(file.getAbsolutePath)  { 
+        write($(teiXML).toString)
+        close
+      }
+   
     places
   }
   
