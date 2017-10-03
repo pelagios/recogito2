@@ -21,6 +21,7 @@ import play.api.http.HttpEntity
 import play.api.libs.streams.Streams
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
+import models.ContentType
 
 case class FieldMapping(
   
@@ -66,7 +67,8 @@ class DownloadsController @Inject() (
       with CSVSerializer
       with GeoJSONSerializer
       with RDFSerializer
-      with tei.PlaintextSerializer {
+      with tei.PlaintextSerializer
+      with tei.TEISerializer {
   
   private def download(documentId: String, export: DocumentInfo => Future[Result])(implicit request: RequestWithAttributes[AnyContent]) = {
     val maybeUser = loggedIn.map(_.user)
@@ -150,7 +152,22 @@ class DownloadsController @Inject() (
   
   def downloadTEI(documentId: String) = AsyncStack { implicit request =>
     download(documentId, { doc =>
-      documentToTEI(doc).map(xml => Ok(xml).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".tei.xml" }))
+      val contentTypes = doc.fileparts.flatMap(pt => ContentType.withName(pt.getContentType)).distinct
+      
+      // At the moment, we only support TEI download for documents that are either plaintext- or TEI-only
+      if (contentTypes.size != 1) {
+        Future.successful(BadRequest("unsupported document content type(s)"))
+      } else if (!contentTypes.head.isText) {
+        Future.successful(BadRequest("unsupported document content type(s)"))
+      } else {
+        val f = contentTypes.head match {
+          case ContentType.TEXT_PLAIN => plaintextToTEI(doc)
+          case ContentType.TEXT_TEIXML => teiToTEI(doc)
+          case _ => throw new Exception // Can't happen under current conditions (and should fail in the future if things go wrong)
+        }
+        
+        f.map(xml => Ok(xml).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".tei.xml" }))
+      }
     })
   }
 

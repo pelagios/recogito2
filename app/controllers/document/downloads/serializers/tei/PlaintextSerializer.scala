@@ -70,7 +70,7 @@ trait PlaintextSerializer extends BaseSerializer {
     ranges._1 :+ new Text(remainder)
   }
   
-  def documentToTEI(docInfo: DocumentInfo)(implicit documentService: DocumentService,
+  def plaintextToTEI(docInfo: DocumentInfo)(implicit documentService: DocumentService,
       uploads: Uploads, annotationService: AnnotationService, ctx: ExecutionContext) = {
     
     val fTexts = Future.sequence {
