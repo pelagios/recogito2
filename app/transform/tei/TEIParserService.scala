@@ -81,7 +81,7 @@ object TEIParserService {
       val quote = el.getTextContent
       val xpath = $(el).xpath
       val anchor = toAnchor(xpath, offset, offset + quote.size)
-            
+
       val ref = el.getAttribute("ref") match {
         case s if s.isEmpty => None
         case s => Some(s)
