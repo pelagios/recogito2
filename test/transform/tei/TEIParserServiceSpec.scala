@@ -27,18 +27,18 @@ class TEIParserServiceSpec extends Specification {
         
   val EXPECTED_ENTITIES = Seq(
     // Places
-    ("from=/tei/text/body/div/p::107;to=/tei/text/body/div/p::111",   "Troy"),
-    ("from=/tei/text/body/div/p::947;to=/tei/text/body/div/p::953",   "Ithaca"),
-    ("from=/tei/text/body/div/p::3016;to=/tei/text/body/div/p::3020", "Troy"),
-    ("from=/tei/text/body/div/p::3976;to=/tei/text/body/div/p::3990", "Ogygian island"),
-    ("from=/tei/text/body/div/p::4093;to=/tei/text/body/div/p::4099", "Ithaca"),
-    ("from=/tei/text/body/div/p::4337;to=/tei/text/body/div/p::4343", "Sparta"),
-    ("from=/tei/text/body/div/p::4351;to=/tei/text/body/div/p::4356", "Pylos"),
+    ("from=/tei/text/body/div/p::127;to=/tei/text/body/div/p::131",       "Troy"),
+    ("from=/tei/text/body/div/p[2]::401;to=/tei/text/body/div/p[2]::407", "Ithaca"),
+    ("from=/tei/text/body/div/p[5]::987;to=/tei/text/body/div/p[5]::991", "Troy"),
+    ("from=/tei/text/body/div/p[7]::182;to=/tei/text/body/div/p[7]::196", "Ogygian island"),
+    ("from=/tei/text/body/div/p[7]::329;to=/tei/text/body/div/p[7]::335", "Ithaca"),
+    ("from=/tei/text/body/div/p[7]::613;to=/tei/text/body/div/p[7]::619", "Sparta"),
+    ("from=/tei/text/body/div/p[7]::637;to=/tei/text/body/div/p[7]::642", "Pylos"),
     // People
-    ("from=/tei/text/body/div/p::445;to=/tei/text/body/div/p::453", "Hyperion"),
-    ("from=/tei/text/body/div/p::689;to=/tei/text/body/div/p::696", "Ulysses"),
-    ("from=/tei/text/body/div/p::791;to=/tei/text/body/div/p::798", "Calypso"),
-    ("from=/tei/text/body/div/p::3202;to=/tei/text/body/div/p::3209", "Ulysses"))
+    ("from=/tei/text/body/div/p::515;to=/tei/text/body/div/p::523",       "Hyperion"),
+    ("from=/tei/text/body/div/p[2]::103;to=/tei/text/body/div/p[2]::110", "Ulysses"),
+    ("from=/tei/text/body/div/p[2]::215;to=/tei/text/body/div/p[2]::222", "Calypso"),
+    ("from=/tei/text/body/div/p[6]::92;to=/tei/text/body/div/p[6]::99",   "Ulysses"))
     
   "The TEI parser" should {
     
