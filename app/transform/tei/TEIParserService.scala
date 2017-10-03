@@ -19,6 +19,7 @@ import transform.{ TransformService, TransformTaskMessages }
 import java.io.FileInputStream
 import java.io.PrintWriter
 import models.ContentType
+import org.w3c.dom.ranges.DocumentRange
 
 object TEIParserService {
   
@@ -73,15 +74,17 @@ object TEIParserService {
     
     // JOOX uses mutable data structures - create a working copy
     val teiXML = $(file).document()
+    val ranges = teiXML.asInstanceOf[DocumentRange]
     
     val places = $(teiXML).find("placeName").get.map { el =>
+      val rangeBefore = ranges.createRange()
+      rangeBefore.setStart(el.getParentNode, 0)
+      rangeBefore.setEnd(el, 0)
+      
+      val offset = rangeBefore.toString.size
+      val quote = el.getTextContent
       val xpath = $(el).xpath
-      val text = el.getTextContent
-      val offset = el.getPreviousSibling match { 
-        case n if n.getNodeType == Node.TEXT_NODE => n.getTextContent.size
-        case _ => 0
-      }
-      val anchor = toAnchor(xpath, offset, offset + text.size)
+      val anchor = toAnchor(xpath, offset, offset + quote.size)
       
       val ref = el.getAttribute("ref") match {
         case s if s.isEmpty => None
@@ -89,8 +92,8 @@ object TEIParserService {
       }
 
       // Convert to standoff annotation and remove from XML DOM
-      $(el).replaceWith(text)   
-      toAnnotation(part, AnnotationBody.PLACE, text, ref, anchor)
+      $(el).replaceWith(quote)   
+      toAnnotation(part, AnnotationBody.PLACE, quote, ref, anchor)
     }
     
     if (replaceOriginalFile)

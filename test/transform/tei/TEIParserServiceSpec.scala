@@ -29,7 +29,7 @@ class TEIParserServiceSpec extends Specification {
     ("from=/tei/text/body/div/p::107;to=/tei/text/body/div/p::111",   "Troy"),
     ("from=/tei/text/body/div/p::947;to=/tei/text/body/div/p::953",   "Ithaca"),
     ("from=/tei/text/body/div/p::3016;to=/tei/text/body/div/p::3020", "Troy"),
-    ("from=/tei/text/body/div/p::3976;to=/tei/text/body/div/p::3990", "Ogygian Island"),
+    ("from=/tei/text/body/div/p::3976;to=/tei/text/body/div/p::3990", "Ogygian island"),
     ("from=/tei/text/body/div/p::4093;to=/tei/text/body/div/p::4099", "Ithaca"),
     ("from=/tei/text/body/div/p::4337;to=/tei/text/body/div/p::4343", "Sparta"),
     ("from=/tei/text/body/div/p::4351;to=/tei/text/body/div/p::4356", "Pylos"))
