@@ -1,25 +1,23 @@
 package transform.tei
 
 import akka.actor.{ ActorSystem, Props }
-import java.io.File
+import java.io.{ File, PrintWriter }
 import java.util.UUID
 import javax.inject.{ Inject, Singleton }
+import models.ContentType
 import models.annotation._
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.task.{ TaskType, TaskService }
 import org.joda.time.DateTime
 import org.joox.JOOX._
 import org.w3c.dom.Node
+import org.w3c.dom.ranges.DocumentRange
 import scala.collection.JavaConversions._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.xml.XML
 import storage.Uploads
 import transform.{ TransformService, TransformTaskMessages }
-import java.io.FileInputStream
-import java.io.PrintWriter
-import models.ContentType
-import org.w3c.dom.ranges.DocumentRange
 
 object TEIParserService {
   
