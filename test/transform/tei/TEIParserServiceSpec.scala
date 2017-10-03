@@ -26,13 +26,27 @@ class TEIParserServiceSpec extends Specification {
   val TEST_FILE = new File("test/resources/transform/tei/odyssey.tei.xml")
         
   val EXPECTED_ENTITIES = Seq(
+    // Places
     ("from=/tei/text/body/div/p::107;to=/tei/text/body/div/p::111",   "Troy"),
     ("from=/tei/text/body/div/p::947;to=/tei/text/body/div/p::953",   "Ithaca"),
     ("from=/tei/text/body/div/p::3016;to=/tei/text/body/div/p::3020", "Troy"),
     ("from=/tei/text/body/div/p::3976;to=/tei/text/body/div/p::3990", "Ogygian island"),
     ("from=/tei/text/body/div/p::4093;to=/tei/text/body/div/p::4099", "Ithaca"),
     ("from=/tei/text/body/div/p::4337;to=/tei/text/body/div/p::4343", "Sparta"),
-    ("from=/tei/text/body/div/p::4351;to=/tei/text/body/div/p::4356", "Pylos"))
+    ("from=/tei/text/body/div/p::4351;to=/tei/text/body/div/p::4356", "Pylos"),
+    // People
+    ("from=/tei/text/body/div/p::445;to=/tei/text/body/div/p::453", "Hyperion"),
+    ("from=/tei/text/body/div/p::689;to=/tei/text/body/div/p::696", "Ulysses"),
+    ("from=/tei/text/body/div/p::791;to=/tei/text/body/div/p::798", "Calypso"),
+    ("from=/tei/text/body/div/p::3202;to=/tei/text/body/div/p::3209", "Ulysses"))
+    
+    
+    /*
+[[37minfo[0m] - application - 
+[[37minfo[0m] - application - from=/tei/text/body/div/p::689;to=/tei/text/body/div/p::696
+[[37minfo[0m] - application - from=/tei/text/body/div/p::791;to=/tei/text/body/div/p::798
+[[37minfo[0m] - application - from=/tei/text/body/div/p::3202;to=/tei/text/body/div/p::3209
+     */
 
   "The TEI parser" should {
     

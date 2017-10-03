@@ -10,7 +10,7 @@ import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord 
 import models.task.{ TaskType, TaskService }
 import org.joda.time.DateTime
 import org.joox.JOOX._
-import org.w3c.dom.Node
+import org.w3c.dom.{ Element, Node }
 import org.w3c.dom.ranges.DocumentRange
 import scala.collection.JavaConversions._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -61,6 +61,8 @@ object TEIParserService {
   }
   
   def extractEntities(part: DocumentFilepartRecord, file: File, replaceOriginalFile: Boolean = true)(implicit ctx: ExecutionContext): Future[Seq[Annotation]] = Future {
+    val teiXML = $(file).document()
+    val ranges = teiXML.asInstanceOf[DocumentRange]
     
     def toAnchor(xpath: String, fromOffset: Int, toOffset: Int) = {
       val path = 
@@ -70,11 +72,7 @@ object TEIParserService {
       "from=" + path + "::" + fromOffset + ";to=" + path + "::" + toOffset 
     }
     
-    // JOOX uses mutable data structures - create a working copy
-    val teiXML = $(file).document()
-    val ranges = teiXML.asInstanceOf[DocumentRange]
-    
-    val places = $(teiXML).find("placeName").get.map { el =>
+    def convertEntity(entityType: AnnotationBody.Type, el: Element) = {
       val rangeBefore = ranges.createRange()
       rangeBefore.setStart(el.getParentNode, 0)
       rangeBefore.setEnd(el, 0)
@@ -83,7 +81,7 @@ object TEIParserService {
       val quote = el.getTextContent
       val xpath = $(el).xpath
       val anchor = toAnchor(xpath, offset, offset + quote.size)
-      
+            
       val ref = el.getAttribute("ref") match {
         case s if s.isEmpty => None
         case s => Some(s)
@@ -91,8 +89,11 @@ object TEIParserService {
 
       // Convert to standoff annotation and remove from XML DOM
       $(el).replaceWith(quote)   
-      toAnnotation(part, AnnotationBody.PLACE, quote, ref, anchor)
+      toAnnotation(part, entityType, quote, ref, anchor)
     }
+    
+    val places = $(teiXML).find("placeName").get.map(convertEntity(AnnotationBody.PLACE, _))
+    val people = $(teiXML).find("personName").get.map(convertEntity(AnnotationBody.PERSON, _))
     
     if (replaceOriginalFile)
       new PrintWriter(file.getAbsolutePath)  { 
@@ -100,7 +101,7 @@ object TEIParserService {
         close
       }
    
-    places
+    places ++ people
   }
   
 }
