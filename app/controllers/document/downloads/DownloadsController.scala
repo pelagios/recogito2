@@ -66,7 +66,7 @@ class DownloadsController @Inject() (
       with CSVSerializer
       with GeoJSONSerializer
       with RDFSerializer
-      with TEISerializer {
+      with tei.PlaintextSerializer {
   
   private def download(documentId: String, export: DocumentInfo => Future[Result])(implicit request: RequestWithAttributes[AnyContent]) = {
     val maybeUser = loggedIn.map(_.user)
