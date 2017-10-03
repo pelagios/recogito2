@@ -64,7 +64,10 @@ object TEIParserService {
   def extractEntities(part: DocumentFilepartRecord, file: File, replaceOriginalFile: Boolean = true)(implicit ctx: ExecutionContext): Future[Seq[Annotation]] = Future {
     
     def toAnchor(xpath: String, fromOffset: Int, toOffset: Int) = {
-      val path = xpath.substring(0, xpath.lastIndexOf('/')).toLowerCase
+      val path = 
+        xpath.substring(0, xpath.lastIndexOf('/')).toLowerCase
+          .replaceAll("\\[1\\]", "") // Selecting first is redundant (and browser clients don't do it)
+        
       "from=" + path + "::" + fromOffset + ";to=" + path + "::" + toOffset 
     }
     
