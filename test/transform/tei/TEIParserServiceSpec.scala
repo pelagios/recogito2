@@ -40,20 +40,19 @@ class TEIParserServiceSpec extends Specification {
     ("from=/tei/text/body/div/p::791;to=/tei/text/body/div/p::798", "Calypso"),
     ("from=/tei/text/body/div/p::3202;to=/tei/text/body/div/p::3209", "Ulysses"))
     
-    
-    /*
-[[37minfo[0m] - application - 
-[[37minfo[0m] - application - from=/tei/text/body/div/p::689;to=/tei/text/body/div/p::696
-[[37minfo[0m] - application - from=/tei/text/body/div/p::791;to=/tei/text/body/div/p::798
-[[37minfo[0m] - application - from=/tei/text/body/div/p::3202;to=/tei/text/body/div/p::3209
-     */
-
   "The TEI parser" should {
     
     val annotations = Await.result(TEIParserService.extractEntities(TEST_FILEPART_RECORD, TEST_FILE, false), 60 seconds)
     
     "properly parse the test document" in {      
-      annotations.size must equalTo(EXPECTED_ENTITIES.size)
+      annotations.size must equalTo(11)
+      
+      val places = annotations.filter(_.bodies.exists(_.hasType == AnnotationBody.PLACE))
+      places.size must equalTo(7)
+      
+      val people = annotations.filter(_.bodies.exists(_.hasType == AnnotationBody.PERSON))
+      people.size must equalTo(4)
+      
       annotations.map { a =>
         val anchor = a.anchor
         val quote = a.bodies.find(_.hasType == AnnotationBody.QUOTE).get.value.get
