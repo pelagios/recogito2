@@ -41,8 +41,8 @@ class GazetteerAdminController @Inject() (
         
         /** TEMPORARY HACK **/
         
-        if (formData.filename.contains(".ttl")) {
-          Logger.info("Importing Pelagios RDF/TTL dump")
+        if (formData.filename.contains(".ttl") || formData.filename.contains(".rdf") || formData.filename.contains(".xml")) {
+          Logger.info("Importing Pelagios RDF dump")
           val importer = new DumpImporter()          
           importer.importDump(formData.ref.file, formData.filename, PelagiosRDFCrosswalk.fromRDF(formData.filename))(places, ctx)
         } else if (formData.filename.toLowerCase.contains("pleiades")) {
