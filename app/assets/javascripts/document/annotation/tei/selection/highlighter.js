@@ -12,7 +12,6 @@ define([
     var self = this,
 
         getDOMPosition = function(path) {
-
           var offsetIdx = path.indexOf('::'),
 
               // CETEIcean-specific: prefix all path elements with 'tei-'!
@@ -41,7 +40,7 @@ define([
                 } while (currentNode && run);
               };
 
-          if (offset > node.length) reanchor();
+          if (!node.length || offset > node.length) reanchor();
 
           return { node: node, offset: offset };
         },
