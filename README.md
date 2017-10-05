@@ -9,10 +9,7 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
 ## Prerequisites
 
 * Java 8 JDK
-* Typesafe Activator 1.3.12. __Note:__ as of May 2017, Activator (the build framework used previously
-  by Play) has been discontinued. I have yet to migrate everything to the proper new process (which
-  uses the SBT build tool). In the mean time, please download the final Activator release from
-  https://downloads.typesafe.com/typesafe-activator/1.3.12/typesafe-activator-1.3.12.zip
+* [SBT](http://www.scala-sbt.org/) (tested with version 1.0.2)
 * PostgreSQL DB
 * To use image annotation, you need to have the [vips](http://www.vips.ecs.soton.ac.uk/) image
   processing system installed. If vips is not available on the command line, Recogito is set to
@@ -26,12 +23,12 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
   Make any environment-specific changes there. (For the most part, the defaults should be fine.)
 * Create a database named 'recogito' on your Postgres DB server. (If you want a different name, adjust
   the settings in your `conf/application.conf` accordingly.)
-* Type `activator run` to start the application in development mode.
+* Type `sbt run` to start the application in development mode.
 * Point your browser to [http://localhost:9000](http://localhost:9000)
 * Recogito automatically creates a single user with administrator privileges with username
   'recogito' and password 'recogito'. Be sure to remove this user - or at least change the
   password - for production use!
-* To generate an Eclipse project, type `activator eclipse`.
+* To generate an Eclipse project, type `sbt eclipse`.
 
 ## Importing gazetteers
 
@@ -48,11 +45,12 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
 
 ## Running in production
 
-* To test production mode before deploying, type `activator testProd`
+* To test production mode before deploying, type `sbt testProd`
+* To change to a different port (than default 9000), type `sbt "testProd -Dhttp.port=9876"`
 * For full production deployment, refer to the current [Play Framework
   docs](https://www.playframework.com/documentation/2.5.x/Production)
 * Be sure to set a random application secret in `conf/application.conf`. Play includes a utility
-  to generate one for you - type `activator playGenerateSecret`.
+  to generate one for you - type `sbt playGenerateSecret`.
 * Production deployment requires an installation of
   [ElasticSearch v2.4.4](https://www.elastic.co/downloads/past-releases/elasticsearch-2-4-4).
   (Recogito will automatically create an embedded ElasticSearch index if cannot find a running
