@@ -20,6 +20,12 @@ trait HasTextSnippets {
     snip(text, offset, quoteLength, bufferSize)
   }
   
+  /** Removes newlines and multiple spaces **/
+  protected def normalize(s: String) = 
+    s.replace("\n", " ") // replace new lines with space
+      .replaceAll("\\s+", " ") // Replace multiple spaces with one
+      .trim
+  
   protected def snip(text: String, from: Int, len: Int, bufferSize: Int) = {
     val (start, prefix) =
       if (from - bufferSize > 0) {
@@ -52,7 +58,7 @@ trait HasTextSnippets {
     val trailingRemovableChars = snippet.reverse.takeWhile(c => CHARS_TO_REMOVE.contains(c)).size
     val trimmedSnippet = snippet.dropRight(trailingRemovableChars).substring(leadingRemovableChars)
     val normalizedSuffix = if (trimmedSnippet.endsWith(".") && suffix.size > 0) suffix.take(2) else suffix
-    Snippet(prefix + trimmedSnippet + normalizedSuffix, from - start + leadingRemovableChars)
+    Snippet(normalize(prefix + trimmedSnippet + normalizedSuffix), from - start + leadingRemovableChars)
   }
   
 }

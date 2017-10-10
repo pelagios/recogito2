@@ -12,7 +12,7 @@ trait HasTEISnippets extends HasTextSnippets {
   private val DEFAULT_BUFFER_SIZE = 80
 
   case class TEIAnchor(startPath: String, startOffset: Int, endPath: String, endOffset: Int)
-  
+    
   private[controllers] def parseAnchor(anchor: String) = {
     
     def separate(a: String): (String, Int) = {
@@ -90,11 +90,23 @@ trait HasTEISnippets extends HasTextSnippets {
       val firstChild = parent.getFirstChild
       val len = firstChild.getNodeValue.size
       
-      // if (offset <= len) {
+      if (offset <= len) {
+        // Offset doesn't cross node boundaries
         (firstChild, offset)
-      // } else {
-                
-      // }        
+      } else {
+        // Offset exceeds first child boundaries - step through DOM
+        def findRecursive(remainingNodes: Seq[Node], remainingOffset: Int): (Node, Int) = {
+          val h = remainingNodes.head
+          val t = remainingNodes.tail
+          val len = Option(h.getNodeValue).map(_.size).getOrElse(0)
+          if (len >= remainingOffset)
+            (h, remainingOffset)
+          else 
+            findRecursive(t, remainingOffset - len)
+        }
+        
+        findRecursive(flattenDOM(firstChild), offset)
+      }        
     }
     
     val ranges = doc.asInstanceOf[DocumentRange]
@@ -106,7 +118,6 @@ trait HasTEISnippets extends HasTextSnippets {
     val endParent = $(doc).xpath(a.endPath).get(0)
     val (endNode, endOffset) = findPosition(endParent, a.endOffset)
 
-    // TODO this will break in many cases - we need to re-implement the clientside "reanchor" feature
     val range = ranges.createRange()
     range.setStart(startNode, startOffset)
     range.setEnd(endNode, endOffset)
@@ -148,10 +159,7 @@ trait HasTEISnippets extends HasTextSnippets {
   def previewFromTEI(xml: String, len: Int = 256): String = {
     val doc = parseXMLString(xml)
     val body = $(doc).find("body")
-    $(body).text
-      .replace("\n", " ") // replace new lines with space
-      .replaceAll("\\s+", " ") // Replace multiple spaces with one
-      .trim.substring(0, len)
+    normalize($(body).text).substring(0, len)
   }
   
 }

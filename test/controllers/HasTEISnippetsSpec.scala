@@ -90,16 +90,26 @@ class HasTEISnippetsSpec extends Specification {
     }
     
     "work across entity boundaries" in {      
-      val anchor =
-        "from=/tei/text/body/div/p::120;" +
-        "to=/tei/text/body/div/p::130"
+      val anchorA =
+        "from=/tei/text/body/div/p::84;" +
+        "to=/tei/text/body/div/p::165"
         
-      val snippet = new TestHasTEISnippets().snippetFromTEIFile(TEST_FILE, anchor, 0)
+      val anchorB =
+        "from=/tei/text/body/div/p::126;" +
+        "to=/tei/text/body/div/p::165"
+        
+      val anchorC =
+        "from=/tei/text/body/div/p::84;" +
+        "to=/tei/text/body/div/p::133"
+        
+      val snippetA = new TestHasTEISnippets().snippetFromTEIFile(TEST_FILE, anchorA, 0)
+      snippetA.text must equalTo("...had sacked the famous town of Troy. Many cities did he visit...")
       
-      play.api.Logger.info(snippet.toString)
+      val snippetB = new TestHasTEISnippets().snippetFromTEIFile(TEST_FILE, anchorB, 0)
+      snippetB.text must equalTo("...Troy. Many cities did he visit...")
       
-      snippet.text must equalTo("...O muse, of that ingenious hero who travelled...")
-      snippet.offset must equalTo(17)
+      val snippetC = new TestHasTEISnippets().snippetFromTEIFile(TEST_FILE, anchorC, 0)
+      snippetC.text must equalTo("...had sacked the famous town of Troy...")
     }
     
   }
