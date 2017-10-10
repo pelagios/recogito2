@@ -18,8 +18,9 @@ import org.w3c.dom.NodeList
 import org.w3c.dom.Text
 import models.annotation.AnnotationBody
 import org.w3c.dom.Document
+import controllers.HasTEISnippets
 
-trait TEISerializer extends BaseSerializer {
+trait TEISerializer extends BaseSerializer with HasTEISnippets {
   
   private val ENTITY_TYPES = Set(AnnotationBody.PLACE, AnnotationBody.PERSON)
 
@@ -34,19 +35,7 @@ trait TEISerializer extends BaseSerializer {
   }
   
   def partToTEI(part: DocumentFilepartRecord, xml: String, annotations: Seq[Annotation]) = {
-    
-    // TODO replace this with JOOX-based parsing (much shorter)
-    val factory = DocumentBuilderFactory.newInstance()
-    val builder = factory.newDocumentBuilder()
-    val in = new InputSource(new StringReader(xml))
-    val doc = builder.parse(in)
-    val ranges = doc.asInstanceOf[DocumentRange]
-    
-    def separate(a: String): (String, Int) = {
-      val path = a.substring(0, a.indexOf("::")).replaceAll("tei", "TEI")
-      val offset = a.substring(a.indexOf("::") + 2).toInt
-      (path, offset)
-    }
+    val doc = parseXMLString(xml)
     
     def toTag(annotation: Annotation) = {
       val quote = annotation.bodies.find(_.hasType == AnnotationBody.QUOTE).get.value.get
@@ -65,23 +54,12 @@ trait TEISerializer extends BaseSerializer {
       el
     }
     
-    sortByOffsetDesc(annotations).foreach { annotation =>
-      val a = annotation.anchor
-      
-      val (startPath, startOffset) = separate(a.substring(5, a.indexOf(";")))
-      val startNode = $(doc).xpath(startPath).get(0).getFirstChild
-      
-      val (endPath, endOffset) = separate(a.substring(a.indexOf(";") + 4))
-      val endNode = $(doc).xpath(endPath).get(0).getFirstChild
+    sortByOffsetDesc(annotations).foreach { annotation =>      
+      val range = toRange(annotation.anchor, doc)
 
       // We only support TEI export for annotations that don't cross node boundaries
-      if (startNode == endNode) {
-        val range = ranges.createRange()
-        range.setStart(startNode, startOffset)
-        range.setEnd(endNode, endOffset)
-              
-        val tag = toTag(annotation)
-  
+      if (range.getStartContainer == range.getEndContainer) {
+        val tag = toTag(annotation)  
         range.deleteContents()
         range.surroundContents(tag)
       }
