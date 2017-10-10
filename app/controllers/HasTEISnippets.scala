@@ -3,7 +3,7 @@ package controllers
 import java.io.{ File, FileReader, StringReader }
 import javax.xml.parsers.DocumentBuilderFactory
 import org.joox.JOOX._
-import org.w3c.dom.Document
+import org.w3c.dom.{ Document, Element, Node }
 import org.w3c.dom.ranges.{ DocumentRange, Range }
 import org.xml.sax.InputSource
 
@@ -26,7 +26,52 @@ trait HasTEISnippets extends HasTextSnippets {
       
     TEIAnchor(startPath, startOffset, endPath, endOffset)    
   }
-    
+  
+  /** Given a starting node, this function 'flattens' the DOM, depth first.
+    *  
+    * E.g. the following structure
+    * 
+    * <a>
+    *   <b>
+    *     <c></c>
+    *     <d></d>
+    *   </b>
+    *   <e>
+    *     <f></f>
+    *     <g>
+    *       <h></h>
+    *       <i></i>
+    *     </g>
+    *   </e>
+    * </a>  
+    * 
+    * will result in the list
+    * 
+    * (a, b, c, d, e, f, g, h, i)
+    */
+  private[controllers] def flattenDOM(node: Node, flattened: Seq[Node] = Seq.empty[Node]): Seq[Node] = {    
+    (Option(node.getFirstChild), Option(node.getNextSibling)) match {
+      
+      case (Some(child), Some(sibling)) =>
+        // Walk child level and then continue with sibling
+        val nodes = flattenDOM(child, flattened :+ node)
+        flattenDOM(sibling, nodes)      
+        
+      case (Some(child), None) =>
+        // Append and continue with child
+        flattenDOM(child, flattened :+ node)
+        
+      case (None, Some(sibling)) =>
+        // Append and continue with sibling
+        flattenDOM(sibling, flattened :+ node)
+        
+      case (None, None) =>
+        // Just append this node and we're done
+        flattened :+ node
+        
+    }
+  }
+  
   private def parseXML(source: InputSource) = {
     val factory = DocumentBuilderFactory.newInstance()
     val builder = factory.newDocumentBuilder()
@@ -40,16 +85,31 @@ trait HasTEISnippets extends HasTextSnippets {
     parseXML(new InputSource(new FileReader(file)))
   
   protected def toRange(anchor: String, doc: Document): Range = {
+    
+    def findPosition(parent: Element, offset: Int): (Node, Int) = {
+      val firstChild = parent.getFirstChild
+      val len = firstChild.getNodeValue.size
+      
+      // if (offset <= len) {
+        (firstChild, offset)
+      // } else {
+                
+      // }        
+    }
+    
     val ranges = doc.asInstanceOf[DocumentRange]
     val a = parseAnchor(anchor)
 
-    val startNode = $(doc).xpath(a.startPath).get(0).getFirstChild
-    val endNode = $(doc).xpath(a.endPath).get(0).getFirstChild
+    val startParent = $(doc).xpath(a.startPath).get(0)
+    val (startNode, startOffset) = findPosition(startParent, a.startOffset)
+    
+    val endParent = $(doc).xpath(a.endPath).get(0)
+    val (endNode, endOffset) = findPosition(endParent, a.endOffset)
 
     // TODO this will break in many cases - we need to re-implement the clientside "reanchor" feature
     val range = ranges.createRange()
-    range.setStart(startNode, a.startOffset)
-    range.setEnd(endNode, a.endOffset)
+    range.setStart(startNode, startOffset)
+    range.setEnd(endNode, endOffset)
     range
   }
   

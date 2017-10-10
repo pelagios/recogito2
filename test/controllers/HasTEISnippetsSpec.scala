@@ -4,6 +4,7 @@ import java.io.File
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
+import org.joox.JOOX._
 import play.api.test._
 import play.api.test.Helpers._
 import scala.io.Source
@@ -32,6 +33,33 @@ class HasTEISnippetsSpec extends Specification {
     
   }
   
+  "Node flattening" should {
+    
+    "work properly in the test structure" in {
+      val doc = $("""
+        <a>
+          <b>
+            <c></c>
+            <d></d>
+          </b>
+          <e>
+            <f></f>
+            <g>
+              <h></h>
+              <i></i>
+            </g>
+          </e>
+        </a>  
+      """
+      // Remove all whitespace - we don't want text nodes in between
+      .replaceAll("\\s+", "").trim).document().getFirstChild
+      
+      val flattened = new TestHasTEISnippets().flattenDOM(doc).map(_.getNodeName)
+      flattened must equalTo(List("a", "b", "c", "d", "e", "f", "g", "h", "i"))
+    }
+    
+  }
+  
   "Preview generation" should {
     
     val xml = Source.fromFile(TEST_FILE).getLines().mkString("\n")
@@ -52,7 +80,6 @@ class HasTEISnippetsSpec extends Specification {
   "Snippet extraction" should {
     
     "work for snippet inside a single text node" in {
-      
       val anchor =
         "from=/tei/text/body/div/p::35;" +
         "to=/tei/text/body/div/p::50"
@@ -62,8 +89,19 @@ class HasTEISnippetsSpec extends Specification {
       snippet.offset must equalTo(17)
     }
     
+    "work across entity boundaries" in {      
+      val anchor =
+        "from=/tei/text/body/div/p::120;" +
+        "to=/tei/text/body/div/p::130"
+        
+      val snippet = new TestHasTEISnippets().snippetFromTEIFile(TEST_FILE, anchor, 0)
+      
+      play.api.Logger.info(snippet.toString)
+      
+      snippet.text must equalTo("...O muse, of that ingenious hero who travelled...")
+      snippet.offset must equalTo(17)
+    }
+    
   }
-  
-  // TODO add more difficult cases
-  
+    
 }
