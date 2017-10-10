@@ -1,13 +1,11 @@
 package controllers
 
-import java.io.File
+import java.io.{ File, FileReader, StringReader }
+import javax.xml.parsers.DocumentBuilderFactory
 import org.joox.JOOX._
 import org.w3c.dom.Document
 import org.w3c.dom.ranges.{ DocumentRange, Range }
-import javax.xml.parsers.DocumentBuilderFactory
 import org.xml.sax.InputSource
-import java.io.StringReader
-import java.io.FileReader
 
 trait HasTEISnippets {
   

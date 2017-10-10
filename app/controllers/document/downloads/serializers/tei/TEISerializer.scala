@@ -1,24 +1,14 @@
 package controllers.document.downloads.serializers.tei
 
+import controllers.HasTEISnippets
 import controllers.document.downloads.serializers.BaseSerializer
-import models.annotation.{ Annotation, AnnotationService }
+import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.{ DocumentInfo, DocumentService }
 import models.generated.tables.records.DocumentFilepartRecord
-import org.w3c.dom.ranges.DocumentRange
+import org.joox.JOOX._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.xml.Elem
 import storage.Uploads
-import javax.xml.parsers.DocumentBuilderFactory
-import org.joox.JOOX._
-import org.xml.sax.InputSource
-import java.io.StringReader
-import javax.xml.xpath.XPathFactory
-import javax.xml.xpath.XPathConstants
-import org.w3c.dom.NodeList
-import org.w3c.dom.Text
-import models.annotation.AnnotationBody
-import org.w3c.dom.Document
-import controllers.HasTEISnippets
 
 trait TEISerializer extends BaseSerializer with HasTEISnippets {
   
