@@ -29,9 +29,9 @@ class HasTextSnippetsSpec extends Specification {
   val annotationAtCenter = createAnnotationAt(240, 246, text)
   val annotationAtEnd    = createAnnotationAt(576, 590, text)
   
-  val snippetAtStart     = new TestHasTextSnippets().extractTextSnippet(text, annotationAtStart)
-  val snippetAtCenter    = new TestHasTextSnippets().extractTextSnippet(text, annotationAtCenter)
-  val snippetAtEnd       = new TestHasTextSnippets().extractTextSnippet(text, annotationAtEnd)
+  val snippetAtStart     = new TestHasTextSnippets().snippetFromText(text, annotationAtStart)
+  val snippetAtCenter    = new TestHasTextSnippets().snippetFromText(text, annotationAtCenter)
+  val snippetAtEnd       = new TestHasTextSnippets().snippetFromText(text, annotationAtEnd)
   
   val evilText = // Snippets determine bounds on whitespace - what if there is none?
     "Loremipsumdolorsitametconsetetursadipscingelitrseddiam" + 
@@ -39,7 +39,7 @@ class HasTextSnippetsSpec extends Specification {
     
   val annotationOnEvilText = createAnnotationAt(18, 28, evilText)
   
-  val snippetOnEvilText = new TestHasTextSnippets().extractTextSnippet(evilText, annotationOnEvilText)
+  val snippetOnEvilText = new TestHasTextSnippets().snippetFromText(evilText, annotationOnEvilText)
     
   def createAnnotationAt(start: Int, end: Int, text: String) = Annotation(
       UUID.randomUUID,

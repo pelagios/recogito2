@@ -106,6 +106,7 @@ class AnnotationAPIController @Inject() (
       with HasAnnotationValidation
       with HasPrettyPrintJSON
       with HasTextSnippets 
+      with HasTEISnippets
       with HasCSVParsing {
 
   def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
@@ -277,8 +278,13 @@ class AnnotationAPIController @Inject() (
     
     def getTextContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = 
       uploads.readTextfile(doc.ownerName, doc.id, part.getFile) map {
-        case Some(text) =>
-          val snippet = extractTextSnippet(text, annotation)
+        case Some(text) => 
+          val snippet = ContentType.withName(part.getContentType).get match {
+            case ContentType.TEXT_TEIXML => snippetFromTEI(text, annotation.anchor)
+            case ContentType.TEXT_PLAIN => snippetFromText(text, annotation)
+            case _ => throw new RuntimeException("Attempt to retrieve text snippet for non-text doc part - should never happen")
+          }  
+          
           Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)
 
         case None =>

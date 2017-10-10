@@ -10,7 +10,7 @@ trait HasTextSnippets {
   
   private val CHARS_TO_REMOVE = Set('\n', ' ', ',', ';', ':')
   
-  private[controllers] def extractTextSnippet(text: String, annotation: Annotation, bufferSize: Int = DEFAULT_BUFFER_SIZE) = {
+  private[controllers] def snippetFromText(text: String, annotation: Annotation, bufferSize: Int = DEFAULT_BUFFER_SIZE) = {
     // It's safe to expect a text anchor, in the form 'char-offset:1269' (otherwise we want to let it fail) 
     val offset = annotation.anchor.substring(12).toInt
     

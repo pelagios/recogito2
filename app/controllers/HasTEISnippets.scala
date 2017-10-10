@@ -53,8 +53,13 @@ trait HasTEISnippets extends HasTextSnippets {
     range
   }
   
-  def extractTEISnippet(file: File, anchor: String, bufferSize: Int = DEFAULT_BUFFER_SIZE) = {
-    val doc = parseXMLFile(file)
+  def snippetFromTEIFile(file: File, anchor: String, bufferSize: Int = DEFAULT_BUFFER_SIZE) =
+    extractSnippet(parseXMLFile(file), anchor, bufferSize)
+  
+  def snippetFromTEI(xml: String, anchor: String, bufferSize: Int = DEFAULT_BUFFER_SIZE) =
+    extractSnippet(parseXMLString(xml), anchor, bufferSize)
+    
+  private def extractSnippet(doc: Document, anchor: String, bufferSize: Int) = {
     val ranges = doc.asInstanceOf[DocumentRange]
        
     val selectedRange = toRange(anchor, doc)
@@ -65,7 +70,10 @@ trait HasTEISnippets extends HasTextSnippets {
     rangeBefore.setEnd(selectedRange.getStartContainer, selectedRange.getStartOffset)
     val trimmedBefore = { 
       val r = rangeBefore.toString
-      r.substring(r.size - bufferSize)
+      
+      // Make sure we have more than just the buffer size,
+      // otherwise the triming algo will treat it as start of sentence
+      r.substring(Math.max(r.size - bufferSize - 1, 0))
     }
     
     val rangeAfter = ranges.createRange()

@@ -39,7 +39,7 @@ class HasTEISnippetsSpec extends Specification {
         "from=/tei/text/body/div/p::36;" +
         "to=/tei/text/body/div/p::50"
         
-      val snippet = new TestHasTEISnippets().extractTEISnippet(TEST_FILE, anchor, 16)
+      val snippet = new TestHasTEISnippets().snippetFromTEIFile(TEST_FILE, anchor, 16)
       snippet.text must equalTo("O muse, of that ingenious hero who travelled...")
       snippet.offset must equalTo(16)
     }
