@@ -8,47 +8,51 @@ trait HasTextSnippets {
   
   private val DEFAULT_BUFFER_SIZE = 80
   
-  private val REMOVEABLE_CHARACTERS = Set(' ', ',', ';', ':')
+  private val CHARS_TO_REMOVE = Set('\n', ' ', ',', ';', ':')
   
   private[controllers] def extractTextSnippet(text: String, annotation: Annotation, bufferSize: Int = DEFAULT_BUFFER_SIZE) = {
-    // Save to expect a text anchor, in the form 'char-offset:1269' (otherwise we want to let it fail) 
+    // It's safe to expect a text anchor, in the form 'char-offset:1269' (otherwise we want to let it fail) 
     val offset = annotation.anchor.substring(12).toInt
     
     // Likewise, safe to expect the annotation has one QUOTE body, with a defined value
     val quoteLength = annotation.bodies.filter(_.hasType == AnnotationBody.QUOTE).head.value.get.size
     
+    snip(text, offset, quoteLength, bufferSize)
+  }
+  
+  protected def snip(text: String, from: Int, len: Int, bufferSize: Int) = {
     val (start, prefix) =
-      if (offset - bufferSize > 0) {
+      if (from - bufferSize > 0) {
         // Snippet starts somewhere inside the text - move cursor after first whitespace
-        val firstWhitespaceIdx = text.indexOf(' ', offset - bufferSize)
+        val firstWhitespaceIdx = text.indexOf(' ', from - bufferSize)
         if (firstWhitespaceIdx > -1)
           (firstWhitespaceIdx, "...")
         else
-          (offset - bufferSize, "...")
+          (from - bufferSize, "...")
       } else {
         // Snippet is at the start of the text
         (0, "")
       }
     
     val (end, suffix) =
-      if ((offset + quoteLength + bufferSize) > text.size) {
+      if ((from + len + bufferSize) > text.size) {
         // Snippet is at the end of the text
         (text.size, "")
       } else {
-        val lastWhitespaceIdx = text.lastIndexOf(' ', offset + quoteLength + bufferSize)
+        val lastWhitespaceIdx = text.lastIndexOf(' ', from + len + bufferSize)
         if (lastWhitespaceIdx > -1)
           // Snippet ends somewhere inside the text - move cursor before last whitespace
           (lastWhitespaceIdx, "...")
         else
-          (offset + quoteLength + bufferSize, "...")
+          (from + len + bufferSize, "...")
       }
     
     val snippet = text.substring(start, end).replace("\n", " ") // Remove newlines in snippets    
-    val leadingRemovableChars = snippet.takeWhile(c => REMOVEABLE_CHARACTERS.contains(c)).size
-    val trailingRemovableChars = snippet.reverse.takeWhile(c => REMOVEABLE_CHARACTERS.contains(c)).size
+    val leadingRemovableChars = snippet.takeWhile(c => CHARS_TO_REMOVE.contains(c)).size
+    val trailingRemovableChars = snippet.reverse.takeWhile(c => CHARS_TO_REMOVE.contains(c)).size
     val trimmedSnippet = snippet.dropRight(trailingRemovableChars).substring(leadingRemovableChars)
     val normalizedSuffix = if (trimmedSnippet.endsWith(".") && suffix.size > 0) suffix.take(2) else suffix
-    Snippet(prefix + trimmedSnippet + normalizedSuffix, offset - start + leadingRemovableChars)
+    Snippet(prefix + trimmedSnippet + normalizedSuffix, from - start + leadingRemovableChars)
   }
   
 }

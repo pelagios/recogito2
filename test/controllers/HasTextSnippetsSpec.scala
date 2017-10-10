@@ -107,8 +107,6 @@ class HasTextSnippetsSpec extends Specification {
 
   "The snippet for the space-less text" should {
     
-    play.api.Logger.info(snippetOnEvilText.toString)
-    
     "start with 'Loremipsum'" in {
       snippetOnEvilText.text.startsWith("Loremipsum") must equalTo(true)
     }

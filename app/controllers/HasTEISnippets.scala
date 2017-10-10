@@ -7,7 +7,7 @@ import org.w3c.dom.Document
 import org.w3c.dom.ranges.{ DocumentRange, Range }
 import org.xml.sax.InputSource
 
-trait HasTEISnippets {
+trait HasTEISnippets extends HasTextSnippets {
   
   private val DEFAULT_BUFFER_SIZE = 80
 
@@ -55,10 +55,26 @@ trait HasTEISnippets {
   
   def extractTEISnippet(file: File, anchor: String, bufferSize: Int = DEFAULT_BUFFER_SIZE) = {
     val doc = parseXMLFile(file)
-    val range = toRange(anchor, doc)
-   
-    // TODO
-    ""
+    val ranges = doc.asInstanceOf[DocumentRange]
+       
+    val selectedRange = toRange(anchor, doc)
+    val selectedQuote = selectedRange.toString
+    
+    val rangeBefore = ranges.createRange()
+    rangeBefore.setStart(doc, 0)
+    rangeBefore.setEnd(selectedRange.getStartContainer, selectedRange.getStartOffset)
+    val trimmedBefore = { 
+      val r = rangeBefore.toString
+      r.substring(r.size - bufferSize)
+    }
+    
+    val rangeAfter = ranges.createRange()
+    rangeAfter.setStart(selectedRange.getEndContainer, selectedRange.getEndOffset)
+    rangeAfter.setEnd(doc, 0)
+    val trimmedAfter = rangeAfter.toString.substring(0, bufferSize)
+    
+    val text = trimmedBefore + selectedQuote + trimmedAfter
+    snip(text, trimmedBefore.size, selectedQuote.size, bufferSize)
   }
   
 }

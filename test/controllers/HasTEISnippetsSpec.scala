@@ -13,17 +13,18 @@ class TestHasTEISnippets extends HasTEISnippets
 class HasTEISnippetsSpec extends Specification {
   
   val TEST_FILE = new File("test/resources/transform/tei/odyssey.tei.xml")
-  
-  val ANCHOR = 
-    "from=/tei/text/body/div/p[2]::82;" +
-    "to=/tei/text/body/div/p[2]::89"
-    
+ 
   "Anchor parsing" should {
     
     "return the correct values" in {
-      val parsed = new TestHasTEISnippets().parseAnchor(ANCHOR)
+      val anchor = 
+        "from=/tei/text/body/div/p[2]::64;" +
+        "to=/tei/text/body/div/p[2]::89"
+      
+      val parsed = new TestHasTEISnippets().parseAnchor(anchor)
+      
       parsed.startPath must equalTo("/TEI/text/body/div/p[2]")
-      parsed.startOffset must equalTo(82)
+      parsed.startOffset must equalTo(64)
       parsed.endPath must equalTo("/TEI/text/body/div/p[2]")
       parsed.endOffset must equalTo(89)
     }
@@ -32,16 +33,19 @@ class HasTEISnippetsSpec extends Specification {
   
   "Snippet extraction" should {
     
-    "return the correct snippet" in {
-       new TestHasTEISnippets().extractTEISnippet(TEST_FILE, ANCHOR)
-       
-       
-       // TODO
-       success
+    "work for snippet inside a single text node" in {
+      
+      val anchor =
+        "from=/tei/text/body/div/p::36;" +
+        "to=/tei/text/body/div/p::50"
+        
+      val snippet = new TestHasTEISnippets().extractTEISnippet(TEST_FILE, anchor, 16)
+      snippet.text must equalTo("O muse, of that ingenious hero who travelled...")
+      snippet.offset must equalTo(16)
     }
     
   }
   
-  // TODO add example where snippet crosses tag bounds
+  // TODO add more difficult cases
   
 }
