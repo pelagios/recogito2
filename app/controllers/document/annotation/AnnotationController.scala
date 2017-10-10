@@ -14,6 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
 import controllers.HasVisitLogging
 import models.visit.VisitService
+import controllers.HasTEISnippets
 
 @Singleton
 class AnnotationController @Inject() (
@@ -25,7 +26,9 @@ class AnnotationController @Inject() (
     implicit val visits: VisitService,
     implicit val webjars: WebJarAssets,
     implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(config, documents, users) with HasVisitLogging {
+  ) extends BaseOptAuthController(config, documents, users)
+    with HasTEISnippets
+    with HasVisitLogging {
 
   /** For convenience: redirects to proper annotation view, given various ID combinations  **/
   def resolveAnnotationView(documentId: String, maybePartId: Option[java.util.UUID], maybeAnnotationId: Option[java.util.UUID]) = AsyncStack { implicit request =>
@@ -103,9 +106,18 @@ class AnnotationController @Inject() (
         }
       
       case Some(ContentType.TEXT_TEIXML) =>
-        fCountAnnotations.map(c =>
-          // TODO need to load the text, so we can render an OG/TC preview snippet 
-          Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, c)))
+        fReadTextfile flatMap {
+          case Some(content) =>
+            fCountAnnotations.map { c =>
+              val preview = previewFromTEI(content)
+              Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c))
+            }
+              
+          case None =>
+            // Filepart found in DB, but not file on filesystem
+            Logger.error("Filepart recorded in the DB is missing on the filesystem: " + doc.ownerName + ", " + doc.id)
+            Future.successful(InternalServerError)
+        }
         
       case Some(ContentType.DATA_CSV) =>
         fCountAnnotations.map(c => Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, c)))

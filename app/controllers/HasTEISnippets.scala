@@ -85,4 +85,13 @@ trait HasTEISnippets extends HasTextSnippets {
     snip(text, trimmedBefore.size, selectedQuote.size, bufferSize)
   }
   
+  def previewFromTEI(xml: String, len: Int = 256): String = {
+    val doc = parseXMLString(xml)
+    val body = $(doc).find("body")
+    $(body).text
+      .replace("\n", " ") // replace new lines with space
+      .replaceAll("\\s+", " ") // Replace multiple spaces with one
+      .trim.substring(0, len)
+  }
+  
 }
