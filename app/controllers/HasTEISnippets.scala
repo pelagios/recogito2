@@ -88,7 +88,7 @@ trait HasTEISnippets extends HasTextSnippets {
     
     def findPosition(parent: Element, offset: Int): (Node, Int) = {
       val firstChild = parent.getFirstChild
-      val len = firstChild.getNodeValue.size
+      val len = Option(firstChild.getNodeValue).map(_.size).getOrElse(0)
       
       if (offset <= len) {
         // Offset doesn't cross node boundaries
