@@ -235,6 +235,9 @@ tei-birth:before {
 tei-bloc {
   /* Empty Rule Set */
 }
+tei-body {
+  display:block;
+}
 tei-broadcast {
   /* Empty Rule Set */
 }
@@ -486,6 +489,9 @@ tei-epigraph {
 tei-explicit {
   font-style: italic;
 }
+tei-fileDesc {
+  display:block;
+}
 tei-fileDesc > extent {
   display: none;
 }
@@ -588,8 +594,11 @@ tei-body > tei-head {
   font-weight:bold;
   padding-top:20px;
 }
+tei-div {
+  display:block;
+}
 tei-div.textpart {
-  display: none;
+  display:none;
 }
 tei-div > tei-head {
   font-size: 135%;
@@ -618,7 +627,7 @@ tei-figure > tei-head {
   border: 1px solid black;
   border-radius: 15px;
   width: 325px;
-  position: relative;
+  // position: relative;
   border: 1px solid #aaaaaa;
   background: #fafafa;
   /* reset text-indent for note with <l> ancestors. */
@@ -1103,8 +1112,8 @@ tei-origin {
 /* p */
 tei-p {
   display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
+  margin-top:0;
+  margin-bottom:2em;
 }
 *[data-tei-rendition~="#center"] p {
   text-align: center;
@@ -1223,18 +1232,16 @@ tei-pubPlace {
   /* Empty Rule Set */
 }
 tei-publicationStmt > * {
-  display: none;
+  /* Empty Rule Set */
 }
 tei-publicationStmt {
   display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
 }
 tei-publicationStmt > date {
-  display: none;
+  /* Empty Rule Set */
 }
 tei-publicationStmt > publisher {
-  display: none;
+  /* Empty Rule Set */
 }
 tei-purpose {
   /* Empty Rule Set */
@@ -1691,6 +1698,9 @@ tei-TEI tei-title[level=a][prev]:before {
 }
 tei-title[level=m] {
   font-style: italic;
+}
+tei-titleStmt {
+  display:block;
 }
 tei-titleStmt > tei-title {
   display: block;

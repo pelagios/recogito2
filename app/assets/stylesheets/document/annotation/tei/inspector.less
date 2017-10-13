@@ -1,0 +1,51 @@
+@import '../../../_colors.less';
+@import '../../../_mixins.less';
+
+tei-header, tei-filedesc, tei-titlestmt,
+tei-title, tei-publicationstmt, tei-sourcedesc,
+tei-text, tei-body, tei-div, tei-p {
+  position:relative;
+}
+
+tei-header:hover, tei-filedesc:hover, tei-titlestmt:hover,
+tei-title:hover, tei-publicationstmt:hover, tei-sourcedesc:hover,
+tei-text:hover, tei-body:hover, tei-div:hover, tei-p:hover {
+  background-color:rgba(255, 255, 0, 0.05);
+  border:1px solid rgba(128, 128, 0, 0.6);
+  .rounded-corners(3px);
+  padding:2px;
+}
+
+tei-header:hover::before, tei-filedesc:hover::before, tei-titlestmt:hover::before,
+tei-title:hover::before, tei-publicationstmt:hover::before, tei-sourcedesc:hover::before,
+tei-text:hover::before, tei-body:hover::before, tei-div:hover::before, tei-p:hover::before {
+  position:absolute;
+  height:20px;
+  min-width:30px;
+  top:-21px;
+  left:-1px;
+  padding:0 3px;
+  font-family:"Courier New", Courier, monospace;
+  font-size:14px;
+  font-weight:bold;
+  line-height:19px;
+  text-align:center;
+  .rounded-corners-top(2px);
+  border-style:solid;
+  border-width:1px 1px 0 1px;
+  border-color:rgba(128, 128, 0, 0.6);
+  background-color:rgba(92, 92, 0, 1);
+  color:#fff;
+}
+
+tei-title:hover::before {
+  content:'title';
+}
+
+tei-p:hover::before {
+  content:'p';
+}
+
+tei-div:hover::before {
+  content:'div';
+}
