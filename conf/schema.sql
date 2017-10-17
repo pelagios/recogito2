@@ -72,6 +72,12 @@ CREATE TABLE document_filepart (
   source TEXT
 );
 
+CREATE TABLE feature_toggle (
+  id SERIAL PRIMARY KEY,
+  username TEXT NOT NULL REFERENCES "user"(username),
+  has_toggle TEXT NOT NULL
+);
+
 -- users can organize documents into folders
 CREATE TABLE folder (
   id SERIAL PRIMARY KEY,
