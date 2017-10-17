@@ -20,6 +20,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Either, Left, Right }
 import storage.{ DB, Uploads }
 import sun.security.provider.SecureRandom
+import models.generated.tables.records.FeatureToggleRecord
 
 @Singleton
 class UserService @Inject() (
@@ -133,15 +134,15 @@ class UserService @Inject() (
     findByUsernameNoCache(username, true)
 
   def findByUsernameNoCache(username: String, ignoreCase: Boolean) = db.query { sql =>
-    val base = sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE))
+    val base = sql.selectFrom(USER.naturalLeftOuterJoin(FEATURE_TOGGLE).naturalLeftOuterJoin(USER_ROLE))
     val records =
       if (ignoreCase)
         base.where(USER.USERNAME.equalIgnoreCase(username)).fetchArray()
       else
         base.where(USER.USERNAME.equal(username)).fetchArray()
 
-    groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord]).headOption
-      .map { case (user, roles) => UserWithRoles(user, roles) }
+    groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord], classOf[FeatureToggleRecord]).headOption
+      .map { case (user, t) => UserWithRoles(user, t._1, t._2.map(_.getHasToggle)) }
   }
   
   def deleteByUsername(username: String) = db.withTransaction { sql =>

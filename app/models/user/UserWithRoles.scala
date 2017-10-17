@@ -1,8 +1,9 @@
 package models.user
 
 import models.generated.tables.records.{ UserRecord, UserRoleRecord }
+import models.generated.tables.records.FeatureToggleRecord
 
-case class UserWithRoles(user: UserRecord, roles: Seq[UserRoleRecord]) {
+case class UserWithRoles(user: UserRecord, roles: Seq[UserRoleRecord], featureToggles: Seq[String]) {
   
   def hasRole(role: Roles.Role): Boolean = roles.exists(_.getHasRole == role.toString)
   

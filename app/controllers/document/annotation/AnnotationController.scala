@@ -15,6 +15,7 @@ import storage.Uploads
 import controllers.HasVisitLogging
 import models.visit.VisitService
 import controllers.HasTEISnippets
+import models.user.UserWithRoles
 
 @Singleton
 class AnnotationController @Inject() (
@@ -66,7 +67,7 @@ class AnnotationController @Inject() (
     val maybeUser = loggedIn.map(_.user)
     documentPartResponse(documentId, seqNo, maybeUser, { case (doc, currentPart, accesslevel) =>
       if (accesslevel.canRead)
-        renderResponse(doc, currentPart, maybeUser, accesslevel)
+        renderResponse(doc, currentPart, loggedIn, accesslevel)
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
         authenticationFailed(request)
       else
@@ -77,7 +78,7 @@ class AnnotationController @Inject() (
   private def renderResponse(
       doc: DocumentInfo,
       currentPart: DocumentFilepartRecord,
-      loggedInUser: Option[UserRecord],
+      loggedInUser: Option[UserWithRoles],
       accesslevel: DocumentAccessLevel
     )(implicit request: RequestHeader) = {
     

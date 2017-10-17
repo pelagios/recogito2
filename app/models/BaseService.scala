@@ -42,11 +42,21 @@ trait BaseService {
   }
   
   /** Converts the results of a two-table left join to a Map[DomainObj1, Seq[DomainObj2]] **/
-  protected def groupLeftJoinResult[T <: Record, V <: Record](records: Seq[Record], t: Class[T], v: Class[V]) =
+  protected def groupLeftJoinResult[T <: Record, V <: Record](records: Seq[Record], t: Class[T], v: Class[V]): Map[T, Seq[V]] =
     records
       .map(r => (r.into(t), r.into(v)))
       .groupBy(_._1)
       .mapValues(_.map(_._2).filter(record => isNotNull(record)))
+      
+  protected def groupLeftJoinResult[T <: Record, V <: Record, U <: Record](records: Seq[Record], t: Class[T], v: Class[V], u: Class[U]): Map[T, (Seq[V], Seq[U])] = {
+    val groupedV = groupLeftJoinResult(records, t, v)
+    val groupedU = groupLeftJoinResult(records, t, u)
+    
+    val keys = (groupedV.keySet ++ groupedU.keySet).toSeq
+    keys.map { t =>
+      t -> (groupedV.get(t).getOrElse(Seq.empty[V]), groupedU.get(t).getOrElse(Seq.empty[U]))
+    }.toMap    
+  }
 
   /** Boilerplate code for conducting a cache lookup, followed by DB lookup if nothing in cache **/
   protected def cachedLookup[T: ClassTag](prefix: String, key: String, 
