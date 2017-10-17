@@ -12,6 +12,7 @@ import javax.annotation.Generated
 
 import models.generated.tables.Document
 import models.generated.tables.DocumentFilepart
+import models.generated.tables.FeatureToggle
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
 import models.generated.tables.SharingPolicy
@@ -54,6 +55,7 @@ class Public extends SchemaImpl("public") {
 
 	private def getSequences0() : List[Sequence[_]] = {
 		return Arrays.asList[Sequence[_]](
+			Sequences.FEATURE_TOGGLE_ID_SEQ,
 			Sequences.FOLDER_ID_SEQ,
 			Sequences.SHARING_POLICY_ID_SEQ,
 			Sequences.UPLOAD_ID_SEQ,
@@ -70,6 +72,7 @@ class Public extends SchemaImpl("public") {
 		return Arrays.asList[Table[_]](
 			Document.DOCUMENT,
 			DocumentFilepart.DOCUMENT_FILEPART,
+			FeatureToggle.FEATURE_TOGGLE,
 			Folder.FOLDER,
 			FolderAssociation.FOLDER_ASSOCIATION,
 			SharingPolicy.SHARING_POLICY,

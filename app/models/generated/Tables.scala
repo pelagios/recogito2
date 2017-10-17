@@ -8,6 +8,7 @@ import javax.annotation.Generated
 
 import models.generated.tables.Document
 import models.generated.tables.DocumentFilepart
+import models.generated.tables.FeatureToggle
 import models.generated.tables.Folder
 import models.generated.tables.FolderAssociation
 import models.generated.tables.SharingPolicy
@@ -39,6 +40,11 @@ object Tables {
 	 * The table public.document_filepart
 	 */
 	val DOCUMENT_FILEPART = models.generated.tables.DocumentFilepart.DOCUMENT_FILEPART
+
+	/**
+	 * The table public.feature_toggle
+	 */
+	val FEATURE_TOGGLE = models.generated.tables.FeatureToggle.FEATURE_TOGGLE
 
 	/**
 	 * The table public.folder
