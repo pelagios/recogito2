@@ -134,20 +134,24 @@ class UserService @Inject() (
     findByUsernameNoCache(username, true)
 
   def findByUsernameNoCache(username: String, ignoreCase: Boolean) = db.query { sql =>
-    
+
     def build(s : SelectWhereStep[Record]) =
       if (ignoreCase)
         s.where(USER.USERNAME.equalIgnoreCase(username))
       else
         s.where(USER.USERNAME.equal(username))
+
+    val queryA = build(sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE)))
+    val queryB = build(sql.selectFrom(USER.naturalJoin(FEATURE_TOGGLE)))
     
-    val baseA = build(sql.selectFrom(USER.naturalJoin(FEATURE_TOGGLE)))
-    val baseB = build(sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE)))
-   
-    val records = (baseA union baseB).fetchArray()
+    val recordsA = queryA.fetchArray
+    val recordsB = queryB.fetchArray
     
-    groupUnionJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord], classOf[FeatureToggleRecord]).headOption
-      .map { case (user, t) => User(user, t._1, t._2) }
+    val userWithRoles = groupLeftJoinResult(recordsA, classOf[UserRecord], classOf[UserRoleRecord]).headOption
+    val featureToggles = recordsB.map(_.into(classOf[FeatureToggleRecord])).toSeq
+    userWithRoles.map { case (user, roles) =>
+      User(user, roles, featureToggles)
+    }
   }
   
   def deleteByUsername(username: String) = db.withTransaction { sql =>
