@@ -13,6 +13,7 @@ import models.generated.tables.records.{ UserRecord, UserRoleRecord, FeatureTogg
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
+import org.jooq.{ Record, SelectWhereStep }
 import play.api.Configuration
 import play.api.cache.CacheApi
 import scala.collection.JavaConversions._
@@ -133,14 +134,19 @@ class UserService @Inject() (
     findByUsernameNoCache(username, true)
 
   def findByUsernameNoCache(username: String, ignoreCase: Boolean) = db.query { sql =>
-    val base = sql.selectFrom(USER.naturalLeftOuterJoin(FEATURE_TOGGLE).naturalLeftOuterJoin(USER_ROLE))
-    val records =
+    
+    def build(s : SelectWhereStep[Record]) =
       if (ignoreCase)
-        base.where(USER.USERNAME.equalIgnoreCase(username)).fetchArray()
+        s.where(USER.USERNAME.equalIgnoreCase(username))
       else
-        base.where(USER.USERNAME.equal(username)).fetchArray()
-
-    groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord], classOf[FeatureToggleRecord]).headOption
+        s.where(USER.USERNAME.equal(username))
+    
+    val baseA = build(sql.selectFrom(USER.naturalJoin(FEATURE_TOGGLE)))
+    val baseB = build(sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE)))
+   
+    val records = (baseA union baseB).fetchArray()
+    
+    groupUnionJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord], classOf[FeatureToggleRecord]).headOption
       .map { case (user, t) => User(user, t._1, t._2) }
   }
   

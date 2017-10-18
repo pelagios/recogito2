@@ -48,7 +48,7 @@ trait BaseService {
       .groupBy(_._1)
       .mapValues(_.map(_._2).filter(record => isNotNull(record)))
       
-  protected def groupLeftJoinResult[T <: Record, V <: Record, U <: Record](records: Seq[Record], t: Class[T], v: Class[V], u: Class[U]): Map[T, (Seq[V], Seq[U])] = {
+  protected def groupUnionJoinResult[T <: Record, V <: Record, U <: Record](records: Seq[Record], t: Class[T], v: Class[V], u: Class[U]): Map[T, (Seq[V], Seq[U])] = {
     val groupedV = groupLeftJoinResult(records, t, v)
     val groupedU = groupLeftJoinResult(records, t, u)
     
