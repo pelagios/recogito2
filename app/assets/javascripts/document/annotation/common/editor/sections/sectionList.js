@@ -90,31 +90,36 @@ define([
 
                 forwardEvent(newTranscriptionField, 'submit'); // Submit event needs to be handled by editor
 
-                // If the user added a transcription, add it on commit
+                // Make sure the field gets checked for existing text on commit
                 queuedUpdates.push(function() {
                   if (!newTranscriptionField.isEmpty())
                     currentAnnotation.bodies.push(newTranscriptionField.getBody());
                 });
 
-                // Field hidden by default if other transcriptions exist already, or when read-only
-                // But always available for users with multitranscription feature enabled
-                if (!Config.hasFeature('multitranscription') &&
-                     transcriptionBodies.length > 0 || !Config.writeAccess)
-
-                  newTranscriptionField.hide();
+                if (Config.hasFeature('multitranscription')) {
+                  newTranscriptionField.on('enter', function() {
+                    var body = newTranscriptionField.getBody();
+                    addExistingTranscription(body);
+                    queuedUpdates.push(function() {
+                        currentAnnotation.bodies.push(body);
+                    });
+                    newTranscriptionField.clear();
+                  });
+                } else {
+                  // Field hidden by default if other transcriptions exist already, or when read-only
+                  if (transcriptionBodies.length > 0 || !Config.writeAccess)
+                    newTranscriptionField.hide();
+                }
               },
 
-              // Adds sections for the existing transcriptions
-              addExistingTranscriptions = function() {
-                jQuery.each(transcriptionBodies, function(idx, body) {
-                  var transcriptionSection = new TranscriptionSection(transcriptionSectionEl, body);
-                  handleDelete(transcriptionSection);
-                  forwardEvent(transcriptionSection, 'submit'); // Submit event needs to be handled by editor
-                  sections.push(transcriptionSection);
-                });
+              addExistingTranscription = function(body) {
+                var transcriptionSection = new TranscriptionSection(transcriptionSectionEl, body);
+                handleDelete(transcriptionSection);
+                forwardEvent(transcriptionSection, 'submit'); // Submit event needs to be handled by editor
+                sections.push(transcriptionSection);
               };
 
-          addExistingTranscriptions();
+          jQuery.each(transcriptionBodies, function(idx, body) { addExistingTranscription(body); });
           initNewTranscriptionField();
         },
 

@@ -43,8 +43,11 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         },
 
         onKeyUp = function(e) {
-          if (e.ctrlKey && e.keyCode == 13)
-            self.fireEvent('submit');
+          if (e.keyCode == 13) {
+            self.fireEvent('enter');
+            if (e.ctrlKey)
+              self.fireEvent('submit');
+          }
         };
 
     textarea.keyup(onKeyUp);
