@@ -10,6 +10,7 @@ import models.{ BaseService, ContentType }
 import models.document.DocumentService
 import models.generated.Tables._
 import models.generated.tables.records._
+import models.user.User
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
@@ -64,13 +65,13 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
   }
 
   /** Inserts a new locally stored filepart - metadata goes to the DB, content to the pending-uploads dir **/
-  def insertUploadFilepart(uploadId: Int, owner: UserRecord, filepart: FilePart[TemporaryFile]):
+  def insertUploadFilepart(uploadId: Int, owner: User, filepart: FilePart[TemporaryFile]):
     Future[Either[Exception, UploadFilepartRecord]] = db.withTransaction { sql =>
      
     val filesizeKb = filepart.ref.file.length.toDouble / 1024
     
-    val usedDiskspaceKb = uploads.getUsedDiskspaceKB(owner.getUsername)
-    val remainingDiskspaceKb = owner.getQuotaMb * 1024 - usedDiskspaceKb
+    val usedDiskspaceKb = uploads.getUsedDiskspaceKB(owner.username)
+    val remainingDiskspaceKb = owner.quotaMb * 1024 - usedDiskspaceKb
     val isQuotaExceeded = remainingDiskspaceKb < filesizeKb
     
     if (isQuotaExceeded) {
@@ -85,7 +86,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
       
       ContentType.fromFile(file) match {
         case Right(contentType) => {
-          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.getUsername, title, contentType.toString, file.getName, filesizeKb, null)
+          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.username, title, contentType.toString, file.getName, filesizeKb, null)
           sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
           Right(filepartRecord)
         }

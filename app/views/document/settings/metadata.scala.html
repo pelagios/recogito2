@@ -1,7 +1,7 @@
 @(
   metadataForm: Form[controllers.document.settings.actions.DocumentMetadata],
   doc: models.document.DocumentInfo,
-  currentUser: models.generated.tables.records.UserRecord
+  currentUser: models.user.User
 )(implicit header: RequestHeader, webjars: WebJarAssets, messages: Messages, flash: Flash)
 
 @_layout("Recogito | Settings - Metadata", doc, currentUser, Some("metadata")) {

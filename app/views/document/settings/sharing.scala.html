@@ -1,6 +1,6 @@
 @(
   doc: models.document.DocumentInfo,
-  currentUser: models.generated.tables.records.UserRecord,
+  currentUser: models.user.User,
   sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
@@ -57,7 +57,7 @@
 
   <script>
     window.config = {
-      me: '@currentUser.getUsername',
+      me: '@currentUser.username',
       documentId: '@doc.id'
     }
   </script>

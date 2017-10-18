@@ -71,17 +71,15 @@ class DownloadsController @Inject() (
       with tei.TEISerializer {
   
   private def download(documentId: String, export: DocumentInfo => Future[Result])(implicit request: RequestWithAttributes[AnyContent]) = {
-    val maybeUser = loggedIn.map(_.user)
-    documentReadResponse(documentId, maybeUser, { case (docInfo, _) => // Used just for the access permission check
+    documentReadResponse(documentId, loggedIn, { case (docInfo, _) => // Used just for the access permission check
       export(docInfo)
     })
   }
 
   def showDownloadOptions(documentId: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user)
-    documentReadResponse(documentId, maybeUser, { case (doc, accesslevel) =>
+    documentReadResponse(documentId, loggedIn, { case (doc, accesslevel) =>
       annotations.countByDocId(documentId).map { documentAnnotationCount =>
-        Ok(views.html.document.downloads.index(doc, maybeUser, accesslevel, documentAnnotationCount))
+        Ok(views.html.document.downloads.index(doc, loggedIn, accesslevel, documentAnnotationCount))
       }
     })
   }

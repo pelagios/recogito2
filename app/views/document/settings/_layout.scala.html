@@ -1,7 +1,7 @@
 @(
   title: String,
   doc: models.document.DocumentInfo,
-  currentUser: models.generated.tables.records.UserRecord,
+  currentUser: models.user.User,
   activeTab: Option[String]
 )(content: Html)(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>

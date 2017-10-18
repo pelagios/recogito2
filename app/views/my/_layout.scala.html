@@ -1,5 +1,5 @@
 @(
-  user: models.generated.tables.records.UserRecord,
+  user: models.user.User,
   usedDiskspace: Long,
   myDocCount: Long,
   sharedWithMeCount: Long,
@@ -20,19 +20,19 @@
 
       <div class="user-section">
         <div class="user-info">
-          <h1>@user.getUsername</h1>
+          <h1>@user.username</h1>
 
           <p class="member-since">
             <span class="icon">&#xf017;</span>
-            Joined on @user.getMemberSince.format("d MMM YYYY")
+            Joined on @user.memberSince.format("d MMM YYYY")
           </p>
 
           <div class="used-diskspace">
             <div class="meter">
-              <div class="bar" style="width:@{Math.max(1.5, 100 * usedDiskspace.toDouble / (user.getQuotaMb * 1024)) }%"></div>
+              <div class="bar" style="width:@{Math.max(1.5, 100 * usedDiskspace.toDouble / (user.quotaMb * 1024)) }%"></div>
             </div>
             <span class="label">
-              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / 1024) } of @user.getQuotaMb MB Used
+              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / 1024) } of @user.quotaMb MB Used
             </span>
           </div>
 
@@ -61,11 +61,11 @@
     <div class="toolbar">
       <ul class="tabs">
         <li class="my-documents @if(activeTab == "my") { enabled }">
-          <a href="@controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("my"), None, None, None)">My documents (@myDocCount)</a>
+          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("my"), None, None, None)">My documents (@myDocCount)</a>
         </li><!--
 
         --><li class="shared-with-me @if(activeTab == "shared") { enabled }">
-          <a href="@controllers.my.routes.MyRecogitoController.index(user.getUsername.toLowerCase, Some("shared"), None, None, None)">Shared with me (@sharedWithMeCount)</a>
+          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("shared"), None, None, None)">Shared with me (@sharedWithMeCount)</a>
         </li>
       </ul>
 
@@ -83,7 +83,7 @@
         <button class="nostyle add-folder" title="Create new folder">&#xe890;</button>
 
         <div class="import">
-          <a class="btn" href="@controllers.my.routes.UploadController.showStep1(user.getUsername.toLowerCase)">New Document</a>
+          <a class="btn" href="@controllers.my.routes.UploadController.showStep1(user.username.toLowerCase)">New Document</a>
         </div>
 
       </div> <!-- .tools -->

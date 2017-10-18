@@ -1,7 +1,7 @@
 @(
   doc: models.document.DocumentInfo,
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
-  currentUser: Option[models.user.UserWithRoles],
+  currentUser: Option[models.user.User],
   accessLevel: models.document.DocumentAccessLevel,
   preview: String,
   annotationCount: Long
@@ -25,7 +25,7 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/tei/app.js")"></script>
     <script>
       window.config = {
-        @if(currentUser.isDefined) { me: '@currentUser.get.user.getUsername', }
+        @if(currentUser.isDefined) { me: '@currentUser.get.username', }
         documentId: '@doc.id',
         documentOwner: '@doc.ownerName',
         partId: '@currentPart.getId',
@@ -37,7 +37,7 @@
     </script>
   </head>
   <body>
-    @views.html.document.iconbar(doc.document, currentUser.map(_.user), accessLevel, "edit")
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit")
     <div class="header-infobox">
       <h1>
         @doc.author.map(_ + ": ")@doc.title

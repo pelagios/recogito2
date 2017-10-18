@@ -42,21 +42,21 @@ class AccountSettingsController @Inject() (
 
   def index() = StackAction(AuthorityKey -> Normal) { implicit request =>
     val form = accountSettingsForm.fill(AccountSettingsData(
-      users.decryptEmail(loggedIn.user.getEmail),
-      Option(loggedIn.user.getRealName),
-      Option(loggedIn.user.getBio),
-      Option(loggedIn.user.getWebsite)))
+      users.decryptEmail(loggedIn.email),
+      Option(loggedIn.realName),
+      Option(loggedIn.bio),
+      Option(loggedIn.website)))
     
-    Ok(views.html.my.settings.account(form, loggedIn.user))
+    Ok(views.html.my.settings.account(form, loggedIn))
   }
 
   def updateAccountSettings() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     accountSettingsForm.bindFromRequest.fold(
       formWithErrors =>
-        Future.successful(BadRequest(views.html.my.settings.account(formWithErrors, loggedIn.user))),
+        Future.successful(BadRequest(views.html.my.settings.account(formWithErrors, loggedIn))),
 
       f =>
-        users.updateUserSettings(loggedIn.user.getUsername, f.email, f.name, f.bio, f.website)
+        users.updateUserSettings(loggedIn.username, f.email, f.name, f.bio, f.website)
           .map { success =>
             if (success)
               Redirect(routes.AccountSettingsController.index).flashing("success" -> "Your settings have been saved.")
@@ -92,7 +92,7 @@ class AccountSettingsController @Inject() (
       }
     }
     
-    val username = loggedIn.user.getUsername
+    val username = loggedIn.username
     
     // Fetch IDs of all documents owned by this user
     val fOwnedDocumentIds = documents.listAllIdsByOwner(username)

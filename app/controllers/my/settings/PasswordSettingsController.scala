@@ -35,16 +35,16 @@ class PasswordSettingsController @Inject() (
   )
 
   def index() = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Ok(views.html.my.settings.password(passwordSettingsForm, loggedIn.user))
+    Ok(views.html.my.settings.password(passwordSettingsForm, loggedIn))
   }
 
   def updatePassword() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     passwordSettingsForm.bindFromRequest.fold(
       formWithErrors =>
-        Future.successful(BadRequest(views.html.my.settings.password(formWithErrors, loggedIn.user))),
+        Future.successful(BadRequest(views.html.my.settings.password(formWithErrors, loggedIn))),
 
       f => {
-        users.updatePassword(loggedIn.user.getUsername, f.currentPassword, f.newPassword)
+        users.updatePassword(loggedIn.username, f.currentPassword, f.newPassword)
           .map { _ match {
             case Right(_) =>
               Redirect(routes.PasswordSettingsController.index).flashing("success" -> "Your password has been updated.")

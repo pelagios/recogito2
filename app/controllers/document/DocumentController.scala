@@ -50,8 +50,7 @@ class DocumentController @Inject() (
     * - in case the document is not an image, returns a BadRequest   
     */
   def getImageManifest(docId: String, partNo: Int) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user)
-    documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
+    documentPartResponse(docId, partNo, loggedIn, { case (doc, currentPart, accesslevel) =>
       ContentType.withName(currentPart.getContentType) match {
         
         case Some(ContentType.IMAGE_UPLOAD) =>
@@ -72,8 +71,7 @@ class DocumentController @Inject() (
 
   /** Returns the image tile at the given relative file path for the specified document part **/
   def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user)
-    documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
+    documentPartResponse(docId, partNo, loggedIn, { case (doc, currentPart, accesslevel) =>
       getTilesetFile(doc.document, currentPart, tilepath).map {
         case Some(file) => Ok.sendFile(file)
         case None => NotFound
@@ -89,8 +87,7 @@ class DocumentController @Inject() (
     def iiifThumbnailURL(iiifUrl: String) =
       iiifUrl.substring(0, iiifUrl.length - 9) + "full/160,/0/default.jpg"
     
-    val maybeUser = loggedIn.map(_.user)
-    documentPartResponse(docId, partNo, maybeUser, { case (doc, currentPart, accesslevel) =>
+    documentPartResponse(docId, partNo, loggedIn, { case (doc, currentPart, accesslevel) =>
       if (currentPart.getContentType == IMAGE_IIIF.toString) {        
         Future.successful(Redirect(iiifThumbnailURL(currentPart.getFile)))
       } else {
@@ -104,8 +101,7 @@ class DocumentController @Inject() (
   
   /** Gets the raw content for the given document part **/
   def getRaw(docId: String, partNo: Int, lines: Option[Int]) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user)
-    documentPartResponse(docId, partNo, maybeUser, { case (document, currentPart, accesslevel) =>
+    documentPartResponse(docId, partNo, loggedIn, { case (document, currentPart, accesslevel) =>
       Future {
         scala.concurrent.blocking {
           val documentDir = uploads.getDocumentDir(document.owner.getUsername, document.id).get

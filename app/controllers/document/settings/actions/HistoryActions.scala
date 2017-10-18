@@ -12,7 +12,7 @@ trait HistoryActions { self: SettingsController =>
   }
 
   def rollbackByTime(documentId: String, contributionId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { _ =>
+    documentAdminAction(documentId, loggedIn.username, { _ =>
       contributions.findById(contributionId).flatMap {
         case Some((contribution, _)) => {
           val f = for {

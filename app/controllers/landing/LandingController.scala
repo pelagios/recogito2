@@ -26,7 +26,7 @@ class LandingController @Inject() (
   def index = StackAction { implicit request =>
     loggedIn match {
       case Some(user) =>
-        Redirect(controllers.my.routes.MyRecogitoController.index(user.user.getUsername, None, None, None, None))
+        Redirect(controllers.my.routes.MyRecogitoController.index(user.username, None, None, None, None))
 
       case None =>
         logPageView()

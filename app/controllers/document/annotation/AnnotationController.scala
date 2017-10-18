@@ -1,21 +1,18 @@
 package controllers.document.annotation
 
-import controllers.{ BaseOptAuthController, WebJarAssets }
+import controllers.{ BaseOptAuthController, HasVisitLogging, HasTEISnippets, WebJarAssets }
 import java.util.UUID
 import javax.inject.{ Inject, Singleton }
 import models.ContentType
 import models.annotation.AnnotationService
 import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
 import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
-import models.user.UserService
+import models.user.{ User, UserService }
+import models.visit.VisitService
 import play.api.{ Configuration, Logger }
 import play.api.mvc.{ RequestHeader, Result }
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
-import controllers.HasVisitLogging
-import models.visit.VisitService
-import controllers.HasTEISnippets
-import models.user.UserWithRoles
 
 @Singleton
 class AnnotationController @Inject() (
@@ -64,8 +61,7 @@ class AnnotationController @Inject() (
 
   /** Shows the annotation view for a specific document part **/
   def showAnnotationView(documentId: String, seqNo: Int) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user)
-    documentPartResponse(documentId, seqNo, maybeUser, { case (doc, currentPart, accesslevel) =>
+    documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
       if (accesslevel.canRead)
         renderResponse(doc, currentPart, loggedIn, accesslevel)
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
@@ -78,7 +74,7 @@ class AnnotationController @Inject() (
   private def renderResponse(
       doc: DocumentInfo,
       currentPart: DocumentFilepartRecord,
-      loggedInUser: Option[UserWithRoles],
+      loggedInUser: Option[User],
       accesslevel: DocumentAccessLevel
     )(implicit request: RequestHeader) = {
     

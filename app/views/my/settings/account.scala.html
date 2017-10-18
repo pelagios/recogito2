@@ -1,6 +1,6 @@
 @(
   settingsForm: Form[controllers.my.settings.AccountSettingsData],
-  user: models.generated.tables.records.UserRecord
+  user: models.user.User
 )(implicit messages: Messages, flash: Flash, request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
@@ -13,7 +13,7 @@
 
   <body>
     <div class="sidebar">
-      @views.html.sidebarHeader(user)
+      @views.html.sidebarHeader(user.record)
 
       <ul class="menu">
         <li class="active">

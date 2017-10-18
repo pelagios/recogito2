@@ -1,6 +1,6 @@
 @(
   doc: models.document.DocumentInfo,
-  currentUser: Option[models.generated.tables.records.UserRecord],
+  currentUser: Option[models.user.User],
   accessLevel: models.document.DocumentAccessLevel,
   annotationCount: Long
  )(implicit request: RequestHeader, webjars: WebJarAssets)
@@ -17,7 +17,7 @@
     <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/map/app.js")"></script>
     <script>
       window.config = {
-        @if(currentUser.isDefined) { me: '@currentUser.get.getUsername', }
+        @if(currentUser.isDefined) { me: '@currentUser.get.username', }
         documentId: '@doc.id',
         documentOwner: '@doc.ownerName'
       }

@@ -34,7 +34,7 @@ class RestoreController @Inject() (
     with BackupReader {
   
   def index() = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Ok(views.html.my.settings.restore(loggedIn.user))
+    Ok(views.html.my.settings.restore(loggedIn))
   }
 
   def restore() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
@@ -46,7 +46,7 @@ class RestoreController @Inject() (
           restoreBackup(
             filepart.ref.file,
             runAsAdmin = false,
-            forcedOwner = Some(loggedIn.user.getUsername)
+            forcedOwner = Some(loggedIn.username)
           ).map { _ => 
             Redirect(routes.RestoreController.index).flashing("success" -> "The document was restored successfully.") 
           }.recover { 

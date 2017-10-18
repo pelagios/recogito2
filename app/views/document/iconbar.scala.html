@@ -1,6 +1,6 @@
 @(
   document: models.generated.tables.records.DocumentRecord,
-  currentUser: Option[models.generated.tables.records.UserRecord],
+  currentUser: Option[models.user.User],
   accessLevel: models.document.DocumentAccessLevel,
   activeView: String
  )(implicit request: RequestHeader)

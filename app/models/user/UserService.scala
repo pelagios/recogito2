@@ -9,7 +9,7 @@ import javax.inject.{ Inject, Singleton }
 import models.{ BaseService, Page, SortOrder }
 import models.user.Roles.Role
 import models.generated.Tables._
-import models.generated.tables.records.{ UserRecord, UserRoleRecord }
+import models.generated.tables.records.{ UserRecord, UserRoleRecord, FeatureToggleRecord }
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
@@ -20,7 +20,6 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Either, Left, Right }
 import storage.{ DB, Uploads }
 import sun.security.provider.SecureRandom
-import models.generated.tables.records.FeatureToggleRecord
 
 @Singleton
 class UserService @Inject() (
@@ -142,7 +141,7 @@ class UserService @Inject() (
         base.where(USER.USERNAME.equal(username)).fetchArray()
 
     groupLeftJoinResult(records, classOf[UserRecord], classOf[UserRoleRecord], classOf[FeatureToggleRecord]).headOption
-      .map { case (user, t) => UserWithRoles(user, t._1, t._2.map(_.getHasToggle)) }
+      .map { case (user, t) => User(user, t._1, t._2) }
   }
   
   def deleteByUsername(username: String) = db.withTransaction { sql =>
@@ -160,7 +159,7 @@ class UserService @Inject() (
       if (username.contains("@"))
         findByEmail(username)
       else
-        findByUsername(username).map(_.map(_.user))
+        findByUsername(username).map(_.map(_.record))
       
     f.map {
       case Some(user) =>

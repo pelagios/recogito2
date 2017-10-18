@@ -1,12 +1,12 @@
 @(
-  owner: models.generated.tables.records.UserRecord,
+  owner: models.user.User,
   documents: models.Page[models.generated.tables.records.DocumentRecord],
-  currentUser: Option[models.generated.tables.records.UserRecord]
+  currentUser: Option[models.user.User]
 )(implicit request: RequestHeader, webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
   <head>
-    <title>@owner.getUsername | Recogito</title>
+    <title>@owner.username | Recogito</title>
     <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,height=device-height,target-densitydpi=device-dpi,user-scalable=yes" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
     <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
@@ -26,11 +26,11 @@
 
       <div class="user-section">
         <div class="user-info">
-          <h1>@owner.getUsername</h1>
+          <h1>@owner.username</h1>
 
           <p class="member-since">
             <span class="icon">&#xf017;</span>
-            Joined on @owner.getMemberSince.format("d MMM YYYY")
+            Joined on @owner.memberSince.format("d MMM YYYY")
           </p>
         </div>
       </div> <!-- .user-section -->
@@ -46,7 +46,7 @@
     <div class="document-panel">
       @if(documents.total == 0) {
         <div class="no-docs-yet">
-          <span>@owner.getUsername has not shared any documents yet</span>
+          <span>@owner.username has not shared any documents yet</span>
         </div>
       } else {
         <table class="document-list public">

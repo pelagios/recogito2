@@ -1,6 +1,4 @@
-@(
-  user: models.generated.tables.records.UserRecord
-)(implicit flash: Flash)
+@(user: models.user.User)(implicit flash: Flash)
 <!DOCTYPE html>
 <html>
   <head>
@@ -10,7 +8,7 @@
 
   <body>
     <div class="sidebar">
-      @views.html.sidebarHeader(user)
+      @views.html.sidebarHeader(user.record)
 
       <ul class="menu">
         <li>

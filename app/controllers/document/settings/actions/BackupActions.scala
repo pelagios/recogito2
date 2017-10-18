@@ -9,7 +9,7 @@ trait BackupActions extends BackupWriter { self: SettingsController =>
   private val TMP_DIR = System.getProperty("java.io.tmpdir")
 
   def exportAsZip(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { doc =>
+    documentAdminAction(documentId, loggedIn.username, { doc =>
       createBackup(doc)(self.ctx, self.uploads, self.annotations).map { file =>
         Ok.sendFile(file)
       }

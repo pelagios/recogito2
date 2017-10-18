@@ -18,8 +18,8 @@ class DiscussionController @Inject() (
   ) extends BaseAuthController(config, documents, users) {
 
   def showDiscussionBoard(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentResponse(documentId, loggedIn.user, { case (doc, accesslevel) =>
-      Ok(views.html.document.discussion.index(doc, Some(loggedIn.user), accesslevel)) })
+    documentResponse(documentId, loggedIn, { case (doc, accesslevel) =>
+      Ok(views.html.document.discussion.index(doc, Some(loggedIn), accesslevel)) })
   }
 
 }

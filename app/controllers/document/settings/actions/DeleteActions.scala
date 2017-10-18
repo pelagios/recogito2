@@ -30,7 +30,7 @@ trait DeleteActions { self: SettingsController =>
 
   /** Deletes all annotations on the document with the given ID **/
   def deleteAnnotations(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentOwnerAction(docId, loggedIn.user.getUsername, { document =>
+    documentOwnerAction(docId, loggedIn.username, { document =>
       
       val deleteAnnotations = annotations.deleteByDocId(docId)
       val deleteContributions = contributions.deleteHistory(docId) 
@@ -45,7 +45,7 @@ trait DeleteActions { self: SettingsController =>
 
   /** Deletes the document with the given ID, along with all annotations and files **/
   def deleteDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentOwnerAction(docId, loggedIn.user.getUsername, { document =>
+    documentOwnerAction(docId, loggedIn.username, { document =>
             
       val deleteDocument = documents.delete(document)
       val deleteAnnotations = annotations.deleteByDocId(docId)

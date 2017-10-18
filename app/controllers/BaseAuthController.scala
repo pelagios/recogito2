@@ -2,8 +2,8 @@ package controllers
 
 import jp.t2v.lab.play2.auth.AuthElement
 import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
-import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
-import models.user.UserService
+import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord }
+import models.user.{ User, UserService }
 import play.api.Configuration
 import play.api.mvc.Result
 import scala.concurrent.ExecutionContext
@@ -21,11 +21,11 @@ abstract class BaseAuthController(
     */
   protected def documentResponse(
       docId: String,
-      user: UserRecord,
+      user: User,
       response: (DocumentInfo, DocumentAccessLevel) => Result
     )(implicit ctx: ExecutionContext) = {
 
-    documents.getExtendedInfo(docId, Some(user.getUsername)).map(_ match {
+    documents.getExtendedInfo(docId, Some(user.username)).map(_ match {
       case Some((doc, accesslevel)) => {
         if (accesslevel.canRead)
           // As long as there are read rights we'll allow access here - the response
@@ -48,7 +48,7 @@ abstract class BaseAuthController(
   protected def documentPartResponse(
       docId: String,
       partNo: Int,
-      user: UserRecord,
+      user: User,
       response: (DocumentInfo, DocumentFilepartRecord, DocumentAccessLevel) => Result
     )(implicit ctx: ExecutionContext) = {
 

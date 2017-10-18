@@ -1,7 +1,7 @@
 @(
   doc: models.document.DocumentInfo,
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
-  currentUser: Option[models.user.UserWithRoles],
+  currentUser: Option[models.user.User],
   accessLevel: models.document.DocumentAccessLevel,
   annotationCount: Long
  )(implicit request: RequestHeader, webjars: WebJarAssets)
@@ -24,7 +24,7 @@
     <script>
       window.config = {
         @if(currentUser.isDefined) {
-          me: '@currentUser.get.user.getUsername',
+          me: '@currentUser.get.username',
           featureToggles: [@Html(currentUser.get.featureToggles.map("'" + _ + "'").mkString(","))],
         }
         documentId: '@doc.id',
@@ -38,7 +38,7 @@
     </script>
   </head>
   <body>
-    @views.html.document.iconbar(doc.document, currentUser.map(_.user), accessLevel, "edit")
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit")
 
     <div class="header-infobox">
       <h1>

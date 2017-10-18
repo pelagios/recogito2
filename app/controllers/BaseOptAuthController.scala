@@ -2,8 +2,8 @@ package controllers
 
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
-import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
-import models.user.UserService
+import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord }
+import models.user.{ User, UserService }
 import play.api.Configuration
 import play.api.mvc.{ AnyContent, Request, Result }
 import scala.concurrent.{ ExecutionContext, Future }
@@ -22,11 +22,11 @@ abstract class BaseOptAuthController(
     */
   protected def documentResponse(
       documentId: String,
-      maybeUser: Option[UserRecord],
+      maybeUser: Option[User],
       response: (DocumentInfo, DocumentAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext) = {
 
-    documents.getExtendedInfo(documentId, maybeUser.map(_.getUsername)).flatMap(_ match {
+    documents.getExtendedInfo(documentId, maybeUser.map(_.username)).flatMap(_ match {
       case Some((doc, accesslevel)) => response(doc, accesslevel)
       case None => Future.successful(NotFoundPage)
     }).recover { case t =>
@@ -38,7 +38,7 @@ abstract class BaseOptAuthController(
   /** Helper that covers the boilerplate for document views requiring read access **/
   protected def documentReadResponse(
       documentId: String,
-      maybeUser: Option[UserRecord],
+      maybeUser: Option[User],
       response: (DocumentInfo, DocumentAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext, request: Request[AnyContent])  = {
     
@@ -56,7 +56,7 @@ abstract class BaseOptAuthController(
   protected def documentPartResponse(
       documentId: String,
       partNo: Int,
-      maybeUser: Option[UserRecord],
+      maybeUser: Option[User],
       response: (DocumentInfo, DocumentFilepartRecord, DocumentAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext, request: Request[AnyContent]) = {
     

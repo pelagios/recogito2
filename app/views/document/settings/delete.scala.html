@@ -1,6 +1,6 @@
 @(
   doc: models.document.DocumentInfo,
-  currentUser: models.generated.tables.records.UserRecord
+  currentUser: models.user.User
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
 @_layout("Recogito | Settings - Delete", doc, currentUser, Some("delete")) {

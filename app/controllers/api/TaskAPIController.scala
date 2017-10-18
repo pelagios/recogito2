@@ -53,7 +53,7 @@ class TaskAPIController @Inject() (
     request.body.asJson.map(json => Json.fromJson[TaskDefinition](json)) match {
       case Some(result) if result.isSuccess =>
         val taskDefinition = result.get
-        documentResponse(taskDefinition.documentId, loggedIn.user, { case (docInfo, accesslevel) =>
+        documentResponse(taskDefinition.documentId, loggedIn, { case (docInfo, accesslevel) =>
           if (accesslevel.canWrite)
             taskDefinition.taskType match {  
               case TaskType("GEORESOLUTION") =>
@@ -73,7 +73,7 @@ class TaskAPIController @Inject() (
   }
     
   def progressByDocument(id: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
-    documents.getExtendedInfo(id, Some(loggedIn.user.getUsername)).flatMap(_ match {
+    documents.getExtendedInfo(id, Some(loggedIn.username)).flatMap(_ match {
       case Some((doc, accesslevel)) =>
         if (accesslevel.canRead) {
           tasks.findByDocument(id).map {

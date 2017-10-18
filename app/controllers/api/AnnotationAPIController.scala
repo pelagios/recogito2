@@ -177,10 +177,10 @@ class AnnotationAPIController @Inject() (
 
   def createAnnotation() = AsyncStack { implicit request => jsonOp[AnnotationStub] { annotationStub =>
     // Fetch the associated document to check access privileges
-    documents.getDocumentRecord(annotationStub.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap(_ match {
+    documents.getDocumentRecord(annotationStub.annotates.documentId, loggedIn.map(_.username)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel.canWrite) {
-          val annotation = stubToAnnotation(annotationStub, loggedIn.map(_.user.getUsername).getOrElse("guest"))
+          val annotation = stubToAnnotation(annotationStub, loggedIn.map(_.username).getOrElse("guest"))
           val f = for {
             (annotationStored, _, previousVersion) <- annotationService.insertOrUpdateAnnotation(annotation)
             success <- if (annotationStored)
@@ -204,7 +204,7 @@ class AnnotationAPIController @Inject() (
   
   def bulkUpsert() = AsyncStack { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
     // We currently restrict to bulk upserts for a single document part only
-    val username = loggedIn.map(_.user.getUsername)
+    val username = loggedIn.map(_.username)
     val documentIds = annotationStubs.map(_.annotates.documentId).distinct
     val partIds = annotationStubs.map(_.annotates.filepartId).distinct    
     
@@ -243,7 +243,7 @@ class AnnotationAPIController @Inject() (
   }}
 
   def getImage(id: UUID) = AsyncStack { implicit request =>    
-    val username = loggedIn.map(_.user.getUsername)
+    val username = loggedIn.map(_.username)
     
     annotationService.findById(id).flatMap {
       case Some((annotation, _)) =>
@@ -323,7 +323,7 @@ class AnnotationAPIController @Inject() (
     annotationService.findById(id).flatMap {
       case Some((annotation, _)) => {
         if (includeContext) {          
-          documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
+          documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.username)).flatMap {
             case Some((doc, accesslevel)) =>
               if (accesslevel.canRead)
                 getContext(doc, annotation).map(context =>
@@ -366,10 +366,10 @@ class AnnotationAPIController @Inject() (
     annotationService.findById(id).flatMap {
       case Some((annotation, version)) =>
         // Fetch the associated document
-        documents.getDocumentRecord(annotation.annotates.documentId, loggedIn.map(_.user.getUsername)).flatMap {
+        documents.getDocumentRecord(annotation.annotates.documentId, loggedIn.map(_.username)).flatMap {
           case Some((document, accesslevel)) => {
             if (accesslevel.canWrite) {
-              val user = loggedIn.map(_.user.getUsername).getOrElse("guest")
+              val user = loggedIn.map(_.username).getOrElse("guest")
               val now = DateTime.now
               annotationService.deleteAnnotation(id, user, now).flatMap {
                 case Some(annotation) =>

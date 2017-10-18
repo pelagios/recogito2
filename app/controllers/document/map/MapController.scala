@@ -23,12 +23,10 @@ class MapController @Inject() (
   ) extends BaseOptAuthController(config, document, users) with HasVisitLogging {
 
   def showMap(documentId: String) = AsyncStack { implicit request =>
-    val maybeUser = loggedIn.map(_.user)
-    
-    documentReadResponse(documentId, maybeUser,  { case (doc, accesslevel) =>
+    documentReadResponse(documentId, loggedIn,  { case (doc, accesslevel) =>
       logDocumentView(doc.document, None, accesslevel)
       annotations.countByDocId(documentId).map { documentAnnotationCount =>
-        Ok(views.html.document.map.index(doc, maybeUser, accesslevel, documentAnnotationCount))
+        Ok(views.html.document.map.index(doc, loggedIn, accesslevel, documentAnnotationCount))
       }
     })
   }

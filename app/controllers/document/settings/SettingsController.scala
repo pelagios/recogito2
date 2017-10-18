@@ -37,7 +37,7 @@ class SettingsController @Inject() (
       with HasPrettyPrintJSON {
 
   def showDocumentSettings(documentId: String, tab: Option[String]) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { doc =>
+    documentAdminAction(documentId, loggedIn.username, { doc =>
       tab.map(_.toLowerCase) match {
         case Some(t) if t == "sharing" => {
           val f = for {
@@ -46,7 +46,7 @@ class SettingsController @Inject() (
 
           f.map(sharingPolicies =>
             // Make sure this page isn't cached, since stuff gets added via AJAX
-            Ok(views.html.document.settings.sharing(doc, loggedIn.user, sharingPolicies))
+            Ok(views.html.document.settings.sharing(doc, loggedIn, sharingPolicies))
               .withHeaders(
                 CACHE_CONTROL -> "no-cache, no-store, must-revalidate",
                 PRAGMA -> "no-cache",
@@ -54,16 +54,16 @@ class SettingsController @Inject() (
         }
 
         case Some(t) if t == "history" =>
-          Future.successful(Ok(views.html.document.settings.history(doc, loggedIn.user)))
+          Future.successful(Ok(views.html.document.settings.history(doc, loggedIn)))
 
         case Some(t) if t == "backup" =>
-          Future.successful(Ok(views.html.document.settings.backup(doc, loggedIn.user)))
+          Future.successful(Ok(views.html.document.settings.backup(doc, loggedIn)))
 
         case Some(t) if t == "delete" =>
-          Future.successful(Ok(views.html.document.settings.delete(doc, loggedIn.user)))
+          Future.successful(Ok(views.html.document.settings.delete(doc, loggedIn)))
 
         case _ =>
-          Future.successful(Ok(views.html.document.settings.metadata(metadataForm(doc.document), doc, loggedIn.user)))
+          Future.successful(Ok(views.html.document.settings.metadata(metadataForm(doc.document), doc, loggedIn)))
       }
     })
   }

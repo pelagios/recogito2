@@ -51,7 +51,7 @@ trait MetadataActions { self: SettingsController =>
 
   /** Sets the part sort order **/
   def setSortOrder(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    jsonDocumentAdminAction[Seq[PartOrdering]](docId, loggedIn.user.getUsername, { case (document, ordering) =>
+    jsonDocumentAdminAction[Seq[PartOrdering]](docId, loggedIn.username, { case (document, ordering) =>
       documents.setFilepartSortOrder(docId, ordering).map(_ => Status(200))
     })
   }
@@ -84,10 +84,10 @@ trait MetadataActions { self: SettingsController =>
   }
 
   def updateDocumentMetadata(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(docId, loggedIn.user.getUsername, { doc =>
+    documentAdminAction(docId, loggedIn.username, { doc =>
       documentMetadataForm.bindFromRequest.fold(
         formWithErrors =>
-          Future.successful(BadRequest(views.html.document.settings.metadata(formWithErrors, doc, loggedIn.user))),
+          Future.successful(BadRequest(views.html.document.settings.metadata(formWithErrors, doc, loggedIn))),
         
         f =>
           documents.updateMetadata(
@@ -117,7 +117,7 @@ trait MetadataActions { self: SettingsController =>
         case None => Left("Title required")
       }
   
-    documentAdminAction(docId, loggedIn.user.getUsername, { doc =>
+    documentAdminAction(docId, loggedIn.username, { doc =>
       // Make sure we're not updating a part that isn't in this document
       if (doc.fileparts.exists(_.getId == partId)) {
         bindFromRequest() match {

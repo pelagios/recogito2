@@ -29,7 +29,7 @@ object CollaboratorStub {
 trait SharingActions { self: SettingsController =>
     
   def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { doc =>
+    documentAdminAction(documentId, loggedIn.username, { doc =>
       // Make sure the license allows public access
       if (doc.license.map(_.isOpen).getOrElse(false))
         documents.setPublicVisibility(documentId, enabled).map(_ => Status(200))
@@ -40,7 +40,7 @@ trait SharingActions { self: SettingsController =>
   }
   
   def addCollaborator(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val currentUser = loggedIn.user.getUsername    
+    val currentUser = loggedIn.username    
     jsonDocumentAdminAction[CollaboratorStub](documentId, currentUser, { case (document, stub) =>
       if (stub.collaborator == document.getOwner) {
         // Doc owner as collaborator wouldn't make sense
@@ -49,8 +49,8 @@ trait SharingActions { self: SettingsController =>
         // If no access level given, use READ as minimum default
         val accessLevel = stub.accessLevel.getOrElse(DocumentAccessLevel.READ)
         users.findByUsername(stub.collaborator).flatMap { _ match {
-          case Some(userWithRoles) => 
-            documents.addDocumentCollaborator(documentId, currentUser, userWithRoles.user.getUsername, accessLevel)
+          case Some(user) => 
+            documents.addDocumentCollaborator(documentId, currentUser, user.username, accessLevel)
               .map { case (policy, isNew) => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy, isNew))) }
             
           case None => 
@@ -61,7 +61,7 @@ trait SharingActions { self: SettingsController =>
   }
   
   def removeCollaborator(documentId: String, username: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.user.getUsername, { _ =>      
+    documentAdminAction(documentId, loggedIn.username, { _ =>      
       documents.removeDocumentCollaborator(documentId, username).map(success =>
         if (success) Status(200) else InternalServerError)
     })

@@ -53,7 +53,7 @@ class PlaceAPIController @Inject() (
   
   /** List all places in document - bound to the current user's access level **/
   def listPlacesInDocument(docId: String, offset: Int, size: Int) = AsyncStack { implicit request =>
-    documentResponse(docId, loggedIn.map(_.user), { case (metadata, accesslevel) =>
+    documentResponse(docId, loggedIn, { case (metadata, accesslevel) =>
       if (accesslevel.canRead)
         places.listPlacesInDocument(docId, offset, size).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
       else
@@ -63,7 +63,7 @@ class PlaceAPIController @Inject() (
   
   /** Search places in document - bound to the current user's access level **/
   def searchPlacesInDocument(query: String, docId: String, offset: Int, size: Int) = AsyncStack { implicit request =>
-    documentResponse(docId, loggedIn.map(_.user), { case (metadata, accesslevel) =>
+    documentResponse(docId, loggedIn, { case (metadata, accesslevel) =>
       if (accesslevel.canRead)
         places.searchPlacesInDocument(query, docId, offset, size).map { results =>
           jsonOk(Json.toJson(results.map(_._1)))
