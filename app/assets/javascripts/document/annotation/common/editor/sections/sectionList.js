@@ -97,7 +97,10 @@ define([
                 });
 
                 // Field hidden by default if other transcriptions exist already, or when read-only
-                if (transcriptionBodies.length > 0 || !Config.writeAccess)
+                // But always available for users with multitranscription feature enabled
+                if (!Config.hasFeature('multitranscription') &&
+                     transcriptionBodies.length > 0 || !Config.writeAccess)
+
                   newTranscriptionField.hide();
               },
 

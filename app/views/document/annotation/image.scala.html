@@ -25,7 +25,7 @@
       window.config = {
         @if(currentUser.isDefined) {
           me: '@currentUser.get.username',
-          featureToggles: [@Html(currentUser.get.featureToggles.map("'" + _ + "'").mkString(","))],
+          features: [@Html(currentUser.get.featureToggles.map("'" + _ + "'").mkString(","))],
         }
         documentId: '@doc.id',
         documentOwner: '@doc.ownerName',
