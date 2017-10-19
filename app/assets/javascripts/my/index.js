@@ -68,6 +68,24 @@ require([
           return false;
         },
 
+        storePageNumber = function() {
+          var pageNumber = (function() {
+                var q = window.location.search,
+                    startIdx = q.indexOf('p='),
+                    endIdx = (startIdx > -1) ?
+                      Math.max(q.indexOf('&', startIdx), q.length) : -1;
+
+                return (endIdx > -1) ? q.substring(startIdx + 2, endIdx) : undefined;
+              })();
+
+              storedLocationStr = localStorage.getItem('r2.my.location');
+              storedLocation = (storedLocationStr) ? JSON.parse(storedLocationStr) : {};
+
+          storedLocation.p = pageNumber;
+          localStorage.setItem('r2.my.location', JSON.stringify(storedLocation));
+        },
+
+        /** Changing the sort order stores settings in localStorage and loads a new page **/
         onClickSort = function(e) {
           var el = jQuery(e.target).closest('td'),
               fieldName = el.data('field'),
@@ -78,21 +96,15 @@ require([
 
               sorting = { sortby: fieldName, order: sortOrder },
 
-              pageNumber = (function() {
-                var q = window.location.search,
-                    startIdx = q.indexOf('p='),
-                    endIdx = (startIdx > -1) ?
-                      Math.max(q.indexOf('&', startIdx), q.length) : -1;
+              updateStoredLocation = function() {
+                var storedAsString = localStorage.getItem('r2.my.location'),
+                    stored = (storedAsString) ? JSON.parse(storedAsString) : {},
+                    updated = jQuery.extend({}, stored, sorting);
 
-                return (endIdx > -1) ? q.substring(startIdx + 2, endIdx) : undefined;
-              })();
+                localStorage.setItem('r2.my.location', JSON.stringify(updated));
+              };
 
-          if (pageNumber)
-            localStorage.setItem('r2.my.sorting', JSON.stringify(jQuery.extend(
-              {}, sorting, { p: pageNumber })));
-          else
-            localStorage.setItem('r2.my.sorting', JSON.stringify(sorting));
-
+          updateStoredLocation();
           URLUtils.setQueryParams(sorting);
         },
 
@@ -149,6 +161,7 @@ require([
           window.location.href = url;
         };
 
+    storePageNumber();
     formatTime();
 
     sortButtons.click(onClickSort);
