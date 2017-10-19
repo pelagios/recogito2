@@ -3,8 +3,8 @@
   usedDiskspace: Long,
   myDocCount: Int,
   rows: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord, Option[models.contribution.Contribution], Long)],
-  sortBy: Option[String],
-  sortOrder: Option[models.SortOrder]
+  sortBy: String,
+  sortOrder: models.SortOrder
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
 @accessLevel(lvl: String) = {
@@ -46,7 +46,7 @@
           "last_modified_by" -> "By",
           "annotations" -> "Annotations",
           "is_public" -> "Public"
-        ), sortBy, sortOrder)
+        ), Some(sortBy), Some(sortOrder))
       </tr>
     </thead>
     <tbody>

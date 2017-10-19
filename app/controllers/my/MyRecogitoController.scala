@@ -30,8 +30,8 @@ class MyRecogitoController @Inject() (
   
   private val INDEX_SORT_PROPERTIES = Seq("last_modified_at", "last_modified_by", "annotations")
   
-  private def isSortingByIndex(sortBy: Option[String]) =
-    sortBy.map(fieldname => INDEX_SORT_PROPERTIES.contains(fieldname.toLowerCase)).getOrElse(false)
+  private def isSortingByIndex(sortBy: String) =
+    INDEX_SORT_PROPERTIES.contains(sortBy.toLowerCase)
 
   private def renderPublicProfile(usernameInPath: String, loggedInUser: Option[User])(implicit request: RequestHeader) = {
     val fOwnerWithRoles = users.findByUsernameIgnoreCase(usernameInPath)
@@ -78,7 +78,7 @@ class MyRecogitoController @Inject() (
     }
   }
   
-  private def renderMyDocuments(user: User, usedSpace: Long, offset: Int, sortBy: Option[String], sortOrder: Option[SortOrder])(implicit request: RequestHeader) = {
+  private def renderMyDocuments(user: User, usedSpace: Long, offset: Int, sortBy: String, sortOrder: SortOrder)(implicit request: RequestHeader) = {
     val startTime = System.currentTimeMillis
     val fSharedCount = documents.countBySharedWith(user.username)
 
@@ -86,7 +86,7 @@ class MyRecogitoController @Inject() (
       if (isSortingByIndex(sortBy)) {
         documents.listAllIdsByOwner(user.username).flatMap { docIds =>
           val f = for {
-            sortedIds <- sortByIndexProperty(docIds, sortBy.get, sortOrder.getOrElse(SortOrder.ASC), offset)
+            sortedIds <- sortByIndexProperty(docIds, sortBy, sortOrder, offset)
             docs <- documents.findByIds(sortedIds)
           } yield (sortedIds, docs)
           
@@ -96,7 +96,7 @@ class MyRecogitoController @Inject() (
           }
         }
       } else {
-        documents.findByOwner(user.username, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
+        documents.findByOwner(user.username, offset, DOCUMENTS_PER_PAGE, Some(sortBy), Some(sortOrder))
       }
         
     val f = for {
@@ -111,7 +111,7 @@ class MyRecogitoController @Inject() (
     }
   }
 
-  private def renderSharedWithMe(user: User, usedSpace: Long, offset: Int, sortBy: Option[String], sortOrder: Option[SortOrder])(implicit request: RequestHeader) = {
+  private def renderSharedWithMe(user: User, usedSpace: Long, offset: Int, sortBy: String, sortOrder: SortOrder)(implicit request: RequestHeader) = {
     val startTime = System.currentTimeMillis    
     val fMyDocsCount = documents.countByOwner(user.username, false)
     
@@ -119,7 +119,7 @@ class MyRecogitoController @Inject() (
       if (isSortingByIndex(sortBy)) {
         documents.listAllIdsSharedWith(user.username).flatMap { docIds =>           
           val f = for {
-            sortedIds <- sortByIndexProperty(docIds, sortBy.get, sortOrder.getOrElse(SortOrder.ASC), offset)
+            sortedIds <- sortByIndexProperty(docIds, sortBy, sortOrder, offset)
             docs <- documents.findByIdsWithSharingPolicy(sortedIds, user.username)
           } yield (sortedIds, docs)
 
@@ -129,7 +129,7 @@ class MyRecogitoController @Inject() (
           }
         }
       } else {
-        documents.findBySharedWith(user.username, offset, DOCUMENTS_PER_PAGE, sortBy, sortOrder)
+        documents.findBySharedWith(user.username, offset, DOCUMENTS_PER_PAGE, Some(sortBy), Some(sortOrder))
       }
     
     val f = for {
@@ -165,16 +165,32 @@ class MyRecogitoController @Inject() (
     }
     
     val offset = (page.getOrElse(1) - 1) * DOCUMENTS_PER_PAGE
-    
-    val sortOrder = order.flatMap(SortOrder.fromString(_))
 
     if (isProfileOwner) {
-      val user = loggedIn.get
-      val usedSpace = uploads.getUsedDiskspaceKB(user.username)
-
-      tab match {
-        case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace, offset, sortBy, sortOrder)
-        case _ => renderMyDocuments(user, usedSpace, offset, sortBy, sortOrder)
+      val normalizedSortOrder = order match {
+        case None => 
+          // No sort order specified: use default
+          Some(SortOrder.ASC)
+        case Some(str) =>
+          // Sort order specified: use only if valid
+          SortOrder.fromString(str)
+      }
+      
+      (sortBy, normalizedSortOrder) match {
+        
+        case (Some(s), Some(o)) =>
+          val user = loggedIn.get
+          val usedSpace = uploads.getUsedDiskspaceKB(user.username)    
+          tab match {
+            case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace, offset, s, o)
+            case _ => renderMyDocuments(user, usedSpace, offset, s, o)
+          }
+          
+        case _ =>
+          // DB natural order is pretty useless - we'll allow access to this URL 
+          // without sort order, but will redirect to sorted by most recent edit
+          Future.successful(Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, tab, page, Some("last_modified_at"), Some("asc"))))
+          
       }
     } else {
       renderPublicProfile(usernameInPath, loggedIn)

@@ -3,8 +3,8 @@
   usedDiskspace: Long,
   rows: models.Page[(models.generated.tables.records.DocumentRecord, Option[models.contribution.Contribution], Long)],
   sharedWithMeCount: Int,
-  sortBy: Option[String],
-  sortOrder: Option[models.SortOrder]
+  sortBy: String,
+  sortOrder: models.SortOrder
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
 @_layout(user, usedDiskspace, rows.total, sharedWithMeCount, "my") {
@@ -32,7 +32,7 @@
           "last_modified_by" -> "By",
           "annotations" -> "Annotations",
           "is_public" -> "Public"
-        ), sortBy, sortOrder)
+        ), Some(sortBy), Some(sortOrder))
       </tr>
     </thead>
     <tbody>
