@@ -9,6 +9,18 @@
       }}
     </a>
   </div>
+  <script>
+    jQuery(document).ready(function() {
+      var storedSorting = localStorage.getItem('r2.my.sorting'),
+          upgrade = function(s) {
+            var upgradeableLinks = jQuery('.to-index');
+            upgradeableLinks.each(function(_, l) {
+              l.href = l.href + '?sortby=' + s.sortby + '&order=' + s.order;
+            });
+          };
+      if (storedSorting) upgrade(JSON.parse(storedSorting));
+    });
+  </script>
 } else {
   <div class="not logged-in">
     <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm(Some(request.uri))">Log in</a>

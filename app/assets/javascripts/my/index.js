@@ -76,9 +76,23 @@ require([
                 (cssClass.indexOf('sorted') === -1) ? 'asc' : // Currently unsorted - use ASC
                 (cssClass.indexOf('asc') > -1) ? 'desc' : 'asc', // If there's an order, toggle
 
-              sorting = { sortby: fieldName, order: sortOrder };
+              sorting = { sortby: fieldName, order: sortOrder },
 
-          localStorage.setItem('r2.my.sorting', JSON.stringify(sorting));
+              pageNumber = (function() {
+                var q = window.location.search,
+                    startIdx = q.indexOf('p='),
+                    endIdx = (startIdx > -1) ?
+                      Math.max(q.indexOf('&', startIdx), q.length) : -1;
+
+                return (endIdx > -1) ? q.substring(startIdx + 2, endIdx) : undefined;
+              })();
+
+          if (pageNumber)
+            localStorage.setItem('r2.my.sorting', JSON.stringify(jQuery.extend(
+              {}, sorting, { p: pageNumber })));
+          else
+            localStorage.setItem('r2.my.sorting', JSON.stringify(sorting));
+
           URLUtils.setQueryParams(sorting);
         },
 

@@ -9,16 +9,4 @@
       <h2>Joined on @owner.getMemberSince.format("d MMM YYYY")</h2>
     }
   </a>
-  <script>
-    jQuery(document).ready(function() {
-      var storedSorting = localStorage.getItem('r2.my.sorting'),
-          upgrade = function(s) {
-            var upgradeableLinks = jQuery('.to-index');
-            upgradeableLinks.each(function(_, l) {
-              l.href = l.href + '?sortby=' + s.sortby + '&order=' + s.order;
-            });
-          };
-      if (storedSorting) upgrade(JSON.parse(storedSorting));
-    });
-  </script>
 </div>
