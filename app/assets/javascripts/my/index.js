@@ -74,9 +74,12 @@ require([
               cssClass = el.attr('class'),
               sortOrder =
                 (cssClass.indexOf('sorted') === -1) ? 'asc' : // Currently unsorted - use ASC
-                (cssClass.indexOf('asc') > -1) ? 'desc' : 'asc'; // If there's an order, toggle
+                (cssClass.indexOf('asc') > -1) ? 'desc' : 'asc', // If there's an order, toggle
 
-          URLUtils.setQueryParams({ 'sortby': fieldName, 'order': sortOrder });
+              sorting = { sortby: fieldName, order: sortOrder };
+
+          localStorage.setItem('r2.my.sorting', JSON.stringify(sorting));
+          URLUtils.setQueryParams(sorting);
         },
 
         /** Temporary: user clicked an icon representing an unimplemented feature **/
