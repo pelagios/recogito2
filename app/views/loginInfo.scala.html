@@ -16,6 +16,7 @@
             var upgradeableLinks = jQuery('.to-index');
             upgradeableLinks.each(function(_, l) {
               l.href = l.href + '?sortby=' + s.sortby + '&order=' + s.order;
+              if (s.p) l.href = l.href + '&p=' + s.p;
             });
           };
       if (storedSorting) upgrade(JSON.parse(storedSorting));
