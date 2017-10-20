@@ -18,6 +18,8 @@ case class AnnotationBody (
 
   uri: Option[String],
   
+  note: Option[String],
+  
   status: Option[AnnotationStatus]
 
 ) {
@@ -80,6 +82,7 @@ object AnnotationBody extends Enumeration with HasDate {
     (JsPath \ "last_modified_at").format[DateTime] and
     (JsPath \ "value").formatNullable[String] and
     (JsPath \ "uri").formatNullable[String] and
+    (JsPath \ "note").formatNullable[String] and
     (JsPath \ "status").formatNullable[AnnotationStatus]
   )(AnnotationBody.apply, unlift(AnnotationBody.unapply))
 

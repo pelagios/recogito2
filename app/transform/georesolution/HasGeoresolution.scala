@@ -105,17 +105,18 @@ trait HasGeoresolution {
       UUID.randomUUID,
       UUID.randomUUID,
       AnnotatedObject(documentId, partId, contentType),
-      Seq.empty[String], // No contributors
+      Seq.empty[String], // no contributors
       getAnchor(resolvable, index),
-      None, // No last modifying user
+      None, // no last modifying user
       now,
       Seq(
         AnnotationBody(
           AnnotationBody.QUOTE,
-          None, // No last modifying user
+          None, // no last modifying user
           now,
           Some(resolvable.toponym),
           None,
+          None, // note
           None
         ),
         AnnotationBody(
@@ -124,6 +125,7 @@ trait HasGeoresolution {
           now,
           None,
           uri,
+          None, // note
           Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None,now))
         )
       )

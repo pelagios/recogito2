@@ -44,6 +44,7 @@ object TEIParserService {
           now,   // lastModifiedAt
           Some(quote),
           None,  // uri
+          None,  // note
           None), // status
 
         AnnotationBody(
@@ -52,6 +53,7 @@ object TEIParserService {
           now,  // lastModifiedAt
           None, // value
           ref,
+          None, // note
           Some(AnnotationStatus(
             AnnotationStatus.VERIFIED,
             None,   // setBy

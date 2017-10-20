@@ -219,6 +219,7 @@ object BackupReader extends HasDate with HasContentTypeList {
     lastModifiedAt: Option[DateTime],
     value: Option[String],
     uri: Option[String],
+    note: Option[String],
     status: Option[AnnotationStatusStub]
   ) {
     
@@ -228,6 +229,7 @@ object BackupReader extends HasDate with HasContentTypeList {
       lastModifiedAt.getOrElse(new DateTime()),
       value,
       uri,
+      note,
       status.map(_.toAnnotationStatus)
     )
     
@@ -239,6 +241,7 @@ object BackupReader extends HasDate with HasContentTypeList {
     (JsPath \ "last_modified_at").readNullable[DateTime] and
     (JsPath \ "value").readNullable[String] and
     (JsPath \ "uri").readNullable[String] and
+    (JsPath \ "note").readNullable[String] and
     (JsPath \ "status").readNullable[AnnotationStatusStub]
   )(AnnotationBodyStub.apply _)
   

@@ -55,6 +55,7 @@ class HasTextSnippetsSpec extends Specification {
         DateTime.now,
         Some(text.substring(start, end)),
         None,
+        None,
         None)))
         
   "The snippet for the first annotation" should {

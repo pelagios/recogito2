@@ -55,6 +55,8 @@ case class AnnotationBodyStub(
   value: Option[String],
 
   uri: Option[String],
+  
+  note: Option[String],
 
   status: Option[AnnotationStatusStub])
 
@@ -66,6 +68,7 @@ object AnnotationBodyStub extends HasDate {
     (JsPath \ "last_modified_at").readNullable[DateTime] and
     (JsPath \ "value").readNullable[String] and
     (JsPath \ "uri").readNullable[String] and
+    (JsPath \ "note").readNullable[String] and
     (JsPath \ "status").readNullable[AnnotationStatusStub]
   )(AnnotationBodyStub.apply _)
 
@@ -152,6 +155,7 @@ class AnnotationAPIController @Inject() (
         b.lastModifiedAt.getOrElse(now),
         b.value,
         b.uri,
+        b.note,
         b.status.map(s =>
           AnnotationStatus(
             s.value,

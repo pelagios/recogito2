@@ -46,6 +46,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       now,
       None,
       Some("http://pleiades.stoa.org/places/246343"),
+      None,
       Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
     
   val annotatesLancaster = Annotation(
@@ -62,6 +63,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       now,
       None,
       Some("http://pleiades.stoa.org/places/89222"),
+      None,
       Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
     
   val annotatesVindobonaAndThessaloniki = Annotation(
@@ -79,6 +81,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         now.plusMinutes(10),
         None,
         Some("http://pleiades.stoa.org/places/128537"),
+        None,
         Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now))),
       AnnotationBody(
         AnnotationBody.PLACE,
@@ -86,6 +89,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         now.plusMinutes(10),
         None,
         Some("http://pleiades.stoa.org/places/491741"),
+        None,
         Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
   
   running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
@@ -270,6 +274,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
           now,
           None,
           Some("http://www.example.com/places/b"),
+          None,
           Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
 
       "update the GeoTag-Place relation accordingly" in {
