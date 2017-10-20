@@ -25,10 +25,8 @@ POST    /reset_password                              controllers.landing.ResetPa
 GET     /help/about                                  controllers.help.HelpController.showAbout
 GET     /help/faq                                    controllers.help.HelpController.showFAQ
 GET     /help/tutorial                               controllers.help.HelpController.showTutorial
-GET     /help                                        controllers.help.HelpController.index
-
-# Localized versions
 GET     /help/:lang/tutorial                         controllers.help.HelpController.showLocalizedTutorial(lang: String)
+GET     /help                                        controllers.help.HelpController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Administration area
@@ -38,7 +36,6 @@ GET     /admin/gazetteers                            controllers.admin.gazetteer
 POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
 DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 
-# GET     /admin/users/:username                       controllers.admin.users.UserAdminController.showDetails(username)
 GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 GET     /admin/users                                 controllers.admin.users.UserAdminController.index
 
@@ -161,4 +158,4 @@ GET     /                                            controllers.landing.Landing
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my                                          controllers.my.MyRecogitoController.my
-GET     /:username                                   controllers.my.MyRecogitoController.index(username: String, tab: Option[String], p: Option[Int], sortby: Option[String], order: Option[String])
+GET     /:username                                   controllers.my.MyRecogitoController.index(username: String, tab: Option[String], p: Option[Int], sortby: Option[String], order: Option[String], size: Option[Int])

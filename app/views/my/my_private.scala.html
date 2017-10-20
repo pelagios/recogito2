@@ -4,10 +4,11 @@
   rows: models.Page[(models.generated.tables.records.DocumentRecord, Option[models.contribution.Contribution], Long)],
   sharedWithMeCount: Int,
   sortBy: String,
-  sortOrder: models.SortOrder
+  sortOrder: models.SortOrder,
+  pageSize: Option[Int]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
-@_layout(user, usedDiskspace, rows.total, sharedWithMeCount, "my") {
+@_layout(user, usedDiskspace, rows.total, sharedWithMeCount, "my", pageSize) {
   <table class="document-list">
     <colgroup>
       <col style="width:14%">
@@ -60,7 +61,7 @@
     </tbody>
   </table>
 
-  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, None, None, None, None).url, rows)
+  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, None, None, None, None, None).url, rows)
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView,

@@ -3,7 +3,8 @@
   usedDiskspace: Long,
   myDocCount: Long,
   sharedWithMeCount: Long,
-  activeTab: String
+  activeTab: String,
+  pageSize: Option[Int]
 )(content: Html)(implicit webjars: WebJarAssets)
 <!DOCTYPE html>
 <html>
@@ -61,11 +62,11 @@
     <div class="toolbar">
       <ul class="tabs">
         <li class="my-documents @if(activeTab == "my") { enabled }">
-          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("my"), None, None, None)">My documents (@myDocCount)</a>
+          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("my"), None, None, None, pageSize)">My documents (@myDocCount)</a>
         </li><!--
 
         --><li class="shared-with-me @if(activeTab == "shared") { enabled }">
-          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("shared"), None, None, None)">Shared with me (@sharedWithMeCount)</a>
+          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("shared"), None, None, None, pageSize)">Shared with me (@sharedWithMeCount)</a>
         </li>
       </ul>
 

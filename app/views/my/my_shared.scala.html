@@ -4,7 +4,8 @@
   myDocCount: Int,
   rows: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord, Option[models.contribution.Contribution], Long)],
   sortBy: String,
-  sortOrder: models.SortOrder
+  sortOrder: models.SortOrder,
+  pageSize: Option[Int]
  )(implicit request: RequestHeader, webjars: WebJarAssets)
 
 @accessLevel(lvl: String) = {
@@ -17,7 +18,7 @@
   }}}
 }
 
-@_layout(user, usedDiskspace, myDocCount, rows.total, "shared") {
+@_layout(user, usedDiskspace, myDocCount, rows.total, "shared", pageSize) {
   <table class="document-list">
     <colgroup>
       <col style="width:11%">  <!-- author -->
@@ -76,7 +77,7 @@
     </tbody>
   </table>
 
-  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, None, None, None, None).url, rows)
+  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, None, None, None, None, None).url, rows)
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView,
