@@ -75,7 +75,7 @@ require([
                     endIdx = (startIdx > -1) ?
                       Math.max(q.indexOf('&', startIdx), q.length) : -1;
 
-                return (endIdx > -1) ? q.substring(param.length + 1, endIdx) : undefined;
+                return (endIdx > -1) ? q.substring(startIdx + param.length + 1, endIdx) : undefined;
               },
 
               pageNumber = getQueryParam('p'),
