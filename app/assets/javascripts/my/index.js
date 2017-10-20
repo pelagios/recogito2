@@ -68,20 +68,24 @@ require([
           return false;
         },
 
-        storePageNumber = function() {
-          var pageNumber = (function() {
+        storePageConfig = function() {
+          var getQueryParam = function(param) {
                 var q = window.location.search,
-                    startIdx = q.indexOf('p='),
+                    startIdx = q.indexOf(param + '='),
                     endIdx = (startIdx > -1) ?
                       Math.max(q.indexOf('&', startIdx), q.length) : -1;
 
-                return (endIdx > -1) ? q.substring(startIdx + 2, endIdx) : undefined;
-              })();
+                return (endIdx > -1) ? q.substring(param.length + 1, endIdx) : undefined;
+              },
+
+              pageNumber = getQueryParam('p'),
+              pageSize = getQueryParam('size'),
 
               storedLocationStr = localStorage.getItem('r2.my.location');
               storedLocation = (storedLocationStr) ? JSON.parse(storedLocationStr) : {};
 
           storedLocation.p = pageNumber;
+          if (pageSize) storedLocation.size = pageSize;
           localStorage.setItem('r2.my.location', JSON.stringify(storedLocation));
         },
 
@@ -161,7 +165,7 @@ require([
           window.location.href = url;
         };
 
-    storePageNumber();
+    storePageConfig();
     formatTime();
 
     sortButtons.click(onClickSort);
