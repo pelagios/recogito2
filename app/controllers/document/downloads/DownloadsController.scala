@@ -67,6 +67,7 @@ class DownloadsController @Inject() (
       with CSVSerializer
       with GeoJSONSerializer
       with RDFSerializer
+      with WebAnnoSerializer
       with tei.PlaintextSerializer
       with tei.TEISerializer {
   
@@ -108,7 +109,15 @@ class DownloadsController @Inject() (
   
   def downloadTTL(documentId: String) = downloadRDF(documentId, RDFFormat.TTL, "ttl") 
   def downloadRDFXML(documentId: String) = downloadRDF(documentId, RDFFormat.RDFXML, "rdf.xml") 
-  def downloadJSONLD(documentId: String) = downloadRDF(documentId, RDFFormat.JSONLD_PRETTY, "jsonld") 
+  
+  def downloadJSONLD(documentId: String) = AsyncStack { implicit request =>
+    download(documentId, { doc =>
+      documentToWebAnnotation(doc).map { json =>
+        Ok(Json.prettyPrint(json))
+          .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".jsonld" })
+      }
+    })
+  }
 
   def downloadGeoJSON(documentId: String, asGazetteer: Boolean) = AsyncStack { implicit request =>
     

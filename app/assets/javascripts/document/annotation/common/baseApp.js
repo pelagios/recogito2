@@ -51,10 +51,52 @@ define([
        });
   };
 
+  BaseApp.prototype.upsertAnnotationBatch = function(annotationStubs) {
+    var self = this,
+
+        // Finds the original stub that corresponds to the annotation
+        findStub = function(annotation) {
+          return annotationStubs.find(function(stub) {
+            // Determine identity based on the anchor
+            return stub.anchor === annotation.anchor;
+          });
+        };
+
+    self.header.showStatusSaving();
+    API.storeAnnotationBatch(annotationStubs)
+       .done(function(annotations) {
+         // Update header info
+         self.header.incrementAnnotationCount(annotations.length);
+         self.header.updateContributorInfo(Config.me);
+         self.header.showStatusSaved();
+
+         annotations.forEach(function(annotation) {
+           // Note: it *should* be safe to assume that the annotations come in the same
+           // order as the original stubs, but we'll be a little definsive here, just in case
+           var stub = findStub(annotation);
+           jQuery.extend(stub, annotation);
+           self.highlighter.refreshAnnotation(stub);
+         });
+       })
+       .fail(function(error) {
+         self.header.showSaveError();
+       });
+  };
+
   BaseApp.prototype.onCreateAnnotation = function(selection) {
     if (selection.isNew)
       this.highlighter.convertSelectionToAnnotation(selection);
     this.upsertAnnotation(selection.annotation);
+  };
+
+  BaseApp.prototype.onCreateAnnotationBatch = function(selections) {
+    var self = this,
+        annotationStubs = selections.map(function(selection) {
+          if (selection.isNew)
+            self.highlighter.convertSelectionToAnnotation(selection);
+          return selection.annotation;
+        });
+    self.upsertAnnotationBatch(annotationStubs);
   };
 
   BaseApp.prototype.onUpdateAnnotation = function(annotationStub) {

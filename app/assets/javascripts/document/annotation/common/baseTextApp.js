@@ -74,10 +74,7 @@ define([
         onCreateAnnotation = function(selection) {
           var reapply = function() {
                 var selections = phraseAnnotator.createSelections(selection.annotation);
-                jQuery.each(selections, function(idx, selection) {
-                  // TODO roll into one request!
-                  self.onCreateAnnotation(selection);
-                });
+                self.onCreateAnnotationBatch(selections);
               },
 
               promptReapply = function() {

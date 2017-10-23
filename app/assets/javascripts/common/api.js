@@ -25,6 +25,14 @@ define([], function() {
       });
     },
 
+    storeAnnotationBatch : function(annotations) {
+      return jsRoutes.controllers.api.AnnotationAPIController.bulkUpsert().ajax({
+        type: 'POST',
+        data: JSON.stringify(annotations),
+        contentType: 'application/json'
+      });
+    },
+
     bulkUpsertAnnotations : function(annotations) {
       return jsRoutes.controllers.api.AnnotationAPIController.bulkUpsert().ajax({
         type: 'POST',
