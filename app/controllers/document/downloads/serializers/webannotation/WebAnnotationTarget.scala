@@ -4,16 +4,21 @@ import models.annotation.Annotation
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-case class WebAnnotationTarget[T <: WebAnnotationSelector](source: String, hasType: String, selector: T)
+case class WebAnnotationTarget(source: String, hasType: String, selector: WebAnnotationSelector)
 
 object WebAnnotationTarget {
   
-  def fromAnnotation[T <: WebAnnotationSelector](annotation: Annotation): WebAnnotationTarget[T] = ???
+  def fromAnnotation(annotation: Annotation) = {
+    
+    // TODO dummy hack for testing only
+    WebAnnotationTarget("", "", TextPositionSelector.fromAnnotation(annotation))
+    
+  }
   
-  implicit def webAnnotationTargetWrites[T <: WebAnnotationSelector](implicit w: Writes[T]): Writes[WebAnnotationTarget[T]] = (
+  implicit val webAnnotationTargetWrites: Writes[WebAnnotationTarget] = (
     (JsPath \ "source").write[String] and
     (JsPath \ "type").write[String] and
-    (JsPath \ "selector").write[T]
+    (JsPath \ "selector").write[WebAnnotationSelector]
   )(t => (t.source, t.hasType, t.selector))
 
 }

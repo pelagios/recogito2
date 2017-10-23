@@ -16,14 +16,16 @@ object WebAnnotation extends HasDate {
     (JsPath \ "type").write[String] and
     (JsPath \ "generator").write[String] and
     (JsPath \ "generated").write[DateTime] and
-    (JsPath \ "body").write[Seq[WebAnnotationBody]]
+    (JsPath \ "body").write[Seq[WebAnnotationBody]] and
+    (JsPath \ "target").write[WebAnnotationTarget]
   )(a => (
     "http://www.w3.org/ns/anno.jsonld",
     a.documentURI + "#" + a.annotation.annotationId.toString,
     "Annotation",
     a.recogitoBaseURI,
     DateTime.now,
-    a.annotation.bodies.flatMap(b => WebAnnotationBody.fromAnnotationBody(b, a.recogitoBaseURI))
+    a.annotation.bodies.flatMap(b => WebAnnotationBody.fromAnnotationBody(b, a.recogitoBaseURI)),
+    WebAnnotationTarget.fromAnnotation(a.annotation)
   ))
 
 }
