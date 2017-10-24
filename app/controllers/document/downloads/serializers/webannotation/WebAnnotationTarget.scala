@@ -30,11 +30,11 @@ object WebAnnotationTarget {
       // TODO Images get an Image target with a fragment selector
       // TODO we could diversify later, to add selectors based on anchor type
       case IMAGE_UPLOAD | IMAGE_IIIF => 
-        WebAnnotationTarget(target, "Image", Seq(FragmentSelector.fromAnnotation(annotation)))
+        WebAnnotationTarget(target, "Image", Seq(ImageFragmentSelector.fromAnnotation(annotation)))
         
       // TODO CSV gets a Dataset target with a Data Position selector
       case DATA_CSV  =>
-        WebAnnotationTarget(target, "Dataset", Seq.empty[WebAnnotationSelector])
+        WebAnnotationTarget(target, "Dataset", Seq(TableFragmentSelector.fromAnnotation(annotation)))
         
       case c =>
         // Should never happen

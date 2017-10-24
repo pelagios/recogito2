@@ -14,9 +14,10 @@ object WebAnnotationSelector {
 
   // If someone knows a way to improve this, let me know...
   implicit val webAnnotationSelectorWriter = Writes[WebAnnotationSelector] {
-    case s: TextPositionSelector => Json.toJson(s)
-    case s: TextQuoteSelector    => Json.toJson(s)
-    case s: FragmentSelector     => Json.toJson(s)
+    case s: TextPositionSelector  => Json.toJson(s)
+    case s: TextQuoteSelector     => Json.toJson(s)
+    case s: ImageFragmentSelector => Json.toJson(s)
+    case s: TableFragmentSelector => Json.toJson(s)
   }
   
 }
@@ -77,23 +78,29 @@ object TextQuoteSelector {
   
 }
 
-case class FragmentSelector(value: String) extends WebAnnotationSelector
+/**
+  * https://www.w3.org/TR/annotation-model/#fragment-selector
+  * 
+  * TODO should we add SVG selector serialization?
+  */
+case class ImageFragmentSelector(value: String) extends WebAnnotationSelector
 
-object FragmentSelector {
+object ImageFragmentSelector {
   
-  def fromAnnotation(a: Annotation): FragmentSelector = ImageAnchor.parse(a.anchor) match {
+  def fromAnnotation(a: Annotation) = ImageAnchor.parse(a.anchor) match {
    case a: PointAnchor =>
-     FragmentSelector(s"xywh=pixel:${a.x},${a.y},0,0")
+     ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},0,0")
      
    case a: RectAnchor =>
-     FragmentSelector(s"xywh=pixel:${a.x},${a.y},${a.w},${a.h}")
+     ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},${a.w},${a.h}")
    
    case a: TiltedBoxAnchor =>
+     // Tilted boxes are 'dumbed down' to their bounds
      val b = a.bounds
-     FragmentSelector(s"xywh=pixel:${b.left},${b.top},${b.width},${b.height}")
+     ImageFragmentSelector(s"xywh=pixel:${b.left},${b.top},${b.width},${b.height}")
   }
   
-  implicit val fragmentSelectorWrites: Writes[FragmentSelector] = (
+  implicit val imageFragmentSelectorWrites: Writes[ImageFragmentSelector] = (
     (JsPath \ "type").write[String] and
     (JsPath \ "conformsTo").write[String] and
     (JsPath \ "value").write[String]
@@ -101,3 +108,23 @@ object FragmentSelector {
   
 }
 
+case class TableFragmentSelector(row: Int) extends WebAnnotationSelector
+
+object TableFragmentSelector {
+  
+  def fromAnnotation(a: Annotation) = {
+    if (a.anchor.startsWith("row")) {
+      val row = a.anchor.substring(4).toInt
+      TableFragmentSelector(row)      
+    } else {
+      throw new IllegalArgumentException(s"Unable to build CSV FragmentSelector for annotation ${a}")
+    }
+  }
+  
+  implicit val tableFragmentSelectorWrites: Writes[TableFragmentSelector] = (
+    (JsPath \ "type").write[String] and
+    (JsPath \ "conformsTo").write[String] and
+    (JsPath \ "value").write[String]
+  )(s => ("FragmentSelector", "https://tools.ietf.org/html/rfc7111", "row=" + s.row)) 
+  
+}
