@@ -32,6 +32,7 @@ object WebAnnotationBody extends Enumeration with HasDate {
     
     val purpose = b.hasType match {
       case COMMENT        => Some("commenting")
+      case TRANSCRIPTION  => Some("transcribing")
       case TAG            => Some("tagging")
       case PLACE | PERSON => Some("identifying")
       case _ => None

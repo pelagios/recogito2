@@ -80,8 +80,35 @@ case class FragmentSelector(value: String) extends WebAnnotationSelector
 
 object FragmentSelector {
   
-  def fromAnnotation(a: Annotation) = {
+  private def toMap(str: String) =
+    str.split(",").map { pair =>
+      val key = pair.substring(0, pair.indexOf('='))
+      val value = pair.substring(pair.indexOf('=') + 1)
+      (key -> value)
+    }.toMap
+  
+  def fromAnnotation(a: Annotation): FragmentSelector = a.anchor match {
     
+    case a if a.startsWith("point") =>
+      // Example: point:839,590
+      val x = a.substring(6, a.indexOf(','))
+      val y = a.substring(a.indexOf(',') + 1)
+      FragmentSelector(s"xywh=${x},${y},0,0")
+      
+    case a if a.startsWith("rect") =>
+      // Example: rect:x=441,y=399,w=88,h=106
+      val args = toMap(a.substring(5))
+      val x = args.get("x").get
+      val y = args.get("y").get
+      val w = args.get("w").get
+      val h = args.get("h").get
+      FragmentSelector(s"xywh=pixel:${x},${y},${w},${h}")
+      
+    case a if a.startsWith("tbox") =>
+      // Example: tbox:x=927,y=575,a=0,l=64,h=22
+      val args = toMap(a.substring(5))
+      // TODO
+      FragmentSelector("undefined")
   }
   
   implicit val fragmentSelectorWrites: Writes[FragmentSelector] = (
