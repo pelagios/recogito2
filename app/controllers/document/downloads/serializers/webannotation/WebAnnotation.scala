@@ -3,6 +3,7 @@ package controllers.document.downloads.serializers.webannotation
 import models.HasDate
 import models.annotation.Annotation
 import org.joda.time.DateTime
+import play.api.mvc.{ AnyContent, Request }
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
@@ -10,7 +11,7 @@ case class WebAnnotation(recogitoBaseURI: String, documentURI: String, annotatio
 
 object WebAnnotation extends HasDate {
   
-  implicit val webAnnotationWrites: Writes[WebAnnotation] = (
+  implicit def webAnnotationWrites(implicit request: Request[AnyContent]): Writes[WebAnnotation] = (
     (JsPath \ "@context").write[String] and
     (JsPath \ "id").write[String] and
     (JsPath \ "type").write[String] and
