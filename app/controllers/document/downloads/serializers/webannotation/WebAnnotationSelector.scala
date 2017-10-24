@@ -18,6 +18,7 @@ object WebAnnotationSelector {
     case s: TextQuoteSelector     => Json.toJson(s)
     case s: ImageFragmentSelector => Json.toJson(s)
     case s: TableFragmentSelector => Json.toJson(s)
+    case s: XPathRangeSelector    => Json.toJson(s)
   }
   
 }
@@ -59,17 +60,13 @@ case class TextQuoteSelector(quote: String) extends WebAnnotationSelector
 
 object TextQuoteSelector {
   
-  def fromAnnotation(a: Annotation) = {
-    val quoteBody = a.bodies.find(_.hasType == AnnotationBody.QUOTE)
-    
-    // TODO support TEI content
-    val isText = a.anchor.startsWith("char-offset:")
-    
-    if (quoteBody.isDefined && isText)
-      TextQuoteSelector(quoteBody.get.value.getOrElse(""))
-    else
+  def fromAnnotation(a: Annotation) =
+    a.bodies.find(_.hasType == AnnotationBody.QUOTE) match {
+      case Some(quoteBody) =>
+        TextQuoteSelector(quoteBody.value.getOrElse(""))
+      case _ =>
       throw new IllegalArgumentException(s"Unable to build TextQuoteSelector for annotation ${a}")
-  }
+    }
   
   implicit val textQuoteSelectorWrites: Writes[TextQuoteSelector] = (
     (JsPath \ "type").write[String] and
@@ -112,19 +109,52 @@ case class TableFragmentSelector(row: Int) extends WebAnnotationSelector
 
 object TableFragmentSelector {
   
-  def fromAnnotation(a: Annotation) = {
+  def fromAnnotation(a: Annotation) =
     if (a.anchor.startsWith("row")) {
-      val row = a.anchor.substring(4).toInt
+     val row = a.anchor.substring(4).toInt
       TableFragmentSelector(row)      
     } else {
       throw new IllegalArgumentException(s"Unable to build CSV FragmentSelector for annotation ${a}")
     }
-  }
   
   implicit val tableFragmentSelectorWrites: Writes[TableFragmentSelector] = (
     (JsPath \ "type").write[String] and
     (JsPath \ "conformsTo").write[String] and
     (JsPath \ "value").write[String]
   )(s => ("FragmentSelector", "https://tools.ietf.org/html/rfc7111", "row=" + s.row)) 
+  
+}
+
+/**
+  * https://www.w3.org/TR/annotation-model/#xpath-selector 
+  */
+case class XPathSelector(value: String)
+
+object XPathSelector {
+  
+  implicit val xpathSelectorWrites: Writes[XPathSelector] = (
+    (JsPath \ "type").write[String] and
+    (JsPath \ "value").write[String]
+  )(s => ("XPathSelector", s.value))  
+  
+}
+
+case class XPathRangeSelector(start: XPathSelector, end: XPathSelector) extends WebAnnotationSelector
+
+object XPathRangeSelector {
+  
+  def fromAnnotation(a: Annotation): XPathRangeSelector = {
+    // Example: from=/tei/text/body/div[6]/p::58;to=/tei/text/body/div[6]/p::67
+    val pair = a.anchor.split(";")
+    val from = pair(0).substring(5, pair(0).indexOf("::"))
+    val to = pair(1).substring(3, pair(1).indexOf("::")) 
+    XPathRangeSelector(XPathSelector(from), XPathSelector(to))
+  }
+  
+  implicit val xpathRangeSelectorWrites: Writes[XPathRangeSelector] = (
+    (JsPath \ "type").write[String] and
+    (JsPath \ "startSelector").write[XPathSelector] and
+    (JsPath \ "endSelector").write[XPathSelector]
+  )(s => ("RangeSelector", s.start, s.end))  
   
 }

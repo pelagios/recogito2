@@ -23,16 +23,17 @@ object WebAnnotationTarget {
           TextPositionSelector.fromAnnotation(annotation),
           TextQuoteSelector.fromAnnotation(annotation)))
         
-      // TODO TEI gets a Text target with two alternative selectors: TextQuote + XPath
+      // TODO TEI gets a Text target with two alternative selectors: TextQuote + XPath Range
       case TEXT_TEIXML =>
-        WebAnnotationTarget(target, "Text", Seq.empty[WebAnnotationSelector])
+        WebAnnotationTarget(target, "Text", Seq(
+          TextQuoteSelector.fromAnnotation(annotation),
+          XPathRangeSelector.fromAnnotation(annotation)))
        
-      // TODO Images get an Image target with a fragment selector
-      // TODO we could diversify later, to add selectors based on anchor type
+      // Images get an Image target with a fragment selector
       case IMAGE_UPLOAD | IMAGE_IIIF => 
         WebAnnotationTarget(target, "Image", Seq(ImageFragmentSelector.fromAnnotation(annotation)))
         
-      // TODO CSV gets a Dataset target with a Data Position selector
+      // CSV gets a Dataset target with a Data Position selector
       case DATA_CSV  =>
         WebAnnotationTarget(target, "Dataset", Seq(TableFragmentSelector.fromAnnotation(annotation)))
         
