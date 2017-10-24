@@ -1,4 +1,4 @@
-package controllers.api.image
+package models.image
 
 import java.io.File
 import models.annotation.Annotation

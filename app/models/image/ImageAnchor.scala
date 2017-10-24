@@ -1,4 +1,4 @@
-package controllers.api.image
+package models.image
 
 import scala.language.implicitConversions
 

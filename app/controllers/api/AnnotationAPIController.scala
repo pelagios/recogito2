@@ -1,7 +1,6 @@
 package controllers.api
 
 import controllers._
-import controllers.api.image.ImageService
 import java.io.File
 import java.util.UUID
 import javax.inject.{ Inject, Singleton }
@@ -11,6 +10,7 @@ import models.annotation._
 import models.contribution._
 import models.document.{ DocumentService, DocumentInfo }
 import models.user.UserService
+import models.image.ImageService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.{ Configuration, Logger }

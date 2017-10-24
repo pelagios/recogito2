@@ -35,6 +35,10 @@ object WebAnnotationTarget {
       // TODO CSV gets a Dataset target with a Data Position selector
       case DATA_CSV  =>
         WebAnnotationTarget(target, "Dataset", Seq.empty[WebAnnotationSelector])
+        
+      case c =>
+        // Should never happen
+        throw new IllegalArgumentException(s"Unable to create Web Annotation target for content type ${c}")
     }
 
   }
