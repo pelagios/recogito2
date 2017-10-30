@@ -110,18 +110,10 @@ trait PlaintextSerializer extends BaseSerializer {
                     
                   case _ => <p/>
                 }
-              }
-              <idno type="URI">{
-                controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL 
-              }</idno>
+              }              
             </publicationStmt>
             <sourceDesc>
-              { 
-                doc.source match { 
-                  case Some(s) => <p><link target={s} /></p>
-                  case _ => <p/> 
-                }
-              }
+              <p><link target={ controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL } /></p> 
             </sourceDesc>
           </fileDesc>
           <encodingDesc>
