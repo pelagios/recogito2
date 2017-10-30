@@ -67,7 +67,7 @@ class DownloadsController @Inject() (
       with CSVSerializer
       with GeoJSONSerializer
       with RDFSerializer
-      with WebAnnotationSerializer
+      with webannotation.WebAnnotationSerializer
       with tei.PlaintextSerializer
       with tei.TEISerializer {
   

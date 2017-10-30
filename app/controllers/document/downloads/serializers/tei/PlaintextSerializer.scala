@@ -2,11 +2,11 @@ package controllers.document.downloads.serializers.tei
 
 import controllers.document.downloads.serializers.BaseSerializer
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import models.document.DocumentService
+import models.document.{ DocumentInfo, DocumentService }
+import play.api.mvc.{ AnyContent, Request }
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.xml.{ Node, Text }
 import storage.Uploads
-import models.document.DocumentInfo
 
 trait PlaintextSerializer extends BaseSerializer {
   
@@ -70,18 +70,18 @@ trait PlaintextSerializer extends BaseSerializer {
     ranges._1 :+ new Text(remainder)
   }
   
-  def plaintextToTEI(docInfo: DocumentInfo)(implicit documentService: DocumentService,
-      uploads: Uploads, annotationService: AnnotationService, ctx: ExecutionContext) = {
+  def plaintextToTEI(doc: DocumentInfo)(implicit documentService: DocumentService,
+      uploads: Uploads, annotationService: AnnotationService, request: Request[AnyContent], ctx: ExecutionContext) = {
     
     val fTexts = Future.sequence {
-      docInfo.fileparts.map { part =>
-        uploads.readTextfile(docInfo.owner.getUsername, docInfo.id, part.getFile).map(_.map((_, part)))
+      doc.fileparts.map { part =>
+        uploads.readTextfile(doc.owner.getUsername, doc.id, part.getFile).map(_.map((_, part)))
       }
     }
     
     val fDivs = fTexts.flatMap { maybeTextsAndParts => 
       val textsAndParts = maybeTextsAndParts.flatten
-      val fAnnotations = annotationService.findByDocId(docInfo.id)
+      val fAnnotations = annotationService.findByDocId(doc.id)
       
       fAnnotations.map { t =>
         val annotationsByPart = t.map(_._1).groupBy(_.annotates.filepartId)
@@ -95,10 +95,10 @@ trait PlaintextSerializer extends BaseSerializer {
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
           <fileDesc>
-            <titleStmt><title>{ docInfo.author.map(_ + ": ").getOrElse("") }{ docInfo.title }</title></titleStmt>
+            <titleStmt><title>{ doc.author.map(_ + ": ").getOrElse("") }{ doc.title }</title></titleStmt>
             <publicationStmt>
               { 
-                (docInfo.dateFreeform, docInfo.dateNumeric) match {
+                (doc.dateFreeform, doc.dateNumeric) match {
                   case (Some(df), Some(dn)) =>
                     <p><date when={ dn.toString }>{ df }</date></p>
                     
@@ -111,16 +111,22 @@ trait PlaintextSerializer extends BaseSerializer {
                   case _ => <p/>
                 }
               }
+              <idno type="URI">{
+                controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL 
+              }</idno>
             </publicationStmt>
             <sourceDesc>
               { 
-                docInfo.source match { 
+                doc.source match { 
                   case Some(s) => <p><link target={s} /></p>
                   case _ => <p/> 
                 }
               }
             </sourceDesc>
           </fileDesc>
+          <encodingDesc>
+            <projectDesc><p>Downloaded from { controllers.landing.routes.LandingController.index().absoluteURL}</p></projectDesc>
+          </encodingDesc>
         </teiHeader>
         <text>
           <body>{ divs }</body>
