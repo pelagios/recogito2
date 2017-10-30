@@ -94,7 +94,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
     }
   }
   
-  def start() = {
+  private def start() = {
     implicit val timeout = 60.seconds
     val response = client.execute { index exists(ES.RECOGITO) }.await
     
@@ -130,7 +130,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
       flush index ES.RECOGITO
     }
   
-  def stop() = {
+  private def stop() = {
     Logger.info("Stopping ElasticSearch local node")
     client.close()
   }

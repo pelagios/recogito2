@@ -27,7 +27,8 @@ class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) {
     } map { _ => 
     } recover { case t: Throwable =>
       Logger.error("Error logging visit event")
-      val foo = t.printStackTrace
+      Logger.error(visit.toString)
+      t.printStackTrace
     }
     
   def countTotal(): Future[Long] =
