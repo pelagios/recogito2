@@ -37,7 +37,8 @@ trait TEISerializer extends BaseSerializer with HasTEISnippets {
         case Some(b) if b.hasType == AnnotationBody.PERSON => doc.createElement("persName")
         case _ => doc.createElement("span")
       }
-
+      
+      el.setAttribute("n", annotation.annotationId.toString)
       if (entityURI.isDefined) el.setAttribute("ref", entityURI.get)
       el.appendChild(doc.createTextNode(quote))
 
