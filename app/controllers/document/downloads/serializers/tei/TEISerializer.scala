@@ -83,7 +83,6 @@ trait TEISerializer extends BaseSerializer with HasTEISnippets {
       val converted = parts.map { case (part, xml) =>
         partToTEI(part, xml, annotationsByPart.get(part.getId).get) }
 
-      // TODO temporary hack
       scala.xml.XML.loadString(converted.head)
     }
   }

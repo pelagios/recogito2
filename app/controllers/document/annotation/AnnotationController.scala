@@ -50,8 +50,15 @@ class AnnotationController @Inject() (
         Redirect(routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo)) })
 
       case (None, Some(annotationId)) =>
-        // No part ID? Could fetch from annotation - not used now, but may be implemented later
-        Future.successful(InternalServerError)
+        // No part ID? Fetch from annotation
+        annotations.findById(annotationId).flatMap {
+          case Some((annotation, _)) => partResponse(annotation.annotates.filepartId, { part =>
+            Redirect(routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo)
+              .withFragment(annotationId.toString).toString)
+          })
+            
+          case None => Future.successful(NotFound)
+        }
 
       case (None, None) =>
         // No part specified - redirect to first part in sequence
