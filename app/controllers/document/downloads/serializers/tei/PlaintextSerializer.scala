@@ -55,9 +55,9 @@ trait PlaintextSerializer extends BaseSerializer {
       
       val placeTag = maybeURI match {
         case Some(uri) =>
-          <placeName ref={ uri }>{ escape(quote) }</placeName>
+          <placeName ref={uri} n={annotation.annotationId.toString}>{ escape(quote) }</placeName>
         case None =>
-          <placeName>{ escape(quote) }</placeName>
+          <placeName n={annotation.annotationId.toString}>{ escape(quote) }</placeName>
       }
       
       val nextNodes = 
