@@ -73,9 +73,11 @@ require([
                 var q = window.location.search,
                     startIdx = q.indexOf(param + '='),
                     endIdx = (startIdx > -1) ?
-                      Math.max(q.indexOf('&', startIdx), q.length) : -1;
+                      q.indexOf('&', startIdx) : -1;
 
-                return (endIdx > -1) ? q.substring(startIdx + param.length + 1, endIdx) : undefined;
+                return (startIdx > -1 && endIdx > -1) ?
+                  q.substring(startIdx + param.length + 1, endIdx) :
+                    (startIdx > -1) ? q.substring(startIdx + param.length + 1) : undefined;
               },
 
               pageNumber = getQueryParam('p'),
