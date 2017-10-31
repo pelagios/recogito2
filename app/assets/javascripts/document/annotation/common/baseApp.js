@@ -13,7 +13,13 @@ define([
 
   BaseApp.prototype.onAnnotationsLoaded = function(annotations) {
     var urlHash = (window.location.hash) ? window.location.hash.substring(1) : false,
-        preselected;
+        preselected,
+
+        scrollIntoView = function(bounds) {
+          var scrollTo = bounds.top - jQuery(window).height() + 100;
+          if (scrollTo > 0)
+            jQuery('html, body').animate({ scrollTop: scrollTo });
+        };
 
     this.header.incrementAnnotationCount(annotations.length);
     // var startTime = new Date().getTime();
@@ -22,8 +28,10 @@ define([
 
     if (urlHash) {
       preselected = this.highlighter.findById(urlHash);
-      if (preselected)
+      if (preselected) {
         this.selector.setSelection(preselected);
+        scrollIntoView(preselected.bounds);
+      }
     }
   };
 
