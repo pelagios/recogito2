@@ -12,7 +12,7 @@ import storage.Uploads
 
 trait TEISerializer extends BaseSerializer with HasTEISnippets {
 
-  private val ENTITY_TYPES = Set(AnnotationBody.PLACE, AnnotationBody.PERSON)
+  private val ENTITY_TYPES = Set(AnnotationBody.PLACE, AnnotationBody.PERSON, AnnotationBody.EVENT)
 
   /** Not really a sort, at least not within the DOM. But sort only matter only within
     * each tag individually. Therefore, it's sufficient if we naively sort everything
@@ -34,7 +34,14 @@ trait TEISerializer extends BaseSerializer with HasTEISnippets {
 
       val el = entityBody match {
         case Some(b) if b.hasType == AnnotationBody.PLACE => doc.createElement("placeName")
+        
         case Some(b) if b.hasType == AnnotationBody.PERSON => doc.createElement("persName")
+        
+        case Some(b) if b.hasType == AnnotationBody.EVENT => 
+          val span = doc.createElement("span")
+          span.setAttribute("type", "event")
+          span
+          
         case _ => doc.createElement("span")
       }
       
