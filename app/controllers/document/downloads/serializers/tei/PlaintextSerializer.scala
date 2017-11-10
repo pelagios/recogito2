@@ -15,7 +15,9 @@ trait PlaintextSerializer extends BaseSerializer {
     str.replace("<", "&lt;")
        .replace(">", "&gt;")
   
-  private def textpartToTEI(text: String, annotations: Seq[Annotation]): Seq[Node] = {    
+  private def textpartToTEI(text: String, annotations: Seq[Annotation]): Seq[Node] = {
+    
+    import AnnotationBody._
     
     // Shorthands for convenience
     def getQuote(annotation: Annotation) =
@@ -24,11 +26,11 @@ trait PlaintextSerializer extends BaseSerializer {
     def getCharOffset(annotation: Annotation) =
       annotation.anchor.substring(annotation.anchor.indexOf(":") + 1).toInt
       
-    // For the time being, TEI will only include place annotations
-    val placeAnnotations = sort(annotations.filter(_.bodies.exists(_.hasType == AnnotationBody.PLACE)))
+    def getEntityType(annotation: Annotation) = 
+      annotation.bodies.find(b => Set(PLACE, PERSON, EVENT).contains(b.hasType))
     
     // XML, by nature can't handle overlapping annotations
-    val nonOverlappingPlaceAnnotations = placeAnnotations.foldLeft(Seq.empty[Annotation]) { case (result, next) =>
+    val nonOverlappingAnnotations = sort(annotations).foldLeft(Seq.empty[Annotation]) { case (result, next) =>
       result.lastOption match {
         case Some(previous) =>
           // Check if next overlaps previous
@@ -48,20 +50,29 @@ trait PlaintextSerializer extends BaseSerializer {
       }
     }
     
-    val ranges = nonOverlappingPlaceAnnotations.foldLeft((Seq.empty[Node], 0)) { case ((nodes, beginIndex), annotation) =>
-      val quote = getQuote(annotation)
+    val ranges = nonOverlappingAnnotations.foldLeft((Seq.empty[Node], 0)) { case ((nodes, beginIndex), annotation) =>
+      val id = annotation.annotationId.toString
+      val quote = escape(getQuote(annotation))
       val offset = getCharOffset(annotation)
-      val maybeURI = annotation.bodies.find(_.hasType == AnnotationBody.PLACE).head.uri
+      val entityType = getEntityType(annotation)
       
-      val placeTag = maybeURI match {
-        case Some(uri) =>
-          <placeName ref={uri} n={annotation.annotationId.toString}>{ escape(quote) }</placeName>
-        case None =>
-          <placeName n={annotation.annotationId.toString}>{ escape(quote) }</placeName>
-      }
+      val teiTag = entityType.map { body =>
+        body.hasType match {        
+          case PLACE => body.uri match {
+            case Some(uri) => <placeName ref={uri} n={id}>{quote}</placeName>
+            case None => <placeName n={id}>{quote}</placeName>
+          }
+            
+          case PERSON =>
+            <persName n={id}>{quote}</persName>
+            
+          case EVENT =>
+            <span n={id} type="event">{quote}</span>
+        }
+      }.getOrElse(<span>{quote}</span>)
       
       val nextNodes = 
-        Seq(new Text(escape(text.substring(beginIndex, offset))), placeTag)
+        Seq(new Text(escape(text.substring(beginIndex, offset))), teiTag)
           
       (nodes ++ nextNodes, offset + quote.size)
     }
