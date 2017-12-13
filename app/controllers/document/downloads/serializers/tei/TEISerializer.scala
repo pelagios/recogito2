@@ -1,7 +1,6 @@
 package controllers.document.downloads.serializers.tei
 
 import controllers.HasTEISnippets
-import controllers.document.downloads.serializers.BaseSerializer
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.{ DocumentInfo, DocumentService }
 import models.generated.tables.records.DocumentFilepartRecord
@@ -10,7 +9,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.xml.Elem
 import storage.Uploads
 
-trait TEISerializer extends BaseSerializer with HasTEISnippets {
+trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
 
   private val ENTITY_TYPES = Set(AnnotationBody.PLACE, AnnotationBody.PERSON, AnnotationBody.EVENT)
 
@@ -31,7 +30,7 @@ trait TEISerializer extends BaseSerializer with HasTEISnippets {
       val quote = annotation.bodies.find(_.hasType == AnnotationBody.QUOTE).get.value.get
       val entityBody = annotation.bodies.find(b => ENTITY_TYPES.contains(b.hasType))
       val entityURI = entityBody.flatMap(_.uri)
-
+      
       val el = entityBody match {
         case Some(b) if b.hasType == AnnotationBody.PLACE => doc.createElement("placeName")
         
@@ -47,6 +46,10 @@ trait TEISerializer extends BaseSerializer with HasTEISnippets {
       
       el.setAttribute("n", annotation.annotationId.toString)
       if (entityURI.isDefined) el.setAttribute("ref", entityURI.get)
+      
+      getAttributes(annotation).foreach { case(key, values) =>
+        el.setAttribute(key, values.mkString) }
+      
       el.appendChild(doc.createTextNode(quote))
 
       el

@@ -1,6 +1,5 @@
 package controllers.document.downloads.serializers.tei
 
-import controllers.document.downloads.serializers.BaseSerializer
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.{ DocumentInfo, DocumentService }
 import play.api.mvc.{ AnyContent, Request }
@@ -8,7 +7,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 import scala.xml.{ UnprefixedAttribute, Node, Null, Text }
 import storage.Uploads
 
-trait PlaintextSerializer extends BaseSerializer {
+trait PlaintextSerializer extends BaseTEISerializer {
   
   /** Simplistic, but should be all we need. If we need more, we can switch to Apache Commons StringEscapeUtils **/
   private def escape(str: String) =
@@ -57,18 +56,7 @@ trait PlaintextSerializer extends BaseSerializer {
       val entityType = getEntityType(annotation)
       
       // By convention, use all tags starting with @ as XML attributes
-      val attributes = annotation.bodies.filter { body =>
-        body.hasType == AnnotationBody.TAG && 
-        body.value.map { value => 
-          value.startsWith("@") && 
-          value.contains(':')
-        }.getOrElse(false)
-      } map { body => 
-        val tag = body.value.get
-        val key = tag.substring(1, tag.indexOf(':'))
-        val value = tag.substring(tag.indexOf(':') + 1)
-        (key, value)
-      } groupBy { _._1 } mapValues { _.map(_._2) } toSeq
+      val attributes = getAttributes(annotation)
       
       val baseTag = entityType.map { body =>
         body.hasType match {        
