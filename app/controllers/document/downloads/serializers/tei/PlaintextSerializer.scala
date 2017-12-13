@@ -5,7 +5,7 @@ import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.{ DocumentInfo, DocumentService }
 import play.api.mvc.{ AnyContent, Request }
 import scala.concurrent.{ Future, ExecutionContext }
-import scala.xml.{ Node, Text }
+import scala.xml.{ UnprefixedAttribute, Node, Null, Text }
 import storage.Uploads
 
 trait PlaintextSerializer extends BaseSerializer {
@@ -56,7 +56,21 @@ trait PlaintextSerializer extends BaseSerializer {
       val offset = getCharOffset(annotation)
       val entityType = getEntityType(annotation)
       
-      val teiTag = entityType.map { body =>
+      // By convention, use all tags starting with @ as XML attributes
+      val attributes = annotation.bodies.filter { body =>
+        body.hasType == AnnotationBody.TAG && 
+        body.value.map { value => 
+          value.startsWith("@") && 
+          value.contains(':')
+        }.getOrElse(false)
+      } map { body => 
+        val tag = body.value.get
+        val key = tag.substring(1, tag.indexOf(':'))
+        val value = tag.substring(tag.indexOf(':') + 1)
+        (key, value)
+      } groupBy { _._1 } mapValues { _.map(_._2) } toSeq
+      
+      val baseTag = entityType.map { body =>
         body.hasType match {        
           case PLACE => body.uri match {
             case Some(uri) => <placeName ref={uri} n={id}>{quote}</placeName>
@@ -70,6 +84,10 @@ trait PlaintextSerializer extends BaseSerializer {
             <span n={id} type="event">{quote}</span>
         }
       }.getOrElse(<span>{quote}</span>)
+      
+      val teiTag = attributes.foldLeft(baseTag) { case (el, (name, values)) =>
+        el % new UnprefixedAttribute(name, Text(values.mkString), Null)
+      }
       
       val nextNodes = 
         Seq(new Text(escape(text.substring(beginIndex, offset))), teiTag)
