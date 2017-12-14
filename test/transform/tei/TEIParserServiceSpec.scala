@@ -38,14 +38,16 @@ class TEIParserServiceSpec extends Specification {
     ("from=/tei/text/body/div/p::515;to=/tei/text/body/div/p::523",       "Hyperion"),
     ("from=/tei/text/body/div/p[2]::103;to=/tei/text/body/div/p[2]::110", "Ulysses"),
     ("from=/tei/text/body/div/p[2]::215;to=/tei/text/body/div/p[2]::222", "Calypso"),
-    ("from=/tei/text/body/div/p[6]::92;to=/tei/text/body/div/p[6]::99",   "Ulysses"))
+    ("from=/tei/text/body/div/p[6]::92;to=/tei/text/body/div/p[6]::99",   "Ulysses"),
+    // Spans
+    ("from=/tei/text/body/div/p[5]::229;to=/tei/text/body/div/p[5]::244", "my heart bleeds"))
     
   "The TEI parser" should {
     
     val annotations = Await.result(TEIParserService.extractEntities(TEST_FILEPART_RECORD, TEST_FILE, false), 60 seconds)
     
     "properly parse the test document" in {      
-      annotations.size must equalTo(11)
+      annotations.size must equalTo(12)
       
       val places = annotations.filter(_.bodies.exists(_.hasType == AnnotationBody.PLACE))
       places.size must equalTo(7)

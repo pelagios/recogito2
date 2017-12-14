@@ -53,9 +53,7 @@ trait PlaintextSerializer extends BaseTEISerializer {
       val id = annotation.annotationId.toString
       val quote = escape(getQuote(annotation))
       val offset = getCharOffset(annotation)
-      val entityType = getEntityType(annotation)
-      
-      // By convention, use all tags starting with @ as XML attributes
+      val entityType = getEntityType(annotation)      
       val attributes = getAttributes(annotation)
       
       val baseTag = entityType.map { body =>
