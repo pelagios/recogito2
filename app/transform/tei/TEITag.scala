@@ -79,6 +79,12 @@ object TEITag {
   }
   
   def convert(part: DocumentFilepartRecord, el: Element, ranges: DocumentRange) = {
+    
+    def getAttribute(key: String) = el.getAttribute(key) match {
+      case s if s.isEmpty => None
+      case s => Some(s)
+    }
+    
     val now = DateTime.now
     
     val quote  = el.getTextContent
@@ -97,18 +103,16 @@ object TEITag {
       val key = attr._1.toLowerCase
       key != "n" && key != "ref" }
       
-    val ref = el.getAttribute("ref") match {
-      case s if s.isEmpty => None
-      case s => Some(s)
-    }
-        
+    val ref = getAttribute("ref")  
+    val t   = getAttribute("type")
     val quoteBody = toQuoteBody(now, quote)
     val tagBodies = toTagBodies(now, attributesToConvert)
     
     val entityBody = el.getNodeName.toLowerCase match {
-      case "placename" => Some(toEntityBody(now, AnnotationBody.PLACE, ref))
-      case "persname"  => Some(toEntityBody(now, AnnotationBody.PERSON, ref))
-      case "span"      => None
+      case "placename"                 => Some(toEntityBody(now, AnnotationBody.PLACE, ref))
+      case "persname"                  => Some(toEntityBody(now, AnnotationBody.PERSON, ref))
+      case "rs" if t == Some("event")  => Some(toEntityBody(now, AnnotationBody.EVENT, None))
+      case "span"                      => None
     }
     
     val allBodies = entityBody match {

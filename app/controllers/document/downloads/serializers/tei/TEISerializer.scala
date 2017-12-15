@@ -37,9 +37,9 @@ trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
         case Some(b) if b.hasType == AnnotationBody.PERSON => doc.createElement("persName")
         
         case Some(b) if b.hasType == AnnotationBody.EVENT => 
-          val span = doc.createElement("span")
-          span.setAttribute("type", "event")
-          span
+          val rs = doc.createElement("rs")
+          rs.setAttribute("type", "event")
+          rs
           
         case _ => doc.createElement("span")
       }

@@ -67,7 +67,7 @@ trait PlaintextSerializer extends BaseTEISerializer {
             <persName n={id}>{quote}</persName>
             
           case EVENT =>
-            <span n={id} type="event">{quote}</span>
+            <rs n={id} type="event">{quote}</rs>
         }
       }.getOrElse(<span>{quote}</span>)
       
