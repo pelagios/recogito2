@@ -56,15 +56,15 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
     for {
       // Retrieve previous version, if any
       maybePrevious       <- findById(annotation.annotationId)
-      
+
       // Store new version: 1) in the annotation index, 2) in the history index
       (stored, esVersion) <- upsertAnnotation(annotation)
       storedToHistory     <- if (stored) insertVersion(annotation) else Future.successful(false)
-      
+
       // Upsert geotags for this annotation
       linksCreated        <- if (stored) insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
     } yield (linksCreated && storedToHistory, esVersion, maybePrevious.map(_._1))
-    
+
   }
 
   /** Upserts a list of annotations, handling non-blocking chaining & retries in case of failure **/
@@ -101,12 +101,12 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         None
       }
     }
-    
+
   private def deleteById(annotationId: String): Future[Boolean] =
     es.client execute {
-      delete id annotationId.toString from ES.RECOGITO / ES.ANNOTATION 
-    } map { _ => 
-      true 
+      delete id annotationId.toString from ES.RECOGITO / ES.ANNOTATION
+    } map { _ =>
+      true
     } recover { case t: Throwable =>
       t.printStackTrace()
       false
@@ -121,11 +121,11 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
           deleted        <- if (markerInserted) deleteById(annotationId.toString) else Future.successful(false)
           geotagsDeleted <- if (deleted) deleteGeoTagsByAnnotation(annotationId) else Future.successful(false)
         } yield geotagsDeleted
-      
+
         f.map { success =>
           if (!success)
             throw new Exception("Error deleting annotation")
-          
+
           Some(annotation)
         }
       }
@@ -134,12 +134,12 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         // Annotation not found
         Future.successful(None)
     })
-    
+
   def countTotal(): Future[Long] =
     es.client execute {
       search in ES.RECOGITO / ES.ANNOTATION limit 0
     } map { _.totalHits }
-        
+
   def countByDocId(id: String): Future[Long] =
     es.client execute {
       search in ES.RECOGITO / ES.ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) limit 0
@@ -155,6 +155,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   def deleteByDocId(docId: String): Future[Boolean] = {
     val deleteAnnotations = findByDocId(docId).flatMap { annotationsAndVersions =>
       if (annotationsAndVersions.size > 0) {
+        es.client.client.prepareBulk()
         es.client execute {
           bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId from ES.RECOGITO / ES.ANNOTATION } )
         } map { response =>
@@ -170,10 +171,10 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         Future.successful(true)
       }
     }
-    
+
     val deleteVersions = deleteHistoryRecordsByDocId(docId)
     val deleteGeoTags = deleteGeoTagsByDocId(docId)
-    
+
     for {
       s1 <- deleteAnnotations
       s2 <- deleteVersions
@@ -193,7 +194,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       search in ES.RECOGITO / ES.ANNOTATION query {
         bool {
           must (
-            nestedQuery("annotates").query(termQuery("annotates.document_id" -> documentId)) 
+            nestedQuery("annotates").query(termQuery("annotates.document_id" -> documentId))
           ) filter (
             rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
           )
@@ -201,7 +202,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       } limit ES.MAX_SIZE
     } map { _.as[(Annotation, Long)].toSeq.map(_._1) }
 
-  /** Rolls back the document to the state at the given timestamp **/ 
+  /** Rolls back the document to the state at the given timestamp **/
   def rollbackToTimestamp(documentId: String, timestamp: DateTime): Future[Boolean] = {
 
     // Rolls back one annotation, i.e. updates to the latest state recorded in the history or deletes
@@ -234,31 +235,31 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         }
       }
 
-    val failedRollbacks = getChangedAfter(documentId, timestamp).flatMap(rollbackAnnotations)    
+    val failedRollbacks = getChangedAfter(documentId, timestamp).flatMap(rollbackAnnotations)
     failedRollbacks.flatMap { failed =>
       if (failed.size == 0) {
         deleteHistoryRecordsAfter(documentId, timestamp)
       } else {
         Logger.warn(failed.size + " failed rollbacks")
-     
-        // TODO what would be a good recovery strategy?  
-        
+
+        // TODO what would be a good recovery strategy?
+
         Future.successful(false)
       }
     }
   }
-  
+
   /** Sorts the given list of document IDs by the number of annotations on the documents **/
   def sortDocsByAnnotationCount(docIds: Seq[String], sortOrder: models.SortOrder, offset: Int, limit: Int) = {
-    
+
     import scala.collection.JavaConverters._
-    
-    val numberOfBuckets = 
+
+    val numberOfBuckets =
       if (sortOrder == models.SortOrder.ASC)
         offset + limit
       else
         docIds.size
-        
+
     es.client execute {
       search in ES.RECOGITO / ES.ANNOTATION query {
         nestedQuery("annotates").query {
@@ -271,22 +272,22 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       } aggs {
         aggregation nested("by_document") path "annotates" aggs (
           aggregation terms "document_id" field "annotates.document_id"
-        ) 
+        )
       } size numberOfBuckets limit 0
     } map { response =>
       val byDocument = response.aggregations.get("by_document").asInstanceOf[Nested]
         .getAggregations.get("document_id").asInstanceOf[Terms]
-      
-      val annotatedDocs = byDocument.getBuckets.asScala.map(_.getKeyAsString).toSeq   
+
+      val annotatedDocs = byDocument.getBuckets.asScala.map(_.getKeyAsString).toSeq
       val unannotatedDocs = (docIds diff annotatedDocs)
-      val docs = 
+      val docs =
         if (sortOrder == models.SortOrder.ASC)
           (annotatedDocs ++ unannotatedDocs)
         else
           (annotatedDocs ++ unannotatedDocs).reverse
-     
+
       docs.drop(offset).take(limit)
-    } 
+    }
   }
 
 }

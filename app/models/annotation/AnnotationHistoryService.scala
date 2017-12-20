@@ -105,6 +105,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
 
     findHistoryRecordsAfter().flatMap { hits =>
       if (hits.size > 0) {
+        es.client.client.prepareBulk()
         es.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.ANNOTATION_HISTORY))
         } map {
@@ -130,6 +131,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
 
     findRecords.flatMap { hits =>
       if (hits.size > 0) {
+        es.client.client.prepareBulk()
         es.client execute {
           bulk (hits.map(h => delete id h.getId from ES.RECOGITO / ES.ANNOTATION_HISTORY))
         } map { response =>

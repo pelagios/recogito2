@@ -102,6 +102,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   override def insertOrUpdateGeoTagsForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean] = {
 
     def insertGeoTags(tags: Seq[(GeoTag, String)]): Future[Boolean] = {
+      es.client.client.prepareBulk()
       es.client execute {
         bulk ( tags.map(tag => index into ES.RECOGITO / ES.GEOTAG source tag._1 parent tag._2) )
       } map { response =>
@@ -129,7 +130,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   }
 
   def rewriteGeoTags(placesBeforeUpdate: Seq[Place], placesAfterUpdate: Seq[Place])(implicit context: ExecutionContext): Future[Boolean] = {
-    
+
     def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
       es.client execute {
         search scroll scrollId keepAlive "5m"
@@ -140,9 +141,11 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       val newParent = placesAfterUpdate.find(_.uris.contains(tag.gazetteerUri)).get
       if (oldParent.id != newParent.id) {
         Logger.debug("Rewriting geotag reference: " + tag.gazetteerUri)
+        // https://stackoverflow.com/questions/35758990/out-of-memory-in-elasticsearch
+        es.client.client.prepareBulk()
         es.client execute {
           bulk (
-            delete id id from ES.RECOGITO / ES.GEOTAG parent parent, 
+            delete id id from ES.RECOGITO / ES.GEOTAG parent parent,
             index into ES.RECOGITO / ES.GEOTAG source tag parent newParent.id
           )
         } map { !_.hasFailures }
@@ -150,11 +153,11 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         Future.successful(true)
       }
     }
-    
+
     def rewriteBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] = {
        val total = response.totalHits
        val tags = response.as[(GeoTag, String, String)].toSeq
-       
+
        if (tags.isEmpty) {
          Future.successful(true)
        } else {
@@ -196,6 +199,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       // Nothing to delete
       Future.successful(true)
     } else {
+      es.client.client.prepareBulk()
       es.client execute {
         bulk ( idsAndParents.map { case (tagId, parentId) => delete id tagId from ES.RECOGITO / ES.GEOTAG parent parentId } )
       } map { response =>

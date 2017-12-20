@@ -143,6 +143,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
 
     findContributionsAfter().flatMap { hits =>
       if (hits.size > 0) {
+        es.client.client.prepareBulk()
         es.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
         } map {
@@ -174,12 +175,13 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
 
     findContributions.flatMap { hits =>
       if (hits.size > 0) {
+        es.client.client.prepareBulk()
         es.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
         } map { response =>
           if (response.hasFailures)
             Logger.error("Failures while deleting contributions: " + response.failureMessage)
-          !response.hasFailures          
+          !response.hasFailures
         } recover { case t: Throwable =>
           t.printStackTrace()
           false
@@ -190,8 +192,8 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       }
     }
   }
-  
-  def countLast24hrs() = 
+
+  def countLast24hrs() =
     es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query {
         constantScoreQuery {
