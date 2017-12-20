@@ -69,6 +69,8 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
   }
 
   def importRecord(record: GazetteerRecord)(implicit context: ExecutionContext): Future[Boolean] = {
+    
+    val startTime = System.currentTimeMillis()
 
     // Fetches affected places from the store and computes the new conflation
     def conflateAffectedPlaces(normalizedRecord: GazetteerRecord): Future[(Seq[(Place, Long)], Seq[Place])] = {
@@ -123,12 +125,26 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
         toDelete.map(id => deletePlace(id).map((id, _)))
       } map { _.filter(!_._2).map(_._1) }
 
-    for {
+    val f = for {
       (placesBefore, placesAfter) <- conflateAffectedPlaces(GazetteerRecord.normalize(record))
       failedUpdates <- storeUpdatedPlaces(placesAfter)
       geotagRewriteSuccessful <- if (failedUpdates.isEmpty) rewriteGeoTags(placesBefore.map(_._1), placesAfter) else Future.successful(false)
       failedDeletes <- if (geotagRewriteSuccessful) deleteMergedPlaces(placesBefore, placesAfter) else Future.successful(Seq.empty[String])
     } yield failedUpdates.isEmpty && failedDeletes.isEmpty && geotagRewriteSuccessful
+    
+    f.map { success =>
+      val took = System.currentTimeMillis - startTime
+      if (took > 1000) {
+        Logger.info(s"Indexing ${record.title} took ${took} ms")
+        
+        // Give ElasticSearch a break, or it will... break 
+        Thread.sleep(5000) 
+      }
+      success 
+    }.recover { case t: Throwable =>
+      t.printStackTrace()
+      false
+    }
   }
 
   /** TODO chain the Futures properly instead of using Await! **/
@@ -136,7 +152,7 @@ trait PlaceImporter { self: PlaceStore with GeoTagStore =>
     Future {
       records.map { record =>
         try {
-          (record, Await.result(importRecord(record), 5.seconds))
+          (record, Await.result(importRecord(record), 20.seconds))
         } catch { case t: Throwable =>
           t.printStackTrace()
           play.api.Logger.warn(t.getMessage)
