@@ -40,14 +40,7 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
     } yield (annotations.map(_._1), places)
     
     f.map { case (annotations, places) =>
-      
-      play.api.Logger.info("Places: " + places.total + " - " + places.items.size)
-      play.api.Logger.info("Annotations: " + annotations.size)
-      
-      val placeAnnotations = annotations.filter(_.bodies.map(_.hasType).contains(AnnotationBody.PLACE))
-      
-      play.api.Logger.info("Place annotations: " + placeAnnotations.size)
-      
+      val placeAnnotations = annotations.filter(_.bodies.map(_.hasType).contains(AnnotationBody.PLACE))      
       val features = places.items.flatMap { case (place, _) =>        
         val annotationsOnThisPlace = placeAnnotations.filter { a =>
           // All annotations that include place URIs of this place
@@ -57,6 +50,9 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         
         val placeURIs = annotationsOnThisPlace.flatMap(_.bodies).filter(_.hasType == AnnotationBody.PLACE).flatMap(_.uri)
         val referencedRecords = place.isConflationOf.filter(g => placeURIs.contains(g.uri))
+        
+        if (place.representativeGeometry.isEmpty)
+          play.api.Logger.info("Place without geometry: " + place.id + " (" + place.titles.mkString + ")")
         
         place.representativeGeometry.map(geometry => 
           ReferencedPlaceFeature(geometry, referencedRecords, annotationsOnThisPlace))
