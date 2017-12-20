@@ -51,9 +51,6 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         val placeURIs = annotationsOnThisPlace.flatMap(_.bodies).filter(_.hasType == AnnotationBody.PLACE).flatMap(_.uri)
         val referencedRecords = place.isConflationOf.filter(g => placeURIs.contains(g.uri))
         
-        if (place.representativeGeometry.isEmpty)
-          play.api.Logger.info("Place without geometry: " + Json.prettyPrint(Json.toJson(place)))
-        
         place.representativeGeometry.map(geometry => 
           ReferencedPlaceFeature(geometry, referencedRecords, annotationsOnThisPlace))
       }
