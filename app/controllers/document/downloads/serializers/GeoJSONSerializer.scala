@@ -52,13 +52,11 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         val referencedRecords = place.isConflationOf.filter(g => placeURIs.contains(g.uri))
         
         if (place.representativeGeometry.isEmpty)
-          play.api.Logger.info("Place without geometry: " + place.id + " (" + place.titles.mkString + ")")
+          play.api.Logger.info("Place without geometry: " + Json.prettyPrint(Json.toJson(place)))
         
         place.representativeGeometry.map(geometry => 
           ReferencedPlaceFeature(geometry, referencedRecords, annotationsOnThisPlace))
       }
-      
-      play.api.Logger.info("Features: " + features.size)
 
       Json.toJson(GeoJSONFeatureCollection(features)) 
     }
