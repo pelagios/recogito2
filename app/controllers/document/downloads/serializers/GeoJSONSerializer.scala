@@ -33,13 +33,17 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
   def placesToGeoJSON(documentId: String)(implicit placeService: PlaceService, annotationService: AnnotationService, ctx: ExecutionContext) = {
     val fAnnotations = annotationService.findByDocId(documentId, 0, ES.MAX_SIZE)
     val fPlaces = placeService.listPlacesInDocument(documentId, 0, ES.MAX_SIZE)
-    
+        
     val f = for {
       annotations <- fAnnotations
       places <- fPlaces
     } yield (annotations.map(_._1), places)
     
     f.map { case (annotations, places) =>
+      
+      play.api.Logger.info("Places: " + places.total + " - " + places.items.size)
+      play.api.Logger.info("Annotations: " + annotations.size)
+      
       val placeAnnotations = annotations.filter(_.bodies.map(_.hasType).contains(AnnotationBody.PLACE))
       val features = places.items.flatMap { case (place, _) =>        
         val annotationsOnThisPlace = placeAnnotations.filter { a =>
