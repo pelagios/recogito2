@@ -71,8 +71,8 @@ define([
       this.element.removeClass('align-right');
     }
 
-    // Flip vertically if popup exceeds screen height
-    if (rectBefore.bottom > windowHeight) {
+    // If popup exceeds screen height, flip vertically if possible
+    if (rectBefore.bottom > windowHeight && rectBefore.y > this.element.outerHeight()) {
       this.element.addClass('align-bottom');
       this.element.css({ top: 'auto', bottom: self.container.clientHeight - translatedBounds.top });
     } else {
