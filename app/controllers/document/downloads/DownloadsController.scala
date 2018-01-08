@@ -2,7 +2,7 @@ package controllers.document.downloads
 
 import akka.util.ByteString
 import akka.stream.scaladsl.Source
-import controllers.{ BaseOptAuthController, WebJarAssets }
+import controllers.BaseOptAuthController
 import controllers.document.downloads.serializers._
 import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.stackc.RequestWithAttributes
@@ -11,14 +11,15 @@ import models.document.{ DocumentInfo, DocumentService }
 import models.place.PlaceService
 import models.user.UserService
 import org.apache.jena.riot.RDFFormat
+import org.webjars.play.WebJarsUtil
 import play.api.{ Configuration, Logger }
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.Enumerator
+import play.api.libs.Files.TemporaryFileCreator
 import play.api.mvc.{ AnyContent, Result }
-import play.api.http.HttpEntity
-import play.api.libs.streams.Streams
+import play.api.http.{ HttpEntity, FileMimeTypes }
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
 import models.ContentType
@@ -57,11 +58,13 @@ object FieldMapping {
 class DownloadsController @Inject() (
     val config: Configuration,
     val users: UserService,
+    implicit val mimeTypes: FileMimeTypes,
+    implicit val tmpFile: TemporaryFileCreator,
     implicit val uploads: Uploads,
     implicit val annotations: AnnotationService,
     implicit val documents: DocumentService,
     implicit val places: PlaceService,
-    implicit val webjars: WebJarAssets,
+    implicit val webjars: WebJarsUtil,
     implicit val ctx: ExecutionContext
   ) extends BaseOptAuthController(config, documents, users)
       with CSVSerializer

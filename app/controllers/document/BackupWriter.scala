@@ -11,10 +11,11 @@ import models.annotation.{ Annotation, AnnotationService }
 import models.document.DocumentInfo
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import play.api.libs.json.Json
-import play.api.libs.Files.TemporaryFile
+import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
 import java.security.DigestInputStream
+import play.api.libs.Files.TemporaryFileCreator
 
 trait BackupWriter extends HasBackupValidation { self: HasConfig =>
   
@@ -41,7 +42,8 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     new BigInteger(1, md.digest()).toString(16)
   }
   
-  def createBackup(doc: DocumentInfo)(implicit ctx: ExecutionContext, uploads: Uploads, annotations: AnnotationService): Future[File] = {
+  def createBackup(doc: DocumentInfo)(implicit ctx: ExecutionContext, uploads: Uploads, 
+      annotations: AnnotationService, tmpFile: TemporaryFileCreator): Future[File] = {
     
     def getFileAsStream(owner: String, documentId: String, filename: String) = {
       val dir = uploads.getDocumentDir(owner, documentId).get // Fail hard if the dir doesn't exist
@@ -63,7 +65,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     }
     
     def getAnnotationsAsStream(docId: String, annotations: Seq[Annotation], parts: Seq[DocumentFilepartRecord]): InputStream = {
-      val tmp = new TemporaryFile(new File(TMP, docId + "_annotations.jsonl"))
+      val tmp = tmpFile.create(TMP, docId + "_annotations.jsonl")
       val writer = new PrintWriter(tmp.file)
       annotations.foreach(a => writer.println(Json.stringify(Json.toJson(a))))
       writer.close()
@@ -71,7 +73,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     }
     
     Future {
-      new TemporaryFile(new File(TMP, doc.id + ".zip"))
+      tmpFile.create(TMP, doc.id + ".zip")
     } flatMap { zipFile =>
       val zipStream = new ZipOutputStream(new FileOutputStream(zipFile.file))
 

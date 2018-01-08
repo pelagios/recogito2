@@ -7,9 +7,9 @@ import models.document.DocumentService
 import models.user.Roles._
 import models.user.UserService
 import org.joda.time.DateTime
+import org.webjars.play.WebJarsUtil
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
-import controllers.WebJarAssets
 import play.api.Configuration
 import play.api.libs.json.Json
 
@@ -19,7 +19,7 @@ class UserAdminController @Inject() (
     val documents: DocumentService,
     val users: UserService,
     implicit val ctx: ExecutionContext,
-    implicit val webjars: WebJarAssets
+    implicit val webJarsUtil: WebJarsUtil
   ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON with HasDate {
 
   def index = StackAction(AuthorityKey -> Admin) { implicit request =>

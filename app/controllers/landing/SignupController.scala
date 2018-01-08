@@ -17,9 +17,10 @@ import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.libs.json.{ Json, JsObject }
-import play.api.mvc.{ Action, Controller }
+import play.api.mvc.{ Action, AbstractController, Controller }
 import scala.concurrent.{ Await, Future, ExecutionContext }
 import scala.concurrent.duration._
+import play.api.i18n.Lang
 
 case class SignupData(username: String, email: String, password: String)
 
@@ -27,9 +28,9 @@ case class SignupData(username: String, email: String, password: String)
 class SignupController @Inject() (
     val config: Configuration,
     val users: UserService,
-    val messagesApi: MessagesApi,
     val annotations: AnnotationService,
     val documents: DocumentService,
+    implicit val messagesApi: MessagesApi,
     implicit val ctx: ExecutionContext
   ) extends Controller with AuthElement with HasUserService with HasConfig with Security with Login with I18nSupport {
 
@@ -136,7 +137,7 @@ class SignupController @Inject() (
     } yield ()
   }
 
-  def showSignupForm = Action {
+  def showSignupForm = Action { implicit request =>
     Ok(views.html.landing.signup(signupForm))
   }
 

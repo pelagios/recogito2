@@ -3,7 +3,7 @@
   currentUser: Option[models.user.User],
   accessLevel: models.document.DocumentAccessLevel,
   annotationCount: Long
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
@@ -11,11 +11,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     @views.html.document.standardMeta(doc, annotationCount)
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/downloads/index.css")"/>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     @if(doc.hasDataParts) {
-      <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>
-      <script src="@routes.WebJarAssets.at(webjars.locate("papaparse.min.js"))"></script>
-      <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/downloads/app.js")"></script>
+      @Html(webJarsUtil.script("jquery-ui.min.js"))
+      @Html(webJarsUtil.script("papaparse.min.js"))
+      @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/downloads/app.js")))
       <script>
         window.config = {
           documentId: '@doc.id',

@@ -16,21 +16,24 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   jdbc,
-  cache,
+  ehcache,
   filters,
+  guice,
 
   "com.nrinaudo" %% "kantan.csv" % "0.2.1",
   "com.nrinaudo" %% "kantan.csv-commons" % "0.2.1",
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "2.4.0",
   "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
-  "com.typesafe.akka" %% "akka-slf4j" % "2.4.2",
+  // "com.typesafe.akka" %% "akka-slf4j" % "2.5.8",
+  "com.typesafe.play" %% "play-iteratees" % "2.6.1",
+  "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1",
   "com.typesafe.play" %% "play-mailer" % "5.0.0",
   "com.vividsolutions" % "jts" % "1.13",
   "commons-io" % "commons-io" % "2.4",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models",
   "eu.bitwalker" % "UserAgentUtils" % "1.20",
-  "jp.t2v" %% "play2-auth" % "0.14.1",
+  // "jp.t2v" %% "play2-auth" % "0.14.1",
   "org.apache.jena" % "jena-arq" % "3.1.0",
   "org.geotools" % "gt-geojson" % "14.3",
   "org.jooq" % "jooq" % "3.7.2",
@@ -38,7 +41,7 @@ libraryDependencies ++= Seq(
   "org.jooq" % "jooq-meta" % "3.7.2",
   "org.jooq" % "joox" % "1.5.0",
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
-  "org.webjars" %% "webjars-play" % "2.5.0",
+  "org.webjars" %% "webjars-play" % "2.6.2",
 
   // Scalagios core + transient dependencies
   "org.pelagios" % "scalagios-core" % "2.0.1" from "https://github.com/pelagios/scalagios/releases/download/v2.0.1/scalagios-core.jar",
@@ -80,15 +83,16 @@ includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
 
-unmanagedClasspath in Runtime <++= (baseDirectory) map { base =>
-  Attributed.blankSeq((file("plugins/") ** "*.jar").get)
-}
+// unmanagedClasspath in Runtime <++= (baseDirectory) map { base =>
+//   Attributed.blankSeq((file("plugins/") ** "*.jar").get)
+// }
 
 val generateJOOQ = taskKey[Seq[File]]("Generate JooQ classes")
-
-val generateJOOQTask = (sourceManaged, fullClasspath in Compile, runner in Compile, streams) map { (src, cp, r, s) =>
+generateJOOQ := {
+  val src = sourceManaged.value
+  val cp = (fullClasspath in Compile).value
+  val r = (runner in Compile).value
+  val s = streams.value
   toError(r.run("org.jooq.util.GenerationTool", cp.files, Array("conf/db.conf.xml"), s.log))
   (src ** "*.scala").get
 }
-
-generateJOOQ <<= generateJOOQTask

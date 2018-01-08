@@ -8,7 +8,7 @@ import models.document.{ DocumentInfo, DocumentService }
 import org.apache.jena.rdf.model.{ Model, ModelFactory }
 import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
 import org.apache.jena.vocabulary.{ DCTerms, RDF }
-import play.api.libs.Files.TemporaryFile
+import play.api.libs.Files.TemporaryFileCreator
 import play.api.mvc.{ AnyContent, Request }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.{ ExecutionContext, Future }
@@ -84,7 +84,7 @@ trait RDFSerializer extends BaseSerializer with HasDate {
   }
   
   def documentToRDF(doc: DocumentInfo, format: RDFFormat)(implicit documentService: DocumentService,
-      annotationService: AnnotationService, request: Request[AnyContent], ctx: ExecutionContext) = {
+      annotationService: AnnotationService, request: Request[AnyContent], tmpFile: TemporaryFileCreator, ctx: ExecutionContext) = {
     
     val baseUri = controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL 
       
@@ -99,8 +99,8 @@ trait RDFSerializer extends BaseSerializer with HasDate {
         createDocumentResource(doc, baseUri, model)
         annotations.foreach(t => createAnnotationResource(doc, t._1, baseUri, model))
       
-        val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".ttl"))
-        val os = new FileOutputStream(tmp.file)
+        val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".ttl")
+        val os = java.nio.file.Files.newOutputStream(tmp.path)
         RDFDataMgr.write(os, model, format)
         os.close()
       

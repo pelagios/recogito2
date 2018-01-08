@@ -1,4 +1,4 @@
-@()(implicit request: RequestHeader, webjars: WebJarAssets)
+@()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 @_layout("Tutorial de 10 minutos", "Un rápido tutorial de Recogito con sus características más importantes. Aprenda a crear anotaciones, a ubicar lugares y a compartir tu trabajo con otros.", "tutorial.css") {
   <h1>Tutorial de 10 minutos</h1>
   <span class="sub-title"><span class="icon">&#xf017;</span> Rápida introducción a Recogito</span>
@@ -291,6 +291,6 @@
     </div>
   </div>
 
-  <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
-  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/help/tutorial.js")"></script>
+  @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/help/tutorial.js")))
 }

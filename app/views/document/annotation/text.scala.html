@@ -5,7 +5,7 @@
   accessLevel: models.document.DocumentAccessLevel,
   annotationCount: Long,
   content: String
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
@@ -14,14 +14,14 @@
     @views.html.document.standardMeta(doc, annotationCount, Some(currentPart), Some(content))
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text/index.css")"/>
     <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
-    <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
-    <script src="@routes.WebJarAssets.at(webjars.locate("leaflet.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("jquery.timeago.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("rangy-core.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("rangy-classapplier.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/text/app.js")"></script>
+    @Html(webJarsUtil.css("leaflet.css"))
+    @Html(webJarsUtil.script("leaflet.js"))
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.script("jquery-ui.min.js"))
+    @Html(webJarsUtil.script("jquery.timeago.js"))
+    @Html(webJarsUtil.script("rangy-core.min.js"))
+    @Html(webJarsUtil.script("rangy-classapplier.min.js"))
+    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/text/app.js")))
     <script>
       window.config = {
         @if(currentUser.isDefined) { me: '@currentUser.get.username', }

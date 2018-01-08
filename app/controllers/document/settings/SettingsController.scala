@@ -1,6 +1,6 @@
 package controllers.document.settings
 
-import controllers.{ BaseAuthController, HasPrettyPrintJSON, WebJarAssets }
+import controllers.{ BaseAuthController, HasPrettyPrintJSON }
 import controllers.document.settings.actions._
 import javax.inject.{ Inject, Singleton }
 import models.annotation.AnnotationService
@@ -9,9 +9,12 @@ import models.document.{ DocumentService, DocumentInfo, DocumentAccessLevel }
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.user.UserService
 import models.user.Roles._
+import org.webjars.play.WebJarsUtil
 import play.api.Configuration
+import play.api.http.FileMimeTypes
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.{ AnyContent, Result, Request }
+import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.json.{ Json, JsSuccess, JsError, Reads }
 import scala.concurrent.{ Future, ExecutionContext }
 import storage.Uploads
@@ -25,8 +28,10 @@ class SettingsController @Inject() (
     val annotations: AnnotationService,
     val uploads: Uploads,
     val messagesApi: MessagesApi,
+    implicit val tmpFile: TemporaryFileCreator,
+    implicit val mimeTypes: FileMimeTypes,
     implicit val ctx: ExecutionContext,
-    implicit val webjars: WebJarAssets
+    implicit val webjars: WebJarsUtil
   ) extends BaseAuthController(config, documents, users)
       with MetadataActions
       with SharingActions

@@ -6,7 +6,7 @@
   sortBy: String,
   sortOrder: models.SortOrder,
   pageSize: Option[Int]
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout(user, usedDiskspace, rows.total, sharedWithMeCount, "my", pageSize) {
   <table class="document-list">

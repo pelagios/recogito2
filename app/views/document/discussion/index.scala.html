@@ -2,12 +2,12 @@
   doc: models.document.DocumentInfo,
   currentUser: Option[models.user.User],
   accessLevel: models.document.DocumentAccessLevel
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/discussion/index.css")"/>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
   </head>
   <body>
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "discussion")

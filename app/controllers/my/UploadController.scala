@@ -1,7 +1,7 @@
 package controllers.my
 
 import akka.actor.ActorSystem
-import controllers.{ BaseAuthController, HasPrettyPrintJSON, WebJarAssets }
+import controllers.{ BaseAuthController, HasPrettyPrintJSON }
 import javax.inject.{ Inject, Singleton }
 import models.{ ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException }
 import models.document.DocumentService
@@ -10,6 +10,7 @@ import models.upload.{ UploadService, QuotaExceededException }
 import models.generated.tables.records.UploadRecord
 import models.user.{ User, UserService }
 import models.user.Roles._
+import org.webjars.play.WebJarsUtil
 import play.api.{ Configuration, Logger }
 import play.api.data.Form
 import play.api.data.Forms._
@@ -38,7 +39,7 @@ class UploadController @Inject() (
     val teiParserService: TEIParserService,
     val nerService: NERService,
     val messagesApi: MessagesApi,
-    implicit val webjars: WebJarAssets,
+    implicit val webjars: WebJarsUtil,
     implicit val ctx: ExecutionContext,
     implicit val system: ActorSystem
   ) extends BaseAuthController(config, documents, users) with I18nSupport with HasPrettyPrintJSON {

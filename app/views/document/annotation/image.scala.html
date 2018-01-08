@@ -4,7 +4,7 @@
   currentUser: Option[models.user.User],
   accessLevel: models.document.DocumentAccessLevel,
   annotationCount: Long
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,15 +12,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
     @views.html.document.standardMeta(doc, annotationCount, Some(currentPart))
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image/index.css")"/>
-    <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("ol.css"))"/>
-    <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("leaflet.css"))"/>
-    <script src="@routes.WebJarAssets.at(webjars.locate("leaflet.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("velocity.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("jquery.timeago.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("ol.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/annotation/image/app.js")"></script>
+    @Html(webJarsUtil.css("ol.css"))
+    @Html(webJarsUtil.css("leaflet.css"))
+    @Html(webJarsUtil.script("leaflet.js"))
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.script("jquery-ui.min.js"))
+    @Html(webJarsUtil.script("velocity.min.js"))
+    @Html(webJarsUtil.script("jquery.timeago.js"))
+    @Html(webJarsUtil.script("ol.js"))
+    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/image/app.js")))
     <script>
       window.config = {
         @if(currentUser.isDefined) {

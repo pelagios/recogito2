@@ -1,6 +1,6 @@
 package controllers.my
 
-import controllers.{ BaseController, Security, WebJarAssets }
+import controllers.{ BaseController, Security }
 import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.{ Page, SortOrder }
@@ -9,6 +9,7 @@ import models.contribution.{ Contribution, ContributionService }
 import models.user.{ User, UserService }
 import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, SharingPolicyRecord }
+import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.RequestHeader
 import scala.concurrent.{ ExecutionContext, Future }
@@ -23,7 +24,7 @@ class MyRecogitoController @Inject() (
     val uploads: Uploads,
     val config: Configuration,
     implicit val ctx: ExecutionContext,
-    implicit val webjars: WebJarAssets
+    implicit val webjars: WebJarsUtil
   ) extends BaseController(config, users) with OptionalAuthElement {
 
   private val DEFAULT_DOCUMENTS_PER_PAGE = 10

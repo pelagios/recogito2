@@ -1,7 +1,7 @@
 package controllers.admin.backup
 
 import akka.actor.ActorSystem
-import controllers.{ BaseAuthController, WebJarAssets }
+import controllers.BaseAuthController
 import controllers.document.BackupReader
 import javax.inject.{ Inject, Singleton }
 import models.ContentType
@@ -10,6 +10,7 @@ import models.document.DocumentService
 import models.generated.tables.records.DocumentFilepartRecord
 import models.user.UserService
 import models.user.Roles._
+import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import scala.concurrent.{ ExecutionContext, Future }
 import transform.tiling.TilingService
@@ -23,7 +24,7 @@ class BackupAdminController @Inject() (
     implicit val documents: DocumentService,
     implicit val ctx: ExecutionContext,
     implicit val system: ActorSystem,
-    implicit val webjars: WebJarAssets
+    implicit val webJarsUtil: WebJarsUtil
   ) extends BaseAuthController(config, documents, users) with BackupReader {
   
   def index = StackAction(AuthorityKey -> Admin) { implicit request => 

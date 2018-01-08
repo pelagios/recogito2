@@ -1,15 +1,15 @@
-@()(implicit request: RequestHeader, webjars: WebJarAssets)
+@()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito | Admin Dashboard</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/admin/index.css")"/>
-    <link rel="stylesheet" href="@routes.WebJarAssets.at(webjars.locate("chartist.min.css"))"/>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("jquery.timeago.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("numeral.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("chartist.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/admin/dashboard.js")"></script>
+    @Html(webJarsUtil.css("chartist.min.css"))
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.script("jquery.timeago.js"))
+    @Html(webJarsUtil.script("numeral.min.js"))
+    @Html(webJarsUtil.script("chartist.min.js"))
+    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/admin/dashboard.js")))
   </head>
   <body>
 

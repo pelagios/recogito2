@@ -1,7 +1,7 @@
 @(
   doc: models.document.DocumentInfo,
   currentUser: models.user.User
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Recogito | Settings - Backup & Restore", doc, currentUser, Some("backup")) {
   <div class="backup panel centered">

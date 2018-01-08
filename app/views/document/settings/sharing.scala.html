@@ -2,7 +2,7 @@
   doc: models.document.DocumentInfo,
   currentUser: models.user.User,
   sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord]
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Recogito | Settings - Sharing", doc, currentUser, Some("sharing")) {
   <div class="panel share-public">
@@ -61,8 +61,8 @@
       documentId: '@doc.id'
     }
   </script>
-  <script src="@routes.WebJarAssets.at(webjars.locate("typeahead.jquery.min.js"))"></script>
-  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/sharing.js")"></script>
+  @Html(webJarsUtil.script("typeahead.jquery.min.js"))
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/settings/sharing.js")))
   @helper.javascriptRouter("jsRoutes")(
     controllers.my.routes.javascript.MyRecogitoController.index,
     controllers.document.settings.routes.javascript.SettingsController.setIsPublic,

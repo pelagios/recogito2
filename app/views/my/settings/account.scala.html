@@ -1,14 +1,14 @@
 @(
   settingsForm: Form[controllers.my.settings.AccountSettingsData],
   user: models.user.User
-)(implicit messages: Messages, flash: Flash, request: RequestHeader, webjars: WebJarAssets)
+)(implicit messages: Messages, flash: Flash, request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Account Settings</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/settings/index.css")"/>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/my/settings/account.js")"></script>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/my/settings/account.js")))
   </head>
 
   <body>

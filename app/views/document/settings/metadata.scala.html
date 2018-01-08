@@ -2,7 +2,7 @@
   metadataForm: Form[controllers.document.settings.actions.DocumentMetadata],
   doc: models.document.DocumentInfo,
   currentUser: models.user.User
-)(implicit header: RequestHeader, webjars: WebJarAssets, messages: Messages, flash: Flash)
+)(implicit header: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil, messages: Messages, flash: Flash)
 
 @_layout("Recogito | Settings - Metadata", doc, currentUser, Some("metadata")) {
   <div class="document-metadata panel centered">
@@ -69,8 +69,8 @@
       }
     }
   </script>
-  <script src="@routes.WebJarAssets.at(webjars.locate("jquery-ui.min.js"))"></script>
-  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/metadata.js")"></script>
+  @Html(webJarsUtil.script("jquery-ui.min.js"))
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/settings/metadata.js")))
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.settings.routes.javascript.SettingsController.setSortOrder,

@@ -1,9 +1,9 @@
-@(gazetteers: Seq[String])(implicit request: RequestHeader, webjars: WebJarAssets)
+@(gazetteers: Seq[String])(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito Administration - Gazetteers</title>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     <script>
       jQuery.on('click', '.gazetteer-list li', function(e) {
         var gazetteer = jQuery(e.target).closest('li').data('gazetteer');

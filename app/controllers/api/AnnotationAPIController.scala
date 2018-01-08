@@ -14,7 +14,9 @@ import models.image.ImageService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.{ Configuration, Logger }
+import play.api.http.FileMimeTypes
 import play.api.mvc.{ AnyContent, Request, Result }
+import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
@@ -102,6 +104,8 @@ class AnnotationAPIController @Inject() (
     val contributions: ContributionService,
     val documents: DocumentService,
     val users: UserService,
+    implicit val mimeTypes: FileMimeTypes,
+    implicit val tmpFile: TemporaryFileCreator,
     implicit val uploads: Uploads,
     implicit val ctx: ExecutionContext
   ) extends BaseController(config, users)

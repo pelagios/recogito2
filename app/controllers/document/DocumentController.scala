@@ -8,6 +8,7 @@ import models.document.DocumentService
 import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import models.user.UserService
 import play.api.Configuration
+import play.api.http.FileMimeTypes
 import play.api.mvc.Action
 import scala.concurrent.{ ExecutionContext, Future }
 import storage.Uploads
@@ -19,6 +20,7 @@ class DocumentController @Inject() (
     val documents: DocumentService,
     val users: UserService,
     val uploads: Uploads,
+    implicit val mimeTypes: FileMimeTypes,
     implicit val ctx: ExecutionContext
   ) extends BaseOptAuthController(config, documents, users) {
 

@@ -10,7 +10,7 @@ trait BackupActions extends BackupWriter { self: SettingsController =>
 
   def exportAsZip(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documentAdminAction(documentId, loggedIn.username, { doc =>
-      createBackup(doc)(self.ctx, self.uploads, self.annotations).map { file =>
+      createBackup(doc)(self.ctx, self.uploads, self.annotations, self.tmpFile).map { file =>
         Ok.sendFile(file)
       }
     })

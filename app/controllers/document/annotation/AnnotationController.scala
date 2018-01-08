@@ -1,6 +1,6 @@
 package controllers.document.annotation
 
-import controllers.{ BaseOptAuthController, HasVisitLogging, HasTEISnippets, WebJarAssets }
+import controllers.{ BaseOptAuthController, HasVisitLogging, HasTEISnippets }
 import java.util.UUID
 import javax.inject.{ Inject, Singleton }
 import models.ContentType
@@ -9,6 +9,7 @@ import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
 import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
 import models.user.{ User, UserService }
 import models.visit.VisitService
+import org.webjars.play.WebJarsUtil
 import play.api.{ Configuration, Logger }
 import play.api.mvc.{ RequestHeader, Result }
 import scala.concurrent.{ ExecutionContext, Future }
@@ -22,7 +23,7 @@ class AnnotationController @Inject() (
     val users: UserService,
     val uploads: Uploads,
     implicit val visits: VisitService,
-    implicit val webjars: WebJarAssets,
+    implicit val webjars: WebJarsUtil,
     implicit val ctx: ExecutionContext
   ) extends BaseOptAuthController(config, documents, users)
     with HasTEISnippets

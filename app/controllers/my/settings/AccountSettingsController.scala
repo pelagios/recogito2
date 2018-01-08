@@ -1,6 +1,6 @@
 package controllers.my.settings
 
-import controllers.{ HasUserService, HasConfig, Security, WebJarAssets }
+import controllers.{ HasUserService, HasConfig, Security }
 import javax.inject.Inject
 import jp.t2v.lab.play2.auth.{ AuthElement, Logout }
 import models.annotation.AnnotationService
@@ -9,6 +9,7 @@ import models.user.Roles._
 import models.user.UserService
 import models.upload.UploadService
 import models.document.DocumentService
+import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
@@ -27,7 +28,7 @@ class AccountSettingsController @Inject() (
     val documents: DocumentService,
     val uploads: UploadService,
     val messagesApi: MessagesApi,
-    implicit val webjars: WebJarAssets,
+    implicit val webjars: WebJarsUtil,
     implicit val ctx: ExecutionContext
   ) extends Controller with AuthElement with HasUserService with HasConfig with Security with Logout with I18nSupport {
 

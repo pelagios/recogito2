@@ -1,7 +1,7 @@
 @(
   doc: models.document.DocumentInfo,
   currentUser: models.user.User
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Recogito | Settings - Edit History", doc, currentUser, Some("history")) {
   <div class="edit-history"></div>
@@ -11,8 +11,8 @@
       documentId: '@doc.id'
     }
   </script>
-  <script src="@routes.WebJarAssets.at(webjars.locate("jquery.timeago.js"))"></script>
-  <script src="@routes.WebJarAssets.at(webjars.locate("require.min.js"))" data-main="@routes.Assets.versioned("javascripts/document/settings/history.js")"></script>
+  @Html(webJarsUtil.script("jquery.timeago.js"))
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/settings/history.js")))
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.resolveAnnotationView,

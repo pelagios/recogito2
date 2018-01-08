@@ -1,10 +1,11 @@
 package controllers.document.discussion
 
-import controllers.{ BaseAuthController, WebJarAssets }
+import controllers.BaseAuthController
 import javax.inject.{ Inject, Singleton }
 import models.document.DocumentService
 import models.user.UserService
 import models.user.Roles._
+import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import scala.concurrent.ExecutionContext
 
@@ -13,7 +14,7 @@ class DiscussionController @Inject() (
     val config: Configuration,
     documents: DocumentService,
     val users: UserService,
-    implicit val webjars: WebJarAssets,
+    implicit val webjars: WebJarsUtil,
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(config, documents, users) {
 

@@ -13,7 +13,7 @@ import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import models.document.DocumentInfo
 import models.place.{ Place, PlaceService }
 import models.generated.tables.records.DocumentFilepartRecord
-import play.api.libs.Files.TemporaryFile
+import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.io.Source
 import storage.Uploads
@@ -28,7 +28,8 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
     }
 
   /** Exports the annotations for the document to the standard Recogito CSV output format **/ 
-  def annotationsToCSV(documentId: String)(implicit annotationService: AnnotationService, placeService: PlaceService, ctx: ExecutionContext) = {
+  def annotationsToCSV(documentId: String)(implicit annotationService: AnnotationService, placeService: PlaceService, 
+      tmpFile: TemporaryFileCreator, ctx: ExecutionContext) = {
 
     def serializeOne(a: Annotation, places: Seq[Place]): Seq[String] = {
       val firstEntity = getFirstEntityBody(a)
@@ -69,7 +70,7 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
       scala.concurrent.blocking {
         val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
         
-        val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".csv"))
+        val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".csv")
         val config = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(header))
         val writer = tmp.file.asCsvWriter[Seq[String]](config)
         
@@ -89,11 +90,12 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
     implicit annotationService: AnnotationService, 
       placeService: PlaceService,
       uploads: Uploads,
+      tmpFile: TemporaryFileCreator,
       ctx: ExecutionContext): Future[(File, String)] = {
     
     def createZip(parts: Seq[(DocumentFilepartRecord, File)]): File = {
-      val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".zip"))
-      val zip = new ZipOutputStream(new FileOutputStream(tmp.file))
+      val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".zip")
+      val zip = new ZipOutputStream(java.nio.file.Files.newOutputStream(tmp.path))
       
       parts.foreach { case (part, file) =>
         val filename = 
@@ -151,7 +153,7 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
             "recogito_lat",
             "recogito_lon")
      
-        val tmp = new TemporaryFile(new File(TMP_DIR, UUID.randomUUID + ".csv"))
+        val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".csv")
         val writerConfig = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(headerFields))
         val writer = tmp.file.asCsvWriter[Seq[String]](writerConfig)
         

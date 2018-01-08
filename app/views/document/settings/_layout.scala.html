@@ -3,13 +3,13 @@
   doc: models.document.DocumentInfo,
   currentUser: models.user.User,
   activeTab: Option[String]
-)(content: Html)(implicit request: RequestHeader, webjars: WebJarAssets)
+)(content: Html)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>@title</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/settings/index.css")"/>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
   </head>
   <body>
     @views.html.document.iconbar(doc.document, Some(currentUser), models.document.DocumentAccessLevel.ADMIN, "settings")

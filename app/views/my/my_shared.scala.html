@@ -6,7 +6,7 @@
   sortBy: String,
   sortOrder: models.SortOrder,
   pageSize: Option[Int]
- )(implicit request: RequestHeader, webjars: WebJarAssets)
+ )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @accessLevel(lvl: String) = {
   @if(lvl == "READ") {

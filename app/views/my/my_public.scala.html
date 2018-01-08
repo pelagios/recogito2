@@ -2,14 +2,14 @@
   owner: models.user.User,
   documents: models.Page[models.generated.tables.records.DocumentRecord],
   currentUser: Option[models.user.User]
-)(implicit request: RequestHeader, webjars: WebJarAssets)
+)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>@owner.username | Recogito</title>
     <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,height=device-height,target-densitydpi=device-dpi,user-scalable=yes" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
-    <script src="@routes.WebJarAssets.at(webjars.locate("1.12.0/jquery.min.js"))"></script>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     <script>
       jQuery(document).ready(function() {
         $(".document-list tr").click(function() {

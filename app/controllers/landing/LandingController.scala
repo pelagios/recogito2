@@ -1,12 +1,13 @@
 package controllers.landing
 
-import controllers.{ HasConfig, HasUserService, HasVisitLogging, HasPrettyPrintJSON, Security, WebJarAssets }
+import controllers.{ HasConfig, HasUserService, HasVisitLogging, HasPrettyPrintJSON, Security }
 import javax.inject.{ Inject, Singleton }
 import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.annotation.AnnotationService
 import models.contribution.ContributionService
 import models.user.UserService
 import models.visit.VisitService
+import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, Controller }
@@ -20,7 +21,7 @@ class LandingController @Inject() (
     val users: UserService,
     implicit val ctx: ExecutionContext,
     implicit val visits: VisitService,
-    implicit val webjars: WebJarAssets
+    implicit val webjars: WebJarsUtil
 ) extends Controller with HasConfig with HasUserService with OptionalAuthElement with Security with HasVisitLogging with HasPrettyPrintJSON {
 
   def index = StackAction { implicit request =>
