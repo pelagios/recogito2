@@ -64,7 +64,7 @@ class UploadController @Inject() (
   implicit def uploadRecordToNewDocumentData(r: UploadRecord) =
     NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getLanguage, r.getSource, r.getEdition)
 
-  def showStep1(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showStep1(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     uploads.findPendingUpload(loggedIn.username).map(_ match {
       case Some(pendingUpload) =>
         Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm.fill(pendingUpload)))
@@ -72,10 +72,10 @@ class UploadController @Inject() (
       case None =>
         Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm))
     })
-  }
+  } */
 
   /** Stores document metadata following step 1 **/
-  def storeDocumentMetadata(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def storeDocumentMetadata(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     newDocumentForm.bindFromRequest.fold(
       formWithErrors =>
         Future.successful(BadRequest(views.html.my.upload.step1(usernameInPath, formWithErrors))),
@@ -88,10 +88,10 @@ class UploadController @Inject() (
             Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
           }}
     )
-  }
+  } */
 
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
-  def showStep2(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showStep2(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     uploads.findPendingUploadWithFileparts(loggedIn.username).map(_ match {
       case Some((pendingUpload, fileparts)) =>
         Ok(views.html.my.upload.step2(usernameInPath, fileparts))
@@ -99,10 +99,10 @@ class UploadController @Inject() (
       case None =>
         Redirect(controllers.my.routes.UploadController.showStep1(usernameInPath))
     })
-  }
+  } */
 
   /** Stores a filepart during step 2 **/
-  def storeFilepart(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def storeFilepart(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     val username = loggedIn.username
     val isFileupload = request.body.asMultipartFormData.isDefined
 
@@ -163,17 +163,17 @@ class UploadController @Inject() (
         t.printStackTrace()
         BadRequest(MSG_ERROR)
       }
-  }
+  } */
 
   /** Deletes a filepart during step 2 **/
-  def deleteFilepart(usernameInPath: String, filename: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def deleteFilepart(usernameInPath: String, filename: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     uploads.deleteFilepartByTitleAndOwner(filename, loggedIn.username).map(success => {
       if (success) Ok else NotFoundPage
     })
-  }
+  } */
 
   /** Step 3 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
-  def showStep3(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def showStep3(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     uploads.findPendingUploadWithFileparts(loggedIn.username).flatMap(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
@@ -216,9 +216,9 @@ class UploadController @Inject() (
         // No pending upload - force user to step 1
         Future.successful(Redirect(controllers.my.routes.UploadController.showStep1(usernameInPath)))
     })
-  }
+  } */
 
-  def cancelUploadWizard(usernameInPath: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def cancelUploadWizard(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     uploads
       .deletePendingUpload(loggedIn.username)
       .map(success => {
@@ -229,10 +229,10 @@ class UploadController @Inject() (
         // TODO add error message
         Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None, None, None, None, None))
       }
-  }
+  } */
 
   /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
-  def queryTaskProgress(username: String, docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def queryTaskProgress(username: String, docId: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     documents.getDocumentRecord(docId, Some(loggedIn.username)).flatMap(_ match {
       // Make sure only users with read access can see the progress
       case Some((document, accesslevel)) if accesslevel.canRead => {
@@ -249,6 +249,6 @@ class UploadController @Inject() (
       case None =>
         Future.successful(NotFoundPage)
     })
-  }
+  } */
 
 }

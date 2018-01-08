@@ -4,7 +4,6 @@ import controllers._
 import java.io.File
 import java.util.UUID
 import javax.inject.{ Inject, Singleton }
-import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.{ ContentType, HasDate }
 import models.annotation._
 import models.contribution._
@@ -109,7 +108,6 @@ class AnnotationAPIController @Inject() (
     implicit val uploads: Uploads,
     implicit val ctx: ExecutionContext
   ) extends BaseController(config, users)
-      with OptionalAuthElement
       with HasAnnotationValidation
       with HasPrettyPrintJSON
       with HasTextSnippets 
@@ -120,7 +118,7 @@ class AnnotationAPIController @Inject() (
 
   def listAnnotationsInPart(docId: String, partNo: Int) = listAnnotations(docId, Some(partNo))
 
-  private def listAnnotations(docId: String, partNo: Option[Int]) = AsyncStack { implicit request =>
+  private def listAnnotations(docId: String, partNo: Option[Int]) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
     // TODO currently annotation read access is unlimited to any logged in user - do we want that?
     (docId, partNo) match {
       case (id, Some(seqNo)) =>
@@ -141,7 +139,7 @@ class AnnotationAPIController @Inject() (
         // Load annotations for entire doc
         annotationService.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
     }
-  }
+  } */
 
   private def stubToAnnotation(stub: AnnotationStub, user: String) = {
     val now = DateTime.now()
@@ -183,7 +181,7 @@ class AnnotationAPIController @Inject() (
     }
   }
 
-  def createAnnotation() = AsyncStack { implicit request => jsonOp[AnnotationStub] { annotationStub =>
+  def createAnnotation() = play.api.mvc.Action { Ok } /* AsyncStack { implicit request => jsonOp[AnnotationStub] { annotationStub =>
     // Fetch the associated document to check access privileges
     documents.getDocumentRecord(annotationStub.annotates.documentId, loggedIn.map(_.username)).flatMap(_ match {
       case Some((document, accesslevel)) => {
@@ -208,9 +206,9 @@ class AnnotationAPIController @Inject() (
         Logger.warn("POST to /annotations but annotation points to unknown document: " + annotationStub.annotates.documentId)
         Future.successful(NotFound)
     })
-  }}
+  }} */
   
-  def bulkUpsert() = AsyncStack { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
+  def bulkUpsert() = play.api.mvc.Action { Ok } /* AsyncStack { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
     // We currently restrict to bulk upserts for a single document part only
     val username = loggedIn.map(_.username)
     val documentIds = annotationStubs.map(_.annotates.documentId).distinct
@@ -248,9 +246,9 @@ class AnnotationAPIController @Inject() (
       Logger.warn("Bulk upsert request for multiple document parts")
       Future.successful(BadRequest)
     }
-  }}
+  }} */
 
-  def getImage(id: UUID) = AsyncStack { implicit request =>    
+  def getImage(id: UUID) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>    
     val username = loggedIn.map(_.username)
     
     annotationService.findById(id).flatMap {
@@ -280,9 +278,9 @@ class AnnotationAPIController @Inject() (
       
       case None => Future.successful(NotFound)
     }
-  }
+  } */
 
-  def getAnnotation(id: UUID, includeContext: Boolean) = AsyncStack { implicit request =>
+  def getAnnotation(id: UUID, includeContext: Boolean) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
     
     def getTextContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = 
       uploads.readTextfile(doc.ownerName, doc.id, part.getFile) map {
@@ -350,7 +348,7 @@ class AnnotationAPIController @Inject() (
 
       case None => Future.successful(NotFoundPage)
     }
-  }
+  } */
 
   private def createDeleteContribution(annotation: Annotation, document: DocumentRecord, user: String, time: DateTime) =
     Contribution(
@@ -370,7 +368,7 @@ class AnnotationAPIController @Inject() (
       getContext(annotation)
     )
 
-  def deleteAnnotation(id: UUID) = AsyncStack { implicit request =>
+  def deleteAnnotation(id: UUID) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
     annotationService.findById(id).flatMap {
       case Some((annotation, version)) =>
         // Fetch the associated document
@@ -401,6 +399,6 @@ class AnnotationAPIController @Inject() (
 
       case None => Future.successful(NotFoundPage)
     }
-  }
+  } */
 
 }

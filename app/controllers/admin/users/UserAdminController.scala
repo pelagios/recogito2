@@ -22,11 +22,11 @@ class UserAdminController @Inject() (
     implicit val webJarsUtil: WebJarsUtil
   ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON with HasDate {
 
-  def index = StackAction(AuthorityKey -> Admin) { implicit request =>
+  def index = play.api.mvc.Action { Ok } /*StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.users.index())
-  }
+  } */
   
-  def listUsers(offset: Int, size: Int, sortBy: Option[String], sortOrder: Option[String]) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+  def listUsers(offset: Int, size: Int, sortBy: Option[String], sortOrder: Option[String]) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Admin) { implicit request =>
     users.listUsers(offset, size, sortBy, sortOrder.flatMap(o => SortOrder.fromString(o))).map { userList =>
       jsonOk(Json.toJson(userList.map { user =>
         Json.obj(
@@ -38,6 +38,6 @@ class UserAdminController @Inject() (
         )
       }))
     }
-  }
+  } */
 
 }

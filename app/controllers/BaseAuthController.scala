@@ -1,6 +1,5 @@
 package controllers
 
-import jp.t2v.lab.play2.auth.AuthElement
 import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
 import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord }
 import models.user.{ User, UserService }
@@ -12,7 +11,9 @@ abstract class BaseAuthController(
     config: Configuration,
     documents: DocumentService,
     users: UserService
-  ) extends BaseController(config, users) with AuthElement {
+  ) extends BaseController(config, users) {
+  
+  /*
   
   /** Helper that covers the boilerplate for all document views
     *
@@ -59,5 +60,7 @@ abstract class BaseAuthController(
       }
     })
   }
+  
+  */
   
 }

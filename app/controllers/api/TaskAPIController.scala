@@ -49,7 +49,7 @@ class TaskAPIController @Inject() (
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON {
 
-  def spawnTask = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def spawnTask = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     request.body.asJson.map(json => Json.fromJson[TaskDefinition](json)) match {
       case Some(result) if result.isSuccess =>
         val taskDefinition = result.get
@@ -70,9 +70,9 @@ class TaskAPIController @Inject() (
       case Some(result) if result.isError => Future.successful(BadRequest(Json.parse("{ \"error\": \"JSON parse error\" }")))
       case None => Future.successful(BadRequest(Json.parse("{ \"error\": \"missing task definition\" }")))
     }
-  }
+  } */
     
-  def progressByDocument(id: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>    
+  def progressByDocument(id: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>    
     documents.getExtendedInfo(id, Some(loggedIn.username)).flatMap(_ match {
       case Some((doc, accesslevel)) =>
         if (accesslevel.canRead) {
@@ -86,6 +86,6 @@ class TaskAPIController @Inject() (
         
       case None => Future.successful(NotFound)
     })
-  }
+  } */
   
 }

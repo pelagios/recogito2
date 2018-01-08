@@ -1,6 +1,5 @@
 package controllers
 
-import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
 import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord }
 import models.user.{ User, UserService }
@@ -12,9 +11,10 @@ abstract class BaseOptAuthController(
     config: Configuration,
     documents: DocumentService,
     users: UserService
-  ) extends BaseController(config, users) with OptionalAuthElement {
+  ) extends BaseController(config, users) {
   
-  
+  /*
+ 
   /** Helper that covers the boilerplate for all document views
     *
     * Just hand this method a function that produces an HTTP OK result for a document, while
@@ -68,4 +68,6 @@ abstract class BaseOptAuthController(
     })
   }
   
-}
+  */
+  
+} 

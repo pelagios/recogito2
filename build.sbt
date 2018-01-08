@@ -11,7 +11,8 @@ scalacOptions ++= Seq("-feature")
 resolvers ++= Seq(
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
   "Open Source Geospatial Foundation Repository" at "http://download.osgeo.org/webdav/geotools/",
-  "http://maven.geotoolkit.org/" at "http://maven.geotoolkit.org/"
+  "http://maven.geotoolkit.org/" at "http://maven.geotoolkit.org/",
+  "Atlassian Releases" at "https://maven.atlassian.com/public/"
 )
 
 libraryDependencies ++= Seq(
@@ -19,6 +20,13 @@ libraryDependencies ++= Seq(
   ehcache,
   filters,
   guice,
+
+  "com.mohiva" %% "play-silhouette" % "5.0.0",
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.0",
+  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.0",
+  "com.mohiva" %% "play-silhouette-persistence" % "5.0.0",
+  "com.mohiva" %% "play-silhouette-testkit" % "5.0.0" % "test",
+  "com.mohiva" %% "play-silhouette-cas" % "5.0.0",
 
   "com.nrinaudo" %% "kantan.csv" % "0.2.1",
   "com.nrinaudo" %% "kantan.csv-commons" % "0.2.1",
@@ -33,6 +41,7 @@ libraryDependencies ++= Seq(
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models",
   "eu.bitwalker" % "UserAgentUtils" % "1.20",
+  "net.codingwell" %% "scala-guice" % "4.1.1",
   // "jp.t2v" %% "play2-auth" % "0.14.1",
   "org.apache.jena" % "jena-arq" % "3.1.0",
   "org.geotools" % "gt-geojson" % "14.3",

@@ -13,6 +13,9 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContextExecutor
 import controllers.HasPrettyPrintJSON
+import com.mohiva.play.silhouette.api.Environment
+import models.user.User
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
 
 @Singleton
 class AdminController @Inject() (
@@ -26,11 +29,11 @@ class AdminController @Inject() (
     implicit val webJarsUtil: WebJarsUtil
   ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON {
         
-  def index = StackAction(AuthorityKey -> Admin) { implicit request =>
+  def index = play.api.mvc.Action { Ok } /* StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.index())
-  }
+  } */
   
-  def getStats() = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+  def getStats() = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Admin) { implicit request =>
     
     // DocumentRecord JSON serialization
     import DocumentService._
@@ -62,6 +65,6 @@ class AdminController @Inject() (
 
       jsonOk(response)
     }
-  }
+  } */
   
 }

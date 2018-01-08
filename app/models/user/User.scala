@@ -1,10 +1,13 @@
 package models.user
 
-import models.generated.tables.records.{ UserRecord, UserRoleRecord }
+import models.generated.tables.records.{UserRecord, UserRoleRecord}
 import models.generated.tables.records.FeatureToggleRecord
 import models.generated.tables.records.FeatureToggleRecord
+import com.mohiva.play.silhouette.api.{Identity, LoginInfo}
 
-case class User(val record: UserRecord, private val roleRecords: Seq[UserRoleRecord], private val featureToggleRecords: Seq[FeatureToggleRecord]) {
+case class User(
+    val record: UserRecord, private val roleRecords: Seq[UserRoleRecord], private val featureToggleRecords: Seq[FeatureToggleRecord]
+) extends Identity {
   
   val username = record.getUsername
   
@@ -25,6 +28,8 @@ case class User(val record: UserRecord, private val roleRecords: Seq[UserRoleRec
   val quotaMb = record.getQuotaMb
     
   val featureToggles = featureToggleRecords.map(_.getHasToggle)
+  
+  val loginInfo = LoginInfo("recogito", username) // Required by Silhouette auth framework
   
   def hasRole(role: Roles.Role): Boolean = roleRecords.exists(_.getHasRole == role.toString)
 

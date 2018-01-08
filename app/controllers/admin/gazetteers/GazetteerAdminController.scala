@@ -27,13 +27,13 @@ class GazetteerAdminController @Inject() (
     implicit val webJarsUtil: WebJarsUtil
   ) extends BaseAuthController(config, documents, users) {
   
-  def index = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+  def index = play.api.mvc.Action { Ok } /*AsyncStack(AuthorityKey -> Admin) { implicit request =>
     places.listGazetteers().map { gazetteers => 
       Ok(views.html.admin.gazetteers.index(gazetteers))
     }
-  }
+  }*/
   
-  def importGazetteer = StackAction(AuthorityKey -> Admin) { implicit request =>
+  def importGazetteer = play.api.mvc.Action { Ok } /*StackAction(AuthorityKey -> Admin) { implicit request =>
     request.body.asMultipartFormData.flatMap(_.file("gazetteer-file")) match {
       case Some(formData) => {
         
@@ -71,12 +71,12 @@ class GazetteerAdminController @Inject() (
       case None => BadRequest
         
     }
-  }
+  } */
   
-  def deleteGazetteer(name: String) = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+  def deleteGazetteer(name: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Admin) { implicit request =>
     places.deleteByGazetteer(name).map { _ =>
       Status(200)
     }
-  }
+  } */
 
 }

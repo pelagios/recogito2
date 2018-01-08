@@ -1,26 +1,30 @@
 package controllers.landing
 
-import controllers.{ HasConfig, HasUserService, Security }
+import controllers.{ HasConfig, HasUserService }
 import javax.inject.{ Inject, Singleton }
-import jp.t2v.lab.play2.auth.{ AuthElement, LoginLogout }
 import models.document.DocumentService
 import models.user.UserService
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.{ Action, Controller }
+import play.api.mvc.{ Action, ControllerComponents }
 import scala.concurrent.{ ExecutionContext, Future }
+import play.api.mvc.AbstractController
+import com.mohiva.play.silhouette.api.Silhouette
+import com.mohiva.play.silhouette.api.LoginInfo
 
 case class LoginData(usernameOrPassword: String, password: String)
 
 @Singleton
-class LoginLogoutController @Inject() (    
+class LoginLogoutController @Inject() (  
+    val components: ControllerComponents,
     val config: Configuration,
     val users: UserService,
-    implicit val ctx: ExecutionContext,
-    val messagesApi: MessagesApi
-  ) extends Controller with AuthElement with HasConfig with HasUserService with Security with LoginLogout with I18nSupport {
+    val silhouette: Silhouette[DefaultEnv],
+    implicit val ctx: ExecutionContext
+    // val messagesApi: MessagesApi
+  ) extends AbstractController(components) with HasConfig with HasUserService with I18nSupport {
 
   private val MESSAGE = "message"
 
@@ -40,21 +44,27 @@ class LoginLogoutController @Inject() (
     }
   }
 
-  def processLogin = Action.async { implicit request =>
+  def processLogin = silhouette.UnsecuredAction.async { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors =>
         Future(BadRequest(views.html.landing.login(formWithErrors))),
 
       loginData =>
         users.validateUser(loginData.usernameOrPassword, loginData.password).flatMap {
-          case Some(validUser) => gotoLoginSucceeded(validUser.getUsername)
+          case Some(validUser) =>
+            silhouette.env.authenticatorService.create(LoginInfo("recogito", validUser.getUsername)).flatMap { authenticator =>
+              silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
+                silhouette.env.authenticatorService.embed(v, Ok)
+              }
+            }
+                        
           case None => Future(Redirect(routes.LoginLogoutController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
         }
     )
   }
 
   def logout = Action.async { implicit request =>
-    gotoLogoutSucceeded
+    Future.successful(Ok) // gotoLogoutSucceeded
   }
 
 }

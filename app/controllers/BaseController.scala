@@ -14,12 +14,14 @@ trait HasUserService { def users: UserService }
 
 /** Common Controller functionality for convenience **/
 abstract class BaseController(config: Configuration, users: UserService)
-  extends Controller with HasConfig with HasUserService with Security {
+  extends Controller with HasConfig with HasUserService {
 
   protected val NotFoundPage = NotFound(views.html.error404())
   
   protected val ForbiddenPage = Forbidden(views.html.error403())
-
+  
+  /*
+   
   /** Returns the value of the specified query string parameter **/
   protected def getQueryParam(key: String)(implicit request: Request[AnyContent]): Option[String] =
     request.queryString.get(key).map(_.head)
@@ -42,4 +44,6 @@ abstract class BaseController(config: Configuration, users: UserService)
   protected def checkParamValue(key: String, value: String)(implicit request: Request[AnyContent]): Boolean =
     getParam(key).equals(Some(value))
 
+  */
+  
 }

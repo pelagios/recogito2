@@ -1,11 +1,10 @@
 package controllers.landing
 
-import controllers.{ HasConfig, HasUserService, Security }
+import controllers.{ HasConfig, HasUserService }
 import java.io.FileInputStream
 import java.sql.Timestamp
 import java.util.{ Date, UUID }
 import javax.inject.{ Inject, Singleton }
-import jp.t2v.lab.play2.auth.{ AuthElement, Login }
 import models.ContentType
 import models.annotation.{ Annotation, AnnotationService }
 import models.document.DocumentService
@@ -17,22 +16,33 @@ import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.libs.json.{ Json, JsObject }
-import play.api.mvc.{ Action, AbstractController, Controller }
+import play.api.mvc.{ Action, AbstractController, ControllerComponents }
 import scala.concurrent.{ Await, Future, ExecutionContext }
 import scala.concurrent.duration._
 import play.api.i18n.Lang
+import com.mohiva.play.silhouette.api.Silhouette
+import com.mohiva.play.silhouette.api.Env
+import models.user.User
+import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
 
 case class SignupData(username: String, email: String, password: String)
 
+trait DefaultEnv extends Env {
+  type I = User
+  type A = CookieAuthenticator
+}
+
 @Singleton
 class SignupController @Inject() (
+    val components: ControllerComponents,
+    val silhouette: Silhouette[DefaultEnv],
     val config: Configuration,
     val users: UserService,
     val annotations: AnnotationService,
     val documents: DocumentService,
-    implicit val messagesApi: MessagesApi,
+    // implicit val messagesApi: MessagesApi,
     implicit val ctx: ExecutionContext
-  ) extends Controller with AuthElement with HasUserService with HasConfig with Security with Login with I18nSupport {
+  ) extends AbstractController(components) with HasUserService with HasConfig with I18nSupport {
 
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
 
@@ -137,8 +147,9 @@ class SignupController @Inject() (
     } yield ()
   }
 
-  def showSignupForm = Action { implicit request =>
-    Ok(views.html.landing.signup(signupForm))
+  def showSignupForm = silhouette.SecuredAction.async { implicit request =>
+    val foo = request.identity
+    Future.successful(Ok(views.html.landing.signup(signupForm)))
   }
 
   def processSignup = Action.async { implicit request =>
@@ -153,11 +164,12 @@ class SignupController @Inject() (
         } yield user
         
         fUser
-          .flatMap(user => gotoLoginSucceeded(user.getUsername))
+          .flatMap(user => Future.successful(Ok)) //gotoLoginSucceeded(user.getUsername))
           .recover { case t:Throwable => {
             t.printStackTrace()
             Ok(views.html.landing.signup(signupForm.bindFromRequest, Some(DEFAULT_ERROR_MESSAGE)))
           }}
+        
       }
     )
   }

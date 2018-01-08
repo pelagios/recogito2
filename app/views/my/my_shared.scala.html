@@ -79,8 +79,8 @@
 
   @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, None, None, None, None, None).url, rows)
 
-  @helper.javascriptRouter("jsRoutes")(
+  @* helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView,
     controllers.document.settings.routes.javascript.SettingsController.deleteDocument
-  )
+  ) *@
 }

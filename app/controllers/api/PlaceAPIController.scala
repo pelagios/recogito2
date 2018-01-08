@@ -23,15 +23,15 @@ class PlaceAPIController @Inject() (
   ) extends BaseOptAuthController(config, documents, users) with HasPrettyPrintJSON {
     
   /** Lookup by URI - open to all, so that it's available to public documents **/
-  def findPlaceByURI(uri: String) = Action.async { implicit request =>
+  def findPlaceByURI(uri: String) = play.api.mvc.Action { Ok } /* Action.async { implicit request =>
     places.findByURI(uri).map { _ match {
       case Some((place, _)) => jsonOk(Json.toJson(place))
       case None => NotFoundPage
     }}
-  }
+  } */
 
   /** Search by query string - available to logged in users only **/
-  def searchPlaces(query: String, offset: Int, size: Int, latlng: Option[String]) = AsyncStack { implicit request =>
+  def searchPlaces(query: String, offset: Int, size: Int, latlng: Option[String]) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
     loggedIn match {
       case Some(user) => {
         val sortFrom = latlng.flatMap { l =>
@@ -49,20 +49,20 @@ class PlaceAPIController @Inject() (
       
       case None => Future.successful(ForbiddenPage)
     }
-  }
+  } */
   
   /** List all places in document - bound to the current user's access level **/
-  def listPlacesInDocument(docId: String, offset: Int, size: Int) = AsyncStack { implicit request =>
+  def listPlacesInDocument(docId: String, offset: Int, size: Int) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
     documentResponse(docId, loggedIn, { case (metadata, accesslevel) =>
       if (accesslevel.canRead)
         places.listPlacesInDocument(docId, offset, size).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
       else
         Future.successful(ForbiddenPage)
     })
-  }
+  } */
   
   /** Search places in document - bound to the current user's access level **/
-  def searchPlacesInDocument(query: String, docId: String, offset: Int, size: Int) = AsyncStack { implicit request =>
+  def searchPlacesInDocument(query: String, docId: String, offset: Int, size: Int) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
     documentResponse(docId, loggedIn, { case (metadata, accesslevel) =>
       if (accesslevel.canRead)
         places.searchPlacesInDocument(query, docId, offset, size).map { results =>
@@ -71,6 +71,6 @@ class PlaceAPIController @Inject() (
       else
         Future.successful(ForbiddenPage)
     })
-  }
+  } */
  
 }

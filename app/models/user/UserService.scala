@@ -1,15 +1,17 @@
 package models.user
 
+import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.api.services.IdentityService
 import controllers.HasConfig
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.sql.Timestamp
 import java.util.Date
-import javax.inject.{ Inject, Singleton }
-import models.{ BaseService, Page, SortOrder }
+import javax.inject.{Inject, Singleton}
+import models.{BaseService, Page, SortOrder}
 import models.user.Roles.Role
 import models.generated.Tables._
-import models.generated.tables.records.{ UserRecord, UserRoleRecord, FeatureToggleRecord }
+import models.generated.tables.records.{UserRecord, UserRoleRecord, FeatureToggleRecord}
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
@@ -17,9 +19,9 @@ import org.jooq.{ Record, SelectWhereStep }
 import play.api.Configuration
 import play.api.cache.CacheApi
 import scala.collection.JavaConversions._
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Either, Left, Right }
-import storage.{ DB, Uploads }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Either, Left, Right}
+import storage.{DB, Uploads}
 import sun.security.provider.SecureRandom
 
 @Singleton
@@ -29,9 +31,12 @@ class UserService @Inject() (
     implicit val cache: CacheApi,
     implicit val ctx: ExecutionContext,
     implicit val db: DB
-  ) extends BaseService with HasConfig with HasEncryption {
+  ) extends BaseService with HasConfig with HasEncryption with IdentityService[User] {
 
   private val DEFAULT_QUOTA = config.getInt("recogito.upload.quota").getOrElse(200) // The default default
+  
+  // Required by Silhouette auth framework
+  def retrieve(loginInfo: LoginInfo): Future[Option[User]] = findByUsername(loginInfo.providerKey)
 
   def countUsers() = db.query { sql =>
     sql.selectCount().from(USER).fetchOne(0, classOf[Int])

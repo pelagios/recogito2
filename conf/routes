@@ -33,119 +33,119 @@ GET     /help                                        controllers.help.HelpContro
 # Administration area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
-POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
-DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
+# GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
+# POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
+# DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 
-GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
-GET     /admin/users                                 controllers.admin.users.UserAdminController.index
+# GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
+# GET     /admin/users                                 controllers.admin.users.UserAdminController.index
 
-GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
-POST    /admin/restore                               controllers.admin.backup.BackupAdminController.restore
+# GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
+# POST    /admin/restore                               controllers.admin.backup.BackupAdminController.restore
 
-GET     /admin/stats.json                            controllers.admin.AdminController.getStats
-GET     /admin                                       controllers.admin.AdminController.index
+# GET     /admin/stats.json                            controllers.admin.AdminController.getStats
+# GET     /admin                                       controllers.admin.AdminController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document views
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id/part/:seqNo/edit               controllers.document.annotation.AnnotationController.showAnnotationView(id: String, seqNo: Int)
-GET     /document/:id/edit                           controllers.document.annotation.AnnotationController.resolveAnnotationView(id: String, part: Option[java.util.UUID] ?= None, annotation: Option[java.util.UUID] ?= None)
+# GET     /document/:id/part/:seqNo/edit               controllers.document.annotation.AnnotationController.showAnnotationView(id: String, seqNo: Int)
+# GET     /document/:id/edit                           controllers.document.annotation.AnnotationController.resolveAnnotationView(id: String, part: Option[java.util.UUID] ?= None, annotation: Option[java.util.UUID] ?= None)
 
-GET     /document/:id/map                            controllers.document.map.MapController.showMap(id: String)
+# GET     /document/:id/map                            controllers.document.map.MapController.showMap(id: String)
 
-GET     /document/:id/stats                          controllers.document.stats.StatsController.showDocumentStats(id: String)
+# GET     /document/:id/stats                          controllers.document.stats.StatsController.showDocumentStats(id: String)
 
-GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
-GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String, export_tables: Boolean ?= false)
-GET     /document/:id/downloads/ttl                  controllers.document.downloads.DownloadsController.downloadTTL(id: String)
-GET     /document/:id/downloads/rdf                  controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
-GET     /document/:id/downloads/jsonld               controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)
-GET     /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
-POST    /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
-GET     /document/:id/downloads/tei                  controllers.document.downloads.DownloadsController.downloadTEI(id: String)
+# GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
+# GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String, export_tables: Boolean ?= false)
+# GET     /document/:id/downloads/ttl                  controllers.document.downloads.DownloadsController.downloadTTL(id: String)
+# GET     /document/:id/downloads/rdf                  controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
+# GET     /document/:id/downloads/jsonld               controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)
+# GET     /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+# POST    /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+# GET     /document/:id/downloads/tei                  controllers.document.downloads.DownloadsController.downloadTEI(id: String)
 
-GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
+# GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
 
-GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
-PUT     /document/:id/settings/sortorder             controllers.document.settings.SettingsController.setSortOrder(id: String)
-POST    /document/:id/settings/metadata              controllers.document.settings.SettingsController.updateDocumentMetadata(id: String)
-POST    /document/:id/settings/metadata/part/:ptId   controllers.document.settings.SettingsController.updateFilepartMetadata(id: String, ptId: java.util.UUID)
-PUT     /document/:id/settings/public                controllers.document.settings.SettingsController.setIsPublic(id: String, enabled: Boolean)
-PUT     /document/:id/settings/collaborator          controllers.document.settings.SettingsController.addCollaborator(id: String)
-DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
-GET     /document/:id/settings/collaborator/search   controllers.document.settings.SettingsController.searchUsers(id: String, q: String)
-GET     /document/:id/settings/history.json          controllers.document.settings.SettingsController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
-POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String, contributionId: String)
-GET     /document/:id/settings/zip-export            controllers.document.settings.SettingsController.exportAsZip(id: String)
-DELETE  /document/:id/settings/delete                controllers.document.settings.SettingsController.deleteDocument(id: String)
-DELETE  /document/:id/settings/delete-annotations    controllers.document.settings.SettingsController.deleteAnnotations(id: String)
+# PUT     /document/:id/settings/sortorder             controllers.document.settings.SettingsController.setSortOrder(id: String)
+# GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
+# POST    /document/:id/settings/metadata              controllers.document.settings.SettingsController.updateDocumentMetadata(id: String)
+# POST    /document/:id/settings/metadata/part/:ptId   controllers.document.settings.SettingsController.updateFilepartMetadata(id: String, ptId: java.util.UUID)
+# PUT     /document/:id/settings/public                controllers.document.settings.SettingsController.setIsPublic(id: String, enabled: Boolean)
+# PUT     /document/:id/settings/collaborator          controllers.document.settings.SettingsController.addCollaborator(id: String)
+# DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
+# GET     /document/:id/settings/collaborator/search   controllers.document.settings.SettingsController.searchUsers(id: String, q: String)
+# GET     /document/:id/settings/history.json          controllers.document.settings.SettingsController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
+# POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String, contributionId: String)
+# GET     /document/:id/settings/zip-export            controllers.document.settings.SettingsController.exportAsZip(id: String)
+# DELETE  /document/:id/settings/delete                controllers.document.settings.SettingsController.deleteDocument(id: String)
+# DELETE  /document/:id/settings/delete-annotations    controllers.document.settings.SettingsController.deleteAnnotations(id: String)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document content
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id/part/:partNo/manifest          controllers.document.DocumentController.getImageManifest(id: String, partNo: Int)
-GET     /document/:id/part/:partNo/tiles/*path       controllers.document.DocumentController.getImageTile(id: String, partNo: Int, path: String)
-GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
-GET     /document/:id/part/:partNo/raw               controllers.document.DocumentController.getRaw(id: String, partNo: Int, lines: Option[Int] ?= None)
+# GET     /document/:id/part/:partNo/manifest          controllers.document.DocumentController.getImageManifest(id: String, partNo: Int)
+# GET     /document/:id/part/:partNo/tiles/*path       controllers.document.DocumentController.getImageTile(id: String, partNo: Int, path: String)
+# GET     /document/:id/part/:partNo/thumb.jpg         controllers.document.DocumentController.getThumbnail(id: String, partNo: Int)
+# GET     /document/:id/part/:partNo/raw               controllers.document.DocumentController.getRaw(id: String, partNo: Int, lines: Option[Int] ?= None)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document and part base paths
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /document/:id                                controllers.document.DocumentController.initialDocumentView(id: String)
+# GET     /document/:id                                controllers.document.DocumentController.initialDocumentView(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # JSON API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-POST    /api/annotation                              controllers.api.AnnotationAPIController.createAnnotation
-GET     /api/annotation/:id.jpg                      controllers.api.AnnotationAPIController.getImage(id: java.util.UUID)
-GET     /api/annotation/:id                          controllers.api.AnnotationAPIController.getAnnotation(id: java.util.UUID, context: Boolean ?= false)
-DELETE  /api/annotation/:id                          controllers.api.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
+# POST    /api/annotation                              controllers.api.AnnotationAPIController.createAnnotation
+# GET     /api/annotation/:id.jpg                      controllers.api.AnnotationAPIController.getImage(id: java.util.UUID)
+# GET     /api/annotation/:id                          controllers.api.AnnotationAPIController.getAnnotation(id: java.util.UUID, context: Boolean ?= false)
+# DELETE  /api/annotation/:id                          controllers.api.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
 
-POST    /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkUpsert
+# POST    /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkUpsert
 
-GET     /api/document/:id/annotations                controllers.api.AnnotationAPIController.listAnnotationsInDocument(id: String)
-GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationAPIController.listAnnotationsInPart(id: String, part: Int)
+# GET     /api/document/:id/annotations                controllers.api.AnnotationAPIController.listAnnotationsInDocument(id: String)
+# GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationAPIController.listAnnotationsInPart(id: String, part: Int)
 
-GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
-GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
+# GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
+# GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
 
-GET     /api/place/search                            controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
-GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
+# GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
+# GET     /api/place/search                            controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
 
-POST    /api/task                                    controllers.api.TaskAPIController.spawnTask
-GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)
+# POST    /api/task                                    controllers.api.TaskAPIController.spawnTask
+# GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /settings/account                            controllers.my.settings.AccountSettingsController.index
-POST    /settings/account                            controllers.my.settings.AccountSettingsController.updateAccountSettings
-DELETE  /settings/account                            controllers.my.settings.AccountSettingsController.deleteAccount
-GET     /settings/password                           controllers.my.settings.PasswordSettingsController.index
-POST    /settings/password                           controllers.my.settings.PasswordSettingsController.updatePassword
-GET     /settings/restore                            controllers.my.settings.RestoreController.index
-POST    /settings/restore                            controllers.my.settings.RestoreController.restore
+# GET     /settings/account                            controllers.my.settings.AccountSettingsController.index
+# POST    /settings/account                            controllers.my.settings.AccountSettingsController.updateAccountSettings
+# DELETE  /settings/account                            controllers.my.settings.AccountSettingsController.deleteAccount
+# GET     /settings/password                           controllers.my.settings.PasswordSettingsController.index
+# POST    /settings/password                           controllers.my.settings.PasswordSettingsController.updatePassword
+# GET     /settings/restore                            controllers.my.settings.RestoreController.index
+# POST    /settings/restore                            controllers.my.settings.RestoreController.restore
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - upload
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /:username/upload/step-1                     controllers.my.UploadController.showStep1(username: String)
-POST    /:username/upload/step-1                     controllers.my.UploadController.storeDocumentMetadata(username: String)
-GET     /:username/upload/step-2                     controllers.my.UploadController.showStep2(username: String)
-POST    /:username/upload/step-2                     controllers.my.UploadController.storeFilepart(username: String)
-DELETE  /:username/upload/step-2/:filename           controllers.my.UploadController.deleteFilepart(username: String, filename: String)
-GET     /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
-POST    /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
-GET     /:username/upload/cancel                     controllers.my.UploadController.cancelUploadWizard(username: String)
-GET     /:username/upload/progress/:docId            controllers.my.UploadController.queryTaskProgress(username: String, docId: String)
+# POST    /:username/upload/step-1                     controllers.my.UploadController.storeDocumentMetadata(username: String)
+# GET     /:username/upload/step-1                     controllers.my.UploadController.showStep1(username: String)
+# GET     /:username/upload/step-2                     controllers.my.UploadController.showStep2(username: String)
+# POST    /:username/upload/step-2                     controllers.my.UploadController.storeFilepart(username: String)
+# DELETE  /:username/upload/step-2/:filename           controllers.my.UploadController.deleteFilepart(username: String, filename: String)
+# GET     /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
+# POST    /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
+# GET     /:username/upload/cancel                     controllers.my.UploadController.cancelUploadWizard(username: String)
+# GET     /:username/upload/progress/:docId            controllers.my.UploadController.queryTaskProgress(username: String, docId: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Application root

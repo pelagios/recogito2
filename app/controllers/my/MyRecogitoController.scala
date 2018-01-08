@@ -1,8 +1,7 @@
 package controllers.my
 
-import controllers.{ BaseController, Security }
+import controllers.BaseController
 import javax.inject.{ Inject, Singleton }
-import jp.t2v.lab.play2.auth.OptionalAuthElement
 import models.{ Page, SortOrder }
 import models.annotation.AnnotationService
 import models.contribution.{ Contribution, ContributionService }
@@ -25,7 +24,7 @@ class MyRecogitoController @Inject() (
     val config: Configuration,
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarsUtil
-  ) extends BaseController(config, users) with OptionalAuthElement {
+  ) extends BaseController(config, users) {
 
   private val DEFAULT_DOCUMENTS_PER_PAGE = 10
   
@@ -148,7 +147,7 @@ class MyRecogitoController @Inject() (
   }
   
   /** A convenience '/my' route that redirects to the personal index **/
-  def my = StackAction { implicit request =>
+  def my = play.api.mvc.Action { Ok } /* StackAction { implicit request =>
     loggedIn match {
       case Some(userWithRoles) =>
         Redirect(routes.MyRecogitoController.index(userWithRoles.username.toLowerCase, None, None, None, None, None))
@@ -158,9 +157,9 @@ class MyRecogitoController @Inject() (
         Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None))
           .withSession("access_uri" -> routes.MyRecogitoController.my.url)
     }
-  }
+  } */
 
-  def index(usernameInPath: String, tab: Option[String], page: Option[Int], sortBy: Option[String], order: Option[String], size: Option[Int]) = AsyncStack { implicit request =>
+  def index(usernameInPath: String, tab: Option[String], page: Option[Int], sortBy: Option[String], order: Option[String], size: Option[Int]) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
     // If the user is logged in & the name in the path == username it's the profile owner
     val isProfileOwner = loggedIn match {
       case Some(userWithRoles) => userWithRoles.username.equalsIgnoreCase(usernameInPath)
@@ -198,6 +197,6 @@ class MyRecogitoController @Inject() (
     } else {
       renderPublicProfile(usernameInPath, loggedIn)
     }
-  }
+  } */
   
 }

@@ -2,7 +2,7 @@ package controllers.admin.backup
 
 import akka.actor.ActorSystem
 import controllers.BaseAuthController
-import controllers.document.BackupReader
+// import controllers.document.BackupReader
 import javax.inject.{ Inject, Singleton }
 import models.ContentType
 import models.annotation.AnnotationService
@@ -25,13 +25,13 @@ class BackupAdminController @Inject() (
     implicit val ctx: ExecutionContext,
     implicit val system: ActorSystem,
     implicit val webJarsUtil: WebJarsUtil
-  ) extends BaseAuthController(config, documents, users) with BackupReader {
+  ) extends BaseAuthController(config, documents, users) /* with BackupReader */ {
   
-  def index = StackAction(AuthorityKey -> Admin) { implicit request => 
+  def index = play.api.mvc.Action { Ok } /*StackAction(AuthorityKey -> Admin) { implicit request => 
     Ok(views.html.admin.backup.index())
-  }
+  }*/
   
-  def restore = AsyncStack(AuthorityKey -> Admin) { implicit request =>
+  def restore = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Admin) { implicit request =>
     
     request.body.asMultipartFormData.flatMap(_.file("backup")) match {
       case Some(formData) =>
@@ -46,6 +46,6 @@ class BackupAdminController @Inject() (
         Future.successful(BadRequest)
     }
     
-  }
+  }*/
   
 }
