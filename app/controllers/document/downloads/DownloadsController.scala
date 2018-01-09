@@ -2,27 +2,28 @@ package controllers.document.downloads
 
 import akka.util.ByteString
 import akka.stream.scaladsl.Source
-import controllers.BaseOptAuthController
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{BaseOptAuthController, Security}
 import controllers.document.downloads.serializers._
-import javax.inject.{ Inject, Singleton }
-import jp.t2v.lab.play2.stackc.RequestWithAttributes
+import javax.inject.{Inject, Singleton}
+import models.ContentType
 import models.annotation.AnnotationService
-import models.document.{ DocumentInfo, DocumentService }
+import models.document.{DocumentInfo, DocumentService}
 import models.place.PlaceService
 import models.user.UserService
 import org.apache.jena.riot.RDFFormat
 import org.webjars.play.WebJarsUtil
-import play.api.{ Configuration, Logger }
+import play.api.{Configuration, Logger}
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.Files.TemporaryFileCreator
-import play.api.mvc.{ AnyContent, Result }
-import play.api.http.{ HttpEntity, FileMimeTypes }
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.mvc.{AnyContent, ControllerComponents, Result}
+import play.api.http.{HttpEntity, FileMimeTypes}
+import scala.concurrent.{ExecutionContext, Future}
 import storage.Uploads
-import models.ContentType
+import com.mohiva.play.silhouette.api.actions.UserAwareRequest
 
 case class FieldMapping(
   
@@ -56,40 +57,42 @@ object FieldMapping {
 
 @Singleton
 class DownloadsController @Inject() (
-    val config: Configuration,
-    val users: UserService,
-    implicit val mimeTypes: FileMimeTypes,
-    implicit val tmpFile: TemporaryFileCreator,
-    implicit val uploads: Uploads,
-    implicit val annotations: AnnotationService,
-    implicit val documents: DocumentService,
-    implicit val places: PlaceService,
-    implicit val webjars: WebJarsUtil,
-    implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(config, documents, users)
-      with CSVSerializer
-      with GeoJSONSerializer
-      with RDFSerializer
-      with webannotation.WebAnnotationSerializer
-      with tei.PlaintextSerializer
-      with tei.TEISerializer {
+  val components: ControllerComponents,
+  val config: Configuration,
+  val users: UserService,
+  val silhouette: Silhouette[Security.Env],
+  implicit val mimeTypes: FileMimeTypes,
+  implicit val tmpFile: TemporaryFileCreator,
+  implicit val uploads: Uploads,
+  implicit val annotations: AnnotationService,
+  implicit val documents: DocumentService,
+  implicit val places: PlaceService,
+  implicit val webjars: WebJarsUtil,
+  implicit val ctx: ExecutionContext
+) extends BaseOptAuthController(components, config, documents, users)
+    with CSVSerializer
+    with GeoJSONSerializer
+    with RDFSerializer
+    with webannotation.WebAnnotationSerializer
+    with tei.PlaintextSerializer
+    with tei.TEISerializer {
   
-  private def download(documentId: String, export: DocumentInfo => Future[Result])(implicit request: RequestWithAttributes[AnyContent]) = {
-    documentReadResponse(documentId, loggedIn, { case (docInfo, _) => // Used just for the access permission check
+  private def download(documentId: String, export: DocumentInfo => Future[Result])(implicit request: UserAwareRequest[Security.Env, AnyContent]) = {
+    documentReadResponse(documentId, request.identity, { case (docInfo, _) => // Used just for the access permission check
       export(docInfo)
     })
   }
 
-  def showDownloadOptions(documentId: String) = AsyncStack { implicit request =>
-    documentReadResponse(documentId, loggedIn, { case (doc, accesslevel) =>
+  def showDownloadOptions(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
+    documentReadResponse(documentId, request.identity, { case (doc, accesslevel) =>
       annotations.countByDocId(documentId).map { documentAnnotationCount =>
-        Ok(views.html.document.downloads.index(doc, loggedIn, accesslevel, documentAnnotationCount))
+        Ok(views.html.document.downloads.index(doc, request.identity, accesslevel, documentAnnotationCount))
       }
     })
   }
 
   /** Exports either 'plain' annotation CSV, or merges annotations with original DATA_* uploads, if any **/
-  def downloadCSV(documentId: String, exportTables: Boolean) = AsyncStack { implicit request =>
+  def downloadCSV(documentId: String, exportTables: Boolean) = silhouette.UserAwareAction.async { implicit request =>
     download(documentId, { doc =>
       if (exportTables)
         exportMergedTables(doc).map { case (file, filename) =>
@@ -102,7 +105,7 @@ class DownloadsController @Inject() (
     })
   }
   
-  private def downloadRDF(documentId: String, format: RDFFormat, extension: String) = AsyncStack { implicit request =>
+  private def downloadRDF(documentId: String, format: RDFFormat, extension: String) = silhouette.UserAwareAction.async { implicit request =>
     download(documentId, { doc =>
       documentToRDF(doc, format).map { file => 
         Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + "." + extension })
@@ -113,7 +116,7 @@ class DownloadsController @Inject() (
   def downloadTTL(documentId: String) = downloadRDF(documentId, RDFFormat.TTL, "ttl") 
   def downloadRDFXML(documentId: String) = downloadRDF(documentId, RDFFormat.RDFXML, "rdf.xml") 
   
-  def downloadJSONLD(documentId: String) = AsyncStack { implicit request =>
+  def downloadJSONLD(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     download(documentId, { doc =>
       documentToWebAnnotation(doc).map { json =>
         Ok(Json.prettyPrint(json))
@@ -122,7 +125,7 @@ class DownloadsController @Inject() (
     })
   }
 
-  def downloadGeoJSON(documentId: String, asGazetteer: Boolean) = AsyncStack { implicit request =>
+  def downloadGeoJSON(documentId: String, asGazetteer: Boolean) = silhouette.UserAwareAction.async { implicit request =>
     
     // Standard GeoJSON download
     def downloadPlaces() =
@@ -160,7 +163,7 @@ class DownloadsController @Inject() (
     })
   }
   
-  def downloadTEI(documentId: String) = AsyncStack { implicit request =>
+  def downloadTEI(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     download(documentId, { doc =>
       val contentTypes = doc.fileparts.flatMap(pt => ContentType.withName(pt.getContentType)).distinct
       

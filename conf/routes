@@ -52,20 +52,20 @@ GET     /help                                        controllers.help.HelpContro
 GET     /document/:id/part/:seqNo/edit               controllers.document.annotation.AnnotationController.showAnnotationView(id: String, seqNo: Int)
 GET     /document/:id/edit                           controllers.document.annotation.AnnotationController.resolveAnnotationView(id: String, part: Option[java.util.UUID] ?= None, annotation: Option[java.util.UUID] ?= None)
 
-# GET     /document/:id/map                            controllers.document.map.MapController.showMap(id: String)
+GET     /document/:id/map                            controllers.document.map.MapController.showMap(id: String)
 
-# GET     /document/:id/stats                          controllers.document.stats.StatsController.showDocumentStats(id: String)
+GET     /document/:id/stats                          controllers.document.stats.StatsController.showDocumentStats(id: String)
 
-# GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
-# GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String, export_tables: Boolean ?= false)
-# GET     /document/:id/downloads/ttl                  controllers.document.downloads.DownloadsController.downloadTTL(id: String)
-# GET     /document/:id/downloads/rdf                  controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
-# GET     /document/:id/downloads/jsonld               controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)
-# GET     /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
-# POST    /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
-# GET     /document/:id/downloads/tei                  controllers.document.downloads.DownloadsController.downloadTEI(id: String)
+GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
+GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String, export_tables: Boolean ?= false)
+GET     /document/:id/downloads/ttl                  controllers.document.downloads.DownloadsController.downloadTTL(id: String)
+GET     /document/:id/downloads/rdf                  controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
+GET     /document/:id/downloads/jsonld               controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)
+GET     /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+POST    /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+GET     /document/:id/downloads/tei                  controllers.document.downloads.DownloadsController.downloadTEI(id: String)
 
-# GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
+GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
 
 PUT     /document/:id/settings/sortorder             controllers.document.settings.SettingsController.setSortOrder(id: String)
 GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
