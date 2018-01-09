@@ -24,6 +24,9 @@ import scala.language.postfixOps
 
 class SilhouetteSecurity  extends AbstractModule with ScalaModule {
   
+  private def getAppSecret(config: Configuration) =
+    config.get[String]("play.crypto.secret")
+  
   override def configure(): Unit = {
     bind[Silhouette[Security.Env]].to[SilhouetteProvider[Security.Env]]
     bind[DelegableAuthInfoDAO[PasswordInfo]].toInstance(new InMemoryAuthInfoDAO[PasswordInfo])
@@ -89,15 +92,15 @@ class SilhouetteSecurity  extends AbstractModule with ScalaModule {
   @Provides
   @Named("authenticator-signer")
   def provideAuthenticatorSigner(configuration: Configuration): Signer = {
-    val config = JcaSignerSettings("SecretKey")
-    new JcaSigner(config)
+    val settings = JcaSignerSettings(getAppSecret(configuration))
+    new JcaSigner(settings)
   }
 
   @Provides
   @Named("authenticator-crypter")
   def provideAuthenticatorCrypter(configuration: Configuration): Crypter = {
-    val config = JcaCrypterSettings("SecretKey")
-    new JcaCrypter(config)
+    val settings = JcaCrypterSettings(getAppSecret(configuration))
+    new JcaCrypter(settings)
   }
 
 }
