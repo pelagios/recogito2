@@ -2,9 +2,9 @@ package models.upload
 
 import collection.JavaConverters._
 import java.io.File
-import java.nio.file.{ Files, Paths, StandardCopyOption }
+import java.nio.file.{Files, Paths, StandardCopyOption}
 import java.sql.Timestamp
-import java.util.{ Date, UUID }
+import java.util.{Date, UUID}
 import javax.inject.Inject
 import models.{ BaseService, ContentType }
 import models.document.DocumentService
@@ -16,7 +16,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
-import storage.{ DB, Uploads }
+import storage.{DB, Uploads}
 
 class QuotaExceededException(val remainingSpaceKb: Long, val filesizeKb: Double) extends RuntimeException
 
@@ -68,7 +68,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
   def insertUploadFilepart(uploadId: Int, owner: User, filepart: FilePart[TemporaryFile]):
     Future[Either[Exception, UploadFilepartRecord]] = db.withTransaction { sql =>
      
-    val filesizeKb = filepart.ref.file.length.toDouble / 1024
+    val filesizeKb = Files.size(filepart.ref.path).toDouble / 1024
     
     val usedDiskspaceKb = uploads.getUsedDiskspaceKB(owner.username)
     val remainingDiskspaceKb = owner.quotaMb * 1024 - usedDiskspaceKb

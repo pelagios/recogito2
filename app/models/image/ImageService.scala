@@ -33,7 +33,7 @@ object ImageService {
     anchor match {
       case tbox: TiltedBoxAnchor =>    
         val rotatedTmp = tmp.create(TMP, annotation.annotationId + ".rot.jpg")
-        val rotatedFile = rotatedTmp.file.getAbsolutePath      
+        val rotatedFile = rotatedTmp.path.toAbsolutePath.toString
         val angleDeg = 180 * tbox.a / Math.PI
                 
         s"vips similarity $croppedFile $rotatedFile --angle $angleDeg" !
@@ -56,9 +56,9 @@ object ImageService {
         
         s"vips crop $rotatedFile $clippedFile $x $y $w $h" ! 
         
-        clippedTmp.file
+        clippedTmp.path.toFile
         
-      case _ => croppedTmp.file
+      case _ => croppedTmp.path.toFile
     }
     
   }

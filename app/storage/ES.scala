@@ -55,13 +55,13 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
   lifecycle.addStopHook { () => Future.successful(stop()) }
     
   lazy val client = {    
-    val home = config.getString("recogito.index.dir") match {
+    val home = config.getOptional[String]("recogito.index.dir") match {
       case Some(dir) => new File(dir)
       case None => new File("index")
     }
     
-    val host = config.getString("es.host").getOrElse("localhost")
-    val port = config.getInt("es.port").getOrElse(9300)
+    val host = config.getOptional[String]("es.host").getOrElse("localhost")
+    val port = config.getOptional[Int]("es.port").getOrElse(9300)
     val remoteClient = ElasticClient.transport(ElasticsearchClientUri(host, port))
     
     // Just fetch cluster stats to see if there's a cluster at all

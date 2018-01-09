@@ -14,11 +14,11 @@ class Uploads @Inject() (config: Configuration) {
     (('a' to 'z') ++ ('A' to 'Z')).toSet
 
   private lazy val UPLOAD_BASE = {
-    val dir = config.getString("recogito.upload.dir") match {
+    val dir = config.getOptional[String]("recogito.upload.dir") match {
       case Some(filename) => new File(filename)
       case None => new File("uploads") // Default
     }
-    
+
     Logger.info("Using " + dir.getAbsolutePath + " as upload location")
 
     if (!dir.exists)
@@ -70,12 +70,12 @@ class Uploads @Inject() (config: Configuration) {
       None
     }
   }
-  
+
   /** TODO make async **/
   def getUsedDiskspaceKB(username: String) =
     getUserDir(username).map(dataDir => FileUtils.sizeOfDirectory(dataDir)).getOrElse(0l) / 1024
-  
-  def deleteUserDir(username: String)(implicit ctx: ExecutionContext): Future[Unit] = Future { 
+
+  def deleteUserDir(username: String)(implicit ctx: ExecutionContext): Future[Unit] = Future {
     scala.concurrent.blocking {
       getUserDir(username).map(userdir => FileUtils.deleteDirectory(userdir))
     }
@@ -94,7 +94,7 @@ class Uploads @Inject() (config: Configuration) {
         None
       }
     })
-    
+
   /** Helper to read the contents of a text filepart **/
   def readTextfile(owner: String, docId: String, filename: String)(implicit ctx: ExecutionContext): Future[Option[String]] = Future {
     scala.concurrent.blocking {
@@ -107,7 +107,7 @@ class Uploads @Inject() (config: Configuration) {
       })
     }
   }
-    
+
   /** Helper **/
   def openThumbnail(owner: String, docId: String, filename: String)(implicit ctx: ExecutionContext): Future[Option[File]] = Future {
     scala.concurrent.blocking {

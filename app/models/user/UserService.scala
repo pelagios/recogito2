@@ -33,8 +33,8 @@ class UserService @Inject() (
     implicit val db: DB
   ) extends BaseService with HasConfig with HasEncryption with IdentityService[User] {
 
-  private val DEFAULT_QUOTA = config.get[Option[Int]]("recogito.upload.quota").getOrElse(200) // The default default
-  
+  private val DEFAULT_QUOTA = config.getOptional[Int]("recogito.upload.quota").getOrElse(200) // The default default
+
   // Required by Silhouette auth framework
   override def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
     findByUsername(loginInfo.providerKey)
@@ -51,7 +51,7 @@ class UserService @Inject() (
       case Some(field) => sql.selectFrom(USER).orderBy(field)
       case None => sql.selectFrom(USER)
     }
-    
+
     val users = query.limit(limit).offset(offset).fetch().into(classOf[UserRecord])
     Page(System.currentTimeMillis - startTime, total, offset, limit, users.toSeq)
   }
@@ -63,7 +63,7 @@ class UserService @Inject() (
     sql.insertInto(USER).set(user).execute()
     user
   }
-  
+
   def insertUserRole(username: String, role: Role) = db.withTransaction { sql =>
     sql.insertInto(USER_ROLE)
       .set(USER_ROLE.USERNAME, username)
@@ -97,9 +97,9 @@ class UserService @Inject() (
               .set(USER.SALT, salt)
               .where(USER.USERNAME.equal(username))
               .execute()
-              
+
           removeFromCache("user", username)
-          
+
           Right(Unit)
         } else {
           // User failed password validation
@@ -145,23 +145,23 @@ class UserService @Inject() (
 
     val queryA = build(sql.selectFrom(USER.naturalLeftOuterJoin(USER_ROLE)))
     val queryB = build(sql.selectFrom(USER.naturalJoin(FEATURE_TOGGLE)))
-    
+
     val recordsA = queryA.fetchArray
     val recordsB = queryB.fetchArray
-    
+
     val userWithRoles = groupLeftJoinResult(recordsA, classOf[UserRecord], classOf[UserRoleRecord]).headOption
     val featureToggles = recordsB.map(_.into(classOf[FeatureToggleRecord])).toSeq
     userWithRoles.map { case (user, roles) =>
       User(user, roles, featureToggles)
     }
   }
-  
+
   def deleteByUsername(username: String) = db.withTransaction { sql =>
     sql.deleteFrom(USER_ROLE).where(USER_ROLE.USERNAME.equal(username)).execute()
     sql.deleteFrom(USER).where(USER.USERNAME.equal(username)).execute()
     removeFromCache("user", username)
   }
-  
+
   def findByEmail(email: String) = db.query { sql =>
     Option(sql.selectFrom(USER).where(USER.EMAIL.equalIgnoreCase(encrypt(email))).fetchOne())
   }
@@ -172,12 +172,12 @@ class UserService @Inject() (
         findByEmail(username)
       else
         findByUsername(username).map(_.map(_.record))
-      
+
     f.map {
       case Some(user) =>
         val isValid = computeHash(user.getSalt + password) == user.getPasswordHash
         if (isValid) Some(user) else None
-      
+
       case None => None
     }
   }
