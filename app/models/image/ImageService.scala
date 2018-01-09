@@ -1,6 +1,7 @@
 package models.image
 
 import java.io.File
+import java.nio.file.Paths
 import models.annotation.Annotation
 import models.document.DocumentInfo
 import models.generated.tables.records.DocumentFilepartRecord
@@ -18,7 +19,7 @@ object ImageService {
     val dir = uploads.getDocumentDir(doc.ownerName, doc.id).get
     
     val sourceFile = new File(dir, part.getFile)
-    val croppedTmp = tmp.create(TMP, annotation.annotationId + ".jpg")
+    val croppedTmp = tmp.create(Paths.get(TMP, s"${annotation.annotationId}.jpg"))
     val croppedFile = croppedTmp.path.toAbsolutePath.toString
     
     val anchor = ImageAnchor.parse(annotation.anchor)
@@ -32,14 +33,14 @@ object ImageService {
     
     anchor match {
       case tbox: TiltedBoxAnchor =>    
-        val rotatedTmp = tmp.create(TMP, annotation.annotationId + ".rot.jpg")
+        val rotatedTmp = tmp.create(Paths.get(TMP, s"${annotation.annotationId}.rot.jpg"))
         val rotatedFile = rotatedTmp.path.toAbsolutePath.toString
         val angleDeg = 180 * tbox.a / Math.PI
                 
         s"vips similarity $croppedFile $rotatedFile --angle $angleDeg" !
 
         // TODO can rotate and crop happen in the same vips command?
-        val clippedTmp = tmp.create(TMP, annotation.annotationId + ".clip.jpg")
+        val clippedTmp = tmp.create(Paths.get(TMP, s"${annotation.annotationId}.clip.jpg"))
         val clippedFile = clippedTmp.path.toAbsolutePath.toString
         
         val a =  ImageAnchor.getQuadrant(tbox.a) match {

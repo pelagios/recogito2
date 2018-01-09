@@ -2,6 +2,7 @@ package controllers.document.downloads.serializers
 
 import controllers.HasCSVParsing
 import java.io.{ BufferedInputStream, File, FileInputStream, FileOutputStream }
+import java.nio.file.Paths
 import java.util.UUID
 import java.util.zip.{ ZipEntry, ZipOutputStream }
 import kantan.csv.CsvConfiguration
@@ -70,15 +71,16 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
       scala.concurrent.blocking {
         val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
         
-        val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".csv")
+        val tmp = tmpFile.create(Paths.get(TMP_DIR, s"${UUID.randomUUID}.csv"))
+        val underlying = tmp.path.toFile
         val config = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(header))
-        val writer = tmp.file.asCsvWriter[Seq[String]](config)
+        val writer = underlying.asCsvWriter[Seq[String]](config)
         
         val tupled = sort(annotations.map(_._1)).map(a => serializeOne(a, places))
         tupled.foreach(t => writer.write(t))
         writer.close()
         
-        tmp.file
+        underlying
       }
     }
   }
@@ -94,8 +96,10 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
       ctx: ExecutionContext): Future[(File, String)] = {
     
     def createZip(parts: Seq[(DocumentFilepartRecord, File)]): File = {
-      val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".zip")
-      val zip = new ZipOutputStream(java.nio.file.Files.newOutputStream(tmp.path))
+      // val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".zip")
+      val p = Paths.get(TMP_DIR, s"${UUID.randomUUID}.zip")
+      val tmp = tmpFile.create(p)
+      val zip = new ZipOutputStream(java.nio.file.Files.newOutputStream(p))
       
       parts.foreach { case (part, file) =>
         val filename = 
@@ -116,7 +120,7 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
       }
       
       zip.close()
-      tmp.file
+      p.toFile
     }
     
     exportMergedDocument[(File, String)](doc, { case (annotations, places, documentDir) =>
@@ -153,9 +157,11 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
             "recogito_lat",
             "recogito_lon")
      
-        val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".csv")
+        val p = Paths.get(TMP_DIR, s"${UUID.randomUUID}.csv")
+        val tmp = tmpFile.create(p)
+        val underlying = p.toFile
         val writerConfig = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(headerFields))
-        val writer = tmp.file.asCsvWriter[Seq[String]](writerConfig)
+        val writer = underlying.asCsvWriter[Seq[String]](writerConfig)
         
         parseCSV(file, delimiter, header = true, { case (row, idx) =>
           extendRow(row, idx)
@@ -166,7 +172,7 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
         
         writer.close()
         
-        (part, tmp.file)
+        (part, underlying)
       }
       
       if (outputFiles.isEmpty)

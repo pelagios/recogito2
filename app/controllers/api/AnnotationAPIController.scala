@@ -105,8 +105,8 @@ class AnnotationAPIController @Inject() (
 
   def listAnnotationsInPart(docId: String, partNo: Int) = listAnnotations(docId, Some(partNo))
 
-  private def listAnnotations(docId: String, partNo: Option[Int]) = silhouette.SecuredAction.async { implicit request =>
-    // TODO currently annotation read access is unlimited to any logged in user - do we want that?
+  private def listAnnotations(docId: String, partNo: Option[Int]) = silhouette.UserAwareAction.async { implicit request =>
+    // TODO currently annotation read access is unrestricted - do we want that?
     (docId, partNo) match {
       case (id, Some(seqNo)) =>
         // Load annotations for specific doc part

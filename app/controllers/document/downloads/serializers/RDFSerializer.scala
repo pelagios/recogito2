@@ -1,6 +1,7 @@
 package controllers.document.downloads.serializers
 
 import java.io.{ File, FileOutputStream }
+import java.nio.file.Paths
 import java.util.UUID
 import models.HasDate
 import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
@@ -99,11 +100,10 @@ trait RDFSerializer extends BaseSerializer with HasDate {
         createDocumentResource(doc, baseUri, model)
         annotations.foreach(t => createAnnotationResource(doc, t._1, baseUri, model))
       
-        val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".ttl")
+        val tmp = tmpFile.create(Paths.get(TMP_DIR, s"${UUID.randomUUID}.ttl"))
         val os = java.nio.file.Files.newOutputStream(tmp.path)
         RDFDataMgr.write(os, model, format)
         os.close()
-      
         tmp.path.toFile
       }
     }

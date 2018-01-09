@@ -2,6 +2,7 @@ package controllers.document
 
 import controllers.HasConfig
 import java.io.{File, FileInputStream, FileOutputStream, BufferedInputStream, ByteArrayInputStream, InputStream, PrintWriter}
+import java.nio.file.Paths
 import java.math.BigInteger
 import java.security.{MessageDigest, DigestInputStream}
 import java.util.UUID
@@ -65,17 +66,18 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     }
     
     def getAnnotationsAsStream(docId: String, annotations: Seq[Annotation], parts: Seq[DocumentFilepartRecord]): InputStream = {
-      val tmp = tmpFile.create(TMP, docId + "_annotations.jsonl")
-      val writer = new PrintWriter(tmp.file)
+      val path = Paths.get(TMP, s"${docId}_annotations.json")
+      val tmp = tmpFile.create(path)
+      val writer = new PrintWriter(path.toFile)
       annotations.foreach(a => writer.println(Json.stringify(Json.toJson(a))))
       writer.close()
-      new FileInputStream(tmp.file)
+      new FileInputStream(path.toFile)
     }
     
     Future {
-      tmpFile.create(TMP, doc.id + ".zip")
+      tmpFile.create(Paths.get(TMP, s"${doc.id}.zip"))
     } flatMap { zipFile =>
-      val zipStream = new ZipOutputStream(new FileOutputStream(zipFile.file))
+      val zipStream = new ZipOutputStream(new FileOutputStream(zipFile.path.toFile))
 
       writeToZip(getManifestAsStream(), "manifest", zipStream)
       val metadataHash = writeToZip(getMetadataAsStream(doc), "metadata.json", zipStream)
@@ -91,7 +93,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
         writeToZip(new ByteArrayInputStream(signature.getBytes), "signature", zipStream)
         
         zipStream.close()
-        zipFile.file
+        zipFile.path.toFile
       }
     }
   }
