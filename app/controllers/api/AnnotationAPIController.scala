@@ -109,7 +109,7 @@ class AnnotationAPIController @Inject() (
     implicit val ctx: ExecutionContext
   ) extends BaseController(config, users)
       with HasAnnotationValidation
-      with HasPrettyPrintJSON
+      // with HasPrettyPrintJSON
       with HasTextSnippets 
       with HasTEISnippets
       with HasCSVParsing {

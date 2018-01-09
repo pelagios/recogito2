@@ -25,23 +25,20 @@ class LandingController @Inject() (
     implicit val ctx: ExecutionContext,
     implicit val visits: VisitService,
     implicit val webjars: WebJarsUtil
-) extends AbstractController(components) with HasConfig with HasUserService with HasVisitLogging /*with HasPrettyPrintJSON*/ {
+) extends AbstractController(components) with HasConfig with HasUserService with HasVisitLogging with HasPrettyPrintJSON {
 
   def index = silhouette.UserAwareAction { implicit request =>
-    
-    play.api.Logger.info(request.identity.toString)
-    
-    /*loggedIn match {
+    request.identity match {
       case Some(user) =>
         Redirect(controllers.my.routes.MyRecogitoController.index(user.username, None, None, None, None, None))
 
       case None =>
-        logPageView()*/
+        logPageView()
         Ok(views.html.landing.index())
-    // }
+    }
   }
   
-  def getStats() = play.api.mvc.Action { Ok } /*Action.async { implicit request =>
+  def getStats() = silhouette.UnsecuredAction.async { implicit request =>
     val fAnnotations = annotations.countTotal()
     val fEdits = contributions.countLast24hrs()
     val fUsers = users.countUsers()
@@ -59,6 +56,6 @@ class LandingController @Inject() (
         "users" -> users
       ))
     }
-  }*/
+  }
 
 }

@@ -42,7 +42,7 @@ class UploadController @Inject() (
     implicit val webjars: WebJarsUtil,
     implicit val ctx: ExecutionContext,
     implicit val system: ActorSystem
-  ) extends BaseAuthController(config, documents, users) with I18nSupport with HasPrettyPrintJSON {
+  ) extends BaseAuthController(config, documents, users) with I18nSupport /* with HasPrettyPrintJSON */ {
   
   implicit val uploadSuccessWrites: Writes[UploadSuccess] =
     (JsPath \ "content_type").write[String].contramap(_.contentType)

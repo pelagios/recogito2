@@ -20,7 +20,7 @@ class PlaceAPIController @Inject() (
     val users: UserService,
     val places: PlaceService,
     implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(config, documents, users) with HasPrettyPrintJSON {
+  ) extends BaseOptAuthController(config, documents, users) /* with HasPrettyPrintJSON */ {
     
   /** Lookup by URI - open to all, so that it's available to public documents **/
   def findPlaceByURI(uri: String) = play.api.mvc.Action { Ok } /* Action.async { implicit request =>

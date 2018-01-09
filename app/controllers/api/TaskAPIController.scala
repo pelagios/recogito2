@@ -47,7 +47,7 @@ class TaskAPIController @Inject() (
     val tasks: TaskService,
     implicit val system: ActorSystem,
     implicit val ctx: ExecutionContext
-  ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON {
+  ) extends BaseAuthController(config, documents, users) /* with HasPrettyPrintJSON */ {
 
   def spawnTask = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     request.body.asJson.map(json => Json.fromJson[TaskDefinition](json)) match {

@@ -27,7 +27,7 @@ class AdminController @Inject() (
     val visits: VisitService,
     implicit val ctx: ExecutionContextExecutor,
     implicit val webJarsUtil: WebJarsUtil
-  ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON {
+  ) extends BaseAuthController(config, documents, users) /* with HasPrettyPrintJSON */ {
         
   def index = play.api.mvc.Action { Ok } /* StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.index())

@@ -20,7 +20,7 @@ class UserAdminController @Inject() (
     val users: UserService,
     implicit val ctx: ExecutionContext,
     implicit val webJarsUtil: WebJarsUtil
-  ) extends BaseAuthController(config, documents, users) with HasPrettyPrintJSON with HasDate {
+  ) extends BaseAuthController(config, documents, users) /*with HasPrettyPrintJSON */ with HasDate {
 
   def index = play.api.mvc.Action { Ok } /*StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.users.index())
