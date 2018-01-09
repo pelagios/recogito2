@@ -17,7 +17,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.jooq.{ Record, SelectWhereStep }
 import play.api.Configuration
-import play.api.cache.CacheApi
+import play.api.cache.SyncCacheApi
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Either, Left, Right}
@@ -28,12 +28,12 @@ import sun.security.provider.SecureRandom
 class UserService @Inject() (
     val config: Configuration,
     val uploads: Uploads,
-    implicit val cache: CacheApi,
+    implicit val cache: SyncCacheApi,
     implicit val ctx: ExecutionContext,
     implicit val db: DB
   ) extends BaseService with HasConfig with HasEncryption with IdentityService[User] {
 
-  private val DEFAULT_QUOTA = config.getInt("recogito.upload.quota").getOrElse(200) // The default default
+  private val DEFAULT_QUOTA = config.get[Option[Int]]("recogito.upload.quota").getOrElse(200) // The default default
   
   // Required by Silhouette auth framework
   override def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
@@ -45,11 +45,8 @@ class UserService @Inject() (
 
   def listUsers(offset: Int = 0, limit: Int = 20, sortBy: Option[String], sortOrder: Option[SortOrder]) = db.query { sql =>
     val startTime = System.currentTimeMillis
-
     val sortField = sortBy.flatMap(fieldname => getSortField(Seq(USER), fieldname, sortOrder))
-
     val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])
-    
     val query = sortField match {
       case Some(field) => sql.selectFrom(USER).orderBy(field)
       case None => sql.selectFrom(USER)
@@ -84,7 +81,6 @@ class UserService @Inject() (
       .execute()
 
     removeFromCache("user", username)
-    
     randomPassword
   }
 

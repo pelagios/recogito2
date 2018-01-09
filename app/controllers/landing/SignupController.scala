@@ -1,44 +1,40 @@
 package controllers.landing
 
-import controllers.{ HasConfig, HasUserService, Security }
+import com.mohiva.play.silhouette.api.{LoginInfo, Silhouette}
+import controllers.{HasConfig, HasUserService, Security}
+import javax.inject.{Inject, Singleton}
 import java.io.FileInputStream
 import java.sql.Timestamp
-import java.util.{ Date, UUID }
-import javax.inject.{ Inject, Singleton }
+import java.util.{Date, UUID}
 import models.ContentType
-import models.annotation.{ Annotation, AnnotationService }
+import models.annotation.{Annotation, AnnotationService}
 import models.document.DocumentService
 import models.user.UserService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation._
-import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.libs.json.{ Json, JsObject }
-import play.api.mvc.{ Action, AbstractController, ControllerComponents }
-import scala.concurrent.{ Await, Future, ExecutionContext }
+import play.api.i18n.I18nSupport
+import play.api.libs.json.{Json, JsObject}
+import play.api.mvc.{AbstractController, ControllerComponents}
+import scala.concurrent.{Await, Future, ExecutionContext}
 import scala.concurrent.duration._
-import play.api.i18n.Lang
-import com.mohiva.play.silhouette.api.Silhouette
-import com.mohiva.play.silhouette.api.Env
-import models.user.User
-import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
-
 
 case class SignupData(username: String, email: String, password: String)
 
 @Singleton
 class SignupController @Inject() (
     val components: ControllerComponents,
-    val silhouette: Silhouette[Security.Env],
     val config: Configuration,
     val users: UserService,
     val annotations: AnnotationService,
     val documents: DocumentService,
-    // implicit val messagesApi: MessagesApi,
+    val silhouette: Silhouette[Security.Env],
     implicit val ctx: ExecutionContext
   ) extends AbstractController(components) with HasUserService with HasConfig with I18nSupport {
+  
+  private val auth = silhouette.env.authenticatorService
 
   private val DEFAULT_ERROR_MESSAGE = "There was an error."
 
@@ -143,12 +139,11 @@ class SignupController @Inject() (
     } yield ()
   }
 
-  def showSignupForm = silhouette.SecuredAction.async { implicit request =>
-    val foo = request.identity
+  def showSignupForm = silhouette.UnsecuredAction.async { implicit request =>
     Future.successful(Ok(views.html.landing.signup(signupForm)))
   }
 
-  def processSignup = Action.async { implicit request =>
+  def processSignup = silhouette.UnsecuredAction.async { implicit request =>
     signupForm.bindFromRequest.fold(
       formWithErrors =>
         Future.successful(BadRequest(views.html.landing.signup(formWithErrors))),
@@ -160,8 +155,11 @@ class SignupController @Inject() (
         } yield user
         
         fUser
-          .flatMap(user => Future.successful(Ok)) //gotoLoginSucceeded(user.getUsername))
-          .recover { case t:Throwable => {
+          .flatMap { user =>
+            auth.create(LoginInfo(Security.PROVIDER_ID, user.getUsername))
+              .flatMap(auth.init(_))
+              .flatMap(auth.embed(_,  Redirect(routes.LandingController.index)))
+          }.recover { case t:Throwable => {
             t.printStackTrace()
             Ok(views.html.landing.signup(signupForm.bindFromRequest, Some(DEFAULT_ERROR_MESSAGE)))
           }}

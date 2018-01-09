@@ -1,7 +1,7 @@
 package models
 
 import org.jooq.{ Table, Record, SortField }
-import play.api.cache.CacheApi
+import play.api.cache.SyncCacheApi
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
@@ -50,7 +50,7 @@ trait BaseService {
 
   /** Boilerplate code for conducting a cache lookup, followed by DB lookup if nothing in cache **/
   protected def cachedLookup[T: ClassTag](prefix: String, key: String, 
-      dbLookup: String => Future[Option[T]])(implicit db: DB, cache: CacheApi, ctx: ExecutionContext): Future[Option[T]] = {
+      dbLookup: String => Future[Option[T]])(implicit db: DB, cache: SyncCacheApi, ctx: ExecutionContext): Future[Option[T]] = {
     
     val maybeCachedValue = cache.get[T](prefix + "_" + key)
     if (maybeCachedValue.isDefined) {
@@ -65,7 +65,7 @@ trait BaseService {
     }
   }
   
-  protected def removeFromCache(prefix: String, key: String)(implicit cache: CacheApi) = {
+  protected def removeFromCache(prefix: String, key: String)(implicit cache: SyncCacheApi) = {
     cache.remove(prefix + "_" + key)
   }
 

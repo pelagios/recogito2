@@ -108,6 +108,8 @@ class SilhouetteSecurity  extends AbstractModule with ScalaModule {
 
 object Security {
   
+  val PROVIDER_ID = "recogito.pelagios.org"
+  
   trait Env extends com.mohiva.play.silhouette.api.Env {
     
     type I = User
