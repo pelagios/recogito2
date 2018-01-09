@@ -1,18 +1,18 @@
 package controllers.document
 
 import controllers.HasConfig
-import java.io.{ File, FileInputStream, FileOutputStream, BufferedInputStream, ByteArrayInputStream, InputStream, PrintWriter }
+import java.io.{File, FileInputStream, FileOutputStream, BufferedInputStream, ByteArrayInputStream, InputStream, PrintWriter}
 import java.math.BigInteger
-import java.security.{ MessageDigest, DigestInputStream }
+import java.security.{MessageDigest, DigestInputStream}
 import java.util.UUID
-import java.util.zip.{ ZipEntry, ZipOutputStream }
+import java.util.zip.{ZipEntry, ZipOutputStream}
 import models.HasDate
-import models.annotation.{ Annotation, AnnotationService }
+import models.annotation.{Annotation, AnnotationService}
 import models.document.DocumentInfo
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.libs.json.Json
 import play.api.libs.Files.TemporaryFileCreator
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import storage.Uploads
 import java.security.DigestInputStream
 import play.api.libs.Files.TemporaryFileCreator

@@ -104,7 +104,7 @@ trait RDFSerializer extends BaseSerializer with HasDate {
         RDFDataMgr.write(os, model, format)
         os.close()
       
-        tmp.file
+        tmp.path.toFile
       }
     }
     

@@ -26,7 +26,7 @@ class PlaceAPIController @Inject() (
   ) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
     
   /** Lookup by URI - open to all, so that it's available to public documents **/
-  def findPlaceByURI(uri: String) = silhouette.UnsecuredAction.async { implicit request =>
+  def findPlaceByURI(uri: String) = Action.async { implicit request =>
     places.findByURI(uri).map { _ match {
       case Some((place, _)) => jsonOk(Json.toJson(place))
       case None => NotFoundPage
@@ -34,7 +34,7 @@ class PlaceAPIController @Inject() (
   }
 
   /** Search by query string - available to logged in users only **/
-  def searchPlaces(query: String, offset: Int, size: Int, latlng: Option[String]) = silhouette.SecuredAction.async { implicit request =>
+  def searchPlaces(query: String, offset: Int, size: Int, latlng: Option[String]) = silhouette.SecuredAction.async { implicit request =>    
     val sortFrom = latlng.flatMap { l =>
       val arg = l.split(",")
       Try(new Coordinate(arg(1).toDouble, arg(0).toDouble)) match {
