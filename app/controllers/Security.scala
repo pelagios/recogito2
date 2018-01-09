@@ -6,7 +6,7 @@ import com.mohiva.play.silhouette.api.crypto.{Crypter, CrypterAuthenticatorEncod
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorService
 import com.mohiva.play.silhouette.api.util._
-import com.mohiva.play.silhouette.api.{Environment, EventBus, Silhouette, SilhouetteProvider}
+import com.mohiva.play.silhouette.api.{Authorization, Environment, EventBus, Silhouette, SilhouetteProvider}
 import com.mohiva.play.silhouette.crypto.{JcaSigner, JcaSignerSettings, JcaCrypter, JcaCrypterSettings} 
 import com.mohiva.play.silhouette.impl.authenticators.{CookieAuthenticator, CookieAuthenticatorSettings, CookieAuthenticatorService}
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
@@ -15,9 +15,11 @@ import com.mohiva.play.silhouette.password.BCryptPasswordHasher
 import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, InMemoryAuthInfoDAO}
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
 import models.user.{User, UserService}
+import models.user.Roles.Role
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
-import play.api.mvc.CookieHeaderEncoding
+import play.api.mvc.{CookieHeaderEncoding, Request}
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
@@ -115,6 +117,14 @@ object Security {
     type I = User
     
     type A = CookieAuthenticator
+    
+  }
+  
+  case class WithRole(role: Role) extends Authorization[User, CookieAuthenticator] {
+
+    def isAuthorized[B](user: User, authenticator: CookieAuthenticator)(implicit request: Request[B]) = {
+      Future.successful(user.hasRole(role))
+    }
     
   }
   

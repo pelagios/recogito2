@@ -1,7 +1,8 @@
 package controllers.admin
 
-import controllers.BaseAuthController
-import javax.inject.{ Inject, Singleton }
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{BaseAuthController, Security}
+import javax.inject.{Inject, Singleton}
 import models.annotation.AnnotationService
 import models.contribution.ContributionService
 import models.document.DocumentService
@@ -17,22 +18,23 @@ import controllers.HasPrettyPrintJSON
 
 @Singleton
 class AdminController @Inject() (
-    val components: ControllerComponents, 
-    val config: Configuration,
-    val annotations: AnnotationService,
-    val contributions: ContributionService,
-    val documents: DocumentService,
-    val users: UserService,
-    val visits: VisitService,
-    implicit val ctx: ExecutionContextExecutor,
-    implicit val webJarsUtil: WebJarsUtil
-  ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
+  val components: ControllerComponents, 
+  val config: Configuration,
+  val annotations: AnnotationService,
+  val contributions: ContributionService,
+  val documents: DocumentService,
+  val users: UserService,
+  val visits: VisitService,
+  val silhouette: Silhouette[Security.Env],
+  implicit val ctx: ExecutionContextExecutor,
+  implicit val webJarsUtil: WebJarsUtil
+) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
         
-  def index = play.api.mvc.Action { Ok } /* StackAction(AuthorityKey -> Admin) { implicit request =>
+  def index = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
     Ok(views.html.admin.index())
-  } */
+  }
   
-  def getStats() = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Admin) { implicit request =>
+  def getStats() = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     
     // DocumentRecord JSON serialization
     import DocumentService._
@@ -64,6 +66,6 @@ class AdminController @Inject() (
 
       jsonOk(response)
     }
-  } */
+  }
   
 }

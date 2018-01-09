@@ -6,7 +6,9 @@ import models.generated.tables.records.FeatureToggleRecord
 import com.mohiva.play.silhouette.api.{Identity, LoginInfo}
 
 case class User(
-    val record: UserRecord, private val roleRecords: Seq[UserRoleRecord], private val featureToggleRecords: Seq[FeatureToggleRecord]
+    
+  val record: UserRecord, private val roleRecords: Seq[UserRoleRecord], private val featureToggleRecords: Seq[FeatureToggleRecord]
+  
 ) extends Identity {
   
   val username = record.getUsername

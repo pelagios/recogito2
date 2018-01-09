@@ -1,7 +1,8 @@
 package controllers.admin.gazetteers
 
 import akka.stream.Materializer
-import controllers.BaseAuthController
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{BaseAuthController, Security}
 import java.io.FileInputStream
 import javax.inject.{Inject, Singleton}
 import models.document.DocumentService
@@ -21,42 +22,43 @@ class GazetteerAdminController @Inject() (
     val documents: DocumentService,
     val places: PlaceService,
     val users: UserService,
+    val silhouette: Silhouette[Security.Env],
     implicit val materializer: Materializer,
     implicit val ctx: ExecutionContext,
     implicit val webJarsUtil: WebJarsUtil
   ) extends BaseAuthController(components, config, documents, users) {
   
-  def index = play.api.mvc.Action { Ok } /*AsyncStack(AuthorityKey -> Admin) { implicit request =>
+  def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     places.listGazetteers().map { gazetteers => 
       Ok(views.html.admin.gazetteers.index(gazetteers))
     }
-  }*/
+  }
   
-  def importGazetteer = play.api.mvc.Action { Ok } /*StackAction(AuthorityKey -> Admin) { implicit request =>
+  def importGazetteer = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
     request.body.asMultipartFormData.flatMap(_.file("gazetteer-file")) match {
       case Some(formData) => {
         
         Logger.info("Importing gazetteer from " + formData.filename)
-  
-        
+          
         /** TEMPORARY HACK **/
+        val file = formData.ref.path.toFile
         
         if (formData.filename.contains(".ttl") || formData.filename.contains(".rdf") || formData.filename.contains(".xml")) {
           Logger.info("Importing Pelagios RDF dump")
           val importer = new DumpImporter()          
-          importer.importDump(formData.ref.file, formData.filename, PelagiosRDFCrosswalk.fromRDF(formData.filename))(places, ctx)
+          importer.importDump(file, formData.filename, PelagiosRDFCrosswalk.fromRDF(formData.filename))(places, ctx)
         } else if (formData.filename.toLowerCase.contains("pleiades")) {
           Logger.info("Using Pleiades crosswalk")
           val importer = new StreamImporter()
-          importer.importPlaces(new FileInputStream(formData.ref.file), PleiadesCrosswalk.fromJson)(places, ctx)
+          importer.importPlaces(new FileInputStream(file), PleiadesCrosswalk.fromJson)(places, ctx)
         } else if (formData.filename.toLowerCase.contains("geonames")) {
           Logger.info("Using GeoNames crosswalk")
           val importer = new StreamImporter()
-          importer.importPlaces(new FileInputStream(formData.ref.file), GeoNamesCrosswalk.fromJson)(places, ctx)
+          importer.importPlaces(new FileInputStream(file), GeoNamesCrosswalk.fromJson)(places, ctx)
         } else if (formData.filename.endsWith("json")) {
           Logger.info("Importing Pelagios GeoJSON FeatureCollection")
           val importer = new DumpImporter()
-          importer.importDump(formData.ref.file, formData.filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(formData.filename))(places, ctx)
+          importer.importDump(file, formData.filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(formData.filename))(places, ctx)
         }
 
         /** TEMPORARY HACK **/
@@ -70,12 +72,12 @@ class GazetteerAdminController @Inject() (
       case None => BadRequest
         
     }
-  } */
+  }
   
-  def deleteGazetteer(name: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Admin) { implicit request =>
+  def deleteGazetteer(name: String) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     places.deleteByGazetteer(name).map { _ =>
       Status(200)
     }
-  } */
+  }
 
 }

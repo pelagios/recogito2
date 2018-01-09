@@ -32,18 +32,18 @@ GET     /help                                        controllers.help.HelpContro
 # Administration area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
-# POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
-# DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
+GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
+POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
+DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 
-# GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
-# GET     /admin/users                                 controllers.admin.users.UserAdminController.index
+GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
+GET     /admin/users                                 controllers.admin.users.UserAdminController.index
 
-# GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
-# POST    /admin/restore                               controllers.admin.backup.BackupAdminController.restore
+GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
+POST    /admin/restore                               controllers.admin.backup.BackupAdminController.restore
 
-# GET     /admin/stats.json                            controllers.admin.AdminController.getStats
-# GET     /admin                                       controllers.admin.AdminController.index
+GET     /admin/stats.json                            controllers.admin.AdminController.getStats
+GET     /admin                                       controllers.admin.AdminController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document views

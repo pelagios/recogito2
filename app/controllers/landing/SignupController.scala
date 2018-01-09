@@ -139,11 +139,11 @@ class SignupController @Inject() (
     } yield ()
   }
 
-  def showSignupForm = silhouette.UnsecuredAction.async { implicit request =>
+  def showSignupForm = Action.async { implicit request =>
     Future.successful(Ok(views.html.landing.signup(signupForm)))
   }
 
-  def processSignup = silhouette.UnsecuredAction.async { implicit request =>
+  def processSignup = Action.async { implicit request =>
     signupForm.bindFromRequest.fold(
       formWithErrors =>
         Future.successful(BadRequest(views.html.landing.signup(formWithErrors))),
