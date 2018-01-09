@@ -92,7 +92,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         None,
         Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
   
-  running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
+  // running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     
     val es = Play.current.injector.instanceOf(classOf[ES])
     val annotations = Play.current.injector.instanceOf(classOf[AnnotationService])
@@ -303,6 +303,6 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       
     }
   
-  }
+//  }
 
 }

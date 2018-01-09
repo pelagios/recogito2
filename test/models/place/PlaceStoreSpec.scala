@@ -53,7 +53,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
     Place(record.uri, None, None, None, Seq(record))
   }
   
-  running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
+  // running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     
     val es = Play.current.injector.instanceOf(classOf[ES])
    
@@ -142,6 +142,6 @@ class PlaceStoreSpec extends Specification with AfterAll {
       
     }
   
-  }
+  // }
     
 }

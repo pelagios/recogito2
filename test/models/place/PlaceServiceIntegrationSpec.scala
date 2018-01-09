@@ -33,7 +33,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
   override def afterAll =
     FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
   
-  running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
+  // running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
     
     val es = Play.current.injector.instanceOf(classOf[ES])
     val places = Play.current.injector.instanceOf(classOf[PlaceService])
@@ -261,6 +261,6 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
       
     }
   
-  }
+  // }
   
 }

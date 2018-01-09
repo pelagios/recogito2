@@ -23,7 +23,7 @@ trait HasBackupValidation { self: HasConfig =>
   
   protected val ALGORITHM = "SHA-256"
   
-  private val SECRET = self.config.getString("play.crypto.secret")
+  protected val SECRET = self.config.get[String]("play.crypto.secret")
   
   private def computeHash(stream: InputStream) = {
     val md = MessageDigest.getInstance(ALGORITHM)
