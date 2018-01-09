@@ -36,10 +36,8 @@ class UserService @Inject() (
   private val DEFAULT_QUOTA = config.getInt("recogito.upload.quota").getOrElse(200) // The default default
   
   // Required by Silhouette auth framework
-  override def retrieve(loginInfo: LoginInfo): Future[Option[User]] = {
-    play.api.Logger.info("retrieveing " + loginInfo.toString)
+  override def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
     findByUsername(loginInfo.providerKey)
-  }
 
   def countUsers() = db.query { sql =>
     sql.selectCount().from(USER).fetchOne(0, classOf[Int])
