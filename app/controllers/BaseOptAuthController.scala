@@ -1,17 +1,18 @@
 package controllers
 
-import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
-import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord }
-import models.user.{ User, UserService }
+import models.document.{DocumentAccessLevel, DocumentInfo, DocumentService}
+import models.generated.tables.records.{DocumentFilepartRecord, DocumentRecord}
+import models.user.{User, UserService}
 import play.api.Configuration
-import play.api.mvc.{ AnyContent, Request, Result }
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.mvc.{AnyContent, ControllerComponents, Request, Result}
+import scala.concurrent.{ExecutionContext, Future}
 
 abstract class BaseOptAuthController(
+    components: ControllerComponents,
     config: Configuration,
     documents: DocumentService,
     users: UserService
-  ) extends BaseController(config, users) {
+  ) extends BaseController(components, config, users) {
   
   /*
  

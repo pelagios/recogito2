@@ -3,21 +3,20 @@ package controllers.admin.gazetteers
 import akka.stream.Materializer
 import controllers.BaseAuthController
 import java.io.FileInputStream
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import models.document.DocumentService
 import models.place.PlaceService
 import models.user.UserService
 import models.user.Roles._
 import org.webjars.play.WebJarsUtil
-import play.api.{ Configuration, Logger }
-import scala.concurrent.{ ExecutionContext, Future }
-import models.place.crosswalks.PleiadesCrosswalk
-import models.place.crosswalks.GeoNamesCrosswalk
-import models.place.crosswalks.PelagiosRDFCrosswalk
-import models.place.crosswalks.PelagiosGeoJSONCrosswalk
+import play.api.{Configuration, Logger}
+import play.api.mvc.ControllerComponents
+import scala.concurrent.{ExecutionContext, Future}
+import models.place.crosswalks._
 
 @Singleton
 class GazetteerAdminController @Inject() (
+    val components: ControllerComponents,
     val config: Configuration,
     val documents: DocumentService,
     val places: PlaceService,
@@ -25,7 +24,7 @@ class GazetteerAdminController @Inject() (
     implicit val materializer: Materializer,
     implicit val ctx: ExecutionContext,
     implicit val webJarsUtil: WebJarsUtil
-  ) extends BaseAuthController(config, documents, users) {
+  ) extends BaseAuthController(components, config, documents, users) {
   
   def index = play.api.mvc.Action { Ok } /*AsyncStack(AuthorityKey -> Admin) { implicit request =>
     places.listGazetteers().map { gazetteers => 

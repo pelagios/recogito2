@@ -11,14 +11,13 @@ import models.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.libs.json.Json
+import play.api.mvc.ControllerComponents
 import scala.concurrent.ExecutionContextExecutor
 import controllers.HasPrettyPrintJSON
-import com.mohiva.play.silhouette.api.Environment
-import models.user.User
-import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
 
 @Singleton
 class AdminController @Inject() (
+    val components: ControllerComponents, 
     val config: Configuration,
     val annotations: AnnotationService,
     val contributions: ContributionService,
@@ -27,7 +26,7 @@ class AdminController @Inject() (
     val visits: VisitService,
     implicit val ctx: ExecutionContextExecutor,
     implicit val webJarsUtil: WebJarsUtil
-  ) extends BaseAuthController(config, documents, users) /* with HasPrettyPrintJSON */ {
+  ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
         
   def index = play.api.mvc.Action { Ok } /* StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.index())

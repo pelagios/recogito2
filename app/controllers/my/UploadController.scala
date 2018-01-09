@@ -1,24 +1,25 @@
 package controllers.my
 
 import akka.actor.ActorSystem
-import controllers.{ BaseAuthController, HasPrettyPrintJSON }
-import javax.inject.{ Inject, Singleton }
-import models.{ ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException }
+import controllers.{BaseAuthController, HasPrettyPrintJSON}
+import javax.inject.{Inject, Singleton}
+import models.{ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException}
 import models.document.DocumentService
-import models.task.{ TaskService, TaskType }
-import models.upload.{ UploadService, QuotaExceededException }
+import models.task.{TaskService, TaskType}
+import models.upload.{UploadService, QuotaExceededException}
 import models.generated.tables.records.UploadRecord
-import models.user.{ User, UserService }
+import models.user.{User, UserService}
 import models.user.Roles._
 import org.webjars.play.WebJarsUtil
-import play.api.{ Configuration, Logger }
+import play.api.{Configuration, Logger}
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.{ I18nSupport, MessagesApi }
+import play.api.i18n.{I18nSupport}
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.mvc.ControllerComponents
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 import transform.ner.NERService
 import transform.tei.TEIParserService
@@ -30,6 +31,7 @@ case class NewDocumentData(title: String, author: String, dateFreeform: String, 
 
 @Singleton
 class UploadController @Inject() (
+    val components: ControllerComponents,
     val config: Configuration,
     val documents: DocumentService,
     val users: UserService,
@@ -38,11 +40,10 @@ class UploadController @Inject() (
     val tilingService: TilingService,
     val teiParserService: TEIParserService,
     val nerService: NERService,
-    val messagesApi: MessagesApi,
     implicit val webjars: WebJarsUtil,
     implicit val ctx: ExecutionContext,
     implicit val system: ActorSystem
-  ) extends BaseAuthController(config, documents, users) with I18nSupport /* with HasPrettyPrintJSON */ {
+  ) extends BaseAuthController(components, config, documents, users) with I18nSupport with HasPrettyPrintJSON {
   
   implicit val uploadSuccessWrites: Writes[UploadSuccess] =
     (JsPath \ "content_type").write[String].contramap(_.contentType)

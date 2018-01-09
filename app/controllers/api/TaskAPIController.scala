@@ -1,18 +1,19 @@
 package controllers.api
 
 import akka.actor.ActorSystem
-import controllers.{ BaseAuthController, HasPrettyPrintJSON }
+import controllers.{BaseAuthController, HasPrettyPrintJSON}
 import java.util.UUID
-import javax.inject.{ Inject, Singleton }
-import models.document.{ DocumentInfo, DocumentService }
-import models.task.{ TaskType, TaskService, TaskRecordAggregate }
+import javax.inject.{Inject, Singleton}
+import models.document.{DocumentInfo, DocumentService}
+import models.task.{TaskType, TaskService, TaskRecordAggregate}
 import models.user.UserService
 import models.user.Roles._
 import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.mvc.ControllerComponents 
+import scala.concurrent.{ExecutionContext, Future}
 import transform.georesolution.GeoresolutionService
 
 case class TaskDefinition(
@@ -40,6 +41,7 @@ object TaskDefinition {
 
 @Singleton
 class TaskAPIController @Inject() (
+    val components: ControllerComponents,
     val config: Configuration,
     val documents: DocumentService,
     val users: UserService,
@@ -47,7 +49,7 @@ class TaskAPIController @Inject() (
     val tasks: TaskService,
     implicit val system: ActorSystem,
     implicit val ctx: ExecutionContext
-  ) extends BaseAuthController(config, documents, users) /* with HasPrettyPrintJSON */ {
+  ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
   def spawnTask = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     request.body.asJson.map(json => Json.fromJson[TaskDefinition](json)) match {

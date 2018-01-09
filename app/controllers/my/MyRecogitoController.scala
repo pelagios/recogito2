@@ -1,30 +1,33 @@
 package controllers.my
 
-import controllers.BaseController
-import javax.inject.{ Inject, Singleton }
-import models.{ Page, SortOrder }
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{BaseController, Security}
+import javax.inject.{Inject, Singleton}
+import models.{Page, SortOrder}
 import models.annotation.AnnotationService
-import models.contribution.{ Contribution, ContributionService }
-import models.user.{ User, UserService }
+import models.contribution.{Contribution, ContributionService}
+import models.user.{User, UserService}
 import models.document.DocumentService
-import models.generated.tables.records.{ DocumentRecord, SharingPolicyRecord }
+import models.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
-import play.api.mvc.RequestHeader
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.mvc.{ControllerComponents, RequestHeader}
+import scala.concurrent.{ExecutionContext, Future}
 import storage.Uploads
 
 @Singleton
 class MyRecogitoController @Inject() (
     val annotations: AnnotationService,
+    val components: ControllerComponents,
     val contributions: ContributionService,
     val documents: DocumentService,
     val users: UserService,
     val uploads: Uploads,
     val config: Configuration,
+    val silhouette: Silhouette[Security.Env],
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarsUtil
-  ) extends BaseController(config, users) {
+  ) extends BaseController(components, config, users) {
 
   private val DEFAULT_DOCUMENTS_PER_PAGE = 10
   

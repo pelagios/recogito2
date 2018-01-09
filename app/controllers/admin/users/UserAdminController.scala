@@ -1,26 +1,27 @@
 package controllers.admin.users
 
-import controllers.{ BaseAuthController, HasPrettyPrintJSON }
-import javax.inject.{ Inject, Singleton }
+import controllers.{BaseAuthController, HasPrettyPrintJSON}
+import javax.inject.{Inject, Singleton}
 import models.{ HasDate, SortOrder }
 import models.document.DocumentService
 import models.user.Roles._
 import models.user.UserService
 import org.joda.time.DateTime
 import org.webjars.play.WebJarsUtil
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext
 import play.api.Configuration
 import play.api.libs.json.Json
+import play.api.mvc.ControllerComponents
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class UserAdminController @Inject() (
+    val components: ControllerComponents, 
     val config: Configuration,
     val documents: DocumentService,
     val users: UserService,
     implicit val ctx: ExecutionContext,
     implicit val webJarsUtil: WebJarsUtil
-  ) extends BaseAuthController(config, documents, users) /*with HasPrettyPrintJSON */ with HasDate {
+  ) extends BaseAuthController(components, config, documents, users) /*with HasPrettyPrintJSON */ with HasDate {
 
   def index = play.api.mvc.Action { Ok } /*StackAction(AuthorityKey -> Admin) { implicit request =>
     Ok(views.html.admin.users.index())
