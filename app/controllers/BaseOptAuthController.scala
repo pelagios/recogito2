@@ -13,8 +13,6 @@ abstract class BaseOptAuthController(
     documents: DocumentService,
     users: UserService
   ) extends BaseController(components, config, users) {
-  
-  /*
  
   /** Helper that covers the boilerplate for all document views
     *
@@ -47,7 +45,7 @@ abstract class BaseOptAuthController(
       if (accesslevel.canRead)
         response(doc, accesslevel)
       else if (maybeUser.isEmpty) // No read rights - but user is not logged in yet 
-        authenticationFailed(request)        
+        Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))  
       else
         Future.successful(ForbiddenPage)
     })
@@ -68,7 +66,5 @@ abstract class BaseOptAuthController(
       }
     })
   }
-  
-  */
   
 } 

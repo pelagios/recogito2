@@ -1,17 +1,18 @@
 package controllers.help
 
 import controllers.HasVisitLogging
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import models.visit.VisitService
 import org.webjars.play.WebJarsUtil
-import play.api.mvc.{ Action, Controller, RequestHeader }
+import play.api.mvc.{Action, AbstractController, ControllerComponents, RequestHeader}
 import play.twirl.api.HtmlFormat
 
 @Singleton
 class HelpController @Inject() (
+    val components: ControllerComponents,
     implicit val visits: VisitService,
     implicit val webjars: WebJarsUtil
-  ) extends Controller with HasVisitLogging {
+  ) extends AbstractController(components) with HasVisitLogging {
 
   private def result(template: HtmlFormat.Appendable)(implicit request: RequestHeader) = {
     logPageView()

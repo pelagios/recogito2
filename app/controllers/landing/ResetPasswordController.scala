@@ -1,24 +1,24 @@
 package controllers.landing
 
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import models.user.UserService
 import models.generated.tables.records.UserRecord
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.{ I18nSupport, MessagesApi }
+import play.api.i18n.I18nSupport
 import play.api.libs.mailer._
-import play.api.mvc.{ Action, Controller }
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.mvc.{Action, AbstractController, ControllerComponents}
+import scala.concurrent.{ExecutionContext, Future}
 
 case class ResetPasswordData(email: String)
 
 @Singleton
 class ResetPasswordController @Inject() (
+    val components: ControllerComponents,
     val users: UserService,
-    val messagesApi: MessagesApi,
     val mailerClient: MailerClient,
     implicit val ctx: ExecutionContext
-  ) extends Controller with I18nSupport {
+  ) extends AbstractController(components) with I18nSupport {
   
   val resetPasswordForm = Form(
     mapping("email" -> email)(ResetPasswordData.apply)(ResetPasswordData.unapply)

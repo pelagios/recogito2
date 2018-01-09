@@ -1,7 +1,8 @@
 package controllers.api
 
+import com.mohiva.play.silhouette.api.Silhouette
 import com.vividsolutions.jts.geom.Coordinate
-import controllers.{BaseOptAuthController, HasPrettyPrintJSON}
+import controllers.{BaseOptAuthController, HasPrettyPrintJSON, Security}
 import javax.inject.{Inject, Singleton}
 import models.document.DocumentService
 import models.place.PlaceService
@@ -20,58 +21,53 @@ class PlaceAPIController @Inject() (
     val documents: DocumentService,
     val users: UserService,
     val places: PlaceService,
+    val silhouette: Silhouette[Security.Env],
     implicit val ctx: ExecutionContext
   ) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
     
   /** Lookup by URI - open to all, so that it's available to public documents **/
-  def findPlaceByURI(uri: String) = play.api.mvc.Action { Ok } /* Action.async { implicit request =>
+  def findPlaceByURI(uri: String) = silhouette.UnsecuredAction.async { implicit request =>
     places.findByURI(uri).map { _ match {
       case Some((place, _)) => jsonOk(Json.toJson(place))
       case None => NotFoundPage
     }}
-  } */
+  }
 
   /** Search by query string - available to logged in users only **/
-  def searchPlaces(query: String, offset: Int, size: Int, latlng: Option[String]) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
-    loggedIn match {
-      case Some(user) => {
-        val sortFrom = latlng.flatMap { l =>
-          val arg = l.split(",")
-          Try(new Coordinate(arg(1).toDouble, arg(0).toDouble)) match {
-            case Success(coord) => Some(coord)
-            case Failure(e) => None
-          }
-        }
-
-        places.searchPlaces(query, offset, size, sortFrom).map { results => 
-          jsonOk(Json.toJson(results.map(_._1)))
-        }
+  def searchPlaces(query: String, offset: Int, size: Int, latlng: Option[String]) = silhouette.SecuredAction.async { implicit request =>
+    val sortFrom = latlng.flatMap { l =>
+      val arg = l.split(",")
+      Try(new Coordinate(arg(1).toDouble, arg(0).toDouble)) match {
+        case Success(coord) => Some(coord)
+        case Failure(e) => None
       }
-      
-      case None => Future.successful(ForbiddenPage)
     }
-  } */
+
+    places.searchPlaces(query, offset, size, sortFrom).map { results => 
+      jsonOk(Json.toJson(results.map(_._1)))
+    }
+  }
   
   /** List all places in document - bound to the current user's access level **/
-  def listPlacesInDocument(docId: String, offset: Int, size: Int) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
-    documentResponse(docId, loggedIn, { case (metadata, accesslevel) =>
+  def listPlacesInDocument(docId: String, offset: Int, size: Int) = silhouette.UserAwareAction.async { implicit request =>
+    documentResponse(docId, request.identity, { case (metadata, accesslevel) =>
       if (accesslevel.canRead)
         places.listPlacesInDocument(docId, offset, size).map(tuples => jsonOk(Json.toJson(tuples.map(_._1))))
       else
-        Future.successful(ForbiddenPage)
+        Future.successful(Forbidden)
     })
-  } */
+  }
   
   /** Search places in document - bound to the current user's access level **/
-  def searchPlacesInDocument(query: String, docId: String, offset: Int, size: Int) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
-    documentResponse(docId, loggedIn, { case (metadata, accesslevel) =>
+  def searchPlacesInDocument(query: String, docId: String, offset: Int, size: Int) = silhouette.UserAwareAction.async { implicit request =>
+    documentResponse(docId, request.identity, { case (metadata, accesslevel) =>
       if (accesslevel.canRead)
         places.searchPlacesInDocument(query, docId, offset, size).map { results =>
           jsonOk(Json.toJson(results.map(_._1)))
         }
       else
-        Future.successful(ForbiddenPage)
+        Future.successful(Forbidden)
     })
-  } */
+  }
  
 }
