@@ -1,7 +1,8 @@
 package controllers.api
 
 import akka.actor.ActorSystem
-import controllers.{BaseAuthController, HasPrettyPrintJSON}
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import models.document.{DocumentInfo, DocumentService}
@@ -17,16 +18,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import transform.georesolution.GeoresolutionService
 
 case class TaskDefinition(
-    
-  taskType: TaskType,
-  
+  taskType  : TaskType,
   documentId: String,
-  
   filepartId: Option[UUID],
-  
-  args: Map[String, String]
-  
-)
+  args      : Map[String, String])
 
 object TaskDefinition {
 
@@ -46,16 +41,17 @@ class TaskAPIController @Inject() (
     val documents: DocumentService,
     val users: UserService,
     val georesolution: GeoresolutionService,
+    val silhouette: Silhouette[Security.Env],
     val tasks: TaskService,
     implicit val system: ActorSystem,
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
-  def spawnTask = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def spawnTask = silhouette.SecuredAction.async { implicit request =>
     request.body.asJson.map(json => Json.fromJson[TaskDefinition](json)) match {
       case Some(result) if result.isSuccess =>
         val taskDefinition = result.get
-        documentResponse(taskDefinition.documentId, loggedIn, { case (docInfo, accesslevel) =>
+        documentResponse(taskDefinition.documentId, request.identity, { case (docInfo, accesslevel) =>
           if (accesslevel.canWrite)
             taskDefinition.taskType match {  
               case TaskType("GEORESOLUTION") =>
@@ -72,10 +68,10 @@ class TaskAPIController @Inject() (
       case Some(result) if result.isError => Future.successful(BadRequest(Json.parse("{ \"error\": \"JSON parse error\" }")))
       case None => Future.successful(BadRequest(Json.parse("{ \"error\": \"missing task definition\" }")))
     }
-  } */
+  }
     
-  def progressByDocument(id: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>    
-    documents.getExtendedInfo(id, Some(loggedIn.username)).flatMap(_ match {
+  def progressByDocument(id: String) = silhouette.SecuredAction.async { implicit request =>    
+    documents.getExtendedInfo(id, Some(request.identity.username)).flatMap(_ match {
       case Some((doc, accesslevel)) =>
         if (accesslevel.canRead) {
           tasks.findByDocument(id).map {
@@ -88,6 +84,6 @@ class TaskAPIController @Inject() (
         
       case None => Future.successful(NotFound)
     })
-  } */
+  }
   
 }

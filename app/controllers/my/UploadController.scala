@@ -1,7 +1,8 @@
 package controllers.my
 
 import akka.actor.ActorSystem
-import controllers.{BaseAuthController, HasPrettyPrintJSON}
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import javax.inject.{Inject, Singleton}
 import models.{ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException}
 import models.document.DocumentService
@@ -37,6 +38,7 @@ class UploadController @Inject() (
     val users: UserService,
     val taskService: TaskService,
     val uploads: UploadService,
+    val silhouette: Silhouette[Security.Env],
     val tilingService: TilingService,
     val teiParserService: TEIParserService,
     val nerService: NERService,
@@ -65,15 +67,15 @@ class UploadController @Inject() (
   implicit def uploadRecordToNewDocumentData(r: UploadRecord) =
     NewDocumentData(r.getTitle, r.getAuthor, r.getDateFreeform, r.getDescription, r.getLanguage, r.getSource, r.getEdition)
 
-  def showStep1(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    uploads.findPendingUpload(loggedIn.username).map(_ match {
+  def showStep1(usernameInPath: String) = silhouette.SecuredAction.async { implicit request =>
+    uploads.findPendingUpload(request.identity.username).map(_ match {
       case Some(pendingUpload) =>
         Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm.fill(pendingUpload)))
 
       case None =>
         Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm))
     })
-  } */
+  }
 
   /** Stores document metadata following step 1 **/
   def storeDocumentMetadata(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
@@ -92,15 +94,15 @@ class UploadController @Inject() (
   } */
 
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
-  def showStep2(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    uploads.findPendingUploadWithFileparts(loggedIn.username).map(_ match {
+  def showStep2(usernameInPath: String) = silhouette.SecuredAction.async { implicit request =>
+    uploads.findPendingUploadWithFileparts(request.identity.username).map(_ match {
       case Some((pendingUpload, fileparts)) =>
         Ok(views.html.my.upload.step2(usernameInPath, fileparts))
 
       case None =>
         Redirect(controllers.my.routes.UploadController.showStep1(usernameInPath))
     })
-  } */
+  }
 
   /** Stores a filepart during step 2 **/
   def storeFilepart(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
@@ -174,8 +176,8 @@ class UploadController @Inject() (
   } */
 
   /** Step 3 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
-  def showStep3(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    uploads.findPendingUploadWithFileparts(loggedIn.username).flatMap(_ match {
+  def showStep3(usernameInPath: String) = silhouette.SecuredAction.async { implicit request =>
+    uploads.findPendingUploadWithFileparts(request.identity.username).flatMap(_ match {
       case Some((pendingUpload, fileparts)) =>
         if (fileparts.isEmpty) {
           // No fileparts - force user to step 2
@@ -217,7 +219,7 @@ class UploadController @Inject() (
         // No pending upload - force user to step 1
         Future.successful(Redirect(controllers.my.routes.UploadController.showStep1(usernameInPath)))
     })
-  } */
+  }
 
   def cancelUploadWizard(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
     uploads

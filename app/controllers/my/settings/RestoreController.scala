@@ -1,52 +1,51 @@
 package controllers.my.settings
 
 import akka.actor.ActorSystem
-import controllers.{ HasUserService, HasConfig, Security }
-import controllers.document.{ BackupReader, HasBackupValidation }
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{HasUserService, HasConfig, Security }
+import controllers.document.{BackupReader, HasBackupValidation}
 import java.io.File
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.AuthElement
 import models.annotation.AnnotationService
 import models.document.DocumentService
 import models.user.Roles._
 import models.user.UserService
 import play.api.{ Configuration, Logger }
 import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.Controller
+import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ ExecutionContext, Future }
 import transform.tiling.TilingService
 
 class RestoreController @Inject() (
-    val config: Configuration,
-    val users: UserService,
-    val messagesApi: MessagesApi,
-    implicit val annotations: AnnotationService,
-    implicit val documents: DocumentService,
-    implicit val tiling: TilingService,
-    implicit val ctx: ExecutionContext,
-    implicit val system: ActorSystem
-) extends Controller 
-    with AuthElement 
+  val components: ControllerComponents,
+  val config: Configuration,
+  val users: UserService,
+  val silhouette: Silhouette[Security.Env],
+  implicit val annotations: AnnotationService,
+  implicit val documents: DocumentService,
+  implicit val tiling: TilingService,
+  implicit val ctx: ExecutionContext,
+  implicit val system: ActorSystem
+) extends AbstractController(components) 
     with HasUserService 
     with HasConfig
-    with Security
     with I18nSupport
     with BackupReader {
   
-  def index() = StackAction(AuthorityKey -> Normal) { implicit request =>
-    Ok(views.html.my.settings.restore(loggedIn))
+  def index() = silhouette.SecuredAction { implicit request =>
+    Ok(views.html.my.settings.restore(request.identity))
   }
 
-  def restore() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def restore() = silhouette.SecuredAction.async { implicit request =>
     request.body.asMultipartFormData.map { tempfile =>
       tempfile.file("backup") match {
        
         case Some(filepart) =>
           // Forces the owner of the backup to the currently logged in user
           restoreBackup(
-            filepart.ref.file,
+            filepart.ref.path.toFile,
             runAsAdmin = false,
-            forcedOwner = Some(loggedIn.username)
+            forcedOwner = Some(request.identity.username)
           ).map { _ => 
             Redirect(routes.RestoreController.index).flashing("success" -> "The document was restored successfully.") 
           }.recover { 

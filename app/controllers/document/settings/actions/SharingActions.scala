@@ -28,8 +28,8 @@ object CollaboratorStub {
 
 trait SharingActions { self: SettingsController =>
     
-  def setIsPublic(documentId: String, enabled: Boolean) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.username, { doc =>
+  def setIsPublic(documentId: String, enabled: Boolean) = self.silhouette.SecuredAction.async { implicit request =>
+    documentAdminAction(documentId, request.identity.username, { doc =>
       // Make sure the license allows public access
       if (doc.license.map(_.isOpen).getOrElse(false))
         documents.setPublicVisibility(documentId, enabled).map(_ => Status(200))
@@ -39,8 +39,8 @@ trait SharingActions { self: SettingsController =>
     })
   }
   
-  def addCollaborator(documentId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val currentUser = loggedIn.username    
+  def addCollaborator(documentId: String) = self.silhouette.SecuredAction.async { implicit request =>
+    val currentUser = request.identity.username    
     jsonDocumentAdminAction[CollaboratorStub](documentId, currentUser, { case (document, stub) =>
       if (stub.collaborator == document.getOwner) {
         // Doc owner as collaborator wouldn't make sense
@@ -60,14 +60,14 @@ trait SharingActions { self: SettingsController =>
     })
   }
   
-  def removeCollaborator(documentId: String, username: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.username, { _ =>      
+  def removeCollaborator(documentId: String, username: String) = self.silhouette.SecuredAction.async { implicit request =>
+    documentAdminAction(documentId, request.identity.username, { _ =>      
       documents.removeDocumentCollaborator(documentId, username).map(success =>
         if (success) Status(200) else InternalServerError)
     })
   }
   
-  def searchUsers(documentId: String, query: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def searchUsers(documentId: String, query: String) = self.silhouette.SecuredAction.async { implicit request =>
     users.searchUsers(query).map { matches =>
       jsonOk(Json.toJson(matches))
     }

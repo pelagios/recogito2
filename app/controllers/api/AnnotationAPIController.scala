@@ -25,14 +25,10 @@ import storage.Uploads
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(
-
   annotationId: Option[UUID],
-
-  annotates: AnnotatedObject,
-
-  anchor: String,
-
-  bodies: Seq[AnnotationBodyStub])
+  annotates   : AnnotatedObject,
+  anchor      : String,
+  bodies      : Seq[AnnotationBodyStub])
 
 object AnnotationStub {
 
@@ -47,20 +43,13 @@ object AnnotationStub {
 
 /** Partial annotation body **/
 case class AnnotationBodyStub(
-
-  hasType: AnnotationBody.Type,
-
+  hasType       : AnnotationBody.Type,
   lastModifiedBy: Option[String],
-
   lastModifiedAt: Option[DateTime],
-
-  value: Option[String],
-
-  uri: Option[String],
-  
-  note: Option[String],
-
-  status: Option[AnnotationStatusStub])
+  value         : Option[String],
+  uri           : Option[String],
+  note          : Option[String],
+  status        : Option[AnnotationStatusStub])
 
 object AnnotationBodyStub extends HasDate {
 
@@ -78,14 +67,9 @@ object AnnotationBodyStub extends HasDate {
 
 /** Partial annotation status **/
 case class AnnotationStatusStub(
-
   value: AnnotationStatus.Value,
-
   setBy: Option[String],
-
-  setAt: Option[DateTime]
-
-)
+  setAt: Option[DateTime])
 
 object AnnotationStatusStub extends HasDate {
 

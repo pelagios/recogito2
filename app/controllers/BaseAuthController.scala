@@ -14,19 +14,16 @@ abstract class BaseAuthController(
     users: UserService
   ) extends BaseController(components, config, users) {
   
-  /*
-  
   /** Helper that covers the boilerplate for all document views
     *
     * Just hand this method a function that produces an HTTP OK result for a document, while
     * the method handles ForbiddenPage/Not Found error cases.
     */
   protected def documentResponse(
-      docId: String,
-      user: User,
-      response: (DocumentInfo, DocumentAccessLevel) => Result
-    )(implicit ctx: ExecutionContext) = {
-
+    docId: String,
+    user: User,
+    response: (DocumentInfo, DocumentAccessLevel) => Result
+  )(implicit ctx: ExecutionContext) = {
     documents.getExtendedInfo(docId, Some(user.username)).map(_ match {
       case Some((doc, accesslevel)) => {
         if (accesslevel.canRead)
@@ -48,12 +45,11 @@ abstract class BaseAuthController(
 
   /** Helper that covers the boilerplate for all document part views **/
   protected def documentPartResponse(
-      docId: String,
-      partNo: Int,
-      user: User,
-      response: (DocumentInfo, DocumentFilepartRecord, DocumentAccessLevel) => Result
-    )(implicit ctx: ExecutionContext) = {
-
+    docId: String,
+    partNo: Int,
+    user: User,
+    response: (DocumentInfo, DocumentFilepartRecord, DocumentAccessLevel) => Result
+  )(implicit ctx: ExecutionContext) = {
     documentResponse(docId, user, { case (doc, accesslevel) =>
       doc.fileparts.find(_.getSequenceNo == partNo) match {
         case None => NotFoundPage
@@ -61,7 +57,5 @@ abstract class BaseAuthController(
       }
     })
   }
-  
-  */
   
 }

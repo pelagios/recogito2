@@ -1,8 +1,8 @@
 package controllers.my.settings
 
-import controllers.{ HasUserService, HasConfig, Security }
+import com.mohiva.play.silhouette.api.{Silhouette, LoginInfo}
+import controllers.{HasUserService, HasConfig, Security}
 import javax.inject.Inject
-import jp.t2v.lab.play2.auth.{ AuthElement, Logout }
 import models.annotation.AnnotationService
 import models.contribution.ContributionService
 import models.user.Roles._
@@ -13,24 +13,29 @@ import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.Controller
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import play.api.i18n.I18nSupport
+import play.api.mvc.{AbstractController, ControllerComponents}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 
-case class AccountSettingsData(email: String, name: Option[String], bio: Option[String], website: Option[String])
+case class AccountSettingsData(
+  email  : String,
+  name   : Option[String],
+  bio    : Option[String],
+  website: Option[String])
 
 class AccountSettingsController @Inject() (
-    val config: Configuration,
-    val users: UserService,
-    val annotations: AnnotationService,
-    val contributions: ContributionService,
-    val documents: DocumentService,
-    val uploads: UploadService,
-    val messagesApi: MessagesApi,
-    implicit val webjars: WebJarsUtil,
-    implicit val ctx: ExecutionContext
-  ) extends Controller with AuthElement with HasUserService with HasConfig with Security with Logout with I18nSupport {
+  val components: ControllerComponents,
+  val config: Configuration,
+  val users: UserService,
+  val annotations: AnnotationService,
+  val contributions: ContributionService,
+  val documents: DocumentService,
+  val silhouette: Silhouette[Security.Env],
+  val uploads: UploadService,
+  implicit val webjars: WebJarsUtil,
+  implicit val ctx: ExecutionContext
+) extends AbstractController(components) with HasUserService with HasConfig with I18nSupport {
 
   val accountSettingsForm = Form(
     mapping(
@@ -41,23 +46,25 @@ class AccountSettingsController @Inject() (
     )(AccountSettingsData.apply)(AccountSettingsData.unapply)
   )
 
-  def index() = StackAction(AuthorityKey -> Normal) { implicit request =>
-    val form = accountSettingsForm.fill(AccountSettingsData(
-      users.decryptEmail(loggedIn.email),
-      Option(loggedIn.realName),
-      Option(loggedIn.bio),
-      Option(loggedIn.website)))
+  def index() = silhouette.SecuredAction { implicit request =>
+    val u = request.identity
     
-    Ok(views.html.my.settings.account(form, loggedIn))
+    val form = accountSettingsForm.fill(AccountSettingsData(
+      users.decryptEmail(u.email),
+      Option(u.realName),
+      Option(u.bio),
+      Option(u.website)))
+    
+    Ok(views.html.my.settings.account(form, u))
   }
 
-  def updateAccountSettings() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def updateAccountSettings() = silhouette.SecuredAction.async { implicit request =>
     accountSettingsForm.bindFromRequest.fold(
       formWithErrors =>
-        Future.successful(BadRequest(views.html.my.settings.account(formWithErrors, loggedIn))),
+        Future.successful(BadRequest(views.html.my.settings.account(formWithErrors, request.identity))),
 
       f =>
-        users.updateUserSettings(loggedIn.username, f.email, f.name, f.bio, f.website)
+        users.updateUserSettings(request.identity.username, f.email, f.name, f.bio, f.website)
           .map { success =>
             if (success)
               Redirect(routes.AccountSettingsController.index).flashing("success" -> "Your settings have been saved.")
@@ -70,7 +77,7 @@ class AccountSettingsController @Inject() (
     )
   }
   
-  def deleteAccount() = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def deleteAccount() = silhouette.SecuredAction.async { implicit request =>
     
     def deleteFromIndex(documentIds: Seq[String]) = {  
       def deleteOneDocument(docId: String): Future[Unit] = {
@@ -93,7 +100,7 @@ class AccountSettingsController @Inject() (
       }
     }
     
-    val username = loggedIn.username
+    val username = request.identity.username
     
     // Fetch IDs of all documents owned by this user
     val fOwnedDocumentIds = documents.listAllIdsByOwner(username)
@@ -119,9 +126,10 @@ class AccountSettingsController @Inject() (
       _ <- users.deleteByUsername(username)
     } yield ()
     
-    f.map { _ =>
-      gotoLogoutSucceeded
-      Ok
+    f.flatMap { _ =>
+      silhouette.env.authenticatorService.discard(
+        request.authenticator,
+        Redirect(controllers.landing.routes.LandingController.index))
     }
   }
 

@@ -13,34 +13,19 @@ import play.api.libs.functional.syntax._
 import scala.concurrent.Future
 
 case class DocumentMetadata(
-
-  title: String,
-
-  author: Option[String],
-
+  title       : String,
+  author      : Option[String],
   dateFreeform: Option[String],
-
-  description: Option[String],
-
-  language: Option[String],
-
-  source: Option[String],
-
-  edition: Option[String],
-
-  license: Option[String],
-  
-  attribution: Option[String]
-
-)
+  description : Option[String],
+  language    : Option[String],
+  source      : Option[String],
+  edition     : Option[String],
+  license     : Option[String],
+  attribution : Option[String])
 
 case class FilepartMetadata(
-
-  title: String,
-  
-  source: Option[String]
-
-)
+  title : String,
+  source: Option[String])
 
 trait MetadataActions { self: SettingsController =>
 
@@ -50,8 +35,8 @@ trait MetadataActions { self: SettingsController =>
   )(PartOrdering.apply _)
 
   /** Sets the part sort order **/
-  def setSortOrder(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    jsonDocumentAdminAction[Seq[PartOrdering]](docId, loggedIn.username, { case (document, ordering) =>
+  def setSortOrder(docId: String) = self.silhouette.SecuredAction.async { implicit request =>
+    jsonDocumentAdminAction[Seq[PartOrdering]](docId, request.identity.username, { case (document, ordering) =>
       documents.setFilepartSortOrder(docId, ordering).map(_ => Status(200))
     })
   }
@@ -83,11 +68,11 @@ trait MetadataActions { self: SettingsController =>
       Option(doc.getAttribution)))
   }
 
-  def updateDocumentMetadata(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(docId, loggedIn.username, { doc =>
+  def updateDocumentMetadata(docId: String) = self.silhouette.SecuredAction.async { implicit request =>
+    documentAdminAction(docId, request.identity.username, { doc =>
       documentMetadataForm.bindFromRequest.fold(
         formWithErrors =>
-          Future.successful(BadRequest(views.html.document.settings.metadata(formWithErrors, doc, loggedIn))),
+          Future.successful(BadRequest(views.html.document.settings.metadata(formWithErrors, doc, request.identity))),
         
         f =>
           documents.updateMetadata(
@@ -108,7 +93,7 @@ trait MetadataActions { self: SettingsController =>
     })
   }
   
-  def updateFilepartMetadata(docId: String, partId: UUID) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def updateFilepartMetadata(docId: String, partId: UUID) = self.silhouette.SecuredAction.async { implicit request =>
     
     def bindFromRequest(): Either[String, FilepartMetadata] =
       getFormParam("title") match {
@@ -117,7 +102,7 @@ trait MetadataActions { self: SettingsController =>
         case None => Left("Title required")
       }
   
-    documentAdminAction(docId, loggedIn.username, { doc =>
+    documentAdminAction(docId, request.identity.username, { doc =>
       // Make sure we're not updating a part that isn't in this document
       if (doc.fileparts.exists(_.getId == partId)) {
         bindFromRequest() match {

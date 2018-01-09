@@ -29,34 +29,28 @@ trait DeleteActions { self: SettingsController =>
   }
 
   /** Deletes all annotations on the document with the given ID **/
-  def deleteAnnotations(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentOwnerAction(docId, loggedIn.username, { document =>
-      
+  def deleteAnnotations(docId: String) = self.silhouette.SecuredAction.async { implicit request =>
+    documentOwnerAction(docId, request.identity.username, { document =>
       val deleteAnnotations = annotations.deleteByDocId(docId)
       val deleteContributions = contributions.deleteHistory(docId) 
-        
       for {
         s1 <- deleteAnnotations
         s2 <- deleteContributions
       } yield (s1 && s2)
-      
     })
   }
 
   /** Deletes the document with the given ID, along with all annotations and files **/
-  def deleteDocument(docId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentOwnerAction(docId, loggedIn.username, { document =>
-            
+  def deleteDocument(docId: String) = self.silhouette.SecuredAction.async { implicit request =>
+    documentOwnerAction(docId, request.identity.username, { document =>
       val deleteDocument = documents.delete(document)
       val deleteAnnotations = annotations.deleteByDocId(docId)
       val deleteContributions = contributions.deleteHistory(docId) 
-      
       for {
         _ <- documents.delete(document)
         s1 <- deleteAnnotations
         s2 <- deleteContributions
       } yield (s1 && s2)
-      
     })
   }
 

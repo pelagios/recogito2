@@ -7,12 +7,12 @@ import scala.concurrent.Future
 
 trait HistoryActions { self: SettingsController =>
   
-  def getContributionHistory(documentId: String, offset: Int, size: Int) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def getContributionHistory(documentId: String, offset: Int, size: Int) = self.silhouette.SecuredAction.async { implicit request =>
     contributions.getHistory(documentId, offset, size).map(contributions => jsonOk(Json.toJson(contributions)))
   }
 
-  def rollbackByTime(documentId: String, contributionId: String) = AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documentAdminAction(documentId, loggedIn.username, { _ =>
+  def rollbackByTime(documentId: String, contributionId: String) = self.silhouette.SecuredAction.async { implicit request =>
+    documentAdminAction(documentId, request.identity.username, { _ =>
       contributions.findById(contributionId).flatMap {
         case Some((contribution, _)) => {
           val f = for {
