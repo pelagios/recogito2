@@ -20,6 +20,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import storage.ES
 import storage.HasES
+import play.api.inject.guice.GuiceApplicationBuilder
 
 @RunWith(classOf[JUnitRunner])
 class GeoTagStoreSpec extends Specification with AfterAll {
@@ -91,12 +92,12 @@ class GeoTagStoreSpec extends Specification with AfterAll {
         Some("http://pleiades.stoa.org/places/491741"),
         None,
         Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None, now)))))
-  
-  // running (FakeApplication(additionalConfiguration = Map("recogito.index.dir" -> TMP_IDX_DIR))) {
+        
+    val application = GuiceApplicationBuilder().configure("recogito.index.dir" -> TMP_IDX_DIR).build()
     
-    val es = Play.current.injector.instanceOf(classOf[ES])
-    val annotations = Play.current.injector.instanceOf(classOf[AnnotationService])
-    val places = Play.current.injector.instanceOf(classOf[PlaceService])
+    val es = application.injector.instanceOf(classOf[ES])
+    val annotations = application.injector.instanceOf(classOf[AnnotationService])
+    val places = application.injector.instanceOf(classOf[PlaceService])
     
     val linkToBarcelona = GeoTag(
       annotatesBarcelona.annotationId,
