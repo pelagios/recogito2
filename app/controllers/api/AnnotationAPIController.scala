@@ -1,5 +1,6 @@
 package controllers.api
 
+import com.mohiva.play.silhouette.api.Silhouette
 import controllers._
 import java.io.File
 import java.util.UUID
@@ -103,6 +104,7 @@ class AnnotationAPIController @Inject() (
     val annotationService: AnnotationService,
     val contributions: ContributionService,
     val documents: DocumentService,
+    val silhouette: Silhouette[Security.Env],
     val users: UserService,
     implicit val mimeTypes: FileMimeTypes,
     implicit val tmpFile: TemporaryFileCreator,
@@ -119,7 +121,7 @@ class AnnotationAPIController @Inject() (
 
   def listAnnotationsInPart(docId: String, partNo: Int) = listAnnotations(docId, Some(partNo))
 
-  private def listAnnotations(docId: String, partNo: Option[Int]) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
+  private def listAnnotations(docId: String, partNo: Option[Int]) = silhouette.SecuredAction.async { implicit request =>
     // TODO currently annotation read access is unlimited to any logged in user - do we want that?
     (docId, partNo) match {
       case (id, Some(seqNo)) =>
@@ -140,7 +142,7 @@ class AnnotationAPIController @Inject() (
         // Load annotations for entire doc
         annotationService.findByDocId(id).map(annotations => jsonOk(Json.toJson(annotations.map(_._1))))
     }
-  } */
+  }
 
   private def stubToAnnotation(stub: AnnotationStub, user: String) = {
     val now = DateTime.now()
@@ -182,12 +184,14 @@ class AnnotationAPIController @Inject() (
     }
   }
 
-  def createAnnotation() = play.api.mvc.Action { Ok } /* AsyncStack { implicit request => jsonOp[AnnotationStub] { annotationStub =>
+  def createAnnotation() = silhouette.SecuredAction.async { implicit request => jsonOp[AnnotationStub] { annotationStub =>
+    val username = request.identity.username
+        
     // Fetch the associated document to check access privileges
-    documents.getDocumentRecord(annotationStub.annotates.documentId, loggedIn.map(_.username)).flatMap(_ match {
+    documents.getDocumentRecord(annotationStub.annotates.documentId, Some(username)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel.canWrite) {
-          val annotation = stubToAnnotation(annotationStub, loggedIn.map(_.username).getOrElse("guest"))
+          val annotation = stubToAnnotation(annotationStub, username)
           val f = for {
             (annotationStored, _, previousVersion) <- annotationService.insertOrUpdateAnnotation(annotation)
             success <- if (annotationStored)
@@ -207,21 +211,21 @@ class AnnotationAPIController @Inject() (
         Logger.warn("POST to /annotations but annotation points to unknown document: " + annotationStub.annotates.documentId)
         Future.successful(NotFound)
     })
-  }} */
+  }}
   
-  def bulkUpsert() = play.api.mvc.Action { Ok } /* AsyncStack { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
+  def bulkUpsert() = silhouette.SecuredAction.async { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
     // We currently restrict to bulk upserts for a single document part only
-    val username = loggedIn.map(_.username)
+    val username = request.identity.username
     val documentIds = annotationStubs.map(_.annotates.documentId).distinct
     val partIds = annotationStubs.map(_.annotates.filepartId).distinct    
     
     if (documentIds.size == 1 || partIds.size == 1) {
-      documents.getExtendedInfo(documentIds.head, username).flatMap {
+      documents.getExtendedInfo(documentIds.head, Some(username)).flatMap {
         case Some((doc, accesslevel)) =>
           if (accesslevel.canWrite) {
             doc.fileparts.find(_.getId == partIds.head) match {
               case Some(filepart) =>
-                val annotations = annotationStubs.map(stub => stubToAnnotation(stub, username.getOrElse("guest")))
+                val annotations = annotationStubs.map(stub => stubToAnnotation(stub, username))
                 annotationService.insertOrUpdateAnnotations(annotations).map { failed =>
                   if (failed.size == 0)
                     // TODO add username and timestamp
@@ -247,11 +251,10 @@ class AnnotationAPIController @Inject() (
       Logger.warn("Bulk upsert request for multiple document parts")
       Future.successful(BadRequest)
     }
-  }} */
+  }}
 
-  def getImage(id: UUID) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>    
-    val username = loggedIn.map(_.username)
-    
+  def getImage(id: UUID) = silhouette.UserAwareAction.async { implicit request =>    
+    val username = request.identity.map(_.username)
     annotationService.findById(id).flatMap {
       case Some((annotation, _)) =>
         val docId = annotation.annotates.documentId
@@ -279,10 +282,9 @@ class AnnotationAPIController @Inject() (
       
       case None => Future.successful(NotFound)
     }
-  } */
+  }
 
-  def getAnnotation(id: UUID, includeContext: Boolean) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
-    
+  def getAnnotation(id: UUID, includeContext: Boolean) = silhouette.UserAwareAction.async { implicit request =>
     def getTextContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = 
       uploads.readTextfile(doc.ownerName, doc.id, part.getFile) map {
         case Some(text) => 
@@ -330,7 +332,7 @@ class AnnotationAPIController @Inject() (
     annotationService.findById(id).flatMap {
       case Some((annotation, _)) => {
         if (includeContext) {          
-          documents.getExtendedInfo(annotation.annotates.documentId, loggedIn.map(_.username)).flatMap {
+          documents.getExtendedInfo(annotation.annotates.documentId, request.identity.map(_.username)).flatMap {
             case Some((doc, accesslevel)) =>
               if (accesslevel.canRead)
                 getContext(doc, annotation).map(context =>
@@ -349,7 +351,7 @@ class AnnotationAPIController @Inject() (
 
       case None => Future.successful(NotFoundPage)
     }
-  } */
+  }
 
   private def createDeleteContribution(annotation: Annotation, document: DocumentRecord, user: String, time: DateTime) =
     Contribution(
@@ -369,18 +371,18 @@ class AnnotationAPIController @Inject() (
       getContext(annotation)
     )
 
-  def deleteAnnotation(id: UUID) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
+  def deleteAnnotation(id: UUID) = silhouette.SecuredAction.async { implicit request =>
+    val username = request.identity.username
     annotationService.findById(id).flatMap {
       case Some((annotation, version)) =>
         // Fetch the associated document
-        documents.getDocumentRecord(annotation.annotates.documentId, loggedIn.map(_.username)).flatMap {
+        documents.getDocumentRecord(annotation.annotates.documentId, Some(username)).flatMap {
           case Some((document, accesslevel)) => {
             if (accesslevel.canWrite) {
-              val user = loggedIn.map(_.username).getOrElse("guest")
               val now = DateTime.now
-              annotationService.deleteAnnotation(id, user, now).flatMap {
+              annotationService.deleteAnnotation(id, username, now).flatMap {
                 case Some(annotation) =>
-                  contributions.insertContribution(createDeleteContribution(annotation, document, user, now)).map(success =>
+                  contributions.insertContribution(createDeleteContribution(annotation, document, username, now)).map(success =>
                     if (success) Status(200) else InternalServerError)
 
                 case None =>
@@ -400,6 +402,6 @@ class AnnotationAPIController @Inject() (
 
       case None => Future.successful(NotFoundPage)
     }
-  } */
+  }
 
 }

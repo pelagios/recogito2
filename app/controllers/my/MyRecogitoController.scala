@@ -150,8 +150,8 @@ class MyRecogitoController @Inject() (
   }
   
   /** A convenience '/my' route that redirects to the personal index **/
-  def my = play.api.mvc.Action { Ok } /* StackAction { implicit request =>
-    loggedIn match {
+  def my = silhouette.UserAwareAction { implicit request =>
+    request.identity match {
       case Some(userWithRoles) =>
         Redirect(routes.MyRecogitoController.index(userWithRoles.username.toLowerCase, None, None, None, None, None))
 
@@ -160,11 +160,18 @@ class MyRecogitoController @Inject() (
         Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None))
           .withSession("access_uri" -> routes.MyRecogitoController.my.url)
     }
-  } */
+  }
 
-  def index(usernameInPath: String, tab: Option[String], page: Option[Int], sortBy: Option[String], order: Option[String], size: Option[Int]) = play.api.mvc.Action { Ok } /* AsyncStack { implicit request =>
+  def index(
+    usernameInPath: String,
+    tab: Option[String],
+    page: Option[Int],
+    sortBy: Option[String],
+    order: Option[String],
+    size: Option[Int]) = silhouette.UserAwareAction.async { implicit request =>
+    
     // If the user is logged in & the name in the path == username it's the profile owner
-    val isProfileOwner = loggedIn match {
+    val isProfileOwner = request.identity match {
       case Some(userWithRoles) => userWithRoles.username.equalsIgnoreCase(usernameInPath)
       case None => false
     }
@@ -184,7 +191,7 @@ class MyRecogitoController @Inject() (
       (sortBy, normalizedSortOrder) match {
         
         case (Some(s), Some(o)) =>
-          val user = loggedIn.get
+          val user = request.identity.get
           val usedSpace = uploads.getUsedDiskspaceKB(user.username)    
           tab match {
             case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace, offset, s, o, size)
@@ -198,8 +205,8 @@ class MyRecogitoController @Inject() (
           
       }
     } else {
-      renderPublicProfile(usernameInPath, loggedIn)
+      renderPublicProfile(usernameInPath, request.identity)
     }
-  } */
+  }
   
 }
