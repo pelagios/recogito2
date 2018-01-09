@@ -1,28 +1,31 @@
 package controllers.document
 
-import controllers.BaseOptAuthController
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{BaseOptAuthController, Security}
 import java.io.File
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import models.ContentType
 import models.document.DocumentService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import models.user.UserService
 import play.api.Configuration
 import play.api.http.FileMimeTypes
-import play.api.mvc.Action
-import scala.concurrent.{ ExecutionContext, Future }
-import storage.Uploads
+import play.api.mvc.ControllerComponents
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
+import storage.Uploads
 
 @Singleton
 class DocumentController @Inject() (
-    val config: Configuration,
-    val documents: DocumentService,
-    val users: UserService,
-    val uploads: Uploads,
-    implicit val mimeTypes: FileMimeTypes,
-    implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(config, documents, users) {
+  val components: ControllerComponents,
+  val config: Configuration,
+  val documents: DocumentService,
+  val silhouette: Silhouette[Security.Env],
+  val users: UserService,
+  val uploads: Uploads,
+  implicit val mimeTypes: FileMimeTypes,
+  implicit val ctx: ExecutionContext
+) extends BaseOptAuthController(components, config, documents, users) {
 
   def initialDocumentView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationView(docId, 1))
@@ -51,8 +54,8 @@ class DocumentController @Inject() (
     * - for IIIF, returns a redirect to the original location of the IIIF info.json   
     * - in case the document is not an image, returns a BadRequest   
     */
-  def getImageManifest(docId: String, partNo: Int) = AsyncStack { implicit request =>
-    documentPartResponse(docId, partNo, loggedIn, { case (doc, currentPart, accesslevel) =>
+  def getImageManifest(docId: String, partNo: Int) = silhouette.UserAwareAction.async { implicit request =>
+    documentPartResponse(docId, partNo, request.identity, { case (doc, currentPart, accesslevel) =>
       ContentType.withName(currentPart.getContentType) match {
         
         case Some(ContentType.IMAGE_UPLOAD) =>
@@ -72,8 +75,8 @@ class DocumentController @Inject() (
   }
 
   /** Returns the image tile at the given relative file path for the specified document part **/
-  def getImageTile(docId: String, partNo: Int, tilepath: String) = AsyncStack { implicit request =>
-    documentPartResponse(docId, partNo, loggedIn, { case (doc, currentPart, accesslevel) =>
+  def getImageTile(docId: String, partNo: Int, tilepath: String) = silhouette.UserAwareAction.async { implicit request =>
+    documentPartResponse(docId, partNo, request.identity, { case (doc, currentPart, accesslevel) =>
       getTilesetFile(doc.document, currentPart, tilepath).map {
         case Some(file) => Ok.sendFile(file)
         case None => NotFound
@@ -82,14 +85,14 @@ class DocumentController @Inject() (
   }
 
   /** Returns a thumbnail file for the given document part **/
-  def getThumbnail(docId: String, partNo: Int) = AsyncStack { implicit request =>
+  def getThumbnail(docId: String, partNo: Int) = silhouette.UserAwareAction.async { implicit request =>
     
     import models.ContentType._
     
     def iiifThumbnailURL(iiifUrl: String) =
       iiifUrl.substring(0, iiifUrl.length - 9) + "full/160,/0/default.jpg"
     
-    documentPartResponse(docId, partNo, loggedIn, { case (doc, currentPart, accesslevel) =>
+    documentPartResponse(docId, partNo, request.identity, { case (doc, currentPart, accesslevel) =>
       if (currentPart.getContentType == IMAGE_IIIF.toString) {        
         Future.successful(Redirect(iiifThumbnailURL(currentPart.getFile)))
       } else {
@@ -102,8 +105,8 @@ class DocumentController @Inject() (
   }
   
   /** Gets the raw content for the given document part **/
-  def getRaw(docId: String, partNo: Int, lines: Option[Int]) = AsyncStack { implicit request =>
-    documentPartResponse(docId, partNo, loggedIn, { case (document, currentPart, accesslevel) =>
+  def getRaw(docId: String, partNo: Int, lines: Option[Int]) = silhouette.UserAwareAction.async { implicit request =>
+    documentPartResponse(docId, partNo, request.identity, { case (document, currentPart, accesslevel) =>
       Future {
         scala.concurrent.blocking {
           val documentDir = uploads.getDocumentDir(document.owner.getUsername, document.id).get

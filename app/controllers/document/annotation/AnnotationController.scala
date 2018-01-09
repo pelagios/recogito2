@@ -1,36 +1,42 @@
 package controllers.document.annotation
 
-import controllers.{ BaseOptAuthController, HasVisitLogging, HasTEISnippets }
+import com.mohiva.play.silhouette.api.Silhouette
+import controllers.{BaseOptAuthController, HasVisitLogging, HasTEISnippets, Security}
 import java.util.UUID
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import models.ContentType
 import models.annotation.AnnotationService
-import models.document.{ DocumentAccessLevel, DocumentInfo, DocumentService }
-import models.generated.tables.records.{ DocumentFilepartRecord, DocumentRecord, UserRecord }
-import models.user.{ User, UserService }
+import models.document.{DocumentAccessLevel, DocumentInfo, DocumentService}
+import models.generated.tables.records.{DocumentFilepartRecord, DocumentRecord, UserRecord}
+import models.user.{User, UserService}
 import models.visit.VisitService
 import org.webjars.play.WebJarsUtil
-import play.api.{ Configuration, Logger }
-import play.api.mvc.{ RequestHeader, Result }
-import scala.concurrent.{ ExecutionContext, Future }
+import play.api.{Configuration, Logger}
+import play.api.mvc.{ControllerComponents, RequestHeader, Result}
+import scala.concurrent.{ExecutionContext, Future}
 import storage.Uploads
 
 @Singleton
 class AnnotationController @Inject() (
-    val config: Configuration,
-    val annotations: AnnotationService,
-    val documents: DocumentService,
-    val users: UserService,
-    val uploads: Uploads,
-    implicit val visits: VisitService,
-    implicit val webjars: WebJarsUtil,
-    implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(config, documents, users)
+  val components: ControllerComponents,
+  val config: Configuration,
+  val annotations: AnnotationService,
+  val documents: DocumentService,
+  val silhouette: Silhouette[Security.Env],
+  val users: UserService,
+  val uploads: Uploads,
+  implicit val visits: VisitService,
+  implicit val webjars: WebJarsUtil,
+  implicit val ctx: ExecutionContext
+) extends BaseOptAuthController(components, config, documents, users)
     with HasTEISnippets
     with HasVisitLogging {
 
   /** For convenience: redirects to proper annotation view, given various ID combinations  **/
-  def resolveAnnotationView(documentId: String, maybePartId: Option[java.util.UUID], maybeAnnotationId: Option[java.util.UUID]) = AsyncStack { implicit request =>
+  def resolveAnnotationView(
+    documentId: String,
+    maybePartId: Option[java.util.UUID],
+    maybeAnnotationId: Option[java.util.UUID]) = Action.async { implicit request =>
 
     // Shorthand re-used below
     def partResponse(partId: UUID, okResponse: DocumentFilepartRecord => Result) =
@@ -68,23 +74,24 @@ class AnnotationController @Inject() (
   }
 
   /** Shows the annotation view for a specific document part **/
-  def showAnnotationView(documentId: String, seqNo: Int) = AsyncStack { implicit request =>
+  def showAnnotationView(documentId: String, seqNo: Int) = silhouette.UserAwareAction.async { implicit request =>
+    val loggedIn = request.identity
     documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
       if (accesslevel.canRead)
         renderResponse(doc, currentPart, loggedIn, accesslevel)
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
-        authenticationFailed(request)
+        Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))
       else
         Future.successful(ForbiddenPage)
     })
   }
 
   private def renderResponse(
-      doc: DocumentInfo,
-      currentPart: DocumentFilepartRecord,
-      loggedInUser: Option[User],
-      accesslevel: DocumentAccessLevel
-    )(implicit request: RequestHeader) = {
+    doc: DocumentInfo,
+    currentPart: DocumentFilepartRecord,
+    loggedInUser: Option[User],
+    accesslevel: DocumentAccessLevel
+  )(implicit request: RequestHeader) = {
     
     logDocumentView(doc.document, Some(currentPart), accesslevel)
     

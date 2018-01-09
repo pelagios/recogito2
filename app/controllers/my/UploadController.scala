@@ -78,20 +78,20 @@ class UploadController @Inject() (
   }
 
   /** Stores document metadata following step 1 **/
-  def storeDocumentMetadata(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def storeDocumentMetadata(usernameInPath: String) = silhouette.SecuredAction.async { implicit request =>
     newDocumentForm.bindFromRequest.fold(
       formWithErrors =>
         Future.successful(BadRequest(views.html.my.upload.step1(usernameInPath, formWithErrors))),
 
       docData =>
-        uploads.storePendingUpload(loggedIn.username, docData.title, docData.author, docData.dateFreeform, docData.description, docData.language, docData.source, docData.edition)
+        uploads.storePendingUpload(request.identity.username, docData.title, docData.author, docData.dateFreeform, docData.description, docData.language, docData.source, docData.edition)
           .flatMap(user => Future.successful(Redirect(controllers.my.routes.UploadController.showStep2(usernameInPath))))
           .recover { case t: Throwable => {
             t.printStackTrace()
             Ok(views.html.my.upload.step1(usernameInPath, newDocumentForm.bindFromRequest, Some(MSG_ERROR)))
           }}
     )
-  } */
+  }
 
   /** Step 2 requires that a pending upload exists - otherwise, redirect to step 1 **/
   def showStep2(usernameInPath: String) = silhouette.SecuredAction.async { implicit request =>
@@ -105,13 +105,13 @@ class UploadController @Inject() (
   }
 
   /** Stores a filepart during step 2 **/
-  def storeFilepart(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    val username = loggedIn.username
+  def storeFilepart(usernameInPath: String) = silhouette.SecuredAction.async { implicit request =>
+    val username = request.identity.username
     val isFileupload = request.body.asMultipartFormData.isDefined
 
     def storeFilepart(pendingUpload: UploadRecord) = request.body.asMultipartFormData.map(tempfile => {
       tempfile.file("file").map(f => {
-        uploads.insertUploadFilepart(pendingUpload.getId, loggedIn, f).map(_ match {
+        uploads.insertUploadFilepart(pendingUpload.getId, request.identity, f).map(_ match {
           case Right(filepart) =>
             // Upload was properly identified and stored
             Ok(Json.toJson(UploadSuccess(filepart.getContentType)))
@@ -166,14 +166,14 @@ class UploadController @Inject() (
         t.printStackTrace()
         BadRequest(MSG_ERROR)
       }
-  } */
+  }
 
   /** Deletes a filepart during step 2 **/
-  def deleteFilepart(usernameInPath: String, filename: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    uploads.deleteFilepartByTitleAndOwner(filename, loggedIn.username).map(success => {
+  def deleteFilepart(usernameInPath: String, filename: String) = silhouette.SecuredAction.async { implicit request =>
+    uploads.deleteFilepartByTitleAndOwner(filename, request.identity.username).map(success => {
       if (success) Ok else NotFoundPage
     })
-  } */
+  }
 
   /** Step 3 requires that a pending upload and at least one filepart exists - otherwise, redirect **/
   def showStep3(usernameInPath: String) = silhouette.SecuredAction.async { implicit request =>
@@ -221,9 +221,9 @@ class UploadController @Inject() (
     })
   }
 
-  def cancelUploadWizard(usernameInPath: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
+  def cancelUploadWizard(usernameInPath: String) = silhouette.SecuredAction.async { implicit request =>
     uploads
-      .deletePendingUpload(loggedIn.username)
+      .deletePendingUpload(request.identity.username)
       .map(success => {
         // TODO add error message if success == false
         Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None, None, None, None, None))
@@ -232,11 +232,11 @@ class UploadController @Inject() (
         // TODO add error message
         Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None, None, None, None, None))
       }
-  } */
+  }
 
   /** Queries for processing progress on a specific task and document (user needs to be logged in and own the document) **/
-  def queryTaskProgress(username: String, docId: String) = play.api.mvc.Action { Ok } /* AsyncStack(AuthorityKey -> Normal) { implicit request =>
-    documents.getDocumentRecord(docId, Some(loggedIn.username)).flatMap(_ match {
+  def queryTaskProgress(username: String, docId: String) = silhouette.SecuredAction.async { implicit request =>
+    documents.getDocumentRecord(docId, Some(request.identity.username)).flatMap(_ match {
       // Make sure only users with read access can see the progress
       case Some((document, accesslevel)) if accesslevel.canRead => {
         taskService.findByDocument(docId).map(_ match {
@@ -252,6 +252,6 @@ class UploadController @Inject() (
       case None =>
         Future.successful(NotFoundPage)
     })
-  } */
+  }
 
 }

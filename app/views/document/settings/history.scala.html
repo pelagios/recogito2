@@ -15,7 +15,7 @@
   @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/settings/history.js")))
 
   @helper.javascriptRouter("jsRoutes")(
-    // controllers.document.annotation.routes.javascript.AnnotationController.resolveAnnotationView,
+    controllers.document.annotation.routes.javascript.AnnotationController.resolveAnnotationView,
     controllers.document.settings.routes.javascript.SettingsController.getContributionHistory,
     controllers.document.settings.routes.javascript.SettingsController.rollbackByTime
   )

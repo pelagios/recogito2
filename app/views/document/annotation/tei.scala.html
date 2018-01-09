@@ -3,6 +3,7 @@
   currentPart: models.generated.tables.records.DocumentFilepartRecord,
   currentUser: Option[models.user.User],
   accessLevel: models.document.DocumentAccessLevel,
+  preview: String,
   annotationCount: Long
  )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
@@ -10,36 +11,33 @@
   <head>
     <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
-    @views.html.document.standardMeta(doc, annotationCount, Some(currentPart))
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image/index.css")"/>
-    @Html(webJarsUtil.css("ol.css"))
+    @views.html.document.standardMeta(doc, annotationCount, Some(currentPart), Some(preview))
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/tei/index.css")"/>
+    <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     @Html(webJarsUtil.css("leaflet.css"))
     @Html(webJarsUtil.script("leaflet.js"))
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     @Html(webJarsUtil.script("jquery-ui.min.js"))
-    @Html(webJarsUtil.script("velocity.min.js"))
     @Html(webJarsUtil.script("jquery.timeago.js"))
-    @Html(webJarsUtil.script("ol.js"))
-    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/image/app.js")))
+    @Html(webJarsUtil.script("rangy-core.min.js"))
+    @Html(webJarsUtil.script("rangy-classapplier.min.js"))
+    <script src="@routes.Assets.versioned("vendor/CETEI.js")"></script>
+    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/tei/app.js")))
     <script>
       window.config = {
-        @if(currentUser.isDefined) {
-          me: '@currentUser.get.username',
-          features: [@Html(currentUser.get.featureToggles.map("'" + _ + "'").mkString(","))],
-        }
+        @if(currentUser.isDefined) { me: '@currentUser.get.username', }
         documentId: '@doc.id',
         documentOwner: '@doc.ownerName',
         partId: '@currentPart.getId',
         partSequenceNo: @currentPart.getSequenceNo,
         contentType: '@currentPart.getContentType',
         writeAccess: @accessLevel.canWrite,
-        isAdmin: @accessLevel.isAdmin,
+        isAdmin: @accessLevel.isAdmin
       }
     </script>
   </head>
   <body>
-    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit")
-
+    @* views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit") *@
     <div class="header-infobox">
       <h1>
         @doc.author.map(_ + ": ")@doc.title
@@ -48,7 +46,7 @@
       <p class="source">@views.html.document.sourceLink(doc.source)</p>
       <p class="quick-stats">
         <span class="icon comment">&#xf0e5;</span>
-        <span class="annotations">0</span> Annotations
+        <span class="annotations">-</span> Annotations
         &nbsp; &centerdot; &nbsp;
         <span class="icon">&#xf0c0;</span>
         <span class="contributors">No Other Contributors</span>
@@ -61,47 +59,32 @@
 
     <div class="header-toolbar">
       <ul class="menu">
-        <li class="group tools">
-          <h3>TOOLS:</h3>
+        <li class="group annotation-mode">
+          <h3>ANNOTATION MODE:</h3>
           <ul>
-            <li data-tool-label="MOVE" data-tool-key="move" class="active">
-              <span class="icon">&#xf256;</span>
-              <span class="label">MOVE</span>
-            </li>
-            <li data-tool-label="POINT" data-tool-key="point" class="has-submenu">
-              <span class="icon">&#xf05b;</span>
-              <span class="label">POINT</span>
+            <li data-mode="NORMAL" class="active"><span class="label">NORMAL</span></li>
+            <li class="quick has-submenu">
+              <span class="label">QUICK</span>
               <div class="submenu" style="display:none;">
                 <ul>
-                  <li data-tool-label="POINT" data-tool-key="point"><span class="icon">&#xf05b;</span> POINT</li>
-                  <li data-tool-label="RECTANGLE" data-tool-key="rect"><span class="icon"><span class="rect"></span></span> RECTANGLE</li>
-                  <li data-tool-label="TILTED BOX" data-tool-key="tbox"><span class="icon"><span class="tilted-box"></span></span> TILTED BOX</li>
+                  <li data-mode="QUICK" data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
+                  <li data-mode="QUICK" data-type="PERSON"><span class="icon">&#xf007;</span> Persons</li>
+                  <li data-mode="QUICK" data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
                 </ul>
               </div>
             </li>
           </ul>
-        </li> <!-- TOOLS group -->
-
-        <li class="group has-submenu disabled">
-          <h3><span class="label">IMAGE</span></h3>
         </li>
 
-        <li class="group has-submenu disabled">
-          <h3><span class="label">LAYERS</span></h3>
-        </li>
-
-        <li class="group help">
-          <h3><span class="label">HELP</span></h3>
+        <li class="group color-scheme">
+          <h3>COLOR:</h3>
+          <ul>
+            <li data-scheme="BY_TYPE" class="active"><span class="label">BY ENTITY TYPE</span></li>
+            <li data-scheme="BY_STATUS"><span class="label">BY VERIFICATION STATUS</span></li>
+          </ul>
         </li>
       </ul> <!-- .menu -->
-
-      <!-- span class="search">
-        <input class="search" type="text" placeholder="Search..."/>
-        <span class="icon">&#xf002;</span>
-      </span -->
     </div> <!-- .header-toolbar -->
-
-    <div id="image-pane"></div>
 
     <div class="sidebar">
       @views.html.sidebarHeader(doc.owner)
@@ -110,15 +93,11 @@
         @for(part <- doc.fileparts) {
           @if(part == currentPart) {
             <li class="active">
-              <a href="#" onclick="return false;">
-                <img src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
-                <span class="label">@part.getTitle</span>
-              </a>
+              <a href="#" onclick="return false;"><span class="label">@part.getTitle</span></a>
             </li>
           } else {
             <li>
               <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, part.getSequenceNo)">
-                <img src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
@@ -127,14 +106,15 @@
       </ul>
     </div> <!-- .sidebar -->
 
+    <div id="main"><div id="content"></div></div>
+
     @helper.javascriptRouter("jsRoutes")(
-      controllers.document.routes.javascript.DocumentController.getImageManifest,
-      controllers.document.routes.javascript.DocumentController.getImageTile,
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
       controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
       controllers.api.routes.javascript.AnnotationAPIController.deleteAnnotation,
       controllers.api.routes.javascript.PlaceAPIController.findPlaceByURI,
-      controllers.api.routes.javascript.PlaceAPIController.searchPlaces
+      controllers.api.routes.javascript.PlaceAPIController.searchPlaces,
+      controllers.document.routes.javascript.DocumentController.getRaw
     )
   </body>
 </html>
