@@ -1,7 +1,7 @@
 package controllers
 
-import play.api.mvc.{ AnyContent, AbstractController, Request }
-import play.api.libs.json.{ Json, JsValue }
+import play.api.mvc.{AnyContent, AbstractController, Request}
+import play.api.libs.json.{Json, JsValue}
 import scala.util.Try
 
 /** Helper for creating pretty-printed JSON responses with proper content-type header **/

@@ -1,10 +1,10 @@
 package controllers
 
-import java.io.{ File, FileReader, StringReader }
+import java.io.{File, FileReader, StringReader}
 import javax.xml.parsers.DocumentBuilderFactory
 import org.joox.JOOX._
-import org.w3c.dom.{ Document, Element, Node }
-import org.w3c.dom.ranges.{ DocumentRange, Range }
+import org.w3c.dom.{Document, Element, Node}
+import org.w3c.dom.ranges.{DocumentRange, Range}
 import org.xml.sax.InputSource
 
 trait HasTEISnippets extends HasTextSnippets {

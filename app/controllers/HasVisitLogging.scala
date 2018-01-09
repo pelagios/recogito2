@@ -4,9 +4,9 @@ import eu.bitwalker.useragentutils.UserAgent
 import models.visit._
 import models.ContentType
 import models.document.DocumentAccessLevel
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime
-import play.api.mvc.{ AnyContent, RequestHeader }
+import play.api.mvc.{AnyContent, RequestHeader}
 import play.api.http.HeaderNames
 import scala.concurrent.Future
 
