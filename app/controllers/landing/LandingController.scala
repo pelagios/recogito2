@@ -1,6 +1,6 @@
 package controllers.landing
 
-import controllers.{ HasConfig, HasUserService, HasVisitLogging, HasPrettyPrintJSON }
+import controllers.{ HasConfig, HasUserService, HasVisitLogging, HasPrettyPrintJSON, Security }
 import javax.inject.{ Inject, Singleton }
 import models.annotation.AnnotationService
 import models.contribution.ContributionService
@@ -12,6 +12,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{ Action, AbstractController }
 import scala.concurrent.ExecutionContext
 import play.api.mvc.ControllerComponents
+import com.mohiva.play.silhouette.api.Silhouette
 
 @Singleton
 class LandingController @Inject() (
@@ -20,12 +21,16 @@ class LandingController @Inject() (
     val annotations: AnnotationService,
     val contributions: ContributionService,
     val users: UserService,
+    val silhouette: Silhouette[Security.Env],
     implicit val ctx: ExecutionContext,
     implicit val visits: VisitService,
     implicit val webjars: WebJarsUtil
 ) extends AbstractController(components) with HasConfig with HasUserService with HasVisitLogging /*with HasPrettyPrintJSON*/ {
 
-  def index = play.api.mvc.Action { implicit request =>
+  def index = silhouette.UserAwareAction { implicit request =>
+    
+    play.api.Logger.info(request.identity.toString)
+    
     /*loggedIn match {
       case Some(user) =>
         Redirect(controllers.my.routes.MyRecogitoController.index(user.username, None, None, None, None, None))

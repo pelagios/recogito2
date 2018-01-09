@@ -1,6 +1,6 @@
 package controllers.landing
 
-import controllers.{ HasConfig, HasUserService }
+import controllers.{ HasConfig, HasUserService, Security }
 import javax.inject.{ Inject, Singleton }
 import models.document.DocumentService
 import models.user.UserService
@@ -21,7 +21,7 @@ class LoginLogoutController @Inject() (
     val components: ControllerComponents,
     val config: Configuration,
     val users: UserService,
-    val silhouette: Silhouette[DefaultEnv],
+    val silhouette: Silhouette[Security.Env],
     implicit val ctx: ExecutionContext
     // val messagesApi: MessagesApi
   ) extends AbstractController(components) with HasConfig with HasUserService with I18nSupport {
@@ -52,9 +52,12 @@ class LoginLogoutController @Inject() (
       loginData =>
         users.validateUser(loginData.usernameOrPassword, loginData.password).flatMap {
           case Some(validUser) =>
+            play.api.Logger.info("its a valid user")
+              
             silhouette.env.authenticatorService.create(LoginInfo("recogito", validUser.getUsername)).flatMap { authenticator =>
               silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
-                silhouette.env.authenticatorService.embed(v, Ok)
+                play.api.Logger.info(v.toString)
+                silhouette.env.authenticatorService.embed(v,  Redirect(routes.LandingController.index))
               }
             }
                         

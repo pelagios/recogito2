@@ -66,6 +66,7 @@ db.default.password="postgres-password-goes-here"
 
 play.modules.enabled += "storage.DBModule"
 play.modules.enabled += "storage.ESModule"
+play.modules.enabled += "controllers.SilhouetteSecurity"
 
 akka {
     jvm-exit-on-fatal-error = off

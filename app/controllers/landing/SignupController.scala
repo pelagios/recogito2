@@ -1,6 +1,6 @@
 package controllers.landing
 
-import controllers.{ HasConfig, HasUserService }
+import controllers.{ HasConfig, HasUserService, Security }
 import java.io.FileInputStream
 import java.sql.Timestamp
 import java.util.{ Date, UUID }
@@ -25,17 +25,13 @@ import com.mohiva.play.silhouette.api.Env
 import models.user.User
 import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
 
-case class SignupData(username: String, email: String, password: String)
 
-trait DefaultEnv extends Env {
-  type I = User
-  type A = CookieAuthenticator
-}
+case class SignupData(username: String, email: String, password: String)
 
 @Singleton
 class SignupController @Inject() (
     val components: ControllerComponents,
-    val silhouette: Silhouette[DefaultEnv],
+    val silhouette: Silhouette[Security.Env],
     val config: Configuration,
     val users: UserService,
     val annotations: AnnotationService,
