@@ -12,6 +12,7 @@ import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
+import controllers.WebJarAssets
 
 @Singleton
 class MapController @Inject() (
