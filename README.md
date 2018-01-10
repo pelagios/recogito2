@@ -46,7 +46,7 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
 ## Running in production
 
 * To test production mode before deploying, type `sbt testProd`
-* To change to a different port (than default 9000), type `sbt "testProd -Dhttp.port=9876"`
+* To change to a different port (than default 9000), type `sbt "runProd -Dhttp.port=9876"`
 * For full production deployment, refer to the current [Play Framework
   docs](https://www.playframework.com/documentation/2.5.x/Production)
 * Be sure to set a random application secret in `conf/application.conf`. Play includes a utility
