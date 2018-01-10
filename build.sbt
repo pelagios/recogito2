@@ -106,9 +106,7 @@ includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
 
-// unmanagedClasspath in Runtime ++= (baseDirectory).value map { base =>
-//   Attributed.blankSeq((file("plugins/") ** "*.jar").get)
-// }
+unmanagedJars in Runtime ++= Attributed.blankSeq((file("plugins/") ** "*.jar").get)
 
 val generateJOOQ = taskKey[Seq[File]]("Generate JooQ classes")
 generateJOOQ := {
