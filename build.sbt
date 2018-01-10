@@ -1,6 +1,6 @@
 name := """recogito2"""
 
-version := "1.0-SNAPSHOT"
+version := "1.2"
 
 scalaVersion := "2.11.11"
 
@@ -30,24 +30,39 @@ libraryDependencies ++= Seq(
 
   "com.nrinaudo" %% "kantan.csv" % "0.2.1",
   "com.nrinaudo" %% "kantan.csv-commons" % "0.2.1",
+
   "com.sksamuel.elastic4s" %% "elastic4s-streams" % "2.4.0",
-  "com.typesafe.akka" %% "akka-contrib" % "2.4.2",
+
+  "com.typesafe.akka" %% "akka-contrib" % "2.5.8",
+  "com.typesafe.akka" %% "akka-testkit" % "2.5.8" % "test",
+
   "com.typesafe.play" %% "play-iteratees" % "2.6.1",
   "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1",
-  "com.typesafe.play" %% "play-mailer" % "5.0.0",
+  "com.typesafe.play" %% "play-mailer" % "6.0.1",
+  "com.typesafe.play" %% "play-mailer-guice" % "6.0.1",
+
   "com.vividsolutions" % "jts" % "1.13",
+
   "commons-io" % "commons-io" % "2.4",
+
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models",
+
   "eu.bitwalker" % "UserAgentUtils" % "1.20",
+
   "net.codingwell" %% "scala-guice" % "4.1.1",
+
   "org.apache.jena" % "jena-arq" % "3.1.0",
+
   "org.geotools" % "gt-geojson" % "14.3",
+
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
   "org.jooq" % "jooq-meta" % "3.7.2",
-  "org.jooq" % "joox" % "1.5.0",
+  "org.jooq" % "joox" % "1.6.0",
+
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
+
   "org.webjars" %% "webjars-play" % "2.6.2",
 
   // Scalagios core + transient dependencies
@@ -77,8 +92,8 @@ libraryDependencies ++= Seq(
   "org.webjars.npm" % "chartist" % "0.9.8",
 
   specs2 % Test,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
-  "com.typesafe.akka" %% "akka-testkit" % "2.4.2" % "test"
+
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
 )
 
 // Play provides two styles of routers, one expects its actions to be injected, the
@@ -91,6 +106,7 @@ includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
 
+/*
 unmanagedClasspath in Runtime <++= (baseDirectory) map { base =>
   Attributed.blankSeq((file("plugins/") ** "*.jar").get)
 }
@@ -104,3 +120,4 @@ generateJOOQ := {
   toError(r.run("org.jooq.util.GenerationTool", cp.files, Array("conf/db.conf.xml"), s.log))
   (src ** "*.scala").get
 }
+*/

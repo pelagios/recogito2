@@ -7,7 +7,7 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorService
 import com.mohiva.play.silhouette.api.util._
 import com.mohiva.play.silhouette.api.{Authorization, Environment, EventBus, Silhouette, SilhouetteProvider}
-import com.mohiva.play.silhouette.crypto.{JcaSigner, JcaSignerSettings, JcaCrypter, JcaCrypterSettings} 
+import com.mohiva.play.silhouette.crypto.{JcaSigner, JcaSignerSettings, JcaCrypter, JcaCrypterSettings}
 import com.mohiva.play.silhouette.impl.authenticators.{CookieAuthenticator, CookieAuthenticatorSettings, CookieAuthenticatorService}
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import com.mohiva.play.silhouette.impl.util.{DefaultFingerprintGenerator, SecureRandomIDGenerator}
@@ -25,10 +25,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
 class SilhouetteSecurity  extends AbstractModule with ScalaModule {
-  
+
   private def getAppSecret(config: Configuration) =
-    config.get[String]("play.crypto.secret")
-  
+    config.get[String]("play.http.secret.key")
+
   override def configure(): Unit = {
     bind[Silhouette[Security.Env]].to[SilhouetteProvider[Security.Env]]
     bind[DelegableAuthInfoDAO[PasswordInfo]].toInstance(new InMemoryAuthInfoDAO[PasswordInfo])
@@ -50,7 +50,7 @@ class SilhouetteSecurity  extends AbstractModule with ScalaModule {
     Seq(),
     eventBus
   )
- 
+
   @Provides
   def provideAuthenticatorService(
     @Named("authenticator-signer") signer: Signer,
@@ -109,23 +109,23 @@ class SilhouetteSecurity  extends AbstractModule with ScalaModule {
 
 
 object Security {
-  
+
   val PROVIDER_ID = "recogito.pelagios.org"
-  
+
   trait Env extends com.mohiva.play.silhouette.api.Env {
-    
+
     type I = User
-    
+
     type A = CookieAuthenticator
-    
+
   }
-  
+
   case class WithRole(role: Role) extends Authorization[User, CookieAuthenticator] {
 
     def isAuthorized[B](user: User, authenticator: CookieAuthenticator)(implicit request: Request[B]) = {
       Future.successful(user.hasRole(role))
     }
-    
+
   }
-  
+
 }
