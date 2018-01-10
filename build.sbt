@@ -106,10 +106,9 @@ includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
 
-/*
-unmanagedClasspath in Runtime <++= (baseDirectory) map { base =>
-  Attributed.blankSeq((file("plugins/") ** "*.jar").get)
-}
+// unmanagedClasspath in Runtime ++= (baseDirectory).value map { base =>
+//   Attributed.blankSeq((file("plugins/") ** "*.jar").get)
+// }
 
 val generateJOOQ = taskKey[Seq[File]]("Generate JooQ classes")
 generateJOOQ := {
@@ -117,7 +116,6 @@ generateJOOQ := {
   val cp = (fullClasspath in Compile).value
   val r = (runner in Compile).value
   val s = streams.value
-  toError(r.run("org.jooq.util.GenerationTool", cp.files, Array("conf/db.conf.xml"), s.log))
+  r.run("org.jooq.util.GenerationTool", cp.files, Array("conf/db.conf.xml"), s.log).failed foreach (sys error _.getMessage)
   (src ** "*.scala").get
 }
-*/
