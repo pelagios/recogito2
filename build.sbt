@@ -59,7 +59,8 @@ libraryDependencies ++= Seq(
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
   "org.jooq" % "jooq-meta" % "3.7.2",
-  "org.jooq" % "joox" % "1.6.0",
+
+  "org.jooq" % "joox" % "1.5.0",
 
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
 
