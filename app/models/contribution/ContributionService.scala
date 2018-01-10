@@ -7,7 +7,6 @@ import javax.inject.{ Inject, Singleton }
 import models.{ HasDate, Page }
 import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
-import org.elasticsearch.search.aggregations.bucket.nested.Nested
 import org.elasticsearch.search.aggregations.bucket.histogram.{ DateHistogramInterval, InternalHistogram }
 import org.elasticsearch.search.sort.SortOrder
 import org.joda.time.{ DateTime, DateTimeZone }
@@ -77,7 +76,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   /** Returns the contribution history on a given document, as a paged result **/
   def getHistory(documentId: String, offset: Int = 0, limit: Int = 20): Future[Page[(Contribution, String)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION query nestedQuery("affects_item").query (
+      search in ES.RECOGITO / ES.CONTRIBUTION query (
         termQuery("affects_item.document_id" -> documentId)
       ) sort (
         field sort "made_at" order SortOrder.DESC
@@ -133,7 +132,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       search in ES.RECOGITO / ES.CONTRIBUTION query {
         bool {
           must (
-            nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
+            termQuery("affects_item.document_id" -> documentId)
           ) filter (
             rangeQuery("made_at").from(formatDate(after)).includeLower(false)
           )
@@ -169,7 +168,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
 
     def findContributions() = es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query {
-        nestedQuery("affects_item").query(termQuery("affects_item.document_id" -> documentId))
+        termQuery("affects_item.document_id" -> documentId)
       } limit ES.MAX_SIZE
     } map { _.getHits.getHits }
 
@@ -208,9 +207,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       search in ES.RECOGITO / ES.CONTRIBUTION aggs (
         aggregation terms "by_user" field "made_by",
         aggregation terms "by_action" field "action",
-        aggregation nested("by_item_type") path "affects_item" aggs (
-          aggregation terms "item_type" field "affects_item.item_type"
-        ),
+        aggregation terms "by_item_type" field "affects_item.item_type",
         aggregation filter "contribution_history" filter (rangeQuery("made_at") from "now-30d") aggs (
            aggregation datehistogram "last_30_days" field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
         )
@@ -218,8 +215,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     } map { response =>
       val byUser = response.aggregations.get("by_user").asInstanceOf[Terms]
       val byAction = response.aggregations.get("by_action").asInstanceOf[Terms]
-      val byItemType = response.aggregations.get("by_item_type").asInstanceOf[Nested]
-        .getAggregations.get("item_type").asInstanceOf[Terms]
+      val byItemType = response.aggregations.get("by_item_type").asInstanceOf[Terms]
 
       val contributionHistory = response.aggregations.get("contribution_history").asInstanceOf[InternalFilter]
         .getAggregations.get("last_30_days").asInstanceOf[InternalHistogram[InternalHistogram.Bucket]]

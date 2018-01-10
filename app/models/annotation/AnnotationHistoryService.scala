@@ -58,7 +58,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
       search in ES.RECOGITO / ES.ANNOTATION_HISTORY query {
         bool {
           must (
-            nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
+            termQuery("annotates.document_id" -> docId)
           ) filter (
             rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
           )
@@ -95,7 +95,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
       search in ES.RECOGITO / ES.ANNOTATION_HISTORY query {
         bool {
           must (
-            nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
+            termQuery("annotates.document_id" -> docId)
           ) filter (
             rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
           )
@@ -125,7 +125,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
   def deleteHistoryRecordsByDocId(docId: String)(implicit es: ES, context: ExecutionContext): Future[Boolean] = {
     def findRecords() = es.client execute {
       search in ES.RECOGITO / ES.ANNOTATION_HISTORY query {
-        nestedQuery("annotates").query(termQuery("annotates.document_id" -> docId))
+        termQuery("annotates.document_id" -> docId)
       } limit ES.MAX_SIZE
     } map { _.getHits.getHits }
 

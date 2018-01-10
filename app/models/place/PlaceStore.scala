@@ -5,7 +5,6 @@ import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
 import com.sksamuel.elastic4s.source.Indexable
 import com.vividsolutions.jts.geom.Coordinate
 import models.Page
-import org.elasticsearch.search.aggregations.bucket.nested.Nested
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.elasticsearch.search.sort.SortOrder
 import play.api.Logger
@@ -69,13 +68,10 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
   override def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]] =
     self.es.client execute {
       search in ES.RECOGITO / ES.PLACE aggs (
-        aggregation nested("by_source_gazetteer") path "is_conflation_of" aggs (
-          aggregation terms "source_gazetteer" field "is_conflation_of.source_gazetteer" size ES.MAX_SIZE
-        )
+        aggregation terms "by_source_gazetteer" field "is_conflation_of.source_gazetteer" size ES.MAX_SIZE
       ) limit 0
     } map { response =>
-      response.aggregations.get("by_source_gazetteer").asInstanceOf[Nested]
-              .getAggregations.get("source_gazetteer").asInstanceOf[Terms]
+      response.aggregations.get("by_source_gazetteer").asInstanceOf[Terms]
               .getBuckets.asScala
               .map(_.getKeyAsString)
     }
@@ -100,7 +96,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
 
   override def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]] =
     self.es.client execute {
-      search in ES.RECOGITO -> ES.PLACE query nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.uri" -> uri)) limit 10
+      search in ES.RECOGITO -> ES.PLACE query termQuery("is_conflation_of.uri" -> uri) limit 10
     } map { response =>
       val placesAndVersions = response.as[(Place, Long)].toSeq
       if (placesAndVersions.isEmpty) {
@@ -117,13 +113,11 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
   override def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =
     self.es.client execute {
       search in ES.RECOGITO / ES.PLACE query {
-        nestedQuery("is_conflation_of").query {
-          bool {
-            should {
-              uris.map(uri => termQuery("is_conflation_of.uri" -> uri)) ++
-              uris.map(uri => termQuery("is_conflation_of.close_matches" -> uri)) ++
-              uris.map(uri => termQuery("is_conflation_of.exact_matches" -> uri))
-            }
+        bool {
+          should {
+            uris.map(uri => termQuery("is_conflation_of.uri" -> uri)) ++
+            uris.map(uri => termQuery("is_conflation_of.close_matches" -> uri)) ++
+            uris.map(uri => termQuery("is_conflation_of.exact_matches" -> uri))
           }
         }
       } limit 100
@@ -138,29 +132,20 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
             queryStringQuery(q).defaultOperator("AND"),
 
             // ...and then look for exact matches in specific fields
-            nestedQuery("is_conflation_of").query {
-              bool {
-                should (
+            bool {
+              should (
 
-                  // Search inside record titles...
-                  matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
-                  matchPhraseQuery("is_conflation_of.title", q),
+                // Search inside record titles...
+                matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
+                matchPhraseQuery("is_conflation_of.title", q),
 
-                  // ...names...
-                  nestedQuery("is_conflation_of.names").query {
-                    matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
-                  },
+                // ...names...
+                matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0),
+                matchPhraseQuery("is_conflation_of.names.name", q),
 
-                  nestedQuery("is_conflation_of.names").query {
-                    matchPhraseQuery("is_conflation_of.names.name", q)
-                  },
-
-                  // ...and descriptions (with lower boost)
-                  nestedQuery("is_conflation_of.descriptions").query {
-                    matchQuery("is_conflation_of.descriptions.description", q).operator("AND")
-                  }.boost(0.2)
-                )
-              }
+                // ...and descriptions (with lower boost)
+                matchQuery("is_conflation_of.descriptions.description", q).operator("AND").boost(0.2)
+              )
             }
           )
         }
@@ -215,8 +200,9 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
 
     // Initial search request
     self.es.client execute {
-      search in ES.RECOGITO / ES.PLACE query
-        nestedQuery("is_conflation_of").query(termQuery("is_conflation_of.source_gazetteer" -> gazetteer)) scroll "1m"
+      search in ES.RECOGITO / ES.PLACE query {
+        termQuery("is_conflation_of.source_gazetteer" -> gazetteer) 
+      } scroll "1m"
     } map { response =>
       processOneBatch(response.getScrollId)
     }

@@ -259,28 +259,19 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         bool {
 
           must(
-            nestedQuery("is_conflation_of").query {
-              bool {
-                should (
-                  // Search inside record titles...
-                  matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
-                  matchPhraseQuery("is_conflation_of.title", q),
+            bool {
+              should (
+                // Search inside record titles...
+                matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
+                matchPhraseQuery("is_conflation_of.title", q),
 
-                  // ...names...
-                  nestedQuery("is_conflation_of.names").query {
-                    matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0)
-                  },
-
-                  nestedQuery("is_conflation_of.names").query {
-                    matchQuery("is_conflation_of.names.name", q)
-                  },
-
-                  // ...and descriptions (with lower boost)
-                  nestedQuery("is_conflation_of.descriptions").query {
-                    matchQuery("is_conflation_of.descriptions.description", q)
-                  }.boost(0.2)
-                )
-              }
+                // ...names...
+                matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0),
+                matchQuery("is_conflation_of.names.name", q),
+                
+                // ...and descriptions (with lower boost)
+                matchQuery("is_conflation_of.descriptions.description", q).boost(0.2)
+              )
             },
 
             hasChildQuery(ES.GEOTAG).query {

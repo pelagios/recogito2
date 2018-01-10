@@ -7,7 +7,6 @@ import java.util.UUID
 import javax.inject.{ Inject, Singleton }
 import models.geotag.ESGeoTagStore
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
-import org.elasticsearch.search.aggregations.bucket.nested.Nested
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
@@ -142,13 +141,17 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
 
   def countByDocId(id: String): Future[Long] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) limit 0
+      search in ES.RECOGITO / ES.ANNOTATION query {
+        termQuery("annotates.document_id" -> id) 
+      } limit 0
     } map { _.totalHits }
 
   /** Retrieves all annotations on a given document **/
   def findByDocId(id: String, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.document_id" -> id)) start offset limit limit
+      search in ES.RECOGITO / ES.ANNOTATION query { 
+        termQuery("annotates.document_id" -> id)
+      } start offset limit limit
     } map(_.as[(Annotation, Long)].toSeq)
 
   /** Deletes all annotations, geo-tags & version history on a given document **/
@@ -185,7 +188,9 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   /** Retrieves all annotations on a given filepart **/
   def findByFilepartId(id: UUID, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query nestedQuery("annotates").query(termQuery("annotates.filepart_id" -> id.toString)) limit limit
+      search in ES.RECOGITO / ES.ANNOTATION query { 
+        termQuery("annotates.filepart_id" -> id.toString)
+      } limit limit
     } map(_.as[(Annotation, Long)].toSeq)
 
   /** Retrieves annotations on a document last updated after a given timestamp **/
@@ -194,7 +199,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       search in ES.RECOGITO / ES.ANNOTATION query {
         bool {
           must (
-            nestedQuery("annotates").query(termQuery("annotates.document_id" -> documentId))
+            termQuery("annotates.document_id" -> documentId)
           ) filter (
             rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
           )
@@ -262,22 +267,16 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
 
     es.client execute {
       search in ES.RECOGITO / ES.ANNOTATION query {
-        nestedQuery("annotates").query {
-          bool {
-            should {
-              docIds.map(id => termQuery("annotates.document_id" -> id))
-            }
+        bool {
+          should {
+            docIds.map(id => termQuery("annotates.document_id" -> id))
           }
         }
       } aggs {
-        aggregation nested("by_document") path "annotates" aggs (
-          aggregation terms "document_id" field "annotates.document_id"
-        )
+        aggregation terms "by_document" field "annotates.document_id"
       } size numberOfBuckets limit 0
     } map { response =>
-      val byDocument = response.aggregations.get("by_document").asInstanceOf[Nested]
-        .getAggregations.get("document_id").asInstanceOf[Terms]
-
+      val byDocument = response.aggregations.get("by_document").asInstanceOf[Terms]
       val annotatedDocs = byDocument.getBuckets.asScala.map(_.getKeyAsString).toSeq
       val unannotatedDocs = (docIds diff annotatedDocs)
       val docs =
