@@ -30,7 +30,7 @@ class TilingServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitS
 
   private val DEST_DIR = new File("test/resources/transform/tiling/Ptolemy_map_15th_century")
 
-  private val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
+  private val TMP_IDX_DIR = "test/resources/services/place/tmp-idx"
 
   override def afterAll = {
     FileUtils.deleteDirectory(DEST_DIR)

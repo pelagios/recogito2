@@ -1,4 +1,4 @@
-package models.contribution
+package services.contribution
 
 import java.util.UUID
 import services.ContentType
@@ -21,7 +21,7 @@ class ContributionSpec extends Specification {
   "The sample Contribution" should {
     
     "be properly created from JSON" in {
-      val json = Source.fromFile("test/resources/models/contribution/contribution.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/services/contribution/contribution.json").getLines().mkString("\n")
       val result = Json.fromJson[Contribution](Json.parse(json))
             
       // Parsed without errors?

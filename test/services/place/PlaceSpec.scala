@@ -1,4 +1,4 @@
-package models.place
+package services.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import org.specs2.mutable._
@@ -15,7 +15,7 @@ class PlaceSpec extends Specification {
 
   "The sample place" should {
 
-    val json = Source.fromFile("test/resources/models/place/place.json").getLines().mkString("\n")
+    val json = Source.fromFile("test/resources/services/place/place.json").getLines().mkString("\n")
     val parseResult = Json.fromJson[Place](Json.parse(json))
     
     "be properly created from JSON" in {

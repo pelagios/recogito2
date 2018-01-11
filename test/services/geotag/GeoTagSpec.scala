@@ -1,4 +1,4 @@
-package models.geotag
+package services.geotag
 
 import java.util.UUID
 import org.joda.time.{ DateTime, DateTimeZone }
@@ -19,7 +19,7 @@ class GeoTagSpec extends Specification {
   "The sample geotag" should {
     
     "be properly created from JSON" in {
-      val json = Source.fromFile("test/resources/models/geotag/geotag.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/services/geotag/geotag.json").getLines().mkString("\n")
       val result = Json.fromJson[GeoTag](Json.parse(json))
       
       // Parsed without errors?

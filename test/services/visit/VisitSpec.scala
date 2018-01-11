@@ -1,4 +1,4 @@
-package models.visit
+package services.visit
 
 import java.util.UUID
 import services.ContentType
@@ -22,7 +22,7 @@ class VisitSpec extends Specification {
   "The sample Visit" should {
     
     "be properly created from JSON" in {
-      val json = Source.fromFile("test/resources/models/visit/visit.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/services/visit/visit.json").getLines().mkString("\n")
       val result = Json.fromJson[Visit](Json.parse(json))
             
       result.isSuccess must equalTo(true) 

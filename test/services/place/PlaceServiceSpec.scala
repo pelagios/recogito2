@@ -1,4 +1,4 @@
-package models.place
+package services.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import java.io.{ File, FileInputStream }
@@ -27,9 +27,9 @@ class PlaceServiceSpec extends Specification {
   val application = GuiceApplicationBuilder().build()
   implicit val executionContext = application.injector.instanceOf[ExecutionContext]
   
-  private val DARE_RDF = new File("test/resources/models/place/gazetteer_sample_dare.ttl")
+  private val DARE_RDF = new File("test/resources/services/place/gazetteer_sample_dare.ttl")
   
-  private val PLEIADES_RDF = new File("test/resources/models/place/gazetteer_sample_pleiades.ttl")
+  private val PLEIADES_RDF = new File("test/resources/services/place/gazetteer_sample_pleiades.ttl")
   
   val testPlaceService = new TestPlaceService()
   

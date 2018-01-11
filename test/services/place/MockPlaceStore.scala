@@ -1,4 +1,4 @@
-package models.place
+package services.place
 
 import collection.JavaConverters._
 import com.vividsolutions.jts.geom.Coordinate

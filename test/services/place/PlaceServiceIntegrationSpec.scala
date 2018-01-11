@@ -1,4 +1,4 @@
-package models.place
+package services.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import java.io.{ File, FileInputStream }
@@ -24,11 +24,11 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
   // Force Specs2 to execute tests in sequential order
   sequential 
   
-  private val DARE_RDF = new File("test/resources/models/place/gazetteer_sample_dare.ttl")
+  private val DARE_RDF = new File("test/resources/services/place/gazetteer_sample_dare.ttl")
   
-  private val PLEIADES_RDF = new File("test/resources/models/place/gazetteer_sample_pleiades.ttl")
+  private val PLEIADES_RDF = new File("test/resources/services/place/gazetteer_sample_pleiades.ttl")
   
-  private val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
+  private val TMP_IDX_DIR = "test/resources/services/place/tmp-idx"
   
   override def afterAll =
     FileUtils.deleteDirectory(new File(TMP_IDX_DIR))

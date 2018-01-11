@@ -22,7 +22,7 @@ class HasAnnotationValidationSpec extends Specification {
   val validator = new TestAnnotationValidator()
   
   private def loadAnnotation(name: String) =
-    Json.fromJson[Annotation](Json.parse(Source.fromFile("test/resources/models/annotation/" + name).getLines().mkString("\n"))).get
+    Json.fromJson[Annotation](Json.parse(Source.fromFile("test/resources/services/annotation/" + name).getLines().mkString("\n"))).get
 
   val document = new DocumentRecord(
     "98muze1cl3saib",

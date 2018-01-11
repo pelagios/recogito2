@@ -1,4 +1,4 @@
-package models.place
+package services.place
 
 import java.io.File
 import services.geotag.ESGeoTagStore
@@ -26,7 +26,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
   // Force Specs2 to execute tests in sequential order
   sequential 
   
-  val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
+  val TMP_IDX_DIR = "test/resources/services/place/tmp-idx"
   
   override def afterAll =
     FileUtils.deleteDirectory(new File(TMP_IDX_DIR))

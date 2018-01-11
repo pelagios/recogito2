@@ -1,4 +1,4 @@
-package models.annotation
+package services.annotation
 
 import java.util.UUID
 import services.ContentType
@@ -20,7 +20,7 @@ class AnnotationSpec extends Specification {
   "The sample text annotation" should {
     
     "be properly created from JSON" in {
-      val json = Source.fromFile("test/resources/models/annotation/text-annotation.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/services/annotation/text-annotation.json").getLines().mkString("\n")
       val result = Json.fromJson[Annotation](Json.parse(json))
       
       // Parsed without errors?
@@ -49,7 +49,7 @@ class AnnotationSpec extends Specification {
   "The sample image annotation" should {
     
     "be properly created from JSON" in {
-      val json = Source.fromFile("test/resources/models/annotation/image-annotation.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/services/annotation/image-annotation.json").getLines().mkString("\n")
       val result = Json.fromJson[Annotation](Json.parse(json))
       
       // Parsed without errors?

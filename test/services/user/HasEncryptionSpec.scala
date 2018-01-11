@@ -1,4 +1,4 @@
-package models.user
+package services.user
 
 import controllers.HasConfig
 import play.api.Configuration

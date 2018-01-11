@@ -1,4 +1,4 @@
-package models.place.crosswalks
+package services.place.crosswalks
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import java.io.{ File, FileInputStream }
@@ -12,7 +12,7 @@ import play.api.test.Helpers._
 @RunWith(classOf[JUnitRunner])
 class PelagiosRDFCrosswalkSpec extends Specification {
 
-  private val GAZETTEER_RDF = new File("test/resources/models/place/gazetteer_sample_pleiades.ttl")
+  private val GAZETTEER_RDF = new File("test/resources/services/place/gazetteer_sample_pleiades.ttl")
   
   "The Pelagios Gazetter RDF crosswalk" should {
     

@@ -1,4 +1,4 @@
-package models.geotag
+package services.geotag
 
 import java.io.File
 import java.util.UUID
@@ -28,7 +28,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
   
   override def afterAll = FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
   
-  private val TMP_IDX_DIR = "test/resources/models/place/tmp-idx"
+  private val TMP_IDX_DIR = "test/resources/services/place/tmp-idx"
   
   val now = DateTime.now().withMillisOfSecond(0).withZone(DateTimeZone.UTC)
   
@@ -140,10 +140,10 @@ class GeoTagStoreSpec extends Specification with AfterAll {
     "After creating 2 annotations with 1 geotag each, the GeoTagService" should {
       
       "contain 2 correct geotags" in {  
-        Await.result(places.importRecords(PelagiosRDFCrosswalk.readFile(new File("test/resources/models/place/gazetteer_sample_dare.ttl"))), 10 seconds)
+        Await.result(places.importRecords(PelagiosRDFCrosswalk.readFile(new File("test/resources/services/place/gazetteer_sample_dare.ttl"))), 10 seconds)
         flush()
       
-        Await.result(places.importRecords(PelagiosRDFCrosswalk.readFile(new File( "test/resources/models/place/gazetteer_sample_pleiades.ttl"))), 10 seconds)
+        Await.result(places.importRecords(PelagiosRDFCrosswalk.readFile(new File( "test/resources/services/place/gazetteer_sample_pleiades.ttl"))), 10 seconds)
         flush()
       
         val (successInsertBarcelona, _, _) = insertAnnotation(annotatesBarcelona)
