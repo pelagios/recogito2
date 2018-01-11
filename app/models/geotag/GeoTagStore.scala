@@ -4,7 +4,7 @@ import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import java.util.UUID
-import models.{HasTryToEither, Page}
+import models.Page
 import models.annotation.{Annotation, AnnotationBody}
 import models.place.{ESPlaceStore, Place, PlaceStore}
 import org.apache.lucene.search.join.ScoreMode
@@ -13,9 +13,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{Future, ExecutionContext}
 import scala.language.{postfixOps, reflectiveCalls}
-import scala.util.Try
 import storage.{ES, HasES}
-import models.HasTryToEither
 
 trait GeoTagStore extends PlaceStore {
 
@@ -50,18 +48,15 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   implicit object GeoTagIndexable extends Indexable[GeoTag] {
     override def json(link: GeoTag): String = Json.stringify(Json.toJson(link))
   }
-
-  implicit object GeoTagHitReader extends HitReader[(GeoTag, String, String)] with HasTryToEither {
-    override def read(hit: Hit): Either[Throwable, (GeoTag, String, String)] = {
+  
+  /** Helper to extract not just the GeoTags, but also document Id and parent Id **/
+  def toGeoTag(response: RichSearchResponse): Seq[(GeoTag, String, String)] =
+    response.hits.map{ hit =>
       val id = hit.id
-      val parent = hit.sourceField("_parent").toString
-
-      play.api.Logger.info(s"parent: ${parent}")
-
-      Try(Json.fromJson[GeoTag](Json.parse(hit.sourceAsString)).get)
-        .map((_, id, parent))
+      val parent = hit.java.field("_parent").value[String]
+      val geotag = Json.fromJson[GeoTag](Json.parse(hit.sourceAsString)).get
+      (geotag, id, parent)
     }
-  }
 
   override def totalGeoTags()(implicit context: ExecutionContext): Future[Long] =
     es.client execute {
@@ -162,7 +157,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     def rewriteBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] = {
        val total = response.totalHits
-       val tags = response.to[(GeoTag, String, String)].toSeq
+       val tags = toGeoTag(response)
 
        if (tags.isEmpty) {
          Future.successful(true)
@@ -224,7 +219,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       search in ES.RECOGITO / ES.GEOTAG query {
         termQuery("annotation_id", annotationId)
       }
-    } map { _.to[(GeoTag, String, String)].toSeq }
+    } map { toGeoTag(_) }
 
   /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
   override def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
@@ -239,7 +234,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         search in ES.RECOGITO / ES.GEOTAG query {
           termQuery("document_id" -> documentId)
         }
-      } map { _.to[(GeoTag, String, String)].map(t => (t._2, t._3)) }
+      } map { toGeoTag(_).map(t => (t._2, t._3)) }
 
     findIdsForDoc(documentId).flatMap(bulkDelete(_))
   }

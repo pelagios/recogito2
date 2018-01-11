@@ -216,10 +216,6 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       val byUser = response.aggregations.termsResult("by_user")
       val byAction = response.aggregations.termsResult("by_action")
       val byItemType = response.aggregations.termsResult("by_item_type")
-      
-      //  Execution exception[[ClassCastException: org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram cannot be cast to 
-      // org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram]]
-
       val contributionHistory = response.aggregations.getAs[InternalFilter]("contribution_history")
         .getAggregations.get("last_30_days").asInstanceOf[InternalDateHistogram]
 
