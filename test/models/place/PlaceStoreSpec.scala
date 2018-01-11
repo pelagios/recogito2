@@ -3,21 +3,19 @@ package models.place
 import java.io.File
 import models.geotag.ESGeoTagStore
 import org.apache.commons.io.FileUtils
-import org.joda.time.{ DateTime, DateTimeZone }
+import org.joda.time.{DateTime, DateTimeZone}
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.specs2.specification.AfterAll
 import org.junit.runner._
-import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.{Logger, Play}
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test._
 import play.api.test.Helpers._
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
-import storage.{ ES, HasES }
+import storage.{ES, HasES}
 import scala.util.Random
-import play.api.Play
-import play.api.inject.guice.GuiceApplicationBuilder
 
 // So we can instantiate an ElasticSearch place store
 class TestPlaceStore(val es: ES) extends ESPlaceStore with HasES with ESGeoTagStore
@@ -55,6 +53,8 @@ class PlaceStoreSpec extends Specification with AfterAll {
   }
   
   val application = GuiceApplicationBuilder().configure("recogito.index.dir" -> TMP_IDX_DIR).build()
+  
+  implicit val executionContext = application.injector.instanceOf[ExecutionContext]
  
   val es = application.injector.instanceOf(classOf[ES])
  

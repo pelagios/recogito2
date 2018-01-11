@@ -33,8 +33,6 @@ libraryDependencies ++= Seq(
 
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.6.1",
   "com.sksamuel.elastic4s" %% "elastic4s-tcp" % "5.6.1",
-  // "com.sksamuel.elastic4s" %% "elastic4s-embedded" % "6.1.2" % "test",
-  // "com.sksamuel.elastic4s" %% "elastic4s-testkit" % "6.1.2" % "test",
 
   "com.typesafe.akka" %% "akka-contrib" % "2.5.8",
   "com.typesafe.akka" %% "akka-testkit" % "2.5.8" % "test",
@@ -95,9 +93,7 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "timeago" % "1.4.1",
   "org.webjars.npm" % "chartist" % "0.9.8",
 
-  specs2 % Test,
-
-  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
+  specs2 % Test
 )
 
 // Play provides two styles of routers, one expects its actions to be injected, the

@@ -9,14 +9,17 @@ import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.Await
+import play.api.inject.guice.GuiceApplicationBuilder
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import scala.io.Source
 import models.annotation.AnnotationBody
 
 @RunWith(classOf[JUnitRunner])
 class TEIParserServiceSpec extends Specification {
+  
+  val application = GuiceApplicationBuilder().build()
+  implicit val executionContext = application.injector.instanceOf[ExecutionContext]
 
   val TEST_FILEPART_RECORD = new DocumentFilepartRecord(
     UUID.randomUUID,

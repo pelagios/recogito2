@@ -9,10 +9,9 @@ import org.specs2.runner._
 import org.specs2.specification.AfterAll
 import org.junit.runner._
 import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.test._
 import play.api.test.Helpers._
-import scala.concurrent.Await
+import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import storage.ES
 import play.api.Play
@@ -35,6 +34,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
     FileUtils.deleteDirectory(new File(TMP_IDX_DIR))
     
   val application = GuiceApplicationBuilder().configure("recogito.index.dir" -> TMP_IDX_DIR).build()
+  implicit val executionContext = application.injector.instanceOf[ExecutionContext]
   val es = application.injector.instanceOf(classOf[ES])
   val places = application.injector.instanceOf(classOf[PlaceService])
 
