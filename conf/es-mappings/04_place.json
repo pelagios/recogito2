@@ -2,7 +2,7 @@
   "place": {
     "dynamic": "false",
     "properties": {
-      "id": { "type": "string", "index": "not_analyzed" },
+      "id": { "type": "keyword" },
       "representative_point": { "type": "geo_point" },
       "temporal_bounds_union": {
         "properties": {
@@ -11,33 +11,32 @@
         }
       },
       "is_conflation_of": {
-        "dynamic": "false",
         "properties": {
-          "uri": { "type": "string", "index": "not_analyzed" },
-          "source_gazetteer": { "type": "string", "index": "not_analyzed" },
+          "uri": { "type": "keyword" },
+          "source_gazetteer": { "type": "keyword" },
           "last_sync_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
           "last_changed_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
           "title": {
-            "type": "string",
+            "type": "text",
             "fields": {
-               "raw": { "type": "string", "analyzer":"lowercase_keyword" }
+               "raw": { "type": "text", "analyzer":"lowercase_keyword" }
             }
           },
           "descriptions": {
             "properties": {
-              "description": { "type": "string" },
-              "language": { "type": "string", "index": "not_analyzed" }
+              "description": { "type": "text" },
+              "language": { "type": "keyword" }
             }
           },
           "names": {
             "properties": {
               "name": {
-                "type": "string",
+                "type": "text",
                 "fields": {
-                  "raw": { "type": "string", "analyzer":"lowercase_keyword" }
+                  "raw": { "type": "text", "analyzer":"lowercase_keyword" }
                 }
               },
-              "language": { "type": "string", "index": "not_analyzed" }
+              "language": { "type": "keyword" }
             }
           },
           "temporal_bounds": {
@@ -46,9 +45,9 @@
               "to": { "type": "date", "format": "yyyy-MM-dd" }
             }
           },
-          "place_types": { "type": "string", "index": "not_analyzed" },
-          "close_matches": { "type": "string", "index": "not_analyzed" },
-          "exact_matches": { "type": "string", "index": "not_analyzed" }
+          "place_types": { "type": "keyword" },
+          "close_matches": { "type": "keyword" },
+          "exact_matches": { "type": "keyword" }
         }
       }
     }

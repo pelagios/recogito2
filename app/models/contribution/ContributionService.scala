@@ -1,21 +1,21 @@
 package models.contribution
 
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
+import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.source.Indexable
-import javax.inject.{ Inject, Singleton }
-import models.{ HasDate, Page }
-import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
-import org.elasticsearch.search.aggregations.bucket.terms.Terms
-import org.elasticsearch.search.aggregations.bucket.histogram.{ DateHistogramInterval, InternalHistogram }
+import javax.inject.{Inject, Singleton}
+import models.{HasDate, HasTryToEither, Page}
 import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.{ DateTime, DateTimeZone }
+import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
+import org.elasticsearch.search.aggregations.bucket.histogram.{DateHistogramInterval, InternalDateHistogram}
+import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
-import play.api.libs.json.{ JsSuccess, Json }
+import play.api.libs.json.{JsSuccess, Json}
 import scala.collection.JavaConverters._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.reflectiveCalls
+import scala.util.Try
 import storage.ES
+import models.HasTryToEither
 
 @Singleton
 class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasDate {
@@ -24,9 +24,9 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     override def json(c: Contribution): String = Json.stringify(Json.toJson(c))
   }
 
-  implicit object ContributionHitAs extends HitAs[(Contribution, String)] {
-    override def as(hit: RichSearchHit): (Contribution, String) =
-      (Json.fromJson[Contribution](Json.parse(hit.sourceAsString)).get, hit.id)
+  implicit object ContributionHitReader extends HitReader[(Contribution, String)] with HasTryToEither {
+    override def read(hit: Hit): Either[Throwable, (Contribution, String)] =
+      Try(Json.fromJson[Contribution](Json.parse(hit.sourceAsString)).get, hit.id)
   }
 
   /** Inserts a contribution record into the index **/
@@ -34,7 +34,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     es.client execute {
       index into ES.RECOGITO / ES.CONTRIBUTION source contribution
     } map {
-      _.isCreated
+      _.created
     } recover { case t: Throwable =>
       Logger.error("Error recording contribution event")
       Logger.error(contribution.toString)
@@ -70,7 +70,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         field sort "made_at" order SortOrder.DESC
       ) limit n
     } map { response =>
-      response.as[(Contribution, String)].toSeq.map(_._1)
+      response.to[(Contribution, String)].toSeq.map(_._1)
     }
 
   /** Returns the contribution history on a given document, as a paged result **/
@@ -82,7 +82,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         field sort "made_at" order SortOrder.DESC
       ) start offset limit limit
     } map { response =>
-      val contributionsWithId = response.as[(Contribution, String)].toSeq
+      val contributionsWithId = response.to[(Contribution, String)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, contributionsWithId)
     }
 
@@ -134,7 +134,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
           must (
             termQuery("affects_item.document_id" -> documentId)
           ) filter (
-            rangeQuery("made_at").from(formatDate(after)).includeLower(false)
+            rangeQuery("made_at").gt(formatDate(after))
           )
         }
       } limit ES.MAX_SIZE
@@ -142,7 +142,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
 
     findContributionsAfter().flatMap { hits =>
       if (hits.size > 0) {
-        es.client.client.prepareBulk()
+        es.client.java.prepareBulk()
         es.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
         } map {
@@ -174,7 +174,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
 
     findContributions.flatMap { hits =>
       if (hits.size > 0) {
-        es.client.client.prepareBulk()
+        es.client.java.prepareBulk()
         es.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
         } map { response =>
@@ -196,11 +196,11 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     es.client execute {
       search in ES.RECOGITO / ES.CONTRIBUTION query {
         constantScoreQuery {
-          filter(rangeQuery("made_at") from "now-24h")
+          filter(rangeQuery("made_at").gt("now-24h"))
         }
       } size 0
     } map { _.totalHits }
-
+    
   /** Returns the system-wide contribution stats **/
   def getGlobalStats(): Future[ContributionStats] =
     es.client execute {
@@ -208,17 +208,20 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         aggregation terms "by_user" field "made_by",
         aggregation terms "by_action" field "action",
         aggregation terms "by_item_type" field "affects_item.item_type",
-        aggregation filter "contribution_history" filter (rangeQuery("made_at") from "now-30d") aggs (
+        aggregation filter "contribution_history" query rangeQuery("made_at").gt("now-30d") subaggs (
            aggregation datehistogram "last_30_days" field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
         )
       ) limit 0
     } map { response =>
-      val byUser = response.aggregations.get("by_user").asInstanceOf[Terms]
-      val byAction = response.aggregations.get("by_action").asInstanceOf[Terms]
-      val byItemType = response.aggregations.get("by_item_type").asInstanceOf[Terms]
+      val byUser = response.aggregations.termsResult("by_user")
+      val byAction = response.aggregations.termsResult("by_action")
+      val byItemType = response.aggregations.termsResult("by_item_type")
+      
+      //  Execution exception[[ClassCastException: org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram cannot be cast to 
+      // org.elasticsearch.search.aggregations.bucket.histogram.InternalHistogram]]
 
-      val contributionHistory = response.aggregations.get("contribution_history").asInstanceOf[InternalFilter]
-        .getAggregations.get("last_30_days").asInstanceOf[InternalHistogram[InternalHistogram.Bucket]]
+      val contributionHistory = response.aggregations.getAs[InternalFilter]("contribution_history")
+        .getAggregations.get("last_30_days").asInstanceOf[InternalDateHistogram]
 
       ContributionStats(
         response.getTookInMillis,

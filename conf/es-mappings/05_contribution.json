@@ -1,23 +1,24 @@
 {
   "contribution": {
+    "dynamic": "false",
     "properties": {
-      "action": { "type": "string", "index": "not_analyzed" },
-      "made_by": { "type": "string", "index": "not_analyzed" },
+      "action": { "type": "keyword" },
+      "made_by": { "type": "keyword" },
       "made_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
       "affects_item": {
         "properties": {
-          "item_type": { "type": "string", "index": "not_analyzed" },
-          "document_id": { "type": "string", "index": "not_analyzed" },
-          "document_owner": { "type": "string", "index": "not_analyzed" },
-          "filepart_id": { "type": "string", "index": "not_analyzed" },
-          "content_type": { "type": "string", "index": "not_analyzed" },
-          "annotation_id": { "type": "string", "index": "not_analyzed" },
-          "annotation_version_id": { "type": "string", "index": "not_analyzed" },
-          "value_before": { "type": "string" },
-          "value_after": { "type": "string" }
+          "item_type": { "type": "keyword" },
+          "document_id": { "type": "keyword" },
+          "document_owner": { "type": "keyword" },
+          "filepart_id": { "type": "keyword" },
+          "content_type": { "type": "keyword" },
+          "annotation_id": { "type": "keyword" },
+          "annotation_version_id": { "type": "keyword" },
+          "value_before": { "type": "text" },
+          "value_after": { "type": "text" }
         }
       },
-      "affects_users": { "type": "string", "index": "not_analyzed" }
+      "affects_users": { "type": "keyword" }
     }
   }
 }

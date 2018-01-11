@@ -1,18 +1,21 @@
 package models.geotag
 
+import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit, RichSearchResponse }
-import com.sksamuel.elastic4s.source.Indexable
+import com.sksamuel.elastic4s.searches.RichSearchResponse
 import java.util.UUID
-import models.Page
-import models.annotation.{ Annotation, AnnotationBody }
-import models.place.{ ESPlaceStore, Place, PlaceStore }
+import models.{HasTryToEither, Page}
+import models.annotation.{Annotation, AnnotationBody}
+import models.place.{ESPlaceStore, Place, PlaceStore}
+import org.apache.lucene.search.join.ScoreMode
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
-import scala.concurrent.{ Future, ExecutionContext }
-import scala.language.{ postfixOps, reflectiveCalls }
-import storage.{ ES, HasES }
+import scala.concurrent.{Future, ExecutionContext}
+import scala.language.{postfixOps, reflectiveCalls}
+import scala.util.Try
+import storage.{ES, HasES}
+import models.HasTryToEither
 
 trait GeoTagStore extends PlaceStore {
 
@@ -48,18 +51,21 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     override def json(link: GeoTag): String = Json.stringify(Json.toJson(link))
   }
 
-  implicit object GeoTagHitAs extends HitAs[(GeoTag, String, String)] {
-    override def as(hit: RichSearchHit): (GeoTag, String, String) = {
+  implicit object GeoTagHitReader extends HitReader[(GeoTag, String, String)] with HasTryToEither {
+    override def read(hit: Hit): Either[Throwable, (GeoTag, String, String)] = {
       val id = hit.id
-      val parent = hit.field("_parent").value[String]
-      val geoTag = Json.fromJson[GeoTag](Json.parse(hit.sourceAsString)).get
-      (geoTag, id, parent)
+      val parent = hit.sourceField("_parent").toString
+
+      play.api.Logger.info(s"parent: ${parent}")
+
+      Try(Json.fromJson[GeoTag](Json.parse(hit.sourceAsString)).get)
+        .map((_, id, parent))
     }
   }
 
   override def totalGeoTags()(implicit context: ExecutionContext): Future[Long] =
     es.client execute {
-      search in ES.RECOGITO -> ES.GEOTAG limit 0
+      search in ES.RECOGITO / ES.GEOTAG limit 0
     } map { _.getHits.getTotalHits }
 
   /** Helper used by insertOrUpdate method to build the geotags from the annotation bodies **/
@@ -102,7 +108,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   override def insertOrUpdateGeoTagsForAnnotation(annotation: Annotation)(implicit context: ExecutionContext): Future[Boolean] = {
 
     def insertGeoTags(tags: Seq[(GeoTag, String)]): Future[Boolean] = {
-      es.client.client.prepareBulk()
+      es.client.java.prepareBulk()
       es.client execute {
         bulk ( tags.map(tag => index into ES.RECOGITO / ES.GEOTAG source tag._1 parent tag._2) )
       } map { response =>
@@ -142,7 +148,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       if (oldParent.id != newParent.id) {
         Logger.debug("Rewriting geotag reference: " + tag.gazetteerUri)
         // https://stackoverflow.com/questions/35758990/out-of-memory-in-elasticsearch
-        es.client.client.prepareBulk()
+        es.client.java.prepareBulk()
         es.client execute {
           bulk (
             delete id id from ES.RECOGITO / ES.GEOTAG parent parent,
@@ -156,7 +162,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     def rewriteBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] = {
        val total = response.totalHits
-       val tags = response.as[(GeoTag, String, String)].toSeq
+       val tags = response.to[(GeoTag, String, String)].toSeq
 
        if (tags.isEmpty) {
          Future.successful(true)
@@ -180,7 +186,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         search in ES.RECOGITO / ES.GEOTAG query {
           bool {
             should (
-              placesBeforeUpdate.map { place => hasParentQuery(ES.PLACE).query { termQuery("id", place.id) } }
+              placesBeforeUpdate.map { place => hasParentQuery(ES.PLACE).query { termQuery("id", place.id) } scoreMode false }
             )
           }
         } limit 50 scroll "5m"
@@ -199,7 +205,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       // Nothing to delete
       Future.successful(true)
     } else {
-      es.client.client.prepareBulk()
+      es.client.java.prepareBulk()
       es.client execute {
         bulk ( idsAndParents.map { case (tagId, parentId) => delete id tagId from ES.RECOGITO / ES.GEOTAG parent parentId } )
       } map { response =>
@@ -218,7 +224,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       search in ES.RECOGITO / ES.GEOTAG query {
         termQuery("annotation_id", annotationId)
       }
-    } map { _.as[(GeoTag, String, String)].toSeq }
+    } map { _.to[(GeoTag, String, String)].toSeq }
 
   /** Unfortunately, ElasticSearch doesn't support delete-by-query directly, so this is a two-step-process **/
   override def deleteGeoTagsByAnnotation(annotationId: UUID)(implicit context: ExecutionContext): Future[Boolean] =
@@ -233,7 +239,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         search in ES.RECOGITO / ES.GEOTAG query {
           termQuery("document_id" -> documentId)
         }
-      } map { _.as[(GeoTag, String, String)].map(t => (t._2, t._3)) }
+      } map { _.to[(GeoTag, String, String)].map(t => (t._2, t._3)) }
 
     findIdsForDoc(documentId).flatMap(bulkDelete(_))
   }
@@ -246,10 +252,10 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
       search in ES.RECOGITO / ES.PLACE query {
         hasChildQuery(ES.GEOTAG).query {
           termQuery("document_id", docId)
-        }
+        } scoreMode(ScoreMode.Avg)
       } start offset limit limit
     } map { response =>
-      val places = response.as[(Place, Long)]
+      val places = response.to[(Place, Long)]
       Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, places)
     }
 
@@ -268,7 +274,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
                 // ...names...
                 matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0),
                 matchQuery("is_conflation_of.names.name", q),
-                
+
                 // ...and descriptions (with lower boost)
                 matchQuery("is_conflation_of.descriptions.description", q).boost(0.2)
               )
@@ -276,13 +282,13 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
             hasChildQuery(ES.GEOTAG).query {
               termQuery("document_id", docId)
-            }
+            } scoreMode ScoreMode.Avg
           )
         }
       } start offset limit limit
     } map { response =>
-      val places = response.as[(Place, Long)].toSeq
-      Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, places)
+      val places = response.to[(Place, Long)].toSeq
+      Page(response.getTook.getMillis, response.totalHits, offset, limit, places)
     }
 
 }

@@ -1,33 +1,34 @@
 package models.visit
 
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
+import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.source.Indexable
 import javax.inject.{ Inject, Singleton }
+import models.HasTryToEither
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ Future, ExecutionContext }
+import scala.util.Try
 import storage.ES
+import play.api.libs.json.JsSuccess
+import play.api.libs.json.JsError
 
 @Singleton
 class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) {
-  
+ 
   implicit object VisitIndexable extends Indexable[Visit] {
     override def json(v: Visit): String = Json.stringify(Json.toJson(v))
   }
 
-  implicit object VisitHitAs extends HitAs[Visit] {
-    override def as(hit: RichSearchHit): Visit =
-      Json.fromJson[Visit](Json.parse(hit.sourceAsString)).get
+  implicit object VisitHitReader extends HitReader[Visit] with HasTryToEither {
+    override def read(hit: Hit): Either[Throwable, Visit] =
+      Try(Json.fromJson[Visit](Json.parse(hit.sourceAsString)).get)
   }
   
   def insertVisit(visit: Visit): Future[Unit] =
     es.client execute {
-      index into ES.RECOGITO / ES.VISIT source visit
-    } map { _ => 
+      indexInto(ES.RECOGITO / ES.VISIT).doc(visit)
+    } map { _ =>
     } recover { case t: Throwable =>
-      Logger.error("Error logging visit event")
-      Logger.error(visit.toString)
       t.printStackTrace
     }
     

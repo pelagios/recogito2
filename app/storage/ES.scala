@@ -1,7 +1,7 @@
 package storage
 
 import com.google.inject.AbstractModule
-import com.sksamuel.elastic4s.{ ElasticClient, ElasticsearchClientUri }
+import com.sksamuel.elastic4s.{ElasticsearchClientUri, TcpClient}
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
 import javax.inject.{ Inject, Singleton }
@@ -62,7 +62,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
     
     val host = config.getOptional[String]("es.host").getOrElse("localhost")
     val port = config.getOptional[Int]("es.port").getOrElse(9300)
-    val remoteClient = ElasticClient.transport(ElasticsearchClientUri(host, port))
+    val remoteClient = TcpClient.transport(ElasticsearchClientUri(host, port))
     
     // Just fetch cluster stats to see if there's a cluster at all
     Try(
@@ -76,9 +76,9 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
       }
         
       case Failure(_) => {
-        // No ES cluster available - instantiate a local client
+        /* No ES cluster available - instantiate a local client
         val settings =
-          Settings.settingsBuilder()
+          Settings.builder()
             .put("http.enabled", true)
             .put("path.home", home.getAbsolutePath)
         
@@ -90,6 +90,8 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
         // relevant in dev mode, anyway)
         Thread.sleep(1000)
         client
+        */
+        throw new RuntimeException("Local fallback no longer supported. Please ensure you have a working ElasticSearch installation.")
       }
     }
   }
@@ -100,11 +102,11 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
     
     if (response.isExists()) {
       // Index exists - create missing mappings as needed
-      val list = client.admin.indices().prepareGetMappings()
+      val list = client.java.admin.indices().prepareGetMappings()
       val existingMappings = list.execute().actionGet().getMappings().get(ES.RECOGITO).keys.toArray.map(_.toString)
       loadMappings(existingMappings).foreach { case (name, json) =>
         Logger.info("Recreating mapping " + name)
-        val putMapping = client.admin.indices().preparePutMapping(ES.RECOGITO)
+        val putMapping = client.java.admin.indices().preparePutMapping(ES.RECOGITO)
         putMapping.setType(name)
         putMapping.setSource(json)
         putMapping.execute().actionGet()
@@ -113,7 +115,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
       // No index - create index with all mappings
       Logger.info("No ES index - initializing...")
       
-      val create = client.admin.indices().prepareCreate(ES.RECOGITO) 
+      val create = client.java.admin.indices().prepareCreate(ES.RECOGITO) 
       create.setSettings(loadSettings())
       
       loadMappings().foreach { case (name, json) =>  { 

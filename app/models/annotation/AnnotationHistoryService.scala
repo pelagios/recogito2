@@ -1,18 +1,17 @@
 package models.annotation
 
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
+import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
-import models.HasDate
+import models.{HasDate, HasTryToEither}
 import org.elasticsearch.search.sort.SortOrder
-import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.reflectiveCalls
+import scala.util.Try
 import storage.ES
 
 trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self: AnnotationHistoryService =>
@@ -21,9 +20,9 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
     override def json(a: AnnotationHistoryRecord): String = Json.stringify(Json.toJson(a))
   }
 
-  implicit object AnnotationHistoryRecordHitAs extends HitAs[AnnotationHistoryRecord] {
-    override def as(hit: RichSearchHit): AnnotationHistoryRecord =
-      Json.fromJson[AnnotationHistoryRecord](Json.parse(hit.sourceAsString)).get
+  implicit object AnnotationHistoryRecordHitReader extends HitReader[AnnotationHistoryRecord] with HasTryToEither {
+    override def read(hit: Hit): Either[Throwable, AnnotationHistoryRecord] =
+      Try(Json.fromJson[AnnotationHistoryRecord](Json.parse(hit.sourceAsString)).get)
   }
 
   /** Inserts a new version into the history index **/
@@ -31,7 +30,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
     es.client execute {
       index into ES.RECOGITO / ES.ANNOTATION_HISTORY source AnnotationHistoryRecord.forVersion(annotation)
     } map {
-      _.isCreated
+      _.created
     } recover { case t: Throwable =>
       Logger.error("Error storing annotation version")
       Logger.error(t.toString)
@@ -44,7 +43,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
     es.client execute {
       index into ES.RECOGITO / ES.ANNOTATION_HISTORY source AnnotationHistoryRecord.forDelete(annotation, deletedBy, deletedAt)
     } map {
-      _.isCreated
+      _.created
     } recover { case t: Throwable =>
       Logger.error("Error storing delete marker")
       Logger.error(t.toString)
@@ -60,15 +59,14 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
           must (
             termQuery("annotates.document_id" -> docId)
           ) filter (
-            rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
+            rangeQuery("last_modified_at").gt(formatDate(after))
           )
         }
       } aggs {
         aggregation terms "by_annotation_id" field "annotation_id" size ES.MAX_SIZE
       }
     } map { response =>
-      response
-        .aggregations.get("by_annotation_id").asInstanceOf[Terms]
+      response.aggregations.termsResult("by_annotation_id")
         .getBuckets.asScala.map(_.getKeyAsString)
     }
 
@@ -85,7 +83,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
       } sort {
         field sort "last_modified_at" order SortOrder.DESC
       } limit 1
-    } map { _.as[AnnotationHistoryRecord].toSeq.headOption }
+    } map { _.to[AnnotationHistoryRecord].toSeq.headOption }
 
   /** Deletes all history records (versions and delete markers) for a document, after a given timestamp **/
   def deleteHistoryRecordsAfter(docId: String, after: DateTime)(implicit es: ES, context: ExecutionContext): Future[Boolean] = {
@@ -97,7 +95,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
           must (
             termQuery("annotates.document_id" -> docId)
           ) filter (
-            rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
+            rangeQuery("last_modified_at").gt(formatDate(after))
           )
         }
       } limit ES.MAX_SIZE
@@ -105,7 +103,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
 
     findHistoryRecordsAfter().flatMap { hits =>
       if (hits.size > 0) {
-        es.client.client.prepareBulk()
+        es.client.java.prepareBulk()
         es.client execute {
           bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.ANNOTATION_HISTORY))
         } map {
@@ -131,7 +129,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
 
     findRecords.flatMap { hits =>
       if (hits.size > 0) {
-        es.client.client.prepareBulk()
+        es.client.java.prepareBulk()
         es.client execute {
           bulk (hits.map(h => delete id h.getId from ES.RECOGITO / ES.ANNOTATION_HISTORY))
         } map { response =>

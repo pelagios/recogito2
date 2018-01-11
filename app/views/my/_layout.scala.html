@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     @Html(webJarsUtil.script("jquery.timeago.js"))
-    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/my/index.js")))
+    <script data-main="@routes.Assets.versioned("javascripts/my/index.js")" src="@webJarsUtil.url("requirejs", "require.min.js").get"></script>
   </head>
   <body>
     <div class="page-header">

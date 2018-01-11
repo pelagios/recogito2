@@ -1,18 +1,18 @@
 package models.annotation
 
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
+import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.source.Indexable
 import java.util.UUID
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
+import models.HasTryToEither
 import models.geotag.ESGeoTagStore
-import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.language.{ reflectiveCalls, postfixOps }
-import storage.{ ES, HasES }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.language.{reflectiveCalls, postfixOps}
+import scala.util.Try
+import storage.{ES, HasES}
 
 /** Encapsulates JSON (de-)serialization so we can add it to Annotation- and AnnotationHistoryService **/
 trait HasAnnotationIndexing {
@@ -21,9 +21,9 @@ trait HasAnnotationIndexing {
     override def json(a: Annotation): String = Json.stringify(Json.toJson(a))
   }
 
-  implicit object AnnotationHitAs extends HitAs[(Annotation, Long)] {
-    override def as(hit: RichSearchHit): (Annotation, Long) =
-      (Json.fromJson[Annotation](Json.parse(hit.sourceAsString)).get, hit.version)
+  implicit object AnnotationHitReader extends HitReader[(Annotation, Long)] with HasTryToEither {
+    override def read(hit: Hit): Either[Throwable, (Annotation, Long)] =
+      Try(Json.fromJson[Annotation](Json.parse(hit.sourceAsString)).get, hit.version)
   }
 
 }
@@ -43,9 +43,9 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
     // the internal ElasticSearch version number
     def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] =
       es.client execute {
-        update id a.annotationId in ES.RECOGITO / ES.ANNOTATION source a docAsUpsert
+        update id a.annotationId.toString in ES.RECOGITO / ES.ANNOTATION docAsUpsert a
       } map { r =>
-        (true, r.getVersion)
+        (true, r.version)
       } recover { case t: Throwable =>
         Logger.error("Error indexing annotation " + annotation.annotationId + ": " + t.getMessage)
         t.printStackTrace
@@ -142,25 +142,25 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   def countByDocId(id: String): Future[Long] =
     es.client execute {
       search in ES.RECOGITO / ES.ANNOTATION query {
-        termQuery("annotates.document_id" -> id) 
+        termQuery("annotates.document_id" -> id)
       } limit 0
     } map { _.totalHits }
 
   /** Retrieves all annotations on a given document **/
   def findByDocId(id: String, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query { 
+      search in ES.RECOGITO / ES.ANNOTATION query {
         termQuery("annotates.document_id" -> id)
       } start offset limit limit
-    } map(_.as[(Annotation, Long)].toSeq)
+    } map(_.to[(Annotation, Long)].toSeq)
 
   /** Deletes all annotations, geo-tags & version history on a given document **/
   def deleteByDocId(docId: String): Future[Boolean] = {
     val deleteAnnotations = findByDocId(docId).flatMap { annotationsAndVersions =>
       if (annotationsAndVersions.size > 0) {
-        es.client.client.prepareBulk()
+        es.client.java.prepareBulk()
         es.client execute {
-          bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId from ES.RECOGITO / ES.ANNOTATION } )
+          bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId.toString from ES.RECOGITO / ES.ANNOTATION } )
         } map { response =>
           if (response.hasFailures)
             Logger.error("Failures while deleting annotations: " + response.failureMessage)
@@ -188,10 +188,10 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   /** Retrieves all annotations on a given filepart **/
   def findByFilepartId(id: UUID, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query { 
+      search in ES.RECOGITO / ES.ANNOTATION query {
         termQuery("annotates.filepart_id" -> id.toString)
       } limit limit
-    } map(_.as[(Annotation, Long)].toSeq)
+    } map(_.to[(Annotation, Long)].toSeq)
 
   /** Retrieves annotations on a document last updated after a given timestamp **/
   def findModifiedAfter(documentId: String, after: DateTime): Future[Seq[Annotation]] =
@@ -201,11 +201,11 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
           must (
             termQuery("annotates.document_id" -> documentId)
           ) filter (
-            rangeQuery("last_modified_at").from(formatDate(after)).includeLower(false)
+            rangeQuery("last_modified_at").gt(formatDate(after))
           )
         }
       } limit ES.MAX_SIZE
-    } map { _.as[(Annotation, Long)].toSeq.map(_._1) }
+    } map { _.to[(Annotation, Long)].toSeq.map(_._1) }
 
   /** Rolls back the document to the state at the given timestamp **/
   def rollbackToTimestamp(documentId: String, timestamp: DateTime): Future[Boolean] = {
@@ -276,7 +276,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         aggregation terms "by_document" field "annotates.document_id"
       } size numberOfBuckets limit 0
     } map { response =>
-      val byDocument = response.aggregations.get("by_document").asInstanceOf[Terms]
+      val byDocument = response.aggregations.termsResult("by_document")
       val annotatedDocs = byDocument.getBuckets.asScala.map(_.getKeyAsString).toSeq
       val unannotatedDocs = (docIds diff annotatedDocs)
       val docs =

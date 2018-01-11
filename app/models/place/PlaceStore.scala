@@ -1,19 +1,20 @@
 package models.place
 
+import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{ HitAs, RichSearchHit }
-import com.sksamuel.elastic4s.source.Indexable
 import com.vividsolutions.jts.geom.Coordinate
-import models.Page
-import org.elasticsearch.search.aggregations.bucket.terms.Terms
+import models.{HasTryToEither, Page}
+import models.geotag.GeoTagStore
+import org.elasticsearch.common.geo.GeoPoint
 import org.elasticsearch.search.sort.SortOrder
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.collection.JavaConverters._
-import scala.concurrent.{ Future, ExecutionContext }
-import scala.language.{ postfixOps, reflectiveCalls }
-import storage.{ ES, HasES }
-import models.geotag.GeoTagStore
+import scala.concurrent.{Future, ExecutionContext}
+import scala.language.{postfixOps, reflectiveCalls}
+import scala.util.Try
+import storage.{ES, HasES}
+import models.HasTryToEither
 
 trait PlaceStore {
 
@@ -55,14 +56,14 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
     override def json(p: Place): String = Json.stringify(Json.toJson(p))
   }
 
-  implicit object PlaceHitAs extends HitAs[(Place, Long)] {
-    override def as(hit: RichSearchHit): (Place, Long) =
-      (Json.fromJson[Place](Json.parse(hit.sourceAsString)).get, hit.version)
+  implicit object PlaceHitReader extends HitReader[(Place, Long)] with HasTryToEither {
+    override def read(hit: Hit): Either[Throwable, (Place, Long)] =
+      Try(Json.fromJson[Place](Json.parse(hit.sourceAsString)).get, hit.version)
   }
 
   override def totalPlaces()(implicit context: ExecutionContext): Future[Long] =
     self.es.client execute {
-      search in ES.RECOGITO -> ES.PLACE limit 0
+      search in ES.RECOGITO / ES.PLACE limit 0
     } map { _.getHits.getTotalHits }
 
   override def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]] =
@@ -71,16 +72,16 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
         aggregation terms "by_source_gazetteer" field "is_conflation_of.source_gazetteer" size ES.MAX_SIZE
       ) limit 0
     } map { response =>
-      response.aggregations.get("by_source_gazetteer").asInstanceOf[Terms]
+      response.aggregations.termsResult("by_source_gazetteer")
               .getBuckets.asScala
               .map(_.getKeyAsString)
     }
 
   override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
     self.es.client execute {
-      update id place.id in ES.RECOGITO / ES.PLACE source place docAsUpsert
+      update id place.id in ES.RECOGITO / ES.PLACE docAsUpsert place
     } map { r =>
-      (true, r.getVersion)
+      (true, r.version)
     } recover { case t: Throwable =>
       Logger.error("Error indexing place " + place.id + ": " + t.getMessage)
       // t.printStackTrace
@@ -90,15 +91,14 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
   override def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =
     self.es.client execute {
       delete id id from ES.RECOGITO / ES.PLACE
-    } map { response =>
-      response.isFound
-    }
+    } map { _ => true
+    } recover { case t: Throwable => false }
 
   override def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]] =
     self.es.client execute {
-      search in ES.RECOGITO -> ES.PLACE query termQuery("is_conflation_of.uri" -> uri) limit 10
+      search in ES.RECOGITO / ES.PLACE query termQuery("is_conflation_of.uri" -> uri) limit 10
     } map { response =>
-      val placesAndVersions = response.as[(Place, Long)].toSeq
+      val placesAndVersions = response.to[(Place, Long)].toSeq
       if (placesAndVersions.isEmpty) {
         None // No place with that URI
       } else {
@@ -121,7 +121,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
           }
         }
       } limit 100
-    } map { _.as[(Place, Long)].toSeq }
+    } map { _.to[(Place, Long)].toSeq }
 
   override def searchPlaces(q: String, offset: Int, limit: Int, sortFrom: Option[Coordinate])(implicit context: ExecutionContext): Future[Page[(Place, Long)]] = {
     self.es.client execute {
@@ -152,11 +152,11 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
       } start offset limit limit
 
       sortFrom match {
-        case Some(coord) => query sort ( geoSort("representative_point") point(coord.y, coord.x) order SortOrder.ASC )
+        case Some(coord) => query sort ( geoSort("representative_point") points(new GeoPoint(coord.y, coord.x)) order SortOrder.ASC )
         case None        => query
       }
     } map { response =>
-      val places = response.as[(Place, Long)].toSeq
+      val places = response.to[(Place, Long)].toSeq
       Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, limit, places)
     }
   }
@@ -191,7 +191,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
       self.es.client execute {
         search scroll scrollId keepAlive "1m"
       } flatMap { response =>
-        applySequential(response.as[(Place, Long)].map(_._1)).map { _ =>
+        applySequential(response.to[(Place, Long)].map(_._1)).map { _ =>
           val processedRecords = cursor + response.getHits.getHits.size
           if (processedRecords < response.getHits.getTotalHits)
             processOneBatch(response.getScrollId, processedRecords)
@@ -201,7 +201,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
     // Initial search request
     self.es.client execute {
       search in ES.RECOGITO / ES.PLACE query {
-        termQuery("is_conflation_of.source_gazetteer" -> gazetteer) 
+        termQuery("is_conflation_of.source_gazetteer" -> gazetteer)
       } scroll "1m"
     } map { response =>
       processOneBatch(response.getScrollId)
