@@ -43,7 +43,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
     // the internal ElasticSearch version number
     def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] =
       es.client execute {
-        update id a.annotationId.toString in ES.RECOGITO / ES.ANNOTATION docAsUpsert a
+        update(a.annotationId.toString) in ES.RECOGITO / ES.ANNOTATION docAsUpsert a
       } map { r =>
         (true, r.version)
       } recover { case t: Throwable =>
@@ -91,11 +91,11 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   /** Retrieves an annotation by ID **/
   def findById(annotationId: UUID): Future[Option[(Annotation, Long)]] =
     es.client execute {
-      get id annotationId.toString from ES.RECOGITO / ES.ANNOTATION
+      get(annotationId.toString) from ES.RECOGITO / ES.ANNOTATION
     } map { response =>
-      if (response.isExists) {
+      if (response.exists) {
         val source = Json.parse(response.sourceAsString)
-        Some((Json.fromJson[Annotation](source).get, response.getVersion))
+        Some((Json.fromJson[Annotation](source).get, response.version))
       } else {
         None
       }
@@ -103,7 +103,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
 
   private def deleteById(annotationId: String): Future[Boolean] =
     es.client execute {
-      delete id annotationId.toString from ES.RECOGITO / ES.ANNOTATION
+      delete(annotationId.toString) from ES.RECOGITO / ES.ANNOTATION
     } map { _ =>
       true
     } recover { case t: Throwable =>
@@ -136,12 +136,12 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
 
   def countTotal(): Future[Long] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION limit 0
+      search(ES.RECOGITO / ES.ANNOTATION) limit 0
     } map { _.totalHits }
 
   def countByDocId(id: String): Future[Long] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query {
+      search(ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.document_id" -> id)
       } limit 0
     } map { _.totalHits }
@@ -149,7 +149,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   /** Retrieves all annotations on a given document **/
   def findByDocId(id: String, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query {
+      search(ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.document_id" -> id)
       } start offset limit limit
     } map(_.to[(Annotation, Long)].toSeq)
@@ -160,7 +160,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       if (annotationsAndVersions.size > 0) {
         es.client.java.prepareBulk()
         es.client execute {
-          bulk ( annotationsAndVersions.map { case (annotation, _) => delete id annotation.annotationId.toString from ES.RECOGITO / ES.ANNOTATION } )
+          bulk ( annotationsAndVersions.map { case (annotation, _) => delete(annotation.annotationId.toString) from ES.RECOGITO / ES.ANNOTATION } )
         } map { response =>
           if (response.hasFailures)
             Logger.error("Failures while deleting annotations: " + response.failureMessage)
@@ -188,7 +188,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   /** Retrieves all annotations on a given filepart **/
   def findByFilepartId(id: UUID, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query {
+      search(ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.filepart_id" -> id.toString)
       } limit limit
     } map(_.to[(Annotation, Long)].toSeq)
@@ -196,14 +196,13 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   /** Retrieves annotations on a document last updated after a given timestamp **/
   def findModifiedAfter(documentId: String, after: DateTime): Future[Seq[Annotation]] =
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query {
-        bool {
+      search(ES.RECOGITO / ES.ANNOTATION) query {
+        boolQuery
           must (
             termQuery("annotates.document_id" -> documentId)
           ) filter (
             rangeQuery("last_modified_at").gt(formatDate(after))
           )
-        }
       } limit ES.MAX_SIZE
     } map { _.to[(Annotation, Long)].toSeq.map(_._1) }
 
@@ -266,14 +265,13 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
         docIds.size
 
     es.client execute {
-      search in ES.RECOGITO / ES.ANNOTATION query {
-        bool {
+      search(ES.RECOGITO / ES.ANNOTATION) query {
+        boolQuery
           should {
             docIds.map(id => termQuery("annotates.document_id" -> id))
           }
-        }
       } aggs {
-        aggregation terms "by_document" field "annotates.document_id"
+        termsAggregation("by_document") field "annotates.document_id"
       } size numberOfBuckets limit 0
     } map { response =>
       val byDocument = response.aggregations.termsResult("by_document")

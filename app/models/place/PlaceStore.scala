@@ -63,13 +63,13 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
 
   override def totalPlaces()(implicit context: ExecutionContext): Future[Long] =
     self.es.client execute {
-      search in ES.RECOGITO / ES.PLACE limit 0
-    } map { _.getHits.getTotalHits }
+      search(ES.RECOGITO / ES.PLACE) limit 0
+    } map { _.totalHits }
 
   override def listGazetteers()(implicit context: ExecutionContext): Future[Seq[String]] =
     self.es.client execute {
-      search in ES.RECOGITO / ES.PLACE aggs (
-        aggregation terms "by_source_gazetteer" field "is_conflation_of.source_gazetteer" size ES.MAX_SIZE
+      search(ES.RECOGITO / ES.PLACE) aggs (
+        termsAggregation("by_source_gazetteer") field "is_conflation_of.source_gazetteer" size ES.MAX_SIZE
       ) limit 0
     } map { response =>
       response.aggregations.termsResult("by_source_gazetteer")
@@ -79,7 +79,7 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
 
   override def insertOrUpdatePlace(place: Place)(implicit context: ExecutionContext): Future[(Boolean, Long)] =
     self.es.client execute {
-      update id place.id in ES.RECOGITO / ES.PLACE docAsUpsert place
+      update(place.id) in ES.RECOGITO / ES.PLACE docAsUpsert place
     } map { r =>
       (true, r.version)
     } recover { case t: Throwable =>
@@ -90,13 +90,13 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
 
   override def deletePlace(id: String)(implicit context: ExecutionContext): Future[Boolean] =
     self.es.client execute {
-      delete id id from ES.RECOGITO / ES.PLACE
+      delete(id) from ES.RECOGITO / ES.PLACE
     } map { _ => true
     } recover { case t: Throwable => false }
 
   override def findByURI(uri: String)(implicit context: ExecutionContext): Future[Option[(Place, Long)]] =
     self.es.client execute {
-      search in ES.RECOGITO / ES.PLACE query termQuery("is_conflation_of.uri" -> uri) limit 10
+      search(ES.RECOGITO / ES.PLACE) query termQuery("is_conflation_of.uri" -> uri) limit 10
     } map { response =>
       val placesAndVersions = response.to[(Place, Long)].toSeq
       if (placesAndVersions.isEmpty) {
@@ -112,27 +112,26 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
 
   override def findByPlaceOrMatchURIs(uris: Seq[String])(implicit context: ExecutionContext): Future[Seq[(Place, Long)]] =
     self.es.client execute {
-      search in ES.RECOGITO / ES.PLACE query {
-        bool {
+      search(ES.RECOGITO / ES.PLACE) query {
+        boolQuery
           should {
             uris.map(uri => termQuery("is_conflation_of.uri" -> uri)) ++
             uris.map(uri => termQuery("is_conflation_of.close_matches" -> uri)) ++
             uris.map(uri => termQuery("is_conflation_of.exact_matches" -> uri))
           }
-        }
       } limit 100
     } map { _.to[(Place, Long)].toSeq }
 
   override def searchPlaces(q: String, offset: Int, limit: Int, sortFrom: Option[Coordinate])(implicit context: ExecutionContext): Future[Page[(Place, Long)]] = {
     self.es.client execute {
-      val query = search in ES.RECOGITO / ES.PLACE query {
-        bool {
+      val query = search(ES.RECOGITO / ES.PLACE) query {
+        boolQuery
           should (
             // Treat as standard query string query first...
             queryStringQuery(q).defaultOperator("AND"),
 
             // ...and then look for exact matches in specific fields
-            bool {
+            boolQuery
               should (
 
                 // Search inside record titles...
@@ -146,18 +145,17 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
                 // ...and descriptions (with lower boost)
                 matchQuery("is_conflation_of.descriptions.description", q).operator("AND").boost(0.2)
               )
-            }
+
           )
-        }
       } start offset limit limit
 
       sortFrom match {
-        case Some(coord) => query sort ( geoSort("representative_point") points(new GeoPoint(coord.y, coord.x)) order SortOrder.ASC )
+        case Some(coord) => query sortBy (geoSort("representative_point") points(new GeoPoint(coord.y, coord.x)) order SortOrder.ASC)
         case None        => query
       }
     } map { response =>
       val places = response.to[(Place, Long)].toSeq
-      Page(response.getTook.getMillis, response.getHits.getTotalHits, 0, limit, places)
+      Page(response.tookInMillis, response.totalHits, 0, limit, places)
     }
   }
 
@@ -189,22 +187,22 @@ private[models] trait ESPlaceStore extends PlaceStore with PlaceImporter with Ge
     // Fetch one scroll batch, processes the results and run next batch
     def processOneBatch(scrollId: String, cursor: Long = 0l): Future[Unit] =
       self.es.client execute {
-        search scroll scrollId keepAlive "1m"
+        searchScroll(scrollId) keepAlive "1m"
       } flatMap { response =>
         applySequential(response.to[(Place, Long)].map(_._1)).map { _ =>
-          val processedRecords = cursor + response.getHits.getHits.size
-          if (processedRecords < response.getHits.getTotalHits)
-            processOneBatch(response.getScrollId, processedRecords)
+          val processedRecords = cursor + response.hits.size
+          if (processedRecords < response.totalHits)
+            processOneBatch(response.scrollId, processedRecords)
         }
       }
 
     // Initial search request
     self.es.client execute {
-      search in ES.RECOGITO / ES.PLACE query {
+      search (ES.RECOGITO / ES.PLACE) query {
         termQuery("is_conflation_of.source_gazetteer" -> gazetteer)
       } scroll "1m"
     } map { response =>
-      processOneBatch(response.getScrollId)
+      processOneBatch(response.scrollId)
     }
 
   }

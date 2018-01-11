@@ -32,7 +32,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   /** Inserts a contribution record into the index **/
   def insertContribution(contribution: Contribution): Future[Boolean] =
     es.client execute {
-      index into ES.RECOGITO / ES.CONTRIBUTION source contribution
+      indexInto(ES.RECOGITO / ES.CONTRIBUTION) source contribution
     } map {
       _.created
     } recover { case t: Throwable =>
@@ -66,8 +66,8 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
 
   def getMostRecent(n: Int): Future[Seq[Contribution]] =
     es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION sort (
-        field sort "made_at" order SortOrder.DESC
+      search(ES.RECOGITO / ES.CONTRIBUTION) sortBy (
+        fieldSort("made_at") order SortOrder.DESC
       ) limit n
     } map { response =>
       response.to[(Contribution, String)].toSeq.map(_._1)
@@ -76,14 +76,14 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   /** Returns the contribution history on a given document, as a paged result **/
   def getHistory(documentId: String, offset: Int = 0, limit: Int = 20): Future[Page[(Contribution, String)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION query (
+      search (ES.RECOGITO / ES.CONTRIBUTION) query (
         termQuery("affects_item.document_id" -> documentId)
-      ) sort (
-        field sort "made_at" order SortOrder.DESC
+      ) sortBy (
+        fieldSort("made_at") order SortOrder.DESC
       ) start offset limit limit
     } map { response =>
       val contributionsWithId = response.to[(Contribution, String)].toSeq
-      Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, contributionsWithId)
+      Page(response.tookInMillis, response.totalHits, offset, limit, contributionsWithId)
     }
 
   /** Shorthand to get the most recent contribution to the given document **/
@@ -110,12 +110,12 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   /** Retrieves a contribution by its ElasticSearch ID **/
   def findById(id: String): Future[Option[(Contribution, String)]] =
     es.client execute {
-      get id id from ES.RECOGITO / ES.CONTRIBUTION
+      get(id) from ES.RECOGITO / ES.CONTRIBUTION
     } map { response =>
-      if (response.isExists) {
+      if (response.exists) {
         Json.fromJson[Contribution](Json.parse(response.sourceAsString)) match {
           case JsSuccess(contribution, _) =>
-            Some(contribution, response.getId)
+            Some(contribution, response.id)
           case _ =>
             // Should never happen
             throw new RuntimeException("Malformed contribution in index")
@@ -129,22 +129,21 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   def deleteHistoryAfter(documentId: String, after: DateTime): Future[Boolean] = {
 
     def findContributionsAfter() = es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION query {
-        bool {
+      search (ES.RECOGITO / ES.CONTRIBUTION) query {
+        boolQuery
           must (
             termQuery("affects_item.document_id" -> documentId)
           ) filter (
             rangeQuery("made_at").gt(formatDate(after))
           )
-        }
       } limit ES.MAX_SIZE
-    } map { _.getHits.getHits }
+    } map { _.hits }
 
     findContributionsAfter().flatMap { hits =>
       if (hits.size > 0) {
         es.client.java.prepareBulk()
         es.client execute {
-          bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
+          bulk ( hits.map(h => delete(h.id) from ES.RECOGITO / ES.CONTRIBUTION) )
         } map {
           !_.hasFailures
         } recover { case t: Throwable =>
@@ -167,16 +166,16 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   def deleteHistory(documentId: String): Future[Boolean] = {
 
     def findContributions() = es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION query {
+      search (ES.RECOGITO / ES.CONTRIBUTION) query {
         termQuery("affects_item.document_id" -> documentId)
       } limit ES.MAX_SIZE
-    } map { _.getHits.getHits }
+    } map { _.hits }
 
     findContributions.flatMap { hits =>
       if (hits.size > 0) {
         es.client.java.prepareBulk()
         es.client execute {
-          bulk ( hits.map(h => delete id h.getId from ES.RECOGITO / ES.CONTRIBUTION) )
+          bulk ( hits.map(h => delete(h.id) from ES.RECOGITO / ES.CONTRIBUTION) )
         } map { response =>
           if (response.hasFailures)
             Logger.error("Failures while deleting contributions: " + response.failureMessage)
@@ -194,9 +193,9 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
 
   def countLast24hrs() =
     es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION query {
+      search (ES.RECOGITO / ES.CONTRIBUTION) query {
         constantScoreQuery {
-          filter(rangeQuery("made_at").gt("now-24h"))
+          rangeQuery("made_at").gt("now-24h")
         }
       } size 0
     } map { _.totalHits }
@@ -204,12 +203,12 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   /** Returns the system-wide contribution stats **/
   def getGlobalStats(): Future[ContributionStats] =
     es.client execute {
-      search in ES.RECOGITO / ES.CONTRIBUTION aggs (
-        aggregation terms "by_user" field "made_by",
-        aggregation terms "by_action" field "action",
-        aggregation terms "by_item_type" field "affects_item.item_type",
-        aggregation filter "contribution_history" query rangeQuery("made_at").gt("now-30d") subaggs (
-           aggregation datehistogram "last_30_days" field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
+      search (ES.RECOGITO / ES.CONTRIBUTION) aggs (
+        termsAggregation("by_user") field "made_by",
+        termsAggregation("by_action") field "action",
+        termsAggregation("by_item_type") field "affects_item.item_type",
+        filterAggregation("contribution_history") query rangeQuery("made_at").gt("now-30d") subaggs (
+          dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
         )
       ) limit 0
     } map { response =>
@@ -220,8 +219,8 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         .getAggregations.get("last_30_days").asInstanceOf[InternalDateHistogram]
 
       ContributionStats(
-        response.getTookInMillis,
-        response.getHits.getTotalHits,
+        response.tookInMillis,
+        response.totalHits,
         byUser.getBuckets.asScala.map(bucket =>
           (bucket.getKeyAsString, bucket.getDocCount)),
         byAction.getBuckets.asScala.map(bucket =>

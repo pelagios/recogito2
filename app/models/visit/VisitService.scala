@@ -34,7 +34,7 @@ class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) {
     
   def countTotal(): Future[Long] =
     es.client execute {
-      search in ES.RECOGITO / ES.VISIT limit 0
+      search(ES.RECOGITO / ES.VISIT) limit 0
     } map { _.totalHits }
   
 }

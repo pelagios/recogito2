@@ -66,9 +66,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
     
     // Just fetch cluster stats to see if there's a cluster at all
     Try(
-      Await.result(remoteClient execute {
-        get cluster stats
-      }, 3.seconds)
+      Await.result(remoteClient execute { clusterStats }, 3.seconds)
     ) match {
       case Success(_) => {
         Logger.info("Joining ElasticSearch cluster")

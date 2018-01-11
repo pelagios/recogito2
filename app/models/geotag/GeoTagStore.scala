@@ -53,15 +53,15 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   def toGeoTag(response: RichSearchResponse): Seq[(GeoTag, String, String)] =
     response.hits.map{ hit =>
       val id = hit.id
-      val parent = hit.java.field("_parent").value[String]
+      val parent = hit.java.getField("_parent").getValue[String]
       val geotag = Json.fromJson[GeoTag](Json.parse(hit.sourceAsString)).get
       (geotag, id, parent)
     }
 
   override def totalGeoTags()(implicit context: ExecutionContext): Future[Long] =
     es.client execute {
-      search in ES.RECOGITO / ES.GEOTAG limit 0
-    } map { _.getHits.getTotalHits }
+      search(ES.RECOGITO / ES.GEOTAG) limit 0
+    } map { _.totalHits }
 
   /** Helper used by insertOrUpdate method to build the geotags from the annotation bodies **/
   private def buildGeoTags(annotation: Annotation)(implicit context: ExecutionContext): Future[Seq[(GeoTag, String)]] = {
@@ -105,7 +105,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     def insertGeoTags(tags: Seq[(GeoTag, String)]): Future[Boolean] = {
       es.client.java.prepareBulk()
       es.client execute {
-        bulk ( tags.map(tag => index into ES.RECOGITO / ES.GEOTAG source tag._1 parent tag._2) )
+        bulk ( tags.map(tag => indexInto(ES.RECOGITO / ES.GEOTAG) source tag._1 parent tag._2) )
       } map { response =>
         if (response.hasFailures)
           Logger.error("Failures while inserting geotags: " + response.failureMessage)
@@ -134,7 +134,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
       es.client execute {
-        search scroll scrollId keepAlive "5m"
+        searchScroll(scrollId) keepAlive "5m"
       }
 
     def rewriteOne(tag: GeoTag, id: String, parent: String) = {
@@ -146,8 +146,8 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
         es.client.java.prepareBulk()
         es.client execute {
           bulk (
-            delete id id from ES.RECOGITO / ES.GEOTAG parent parent,
-            index into ES.RECOGITO / ES.GEOTAG source tag parent newParent.id
+            delete(id) from ES.RECOGITO / ES.GEOTAG parent parent,
+            indexInto(ES.RECOGITO / ES.GEOTAG) source tag parent newParent.id
           )
         } map { !_.hasFailures }
       } else {
@@ -178,12 +178,11 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     if (placesBeforeUpdate.size > 0) {
       es.client execute {
-        search in ES.RECOGITO / ES.GEOTAG query {
-          bool {
+        search (ES.RECOGITO / ES.GEOTAG) query {
+          boolQuery
             should (
               placesBeforeUpdate.map { place => hasParentQuery(ES.PLACE).query { termQuery("id", place.id) } scoreMode false }
             )
-          }
         } limit 50 scroll "5m"
       } flatMap {
         rewriteBatch(_)
@@ -202,7 +201,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
     } else {
       es.client.java.prepareBulk()
       es.client execute {
-        bulk ( idsAndParents.map { case (tagId, parentId) => delete id tagId from ES.RECOGITO / ES.GEOTAG parent parentId } )
+        bulk ( idsAndParents.map { case (tagId, parentId) => delete(tagId) from ES.RECOGITO / ES.GEOTAG parent parentId } )
       } map { response =>
         if (response.hasFailures)
           Logger.error("Failures while deleting geotags: " + response.failureMessage)
@@ -216,7 +215,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
   /** Helper method that retrieves geotags for an annotation along with their internal _id field **/
   private def findGeoTagsByAnnotationWithIdAndParent(annotationId: String)(implicit context: ExecutionContext): Future[Seq[(GeoTag, String, String)]] =
     es.client execute {
-      search in ES.RECOGITO / ES.GEOTAG query {
+      search(ES.RECOGITO / ES.GEOTAG) query {
         termQuery("annotation_id", annotationId)
       }
     } map { toGeoTag(_) }
@@ -231,7 +230,7 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
     def findIdsForDoc(documentId: String) =
       es.client execute {
-        search in ES.RECOGITO / ES.GEOTAG query {
+        search(ES.RECOGITO / ES.GEOTAG) query {
           termQuery("document_id" -> documentId)
         }
       } map { toGeoTag(_).map(t => (t._2, t._3)) }
@@ -244,24 +243,21 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
 
   override def listPlacesInDocument(docId: String, offset: Int, limit: Int)(implicit context: ExecutionContext) =
     es.client execute {
-      search in ES.RECOGITO / ES.PLACE query {
+      search(ES.RECOGITO / ES.PLACE) query {
         hasChildQuery(ES.GEOTAG).query {
           termQuery("document_id", docId)
         } scoreMode(ScoreMode.Avg)
       } start offset limit limit
     } map { response =>
       val places = response.to[(Place, Long)]
-      Page(response.getTook.getMillis, response.getHits.getTotalHits, offset, limit, places)
+      Page(response.tookInMillis, response.totalHits, offset, limit, places)
     }
 
   override def searchPlacesInDocument(q: String, docId: String, offset: Int, limit: Int)(implicit context: ExecutionContext) =
     es.client execute {
-      search in ES.RECOGITO / ES.PLACE query {
-        bool {
-
-          must(
-            bool {
-              should (
+      search (ES.RECOGITO / ES.PLACE) query {
+        boolQuery.must(
+            boolQuery.should(
                 // Search inside record titles...
                 matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
                 matchPhraseQuery("is_conflation_of.title", q),
@@ -273,17 +269,16 @@ private[models] trait ESGeoTagStore extends ESPlaceStore with GeoTagStore { self
                 // ...and descriptions (with lower boost)
                 matchQuery("is_conflation_of.descriptions.description", q).boost(0.2)
               )
-            },
+            )
 
             hasChildQuery(ES.GEOTAG).query {
               termQuery("document_id", docId)
             } scoreMode ScoreMode.Avg
-          )
-        }
+            
       } start offset limit limit
     } map { response =>
       val places = response.to[(Place, Long)].toSeq
-      Page(response.getTook.getMillis, response.totalHits, offset, limit, places)
+      Page(response.tookInMillis, response.totalHits, offset, limit, places)
     }
 
 }
