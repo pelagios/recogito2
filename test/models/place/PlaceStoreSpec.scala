@@ -62,7 +62,7 @@ class PlaceStoreSpec extends Specification with AfterAll {
   
   val initialPlace = createNewTestPlace()
   
-  def flush() = Await.result(es.flushIndex, 10 seconds)
+  def flush() = Await.result(es.flush, 10 seconds)
   
   def totalPlaces() = Await.result(testStore.totalPlaces(), 10 seconds)
   

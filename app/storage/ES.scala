@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import java.io.File
 import javax.inject.{ Inject, Singleton }
 import org.elasticsearch.common.settings.Settings
+import org.elasticsearch.common.xcontent.XContentType
 import play.api.{ Configuration, Logger }
 import play.api.inject.ApplicationLifecycle
 import scala.io.Source
@@ -64,71 +65,38 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
     val port = config.getOptional[Int]("es.port").getOrElse(9300)
     val remoteClient = TcpClient.transport(ElasticsearchClientUri(host, port))
     
-    // Just fetch cluster stats to see if there's a cluster at all
-    Try(
-      Await.result(remoteClient execute { clusterStats }, 3.seconds)
-    ) match {
-      case Success(_) => {
+    Try(Await.result(remoteClient execute { clusterStats }, 3.seconds)) match {
+      case Success(_) =>
         Logger.info("Joining ElasticSearch cluster")
         remoteClient 
-      }
         
-      case Failure(_) => {
-        /* No ES cluster available - instantiate a local client
-        val settings =
-          Settings.builder()
-            .put("http.enabled", true)
-            .put("path.home", home.getAbsolutePath)
-        
-        Logger.info("Local index - using " + home.getAbsolutePath + " as location")
-        val client = ElasticClient.local(settings.build)
-        
-        // Introduce wait time, otherwise local index init is so slow that subsequent
-        // .isExists request returns false despite an existing index (note: this is only
-        // relevant in dev mode, anyway)
-        Thread.sleep(1000)
-        client
-        */
+      case Failure(_) =>
         throw new RuntimeException("Local fallback no longer supported. Please ensure you have a working ElasticSearch installation.")
-      }
     }
   }
   
   private def start() = {
     implicit val timeout = 60.seconds
+    
     val response = client.execute { index exists(ES.RECOGITO) }.await
     
-    if (response.isExists()) {
-      // Index exists - create missing mappings as needed
-      val list = client.java.admin.indices().prepareGetMappings()
-      val existingMappings = list.execute().actionGet().getMappings().get(ES.RECOGITO).keys.toArray.map(_.toString)
-      loadMappings(existingMappings).foreach { case (name, json) =>
-        Logger.info("Recreating mapping " + name)
-        val putMapping = client.java.admin.indices().preparePutMapping(ES.RECOGITO)
-        putMapping.setType(name)
-        putMapping.setSource(json)
-        putMapping.execute().actionGet()
-      }
-    } else {
+    if (!response.isExists()) {
       // No index - create index with all mappings
       Logger.info("No ES index - initializing...")
       
       val create = client.java.admin.indices().prepareCreate(ES.RECOGITO) 
-      create.setSettings(loadSettings())
+      create.setSettings(loadSettings(), XContentType.JSON)
       
       loadMappings().foreach { case (name, json) =>  { 
         Logger.info("Create mapping - " + name)
-        create.addMapping(name, json)
+        create.addMapping(name, json, XContentType.JSON)
       }}
      
       create.execute().actionGet()
     }
   }
   
-  def flushIndex =
-    client execute {
-      flush index ES.RECOGITO
-    }
+  def flush = client execute flushIndex(ES.RECOGITO)
   
   private def stop() = {
     Logger.info("Stopping ElasticSearch local node")

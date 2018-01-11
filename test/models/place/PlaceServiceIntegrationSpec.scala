@@ -40,7 +40,7 @@ class PlaceServiceIntegrationSpec extends Specification with AfterAll {
 
   /** Async Await shorthands **/
   def flush() = 
-    Await.result(es.flushIndex, 10 seconds)
+    Await.result(es.flush, 10 seconds)
     
   def importRecords(records: Seq[GazetteerRecord]): Seq[GazetteerRecord] =
     Await.result(places.importRecords(records), 10 seconds)

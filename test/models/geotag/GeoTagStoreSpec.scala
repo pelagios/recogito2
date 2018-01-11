@@ -131,7 +131,7 @@ class GeoTagStoreSpec extends Specification with AfterAll {
       Seq.empty[String], Seq("rainer"), Some("rainer"),
       annotatesVindobonaAndThessaloniki.lastModifiedAt)
               
-    def flush() = Await.result(es.flushIndex, 10 seconds)
+    def flush() = Await.result(es.flush, 10 seconds)
     def insertAnnotation(a: Annotation) = Await.result(annotations.insertOrUpdateAnnotation(a), 10 seconds)
     def totalGeoTags() = Await.result(places.totalGeoTags(), 10 seconds)
     def findByAnnotationId(id: UUID) = Await.result(places.findGeoTagsByAnnotation(id), 10 seconds)
