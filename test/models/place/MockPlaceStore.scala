@@ -4,9 +4,9 @@ import collection.JavaConverters._
 import com.vividsolutions.jts.geom.Coordinate
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import models.Page
-import models.annotation.Annotation
-import models.geotag.GeoTagStore
+import services.Page
+import services.annotation.Annotation
+import services.geotag.GeoTagStore
 import play.api.Logger
 import scala.concurrent.{ ExecutionContext, Future }
 

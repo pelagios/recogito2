@@ -1,9 +1,9 @@
-@(cells: Seq[(String, String)], sortBy: Option[String], sortOrder: Option[models.SortOrder])(implicit request: RequestHeader)
+@(cells: Seq[(String, String)], sortBy: Option[String], sortOrder: Option[services.SortOrder])(implicit request: RequestHeader)
 
 @cssClass(field: String) = @{
   if (sortBy == Some(field)) {
     sortOrder match {
-      case Some(order) if order == models.SortOrder.DESC => Some("sorted desc")
+      case Some(order) if order == services.SortOrder.DESC => Some("sorted desc")
       case _ => Some("sorted asc")
     }
   } else {

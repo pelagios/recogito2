@@ -2,7 +2,7 @@ package controllers.admin.gazetteers
 
 import java.io.{InputStream, File, FileInputStream}
 import java.util.zip.GZIPInputStream
-import models.place.{GazetteerRecord, PlaceService}
+import services.place.{GazetteerRecord, PlaceService}
 import play.api.Logger
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._

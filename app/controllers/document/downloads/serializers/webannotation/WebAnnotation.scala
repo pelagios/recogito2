@@ -1,7 +1,7 @@
 package controllers.document.downloads.serializers.webannotation
 
-import models.HasDate
-import models.annotation.Annotation
+import services.HasDate
+import services.annotation.Annotation
 import org.joda.time.DateTime
 import play.api.mvc.{ AnyContent, Request }
 import play.api.libs.json._

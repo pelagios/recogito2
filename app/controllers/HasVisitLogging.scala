@@ -1,10 +1,10 @@
 package controllers
 
 import eu.bitwalker.useragentutils.UserAgent
-import models.visit._
-import models.ContentType
-import models.document.DocumentAccessLevel
-import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.visit._
+import services.ContentType
+import services.document.DocumentAccessLevel
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime
 import play.api.mvc.{AnyContent, RequestHeader}
 import play.api.http.HeaderNames

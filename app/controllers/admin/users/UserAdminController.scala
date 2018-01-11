@@ -3,10 +3,10 @@ package controllers.admin.users
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import javax.inject.{Inject, Singleton}
-import models.{HasDate, SortOrder}
-import models.document.DocumentService
-import models.user.Roles._
-import models.user.UserService
+import services.{HasDate, SortOrder}
+import services.document.DocumentService
+import services.user.Roles._
+import services.user.UserService
 import org.joda.time.DateTime
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration

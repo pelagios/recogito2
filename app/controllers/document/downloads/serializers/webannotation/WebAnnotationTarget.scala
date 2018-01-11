@@ -1,6 +1,6 @@
 package controllers.document.downloads.serializers.webannotation
 
-import models.annotation.Annotation
+import services.annotation.Annotation
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.mvc.{ AnyContent, Request }
@@ -14,7 +14,7 @@ object WebAnnotationTarget {
     val partId = annotation.annotates.filepartId
     val target = controllers.document.annotation.routes.AnnotationController.resolveAnnotationView(docId, Some(partId), None).absoluteURL
     
-    import models.ContentType._
+    import services.ContentType._
     
     annotation.annotates.contentType match {
       // Plaintest gets a Text target with two alternative selectors: TextQuote + TextPosition

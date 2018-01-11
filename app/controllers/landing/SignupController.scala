@@ -6,11 +6,11 @@ import javax.inject.{Inject, Singleton}
 import java.io.FileInputStream
 import java.sql.Timestamp
 import java.util.{Date, UUID}
-import models.ContentType
-import models.annotation.{Annotation, AnnotationService}
-import models.document.DocumentService
-import models.user.UserService
-import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.ContentType
+import services.annotation.{Annotation, AnnotationService}
+import services.document.DocumentService
+import services.user.UserService
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._

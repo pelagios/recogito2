@@ -8,10 +8,10 @@ import kantan.csv.CsvConfiguration.{ Header, QuotePolicy }
 import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import kantan.codecs.Result.Success
-import models.annotation.AnnotationService
-import models.place.PlaceService
-import models.task.{ TaskService, TaskStatus }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.annotation.AnnotationService
+import services.place.PlaceService
+import services.task.{ TaskService, TaskStatus }
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._
 import scala.util.Try

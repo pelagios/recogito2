@@ -1,9 +1,9 @@
 package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
-import models.document.DocumentAccessLevel
-import models.generated.tables.records.SharingPolicyRecord
-import models.user.Roles._
+import services.document.DocumentAccessLevel
+import services.generated.tables.records.SharingPolicyRecord
+import services.user.Roles._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._

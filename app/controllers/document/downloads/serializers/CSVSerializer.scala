@@ -9,11 +9,11 @@ import kantan.csv.CsvConfiguration
 import kantan.csv.CsvConfiguration.{ Header, QuotePolicy }
 import kantan.csv.ops._
 import kantan.csv.engine.commons._
-import models.ContentType
-import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import models.document.DocumentInfo
-import models.place.{ Place, PlaceService }
-import models.generated.tables.records.DocumentFilepartRecord
+import services.ContentType
+import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import services.document.DocumentInfo
+import services.place.{ Place, PlaceService }
+import services.generated.tables.records.DocumentFilepartRecord
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.io.Source

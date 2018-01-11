@@ -1,9 +1,9 @@
 package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
-import models.document.DocumentAccessLevel
-import models.generated.tables.records.DocumentRecord
-import models.user.Roles._
+import services.document.DocumentAccessLevel
+import services.generated.tables.records.DocumentRecord
+import services.user.Roles._
 import play.api.mvc.{ AnyContent, Request }
 import scala.concurrent.Future
 

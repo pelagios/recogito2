@@ -6,10 +6,10 @@ import controllers.{HasUserService, HasConfig, Security }
 import controllers.document.{BackupReader, HasBackupValidation}
 import java.io.File
 import javax.inject.Inject
-import models.annotation.AnnotationService
-import models.document.DocumentService
-import models.user.Roles._
-import models.user.UserService
+import services.annotation.AnnotationService
+import services.document.DocumentService
+import services.user.Roles._
+import services.user.UserService
 import play.api.{ Configuration, Logger }
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc.{AbstractController, ControllerComponents}

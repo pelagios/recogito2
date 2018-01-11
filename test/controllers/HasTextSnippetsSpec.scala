@@ -1,8 +1,8 @@
 package controllers
 
 import java.util.UUID
-import models.ContentType
-import models.annotation._
+import services.ContentType
+import services.annotation._
 import org.joda.time.DateTime
 import org.specs2.mutable._
 import org.specs2.runner._

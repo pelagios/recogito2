@@ -1,4 +1,4 @@
-@(currentUser: Option[models.user.User])(implicit request: RequestHeader)
+@(currentUser: Option[services.user.User])(implicit request: RequestHeader)
 @if(currentUser.isDefined) {
   <div class="logged-in">
     Logged in as

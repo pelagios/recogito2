@@ -3,12 +3,12 @@ package controllers.admin
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, Security}
 import javax.inject.{Inject, Singleton}
-import models.annotation.AnnotationService
-import models.contribution.ContributionService
-import models.document.DocumentService
-import models.user.UserService
-import models.user.Roles._
-import models.visit.VisitService
+import services.annotation.AnnotationService
+import services.contribution.ContributionService
+import services.document.DocumentService
+import services.user.UserService
+import services.user.Roles._
+import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.libs.json.Json

@@ -2,11 +2,11 @@ package transform.georesolution
 
 import akka.actor.Props
 import java.io.File
-import models.ContentType
-import models.annotation.AnnotationService
-import models.task.TaskService
-import models.place.PlaceService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.ContentType
+import services.annotation.AnnotationService
+import services.task.TaskService
+import services.place.PlaceService
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 import transform.TransformSupervisorActor

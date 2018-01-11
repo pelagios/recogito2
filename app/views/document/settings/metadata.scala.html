@@ -1,7 +1,7 @@
 @(
   metadataForm: Form[controllers.document.settings.actions.DocumentMetadata],
-  doc: models.document.DocumentInfo,
-  currentUser: models.user.User
+  doc: services.document.DocumentInfo,
+  currentUser: services.user.User
 )(implicit header: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil, messages: Messages, flash: Flash)
 
 @_layout("Recogito | Settings - Metadata", doc, currentUser, Some("metadata")) {
@@ -29,7 +29,7 @@
           <dd>
             <select id="license" name="license">
               <option value @if(doc.license.isEmpty) { selected="true" }>-- Select a license --</option>
-              @for(license <- models.document.License.values) {
+              @for(license <- services.document.License.values) {
                 <option value="@license.acronym" @if(doc.license == Some(license)) { selected="true" }>@license.name</option>
               }
             </select>
@@ -62,7 +62,7 @@
   </div>
 
   <script>
-    @defining(models.document.DocumentService.documentFilepartRecordWrites) { implicit writes =>
+    @defining(services.document.DocumentService.documentFilepartRecordWrites) { implicit writes =>
       window.config = {
         documentId: "@doc.id",
         fileparts: @Html(play.api.libs.json.Json.toJson(doc.fileparts).toString)

@@ -15,7 +15,7 @@ import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import storage.ES
 import play.api.Play
-import models.place.crosswalks.PelagiosRDFCrosswalk
+import services.place.crosswalks.PelagiosRDFCrosswalk
 import play.api.inject.guice.GuiceApplicationBuilder
 
 @RunWith(classOf[JUnitRunner])

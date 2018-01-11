@@ -2,9 +2,9 @@ package transform.tiling
 
 import akka.actor.Props
 import java.io.File
-import models.ContentType
-import models.task.TaskService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.ContentType
+import services.task.TaskService
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import transform.TransformSupervisorActor

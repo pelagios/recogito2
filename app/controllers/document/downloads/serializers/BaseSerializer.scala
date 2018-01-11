@@ -1,13 +1,13 @@
 package controllers.document.downloads.serializers
 
 import java.io.File
-import models.ContentType
-import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import models.place.{ GazetteerRecord, Place, PlaceService }
+import services.ContentType
+import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import services.place.{ GazetteerRecord, Place, PlaceService }
 import play.api.Logger
 import scala.concurrent.ExecutionContext
 import storage.{ ES, Uploads }
-import models.document.DocumentInfo
+import services.document.DocumentInfo
 
 trait BaseSerializer {
   

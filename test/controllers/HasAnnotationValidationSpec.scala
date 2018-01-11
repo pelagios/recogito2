@@ -2,9 +2,9 @@ package controllers
 
 import java.sql.Timestamp
 import java.util.UUID
-import models.annotation.Annotation
-import models.contribution.ContributionAction._
-import models.contribution.ItemType._
+import services.annotation.Annotation
+import services.contribution.ContributionAction._
+import services.contribution.ItemType._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -12,7 +12,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import scala.io.Source
 import play.api.libs.json.Json
-import models.generated.tables.records.DocumentRecord
+import services.generated.tables.records.DocumentRecord
 
 class TestAnnotationValidator extends HasAnnotationValidation
 

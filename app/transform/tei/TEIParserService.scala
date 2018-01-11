@@ -3,9 +3,9 @@ package transform.tei
 import akka.actor.{ ActorSystem, Props }
 import java.io.{ File, PrintWriter }
 import javax.inject.{ Inject, Singleton }
-import models.annotation.{ Annotation, AnnotationService }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import models.task.{ TaskType, TaskService }
+import services.annotation.{ Annotation, AnnotationService }
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.task.{ TaskType, TaskService }
 import org.joox.JOOX._
 import org.w3c.dom.ranges.DocumentRange
 import scala.collection.JavaConversions._

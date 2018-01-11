@@ -1,4 +1,4 @@
-@(baseUrl: String, page: models.Page[_ <: Any])(implicit request: RequestHeader)
+@(baseUrl: String, page: services.Page[_ <: Any])(implicit request: RequestHeader)
 
 @createRange(currentPage: Int, totalPages: Int) = @{
   val maxLength = 10

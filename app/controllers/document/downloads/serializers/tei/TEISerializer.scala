@@ -1,9 +1,9 @@
 package controllers.document.downloads.serializers.tei
 
 import controllers.HasTEISnippets
-import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import models.document.{ DocumentInfo, DocumentService }
-import models.generated.tables.records.DocumentFilepartRecord
+import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import services.document.{ DocumentInfo, DocumentService }
+import services.generated.tables.records.DocumentFilepartRecord
 import org.joox.JOOX._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.xml.Elem

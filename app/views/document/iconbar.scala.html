@@ -1,7 +1,7 @@
 @(
-  document: models.generated.tables.records.DocumentRecord,
-  currentUser: Option[models.user.User],
-  accessLevel: models.document.DocumentAccessLevel,
+  document: services.generated.tables.records.DocumentRecord,
+  currentUser: Option[services.user.User],
+  accessLevel: services.document.DocumentAccessLevel,
   activeView: String
  )(implicit request: RequestHeader)
   <div class="header-iconbar">

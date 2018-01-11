@@ -2,10 +2,10 @@ package transform.tei
 
 import akka.actor.Actor
 import java.io.File
-import models.annotation.AnnotationService
-import models.generated.tables.records.DocumentRecord
-import models.generated.tables.records.DocumentFilepartRecord
-import models.task.{ TaskService, TaskStatus }
+import services.annotation.AnnotationService
+import services.generated.tables.records.DocumentRecord
+import services.generated.tables.records.DocumentFilepartRecord
+import services.task.{ TaskService, TaskStatus }
 import scala.concurrent.{ Await, ExecutionContext } 
 import scala.concurrent.duration._
 import play.api.Logger

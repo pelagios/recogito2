@@ -1,7 +1,7 @@
 @(
-  owner: models.user.User,
-  documents: models.Page[models.generated.tables.records.DocumentRecord],
-  currentUser: Option[models.user.User]
+  owner: services.user.User,
+  documents: services.Page[services.generated.tables.records.DocumentRecord],
+  currentUser: Option[services.user.User]
 )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>

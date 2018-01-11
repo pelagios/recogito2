@@ -2,10 +2,10 @@ package transform.tei
 
 import akka.actor.Props
 import java.io.File
-import models.ContentType
-import models.annotation.AnnotationService
-import models.task.TaskService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.ContentType
+import services.annotation.AnnotationService
+import services.task.TaskService
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import transform.TransformSupervisorActor

@@ -1,7 +1,7 @@
 @(
   title: String,
-  doc: models.document.DocumentInfo,
-  currentUser: models.user.User,
+  doc: services.document.DocumentInfo,
+  currentUser: services.user.User,
   activeTab: Option[String]
 )(content: Html)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
@@ -12,7 +12,7 @@
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
   </head>
   <body>
-    @views.html.document.iconbar(doc.document, Some(currentUser), models.document.DocumentAccessLevel.ADMIN, "settings")
+    @views.html.document.iconbar(doc.document, Some(currentUser), services.document.DocumentAccessLevel.ADMIN, "settings")
 
     <div class="sidebar">
       @views.html.sidebarHeader(doc.owner)

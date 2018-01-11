@@ -4,10 +4,10 @@ import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
 import controllers.HasCSVParsing
 import controllers.document.downloads.FieldMapping
 import java.io.File
-import models.{ ContentType, HasGeometry }
-import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import models.document.DocumentInfo
-import models.place.{ Place, PlaceService, GazetteerRecord }
+import services.{ ContentType, HasGeometry }
+import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import services.document.DocumentInfo
+import services.place.{ Place, PlaceService, GazetteerRecord }
 import org.geotools.geometry.jts.JTSFactoryFinder
 import play.api.libs.json._
 import play.api.libs.functional.syntax._

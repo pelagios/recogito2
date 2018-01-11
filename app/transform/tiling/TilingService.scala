@@ -3,8 +3,8 @@ package transform.tiling
 import akka.actor.{ ActorSystem, Props }
 import java.io.File
 import javax.inject.{ Inject, Singleton }
-import models.task.{ TaskService, TaskType }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.task.{ TaskService, TaskType }
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.concurrent.duration._
 import scala.language.postfixOps

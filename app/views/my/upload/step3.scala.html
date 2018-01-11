@@ -1,7 +1,7 @@
 @(username: String,
-  document: models.generated.tables.records.DocumentRecord,
-  fileparts: Seq[models.generated.tables.records.DocumentFilepartRecord],
-  tasks: Seq[models.task.TaskType])(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+  document: services.generated.tables.records.DocumentRecord,
+  fileparts: Seq[services.generated.tables.records.DocumentFilepartRecord],
+  tasks: Seq[services.task.TaskType])(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>

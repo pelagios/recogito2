@@ -1,7 +1,7 @@
 @(
-  doc: models.document.DocumentInfo,
-  currentUser: models.user.User,
-  sharingPolicies: Seq[models.generated.tables.records.SharingPolicyRecord]
+  doc: services.document.DocumentInfo,
+  currentUser: services.user.User,
+  sharingPolicies: Seq[services.generated.tables.records.SharingPolicyRecord]
  )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Recogito | Settings - Sharing", doc, currentUser, Some("sharing")) {

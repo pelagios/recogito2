@@ -4,10 +4,10 @@ import com.mohiva.play.silhouette.api.Silhouette
 import com.vividsolutions.jts.geom.Coordinate
 import controllers.{BaseOptAuthController, HasPrettyPrintJSON, Security}
 import javax.inject.{Inject, Singleton}
-import models.document.DocumentService
-import models.place.PlaceService
-import models.user.UserService
-import models.user.Roles._
+import services.document.DocumentService
+import services.place.PlaceService
+import services.user.UserService
+import services.user.Roles._
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}

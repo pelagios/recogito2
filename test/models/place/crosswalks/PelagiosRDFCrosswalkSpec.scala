@@ -2,7 +2,7 @@ package models.place.crosswalks
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import java.io.{ File, FileInputStream }
-import models.place.{ Gazetteer, Name, Description, TemporalBounds }
+import services.place.{ Gazetteer, Name, Description, TemporalBounds }
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._

@@ -3,11 +3,11 @@ package controllers.document.map
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, HasVisitLogging, Security}
 import javax.inject.{Inject, Singleton}
-import models.document.DocumentService
-import models.annotation.AnnotationService
-import models.user.UserService
-import models.user.Roles._
-import models.visit.VisitService
+import services.document.DocumentService
+import services.annotation.AnnotationService
+import services.user.UserService
+import services.user.Roles._
+import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.ControllerComponents

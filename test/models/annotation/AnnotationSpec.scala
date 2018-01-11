@@ -1,7 +1,7 @@
 package models.annotation
 
 import java.util.UUID
-import models.ContentType
+import services.ContentType
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat
 import org.junit.runner._

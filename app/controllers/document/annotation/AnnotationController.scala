@@ -4,12 +4,12 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, HasVisitLogging, HasTEISnippets, Security}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import models.ContentType
-import models.annotation.AnnotationService
-import models.document.{DocumentAccessLevel, DocumentInfo, DocumentService}
-import models.generated.tables.records.{DocumentFilepartRecord, DocumentRecord, UserRecord}
-import models.user.{User, UserService}
-import models.visit.VisitService
+import services.ContentType
+import services.annotation.AnnotationService
+import services.document.{DocumentAccessLevel, DocumentInfo, DocumentService}
+import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord, UserRecord}
+import services.user.{User, UserService}
+import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}
 import play.api.mvc.{ControllerComponents, RequestHeader, Result}

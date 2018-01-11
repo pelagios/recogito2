@@ -1,8 +1,8 @@
 @(
-  doc: models.document.DocumentInfo,
-  currentPart: models.generated.tables.records.DocumentFilepartRecord,
-  currentUser: Option[models.user.User],
-  accessLevel: models.document.DocumentAccessLevel,
+  doc: services.document.DocumentInfo,
+  currentPart: services.generated.tables.records.DocumentFilepartRecord,
+  currentUser: Option[services.user.User],
+  accessLevel: services.document.DocumentAccessLevel,
   annotationCount: Long,
   content: String
  )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)

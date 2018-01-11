@@ -6,7 +6,7 @@ import kantan.csv.CsvConfiguration.{ Header, QuotePolicy }
 import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import kantan.codecs.Result.Success
-import models.annotation.Annotation
+import services.annotation.Annotation
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
 

@@ -1,7 +1,7 @@
 package controllers.document.downloads.serializers.webannotation
 
-import models.image._
-import models.annotation.{ Annotation, AnnotationBody }
+import services.image._
+import services.annotation.{ Annotation, AnnotationBody }
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 

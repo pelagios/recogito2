@@ -2,8 +2,8 @@ package transform.tiling
 
 import akka.actor.Actor
 import java.io.File
-import models.task.{ TaskService, TaskStatus }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.task.{ TaskService, TaskStatus }
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._
 

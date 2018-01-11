@@ -2,7 +2,7 @@ package controllers.document.settings.actions
 
 import controllers.document.BackupWriter
 import controllers.document.settings.SettingsController
-import models.user.Roles._
+import services.user.Roles._
 
 trait BackupActions extends BackupWriter { self: SettingsController =>
 

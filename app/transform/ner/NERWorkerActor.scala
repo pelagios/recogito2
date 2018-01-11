@@ -3,11 +3,11 @@ package transform.ner
 import akka.actor.Actor
 import java.io.File
 import java.util.UUID
-import models.ContentType
-import models.annotation._
-import models.place.PlaceService
-import models.task._
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.ContentType
+import services.annotation._
+import services.place.PlaceService
+import services.task._
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import org.pelagios.recogito.sdk.ner._
 import play.api.Logger

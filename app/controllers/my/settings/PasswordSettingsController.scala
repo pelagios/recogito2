@@ -3,8 +3,8 @@ package controllers.my.settings
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{ HasConfig, HasUserService, Security }
 import javax.inject.Inject
-import models.user.UserService
-import models.user.Roles._
+import services.user.UserService
+import services.user.Roles._
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._

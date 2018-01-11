@@ -1,6 +1,6 @@
 package controllers
 
-import models.annotation.{Annotation, AnnotationBody}
+import services.annotation.{Annotation, AnnotationBody}
 
 trait HasTextSnippets {
   

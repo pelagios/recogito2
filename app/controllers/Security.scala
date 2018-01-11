@@ -14,8 +14,8 @@ import com.mohiva.play.silhouette.impl.util.{DefaultFingerprintGenerator, Secure
 import com.mohiva.play.silhouette.password.BCryptPasswordHasher
 import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, InMemoryAuthInfoDAO}
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
-import models.user.{User, UserService}
-import models.user.Roles.Role
+import services.user.{User, UserService}
+import services.user.Roles.Role
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
 import play.api.mvc.{CookieHeaderEncoding, Request}

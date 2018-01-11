@@ -2,10 +2,10 @@ package models.geotag
 
 import java.io.File
 import java.util.UUID
-import models.ContentType
-import models.annotation._
-import models.place._
-import models.place.crosswalks.PelagiosRDFCrosswalk
+import services.ContentType
+import services.annotation._
+import services.place._
+import services.place.crosswalks.PelagiosRDFCrosswalk
 import org.apache.commons.io.FileUtils
 import org.joda.time.{DateTime, DateTimeZone}
 import org.specs2.mutable._

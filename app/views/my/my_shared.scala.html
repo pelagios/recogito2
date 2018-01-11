@@ -1,10 +1,10 @@
 @(
-  user: models.user.User,
+  user: services.user.User,
   usedDiskspace: Long,
   myDocCount: Int,
-  rows: models.Page[(models.generated.tables.records.DocumentRecord, models.generated.tables.records.SharingPolicyRecord, Option[models.contribution.Contribution], Long)],
+  rows: services.Page[(services.generated.tables.records.DocumentRecord, services.generated.tables.records.SharingPolicyRecord, Option[services.contribution.Contribution], Long)],
   sortBy: String,
-  sortOrder: models.SortOrder,
+  sortOrder: services.SortOrder,
   pageSize: Option[Int]
  )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 

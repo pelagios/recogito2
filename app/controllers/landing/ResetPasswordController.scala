@@ -1,8 +1,8 @@
 package controllers.landing
 
 import javax.inject.{Inject, Singleton}
-import models.user.UserService
-import models.generated.tables.records.UserRecord
+import services.user.UserService
+import services.generated.tables.records.UserRecord
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport

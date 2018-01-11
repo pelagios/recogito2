@@ -2,9 +2,9 @@ package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
 import java.util.UUID
-import models.document.PartOrdering
-import models.user.Roles._
-import models.generated.tables.records.DocumentRecord
+import services.document.PartOrdering
+import services.user.Roles._
+import services.generated.tables.records.DocumentRecord
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.json._

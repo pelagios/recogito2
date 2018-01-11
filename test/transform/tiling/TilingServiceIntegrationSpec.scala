@@ -5,9 +5,9 @@ import akka.testkit.{ TestKit, ImplicitSender }
 import java.io.File
 import java.util.UUID
 import java.sql.Timestamp
-import models.ContentType
-import models.task.{ TaskService, TaskStatus }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.ContentType
+import services.task.{ TaskService, TaskStatus }
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.apache.commons.io.FileUtils
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -20,7 +20,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import models.task.TaskStatus
+import services.task.TaskStatus
 
 @RunWith(classOf[JUnitRunner])
 class TilingServiceIntegrationSpec extends TestKit(ActorSystem()) with ImplicitSender with SpecificationLike with AfterAll {

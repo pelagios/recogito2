@@ -5,10 +5,10 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import models.document.{DocumentInfo, DocumentService}
-import models.task.{TaskType, TaskService, TaskRecordAggregate}
-import models.user.UserService
-import models.user.Roles._
+import services.document.{DocumentInfo, DocumentService}
+import services.task.{TaskType, TaskService, TaskRecordAggregate}
+import services.user.UserService
+import services.user.Roles._
 import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.json.Reads._

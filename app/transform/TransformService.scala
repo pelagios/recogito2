@@ -1,7 +1,7 @@
 package transform
 
 import akka.actor.ActorSystem 
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 
 private[transform] object TransformTaskMessages {
   

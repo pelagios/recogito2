@@ -5,15 +5,15 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, Security}
 import java.io.FileInputStream
 import javax.inject.{Inject, Singleton}
-import models.document.DocumentService
-import models.place.PlaceService
-import models.user.UserService
-import models.user.Roles._
+import services.document.DocumentService
+import services.place.PlaceService
+import services.user.UserService
+import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
-import models.place.crosswalks._
+import services.place.crosswalks._
 
 @Singleton
 class GazetteerAdminController @Inject() (

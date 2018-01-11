@@ -1,7 +1,7 @@
 package controllers.document.downloads.serializers.tei
 
-import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import models.document.{ DocumentInfo, DocumentService }
+import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import services.document.{ DocumentInfo, DocumentService }
 import play.api.mvc.{ AnyContent, Request }
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.xml.{ UnprefixedAttribute, Node, Null, Text }

@@ -7,10 +7,10 @@ import java.io.{ File, InputStream }
 import java.sql.Timestamp
 import java.util.UUID
 import java.util.zip.ZipFile
-import models.{ ContentType, HasDate, HasContentTypeList }
-import models.annotation._
-import models.document.DocumentService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.{ ContentType, HasDate, HasContentTypeList }
+import services.annotation._
+import services.document.DocumentService
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._

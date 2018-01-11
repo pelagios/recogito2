@@ -1,8 +1,8 @@
 package controllers.document.downloads.serializers.webannotation
 
 import controllers.document.downloads.serializers.BaseSerializer
-import models.annotation.AnnotationService
-import models.document.{ DocumentInfo, DocumentService }
+import services.annotation.AnnotationService
+import services.document.{ DocumentInfo, DocumentService }
 import play.api.mvc.{ AnyContent, Request }
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext

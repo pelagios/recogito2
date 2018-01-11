@@ -1,7 +1,7 @@
 package controllers.document.downloads.serializers.tei
 
 import controllers.document.downloads.serializers.BaseSerializer
-import models.annotation.{ Annotation, AnnotationBody }
+import services.annotation.{ Annotation, AnnotationBody }
 
 trait BaseTEISerializer extends BaseSerializer {
 

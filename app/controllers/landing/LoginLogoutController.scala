@@ -3,7 +3,7 @@ package controllers.landing
 import com.mohiva.play.silhouette.api.{LoginInfo, Silhouette}
 import controllers.{HasConfig, HasUserService, Security}
 import javax.inject.{Inject, Singleton}
-import models.user.UserService
+import services.user.UserService
 import play.api.Configuration
 import play.api.data.Form
 import play.api.data.Forms._

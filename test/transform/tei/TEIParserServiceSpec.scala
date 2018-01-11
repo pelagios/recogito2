@@ -2,8 +2,8 @@ package transform.tei
 
 import java.io.File
 import java.util.UUID
-import models.ContentType
-import models.generated.tables.records.DocumentFilepartRecord
+import services.ContentType
+import services.generated.tables.records.DocumentFilepartRecord
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -13,7 +13,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import scala.io.Source
-import models.annotation.AnnotationBody
+import services.annotation.AnnotationBody
 
 @RunWith(classOf[JUnitRunner])
 class TEIParserServiceSpec extends Specification {

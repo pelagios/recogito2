@@ -3,9 +3,9 @@ package controllers.document.downloads.serializers
 import java.io.{ File, FileOutputStream }
 import java.nio.file.Paths
 import java.util.UUID
-import models.HasDate
-import models.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import models.document.{ DocumentInfo, DocumentService }
+import services.HasDate
+import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import services.document.{ DocumentInfo, DocumentService }
 import org.apache.jena.rdf.model.{ Model, ModelFactory }
 import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
 import org.apache.jena.vocabulary.{ DCTerms, RDF }

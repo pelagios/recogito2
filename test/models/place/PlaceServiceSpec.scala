@@ -2,7 +2,7 @@ package models.place
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import java.io.{ File, FileInputStream }
-import models.geotag.GeoTagStore
+import services.geotag.GeoTagStore
 import org.joda.time.DateTime
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -13,7 +13,7 @@ import play.api.test.Helpers._
 import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
-import models.place.crosswalks.PelagiosRDFCrosswalk
+import services.place.crosswalks.PelagiosRDFCrosswalk
 
 // So we can instantiate a PlaceService running on a mock store
 class TestPlaceService extends MockPlaceStore with PlaceImporter with GeoTagStore

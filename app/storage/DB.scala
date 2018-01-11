@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import com.google.inject.AbstractModule
 import java.sql.Connection
 import javax.inject.{ Inject, Singleton }
-import models.user.UserService
-import models.user.Roles
+import services.user.UserService
+import services.user.Roles
 import org.jooq.impl.DSL
 import org.jooq.{ SQLDialect, DSLContext }
 import play.api.db.Database

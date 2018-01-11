@@ -3,12 +3,12 @@ package controllers.my.settings
 import com.mohiva.play.silhouette.api.{Silhouette, LoginInfo}
 import controllers.{HasUserService, HasConfig, Security}
 import javax.inject.Inject
-import models.annotation.AnnotationService
-import models.contribution.ContributionService
-import models.user.Roles._
-import models.user.UserService
-import models.upload.UploadService
-import models.document.DocumentService
+import services.annotation.AnnotationService
+import services.contribution.ContributionService
+import services.user.Roles._
+import services.user.UserService
+import services.upload.UploadService
+import services.document.DocumentService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.data.Form

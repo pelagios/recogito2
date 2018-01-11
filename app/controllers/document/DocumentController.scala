@@ -4,10 +4,10 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, Security}
 import java.io.File
 import javax.inject.{Inject, Singleton}
-import models.ContentType
-import models.document.DocumentService
-import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import models.user.UserService
+import services.ContentType
+import services.document.DocumentService
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.user.UserService
 import play.api.Configuration
 import play.api.http.FileMimeTypes
 import play.api.mvc.ControllerComponents
@@ -87,7 +87,7 @@ class DocumentController @Inject() (
   /** Returns a thumbnail file for the given document part **/
   def getThumbnail(docId: String, partNo: Int) = silhouette.UserAwareAction.async { implicit request =>
     
-    import models.ContentType._
+    import services.ContentType._
     
     def iiifThumbnailURL(iiifUrl: String) =
       iiifUrl.substring(0, iiifUrl.length - 9) + "full/160,/0/default.jpg"

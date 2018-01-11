@@ -1,7 +1,7 @@
 @(
-  doc: models.document.DocumentInfo,
-  currentUser: Option[models.user.User],
-  accessLevel: models.document.DocumentAccessLevel
+  doc: services.document.DocumentInfo,
+  currentUser: Option[services.user.User],
+  accessLevel: services.document.DocumentAccessLevel
  )(implicit header: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>

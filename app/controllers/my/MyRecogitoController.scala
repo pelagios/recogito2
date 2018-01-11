@@ -3,12 +3,12 @@ package controllers.my
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, Security}
 import javax.inject.{Inject, Singleton}
-import models.{Page, SortOrder}
-import models.annotation.AnnotationService
-import models.contribution.{Contribution, ContributionService}
-import models.user.{User, UserService}
-import models.document.DocumentService
-import models.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
+import services.{Page, SortOrder}
+import services.annotation.AnnotationService
+import services.contribution.{Contribution, ContributionService}
+import services.user.{User, UserService}
+import services.document.DocumentService
+import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.{ControllerComponents, RequestHeader}

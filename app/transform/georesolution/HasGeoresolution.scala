@@ -2,11 +2,11 @@ package transform.georesolution
 
 import com.vividsolutions.jts.geom.Coordinate
 import java.util.UUID
-import models.ContentType
-import models.annotation._
-import models.place.PlaceService
-import models.task.TaskService
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.ContentType
+import services.annotation._
+import services.place.PlaceService
+import services.task.TaskService
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._

@@ -4,12 +4,12 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import controllers.document.settings.actions._
 import javax.inject.{Inject, Singleton}
-import models.annotation.AnnotationService
-import models.contribution.ContributionService
-import models.document.{DocumentService, DocumentInfo, DocumentAccessLevel}
-import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import models.user.UserService
-import models.user.Roles._
+import services.annotation.AnnotationService
+import services.contribution.ContributionService
+import services.document.{DocumentService, DocumentInfo, DocumentAccessLevel}
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.user.UserService
+import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.http.FileMimeTypes

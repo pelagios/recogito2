@@ -3,10 +3,10 @@ package transform.georesolution
 import akka.actor.{ ActorSystem, Props }
 import java.io.File
 import javax.inject.{ Inject, Singleton }
-import models.annotation.AnnotationService
-import models.place.PlaceService
-import models.task.{ TaskService, TaskType }
-import models.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.annotation.AnnotationService
+import services.place.PlaceService
+import services.task.{ TaskService, TaskType }
+import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import storage.Uploads

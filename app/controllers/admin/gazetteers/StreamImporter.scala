@@ -4,7 +4,7 @@ import akka.stream.{ActorAttributes, ClosedShape, Materializer, Supervision}
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import java.io.InputStream
-import models.place.{GazetteerRecord, PlaceService}
+import services.place.{GazetteerRecord, PlaceService}
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{Await, ExecutionContext}

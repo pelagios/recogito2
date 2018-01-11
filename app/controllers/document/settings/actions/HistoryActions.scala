@@ -1,7 +1,7 @@
 package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
-import models.user.Roles._
+import services.user.Roles._
 import play.api.libs.json.Json
 import scala.concurrent.Future
 

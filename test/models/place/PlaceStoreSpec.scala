@@ -1,7 +1,7 @@
 package models.place
 
 import java.io.File
-import models.geotag.ESGeoTagStore
+import services.geotag.ESGeoTagStore
 import org.apache.commons.io.FileUtils
 import org.joda.time.{DateTime, DateTimeZone}
 import org.specs2.mutable._

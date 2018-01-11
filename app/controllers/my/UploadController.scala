@@ -4,13 +4,13 @@ import akka.actor.ActorSystem
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import javax.inject.{Inject, Singleton}
-import models.{ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException}
-import models.document.DocumentService
-import models.task.{TaskService, TaskType}
-import models.upload.{UploadService, QuotaExceededException}
-import models.generated.tables.records.UploadRecord
-import models.user.{User, UserService}
-import models.user.Roles._
+import services.{ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException}
+import services.document.DocumentService
+import services.task.{TaskService, TaskType}
+import services.upload.{UploadService, QuotaExceededException}
+import services.generated.tables.records.UploadRecord
+import services.user.{User, UserService}
+import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}
 import play.api.data.Form

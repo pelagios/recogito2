@@ -1,8 +1,8 @@
 package models.visit
 
 import java.util.UUID
-import models.ContentType
-import models.document.DocumentAccessLevel
+import services.ContentType
+import services.document.DocumentAccessLevel
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._

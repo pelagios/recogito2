@@ -1,6 +1,6 @@
 @(
-  doc: models.document.DocumentInfo,
-  currentUser: models.user.User
+  doc: services.document.DocumentInfo,
+  currentUser: services.user.User
  )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Recogito | Settings - Backup & Restore", doc, currentUser, Some("backup")) {

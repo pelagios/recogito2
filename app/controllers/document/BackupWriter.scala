@@ -7,10 +7,10 @@ import java.math.BigInteger
 import java.security.{MessageDigest, DigestInputStream}
 import java.util.UUID
 import java.util.zip.{ZipEntry, ZipOutputStream}
-import models.HasDate
-import models.annotation.{Annotation, AnnotationService}
-import models.document.DocumentInfo
-import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.HasDate
+import services.annotation.{Annotation, AnnotationService}
+import services.document.DocumentInfo
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.libs.json.Json
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,7 +59,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     def getMetadataAsStream(doc: DocumentInfo) = {
       
       // DocumentRecord JSON serialization
-      import models.document.DocumentService._
+      import services.document.DocumentService._
       
       val json = Json.prettyPrint(Json.toJson((doc.document, doc.fileparts)))
       new ByteArrayInputStream(json.getBytes)

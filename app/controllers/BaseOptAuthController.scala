@@ -1,8 +1,8 @@
 package controllers
 
-import models.document.{DocumentAccessLevel, DocumentInfo, DocumentService}
-import models.generated.tables.records.{DocumentFilepartRecord, DocumentRecord}
-import models.user.{User, UserService}
+import services.document.{DocumentAccessLevel, DocumentInfo, DocumentService}
+import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord}
+import services.user.{User, UserService}
 import play.api.Configuration
 import play.api.mvc.{AnyContent, ControllerComponents, Request, Result}
 import scala.concurrent.{ExecutionContext, Future}

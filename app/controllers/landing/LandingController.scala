@@ -2,10 +2,10 @@ package controllers.landing
 
 import controllers.{ HasConfig, HasUserService, HasVisitLogging, HasPrettyPrintJSON, Security }
 import javax.inject.{ Inject, Singleton }
-import models.annotation.AnnotationService
-import models.contribution.ContributionService
-import models.user.UserService
-import models.visit.VisitService
+import services.annotation.AnnotationService
+import services.contribution.ContributionService
+import services.user.UserService
+import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.libs.json.Json

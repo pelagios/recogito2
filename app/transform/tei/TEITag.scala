@@ -1,9 +1,9 @@
 package transform.tei
 
 import java.util.UUID
-import models.ContentType
-import models.annotation.{ Annotation, AnnotationBody, AnnotationStatus, AnnotatedObject }
-import models.generated.tables.records.DocumentFilepartRecord
+import services.ContentType
+import services.annotation.{ Annotation, AnnotationBody, AnnotationStatus, AnnotatedObject }
+import services.generated.tables.records.DocumentFilepartRecord
 import org.joda.time.DateTime
 import org.joox.JOOX._
 import org.w3c.dom.Element

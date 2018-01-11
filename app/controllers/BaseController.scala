@@ -1,6 +1,6 @@
 package controllers
 
-import models.user.UserService
+import services.user.UserService
 import play.api.Configuration
 import play.api.mvc.{ AnyContent, AbstractController, ControllerComponents, Request }
 

@@ -3,9 +3,9 @@ package controllers.document.discussion
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, Security}
 import javax.inject.{Inject, Singleton}
-import models.document.DocumentService
-import models.user.UserService
-import models.user.Roles._
+import services.document.DocumentService
+import services.user.UserService
+import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.ControllerComponents

@@ -1,9 +1,9 @@
 package controllers
 
-import models.ContentType
-import models.annotation.{ Annotation, AnnotationBody, AnnotationStatus }
-import models.contribution._
-import models.generated.tables.records.DocumentRecord
+import services.ContentType
+import services.annotation.{ Annotation, AnnotationBody, AnnotationStatus }
+import services.contribution._
+import services.generated.tables.records.DocumentRecord
 
 trait HasAnnotationValidation {
   

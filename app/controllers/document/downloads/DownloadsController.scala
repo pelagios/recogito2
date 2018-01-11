@@ -6,11 +6,11 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, Security}
 import controllers.document.downloads.serializers._
 import javax.inject.{Inject, Singleton}
-import models.ContentType
-import models.annotation.AnnotationService
-import models.document.{DocumentInfo, DocumentService}
-import models.place.PlaceService
-import models.user.UserService
+import services.ContentType
+import services.annotation.AnnotationService
+import services.document.{DocumentInfo, DocumentService}
+import services.place.PlaceService
+import services.user.UserService
 import org.apache.jena.riot.RDFFormat
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}

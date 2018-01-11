@@ -5,13 +5,13 @@ import controllers._
 import java.io.File
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import models.{ContentType, HasDate}
-import models.annotation._
-import models.contribution._
-import models.document.{DocumentService, DocumentInfo}
-import models.user.UserService
-import models.image.ImageService
-import models.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.{ContentType, HasDate}
+import services.annotation._
+import services.contribution._
+import services.document.{DocumentService, DocumentInfo}
+import services.user.UserService
+import services.image.ImageService
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime
 import play.api.{Configuration, Logger}
 import play.api.http.FileMimeTypes
