@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.0",
   "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.0",
   "com.mohiva" %% "play-silhouette-persistence" % "5.0.0",
-  "com.mohiva" %% "play-silhouette-testkit" % "5.0.0" % "test",
+  "com.mohiva" %% "play-silhouette-testkit" % "5.0.0" % Test,
   "com.mohiva" %% "play-silhouette-cas" % "5.0.0",
 
   "com.nrinaudo" %% "kantan.csv" % "0.2.1",
@@ -35,7 +35,7 @@ libraryDependencies ++= Seq(
   "com.sksamuel.elastic4s" %% "elastic4s-tcp" % "5.6.1",
 
   "com.typesafe.akka" %% "akka-contrib" % "2.5.8",
-  "com.typesafe.akka" %% "akka-testkit" % "2.5.8" % "test",
+  "com.typesafe.akka" %% "akka-testkit" % "2.5.8" % Test,
 
   "com.typesafe.play" %% "play-iteratees" % "2.6.1",
   "com.typesafe.play" %% "play-iteratees-reactive-streams" % "2.6.1",
