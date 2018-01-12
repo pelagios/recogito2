@@ -55,12 +55,7 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
   
   lifecycle.addStopHook { () => Future.successful(stop()) }
     
-  lazy val client = {    
-    val home = config.getOptional[String]("recogito.index.dir") match {
-      case Some(dir) => new File(dir)
-      case None => new File("index")
-    }
-    
+  lazy val client = {
     val host = config.getOptional[String]("es.host").getOrElse("localhost")
     val port = config.getOptional[Int]("es.port").getOrElse(9300)
     val remoteClient = TcpClient.transport(ElasticsearchClientUri(host, port))
