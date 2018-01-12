@@ -1,9 +1,8 @@
 package services.user
 
-import services.generated.tables.records.{UserRecord, UserRoleRecord}
-import services.generated.tables.records.FeatureToggleRecord
-import services.generated.tables.records.FeatureToggleRecord
 import com.mohiva.play.silhouette.api.{Identity, LoginInfo}
+import controllers.Security
+import services.generated.tables.records.{FeatureToggleRecord, UserRecord, UserRoleRecord}
 
 case class User(
     
@@ -31,7 +30,7 @@ case class User(
     
   val featureToggles = featureToggleRecords.map(_.getHasToggle)
   
-  val loginInfo = LoginInfo("recogito", username) // Required by Silhouette auth framework
+  val loginInfo = LoginInfo(Security.PROVIDER_ID, username) // Required by Silhouette auth framework
   
   def hasRole(role: Roles.Role): Boolean = roleRecords.exists(_.getHasRole == role.toString)
 
