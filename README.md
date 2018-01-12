@@ -1,16 +1,19 @@
-# Recogito 2
+# Recogito
 
 [![Project Stats](https://www.openhub.net/p/recogito2/widgets/project_thin_badge.gif)](https://www.openhub.net/p/recogito2)
 
-Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation tool for texts and images, developed by
-[Pelagios](http://commons.pelagios.org). Track our progress on
+Home of [Recogito](http://recogito.pelagios.org) - a Linked Data annotation tool for texts and
+images, developed by [Pelagios](http://commons.pelagios.org). Track our progress on
 [Waffle.io](http://waffle.io/pelagios/recogito2).
 
 ## Prerequisites
 
 * Java 8 JDK
-* [SBT](http://www.scala-sbt.org/) (tested with version 1.0.2)
-* PostgreSQL DB
+* [SBT](http://www.scala-sbt.org/) (version 1.0.x)
+* PostgreSQL DB (tested with version 9.3)
+* __Important: as of version 2.2, Recogito requires an installation of
+  [ElasticSearch v5.6.5](https://www.elastic.co/downloads/past-releases/elasticsearch-5-6-5).
+  Automatic fallback to an embedded ElasticSearch index is no longer supported.__
 * To use image annotation, you need to have the [vips](http://www.vips.ecs.soton.ac.uk/) image
   processing system installed. If vips is not available on the command line, Recogito is set to
   reject uploaded images as 'unsupported content'. (Note: on Ubuntu, 'libvips-tools' is the
@@ -45,20 +48,16 @@ Home of [Recogito v2.0](http://recogito.pelagios.org) - a Linked Data annotation
 
 ## Running in production
 
-* To test production mode before deploying, type `sbt testProd`
+* To test production mode before deploying, type `sbt runProd`
 * To change to a different port (than default 9000), type `sbt "runProd -Dhttp.port=9876"`
 * For full production deployment, refer to the current [Play Framework
-  docs](https://www.playframework.com/documentation/2.5.x/Production)
+  docs](https://www.playframework.com/documentation/2.6.x/Production)
 * Be sure to set a random application secret in `conf/application.conf`. Play includes a utility
   to generate one for you - type `sbt playGenerateSecret`.
-* Production deployment requires an installation of
-  [ElasticSearch v2.4.4](https://www.elastic.co/downloads/past-releases/elasticsearch-2-4-4).
-  (Recogito will automatically create an embedded ElasticSearch index if cannot find a running
-  cluster. However we strictly recommend this only for development purposes!).
 * Last but not least: another reminder to remove the default 'recogito' admin user - or at least
   change its password!
 
 ## License
 
-Recogito v2.0 is licensed under the terms of the
+Recogito is licensed under the terms of the
 [Apache 2.0 license](https://github.com/pelagios/recogito2/blob/master/LICENSE).

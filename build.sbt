@@ -1,6 +1,6 @@
 name := """recogito2"""
 
-version := "1.2"
+version := "2.2"
 
 scalaVersion := "2.11.11"
 

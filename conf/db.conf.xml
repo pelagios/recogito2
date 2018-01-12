@@ -42,7 +42,7 @@
     </generate>
 
     <target>
-      <packageName>models.generated</packageName>
+      <packageName>services.generated</packageName>
       <directory>app</directory>
     </target>
   </generator>
