@@ -8,6 +8,11 @@ import java.lang.Integer
 
 import javax.annotation.Generated
 
+import org.jooq.ForeignKey
+import org.jooq.Identity
+import org.jooq.UniqueKey
+import org.jooq.impl.AbstractKeys
+
 import services.generated.tables.Document
 import services.generated.tables.DocumentFilepart
 import services.generated.tables.FeatureToggle
@@ -30,11 +35,6 @@ import services.generated.tables.records.UploadFilepartRecord
 import services.generated.tables.records.UploadRecord
 import services.generated.tables.records.UserRecord
 import services.generated.tables.records.UserRoleRecord
-
-import org.jooq.ForeignKey
-import org.jooq.Identity
-import org.jooq.UniqueKey
-import org.jooq.impl.AbstractKeys
 
 
 /**

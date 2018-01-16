@@ -11,13 +11,13 @@ import java.util.UUID
 
 import javax.annotation.Generated
 
-import services.generated.tables.Task
-
 import org.jooq.Field
 import org.jooq.Record1
 import org.jooq.Record11
 import org.jooq.Row11
 import org.jooq.impl.UpdatableRecordImpl
+
+import services.generated.tables.Task
 
 
 /**

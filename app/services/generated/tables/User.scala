@@ -13,15 +13,15 @@ import java.util.List
 
 import javax.annotation.Generated
 
-import services.generated.Keys
-import services.generated.Public
-import services.generated.tables.records.UserRecord
-
 import org.jooq.Field
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
 import org.jooq.impl.TableImpl
+
+import services.generated.Keys
+import services.generated.Public
+import services.generated.tables.records.UserRecord
 
 
 object User {
@@ -95,6 +95,11 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	 * The column <code>public.user.quota_mb</code>.
 	 */
 	val QUOTA_MB : TableField[UserRecord, Integer] = createField("quota_mb", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
+
+	/**
+	 * The column <code>public.user.last_login</code>.
+	 */
+	val LAST_LOGIN : TableField[UserRecord, Timestamp] = createField("last_login", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaulted(true), "")
 
 	/**
 	 * Create a <code>public.user</code> table reference

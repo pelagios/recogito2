@@ -10,6 +10,10 @@ import java.util.List
 
 import javax.annotation.Generated
 
+import org.jooq.Sequence
+import org.jooq.Table
+import org.jooq.impl.SchemaImpl
+
 import services.generated.tables.Document
 import services.generated.tables.DocumentFilepart
 import services.generated.tables.FeatureToggle
@@ -21,10 +25,6 @@ import services.generated.tables.Upload
 import services.generated.tables.UploadFilepart
 import services.generated.tables.User
 import services.generated.tables.UserRole
-
-import org.jooq.Sequence
-import org.jooq.Table
-import org.jooq.impl.SchemaImpl
 
 
 object Public {

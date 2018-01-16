@@ -8,7 +8,8 @@ CREATE TABLE "user" (
   real_name TEXT,
   bio TEXT,
   website TEXT,
-  quota_mb INT NOT NULL DEFAULT 200
+  quota_mb INT NOT NULL DEFAULT 200,
+  last_login TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE TABLE user_role (

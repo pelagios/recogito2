@@ -13,10 +13,6 @@ import java.util.List
 
 import javax.annotation.Generated
 
-import services.generated.Keys
-import services.generated.Public
-import services.generated.tables.records.SharingPolicyRecord
-
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Identity
@@ -24,6 +20,10 @@ import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
 import org.jooq.impl.TableImpl
+
+import services.generated.Keys
+import services.generated.Public
+import services.generated.tables.records.SharingPolicyRecord
 
 
 object SharingPolicy {

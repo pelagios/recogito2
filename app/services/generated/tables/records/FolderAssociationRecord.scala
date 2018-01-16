@@ -9,12 +9,12 @@ import java.lang.String
 
 import javax.annotation.Generated
 
-import services.generated.tables.FolderAssociation
-
 import org.jooq.Field
 import org.jooq.Record2
 import org.jooq.Row2
 import org.jooq.impl.TableRecordImpl
+
+import services.generated.tables.FolderAssociation
 
 
 /**

@@ -9,13 +9,13 @@ import java.lang.String
 
 import javax.annotation.Generated
 
-import services.generated.tables.UserRole
-
 import org.jooq.Field
 import org.jooq.Record1
 import org.jooq.Record3
 import org.jooq.Row3
 import org.jooq.impl.UpdatableRecordImpl
+
+import services.generated.tables.UserRole
 
 
 /**

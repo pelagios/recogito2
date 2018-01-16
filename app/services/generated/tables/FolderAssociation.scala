@@ -12,15 +12,15 @@ import java.util.List
 
 import javax.annotation.Generated
 
-import services.generated.Keys
-import services.generated.Public
-import services.generated.tables.records.FolderAssociationRecord
-
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.impl.TableImpl
+
+import services.generated.Keys
+import services.generated.Public
+import services.generated.tables.records.FolderAssociationRecord
 
 
 object FolderAssociation {
