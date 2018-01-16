@@ -37,6 +37,7 @@ POST    /admin/gazetteers                            controllers.admin.gazetteer
 DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 
 GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
+GET     /admin/idle-users.json                       controllers.admin.users.UserAdminController.listIdleUsers(since: String, offset: Int ?= 0, size: Int ?= 100)
 GET     /admin/users                                 controllers.admin.users.UserAdminController.index
 
 GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index

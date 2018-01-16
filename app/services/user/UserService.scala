@@ -36,8 +36,7 @@ class UserService @Inject() (
   private val DEFAULT_QUOTA = config.getOptional[Int]("recogito.upload.quota").getOrElse(200) // The default default
 
   // Required by Silhouette auth framework
-  override def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
-    findByUsername(loginInfo.providerKey)
+  override def retrieve(loginInfo: LoginInfo): Future[Option[User]] = findByUsername(loginInfo.providerKey)
 
   def countUsers() = db.query { sql =>
     sql.selectCount().from(USER).fetchOne(0, classOf[Int])
@@ -55,6 +54,28 @@ class UserService @Inject() (
     val users = query.limit(limit).offset(offset).fetch().into(classOf[UserRecord])
     Page(System.currentTimeMillis - startTime, total, offset, limit, users.toSeq)
   }
+  
+  def listIdleUsers(since: Timestamp, offset: Int = 0, limit: Int = 20) = db.query {  sql =>
+    val startTime = System.currentTimeMillis
+    
+    val total = sql.selectCount()
+      .from(USER)
+      .where(USER.LAST_LOGIN.lessThan(since))
+      .fetchOne(0, classOf[Int])
+      
+    // We'll often use this just to count, so make to skip to 2nd query unless needed
+    val users = 
+      if (limit == 0)
+        Seq.empty[UserRecord]
+      else
+        sql.selectFrom(USER)
+          .where(USER.LAST_LOGIN.lessThan(since))
+          .limit(limit)
+          .offset(offset)
+          .fetch().into(classOf[UserRecord]).toSeq
+    
+    Page(System.currentTimeMillis - startTime, total, offset, limit, users)
+  } 
 
   def insertUser(username: String, email: String, password: String) = db.withTransaction { sql =>
     val now = new Timestamp(new Date().getTime)
