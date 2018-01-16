@@ -69,8 +69,8 @@ class SilhouetteSecurity  extends AbstractModule with ScalaModule {
       httpOnlyCookie = true, // Not accessible through JS
       useFingerprinting = true,
       cookieMaxAge = None,
-      authenticatorIdleTimeout = None,
-      authenticatorExpiry = 1.hour)
+      authenticatorIdleTimeout = Some(1.hour),
+      authenticatorExpiry = 24.hours)
 
     val enc = new CrypterAuthenticatorEncoder(crypter)
     new CookieAuthenticatorService(config, None, signer, cookieHeaderEncoding, enc  , fingerprintGenerator, idGenerator, clock)
