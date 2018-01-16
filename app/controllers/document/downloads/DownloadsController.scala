@@ -179,7 +179,9 @@ class DownloadsController @Inject() (
           case _ => throw new Exception // Can't happen under current conditions (and should fail in the future if things go wrong)
         }
         
-        f.map(xml => Ok(xml).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".tei.xml" }))
+        f.map { xml => 
+          Ok(xml).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}.tei.xml" })
+        }
       }
     })
   }
