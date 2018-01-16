@@ -71,6 +71,13 @@ class UserService @Inject() (
       .set(USER_ROLE.HAS_ROLE, role.toString)
       .execute()
   }
+  
+  def updateLastLogin(username: String) = db.withTransaction { sql =>
+    sql.update(USER)
+      .set(USER.LAST_LOGIN, new Timestamp(new Date().getTime))
+      .where(USER.USERNAME.equal(username))
+      .execute()
+  }
 
   def resetPassword(username: String): Future[String] = db.withTransaction { sql =>
     val randomPassword = RandomStringUtils.randomAlphanumeric(18)

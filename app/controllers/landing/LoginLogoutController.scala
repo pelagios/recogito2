@@ -50,6 +50,7 @@ class LoginLogoutController @Inject() (
       loginData =>
         users.validateUser(loginData.usernameOrPassword, loginData.password).flatMap {
           case Some(validUser) =>
+            users.updateLastLogin(validUser.getUsername)
             auth.create(LoginInfo(Security.PROVIDER_ID, validUser.getUsername))
               .flatMap(auth.init(_))
               .flatMap(auth.embed(_,  Redirect(routes.LandingController.index)))
