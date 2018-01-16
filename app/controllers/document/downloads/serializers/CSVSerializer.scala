@@ -1,21 +1,21 @@
 package controllers.document.downloads.serializers
 
 import controllers.HasCSVParsing
-import java.io.{ BufferedInputStream, File, FileInputStream, FileOutputStream }
+import java.io.{BufferedInputStream, File, FileInputStream, FileOutputStream}
 import java.nio.file.Paths
 import java.util.UUID
-import java.util.zip.{ ZipEntry, ZipOutputStream }
+import java.util.zip.{ZipEntry, ZipOutputStream}
 import kantan.csv.CsvConfiguration
-import kantan.csv.CsvConfiguration.{ Header, QuotePolicy }
+import kantan.csv.CsvConfiguration.{Header, QuotePolicy}
 import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import services.ContentType
-import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.document.DocumentInfo
-import services.place.{ Place, PlaceService }
+import services.place.{Place, PlaceService}
 import services.generated.tables.records.DocumentFilepartRecord
 import play.api.libs.Files.TemporaryFileCreator
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.concurrent.{Future, ExecutionContext}
 import scala.io.Source
 import storage.Uploads
 

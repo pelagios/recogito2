@@ -42,6 +42,8 @@ GET     /admin/users                                 controllers.admin.users.Use
 GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
 POST    /admin/restore                               controllers.admin.backup.BackupAdminController.restore
 
+GET     /admin/export/visits                         controllers.admin.backup.BackupAdminController.exportVisits
+
 GET     /admin/stats.json                            controllers.admin.AdminController.getStats
 GET     /admin                                       controllers.admin.AdminController.index
 
