@@ -13,6 +13,8 @@ import services.generated.tables.records.DocumentFilepartRecord
 import services.user.UserService
 import services.user.Roles._
 import services.visit.VisitService
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.{ControllerComponents, ResponseHeader, Result}
@@ -37,8 +39,18 @@ class BackupAdminController @Inject() (
     implicit val webJarsUtil: WebJarsUtil
   ) extends BaseAuthController(components, config, documents, users) with BackupReader {
   
-  def index = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request => 
-    Ok(views.html.admin.backup.index())
+  def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>    
+    val fVisitsTotal = visits.countTotal()
+    val fVisits6Months = visits.countSince(DateTime.now() minusMonths 6)
+    
+    val f = for {
+      vTotal <- fVisitsTotal
+      v6Months <- fVisits6Months
+    } yield (vTotal, v6Months)
+    
+    f.map { case (vTotal, v6Months) =>
+      Ok(views.html.admin.backup.index(vTotal, v6Months))
+    }
   }
   
   def restore = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
@@ -56,11 +68,13 @@ class BackupAdminController @Inject() (
     }
   }
   
-  def exportVisits= silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+  def exportVisits= silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>    
     visits.scrollExport().map { path =>
+      val fmt = DateTimeFormat.forPattern("yyyy-MM-dd")
       val source = FileIO.fromPath(path)
+      val filename = s"visits-exported-${fmt.print(DateTime.now)}.csv"
       Result(
-        header = ResponseHeader(200, Map.empty),
+        header = ResponseHeader(200, Map("Content-Disposition" -> s"""attachment; filename="${filename}"""")),
         body = HttpEntity.Streamed(source, None, Some("text/csv"))
       )
     }

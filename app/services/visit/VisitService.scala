@@ -3,18 +3,18 @@ package services.visit
 import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.searches.{RichSearchResponse, RichSearchHit}
 import com.sksamuel.elastic4s.ElasticDsl._
+import java.nio.file.Path
 import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.libs.Files.{TemporaryFile, TemporaryFileCreator}
 import scala.concurrent.{Future, ExecutionContext}
 import scala.util.Try
-import services.HasTryToEither
+import services.{HasDate, HasTryToEither}
 import storage.ES
-import java.nio.file.Path
 
 @Singleton
-class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) {
+class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasDate {
  
   implicit object VisitIndexable extends Indexable[Visit] {
     override def json(v: Visit): String = Json.stringify(Json.toJson(v))
@@ -38,10 +38,14 @@ class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) {
       search(ES.RECOGITO / ES.VISIT) limit 0
     } map { _.totalHits }
     
-  def countSince(date: DateTime): Future[Long] = ???
+  def countSince(date: DateTime): Future[Long] =
+    es.client execute {
+      search(ES.RECOGITO / ES.VISIT) query {
+        rangeQuery("visited_at").gt(formatDate(date))
+      } limit 0
+    } map { _.totalHits }
     
   def scrollExport()(implicit creator: TemporaryFileCreator): Future[Path] = {
-    
     val exporter = CsvExporter.createNew()
     
     def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =

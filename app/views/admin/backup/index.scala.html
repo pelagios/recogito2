@@ -1,4 +1,7 @@
-@()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+@(
+  visitsTotal: Long,
+  visits6Months: Long
+)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
@@ -27,13 +30,12 @@
     <div class="visit-stats">
       <h1>Visit Stats</h1>
       <p>
-        XX.XXX visits recorded since ...
+        @visitsTotal visits recorded
         (<a href="@controllers.admin.backup.routes.BackupAdminController.exportVisits">Download CSV</a>)
       </p>
 
       <p>
-        XX.XXX visits older than 1 year
-        (<a href="#">Download CSV</a>)
+        @visits6Months visits in the last 6 months
       </p>
     </div>
   </body>
