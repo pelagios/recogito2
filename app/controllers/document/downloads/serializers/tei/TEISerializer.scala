@@ -90,10 +90,10 @@ trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
     } yield (parts, annotations)
 
     f.map { case (parts, annotationsByPart) =>
-
-      val converted = parts.map { case (part, xml) =>
-        partToTEI(part, xml, annotationsByPart.get(part.getId).get) }
-
+      val converted = parts.flatMap { case (part, xml) =>        
+        annotationsByPart.get(part.getId).map(partToTEI(part, xml, _))
+      }
+      
       scala.xml.XML.loadString(converted.head)
     }
   }
