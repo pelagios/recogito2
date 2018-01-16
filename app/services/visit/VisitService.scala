@@ -12,6 +12,7 @@ import scala.concurrent.{Future, ExecutionContext}
 import scala.util.Try
 import services.{HasDate, HasTryToEither}
 import storage.ES
+import org.elasticsearch.index.reindex.DeleteByQueryAction
 
 @Singleton
 class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasDate {
@@ -84,5 +85,16 @@ class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) ex
     }
    
   }
+  
+  def deleteOlderThan(date: DateTime): Future[Boolean] =
+    es.client execute {
+      deleteIn(ES.RECOGITO / ES.VISIT) by {
+        rangeQuery("visited_at").lt(formatDate(date))
+      }
+    } map { _ => true
+    } recover { case t: Throwable =>
+      t.printStackTrace()
+      false
+    }
   
 }

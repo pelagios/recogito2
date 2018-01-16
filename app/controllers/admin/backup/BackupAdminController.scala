@@ -68,7 +68,7 @@ class BackupAdminController @Inject() (
     }
   }
   
-  def exportVisits= silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>    
+  def exportVisits = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>    
     visits.scrollExport().map { path =>
       val fmt = DateTimeFormat.forPattern("yyyy-MM-dd")
       val source = FileIO.fromPath(path)
@@ -77,6 +77,20 @@ class BackupAdminController @Inject() (
         header = ResponseHeader(200, Map("Content-Disposition" -> s"""attachment; filename="${filename}"""")),
         body = HttpEntity.Streamed(source, None, Some("text/csv"))
       )
+    }
+  }
+  
+  def deleteVisitsOlderThan(date: Option[String]) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+    date match {
+      case Some(_) =>
+        Future.successful(BadRequest("User-provided dates not supported yet."))
+      
+      case _ => 
+        val cutoffDate = DateTime.now minusMonths 6
+        visits.deleteOlderThan(cutoffDate).map { success =>
+          if (success) Ok("Done.")
+          else InternalServerError("Something went wrong.")
+        }
     }
   }
 
