@@ -6,7 +6,8 @@ require([], function(Formatting) {
           { name: "email", type: "text", title: "E-Mail" },
           { name: "real_name", type: "text", title: "Real Name" },
           { name: "member_since", type: "text", title: "Member Since" },
-          { name: "quota", type: "number", title: "Quota" }
+          { name: "quota", type: "number", title: "Quota" },
+          { type: "control",  editButton: false }
         ],
 
         loadData = function(filter) {
@@ -20,6 +21,14 @@ require([], function(Formatting) {
               'itemsCount': response.total
             };
           });
+        },
+
+        deleteUser = function(user) {
+          console.log('Deleting user ' + user.username);
+          jsRoutes.controllers.admin.users.UserAdminController.deleteAccount(user.username)
+            .ajax().done(function() {
+              console.log('Done.');
+            });
         };
 
     jQuery('.user-list').jsGrid({
@@ -30,7 +39,10 @@ require([], function(Formatting) {
       pageLoading: true,
       autoload: true,
       fields: fields,
-      controller: { loadData: loadData },
+      controller: {
+        loadData: loadData,
+        deleteItem: deleteUser
+      },
     });
 
   });

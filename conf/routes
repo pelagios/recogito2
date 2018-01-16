@@ -38,6 +38,7 @@ DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteer
 
 GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 GET     /admin/idle-users.json                       controllers.admin.users.UserAdminController.listIdleUsers(since: String, offset: Int ?= 0, size: Int ?= 100)
+DELETE  /admin/user/:username                        controllers.admin.users.UserAdminController.deleteAccount(username: String)
 GET     /admin/users                                 controllers.admin.users.UserAdminController.index
 
 GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index

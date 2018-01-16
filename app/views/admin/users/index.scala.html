@@ -13,7 +13,8 @@
     <div class="user-list"></div>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.admin.users.routes.javascript.UserAdminController.listUsers
+      controllers.admin.users.routes.javascript.UserAdminController.listUsers,
+      controllers.admin.users.routes.javascript.UserAdminController.deleteAccount
     )
   </body>
 </html>

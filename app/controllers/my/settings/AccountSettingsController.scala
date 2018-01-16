@@ -17,6 +17,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
+import controllers.HasAccountRemoval
 
 case class AccountSettingsData(
   email  : String,
@@ -27,15 +28,15 @@ case class AccountSettingsData(
 class AccountSettingsController @Inject() (
   val components: ControllerComponents,
   val config: Configuration,
-  val users: UserService,
-  val annotations: AnnotationService,
-  val contributions: ContributionService,
-  val documents: DocumentService,
   val silhouette: Silhouette[Security.Env],
-  val uploads: UploadService,
-  implicit val webjars: WebJarsUtil,
-  implicit val ctx: ExecutionContext
-) extends AbstractController(components) with HasUserService with HasConfig with I18nSupport {
+  implicit val annotations: AnnotationService,
+  implicit val contributions: ContributionService,
+  implicit val ctx: ExecutionContext,
+  implicit val documents: DocumentService,
+  implicit val uploads: UploadService,
+  implicit val users: UserService,
+  implicit val webjars: WebJarsUtil
+) extends AbstractController(components) with HasUserService with HasConfig with HasAccountRemoval with I18nSupport {
 
   val accountSettingsForm = Form(
     mapping(
@@ -78,55 +79,7 @@ class AccountSettingsController @Inject() (
   }
   
   def deleteAccount() = silhouette.SecuredAction.async { implicit request =>
-    
-    def deleteFromIndex(documentIds: Seq[String]) = {  
-      def deleteOneDocument(docId: String): Future[Unit] = {
-        // Annotations, geo-tags and version history
-        val deleteAnnotations = annotations.deleteByDocId(docId)
-          
-        // Contributions
-        val deleteContributions = contributions.deleteHistory(docId) 
-          
-        for {
-          _ <- deleteAnnotations
-          _ <- deleteContributions
-        } yield ()
-      }
-      
-      Future {
-        scala.concurrent.blocking {
-          documentIds.foreach(id => Await.result(deleteOneDocument(id), 10.second))
-        }
-      }
-    }
-    
-    val username = request.identity.username
-    
-    // Fetch IDs of all documents owned by this user
-    val fOwnedDocumentIds = documents.listAllIdsByOwner(username)
-        
-    // Delete pending upload & upload_filepart records
-    val fDeletePendingUpload = uploads.deletePendingUpload(username)
-    
-    // Delete sharing policies shared by and with this user
-    val fDeleteSharingPolicies = documents.deleteAffectedPolicies(username)
-        
-    val f = for {
-      ids <- fOwnedDocumentIds
-      _ <- fDeletePendingUpload
-      _ <- fDeleteSharingPolicies
-      
-      // Delete owned documents, document_fileparts & sharing policies linked to them
-      _ <- documents.deleteByOwner(username) 
-      
-      // Delete annotations, history, geotags & contributions
-      _ <- deleteFromIndex(ids)
-
-      // User & roles
-      _ <- users.deleteByUsername(username)
-    } yield ()
-    
-    f.flatMap { _ =>
+    deleteUserAccount(request.identity.username).flatMap { _ =>
       silhouette.env.authenticatorService.discard(
         request.authenticator,
         Redirect(controllers.landing.routes.LandingController.index))

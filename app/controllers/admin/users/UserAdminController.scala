@@ -4,7 +4,10 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import javax.inject.{Inject, Singleton}
 import services.{HasDate, SortOrder}
+import services.annotation.AnnotationService
+import services.contribution.ContributionService
 import services.document.DocumentService
+import services.upload.UploadService
 import services.user.Roles._
 import services.user.UserService
 import services.generated.tables.records.UserRecord
@@ -18,17 +21,21 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Try, Success, Failure}
 import org.joda.time.format.DateTimeFormat
 import java.sql.Timestamp
+import controllers.HasAccountRemoval
 
 @Singleton
 class UserAdminController @Inject() (
   val components: ControllerComponents, 
   val config: Configuration,
-  val documents: DocumentService,
-  val users: UserService,
   val silhouette: Silhouette[Security.Env],
+  implicit val annotations: AnnotationService,
+  implicit val contributions: ContributionService,
   implicit val ctx: ExecutionContext,
+  implicit val documents: DocumentService,
+  implicit val uploads: UploadService,
+  implicit val users: UserService,
   implicit val webJarsUtil: WebJarsUtil
-) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON with HasDate {
+) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON with HasDate with HasAccountRemoval {
   
   private val fmt = DateTimeFormat.forPattern("yyyy-MM-dd")
   
@@ -68,6 +75,10 @@ class UserAdminController @Inject() (
       case Failure(t) =>
         Future.successful(BadRequest(s"Invalid date: ${date}")) 
     }
+  }
+  
+  def deleteAccount(username: String) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+    deleteUserAccount(username).map(_ => Ok)
   }
 
 }
