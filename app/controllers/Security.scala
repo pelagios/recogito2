@@ -8,6 +8,7 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services.AuthenticatorService
 import com.mohiva.play.silhouette.api.util._
 import com.mohiva.play.silhouette.api.{Authorization, Environment, EventBus, Silhouette, SilhouetteProvider}
+import com.mohiva.play.silhouette.api.actions.SecuredErrorHandler
 import com.mohiva.play.silhouette.crypto.{JcaSigner, JcaSignerSettings, JcaCrypter, JcaCrypterSettings}
 import com.mohiva.play.silhouette.impl.authenticators.{CookieAuthenticator, CookieAuthenticatorSettings, CookieAuthenticatorService}
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
@@ -18,12 +19,13 @@ import services.user.{User, UserService}
 import services.user.Roles.Role
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
-import play.api.mvc.{CookieHeaderEncoding, Request}
+import play.api.mvc.{CookieHeaderEncoding, Request, RequestHeader, Results}
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import scala.reflect.ClassTag
+import javax.inject.Inject
 
 class SilhouetteSecurity  extends AbstractModule with ScalaModule {
 
@@ -32,6 +34,7 @@ class SilhouetteSecurity  extends AbstractModule with ScalaModule {
 
   override def configure(): Unit = {
     bind[Silhouette[Security.Env]].to[SilhouetteProvider[Security.Env]]
+    bind[SecuredErrorHandler].to[RecogitoSecuredErrorHandler]
     bind[PasswordHasher].toInstance(new BCryptPasswordHasher)
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
     bind[FingerprintGenerator].toInstance(new DefaultFingerprintGenerator(false))
@@ -155,4 +158,17 @@ class AuthInfoRepositoryImpl[C <: AuthInfo](implicit tag: ClassTag[C]) extends A
     Future.successful(())
   }
 
+}
+
+/** https://github.com/mohiva/play-silhouette-seed/blob/master/app/utils/auth/CustomSecuredErrorHandler.scala **/
+class RecogitoSecuredErrorHandler @Inject()() extends SecuredErrorHandler {
+
+  override def onNotAuthenticated(implicit request: RequestHeader) = {
+    Future.successful(Results.Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm()))
+  }
+
+  override def onNotAuthorized(implicit request: RequestHeader) = {
+    Future.successful(Results.Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm()))
+  }
+  
 }
