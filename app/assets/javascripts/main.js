@@ -4,6 +4,7 @@ require.config({
   paths: { marked: '../../../web-modules/main/webjars/lib/marked/marked.min' },
   modules : [
     { name : 'admin/dashboard' },
+    { name : 'admin/maintenance' },
     { name : 'admin/users' },
     { name : 'document/annotation/image/app' },
     { name : 'document/annotation/table/app' },

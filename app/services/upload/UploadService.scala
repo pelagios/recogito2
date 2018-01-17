@@ -151,13 +151,26 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
          .where(UPLOAD_FILEPART.OWNER.equal(username))
          .fetchArray
 
-    fileparts.foreach(part => {
+    fileparts.foreach { part =>
       val file = new File(uploads.PENDING_UPLOADS_DIR, part.getFile)
       file.delete()
-    })
+    }
 
-    sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.OWNER.equal(username)).execute
+    sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.OWNER.equal(username)).execute()
     sql.deleteFrom(UPLOAD).where(UPLOAD.OWNER.equal(username)).execute() == 1
+  }
+  
+  /** Admin-level method to drop all pending uploads from the system **/
+  def deleteAllPendingUploads() = db.withTransaction { sql =>
+    // Delete files from 'pending' directory
+    val fileparts = sql.selectFrom(UPLOAD_FILEPART).fetchArray()
+    fileparts.foreach { part =>
+      val file = new File(uploads.PENDING_UPLOADS_DIR, part.getFile)
+      file.delete()
+    }
+    
+    sql.deleteFrom(UPLOAD_FILEPART).execute()
+    sql.deleteFrom(UPLOAD).execute()
   }
 
   /** Retrieves the pending uplotad for a user (if any) along with the filepart metadata records **/

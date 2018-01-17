@@ -3,6 +3,7 @@ package controllers.admin.maintenance
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, Security}
 import javax.inject.{Inject, Singleton}
+import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.ControllerComponents
 import scala.concurrent.ExecutionContext
@@ -19,7 +20,8 @@ class MaintenanceController @Inject()(
   val silhouette: Silhouette[Security.Env],
   val uploads: UploadService,
   val users: UserService,
-  implicit val ctx: ExecutionContext
+  implicit val ctx: ExecutionContext,
+  implicit val webJarsUtil: WebJarsUtil
 ) extends BaseAuthController(components, config, documents, users) {
   
   def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
@@ -32,8 +34,8 @@ class MaintenanceController @Inject()(
     Ok
   }
   
-  def deleteAllPending = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
-    Ok
+  def deleteAllPending = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+    uploads.deleteAllPendingUploads().map(_ => Ok)
   }
   
 }

@@ -1,8 +1,10 @@
-@(uploads: Seq[services.generated.tables.records.UploadRecord])
+@(uploads: Seq[services.generated.tables.records.UploadRecord])(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito Administration - Maintenance</title>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/admin/maintenance.js")))
   </head>
   <body>
     <div class="side-navbar">
@@ -21,11 +23,15 @@
             <td>@upload.getOwner</td>
             <td>@upload.getTitle</td>
             <td>@upload.getCreatedAt</td>
-            <td><a href="#">Delete</a></td>
+            <td><a href="#" class="delete-one">Delete</a></td>
           </tr>
         }
       </table>
-      <a href="#">Delete all</a>
+      <a href="#" class="delete-all">Delete all</a>
     </div>
+
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.admin.maintenance.routes.javascript.MaintenanceController.deleteAllPending
+    )
   </body>
 </html>
