@@ -21,7 +21,7 @@ import storage.{DB, Uploads}
 class QuotaExceededException(val remainingSpaceKb: Long, val filesizeKb: Double) extends RuntimeException
 
 class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) extends BaseService {
-
+  
   /** Inserts a new upload, or updates an existing one if it already exists **/
   def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String) =
     db.withTransaction { sql =>
@@ -91,7 +91,9 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
           Right(filepartRecord)
         }
   
-        case Left(e) => Left(e)
+        case Left(e) =>
+          file.delete()
+          Left(e)
       }
     }
   }
