@@ -26,6 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import scala.reflect.ClassTag
 import javax.inject.Inject
+import play.api.http.HeaderNames
 
 class SilhouetteSecurity  extends AbstractModule with ScalaModule {
 
@@ -164,11 +165,18 @@ class AuthInfoRepositoryImpl[C <: AuthInfo](implicit tag: ClassTag[C]) extends A
 class RecogitoSecuredErrorHandler @Inject()() extends SecuredErrorHandler {
 
   override def onNotAuthenticated(implicit request: RequestHeader) = {
-    Future.successful(Results.Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm()))
+    Future.successful(
+      Results.Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm())
+        .withSession("access_uri" -> request.uri)
+    )
   }
 
   override def onNotAuthorized(implicit request: RequestHeader) = {
-    Future.successful(Results.Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm()))
+    play.api.Logger.info("bar")
+    Future.successful(
+      Results.Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm())
+        .withSession("access_uri" -> request.uri)
+    )
   }
   
 }

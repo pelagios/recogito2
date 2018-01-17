@@ -45,7 +45,10 @@ abstract class BaseOptAuthController(
       if (accesslevel.canRead)
         response(doc, accesslevel)
       else if (maybeUser.isEmpty) // No read rights - but user is not logged in yet 
-        Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))  
+        Future.successful(
+          Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None))
+            .withSession("access_uri" -> request.uri)
+        )  
       else
         Future.successful(ForbiddenPage)
     })
