@@ -1,0 +1,31 @@
+@(uploads: Seq[services.generated.tables.records.UploadRecord])
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito Administration - Maintenance</title>
+  </head>
+  <body>
+    <div class="side-navbar">
+      <ul>
+        <li><a href="#">Users</a></li>
+        <li><a href="#">Gazetteers</a></li>
+        <li><a href="#">Backup &amp; Restore</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <h1>Pending Uploads</h1>
+      <table>
+        @for(upload <- uploads) {
+          <tr>
+            <td>@upload.getOwner</td>
+            <td>@upload.getTitle</td>
+            <td>@upload.getCreatedAt</td>
+            <td><a href="#">Delete</a></td>
+          </tr>
+        }
+      </table>
+      <a href="#">Delete all</a>
+    </div>
+  </body>
+</html>
