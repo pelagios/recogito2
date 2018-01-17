@@ -22,6 +22,18 @@ class QuotaExceededException(val remainingSpaceKb: Long, val filesizeKb: Double)
 
 class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) extends BaseService {
   
+  /** Admin-level method to fetch all pending uploads in the system **/
+  def listPendingUploads(olderThan: Option[Timestamp]) = db.query { sql =>
+    olderThan match {
+      case Some(date) =>
+        sql.selectFrom(UPLOAD)
+          .where(UPLOAD.CREATED_AT.lessThan(date)).fetchArray()
+        
+      case _ =>
+        sql.selectFrom(UPLOAD).fetchArray()
+    }
+  }
+  
   /** Inserts a new upload, or updates an existing one if it already exists **/
   def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String) =
     db.withTransaction { sql =>
