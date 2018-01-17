@@ -11,12 +11,21 @@ CREATE TABLE "user" (
   quota_mb INT NOT NULL DEFAULT 200,
   last_login TIMESTAMP WITH TIME ZONE NOT NULL
 );
+CREATE INDEX idx_user_email ON "user"(email);
 
 CREATE TABLE user_role (
   id SERIAL PRIMARY KEY,
   username TEXT NOT NULL REFERENCES "user"(username),
   has_role TEXT NOT NULL
 );
+CREATE INDEX idx_user_role_username ON user_role(username);
+
+CREATE TABLE feature_toggle (
+  id SERIAL PRIMARY KEY,
+  username TEXT NOT NULL REFERENCES "user"(username),
+  has_toggle TEXT NOT NULL
+);
+CREATE INDEX idx_feature_toggle_username ON feature_toggle(username);
 
 -- staging area for documents during upload workflow
 CREATE TABLE upload (
@@ -62,6 +71,7 @@ CREATE TABLE document (
   is_public BOOLEAN NOT NULL DEFAULT FALSE,
   attribution TEXT
 );
+CREATE INDEX idx_document_owner ON document(owner);
 
 CREATE TABLE document_filepart (
   id UUID PRIMARY KEY,
@@ -72,12 +82,7 @@ CREATE TABLE document_filepart (
   sequence_no INTEGER NOT NULL,
   source TEXT
 );
-
-CREATE TABLE feature_toggle (
-  id SERIAL PRIMARY KEY,
-  username TEXT NOT NULL REFERENCES "user"(username),
-  has_toggle TEXT NOT NULL
-);
+CREATE INDEX idx_document_filepart_document_id ON document_filepart(document_id);
 
 -- users can organize documents into folders
 CREATE TABLE folder (
@@ -105,6 +110,8 @@ CREATE TABLE sharing_policy (
   access_level TEXT NOT NULL,
   UNIQUE (document_id, shared_with)
 );
+CREATE INDEX idx_sharing_policy_document_id ON sharing_policy(document_id);
+CREATE INDEX idx_sharing_policy_shared_with ON sharing_policy(shared_with);
 
 -- keep a log of what happened for shared elements
 -- e.g. to inform users about what happened
