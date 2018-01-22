@@ -12,8 +12,8 @@ trait EntityService {
   
   def countEntities(eType: Option[EntityType] = None): Future[Long]
   
-  def listEntities(eType: Option[EntityType] = None, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Page[IndexedEntity]]
-
+  def listAuthorities(eType: Option[EntityType] = None): Future[Seq[(String, Long)]]
+  
   def upsertEntities(entities: Seq[IndexedEntity]): Future[Boolean]
   
   def deleteEntities(ids: Seq[UUID]): Future[Boolean]

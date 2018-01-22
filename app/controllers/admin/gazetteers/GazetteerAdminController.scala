@@ -33,8 +33,8 @@ class GazetteerAdminController @Inject() (
 ) extends BaseAuthController(components, config, documents, users) {
   
   def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
-    entities.listEntities(Some(EntityType.PLACE)).map { gazetteers => 
-      Ok(views.html.admin.gazetteers.index(gazetteers.items.map(_.entity.title)))
+    entities.listAuthorities(Some(EntityType.PLACE)).map { gazetteers => 
+      Ok(views.html.admin.gazetteers.index(gazetteers.map(_._1)))
     }
   }
   

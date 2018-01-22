@@ -49,8 +49,8 @@ class EntityServiceImpl @Inject()(
       } map { _.totalHits }
   }
   
-  override def listEntities(eType: Option[EntityType] = None, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Page[IndexedEntity]] = {
-    val query = eType match {
+  override def listAuthorities(eType: Option[EntityType] = None): Future[Seq[(String, Long)]] = {
+    val base = eType match {
       case Some(t) =>
           search(ES.RECOGITO / ES.ENTITY) query termQuery("entity_type" -> t.toString)
       case _ =>
@@ -58,8 +58,12 @@ class EntityServiceImpl @Inject()(
     }
     
     es.client execute { 
-      query start offset limit limit 
-    } map { toPage(_, offset, limit) }
+      base size 0 aggs (
+        termsAggregation("by_authority") field ("is_conflation_of.source_authority") size ES.MAX_SIZE
+      ) 
+    } map { response =>
+      parseTermsAggregation(response.aggregations.termsResult("by_authority")).toSeq
+    }
   }
   
   override def upsertEntities(entities: Seq[IndexedEntity]): Future[Boolean] = {
@@ -179,7 +183,7 @@ class EntityServiceImpl @Inject()(
           termsAggregation("by_union_id") field("bodies.reference.union_id") size ES.MAX_SIZE
         ) size 0
       } map { response =>
-        parseTerms(response.aggregations.termsResult("by_union_id"))
+        parseTermsAggregation(response.aggregations.termsResult("by_union_id"))
       }
     
     def resolveEntities(unionIds: Seq[String]): Future[Seq[IndexedEntity]] = 

@@ -155,7 +155,7 @@ trait ElasticSearchSanitizer {
 
 trait HasAggregations {
   
-  def parseTerms(terms: Terms) =
+  def parseTermsAggregation(terms: Terms) =
     terms.getBuckets.asScala.toSeq.map { bucket =>
       (bucket.getKeyAsString, bucket.getDocCount) 
     }.toMap
