@@ -1,4 +1,4 @@
-package services.entity
+package services.entity.importer
 
 import collection.JavaConverters._
 import com.vividsolutions.jts.geom.Coordinate
@@ -7,6 +7,11 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.{ExecutionContext, Future}
 import services.Page
 import storage.ES
+import services.entity.Entity
+import services.entity.EntityRecord
+import services.entity.EntityService
+import services.entity.EntityType
+import services.entity.IndexedEntity
 
 class MockEntityService(implicit ctx: ExecutionContext) extends EntityService {
   

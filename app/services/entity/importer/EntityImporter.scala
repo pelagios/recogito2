@@ -37,7 +37,7 @@ class EntityImporter(
   }
   
   /** Takes a list of N records and conflates them to M entities, based on their link information **/ 
-  private def conflateRecursive(records: Seq[EntityRecord], entities: Seq[Entity] = Seq.empty[Entity]): Seq[Entity] = {
+  private[entity] def conflateRecursive(records: Seq[EntityRecord], entities: Seq[Entity] = Seq.empty[Entity]): Seq[Entity] = {
 
     def conflateOne(r: EntityRecord, entities: Seq[Entity]): Seq[Entity] = {
       val connectedEntities = entities.filter(_.isConflationOf.exists(_.isConnectedWith(r)))

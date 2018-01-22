@@ -1,8 +1,7 @@
-package services.place
+package services.entity.importer
 
-import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
-import java.io.{ File, FileInputStream }
-import services.geotag.GeoTagStore
+import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory}
+import java.io.{File, FileInputStream}
 import org.joda.time.DateTime
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -13,105 +12,102 @@ import play.api.test.Helpers._
 import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
-import services.place.crosswalks.PelagiosRDFCrosswalk
-
-// So we can instantiate a PlaceService running on a mock store
-class TestPlaceService extends MockPlaceStore with PlaceImporter with GeoTagStore
+import services.entity._
 
 @RunWith(classOf[JUnitRunner])
-class PlaceServiceSpec extends Specification {
-  
-  // Force Specs2 to execute tests in sequential order
-  sequential 
+class EntityImporterSpec extends Specification {
+  sequential // Force Specs2 to execute tests in sequential order
   
   val application = GuiceApplicationBuilder().build()
+  
   implicit val executionContext = application.injector.instanceOf[ExecutionContext]
   
   private val DARE_RDF = new File("test/resources/services/place/gazetteer_sample_dare.ttl")
   
   private val PLEIADES_RDF = new File("test/resources/services/place/gazetteer_sample_pleiades.ttl")
   
-  val testPlaceService = new TestPlaceService()
+  val testService = new MockEntityService() 
+  val testImporter = new EntityImporter(testService, EntityType.PLACE, null, executionContext)
   
   /** Async Await shorthands **/
-  private def importRecords(records: Seq[GazetteerRecord]): Seq[GazetteerRecord] =
-    Await.result(testPlaceService.importRecords(records), 10 seconds)
+  private def importRecords(records: Seq[EntityRecord]) =
+    Await.result(testImporter.importRecords(records), 10 seconds)
   
-  private def findByURI(uri: String): Place =
-    Await.result(testPlaceService.findByURI(uri), 10 seconds).get._1
+  private def findByURI(uri: String) =
+    Await.result(testService.findByURI(uri), 10 seconds).get.entity
     
-  private def getTotalPlaces(): Long =
-    Await.result(testPlaceService.totalPlaces(), 10 seconds)
+  private def countEntities(): Long =
+    Await.result(testService.countEntities(), 10 seconds)
   
   "The conflate method" should {
     
     "properly merge 3 test records that should be joined" in {
-      val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
+      val recordA = EntityRecord("http://www.example.com/place/a", "Gazetteer A", DateTime.now(),
         None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
         None, None,
         Seq("http://www.example.com/place/b"),
         Seq.empty[String])
         
-      val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
+      val recordB = EntityRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
         None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         None, None,
         Seq.empty[String], Seq.empty[String])
 
-      val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
+      val recordC = EntityRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
         None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
         None, None,
         Seq("http://www.example.com/place/a"),
         Seq("http://www.example.com/place/b"))
         
-      val conflated = testPlaceService.conflate(Seq(recordA, recordB, recordC))
+      val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
       conflated.size must equalTo(1)
       conflated.head.id must equalTo(recordA.uri)
       conflated.head.isConflationOf.size must equalTo(3)
     }
     
     "properly separate 3 records that should remain speparate" in {
-      val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
+      val recordA = EntityRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
         None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         None, None,
         Seq("http://www.example.com/place/d"),
         Seq.empty[String])
         
-      val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
+      val recordB = EntityRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
         None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         None, None,
         Seq.empty[String], Seq.empty[String])
 
-      val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
+      val recordC = EntityRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
         None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         None, None,
         Seq("http://www.example.com/place/e"),
         Seq("http://www.example.com/place/f"))
         
-      val conflated = testPlaceService.conflate(Seq(recordA, recordB, recordC))
+      val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
       conflated.size must equalTo(3)
       conflated.map(_.id) must containAllOf(Seq(recordA.uri, recordB.uri, recordC.uri))
       conflated.map(_.isConflationOf.size) must equalTo(Seq(1, 1, 1))
     }
     
     "properly conflate 3 records into 2 groups of 1 and 2 places" in {
-      val recordA = GazetteerRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
+      val recordA = EntityRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
         None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
         None, None,
         Seq("http://www.example.com/place/d"),
         Seq.empty[String])
         
-      val recordB = GazetteerRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
+      val recordB = EntityRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
         None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
         None, None,
         Seq.empty[String], Seq.empty[String])
 
       val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
-        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
+        None, "Record C", EntityRecord.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
         None, None,
         Seq("http://www.example.com/place/e"),
         Seq("http://www.example.com/place/a"))
         
-      val conflated = testPlaceService.conflate(Seq(recordA, recordB, recordC))
+      val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
       
       conflated.size must equalTo(2)
       conflated.map(_.id) must containAllOf(Seq(recordA.uri, recordB.uri))
