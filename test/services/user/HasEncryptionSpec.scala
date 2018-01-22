@@ -11,7 +11,7 @@ import play.api.test.Helpers._
 class TestEncryptionService(val config: Configuration) extends HasEncryption with HasConfig
 
 @RunWith(classOf[JUnitRunner])
-class TEIParserServiceSpec extends Specification {
+class HasEncryptionSpec extends Specification {
   
   "With a configured key, the encryption trait" should {
 

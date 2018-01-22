@@ -1,5 +1,5 @@
 {
-  "internal_id": "69d6b969-7f6b-4934-8c81-848dd194aeaf",
+  "union_id": "69d6b969-7f6b-4934-8c81-848dd194aeaf",
   "entity_type": "PLACE",
   "title": "Ad Mauros",
   "representative_geometry": {
@@ -7,7 +7,10 @@
      "coordinates": [ 14.02358, 48.31058 ]
    },
   "representative_point": [ 14.02358, 48.31058 ],
-  "bbox": [[ 14.02358, 48.31058], [ 14.02358, 48.31058]],
+  "bbox": {
+    "type": "Envelope",
+    "coordinates": [[ 14.02358, 48.31058], [ 14.02358, 48.31058]]
+  },
   "temporal_bounds_union": { "from": -30, "to": 640 },
   "is_conflation_of": [
     {

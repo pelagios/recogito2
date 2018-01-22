@@ -25,7 +25,7 @@ object EntityRecordSpec {
   
   val pleiadesRecord = EntityRecord(
     "http://pleiades.stoa.org/places/118543",
-    "Pleiades",
+    "http://pleiades.stoa.org",
     SYNC_TIME,
     Some(SYNC_TIME),
     "Ad Mauros",
@@ -41,7 +41,7 @@ object EntityRecordSpec {
     
   val dareRecord = EntityRecord(
     "http://dare.ht.lu.se/places/10778",
-    "DARE",
+    "http://dare.ht.lu.se/",
     SYNC_TIME,
     Some(SYNC_TIME),
     "Ad Mauros/Marinianio, Eferding",
@@ -62,7 +62,7 @@ object EntityRecordSpec {
     
   val trismegistosRecord = EntityRecord(
     "http://www.trismegistos.org/place/35191",
-    "Trismegistos",
+    "http://www.trismegistos.org",
     SYNC_TIME,
     None,
     "Ad Mauros",
@@ -87,12 +87,12 @@ class EntityRecordSpec extends Specification {
 
   import EntityRecordSpec._
   
-  "sample gazetteer records" should {
+  "sample entity records" should {
     
     "be properly created from place JSON" in {
-      val json = Source.fromFile("test/resources/services/place/place.json").getLines().mkString("\n")
+      val json = Source.fromFile("test/resources/services/entity/place.json").getLines().mkString("\n")
       val parseResult = Json.fromJson[Entity](Json.parse(json))
-      
+
       parseResult.isSuccess must equalTo(true)
       
       val gazetteerRecords = parseResult.get.isConflationOf

@@ -1,5 +1,6 @@
 package services.entity
 
+import java.util.UUID
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -9,7 +10,6 @@ import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json.Json
 import scala.io.Source
-import java.util.UUID
 
 @RunWith(classOf[JUnitRunner])
 class PlaceSpec extends Specification {
@@ -26,7 +26,7 @@ class PlaceSpec extends Specification {
     "have the expected top-level properties (ID, title, geometry, temporal bounds)" in {
       val place = parseResult.get
       
-      place.unionId must equalTo ("http://pleiades.stoa.org/places/118543")
+      place.unionId must equalTo (UUID.fromString("69d6b969-7f6b-4934-8c81-848dd194aeaf"))
       place.titles must contain("Ad Mauros")
 
       val location = new Coordinate(14.02358, 48.31058)
@@ -48,7 +48,7 @@ class PlaceSpec extends Specification {
     
     "report the expected source gazetteers" in {
       val place = parseResult.get
-      val expectedGazetteers = Seq("Pleiades", "Trismegistos", "DARE")
+      val expectedGazetteers = Seq("http://pleiades.stoa.org", "http://www.trismegistos.org", "http://dare.ht.lu.se/")
         
       place.sourceAuthorities.size must equalTo(3)
       place.sourceAuthorities must containAllOf(expectedGazetteers)
@@ -58,8 +58,8 @@ class PlaceSpec extends Specification {
       val place = parseResult.get      
       
       place.subjects.size must equalTo(2)
-      place.subjects.get("fort").get must containAllOf(Seq("DARE", "Pleiades"))
-      place.subjects.get("tower").get must equalTo(Seq("Pleiades"))
+      place.subjects.get("fort").get must containAllOf(Seq("http://dare.ht.lu.se/", "http://pleiades.stoa.org"))
+      place.subjects.get("tower").get must equalTo(Seq("http://pleiades.stoa.org"))
     }
     
     "list the expected descriptions by gazetteer" in {
@@ -67,17 +67,17 @@ class PlaceSpec extends Specification {
 
       place.descriptions.size must equalTo(1)
       place.descriptions.head._1 must equalTo(Description("An ancient place, cited: BAtlas 12 H4 Ad Mauros"))
-      place.descriptions.head._2 must equalTo(Seq("Pleiades"))
+      place.descriptions.head._2 must equalTo(Seq("http://pleiades.stoa.org"))
     }
     
     "list the expected names per gazetteer" in {
       val place = parseResult.get
       
       place.names.size must equalTo(4)
-      place.names.get(Name("Ad Mauros")).get must containAllOf(Seq("Trismegistos", "Pleiades"))
-      place.names.get(Name("Ad Mauros/Marinianio, Eferding")).get must equalTo(Seq("DARE"))
-      place.names.get(Name("Eferding")).get must equalTo(Seq("Trismegistos"))
-      place.names.get(Name("Marianianio", Some("la"))).get must equalTo(Seq("Trismegistos"))      
+      place.names.get(Name("Ad Mauros")).get must containAllOf(Seq("http://www.trismegistos.org", "http://pleiades.stoa.org"))
+      place.names.get(Name("Ad Mauros/Marinianio, Eferding")).get must equalTo(Seq("http://dare.ht.lu.se/"))
+      place.names.get(Name("Eferding")).get must equalTo(Seq("http://www.trismegistos.org"))
+      place.names.get(Name("Marianianio", Some("la"))).get must equalTo(Seq("http://www.trismegistos.org"))      
     }
     
     "list the expected close- and exactMatches" in {
@@ -116,7 +116,9 @@ class PlaceSpec extends Specification {
       parsedFromJson.isSuccess must equalTo(true)
       
       val after = parsedFromJson.get
-      after must equalTo(before)
+      // Per design, the BBox field is filled during the roundtrip - ignore it for the comparison!
+      val afterWithoutBBox = after.copy(storedBBox = None)
+      afterWithoutBBox must equalTo(before)
     }
     
   }
