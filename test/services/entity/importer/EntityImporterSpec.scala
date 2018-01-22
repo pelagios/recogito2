@@ -3,9 +3,9 @@ package services.entity.importer
 import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory}
 import java.io.{File, FileInputStream}
 import org.joda.time.DateTime
+import org.junit.runner.RunWith
 import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
+import org.specs2.runner.JUnitRunner
 import play.api.Logger
 import play.api.test._
 import play.api.test.Helpers._
@@ -13,6 +13,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import services.entity._
+import services.entity.crosswalks.rdf.PelagiosRDFCrosswalk
 
 @RunWith(classOf[JUnitRunner])
 class EntityImporterSpec extends Specification {
@@ -43,74 +44,57 @@ class EntityImporterSpec extends Specification {
     
     "properly merge 3 test records that should be joined" in {
       val recordA = EntityRecord("http://www.example.com/place/a", "Gazetteer A", DateTime.now(),
-        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
-        None, None,
-        Seq("http://www.example.com/place/b"),
-        Seq.empty[String])
+        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String],
+        None, Seq(Link("http://www.example.com/place/b", LinkType.CLOSE_MATCH)))
         
-      val recordB = EntityRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
-        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
-        None, None,
-        Seq.empty[String], Seq.empty[String])
+      val recordB = EntityRecord("http://www.example.com/place/b", "Gazetteer B", DateTime.now(),
+        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String], 
+        None, Seq.empty[Link])
 
-      val recordC = EntityRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
-        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
-        None, None,
-        Seq("http://www.example.com/place/a"),
-        Seq("http://www.example.com/place/b"))
+      val recordC = EntityRecord("http://www.example.com/place/c", "Gazetteer C", DateTime.now(),
+        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String],
+        None, Seq(Link("http://www.example.com/place/a", LinkType.CLOSE_MATCH), Link("http://www.example.com/place/b", LinkType.EXACT_MATCH)))
         
       val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
       conflated.size must equalTo(1)
-      conflated.head.id must equalTo(recordA.uri)
       conflated.head.isConflationOf.size must equalTo(3)
     }
     
     "properly separate 3 records that should remain speparate" in {
-      val recordA = EntityRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
-        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
-        None, None,
-        Seq("http://www.example.com/place/d"),
-        Seq.empty[String])
+      val recordA = EntityRecord("http://www.example.com/place/a", "Gazetteer A", DateTime.now(),
+        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String], 
+        None, Seq(Link("http://www.example.com/place/d", LinkType.CLOSE_MATCH)))
         
-      val recordB = EntityRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
-        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
-        None, None,
-        Seq.empty[String], Seq.empty[String])
+      val recordB = EntityRecord("http://www.example.com/place/b", "Gazetteer B", DateTime.now(),
+        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String], 
+        None, Seq.empty[Link])
 
-      val recordC = EntityRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
-        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
-        None, None,
-        Seq("http://www.example.com/place/e"),
-        Seq("http://www.example.com/place/f"))
+      val recordC = EntityRecord("http://www.example.com/place/c", "Gazetteer C", DateTime.now(),
+        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String], 
+        None, Seq(Link("http://www.example.com/place/e", LinkType.CLOSE_MATCH), Link("http://www.example.com/place/f", LinkType.EXACT_MATCH)))
         
       val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
       conflated.size must equalTo(3)
-      conflated.map(_.id) must containAllOf(Seq(recordA.uri, recordB.uri, recordC.uri))
+      conflated.flatMap(_.uris) must containAllOf(Seq(recordA.uri, recordB.uri, recordC.uri))
       conflated.map(_.isConflationOf.size) must equalTo(Seq(1, 1, 1))
     }
     
     "properly conflate 3 records into 2 groups of 1 and 2 places" in {
-      val recordA = EntityRecord("http://www.example.com/place/a", Gazetteer("Gazetteer A"), DateTime.now(),
-        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
-        None, None,
-        Seq("http://www.example.com/place/d"),
-        Seq.empty[String])
+      val recordA = EntityRecord("http://www.example.com/place/a", "Gazetteer A", DateTime.now(),
+        None, "Record A", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String],
+        None, Seq(Link("http://www.example.com/place/d", LinkType.CLOSE_MATCH)))
         
-      val recordB = EntityRecord("http://www.example.com/place/b", Gazetteer("Gazetteer B"), DateTime.now(),
-        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String], 
-        None, None,
-        Seq.empty[String], Seq.empty[String])
+      val recordB = EntityRecord("http://www.example.com/place/b", "Gazetteer B", DateTime.now(),
+        None, "Record B", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String], 
+        None, Seq.empty[Link])
 
-      val recordC = GazetteerRecord("http://www.example.com/place/c", Gazetteer("Gazetteer C"), DateTime.now(),
-        None, "Record C", EntityRecord.empty[Description], Seq.empty[Name], None, None, None, Seq.empty[String],
-        None, None,
-        Seq("http://www.example.com/place/e"),
-        Seq("http://www.example.com/place/a"))
+      val recordC = EntityRecord("http://www.example.com/place/c", "Gazetteer C", DateTime.now(),
+        None, "Record C", Seq.empty[Description], Seq.empty[Name], None, None, None, None, Seq.empty[String],
+        None, Seq(Link("http://www.example.com/place/e", LinkType.CLOSE_MATCH), Link("http://www.example.com/place/a", LinkType.EXACT_MATCH)))
         
       val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
-      
       conflated.size must equalTo(2)
-      conflated.map(_.id) must containAllOf(Seq(recordA.uri, recordB.uri))
+      conflated.flatMap(_.uris) must containAllOf(Seq(recordA.uri, recordB.uri))
     }
     
   }
@@ -123,7 +107,7 @@ class EntityImporterSpec extends Specification {
       // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec
       val failedRecords = importRecords(dareRecords)
       failedRecords.size must equalTo(0)
-      getTotalPlaces() must equalTo(4)
+      countEntities() must equalTo(4)
     }
     
     "return DARE places based on their URI" in {
@@ -146,9 +130,9 @@ class EntityImporterSpec extends Specification {
   "Based on the fictitious sample record, getAffectedPlaces" should {
     
     "return Vindobona, Thessalonica and Calunium" in {
-      val fakeVindobona = GazetteerRecord(
+      val fakeVindobona = EntityRecord(
         "http://www.wikidata.org/entity/Q871525/", // This will cause DARE's Vindobona to match
-        Gazetteer("DummyGazetteer"),
+        "DummyGazetteer",
         DateTime.now(),
         None,
         "A fake place",
@@ -157,20 +141,21 @@ class EntityImporterSpec extends Specification {
         None,
         None,
         None,
+        None,
         Seq.empty[String],
         None,
-        None,
-        Seq("http://dare.ht.lu.se/places/17068/"), // This will match DARE's Thessalonica
-        Seq("http://www.trismegistos.org/place/15045/")) // This is a common match with DARE's Calunium
+        Seq(
+          Link("http://dare.ht.lu.se/places/17068/", LinkType.CLOSE_MATCH), // This will match DARE's Thessalonica
+          Link("http://www.trismegistos.org/place/15045/", LinkType.EXACT_MATCH))) // This is a common match with DARE's Calunium
       
       val expectedPlaceURIs = Seq(
         "http://dare.ht.lu.se/places/10783",
         "http://dare.ht.lu.se/places/17068",
         "http://dare.ht.lu.se/places/23712")
                 
-      val affectedPlaces = Await.result(testPlaceService.getAffectedPlaces(fakeVindobona), 10 seconds)
+      val affectedPlaces = Await.result(testImporter.getAffectedEntities(fakeVindobona), 10 seconds)
       affectedPlaces.size must equalTo(3)
-      affectedPlaces.map(_._1.id) must containAllOf(expectedPlaceURIs)
+      affectedPlaces.flatMap(_.entity.uris) must containAllOf(expectedPlaceURIs)
     }
     
   }
@@ -182,7 +167,7 @@ class EntityImporterSpec extends Specification {
     "contain 5 places" in {
       val failedRecords = importRecords(pleiadesRecords)
       failedRecords.size must equalTo(0)
-      getTotalPlaces() must equalTo(5)
+      countEntities() must equalTo(5)
     }
     
     "return the places by any URI - DARE or Pleiades" in { 
@@ -241,25 +226,25 @@ class EntityImporterSpec extends Specification {
       vindobona.descriptions.size must equalTo(2)
       vindobona.descriptions.keys must containAllOf(expectedDescriptions)
       
-      vindobona.placeTypes.keys must equalTo(Seq("SETTLEMENT"))      
+      vindobona.subjects.keys must equalTo(Seq("SETTLEMENT"))      
       vindobona.temporalBoundsUnion must equalTo(Some(TemporalBounds.fromYears(-30, 640)))
       
       vindobona.names.size must equalTo(6)
             
-      vindobona.names.get(Name("Mun. Vindobona")).get must equalTo(Seq(Gazetteer("gazetteer_sample_pleiades")))
-      vindobona.names.get(Name("Mun. Vindobona", Some("la"))).get must equalTo(Seq(Gazetteer("gazetteer_sample_dare")))
-      vindobona.names.get(Name("Wien")).get must containAllOf(Seq(Gazetteer("gazetteer_sample_pleiades"), Gazetteer("gazetteer_sample_dare")))
-      vindobona.names.get(Name("Wien/Vienna AUS")).get must equalTo(Seq(Gazetteer("gazetteer_sample_pleiades")))
-      vindobona.names.get(Name("Vienne", Some("fr"))).get must equalTo(Seq(Gazetteer("gazetteer_sample_dare")))
-      vindobona.names.get(Name("Vienna", Some("en"))).get must equalTo(Seq(Gazetteer("gazetteer_sample_dare")))
+      vindobona.names.get(Name("Mun. Vindobona")).get must equalTo(Seq("gazetteer_sample_pleiades"))
+      vindobona.names.get(Name("Mun. Vindobona", Some("la"))).get must equalTo(Seq("gazetteer_sample_dare"))
+      vindobona.names.get(Name("Wien")).get must containAllOf(Seq("gazetteer_sample_pleiades", "gazetteer_sample_dare"))
+      vindobona.names.get(Name("Wien/Vienna AUS")).get must equalTo(Seq("gazetteer_sample_pleiades"))
+      vindobona.names.get(Name("Vienne", Some("fr"))).get must equalTo(Seq("gazetteer_sample_dare"))
+      vindobona.names.get(Name("Vienna", Some("en"))).get must equalTo(Seq("gazetteer_sample_dare"))
 
       val expectedCloseMatches = Seq("http://www.wikidata.org/entity/Q871525")
       val expectedExactMatches = Seq(
           "http://pleiades.stoa.org/places/128460",
           "http://www.trismegistos.org/place/28821")
 
-      vindobona.closeMatches must equalTo(expectedCloseMatches)
-      vindobona.exactMatches must containAllOf(expectedExactMatches)
+      vindobona.links.filter(_.linkType == LinkType.CLOSE_MATCH) must equalTo(expectedCloseMatches)
+      vindobona.links.filter(_.linkType == LinkType.EXACT_MATCH) must containAllOf(expectedExactMatches)
       
       vindobona.isConflationOf.size must equalTo(2)
       
@@ -277,9 +262,9 @@ class EntityImporterSpec extends Specification {
     
     "contain one place less" in {
       // A fictitious record connecting the two Vindobonas
-      val fakeMeidling = GazetteerRecord(
+      val fakeMeidling = EntityRecord(
         "http://de.wikipedia.org/wiki/Meidling",
-        Gazetteer("DummyGazetteer"),
+        "DummyGazetteer",
         DateTime.now(),
         None,
         "A fake briding place",
@@ -288,19 +273,20 @@ class EntityImporterSpec extends Specification {
         None,
         None,
         None,
+        None,
         Seq.empty[String],
         None,
-        None,
-        Seq("http://pleiades.stoa.org/places/128460"), // Mun. Vindobona
-        Seq("http://pleiades.stoa.org/places/128537")) // Vindobona
+        Seq(
+          Link("http://pleiades.stoa.org/places/128460", LinkType.CLOSE_MATCH), // Mun. Vindobona
+          Link("http://pleiades.stoa.org/places/128537", LinkType.EXACT_MATCH))) // Vindobona
       
       importRecords(Seq(fakeMeidling))
-      getTotalPlaces() must equalTo(4)
+      countEntities() must equalTo(4)
     }
     
     "have properly conflated the successor place" in {
       val conflated = findByURI("http://dare.ht.lu.se/places/10783")
-      conflated.id must equalTo("http://dare.ht.lu.se/places/10783")
+      conflated.uris.head must equalTo("http://dare.ht.lu.se/places/10783")
       
       val expectedURIs = Seq(
         "http://de.wikipedia.org/wiki/Meidling",
@@ -317,9 +303,9 @@ class EntityImporterSpec extends Specification {
     
     "contain two places more" in {
       // Update our fictitious record, so that it no longer connects the two Vindobonas
-      val fakeMeidling = GazetteerRecord(
+      val fakeMeidling = EntityRecord(
         "http://de.wikipedia.org/wiki/Meidling",
-        Gazetteer("DummyGazetteer"),
+        "DummyGazetteer",
         DateTime.now(),
         None,
         "A fake briding place",
@@ -328,19 +314,18 @@ class EntityImporterSpec extends Specification {
         None,
         None,
         None,
+        None,
         Seq.empty[String],
         None,
-        None,
-        Seq.empty[String], 
-        Seq.empty[String])
+        Seq.empty[Link])
        
       importRecords(Seq(fakeMeidling))
-      getTotalPlaces() must equalTo(6)
+      countEntities() must equalTo(6)
     }
     
     "should contain 3 properly conflated successor places (2 original Vindobonas and dummy Meidling record)" in {
       val munVindobona = findByURI("http://dare.ht.lu.se/places/10783")
-      munVindobona.id must equalTo("http://dare.ht.lu.se/places/10783")
+      munVindobona.uris.head must equalTo("http://dare.ht.lu.se/places/10783")
       munVindobona.isConflationOf.size must equalTo(2)
       munVindobona.uris must containAllOf(Seq("http://dare.ht.lu.se/places/10783", "http://pleiades.stoa.org/places/128460"))
       

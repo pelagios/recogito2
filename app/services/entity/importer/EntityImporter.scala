@@ -25,7 +25,7 @@ class EntityImporter(
   private val THROTTLE_DURATION = 5000
   
   /** Fetches all entities from the index that will be affected from adding this record **/
-  private def getAffectedEntities(normalizedRecord: EntityRecord): Future[Seq[IndexedEntity]] = {
+  private[entity] def getAffectedEntities(normalizedRecord: EntityRecord): Future[Seq[IndexedEntity]] = {
     // We need to query for this record's URI as well as all close/exactMatches
     val identifiers = normalizedRecord.uri +: normalizedRecord.directMatches
 
