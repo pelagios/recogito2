@@ -70,8 +70,6 @@ define([
                         anchor: 'char-offset:' + computeOffset(),
 
                         bodies: jQuery.map(annotation.bodies, function(body) {
-                          console.log(body);
-                          console.log(jQuery.extend({}, body));
                           return jQuery.extend({}, body);
                         })
                       },
