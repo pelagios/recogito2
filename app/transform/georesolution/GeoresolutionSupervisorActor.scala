@@ -5,7 +5,7 @@ import java.io.File
 import services.ContentType
 import services.annotation.AnnotationService
 import services.task.TaskService
-import services.place.PlaceService
+import services.entity.EntityService
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
@@ -18,7 +18,7 @@ private[georesolution] class GeoresolutionSupervisorActor(
     args: Map[String, String],
     taskService: TaskService,
     annotations: AnnotationService,
-    places: PlaceService,
+    entities: EntityService,
     keepalive: FiniteDuration,
     ctx: ExecutionContext
   ) extends TransformSupervisorActor(
@@ -43,7 +43,7 @@ private[georesolution] class GeoresolutionSupervisorActor(
           args,
           taskService,
           annotations,
-          places,
+          entities,
           ctx),
         name = "georesolution.doc." + document.getId + ".part." + part.getId))
   

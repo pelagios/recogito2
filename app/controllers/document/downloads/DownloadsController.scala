@@ -3,13 +3,14 @@ package controllers.document.downloads
 import akka.util.ByteString
 import akka.stream.scaladsl.Source
 import com.mohiva.play.silhouette.api.Silhouette
+import com.mohiva.play.silhouette.api.actions.UserAwareRequest
 import controllers.{BaseOptAuthController, Security}
 import controllers.document.downloads.serializers._
 import javax.inject.{Inject, Singleton}
 import services.ContentType
 import services.annotation.AnnotationService
 import services.document.{DocumentInfo, DocumentService}
-import services.place.PlaceService
+import services.entity.EntityService
 import services.user.UserService
 import org.apache.jena.riot.RDFFormat
 import org.webjars.play.WebJarsUtil
@@ -23,7 +24,6 @@ import play.api.mvc.{AnyContent, ControllerComponents, Result}
 import play.api.http.{HttpEntity, FileMimeTypes}
 import scala.concurrent.{ExecutionContext, Future}
 import storage.Uploads
-import com.mohiva.play.silhouette.api.actions.UserAwareRequest
 
 case class FieldMapping(
   
@@ -66,7 +66,7 @@ class DownloadsController @Inject() (
   implicit val uploads: Uploads,
   implicit val annotations: AnnotationService,
   implicit val documents: DocumentService,
-  implicit val places: PlaceService,
+  implicit val entities: EntityService,
   implicit val webjars: WebJarsUtil,
   implicit val ctx: ExecutionContext
 ) extends BaseOptAuthController(components, config, documents, users)

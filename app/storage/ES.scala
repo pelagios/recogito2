@@ -7,9 +7,11 @@ import java.io.File
 import javax.inject.{ Inject, Singleton }
 import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.xcontent.XContentType
+import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import play.api.{ Configuration, Logger }
 import play.api.inject.ApplicationLifecycle
 import scala.io.Source
+import scala.collection.JavaConverters._
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import scala.util.{ Try, Success, Failure }
@@ -23,8 +25,6 @@ class ESModule extends AbstractModule {
   
 }
 
-trait HasES { def es: ES }
-
 /** Constants **/
 object ES extends ElasticSearchSanitizer {
   
@@ -34,8 +34,7 @@ object ES extends ElasticSearchSanitizer {
   // Mapping type names
   val ANNOTATION         = "annotation"
   val ANNOTATION_HISTORY = "annotation_history"
-  val GEOTAG             = "geotag"
-  val PLACE              = "place"
+  val ENTITY             = "entity"
   val CONTRIBUTION       = "contribution"
   val VISIT              = "visit"
   
@@ -151,5 +150,14 @@ trait ElasticSearchSanitizer {
   private def escapeOddQuote(term: String): String = {
     if (term.count(_ == '"') % 2 == 1) term.replaceAll("""(.*)"(.*)""", """$1\\"$2""") else term
   }
+  
+}
+
+trait HasAggregations {
+  
+  def parseTerms(terms: Terms) =
+    terms.getBuckets.asScala.toSeq.map { bucket =>
+      (bucket.getKeyAsString, bucket.getDocCount) 
+    }.toMap
   
 }

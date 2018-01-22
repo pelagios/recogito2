@@ -3,7 +3,7 @@ package controllers.document.downloads.serializers
 import java.io.File
 import services.ContentType
 import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import services.place.{ GazetteerRecord, Place, PlaceService }
+import services.entity.{Entity, EntityRecord, EntityService, EntityType}
 import play.api.Logger
 import scala.concurrent.ExecutionContext
 import storage.{ ES, Uploads }
@@ -65,16 +65,16 @@ trait BaseSerializer {
   
   protected def exportMergedDocument[T](
     doc: DocumentInfo,
-    fn: (Seq[Annotation], Seq[Place], File) => T
-  )(implicit placeService: PlaceService, annotationService: AnnotationService, uploads: Uploads, ctx: ExecutionContext) = {
+    fn: (Seq[Annotation], Seq[Entity], File) => T
+  )(implicit entityService: EntityService, annotationService: AnnotationService, uploads: Uploads, ctx: ExecutionContext) = {
     
     val fAnnotations = annotationService.findByDocId(doc.id, 0, ES.MAX_SIZE)
-    val fPlaces = placeService.listPlacesInDocument(doc.id, 0, ES.MAX_SIZE)
+    val fPlaces = entityService.listEntitiesInDocument(doc.id, Some(EntityType.PLACE), 0, ES.MAX_SIZE)
     
     val f = for {
       annotations <- fAnnotations
       places <- fPlaces
-    } yield (annotations.map(_._1), places.items.map(_._1))
+    } yield (annotations.map(_._1), places.items.map(_._1.entity))
     
     f.map { case (annotations, places) =>
       scala.concurrent.blocking {

@@ -1,34 +1,28 @@
-package services.place.crosswalks
+package services.entity.crosswalks.geojson
 
 import com.vividsolutions.jts.geom.Geometry
 import services.HasGeometry
-import services.place.GazetteerRecord
+import services.entity.EntityRecord
 import play.api.Logger
 import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
 trait BaseGeoJSONCrosswalk {
-  
-  def fromJson[T](record: String, crosswalk: T => GazetteerRecord)(implicit reads: Reads[T]): Option[GazetteerRecord] =
-    
+
+  def fromJson[T](record: String, crosswalk: T => EntityRecord)(implicit reads: Reads[T]): Option[EntityRecord] =
     Json.fromJson[T](Json.parse(record)) match {
-    
       case s: JsSuccess[T] => Some(crosswalk(s.get))
-        
       case e: JsError =>
-        Logger.error(e.toString)      
+        Logger.warn(e.toString)
         None
-        
     }
-  
+
 }
 
 case class Feature(geometry: Geometry)
 
 object Feature extends HasGeometry {
-  
-  implicit val featureReads: Reads[Feature] =
-    (JsPath \ "geometry").read[Geometry].map(Feature(_))
-  
+
+  implicit val featureReads: Reads[Feature] = (JsPath \ "geometry").read[Geometry].map(Feature(_))
+
 }

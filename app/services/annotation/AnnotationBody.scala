@@ -3,26 +3,20 @@ package services.annotation
 import services.HasDate
 import org.joda.time.DateTime
 import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
 case class AnnotationBody (
-
   hasType: AnnotationBody.Type,
-
   lastModifiedBy: Option[String],
-
   lastModifiedAt: DateTime,
-
   value: Option[String],
-
-  uri: Option[String],
-  
-  note: Option[String],
-  
+  reference: Option[Reference],
+  note: Option[String], 
   status: Option[AnnotationStatus]
-
 ) {
+  
+  /** For convenience: shorthand to entity ref URI **/
+  lazy val uri = reference.map(_.uri)
   
   /** Returns true if the bodies are equal in terms of content.
     *
@@ -44,7 +38,7 @@ case class AnnotationBody (
       false
     else if (value != other.value)
       false
-    else if (uri != other.uri)
+    else if (reference.map(_.uri) != other.reference.map(_.uri))
       false
     else
       true
@@ -81,7 +75,7 @@ object AnnotationBody extends Enumeration with HasDate {
     (JsPath \ "last_modified_by").formatNullable[String] and
     (JsPath \ "last_modified_at").format[DateTime] and
     (JsPath \ "value").formatNullable[String] and
-    (JsPath \ "uri").formatNullable[String] and
+    (JsPath \ "reference").formatNullable[Reference] and
     (JsPath \ "note").formatNullable[String] and
     (JsPath \ "status").formatNullable[AnnotationStatus]
   )(AnnotationBody.apply, unlift(AnnotationBody.unapply))

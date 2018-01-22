@@ -52,6 +52,7 @@ define([
                 var ranges = createRangesInTextNode(textNode);
 
                 return jQuery.map(ranges, function(range) {
+
                   var computeOffset = function() {
                         var rangeBefore = rangy.createRange();
                         rangeBefore.setStart(contentEl, 0);
@@ -68,8 +69,9 @@ define([
                         },
                         anchor: 'char-offset:' + computeOffset(),
 
-                        // Clone bodies
                         bodies: jQuery.map(annotation.bodies, function(body) {
+                          console.log(body);
+                          console.log(jQuery.extend({}, body));
                           return jQuery.extend({}, body);
                         })
                       },

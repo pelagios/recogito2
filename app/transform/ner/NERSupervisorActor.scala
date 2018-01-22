@@ -3,9 +3,9 @@ package transform.ner
 import akka.actor.Props
 import java.io.File
 import services.annotation.AnnotationService
-import services.place.PlaceService
+import services.entity.EntityService
 import services.task.TaskService
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import transform.TransformSupervisorActor
@@ -17,7 +17,7 @@ private[ner] class NERSupervisorActor(
     args: Map[String, String],
     taskService: TaskService,
     annotations: AnnotationService,
-    places: PlaceService,
+    entities: EntityService,
     keepalive: FiniteDuration,
     ctx: ExecutionContext
   ) extends TransformSupervisorActor(
@@ -43,7 +43,7 @@ private[ner] class NERSupervisorActor(
           args,
           taskService,
           annotations,
-          places,
+          entities,
           ctx),
         name = "ner.doc." + document.getId + ".part." + part.getId))
 

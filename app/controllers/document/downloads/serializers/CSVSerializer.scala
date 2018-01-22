@@ -12,7 +12,7 @@ import kantan.csv.engine.commons._
 import services.ContentType
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.document.DocumentInfo
-import services.place.{Place, PlaceService}
+import services.entity.{Entity, EntityService, EntityType}
 import services.generated.tables.records.DocumentFilepartRecord
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{Future, ExecutionContext}
@@ -23,16 +23,16 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
 
   private val EMPTY     = ""
   
-  private def findPlace(body: AnnotationBody, places: Seq[Place]): Option[Place] =
+  private def findPlace(body: AnnotationBody, places: Seq[Entity]): Option[Entity] =
     body.uri.flatMap { uri =>
       places.find(_.uris.contains(uri))
     }
 
   /** Exports the annotations for the document to the standard Recogito CSV output format **/ 
-  def annotationsToCSV(documentId: String)(implicit annotationService: AnnotationService, placeService: PlaceService, 
-      tmpFile: TemporaryFileCreator, ctx: ExecutionContext) = {
+  def annotationsToCSV(documentId: String)(implicit annotationService: AnnotationService, entityService: EntityService, 
+    tmpFile: TemporaryFileCreator, ctx: ExecutionContext) = {
 
-    def serializeOne(a: Annotation, places: Seq[Place]): Seq[String] = {
+    def serializeOne(a: Annotation, places: Seq[Entity]): Seq[String] = {
       val firstEntity = getFirstEntityBody(a)
       val maybePlace = firstEntity.flatMap(body => findPlace(body, places))
       
@@ -43,7 +43,7 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
           getFirstTranscription(a)
         else None
         
-      val placeTypes = maybePlace.map(_.placeTypes.map(_._1).mkString(","))
+      val placeTypes = maybePlace.map(_.subjects.map(_._1).mkString(","))
 
       Seq(a.annotationId.toString,
           quoteOrTranscription.getOrElse(EMPTY),
@@ -53,19 +53,19 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
           maybePlace.map(_.titles.mkString("|")).getOrElse(EMPTY),
           maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(EMPTY),
           maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY),
-          maybePlace.map(_.placeTypes.map(_._1).mkString(",")).getOrElse(EMPTY),
+          maybePlace.map(_.subjects.map(_._1).mkString(",")).getOrElse(EMPTY),
           firstEntity.flatMap(_.status.map(_.value.toString)).getOrElse(EMPTY),
           getTagBodies(a).flatMap(_.value).mkString("|"),
           getCommentBodies(a).flatMap(_.value).mkString("|"))
     }
 
     val annotationQuery = annotationService.findByDocId(documentId)
-    val placeQuery = placeService.listPlacesInDocument(documentId)
+    val placeQuery = entityService.listEntitiesInDocument(documentId, Some(EntityType.PLACE))
 
     val f = for {
       annotations <- annotationQuery
       places <- placeQuery
-    } yield (annotations, places.items.map(_._1))
+    } yield (annotations, places.items.map(_._1.entity))
 
     f.map { case (annotations, places) =>
       scala.concurrent.blocking {
@@ -90,7 +90,7 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
     doc: DocumentInfo
   )(
     implicit annotationService: AnnotationService, 
-      placeService: PlaceService,
+      entityService: EntityService,
       uploads: Uploads,
       tmpFile: TemporaryFileCreator,
       ctx: ExecutionContext): Future[(File, String)] = {

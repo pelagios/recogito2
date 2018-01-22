@@ -1,17 +1,17 @@
 package transform.ner
 
-import akka.actor.{ ActorSystem, Props }
+import akka.actor.{ActorSystem, Props}
 import java.io.File
-import javax.inject.{ Inject, Singleton }
+import javax.inject.{Inject, Singleton}
 import services.ContentType
 import services.annotation.AnnotationService
-import services.place.PlaceService
-import services.task.{ TaskService, TaskType }
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.entity.EntityService
+import services.task.{TaskService, TaskType}
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.pelagios.recogito.sdk.ner._
 import play.api.Logger
 import scala.collection.JavaConverters._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import storage.Uploads
 import transform._
@@ -48,7 +48,7 @@ object NERService {
 @Singleton
 class NERService @Inject() (
     annotations: AnnotationService,
-    places: PlaceService,
+    entities: EntityService,
     taskService: TaskService,
     uploads: Uploads,
     ctx: ExecutionContext) extends TransformService {
@@ -79,7 +79,7 @@ class NERService @Inject() (
           args,
           taskService,
           annotations,
-          places,
+          entities,
           keepalive,
           ctx),
         name = "ner.doc." + document.getId)

@@ -9,7 +9,7 @@ import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import kantan.codecs.Result.Success
 import services.annotation.AnnotationService
-import services.place.PlaceService
+import services.entity.EntityService
 import services.task.{ TaskService, TaskStatus }
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ Await, ExecutionContext }
@@ -23,7 +23,7 @@ private[georesolution] class GeoresolutionWorkerActor(
     args: Map[String, String],
     implicit val taskService: TaskService,
     implicit val annotationService: AnnotationService,
-    implicit val placeService: PlaceService,
+    implicit val entityService: EntityService,
     implicit val ctx: ExecutionContext) extends Actor with HasGeoresolution {    
   
   type T = Georesolvable

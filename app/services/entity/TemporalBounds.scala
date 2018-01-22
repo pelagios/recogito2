@@ -1,4 +1,4 @@
-package services.place
+package services.entity
 
 import org.joda.time.{ DateTime, DateTimeZone }
 import org.joda.time.format.DateTimeFormat

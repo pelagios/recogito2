@@ -6,31 +6,35 @@ import controllers.{BaseAuthController, Security}
 import java.io.FileInputStream
 import javax.inject.{Inject, Singleton}
 import services.document.DocumentService
-import services.place.PlaceService
+import services.entity.{EntityService, EntityType}
+import services.entity.crosswalks.geojson._
+import services.entity.crosswalks.rdf._
+import services.entity.importer.EntityImporter
 import services.user.UserService
 import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
-import services.place.crosswalks._
+import storage.ES
 
 @Singleton
 class GazetteerAdminController @Inject() (
-    val components: ControllerComponents,
-    val config: Configuration,
-    val documents: DocumentService,
-    val places: PlaceService,
-    val users: UserService,
-    val silhouette: Silhouette[Security.Env],
-    implicit val materializer: Materializer,
-    implicit val ctx: ExecutionContext,
-    implicit val webJarsUtil: WebJarsUtil
-  ) extends BaseAuthController(components, config, documents, users) {
+  val components: ControllerComponents,
+  val config: Configuration,
+  val documents: DocumentService,
+  val entities: EntityService,
+  val users: UserService,
+  val es: ES,
+  val silhouette: Silhouette[Security.Env],
+  implicit val materializer: Materializer,
+  implicit val ctx: ExecutionContext,
+  implicit val webJarsUtil: WebJarsUtil
+) extends BaseAuthController(components, config, documents, users) {
   
   def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
-    places.listGazetteers().map { gazetteers => 
-      Ok(views.html.admin.gazetteers.index(gazetteers))
+    entities.listEntities(Some(EntityType.PLACE)).map { gazetteers => 
+      Ok(views.html.admin.gazetteers.index(gazetteers.items.map(_.entity.title)))
     }
   }
   
@@ -42,23 +46,24 @@ class GazetteerAdminController @Inject() (
           
         /** TEMPORARY HACK **/
         val file = formData.ref.path.toFile
+        val importer = new EntityImporter(entities, EntityType.PLACE, es, ctx)
         
         if (formData.filename.contains(".ttl") || formData.filename.contains(".rdf") || formData.filename.contains(".xml")) {
           Logger.info("Importing Pelagios RDF dump")
-          val importer = new DumpImporter()          
-          importer.importDump(file, formData.filename, PelagiosRDFCrosswalk.fromRDF(formData.filename))(places, ctx)
+          val loader = new DumpLoader()          
+          loader.importDump(file, formData.filename, PelagiosRDFCrosswalk.fromRDF(formData.filename), importer)
         } else if (formData.filename.toLowerCase.contains("pleiades")) {
           Logger.info("Using Pleiades crosswalk")
-          val importer = new StreamImporter()
-          importer.importPlaces(new FileInputStream(file), PleiadesCrosswalk.fromJson)(places, ctx)
+          val loader = new StreamLoader()
+          loader.importPlaces(new FileInputStream(file), PleiadesCrosswalk.fromJson, importer)
         } else if (formData.filename.toLowerCase.contains("geonames")) {
           Logger.info("Using GeoNames crosswalk")
-          val importer = new StreamImporter()
-          importer.importPlaces(new FileInputStream(file), GeoNamesCrosswalk.fromJson)(places, ctx)
+          val loader = new StreamLoader()
+          loader.importPlaces(new FileInputStream(file), GeoNamesCrosswalk.fromJson, importer)
         } else if (formData.filename.endsWith("json")) {
           Logger.info("Importing Pelagios GeoJSON FeatureCollection")
-          val importer = new DumpImporter()
-          importer.importDump(file, formData.filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(formData.filename))(places, ctx)
+          val loader = new DumpLoader()
+          loader.importDump(file, formData.filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(formData.filename), importer)
         }
 
         /** TEMPORARY HACK **/
@@ -75,7 +80,7 @@ class GazetteerAdminController @Inject() (
   }
   
   def deleteGazetteer(name: String) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
-    places.deleteByGazetteer(name).map { _ =>
+    entities.deleteByAuthoritySource(name).map { _ =>
       Status(200)
     }
   }

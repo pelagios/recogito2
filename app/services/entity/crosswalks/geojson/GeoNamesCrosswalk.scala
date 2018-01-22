@@ -1,21 +1,18 @@
-package services.place.crosswalks
+package services.entity.crosswalks.geojson
 
 import com.vividsolutions.jts.geom.Coordinate
-import services.{ HasGeometry, HasNullableSeq }
-import services.place.{ CountryCode, Description, Gazetteer, GazetteerRecord, Name }
+import services.HasGeometry
 import org.joda.time.DateTime
+import services.entity._
 import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
 object GeoNamesCrosswalk extends BaseGeoJSONCrosswalk {
-  
-  private val GEONAMES = Gazetteer("GeoNames")
-  
-  def fromJson(record: String): Option[GazetteerRecord] = super.fromJson[GeoNamesRecord](record, { geonames =>
-    GazetteerRecord(
+
+  def fromJson(record: String): Option[EntityRecord] = super.fromJson[GeoNamesRecord](record, { geonames =>
+    EntityRecord(
       geonames.uri,
-      GEONAMES,
+      "http://www.geonames.org",
       DateTime.now(),
       None, // lastChangedAt
       geonames.title,
@@ -23,41 +20,29 @@ object GeoNamesCrosswalk extends BaseGeoJSONCrosswalk {
       geonames.names,
       geonames.features.headOption.map(_.geometry), // TODO compute union?
       geonames.representativePoint,
-      None, // temporalBounds
-      Seq.empty[String], // place types
       geonames.countryCode.map(c => CountryCode(c.toUpperCase)),
-      geonames.population,
-      geonames.closeMatches,
-      Seq.empty[String]  // exactMatches
+      None, // temporalBounds
+      Seq.empty[String], // subjects
+      geonames.population, // priority
+      geonames.closeMatches.map(Link(_, LinkType.CLOSE_MATCH))
     )
   })
-  
+
 }
 
 case class GeoNamesRecord(
-
   uri: String,
-  
   title: String,
-  
   description: Option[String],
-  
   names: Seq[Name],
-  
   features: Seq[Feature],
-  
   representativePoint: Option[Coordinate],
-  
   countryCode: Option[String],
-  
   population: Option[Long],
-  
-  closeMatches: Seq[String]
-    
-)
+  closeMatches: Seq[String])
 
 object GeoNamesRecord extends HasGeometry {
-  
+
   implicit val geonamesRecordReads: Reads[GeoNamesRecord] = (
     (JsPath \ "uri").read[String] and
     (JsPath \ "title").read[String] and
@@ -69,6 +54,5 @@ object GeoNamesRecord extends HasGeometry {
     (JsPath \ "population").readNullable[Long] and
     (JsPath \ "close_matches").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String]))
   )(GeoNamesRecord.apply _)
-  
-}
 
+}

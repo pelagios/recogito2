@@ -7,7 +7,7 @@ import java.io.File
 import services.{ ContentType, HasGeometry }
 import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import services.document.DocumentInfo
-import services.place.{ Place, PlaceService, GazetteerRecord }
+import services.entity.{Entity, EntityRecord, EntityService, EntityType}
 import org.geotools.geometry.jts.JTSFactoryFinder
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -16,7 +16,7 @@ import storage.{ ES, Uploads }
 
 trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
   
-  private def findGazetteerRecords(annotation: Annotation, places: Seq[Place]): Seq[GazetteerRecord] = {
+  private def findGazetteerRecords(annotation: Annotation, places: Seq[Entity]): Seq[EntityRecord] = {
     // Place URIs in this annotation
     val placeURIs = annotation.bodies
       .filter(_.hasType == AnnotationBody.PLACE)
@@ -25,14 +25,14 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
     placeURIs.flatMap { uri =>
       places.find(_.uris.contains(uri))
         .map(_.isConflationOf)
-        .getOrElse(Seq.empty[GazetteerRecord])
+        .getOrElse(Seq.empty[EntityRecord])
         .filter(_.uri == uri)      
     }
   }
 
-  def placesToGeoJSON(documentId: String)(implicit placeService: PlaceService, annotationService: AnnotationService, ctx: ExecutionContext) = {
+  def placesToGeoJSON(documentId: String)(implicit entityService: EntityService, annotationService: AnnotationService, ctx: ExecutionContext) = {
     val fAnnotations = annotationService.findByDocId(documentId, 0, ES.MAX_SIZE)
-    val fPlaces = placeService.listPlacesInDocument(documentId, 0, ES.MAX_SIZE)
+    val fPlaces = entityService.listEntitiesInDocument(documentId, Some(EntityType.PLACE), 0, ES.MAX_SIZE)
         
     val f = for {
       annotations <- fAnnotations
@@ -41,7 +41,8 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
     
     f.map { case (annotations, places) =>
       val placeAnnotations = annotations.filter(_.bodies.map(_.hasType).contains(AnnotationBody.PLACE))      
-      val features = places.items.flatMap { case (place, _) =>        
+      val features = places.items.flatMap { e =>      
+        val place = e._1.entity
         val annotationsOnThisPlace = placeAnnotations.filter { a =>
           // All annotations that include place URIs of this place
           val placeURIs = a.bodies.filter(_.hasType == AnnotationBody.PLACE).flatMap(_.uri)
@@ -60,12 +61,12 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
   }
   
   def exportGeoJSONGazetteer(
-      doc: DocumentInfo,
-      fieldMapping: FieldMapping
+    doc: DocumentInfo,
+    fieldMapping: FieldMapping
   )(implicit annotationService: AnnotationService,
-      placeService: PlaceService, 
-      uploads: Uploads,
-      ctx: ExecutionContext) = exportMergedDocument(doc, { case (annotations, places, documentDir) =>
+    entityService: EntityService, 
+    uploads: Uploads,
+    ctx: ExecutionContext) = exportMergedDocument(doc, { case (annotations, places, documentDir) =>
         
       val factory = JTSFactoryFinder.getGeometryFactory()
       
@@ -74,7 +75,7 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
       def rowToFeature(row: List[String], index: Int) = {
         val anchor = "row:" + index
         val maybeAnnotation = annotations.find(_.anchor == anchor)
-        val matches = maybeAnnotation.map(annotation => findGazetteerRecords(annotation, places)).getOrElse(Seq.empty[GazetteerRecord])
+        val matches = maybeAnnotation.map(annotation => findGazetteerRecords(annotation, places)).getOrElse(Seq.empty[EntityRecord])
         
         val id = row(fieldMapping.FIELD_ID)
         
@@ -140,8 +141,8 @@ object GeoJSONFeature extends HasGeometry {
       f.gazetteerRecords.map(_.uri),
       f.gazetteerRecords.map(_.title),
       toOptSeq(f.gazetteerRecords.flatMap(_.names.map(_.name))),
-      toOptSeq(f.gazetteerRecords.flatMap(_.placeTypes)),
-      f.gazetteerRecords.map(_.sourceGazetteer.name),
+      toOptSeq(f.gazetteerRecords.flatMap(_.subjects)),
+      f.gazetteerRecords.map(_.sourceAuthority),
       toOptSeq(f.quotes),
       toOptSeq(f.tags),
       toOptSeq(f.comments)
@@ -177,7 +178,7 @@ object GeoJSONFeature extends HasGeometry {
 /** Feature representing references to a place in a document **/ 
 case class ReferencedPlaceFeature(
   geometry         : Geometry,
-  gazetteerRecords : Seq[GazetteerRecord],
+  gazetteerRecords : Seq[EntityRecord],
   annotations      : Seq[Annotation]
 ) extends GeoJSONFeature {
   

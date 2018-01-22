@@ -28,7 +28,7 @@ import scala.reflect.ClassTag
 import javax.inject.Inject
 import play.api.http.HeaderNames
 
-class SilhouetteSecurity  extends AbstractModule with ScalaModule {
+class SilhouetteSecurity extends AbstractModule with ScalaModule {
 
   private def getAppSecret(config: Configuration) =
     config.get[String]("play.http.secret.key")

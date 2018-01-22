@@ -1,76 +1,74 @@
 package services.annotation
 
-import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import services.HasTryToEither
-import services.geotag.ESGeoTagStore
+import services.entity.{EntityService, IndexedEntity}
 import org.joda.time.DateTime
 import play.api.Logger
-import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.{reflectiveCalls, postfixOps}
-import scala.util.Try
-import storage.{ES, HasES}
-
-/** Encapsulates JSON (de-)serialization so we can add it to Annotation- and AnnotationHistoryService **/
-trait HasAnnotationIndexing {
-
-  implicit object AnnotationIndexable extends Indexable[Annotation] {
-    override def json(a: Annotation): String = Json.stringify(Json.toJson(a))
-  }
-
-  implicit object AnnotationHitReader extends HitReader[(Annotation, Long)] with HasTryToEither {
-    override def read(hit: Hit): Either[Throwable, (Annotation, Long)] =
-      Try(Json.fromJson[Annotation](Json.parse(hit.sourceAsString)).get, hit.version)
-  }
-
-}
+import storage.ES
 
 @Singleton
-class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContext)
-  extends HasAnnotationIndexing with AnnotationHistoryService with ESGeoTagStore with HasES {
+class AnnotationService @Inject() (
+  entityService: EntityService,
+  implicit val ctx: ExecutionContext,
+  implicit val es: ES
+) extends HasAnnotationIndexing with AnnotationHistoryService {
 
-  /** Upserts an annotation, automatically dealing with updating version history and geotags.
+  /** Upserts an annotation.
+    *  
+    * Automatically deals with version history.
     *
-    * Returns a boolean flag indicating successful completion, the internal ElasticSearch
+    * @return a boolean flag indicating successful completion, the internal ElasticSearch
     * version, and the previous version of the annotation, if any.
     */
-  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = true): Future[(Boolean, Long, Option[Annotation])] = {
+  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = true): Future[(Boolean, Option[Annotation])] = {
 
-    // Upsert annotation in the annotation index; returns a boolean flag indicating success, plus
-    // the internal ElasticSearch version number
-    def upsertAnnotation(a: Annotation): Future[(Boolean, Long)] =
+    val fResolveEntityReferences = {
+      val entityURIs = annotation.bodies.flatMap(_.uri)
+      val fResolved = Future.sequence(entityURIs.map(entityService.findByURI(_)))
+      for {
+        resolved <- fResolved
+      } yield resolved.flatten
+    }
+    
+    def addUnionIds(annotation: Annotation, resolvedIndexed: Seq[IndexedEntity]) = {
+      val resolved = resolvedIndexed.map(_.entity)
+      annotation.copy(bodies = annotation.bodies.map { body =>
+        val referencedEntity = body.uri.flatMap(uri => resolved.find(_.uris.contains(uri)))
+        referencedEntity match {
+          case None => body // No referenced entity, just return original body
+          case Some(e) =>
+            body.copy(reference = body.reference.map(_.copy(unionId = Some(e.unionId))))
+        }
+      })
+    }
+    
+    def upsertAnnotation(a: Annotation): Future[Boolean] =
       es.client execute {
         update(a.annotationId.toString) in ES.RECOGITO / ES.ANNOTATION docAsUpsert a
-      } map { r =>
-        (true, r.version)
+      } map { _ => true
       } recover { case t: Throwable =>
-        Logger.error("Error indexing annotation " + annotation.annotationId + ": " + t.getMessage)
+        Logger.error(s"Error indexing annotation ${annotation.annotationId}: ${t.getMessage}")
         t.printStackTrace
-        (false, -1l)
+        false
       }
-
+      
     for {
-      // Retrieve previous version, if any
-      maybePrevious       <- findById(annotation.annotationId)
-
-      // Store new version: 1) in the annotation index, 2) in the history index
-      (stored, esVersion) <- upsertAnnotation(annotation)
-      storedToHistory     <- if (stored) insertVersion(annotation) else Future.successful(false)
-
-      // Upsert geotags for this annotation
-      linksCreated        <- if (stored) insertOrUpdateGeoTagsForAnnotation(annotation) else Future.successful(false)
-    } yield (linksCreated && storedToHistory, esVersion, maybePrevious.map(_._1))
+      resolvedEntities <- fResolveEntityReferences
+      maybePrevious <- findById(annotation.annotationId)
+      stored <- upsertAnnotation(addUnionIds(annotation, resolvedEntities))
+      storedToHistory <- if (stored) insertVersion(annotation)
+                         else Future.successful(false)
+    } yield (storedToHistory, maybePrevious.map(_._1))
 
   }
 
-  /** Upserts a list of annotations, handling non-blocking chaining & retries in case of failure **/
   def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = ES.MAX_RETRIES): Future[Seq[Annotation]] =
     annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
       future.flatMap { failedAnnotations =>
-        insertOrUpdateAnnotation(annotation).map { case (success, _, _) =>
+        insertOrUpdateAnnotation(annotation).map { case (success, _) =>
           if (success) failedAnnotations else failedAnnotations :+ annotation
         }
       }
@@ -88,19 +86,16 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       }
     }
 
-  /** Retrieves an annotation by ID **/
   def findById(annotationId: UUID): Future[Option[(Annotation, Long)]] =
     es.client execute {
       get(annotationId.toString) from ES.RECOGITO / ES.ANNOTATION
     } map { response =>
-      if (response.exists) {
-        val source = Json.parse(response.sourceAsString)
-        Some((Json.fromJson[Annotation](source).get, response.version))
-      } else {
+      if (response.exists)
+        Some(response.to[(Annotation, Long)])
+      else
         None
-      }
     }
-
+    
   private def deleteById(annotationId: String): Future[Boolean] =
     es.client execute {
       delete(annotationId.toString) from ES.RECOGITO / ES.ANNOTATION
@@ -114,24 +109,22 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
   /** Deletes the annotation with the given ID **/
   def deleteAnnotation(annotationId: UUID, deletedBy: String, deletedAt: DateTime): Future[Option[Annotation]] =
     findById(annotationId).flatMap(_ match {
-      case Some((annotation, _)) => {
+      case Some((annotation, _)) =>
         val f = for {
           markerInserted <- insertDeleteMarker(annotation, deletedBy, deletedAt)
-          deleted        <- if (markerInserted) deleteById(annotationId.toString) else Future.successful(false)
-          geotagsDeleted <- if (deleted) deleteGeoTagsByAnnotation(annotationId) else Future.successful(false)
-        } yield geotagsDeleted
+          if (markerInserted)
+            deleted <- deleteById(annotationId.toString)
+        } yield deleted
 
         f.map { success =>
-          if (!success)
-            throw new Exception("Error deleting annotation")
-
+          if (!success) throw new Exception("Error deleting annotation")
           Some(annotation)
+        } recover { case t: Throwable =>
+          t.printStackTrace()
+          None 
         }
-      }
 
-      case None =>
-        // Annotation not found
-        Future.successful(None)
+      case None => Future.successful(None)
     })
 
   def countTotal(): Future[Long] =
@@ -146,7 +139,6 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       } limit 0
     } map { _.totalHits }
 
-  /** Retrieves all annotations on a given document **/
   def findByDocId(id: String, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION) query {
@@ -154,7 +146,7 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
       } start offset limit limit
     } map(_.to[(Annotation, Long)].toSeq)
 
-  /** Deletes all annotations, geo-tags & version history on a given document **/
+  /** Deletes all annotations & version history on a given document **/
   def deleteByDocId(docId: String): Future[Boolean] = {
     val deleteAnnotations = findByDocId(docId).flatMap { annotationsAndVersions =>
       if (annotationsAndVersions.size > 0) {
@@ -176,13 +168,11 @@ class AnnotationService @Inject() (implicit val es: ES, val ctx: ExecutionContex
     }
 
     val deleteVersions = deleteHistoryRecordsByDocId(docId)
-    val deleteGeoTags = deleteGeoTagsByDocId(docId)
 
     for {
       s1 <- deleteAnnotations
       s2 <- deleteVersions
-      s3 <- deleteGeoTags
-    } yield (s1 && s2 && s3)
+    } yield (s1 && s2)
   }
 
   /** Retrieves all annotations on a given filepart **/

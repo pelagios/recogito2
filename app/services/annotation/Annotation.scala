@@ -8,21 +8,13 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
 case class Annotation(
-
   annotationId: UUID,
-
   versionId: UUID,
-
   annotates: AnnotatedObject,
-
   contributors: Seq[String],
-
   anchor: String,
-
   lastModifiedBy: Option[String],
-
   lastModifiedAt: DateTime,
-
   bodies: Seq[AnnotationBody])
 
 case class AnnotatedObject(documentId: String, filepartId: UUID, contentType: ContentType)

@@ -4,7 +4,7 @@ import akka.actor.{ ActorSystem, Props }
 import java.io.File
 import javax.inject.{ Inject, Singleton }
 import services.annotation.AnnotationService
-import services.place.PlaceService
+import services.entity.EntityService
 import services.task.{ TaskService, TaskType }
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.ExecutionContext
@@ -21,7 +21,7 @@ object GeoresolutionService {
 @Singleton
 class GeoresolutionService @Inject() (
     annotations: AnnotationService,
-    places: PlaceService,
+    entities: EntityService,
     taskService: TaskService,
     uploads: Uploads,
     ctx: ExecutionContext) extends TransformService {
@@ -46,7 +46,7 @@ class GeoresolutionService @Inject() (
           args,
           taskService,
           annotations,
-          places,
+          entities,
           keepalive,
           ctx),
         name = "georesolution.doc." + document.getId)

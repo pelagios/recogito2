@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate
 import java.util.UUID
 import services.ContentType
 import services.annotation._
-import services.place.PlaceService
+import services.entity.{EntityService, EntityType}
 import services.task.TaskService
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
@@ -44,17 +44,17 @@ trait HasGeoresolution {
       total: Int,
       taskId: UUID,
       progressRange: (Int, Int) = (0, 100)
-    )(implicit annotationService: AnnotationService, placeService: PlaceService, taskService: TaskService, ctx: ExecutionContext) = {
+    )(implicit annotationService: AnnotationService, entityService: EntityService, taskService: TaskService, ctx: ExecutionContext) = {
     
     val docId = document.getId
     val partId = part.getId
     val contentType = ContentType.withName(part.getContentType).get
     
     def resolveOne(resolvable: T, index: Int) = {
-      placeService.searchPlaces(ES.sanitize(resolvable.toponym), 0, 1, resolvable.coord).map { topHits =>
+      entityService.searchEntities(ES.sanitize(resolvable.toponym), Some(EntityType.PLACE), 0, 1, resolvable.coord).map { topHits =>
         if (topHits.total > 0)
           // TODO be smarter about choosing the right URI from the place
-          toAnnotation(docId, partId, contentType, resolvable, Some(topHits.items(0)._1.id), index)         
+          toAnnotation(docId, partId, contentType, resolvable, Some(topHits.items(0).entity.uris.head), index)         
         else
           // No gazetteer match found
           toAnnotation(docId, partId, contentType, resolvable, None, index)
@@ -73,7 +73,7 @@ trait HasGeoresolution {
         case Some(resolvable) =>
           val f = for {
             annotation <- resolveOne(resolvable, counter)
-            (success, _, _) <- annotationService.insertOrUpdateAnnotation(annotation)
+            (success, _) <- annotationService.insertOrUpdateAnnotation(annotation)
           } yield (success)
           
           Await.result(f, 10.seconds)

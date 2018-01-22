@@ -14,7 +14,7 @@ import scala.language.reflectiveCalls
 import scala.util.Try
 import storage.ES
 
-trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self: AnnotationHistoryService =>
+trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
 
   implicit object AnnotationHistoryRecordIndexable extends Indexable[AnnotationHistoryRecord] {
     override def json(a: AnnotationHistoryRecord): String = Json.stringify(Json.toJson(a))
@@ -29,11 +29,9 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
   def insertVersion(annotation: Annotation)(implicit es: ES, context: ExecutionContext): Future[Boolean] =
     es.client execute {
       indexInto(ES.RECOGITO / ES.ANNOTATION_HISTORY) source AnnotationHistoryRecord.forVersion(annotation)
-    } map {
-      _.created
+    } map { _.created
     } recover { case t: Throwable =>
       Logger.error("Error storing annotation version")
-      Logger.error(t.toString)
       t.printStackTrace
       false
     }
@@ -42,11 +40,9 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
   def insertDeleteMarker(annotation: Annotation, deletedBy: String, deletedAt: DateTime)(implicit es: ES, context: ExecutionContext): Future[Boolean] =
     es.client execute {
       indexInto(ES.RECOGITO / ES.ANNOTATION_HISTORY) source AnnotationHistoryRecord.forDelete(annotation, deletedBy, deletedAt)
-    } map {
-      _.created
+    } map { _.created
     } recover { case t: Throwable =>
       Logger.error("Error storing delete marker")
-      Logger.error(t.toString)
       t.printStackTrace
       false
     }
@@ -55,33 +51,29 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
   def getChangedAfter(docId: String, after: DateTime)(implicit es: ES, context: ExecutionContext): Future[Seq[String]] =
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION_HISTORY) query {
-        boolQuery
-          must (
-            termQuery("annotates.document_id" -> docId)
-          ) filter (
-            rangeQuery("last_modified_at").gt(formatDate(after))
-          )
+        boolQuery must (
+          termQuery("annotates.document_id" -> docId),
+          rangeQuery("last_modified_at").gt(formatDate(after))
+        )
       } aggs {
         termsAggregation("by_annotation_id") field "annotation_id" size ES.MAX_SIZE
       }
-    } map { response =>
-      response.aggregations.termsResult("by_annotation_id")
-        .getBuckets.asScala.map(_.getKeyAsString)
+    } map { 
+      _.aggregations.termsResult("by_annotation_id")
+       .getBuckets.asScala.map(_.getKeyAsString)
     }
 
   def getAnnotationStateAt(annotationId: String, time: DateTime)(implicit es: ES, context: ExecutionContext): Future[Option[AnnotationHistoryRecord]] =
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION_HISTORY) query {
-        boolQuery
-          must (
-            termQuery("annotation_id" -> annotationId)
-          ) filter (
-            rangeQuery("last_modified_at").lte(formatDate(time))
-          )
+        boolQuery must (
+          termQuery("annotation_id" -> annotationId),
+          rangeQuery("last_modified_at").lte(formatDate(time))
+        )
       } sortBy {
         fieldSort("last_modified_at") order SortOrder.DESC
       } limit 1
-    } map { _.to[AnnotationHistoryRecord].toSeq.headOption }
+    } map { _.to[AnnotationHistoryRecord].headOption }
 
   /** Deletes all history records (versions and delete markers) for a document, after a given timestamp **/
   def deleteHistoryRecordsAfter(docId: String, after: DateTime)(implicit es: ES, context: ExecutionContext): Future[Boolean] = {
@@ -103,8 +95,7 @@ trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate { self
         es.client.java.prepareBulk()
         es.client execute {
           bulk ( hits.map(h => delete(h.id) from ES.RECOGITO / ES.ANNOTATION_HISTORY))
-        } map {
-          !_.hasFailures
+        } map { !_.hasFailures
         } recover { case t: Throwable =>
           t.printStackTrace()
           false

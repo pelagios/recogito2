@@ -1,22 +1,21 @@
-package services.place.crosswalks
+package services.entity.crosswalks.geojson
 
-import com.vividsolutions.jts.geom.{ Coordinate, Geometry }
+import com.vividsolutions.jts.geom.{Coordinate, Geometry}
 import java.io.InputStream
 import services.HasGeometry
-import services.place.{ Description, Gazetteer, GazetteerRecord, Name }
-import org.joda.time.{ DateTime, DateTimeZone }
+import services.entity._
+import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
 object PelagiosGeoJSONCrosswalk extends BaseGeoJSONCrosswalk {
-  
-  def fromGeoJSON(filename: String)(in: InputStream): Seq[GazetteerRecord] = {
+
+  def fromGeoJSON(filename: String)(in: InputStream): Seq[EntityRecord] = {
     val source = filename.substring(0, filename.indexOf('.'))
     val fc = Json.fromJson[PelagiosGazetteerFeatureCollection](Json.parse(in)).get
-    fc.features.map(f => GazetteerRecord(
+    fc.features.map(f => EntityRecord(
       f.uri,
-      Gazetteer(source),
+      source,
       DateTime.now().withZone(DateTimeZone.UTC),
       None, // lastChangedAt
       f.title,
@@ -24,15 +23,14 @@ object PelagiosGeoJSONCrosswalk extends BaseGeoJSONCrosswalk {
       f.names,
       f.geometry,
       f.geometry.map(_.getCentroid.getCoordinate),
-      None,
-      Seq.empty[String], // place types
-      None,
-      None,
-      Seq.empty[String], // closeMatches
-      Seq.empty[String]  // exactMatches
+      None, // country code
+      None, // temporal bounds
+      Seq.empty[String], // subjects
+      None, // priority
+      Seq.empty[Link]
     ))
   }
-  
+
 }
 
 case class PelagiosGazetteerFeature(
@@ -42,11 +40,11 @@ case class PelagiosGazetteerFeature(
   names               : Seq[Name],
   geometry            : Option[Geometry],
   representativePoint : Option[Coordinate])
-  
+
 case class PelagiosGazetteerFeatureCollection(features: Seq[PelagiosGazetteerFeature])
-  
+
 object PelagiosGazetteerFeature extends HasGeometry {
-  
+
   implicit val pelagiosGeoJSONReads: Reads[PelagiosGazetteerFeature] = (
     (JsPath \ "uri").read[String] and
     (JsPath \ "title").read[String] and
@@ -61,5 +59,5 @@ object PelagiosGazetteerFeatureCollection {
 
   implicit val pelagiosGazetteerFeatureCollectionRead: Reads[PelagiosGazetteerFeatureCollection] =
     (JsPath \ "features").read[Seq[PelagiosGazetteerFeature]].map(PelagiosGazetteerFeatureCollection(_))
-  
+
 }

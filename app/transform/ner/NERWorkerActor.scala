@@ -5,17 +5,17 @@ import java.io.File
 import java.util.UUID
 import services.ContentType
 import services.annotation._
-import services.place.PlaceService
+import services.entity.EntityService
 import services.task._
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime
 import org.pelagios.recogito.sdk.ner._
 import play.api.Logger
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.io.Source
 import storage.ES
-import transform.georesolution.{ Georesolvable, HasGeoresolution }
+import transform.georesolution.{Georesolvable, HasGeoresolution}
 
 case class EntityGeoresolvable(entity: Entity) extends Georesolvable {
   
@@ -32,7 +32,7 @@ private[ner] class NERWorkerActor(
     args: Map[String, String],
     implicit val taskService: TaskService,
     implicit val annotationService: AnnotationService,
-    implicit val placeService: PlaceService,
+    implicit val entityService: EntityService,
     implicit val ctx: ExecutionContext) extends Actor with HasGeoresolution {
 
   import transform.TransformTaskMessages._ 

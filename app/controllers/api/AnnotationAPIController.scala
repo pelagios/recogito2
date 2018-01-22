@@ -47,7 +47,7 @@ case class AnnotationBodyStub(
   lastModifiedBy: Option[String],
   lastModifiedAt: Option[DateTime],
   value         : Option[String],
-  uri           : Option[String],
+  uri           : Option[Reference],
   note          : Option[String],
   status        : Option[AnnotationStatusStub])
 
@@ -58,7 +58,7 @@ object AnnotationBodyStub extends HasDate {
     (JsPath \ "last_modified_by").readNullable[String] and
     (JsPath \ "last_modified_at").readNullable[DateTime] and
     (JsPath \ "value").readNullable[String] and
-    (JsPath \ "uri").readNullable[String] and
+    (JsPath \ "reference").readNullable[Reference] and
     (JsPath \ "note").readNullable[String] and
     (JsPath \ "status").readNullable[AnnotationStatusStub]
   )(AnnotationBodyStub.apply _)
@@ -97,7 +97,7 @@ class AnnotationAPIController @Inject() (
   ) extends BaseController(components, config, users)
       with HasAnnotationValidation
       with HasPrettyPrintJSON
-      with HasTextSnippets 
+      with HasTextSnippets
       with HasTEISnippets
       with HasCSVParsing {
 
@@ -151,7 +151,7 @@ class AnnotationAPIController @Inject() (
             Some(s.setBy.getOrElse(user)),
             s.setAt.getOrElse(now))))))
   }
-  
+
   /** Common boilerplate code for all API methods carrying JSON config payload **/
   private def jsonOp[T](op: T => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]) = {
     request.body.asJson match {
@@ -170,14 +170,14 @@ class AnnotationAPIController @Inject() (
 
   def createAnnotation() = silhouette.SecuredAction.async { implicit request => jsonOp[AnnotationStub] { annotationStub =>
     val username = request.identity.username
-        
+
     // Fetch the associated document to check access privileges
     documents.getDocumentRecord(annotationStub.annotates.documentId, Some(username)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel.canWrite) {
           val annotation = stubToAnnotation(annotationStub, username)
           val f = for {
-            (annotationStored, _, previousVersion) <- annotationService.insertOrUpdateAnnotation(annotation)
+            (annotationStored, previousVersion) <- annotationService.insertOrUpdateAnnotation(annotation)
             success <- if (annotationStored)
                          contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
                        else
@@ -196,13 +196,13 @@ class AnnotationAPIController @Inject() (
         Future.successful(NotFound)
     })
   }}
-  
+
   def bulkUpsert() = silhouette.SecuredAction.async { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
     // We currently restrict to bulk upserts for a single document part only
     val username = request.identity.username
     val documentIds = annotationStubs.map(_.annotates.documentId).distinct
-    val partIds = annotationStubs.map(_.annotates.filepartId).distinct    
-    
+    val partIds = annotationStubs.map(_.annotates.filepartId).distinct
+
     if (documentIds.size == 1 || partIds.size == 1) {
       documents.getExtendedInfo(documentIds.head, Some(username)).flatMap {
         case Some((doc, accesslevel)) =>
@@ -217,7 +217,7 @@ class AnnotationAPIController @Inject() (
                   else
                     InternalServerError
                 }
-              
+
               case None =>
                 Logger.warn("Bulk upsert with invalid content: filepart not in document: " + documentIds.head + "/" + partIds.head)
                 Future.successful(BadRequest)
@@ -226,7 +226,7 @@ class AnnotationAPIController @Inject() (
             // No write permissions
             Future.successful(Forbidden)
           }
-        
+
         case None =>
           Logger.warn("Bulk upsert request points to unknown document: " + documentIds.head)
           Future.successful(NotFound)
@@ -237,13 +237,13 @@ class AnnotationAPIController @Inject() (
     }
   }}
 
-  def getImage(id: UUID) = silhouette.UserAwareAction.async { implicit request =>    
+  def getImage(id: UUID) = silhouette.UserAwareAction.async { implicit request =>
     val username = request.identity.map(_.username)
     annotationService.findById(id).flatMap {
       case Some((annotation, _)) =>
         val docId = annotation.annotates.documentId
         val partId = annotation.annotates.filepartId
-        
+
         documents.getExtendedInfo(docId, username).flatMap {
           case Some((doc, accesslevel)) =>
             doc.fileparts.find(_.getId == partId) match {
@@ -252,56 +252,56 @@ class AnnotationAPIController @Inject() (
                   Ok.sendFile(file))
                 else
                   Future.successful(Forbidden)
-                
+
               case None =>
                 Logger.error(s"Attempted to render image for annotation $id but filepart $partId not found")
                 Future.successful(InternalServerError)
             }
-            
+
           case None =>
             // Annotation exists, but not the doc?
             Logger.error(s"Attempted to render image for annotation $id but document $docId not found")
             Future.successful(InternalServerError)
         }
-      
+
       case None => Future.successful(NotFound)
     }
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = silhouette.UserAwareAction.async { implicit request =>
-    def getTextContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = 
+    def getTextContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] =
       uploads.readTextfile(doc.ownerName, doc.id, part.getFile) map {
-        case Some(text) => 
+        case Some(text) =>
           val snippet = ContentType.withName(part.getContentType).get match {
             case ContentType.TEXT_TEIXML => snippetFromTEI(text, annotation.anchor)
             case ContentType.TEXT_PLAIN => snippetFromText(text, annotation)
             case _ => throw new RuntimeException("Attempt to retrieve text snippet for non-text doc part - should never happen")
-          }  
-          
+          }
+
           Json.obj("snippet" -> snippet.text, "char_offset" -> snippet.offset)
 
         case None =>
           Logger.warn("No text content found for filepart " + annotation.annotates.filepartId)
           JsNull
       }
-    
+
     def getDataContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = {
       uploads.getDocumentDir(doc.ownerName, doc.id).map { dir =>
-        extractLine(new File(dir, part.getFile), annotation.anchor.substring(4).toInt).map(snippet => Json.toJson(snippet)) 
+        extractLine(new File(dir, part.getFile), annotation.anchor.substring(4).toInt).map(snippet => Json.toJson(snippet))
       } getOrElse {
         Logger.warn("No file content found for filepart " + annotation.annotates.filepartId)
         Future.successful(JsNull)
       }
     }
-    
+
     def getContext(doc: DocumentInfo, annotation: Annotation): Future[JsValue] = annotation.annotates.contentType match {
       case t if t.isImage => Future.successful(JsNull)
-      
+
       case t if t.isText | t.isData => doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
         case Some(part) =>
           if (t.isText) getTextContext(doc, part, annotation)
           else getDataContext(doc, part, annotation)
-  
+
         case None =>
           // Annotation referenced a part ID that's not in the database
           Logger.error("Annotation points to filepart " + annotation.annotates.filepartId + " but not in DB")
@@ -312,10 +312,10 @@ class AnnotationAPIController @Inject() (
         Logger.error("Annotation indicates unsupported content type " + annotation.annotates.contentType)
         Future.successful(JsNull)
     }
-        
+
     annotationService.findById(id).flatMap {
       case Some((annotation, _)) => {
-        if (includeContext) {          
+        if (includeContext) {
           documents.getExtendedInfo(annotation.annotates.documentId, request.identity.map(_.username)).flatMap {
             case Some((doc, accesslevel)) =>
               if (accesslevel.canRead)
@@ -323,7 +323,7 @@ class AnnotationAPIController @Inject() (
                   jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> context)))
               else
                 Future.successful(ForbiddenPage)
-              
+
             case _ =>
               Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
               Future.successful(NotFoundPage)

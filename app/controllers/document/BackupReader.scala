@@ -20,34 +20,34 @@ import scala.io.Source
 import transform.tiling.TilingService
 
 trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
-  
+
   import BackupReader._
-  
+
   private def openZipFile(file: File) = {
     val zipFile = new ZipFile(file)
     (zipFile, zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX")))
   }
-  
+
   def readMetadata(file: File, runAsAdmin: Boolean, forcedOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
-    
+
     def parseDocumentMetadata(json: JsValue) = {
       // User ID from backup, or create new if allowed (for interop with legacy backups)
       val id = (json \ "id").asOpt[String]
-        .getOrElse { 
+        .getOrElse {
           if (!runAsAdmin) // Only admins may import legacy backups
             throw new HasBackupValidation.InvalidBackupException
-            
-          documentService.generateRandomID() 
+
+          documentService.generateRandomID()
         }
-      
+
       if (documentService.existsId(id))
         throw new HasBackupValidation.DocumentExistsException
-        
+
       val owner = forcedOwner match {
           // Personal restore always forces the document owner to the logged-in user
           case Some(username) => username
 
-          // Only admins can retain the user from the backup metadata - but 
+          // Only admins can retain the user from the backup metadata - but
           // forceOwner == None && runAsAdmin == false should never happen
           case _ =>
             if (!runAsAdmin)
@@ -75,7 +75,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         (json \ "is_public").asOpt[Boolean].getOrElse(false).asInstanceOf[Boolean],
         (json \ "attribution").asOpt[String].getOrElse(null))
     }
-    
+
     def parseFilepartMetadata(documentId: String, json: JsValue) =
       (json \ "parts").as[Seq[JsObject]].zipWithIndex.map { case (obj, idx) =>
         new DocumentFilepartRecord(
@@ -88,31 +88,31 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
           idx + 1,
           (obj \ "source").asOpt[String].getOrElse(null))
       }
-          
-    scala.concurrent.blocking {      
+
+    scala.concurrent.blocking {
       val (zipFile, entries) = openZipFile(file)
       val metadataEntry = entries.filter(_.getName == "metadata.json").head
       val metadataJson  = Json.parse(Source.fromInputStream(zipFile.getInputStream(metadataEntry), "UTF-8").getLines.mkString("\n"))
-        
+
       val documentRecord  = parseDocumentMetadata(metadataJson)
-      val filepartRecords = parseFilepartMetadata(documentRecord.getId, metadataJson) 
-      
+      val filepartRecords = parseFilepartMetadata(documentRecord.getId, metadataJson)
+
       (documentRecord, filepartRecords)
     }
   }
-  
+
   def readAnnotations(file: File)(implicit ctx: ExecutionContext) = Future {
-      
+
     def parseAnnotation(json: String) =
       Json.fromJson[AnnotationStub](Json.parse(json)).get
-    
+
     scala.concurrent.blocking {
       val (zipFile, entries) = openZipFile(file)
       val annotationEntry = entries.filter(_.getName == "annotations.jsonl").head
       Source.fromInputStream(zipFile.getInputStream(annotationEntry), "UTF-8").getLines.map(parseAnnotation)
     }
   }
-  
+
   def restoreBackup(
       file: File,
       runAsAdmin: Boolean,
@@ -122,44 +122,44 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
                tilingService: TilingService,
                ctx: ExecutionContext,
                system: ActorSystem) = {
-    
+
     def restoreTilesets(document: DocumentRecord, imageParts: Seq[DocumentFilepartRecord]) = {
       tilingService.spawnTask(document, imageParts)
     }
-    
+
     def restoreDocument(document: DocumentRecord, parts: Seq[DocumentFilepartRecord]) = {
       val (zipFile, entries) = openZipFile(file)
-      
-      val fileparts = parts.map { part => 
+
+      val fileparts = parts.map { part =>
         val entry = entries.filter(_.getName == "parts" + File.separator + part.getFile).head
         val stream = zipFile.getInputStream(entry)
         (part, stream)
       }
-      
+
       documentService.importDocument(document, fileparts).map { _ =>
         // TODO wait for tiling to be finished?
         val uploadedImageParts = fileparts.filter { case (part, _) =>
           ContentType.withName(part.getContentType) == Some(ContentType.IMAGE_UPLOAD) }.map(_._1)
-        
+
         if (uploadedImageParts.size > 0)
           restoreTilesets(document, uploadedImageParts)
       }
-    }    
-    
+    }
+
     def restoreAnnotations(annotationStubs: Iterator[AnnotationStub], docId: String, fileparts: Seq[DocumentFilepartRecord]) = {
-      val filepartIds = fileparts.map(_.getId) 
-        
+      val filepartIds = fileparts.map(_.getId)
+
       val annotations = annotationStubs
         .map(stub => stub.toAnnotation(docId, fileparts))
         .filter(annotation => filepartIds.contains(annotation.annotates.filepartId))
- 
+
       annotationService.insertOrUpdateAnnotations(annotations.toSeq)
     }
-    
+
     def restore() = {
       val fReadMetadata = readMetadata(file, runAsAdmin, forcedOwner)
       val fReadAnnotations = readAnnotations(file)
-      
+
       for {
         (document, parts) <- fReadMetadata
         annotationStubs <- fReadAnnotations
@@ -167,52 +167,52 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         _ <- restoreAnnotations(annotationStubs, document.getId, parts)
       } yield (document, parts)
     }
-    
+
     if (runAsAdmin) // Admins can just restore...
       restore()
     else // ...anyone else needs to go through validation first
       validateBackup(file).flatMap { valid =>
         if (!valid)
           throw new HasBackupValidation.InvalidSignatureException
-          
+
         restore()
       }
   }
-  
+
 }
 
 object BackupReader extends HasDate with HasContentTypeList {
-  
+
   case class AnnotatedObjectStub(
     documentId: Option[String],
     filepartId: Option[UUID],
     filepartTitle: Option[String],
     contentType: ContentType
   ) {
-    
+
     def toAnnotatedObject(docId: String, fileparts: Seq[DocumentFilepartRecord]) = AnnotatedObject(
       docId,
       filepartId.getOrElse(fileparts.find(_.getTitle.equals(filepartTitle.get)).get.getId),
       contentType: ContentType
     )
-    
+
   }
-  
+
   private implicit val annotatedObjectStubReads: Reads[AnnotatedObjectStub] = (
     (JsPath \ "document_id").readNullable[String] and
     (JsPath \ "filepart_id").readNullable[UUID] and
     (JsPath \ "filepart_title").readNullable[String] and
     (JsPath \ "content_type").read[JsValue].map(fromCTypeList)
   )(AnnotatedObjectStub.apply _)
-  
-  
+
+
   private implicit val annotationStatusStubReads: Reads[AnnotationStatusStub] = (
     (JsPath \ "value").read[AnnotationStatus.Value] and
     (JsPath \ "set_by").readNullable[String] and
     (JsPath \ "set_at").readNullable[DateTime]
   )(AnnotationStatusStub.apply _)
-  
-  
+
+
   case class AnnotationBodyStub(
     hasType: AnnotationBody.Type,
     lastModifiedBy: Option[String],
@@ -222,7 +222,7 @@ object BackupReader extends HasDate with HasContentTypeList {
     note: Option[String],
     status: Option[AnnotationStatusStub]
   ) {
-    
+
     val toAnnotationBody = AnnotationBody(
       hasType,
       lastModifiedBy,
@@ -232,9 +232,9 @@ object BackupReader extends HasDate with HasContentTypeList {
       note,
       status.map(_.toAnnotationStatus)
     )
-    
+
   }
-    
+
   private implicit val annotationBodyStubReads: Reads[AnnotationBodyStub] = (
     (JsPath \ "type").read[AnnotationBody.Type] and
     (JsPath \ "last_modified_by").readNullable[String] and
@@ -244,17 +244,17 @@ object BackupReader extends HasDate with HasContentTypeList {
     (JsPath \ "note").readNullable[String] and
     (JsPath \ "status").readNullable[AnnotationStatusStub]
   )(AnnotationBodyStub.apply _)
-  
+
   case class AnnotationStatusStub(
     value: AnnotationStatus.Value,
     setBy: Option[String],
     setAt: Option[DateTime]
   ) {
-    
+
     val toAnnotationStatus = AnnotationStatus(value, setBy, setAt.getOrElse(new DateTime()))
-    
+
   }
-  
+
   case class AnnotationStub(
     annotationId: UUID,
     versionId: UUID,
@@ -265,7 +265,7 @@ object BackupReader extends HasDate with HasContentTypeList {
     lastModifiedAt: Option[DateTime],
     bodies: Seq[AnnotationBodyStub]
   ) {
-    
+
     def toAnnotation(docId: String, fileparts: Seq[DocumentFilepartRecord]) = Annotation(
       annotationId,
       versionId,
@@ -276,9 +276,9 @@ object BackupReader extends HasDate with HasContentTypeList {
       lastModifiedAt.getOrElse(new DateTime()),
       bodies.map(_.toAnnotationBody)
     )
-    
+
   }
-  
+
   private implicit val annotationStubReads: Reads[AnnotationStub] = (
     (JsPath \ "annotation_id").read[UUID] and
     (JsPath \ "version_id").read[UUID] and

@@ -1,9 +1,18 @@
 {
-  "place": {
+  "entity": {
     "dynamic": "false",
     "properties": {
-      "id": { "type": "keyword" },
+      "union_id": { "type": "keyword" },
+      "entity_type": { "type": "keyword" },
+      "title": {
+        "type": "text",
+        "fields": {
+           "raw": { "type": "text", "analyzer":"lowercase_keyword" }
+        }
+      },
+      "representative_geometry": { "enabled": "false" },
       "representative_point": { "type": "geo_point" },
+      "bbox": { "type": "geo_shape", "tree": "quadtree", "distance_error_pct": 0.001 },
       "temporal_bounds_union": {
         "properties": {
           "from": { "type": "date", "format": "yyyy-MM-dd" },
@@ -13,8 +22,8 @@
       "is_conflation_of": {
         "properties": {
           "uri": { "type": "keyword" },
-          "source_gazetteer": { "type": "keyword" },
-          "last_sync_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
+          "source_authority": { "type": "keyword" },
+          "last_synced_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
           "last_changed_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
           "title": {
             "type": "text",
@@ -39,15 +48,18 @@
               "language": { "type": "keyword" }
             }
           },
-          "temporal_bounds": {
+          "geometry": { "enabled": false },
+          "representative_point": { "enabled": false },
+          "country_code": { "type": "keyword" },
+          "temporal_bounds": { "enabled": false },
+          "subjects": { "type": "keyword" },
+          "priority": { "type": "long" },
+          "links": {
             "properties": {
-              "from": { "type": "date", "format": "yyyy-MM-dd" },
-              "to": { "type": "date", "format": "yyyy-MM-dd" }
+              "uri":  { "type": "keyword" },
+              "link_type": { "type": "keyword" }
             }
-          },
-          "place_types": { "type": "keyword" },
-          "close_matches": { "type": "keyword" },
-          "exact_matches": { "type": "keyword" }
+          }
         }
       }
     }

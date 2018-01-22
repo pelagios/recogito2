@@ -1,16 +1,19 @@
 {
-  "id": "http://pleiades.stoa.org/places/118543",
+  "internal_id": "69d6b969-7f6b-4934-8c81-848dd194aeaf",
+  "entity_type": "PLACE",
+  "title": "Ad Mauros",
   "representative_geometry": {
      "type": "Point",
      "coordinates": [ 14.02358, 48.31058 ]
    },
   "representative_point": [ 14.02358, 48.31058 ],
+  "bbox": [[ 14.02358, 48.31058], [ 14.02358, 48.31058]],
   "temporal_bounds_union": { "from": -30, "to": 640 },
   "is_conflation_of": [
     {
       "uri": "http://pleiades.stoa.org/places/118543",
-      "source_gazetteer": "Pleiades",
-      "last_sync_at": "2016-04-03T11:23:00Z",
+      "source_authority": "http://pleiades.stoa.org",
+      "last_synced_at": "2016-04-03T11:23:00Z",
       "last_changed_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros",
       "descriptions": [
@@ -25,11 +28,11 @@
        },
       "representative_point": [ 14.02358, 48.31058 ],
       "temporal_bounds": { "from": -30, "to": 640 },
-      "place_types": [ "fort" , "tower" ]
+      "subjects": [ "fort" , "tower" ]
     }, {
       "uri": "http://dare.ht.lu.se/places/10778",
-      "source_gazetteer": "DARE",
-      "last_sync_at": "2016-04-03T11:23:00Z",
+      "source_authority": "http://dare.ht.lu.se/",
+      "last_synced_at": "2016-04-03T11:23:00Z",
       "last_changed_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros/Marinianio, Eferding",
       "names": [
@@ -41,17 +44,17 @@
        },
       "representative_point": [ 14.02358, 48.31058 ],
       "temporal_bounds": { "from": -30, "to": 640 },
-      "place_types": [ "fort" ],
-      "close_matches": [
-        "http://sws.geonames.org/2780394",
-        "http://www.wikidata.org/entity/Q2739862",
-        "http://de.wikipedia.org/wiki/Kastell_Eferding",
-        "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html"
+      "subjects": [ "fort" ],
+      "links": [
+        { "uri": "http://sws.geonames.org/2780394", "link_type": "closeMatch" },
+        { "uri": "http://www.wikidata.org/entity/Q2739862", "link_type": "closeMatch" },
+        { "uri": "http://de.wikipedia.org/wiki/Kastell_Eferding", "link_type": "closeMatch" },
+        { "uri": "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html", "link_type": "closeMatch" }
       ]
     },{
       "uri": "http://www.trismegistos.org/place/35191",
-      "source_gazetteer": "Trismegistos",
-      "last_sync_at": "2016-04-03T11:23:00Z",
+      "source_authority": "http://www.trismegistos.org",
+      "last_synced_at": "2016-04-03T11:23:00Z",
       "title": "Ad Mauros",
       "names": [
         { "name": "Ad Mauros" },
