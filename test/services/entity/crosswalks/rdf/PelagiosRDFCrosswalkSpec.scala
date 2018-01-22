@@ -12,7 +12,7 @@ import services.entity.{Description, Name, TemporalBounds}
 @RunWith(classOf[JUnitRunner])
 class PelagiosRDFCrosswalkSpec extends Specification {
 
-  private val GAZETTEER_RDF = new File("test/resources/services/place/gazetteer_sample_pleiades.ttl")
+  private val GAZETTEER_RDF = new File("test/resources/services/entity/gazetteer_sample_pleiades.ttl")
   
   "The Pelagios Gazetter RDF crosswalk" should {
     
