@@ -1,13 +1,13 @@
-package services.place.crosswalks
+package services.entity.crosswalks.rdf
 
-import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
-import java.io.{ File, FileInputStream }
-import services.place.{ Gazetteer, Name, Description, TemporalBounds }
+import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory}
+import java.io.{File, FileInputStream}
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
+import services.entity.{Description, Name, TemporalBounds}
 
 @RunWith(classOf[JUnitRunner])
 class PelagiosRDFCrosswalkSpec extends Specification {
@@ -43,12 +43,12 @@ class PelagiosRDFCrosswalkSpec extends Specification {
     "properly import all properties of the test record" in {
       val testRecord = records.find(_.uri == "http://pleiades.stoa.org/places/128460").get
       
-      testRecord.sourceGazetteer must equalTo (Gazetteer("gazetteer_sample_pleiades"))
+      testRecord.sourceAuthority must equalTo ("gazetteer_sample_pleiades")
       
       testRecord.title must equalTo("Mun. Vindobona")
 
-      testRecord.placeTypes.size must equalTo(1)
-      testRecord.placeTypes.head must equalTo("SETTLEMENT")
+      testRecord.subjects.size must equalTo(1)
+      testRecord.subjects.head must equalTo("SETTLEMENT")
       
       testRecord.descriptions.size must equalTo(1)
       testRecord.descriptions.head must equalTo(Description("An ancient place, cited: BAtlas 13 B4 Mun. Vindobona"))
@@ -66,9 +66,7 @@ class PelagiosRDFCrosswalkSpec extends Specification {
       testRecord.representativePoint must equalTo(Some(coord))
 
       testRecord.temporalBounds must equalTo(Some(TemporalBounds.fromYears(-20, 630)))
-      testRecord.closeMatches.size must equalTo(0)
-      testRecord.exactMatches.size must equalTo(0)
-      testRecord.allMatches.size must equalTo(0)
+      testRecord.links.size must equalTo(0)
     }
     
   }

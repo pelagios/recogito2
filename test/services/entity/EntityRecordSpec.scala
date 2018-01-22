@@ -1,9 +1,9 @@
-package services.place
+package services.entity
 
-import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
+import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory}
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.joda.time.{ DateTime, DateTimeZone }
+import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.DateTimeFormat
 import org.junit.runner._
 import play.api.test._
@@ -11,7 +11,7 @@ import play.api.test.Helpers._
 import play.api.libs.json.Json
 import scala.io.Source
 
-object GazetteerRecordSpec {
+object EntityRecordSpec {
   
   private val DATE_TIME_PATTERN = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
   
@@ -23,9 +23,9 @@ object GazetteerRecordSpec {
   private val from = new DateTime(DateTimeZone.UTC).withDate(-30, 1, 1).withTime(0, 0, 0, 0)
   private val to = new DateTime(DateTimeZone.UTC).withDate(640, 1, 1).withTime(0, 0, 0, 0)
   
-  val pleiadesRecord = GazetteerRecord(
+  val pleiadesRecord = EntityRecord(
     "http://pleiades.stoa.org/places/118543",
-    Gazetteer("Pleiades"),
+    "Pleiades",
     SYNC_TIME,
     Some(SYNC_TIME),
     "Ad Mauros",
@@ -33,16 +33,15 @@ object GazetteerRecordSpec {
     Seq(Name("Ad Mauros")),
     Some(point),
     Some(coord),
+    None,
     Some(TemporalBounds(from, to)),
     Seq("fort" , "tower"),
     None,
-    None,
-    Seq.empty[String],
-    Seq.empty[String])
+    Seq.empty[Link])
     
-  val dareRecord = GazetteerRecord(
+  val dareRecord = EntityRecord(
     "http://dare.ht.lu.se/places/10778",
-    Gazetteer("DARE"),
+    "DARE",
     SYNC_TIME,
     Some(SYNC_TIME),
     "Ad Mauros/Marinianio, Eferding",
@@ -50,21 +49,20 @@ object GazetteerRecordSpec {
     Seq(Name("Ad Mauros/Marinianio, Eferding")),
     Some(point),
     Some(coord),
+    None,
     Some(TemporalBounds(from, to)),
     Seq("fort"),
     None,
-    None,
     Seq(
-      "http://sws.geonames.org/2780394",
-      "http://www.wikidata.org/entity/Q2739862",
-      "http://de.wikipedia.org/wiki/Kastell_Eferding",
-      "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html"
-    ),
-    Seq.empty[String]) 
+      Link("http://sws.geonames.org/2780394", LinkType.CLOSE_MATCH),
+      Link("http://www.wikidata.org/entity/Q2739862", LinkType.CLOSE_MATCH),
+      Link("http://de.wikipedia.org/wiki/Kastell_Eferding", LinkType.CLOSE_MATCH),
+      Link("http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html", LinkType.CLOSE_MATCH)
+    )) 
     
-  val trismegistosRecord = GazetteerRecord(
+  val trismegistosRecord = EntityRecord(
     "http://www.trismegistos.org/place/35191",
-    Gazetteer("Trismegistos"),
+    "Trismegistos",
     SYNC_TIME,
     None,
     "Ad Mauros",
@@ -77,24 +75,23 @@ object GazetteerRecordSpec {
     None,
     None,
     None,
-    Seq.empty[String],
-    None,
     None,
     Seq.empty[String],
-    Seq.empty[String])
+    None,
+    Seq.empty[Link])
   
 }
 
 @RunWith(classOf[JUnitRunner])
-class GazetteerRecordSpec extends Specification {
+class EntityRecordSpec extends Specification {
 
-  import GazetteerRecordSpec._
+  import EntityRecordSpec._
   
   "sample gazetteer records" should {
     
     "be properly created from place JSON" in {
       val json = Source.fromFile("test/resources/services/place/place.json").getLines().mkString("\n")
-      val parseResult = Json.fromJson[Place](Json.parse(json))
+      val parseResult = Json.fromJson[Entity](Json.parse(json))
       
       parseResult.isSuccess must equalTo(true)
       

@@ -64,17 +64,20 @@ case class Entity (
       .flatMap(e => e.subjects.map((_, e.sourceAuthority)))
       .groupBy(_._1)
       .map { case (subject, s) => (subject -> s.map(_._2)) }.toMap
-  
+
   /** Returns either the pre-computed bbox, or computes a new from the geometry **/
   lazy val bbox = storedBBox match {
     case Some(env) => Some(env)
     case None => representativeGeometry.map(_.getEnvelopeInternal)
   }
 
+  /** Shorthand: links **/
+  lazy val links = isConflationOf.flatMap(_.links)
+
 }
 
 object Entity extends HasGeometry {
-    
+
   // Although this means a bit more code, we use separate Reader/Writer
   // so we can specifically handle the bbox field
   implicit val entityReads: Reads[Entity] = (
@@ -87,7 +90,7 @@ object Entity extends HasGeometry {
     (JsPath \ "is_conflation_of").read[Seq[EntityRecord]] and
     (JsPath \ "bbox").readNullable[Envelope]
   )(Entity.apply _)
-  
+
   implicit val entityWrites: Writes[Entity] = (
     (JsPath \ "union_id").write[UUID] and
     (JsPath \ "entity_type").write[EntityType] and

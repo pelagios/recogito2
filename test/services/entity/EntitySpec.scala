@@ -1,4 +1,4 @@
-package services.place
+package services.entity
 
 import com.vividsolutions.jts.geom.{ Coordinate, GeometryFactory }
 import org.specs2.mutable._
@@ -9,6 +9,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json.Json
 import scala.io.Source
+import java.util.UUID
 
 @RunWith(classOf[JUnitRunner])
 class PlaceSpec extends Specification {
@@ -16,7 +17,7 @@ class PlaceSpec extends Specification {
   "The sample place" should {
 
     val json = Source.fromFile("test/resources/services/entity/place.json").getLines().mkString("\n")
-    val parseResult = Json.fromJson[Place](Json.parse(json))
+    val parseResult = Json.fromJson[Entity](Json.parse(json))
     
     "be properly created from JSON" in {
       parseResult.isSuccess must equalTo(true)
@@ -25,7 +26,7 @@ class PlaceSpec extends Specification {
     "have the expected top-level properties (ID, title, geometry, temporal bounds)" in {
       val place = parseResult.get
       
-      place.id must equalTo ("http://pleiades.stoa.org/places/118543")
+      place.unionId must equalTo ("http://pleiades.stoa.org/places/118543")
       place.titles must contain("Ad Mauros")
 
       val location = new Coordinate(14.02358, 48.31058)
@@ -47,19 +48,18 @@ class PlaceSpec extends Specification {
     
     "report the expected source gazetteers" in {
       val place = parseResult.get
-      val expectedGazetteers = 
-        Seq("Pleiades", "Trismegistos", "DARE").map(Gazetteer(_))
+      val expectedGazetteers = Seq("Pleiades", "Trismegistos", "DARE")
         
-      place.sourceGazetteers.size must equalTo(3)
-      place.sourceGazetteers must containAllOf(expectedGazetteers)
+      place.sourceAuthorities.size must equalTo(3)
+      place.sourceAuthorities must containAllOf(expectedGazetteers)
     }
     
     "list the expected place types per gazetteer" in {
       val place = parseResult.get      
       
-      place.placeTypes.size must equalTo(2)
-      place.placeTypes.get("fort").get must containAllOf(Seq(Gazetteer("DARE"), Gazetteer("Pleiades")))
-      place.placeTypes.get("tower").get must equalTo(Seq(Gazetteer("Pleiades")))
+      place.subjects.size must equalTo(2)
+      place.subjects.get("fort").get must containAllOf(Seq("DARE", "Pleiades"))
+      place.subjects.get("tower").get must equalTo(Seq("Pleiades"))
     }
     
     "list the expected descriptions by gazetteer" in {
@@ -67,34 +67,29 @@ class PlaceSpec extends Specification {
 
       place.descriptions.size must equalTo(1)
       place.descriptions.head._1 must equalTo(Description("An ancient place, cited: BAtlas 12 H4 Ad Mauros"))
-      place.descriptions.head._2 must equalTo(Seq(Gazetteer("Pleiades")))
+      place.descriptions.head._2 must equalTo(Seq("Pleiades"))
     }
     
     "list the expected names per gazetteer" in {
       val place = parseResult.get
       
       place.names.size must equalTo(4)
-      place.names.get(Name("Ad Mauros")).get must containAllOf(Seq(Gazetteer("Trismegistos"), Gazetteer("Pleiades")))
-      place.names.get(Name("Ad Mauros/Marinianio, Eferding")).get must equalTo(Seq(Gazetteer("DARE")))
-      place.names.get(Name("Eferding")).get must equalTo(Seq(Gazetteer("Trismegistos")))
-      place.names.get(Name("Marianianio", Some("la"))).get must equalTo(Seq(Gazetteer("Trismegistos")))      
+      place.names.get(Name("Ad Mauros")).get must containAllOf(Seq("Trismegistos", "Pleiades"))
+      place.names.get(Name("Ad Mauros/Marinianio, Eferding")).get must equalTo(Seq("DARE"))
+      place.names.get(Name("Eferding")).get must equalTo(Seq("Trismegistos"))
+      place.names.get(Name("Marianianio", Some("la"))).get must equalTo(Seq("Trismegistos"))      
     }
     
     "list the expected close- and exactMatches" in {
       val place = parseResult.get
       val expectedCloseMatches = Seq(
-        "http://sws.geonames.org/2780394",
-        "http://www.wikidata.org/entity/Q2739862",
-        "http://de.wikipedia.org/wiki/Kastell_Eferding",
-        "http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html")
-       
-      place.closeMatches.size must equalTo(4)
-      place.closeMatches must containAllOf(expectedCloseMatches)
-      
-      place.exactMatches.size must equalTo(0)
-      
-      place.allMatches.size must equalTo(4)
-      place.allMatches must containAllOf(expectedCloseMatches)
+        Link("http://sws.geonames.org/2780394", LinkType.CLOSE_MATCH),
+        Link("http://www.wikidata.org/entity/Q2739862", LinkType.CLOSE_MATCH),
+        Link("http://de.wikipedia.org/wiki/Kastell_Eferding", LinkType.CLOSE_MATCH),
+        Link("http://www.cambridge.org/us/talbert/talbertdatabase/TPPlace1513.html", LinkType.CLOSE_MATCH))
+        
+      place.links.size must equalTo(4)       
+      place.links must containAllOf(expectedCloseMatches)      
     }
     
   }
@@ -103,10 +98,12 @@ class PlaceSpec extends Specification {
     
     "yield an equal Place before and after" in {
       
-      import GazetteerRecordSpec._
+      import EntityRecordSpec._
       
-      val before = Place(
-        "http://pleiades.stoa.org/places/118543",
+      val before = Entity(
+        UUID.randomUUID,
+        EntityType.PLACE,
+        "Ad Mauros",
         dareRecord.geometry,
         dareRecord.representativePoint,
         dareRecord.temporalBounds,
@@ -115,7 +112,7 @@ class PlaceSpec extends Specification {
                   
       val serializedToJson = Json.stringify(Json.toJson(before))
       
-      val parsedFromJson = Json.fromJson[Place](Json.parse(serializedToJson))
+      val parsedFromJson = Json.fromJson[Entity](Json.parse(serializedToJson))
       parsedFromJson.isSuccess must equalTo(true)
       
       val after = parsedFromJson.get
