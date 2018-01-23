@@ -56,6 +56,7 @@ class EntityImporterSpec extends Specification {
         None, Seq(Link("http://www.example.com/place/a", LinkType.CLOSE_MATCH), Link("http://www.example.com/place/b", LinkType.EXACT_MATCH)))
         
       val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
+
       conflated.size must equalTo(1)
       conflated.head.isConflationOf.size must equalTo(3)
     }
@@ -74,6 +75,10 @@ class EntityImporterSpec extends Specification {
         None, Seq(Link("http://www.example.com/place/e", LinkType.CLOSE_MATCH), Link("http://www.example.com/place/f", LinkType.EXACT_MATCH)))
         
       val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
+      
+      println("===TEST2===")
+      println(conflated.toString)
+      
       conflated.size must equalTo(3)
       conflated.flatMap(_.uris) must containAllOf(Seq(recordA.uri, recordB.uri, recordC.uri))
       conflated.map(_.isConflationOf.size) must equalTo(Seq(1, 1, 1))

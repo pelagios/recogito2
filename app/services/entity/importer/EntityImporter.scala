@@ -1,19 +1,17 @@
 package services.entity.importer
 
-import java.util.UUID
-import javax.inject.Inject
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 import services.entity._
 import storage.ES
 
-class EntityImporter(
-  entityService: EntityService,
-  ENTITY_TYPE: EntityType, 
-  implicit val es: ES,
-  implicit val ctx: ExecutionContext
-) extends ReferenceRewriter with HasBatchImport {
+class EntityImporter (
+  entityService    : EntityService,
+  rewriter         : ReferenceRewriter,
+  ENTITY_TYPE      : EntityType, 
+  implicit val es  : ES,
+  implicit val ctx : ExecutionContext
+) extends HasBatchImport {
   
   /** Maximum number of URIs we will concatenate to an OR query **/
   private val MAX_URIS_IN_QUERY = 100
@@ -120,7 +118,7 @@ class EntityImporter(
       upsertSuccess <- entityService.upsertEntities(entitiesAfter)
       deleteSuccess <- if (upsertSuccess) deleteMerged(entitiesBefore, entitiesAfter)
                        else Future.successful(false)
-      rewriteSuccess <- if (deleteSuccess) rewriteReferencesTo(entitiesBefore, entitiesAfter)
+      rewriteSuccess <- if (deleteSuccess) rewriter.rewriteReferencesTo(entitiesBefore, entitiesAfter)
                        else Future.successful(false)
     } yield (rewriteSuccess)
     

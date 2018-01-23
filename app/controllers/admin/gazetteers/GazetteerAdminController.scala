@@ -9,13 +9,13 @@ import services.document.DocumentService
 import services.entity.{EntityService, EntityType}
 import services.entity.crosswalks.geojson._
 import services.entity.crosswalks.rdf._
-import services.entity.importer.EntityImporter
+import services.entity.importer.EntityImporterFactory
 import services.user.UserService
 import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}
 import play.api.mvc.ControllerComponents
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import storage.ES
 
 @Singleton
@@ -24,8 +24,8 @@ class GazetteerAdminController @Inject() (
   val config: Configuration,
   val documents: DocumentService,
   val entities: EntityService,
+  val importerFactory: EntityImporterFactory,
   val users: UserService,
-  val es: ES,
   val silhouette: Silhouette[Security.Env],
   implicit val materializer: Materializer,
   implicit val ctx: ExecutionContext,
@@ -45,8 +45,9 @@ class GazetteerAdminController @Inject() (
         Logger.info("Importing gazetteer from " + formData.filename)
           
         /** TEMPORARY HACK **/
+        
         val file = formData.ref.path.toFile
-        val importer = new EntityImporter(entities, EntityType.PLACE, es, ctx)
+        val importer = importerFactory.createImporter(EntityType.PLACE)
         
         if (formData.filename.contains(".ttl") || formData.filename.contains(".rdf") || formData.filename.contains(".xml")) {
           Logger.info("Importing Pelagios RDF dump")
@@ -68,9 +69,6 @@ class GazetteerAdminController @Inject() (
 
         /** TEMPORARY HACK **/
         
-          
-          
-          
         Redirect(routes.GazetteerAdminController.index)
       }
         

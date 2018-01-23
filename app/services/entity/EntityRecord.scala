@@ -70,8 +70,8 @@ case class EntityRecord (
     * - both records share at least one link
     */
   def isConnectedWith(other: EntityRecord): Boolean = {
-    val thisIdentifiers = (uri :+ directMatches).toSet
-    val otherIdentifiers = (other.uri :+ other.directMatches).toSet
+    val thisIdentifiers = (uri +: directMatches).toSet
+    val otherIdentifiers = (other.uri +: other.directMatches).toSet
     thisIdentifiers.intersect(otherIdentifiers).size > 0
   }
   
