@@ -10,19 +10,6 @@ import play.api.libs.functional.syntax._
 object GeoNamesCrosswalk extends BaseGeoJSONCrosswalk {
 
   def fromJson(record: String): Option[EntityRecord] = super.fromJson[GeoNamesRecord](record, { geonames =>
-    val (representativePoint, geometry) = {
-      val reprPoint = geonames.representativePoint     
-      val geometry = geonames.features.headOption.map(_.geometry)
-      
-      // Fill blanks if necessary
-      (reprPoint, geometry) match {
-        case (Some(c), Some(g)) => (Some(c), Some(g))
-        case (Some(c), None) => (Some(c), Some(new GeometryFactory().createPoint(c))) 
-        case (None, Some(g)) => (Some(g.getCentroid.getCoordinate), Some(g))
-        case (None, None) => (None, None)
-      }
-    }
-    
     EntityRecord(
       geonames.uri,
       "http://www.geonames.org",
@@ -31,8 +18,8 @@ object GeoNamesCrosswalk extends BaseGeoJSONCrosswalk {
       geonames.title,
       geonames.description.map(d => Seq(new Description(d))).getOrElse(Seq.empty[Description]),
       geonames.names,
-      geometry, // TODO compute union?
-      representativePoint,
+      geonames.features.headOption.map(_.geometry), // TODO compute union?
+      geonames.representativePoint,
       geonames.countryCode.map(c => CountryCode(c.toUpperCase)),
       None, // temporalBounds
       Seq.empty[String], // subjects
