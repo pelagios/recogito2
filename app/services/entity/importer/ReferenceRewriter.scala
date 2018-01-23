@@ -13,6 +13,6 @@ import services.entity.IndexedEntity
   */
 trait ReferenceRewriter {
 
-   def rewriteReferencesTo(entitiesBefore: Seq[IndexedEntity], entitiesAfter: Seq[IndexedEntity]): Future[Boolean]
+  def rewriteReferencesTo(entitiesBefore: Seq[IndexedEntity], entitiesAfter: Seq[IndexedEntity]): Future[Boolean]
     
 }

@@ -28,7 +28,8 @@ class EntityImporterSpec extends Specification {
   private val PLEIADES_RDF = new File("test/resources/services/entity/gazetteer_sample_pleiades.ttl")
   
   val testService = new MockEntityService() 
-  val testImporter = new EntityImporter(testService, EntityType.PLACE, null, executionContext)
+  
+  val testImporter = new EntityImporter (testService, new MockReferenceRewriter(), EntityType.PLACE, null, executionContext)
   
   /** Async Await shorthands **/
   private def importRecords(records: Seq[EntityRecord]) =
@@ -75,9 +76,6 @@ class EntityImporterSpec extends Specification {
         None, Seq(Link("http://www.example.com/place/e", LinkType.CLOSE_MATCH), Link("http://www.example.com/place/f", LinkType.EXACT_MATCH)))
         
       val conflated = testImporter.conflateRecursive(Seq(recordA, recordB, recordC))
-      
-      println("===TEST2===")
-      println(conflated.toString)
       
       conflated.size must equalTo(3)
       conflated.flatMap(_.uris) must containAllOf(Seq(recordA.uri, recordB.uri, recordC.uri))
@@ -231,7 +229,7 @@ class EntityImporterSpec extends Specification {
       vindobona.descriptions.size must equalTo(2)
       vindobona.descriptions.keys must containAllOf(expectedDescriptions)
       
-      vindobona.subjects.keys must equalTo(Seq("SETTLEMENT"))      
+      vindobona.subjects.keys must containAllOf(Seq("SETTLEMENT"))      
       vindobona.temporalBoundsUnion must equalTo(Some(TemporalBounds.fromYears(-30, 640)))
       
       vindobona.names.size must equalTo(6)
@@ -243,10 +241,12 @@ class EntityImporterSpec extends Specification {
       vindobona.names.get(Name("Vienne", Some("fr"))).get must equalTo(Seq("gazetteer_sample_dare"))
       vindobona.names.get(Name("Vienna", Some("en"))).get must equalTo(Seq("gazetteer_sample_dare"))
 
-      val expectedCloseMatches = Seq("http://www.wikidata.org/entity/Q871525")
+      val expectedCloseMatches = 
+        Seq("http://www.wikidata.org/entity/Q871525").map(Link(_, LinkType.CLOSE_MATCH))
+        
       val expectedExactMatches = Seq(
           "http://pleiades.stoa.org/places/128460",
-          "http://www.trismegistos.org/place/28821")
+          "http://www.trismegistos.org/place/28821").map(Link(_, LinkType.EXACT_MATCH))
 
       vindobona.links.filter(_.linkType == LinkType.CLOSE_MATCH) must equalTo(expectedCloseMatches)
       vindobona.links.filter(_.linkType == LinkType.EXACT_MATCH) must containAllOf(expectedExactMatches)
@@ -291,8 +291,6 @@ class EntityImporterSpec extends Specification {
     
     "have properly conflated the successor place" in {
       val conflated = findByURI("http://dare.ht.lu.se/places/10783")
-      conflated.uris.head must equalTo("http://dare.ht.lu.se/places/10783")
-      
       val expectedURIs = Seq(
         "http://de.wikipedia.org/wiki/Meidling",
         "http://dare.ht.lu.se/places/10783",
