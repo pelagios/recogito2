@@ -33,18 +33,6 @@ class AnnotationService @Inject() (
       } yield resolved.flatten
     }
     
-    def addUnionIds(annotation: Annotation, resolvedIndexed: Seq[IndexedEntity]) = {
-      val resolved = resolvedIndexed.map(_.entity)
-      annotation.copy(bodies = annotation.bodies.map { body =>
-        val referencedEntity = body.uri.flatMap(uri => resolved.find(_.uris.contains(uri)))
-        referencedEntity match {
-          case None => body // No referenced entity, just return original body
-          case Some(e) =>
-            body.copy(reference = body.reference.map(_.copy(unionId = Some(e.unionId))))
-        }
-      })
-    }
-    
     def upsertAnnotation(a: Annotation): Future[Boolean] =
       es.client execute {
         update(a.annotationId.toString) in ES.RECOGITO / ES.ANNOTATION docAsUpsert a

@@ -3,6 +3,7 @@ package storage
 import com.google.inject.AbstractModule
 import com.sksamuel.elastic4s.{ElasticsearchClientUri, TcpClient}
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.bulk.RichBulkResponse
 import java.io.File
 import javax.inject.{ Inject, Singleton }
 import org.elasticsearch.common.settings.Settings
@@ -43,6 +44,13 @@ object ES extends ElasticSearchSanitizer {
 
   // Max. number of retries to do in case of failed imports
   val MAX_RETRIES        = 10
+  
+  def logFailures(response: RichBulkResponse): Boolean = {
+    if (response.hasFailures)
+      response.failures.map(f => Logger.warn(f.failureMessage))
+    
+    !response.hasFailures 
+  }
 
 }
 

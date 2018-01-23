@@ -87,7 +87,7 @@ class EntityServiceImpl @Inject()(
       es.client.java.prepareBulk()
       es.client execute {
         bulk (queries)
-      } map { !_.hasFailures
+      } map { ES.logFailures(_)
       } recover { case t: Throwable =>
         Logger.info(entities.toString)
         t.printStackTrace
@@ -105,7 +105,7 @@ class EntityServiceImpl @Inject()(
         bulk(ids.map { id =>
           delete(id.toString) from ES.RECOGITO / ES.ENTITY
         })
-      } map { !_.hasFailures }
+      } map { ES.logFailures(_) }
     }
   }
   

@@ -3,6 +3,7 @@ package services.entity.importer
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import javax.inject.Inject
+import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
 import services.entity.IndexedEntity
 import storage.ES
@@ -18,22 +19,22 @@ class ReferenceRewriterImpl @Inject()(implicit ctx: ExecutionContext, es: ES)
       bulk(batch.map { case (annotation, version) =>
         update(annotation.annotationId.toString) in ES.RECOGITO / ES.ANNOTATION doc annotation version version
       })
-    } map { _.hasFailures }
+    } map { ES.logFailures(_) }
 
-  private def updateBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] =
+  private def updateBatch(response: RichSearchResponse, entitiesAfter: Seq[IndexedEntity], cursor: Long = 0l): Future[Boolean] =
     response.to[(Annotation, Long)].toSeq match {
       case Nil => Future.successful(true)
       case annotationsAndIds =>
-        val updated = annotationsAndIds.map { case (a, id) =>
-          // TODO update union_id in annotation bodies
-          (a, id)
+        val updated = annotationsAndIds.map { case (before, id) =>
+          val after = addUnionIds(before, entitiesAfter)
+          (after, id)
         }
 
         reindexBatch(updated).flatMap { success =>
           val rewritten = cursor + annotationsAndIds.size
           if (rewritten < response.totalHits)
             fetchNextBatch(response.scrollId).flatMap { response =>
-              updateBatch(response, rewritten)
+              updateBatch(response, entitiesAfter, rewritten)
             }
           else
             Future.successful(success)
@@ -60,7 +61,7 @@ class ReferenceRewriterImpl @Inject()(implicit ctx: ExecutionContext, es: ES)
     else
       for {
         affectedAnnotations <- fetchFirstBatch(entitiesBefore)
-        success <- updateBatch(affectedAnnotations)
+        success <- updateBatch(affectedAnnotations, entitiesAfter)
       } yield (success)
 
 }

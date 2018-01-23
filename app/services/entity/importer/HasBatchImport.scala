@@ -9,10 +9,10 @@ trait HasBatchImport {
   def importRecord(record: EntityRecord): Future[Boolean]
   
   // Maximum number of times a gazetteer record or place link update will be retried in case of failure
-  private def MAX_RETRIES = 5
+  private def MAX_RETRIES = 20
   
   // Incremental backoff time (ms) for index retries
-  private val BACKOFF_MS = 1000
+  private val BACKOFF_MS = 500
   
   /** Imports a batch of entity records into the index
     * 
