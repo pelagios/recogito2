@@ -25,7 +25,9 @@
       "type": "PLACE",
       "last_modified_by": "rainer",
       "last_modified_at": "2016-06-06T07:11:00Z",
-      "uri": "https://www.wikidata.org/wiki/Q87091"
+      "reference": {
+        "uri": "https://www.wikidata.org/wiki/Q87091"
+      }
     }
   ]
 }

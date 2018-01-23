@@ -92,11 +92,11 @@ class HasTEISnippetsSpec extends Specification {
     "work across entity boundaries" in {      
       val anchorA =
         "from=/tei/text/body/div/p::84;" +
-        "to=/tei/text/body/div/p::165"
+        "to=/tei/text/body/div/p::170"
         
       val anchorB =
         "from=/tei/text/body/div/p::126;" +
-        "to=/tei/text/body/div/p::165"
+        "to=/tei/text/body/div/p::170"
         
       val anchorC =
         "from=/tei/text/body/div/p::84;" +

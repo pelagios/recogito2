@@ -25,7 +25,9 @@
       "type": "PLACE",
       "last_modified_by": "rainer",
       "last_modified_at": "2016-02-23T18:24:00Z",
-      "uri": "https://www.wikidata.org/wiki/Q8709"
+      "reference": {
+        "uri": "https://www.wikidata.org/wiki/Q8709"
+      }
     },{
       "type": "COMMENT",
       "last_modified_by": "rainer",

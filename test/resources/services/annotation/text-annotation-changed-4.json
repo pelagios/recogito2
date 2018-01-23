@@ -20,7 +20,9 @@
       "type": "PLACE",
       "last_modified_by": "simon",
       "last_modified_at": "2016-06-06T07:11:00Z",
-      "uri": "https://www.wikidata.org/wiki/Q8709",
+      "reference": {
+        "uri": "https://www.wikidata.org/wiki/Q8709"
+      },
       "status": {
         "value": "VERIFIED",
         "set_by": "simon",
@@ -30,7 +32,9 @@
       "type": "PLACE",
       "last_modified_by": "simon",
       "last_modified_at": "2016-06-06T07:11:00Z",
-      "uri": "https://www.wikidata.org/wiki/Q870912"
+      "reference": {
+        "uri": "https://www.wikidata.org/wiki/Q870912"
+      }
     },{
       "type": "COMMENT",
       "last_modified_by": "simon",

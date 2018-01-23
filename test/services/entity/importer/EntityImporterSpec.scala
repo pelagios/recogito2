@@ -23,9 +23,9 @@ class EntityImporterSpec extends Specification {
   
   implicit val executionContext = application.injector.instanceOf[ExecutionContext]
   
-  private val DARE_RDF = new File("test/resources/services/place/gazetteer_sample_dare.ttl")
+  private val DARE_RDF = new File("test/resources/services/entity/gazetteer_sample_dare.ttl")
   
-  private val PLEIADES_RDF = new File("test/resources/services/place/gazetteer_sample_pleiades.ttl")
+  private val PLEIADES_RDF = new File("test/resources/services/entity/gazetteer_sample_pleiades.ttl")
   
   val testService = new MockEntityService() 
   val testImporter = new EntityImporter(testService, EntityType.PLACE, null, executionContext)
