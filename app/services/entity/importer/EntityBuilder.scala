@@ -27,6 +27,24 @@ object EntityBuilder {
       - score * boost
     }.head
     
+  /** Robust way to compute a centroid from a geometry.
+    *
+    * Unfortunately, JTS will generate the following "valid" centroid
+    * for MultiPoly geometries: Coordinate(NaN, NaN, NaN)
+    * This method works around this... JTS feature.
+    */
+  private[importer] def getCentroid(geom: Geometry) = {
+    val centroid = geom.getCentroid.getCoordinate
+    if (centroid.x.isNaN || centroid.y.isNaN) {
+      val coords = geom.getCoordinates
+      val x = coords.map(_.x).sum / coords.size
+      val y = coords.map(_.y).sum / coords.size
+      new Coordinate(x, y)
+    } else {
+      centroid
+    }
+  }
+          
   /** A set of conventions to select reasonable 'representative geometry' for an entity **/
   private def getPreferredLocation(records: Seq[EntityRecord]): (Option[Geometry], Option[Coordinate]) = {    
     // Rule 1: prefer DARE for representative point
@@ -62,7 +80,7 @@ object EntityBuilder {
 
       case (Some(g), None) =>
         // Only geometry - use centroid for point
-        (Some(g), Some(g.getCentroid.getCoordinate))
+        (Some(g), Some(getCentroid(g)))
 
       case (None, Some(pt)) =>
         // Only point - add a point geometry

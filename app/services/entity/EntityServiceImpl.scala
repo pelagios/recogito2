@@ -22,7 +22,11 @@ class EntityServiceImpl @Inject()(
 ) extends EntityService with HasAggregations {
   
   implicit object EntityIndexable extends Indexable[Entity] {
-    override def json(e: Entity): String = Json.stringify(Json.toJson(e))
+    override def json(e: Entity): String = 
+      try { Json.stringify(Json.toJson(e)) } catch { case t: Throwable =>
+        play.api.Logger.info(e.toString)
+        throw t
+      }
   }
 
   implicit object EntityHitReader extends HitReader[IndexedEntity] with HasTryToEither {
@@ -85,6 +89,7 @@ class EntityServiceImpl @Inject()(
         bulk (queries)
       } map { !_.hasFailures
       } recover { case t: Throwable =>
+        Logger.info(entities.toString)
         t.printStackTrace
         false
       }
@@ -120,7 +125,7 @@ class EntityServiceImpl @Inject()(
       search(ES.RECOGITO / ES.ENTITY) query boolQuery.should {
         uris.map(uri => termQuery("is_conflation_of.uri" -> uri)) ++
         uris.map(uri => termQuery("is_conflation_of.links.uri" -> uri))
-      } limit 100
+      } version true limit ES.MAX_SIZE
     } map { _.to[IndexedEntity] }
   
   override def searchEntities(

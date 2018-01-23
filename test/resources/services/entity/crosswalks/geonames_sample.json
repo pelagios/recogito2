@@ -1,0 +1,65 @@
+{
+	"names": [{
+		"name": "Vaaf Atoll"
+	}, {
+		"name": "Vaavu Atoll"
+	}, {
+		"name": "Felidhu Atoll"
+	}, {
+		"name": "Waavu Atoll"
+	}, {
+		"name": "Vāvu"
+	}, {
+		"name": "Felidu Atoll"
+	}, {
+		"name": "Felidhu Atholhu"
+	}, {
+		"name": "Vaavu Atholhu"
+	}],
+	"type": "FeatureCollection",
+	"uri": "http://sws.geonames.org/1281843",
+	"country_code": "MV",
+	"features": [{
+		"geometry": {
+			"coordinates": [
+				[
+					[
+						[73.52, 3.36],
+						[73.52, 3.36],
+						[73.52, 3.36],
+						[73.52, 3.36],
+						[73.52, 3.36],
+						[73.52, 3.36],
+						[73.52, 3.36],
+						[73.52, 3.36]
+					]
+				],
+				[
+					[
+						[73.75, 3.45],
+						[73.75, 3.45],
+						[73.75, 3.45],
+						[73.75, 3.45],
+						[73.75, 3.45],
+						[73.75, 3.45],
+						[73.75, 3.45],
+						[73.75, 3.45]
+					]
+				],
+				[
+					[
+						[73.51, 3.5],
+						[73.51, 3.5],
+						[73.51, 3.5],
+						[73.51, 3.5],
+						[73.51, 3.5],
+						[73.51, 3.5]
+					]
+				]
+			],
+			"type": "MultiPolygon"
+		}
+	}],
+	"title": "Vaavu Atholhu",
+	"close_matches": ["http://www.wikidata.org/wiki/Q2709111", "https://en.wikipedia.org/wiki/Vaavu_Atoll"]
+}
