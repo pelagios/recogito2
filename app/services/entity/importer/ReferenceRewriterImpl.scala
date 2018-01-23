@@ -51,7 +51,7 @@ class ReferenceRewriterImpl @Inject()(implicit ctx: ExecutionContext, es: ES)
         should(referencedEntities.map { e =>
           termQuery("bodies.reference.union_id" -> e.entity.unionId.toString)
         })
-      } limit SCROLL_BATCH_SIZE scroll "5m"
+      } version true limit SCROLL_BATCH_SIZE scroll "5m"
     }
 
   override def rewriteReferencesTo(entitiesBefore: Seq[IndexedEntity], entitiesAfter: Seq[IndexedEntity]): Future[Boolean] =
