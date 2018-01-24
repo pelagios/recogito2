@@ -13,7 +13,7 @@ import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import services.{HasTryToEither, Page}
-import storage.{ES, HasAggregations}
+import storage.es.{ES, HasAggregations}
 
 @Singleton
 class EntityServiceImpl @Inject()(

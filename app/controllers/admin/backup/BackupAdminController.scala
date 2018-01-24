@@ -21,7 +21,7 @@ import play.api.mvc.{ControllerComponents, ResponseHeader, Result}
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.http.HttpEntity
 import scala.concurrent.{ExecutionContext, Future}
-import storage.migration.AnnotationMigrationUtil
+import storage.es.migration.AnnotationMigrationUtil
 import transform.tiling.TilingService
 
 @Singleton

@@ -14,7 +14,7 @@ import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord
 import play.api.libs.json.Json
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{ExecutionContext, Future}
-import storage.Uploads
+import storage.uploads.Uploads
 import java.security.DigestInputStream
 import play.api.libs.Files.TemporaryFileCreator
 

@@ -1,4 +1,4 @@
-package storage
+package storage.uploads
 
 import java.io.File
 import javax.inject.{Inject, Singleton}

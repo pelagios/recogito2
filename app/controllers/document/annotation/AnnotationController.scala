@@ -14,7 +14,7 @@ import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}
 import play.api.mvc.{ControllerComponents, RequestHeader, Result}
 import scala.concurrent.{ExecutionContext, Future}
-import storage.Uploads
+import storage.uploads.Uploads
 
 @Singleton
 class AnnotationController @Inject() (

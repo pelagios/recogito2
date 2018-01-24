@@ -13,7 +13,7 @@ import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.{ControllerComponents, RequestHeader}
 import scala.concurrent.{ExecutionContext, Future}
-import storage.Uploads
+import storage.uploads.Uploads
 
 @Singleton
 class MyRecogitoController @Inject() (

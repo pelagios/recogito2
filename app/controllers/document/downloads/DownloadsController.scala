@@ -23,7 +23,7 @@ import play.api.libs.Files.TemporaryFileCreator
 import play.api.mvc.{AnyContent, ControllerComponents, Result}
 import play.api.http.{HttpEntity, FileMimeTypes}
 import scala.concurrent.{ExecutionContext, Future}
-import storage.Uploads
+import storage.uploads.Uploads
 
 case class FieldMapping(
   

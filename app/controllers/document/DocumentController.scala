@@ -13,7 +13,7 @@ import play.api.http.FileMimeTypes
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
-import storage.Uploads
+import storage.uploads.Uploads
 
 @Singleton
 class DocumentController @Inject() (

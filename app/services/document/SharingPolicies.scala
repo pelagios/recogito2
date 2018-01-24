@@ -6,7 +6,7 @@ import java.util.Date
 import services.{ Page, SortOrder }
 import services.generated.Tables._
 import services.generated.tables.records.{ DocumentRecord, SharingPolicyRecord }
-import storage.DB
+import storage.db.DB
 
 trait SharingPolicies { self: DocumentService =>
   

@@ -7,7 +7,7 @@ import services.document.DocumentInfo
 import services.generated.tables.records.DocumentFilepartRecord
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.postfixOps
-import storage.Uploads
+import storage.uploads.Uploads
 import sys.process._
 import play.api.libs.Files.TemporaryFileCreator
 

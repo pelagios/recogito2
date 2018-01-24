@@ -9,7 +9,7 @@ import services.task.{ TaskService, TaskType }
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import storage.Uploads
+import storage.uploads.Uploads
 import transform._
 
 object GeoresolutionService {

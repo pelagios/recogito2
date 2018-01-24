@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate
 import java.util.UUID
 import scala.concurrent.Future
 import services.Page
-import storage.ES
+import storage.es.ES
 
 case class IndexedEntity(entity: Entity, version: Option[Long] = None)
 

@@ -7,7 +7,7 @@ import services.generated.tables.records.DocumentFilepartRecord
 import org.joox.JOOX._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.xml.Elem
-import storage.Uploads
+import storage.uploads.Uploads
 
 trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
 

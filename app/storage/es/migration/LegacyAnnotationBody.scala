@@ -1,4 +1,4 @@
-package storage.migration.legacy
+package storage.es.migration
 
 import services.HasDate
 import services.annotation.{AnnotationBody, AnnotationStatus, Reference}
@@ -16,7 +16,7 @@ case class LegacyAnnotationBody(
   note: Option[String],
   status: Option[AnnotationStatus]
 ) {
-  
+
   def toNewAPI = AnnotationBody(
     hasType,
     lastModifiedBy,
@@ -26,7 +26,7 @@ case class LegacyAnnotationBody(
     note,
     status
   )
-  
+
 }
 
 object LegacyAnnotationBody extends Enumeration with HasDate {

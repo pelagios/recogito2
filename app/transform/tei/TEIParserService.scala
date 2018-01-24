@@ -11,7 +11,7 @@ import org.w3c.dom.ranges.DocumentRange
 import scala.collection.JavaConversions._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
-import storage.Uploads
+import storage.uploads.Uploads
 import transform.{ TransformService, TransformTaskMessages }
 
 object TEIParserService {

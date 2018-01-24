@@ -6,7 +6,7 @@ import javax.inject.Inject
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
 import services.entity.IndexedEntity
-import storage.ES
+import storage.es.ES
 import services.annotation.{Annotation, HasAnnotationIndexing}
 
 class ReferenceRewriterImpl @Inject()(implicit ctx: ExecutionContext, es: ES)

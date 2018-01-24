@@ -5,7 +5,7 @@ import services.document.{ DocumentInfo, DocumentService }
 import play.api.mvc.{ AnyContent, Request }
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.xml.{ UnprefixedAttribute, Node, Null, Text }
-import storage.Uploads
+import storage.uploads.Uploads
 
 trait PlaintextSerializer extends BaseTEISerializer {
   

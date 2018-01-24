@@ -1,11 +1,11 @@
 package services.document
 
 import collection.JavaConversions._
-import java.io.{ File, InputStream }
+import java.io.{File, InputStream}
 import java.nio.file.Files
 import java.util.UUID
-import javax.inject.{ Inject, Singleton }
-import services.{ BaseService, HasDate, Page, SortOrder }
+import javax.inject.{Inject, Singleton}
+import services.{BaseService, HasDate, Page, SortOrder}
 import services.generated.Tables._
 import services.generated.tables.records._
 import org.joda.time.DateTime
@@ -15,9 +15,10 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
-import storage.{ DB, Uploads }
+import storage.db.DB
+import storage.uploads.Uploads
 
 case class PartOrdering(partId: UUID, seqNo: Int)
 

@@ -18,7 +18,7 @@ import play.api.mvc.{AnyContent, ControllerComponents, Result, Request}
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.json.{Json, JsSuccess, JsError, Reads}
 import scala.concurrent.{Future, ExecutionContext}
-import storage.Uploads
+import storage.uploads.Uploads
 
 @Singleton
 class SettingsController @Inject() (

@@ -8,7 +8,7 @@ import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecor
 import scala.concurrent.{ Future, ExecutionContext }
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import storage.Uploads
+import storage.uploads.Uploads
 import sys.process._
 import transform._
 

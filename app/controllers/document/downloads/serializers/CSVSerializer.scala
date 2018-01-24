@@ -17,7 +17,7 @@ import services.generated.tables.records.DocumentFilepartRecord
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{Future, ExecutionContext}
 import scala.io.Source
-import storage.Uploads
+import storage.uploads.Uploads
 
 trait CSVSerializer extends BaseSerializer with HasCSVParsing {
 

@@ -3,7 +3,7 @@ package services.entity.importer
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
 import services.entity._
-import storage.ES
+import storage.es.ES
 
 class EntityImporter (
   entityService    : EntityService,

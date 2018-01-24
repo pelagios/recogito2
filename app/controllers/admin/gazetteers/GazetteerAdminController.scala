@@ -16,7 +16,7 @@ import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}
 import play.api.mvc.ControllerComponents
 import scala.concurrent.ExecutionContext
-import storage.ES
+import storage.es.ES
 
 @Singleton
 class GazetteerAdminController @Inject() (

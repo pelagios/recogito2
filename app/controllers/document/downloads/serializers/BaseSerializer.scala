@@ -6,7 +6,8 @@ import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import services.entity.{Entity, EntityRecord, EntityService, EntityType}
 import play.api.Logger
 import scala.concurrent.ExecutionContext
-import storage.{ ES, Uploads }
+import storage.es.ES
+import storage.uploads.Uploads
 import services.document.DocumentInfo
 
 trait BaseSerializer {

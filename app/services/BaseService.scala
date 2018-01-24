@@ -5,7 +5,7 @@ import play.api.cache.SyncCacheApi
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
-import storage.DB
+import storage.db.DB
 
 /** Generic sort order symbol **/
 sealed class SortOrder

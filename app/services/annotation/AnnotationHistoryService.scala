@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.reflectiveCalls
 import scala.util.Try
-import storage.ES
+import storage.es.ES
 
 trait AnnotationHistoryService extends HasAnnotationIndexing with HasDate {
 

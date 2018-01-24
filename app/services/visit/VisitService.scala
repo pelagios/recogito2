@@ -11,7 +11,7 @@ import play.api.libs.Files.{TemporaryFile, TemporaryFileCreator}
 import scala.concurrent.{Future, ExecutionContext}
 import scala.util.Try
 import services.{HasDate, HasTryToEither}
-import storage.ES
+import storage.es.ES
 import org.elasticsearch.index.reindex.DeleteByQueryAction
 
 @Singleton

@@ -13,7 +13,7 @@ import play.api.Logger
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
-import storage.Uploads
+import storage.uploads.Uploads
 import transform._
 
 object NERService { 

@@ -3,7 +3,7 @@ package services.entity.importer
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import services.entity.{EntityService, EntityType}
-import storage.ES
+import storage.es.ES
 
 /** Helper class to generate new importer instances.
   *  

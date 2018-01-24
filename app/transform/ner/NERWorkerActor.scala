@@ -14,7 +14,7 @@ import play.api.Logger
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.io.Source
-import storage.ES
+import storage.es.ES
 import transform.georesolution.{Georesolvable, HasGeoresolution}
 
 case class EntityGeoresolvable(entity: Entity) extends Georesolvable {

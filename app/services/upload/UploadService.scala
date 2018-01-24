@@ -16,7 +16,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
-import storage.{DB, Uploads}
+import storage.db.DB
+import storage.uploads.Uploads
 
 class QuotaExceededException(val remainingSpaceKb: Long, val filesizeKb: Double) extends RuntimeException
 

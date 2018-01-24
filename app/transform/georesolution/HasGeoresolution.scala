@@ -10,7 +10,7 @@ import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecor
 import org.joda.time.DateTime
 import scala.concurrent.{ Await, ExecutionContext }
 import scala.concurrent.duration._
-import storage.ES
+import storage.es.ES
 
 trait Georesolvable {
   

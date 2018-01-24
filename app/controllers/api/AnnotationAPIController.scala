@@ -21,7 +21,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ExecutionContext, Future}
-import storage.Uploads
+import storage.uploads.Uploads
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
 case class AnnotationStub(

@@ -7,7 +7,7 @@ import services.entity.{EntityService, IndexedEntity}
 import org.joda.time.DateTime
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
-import storage.ES
+import storage.es.ES
 
 @Singleton
 class AnnotationService @Inject() (

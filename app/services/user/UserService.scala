@@ -21,7 +21,8 @@ import play.api.cache.SyncCacheApi
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Either, Left, Right}
-import storage.{DB, Uploads}
+import storage.db.DB
+import storage.uploads.Uploads
 import sun.security.provider.SecureRandom
 
 @Singleton

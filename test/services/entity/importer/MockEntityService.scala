@@ -6,7 +6,7 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.{ExecutionContext, Future}
 import services.Page
-import storage.ES
+import storage.es.ES
 import services.entity.Entity
 import services.entity.EntityRecord
 import services.entity.EntityService

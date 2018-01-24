@@ -1,4 +1,4 @@
-package storage
+package storage.db
 
 import akka.actor.ActorSystem
 import com.google.inject.AbstractModule
@@ -14,7 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.io.Source
 
 object DB {
-  
+
   val CURRENT_SQLDIALECTT = SQLDialect.POSTGRES_9_4
 
 }
@@ -23,16 +23,16 @@ object DB {
 class DB @Inject() (db: Database, system: ActorSystem) {
 
   private val databaseContext: ExecutionContext = system.dispatchers.lookup("contexts.database")
-  
+
   /** Connection helpers **/
-  
+
   def query[A](block: DSLContext => A): Future[A] = Future {
     db.withConnection { connection =>
       val sql = DSL.using(connection, DB.CURRENT_SQLDIALECTT)
       block(sql)
     }
   }(databaseContext)
-  
+
   def withTransaction[A](block: DSLContext => A): Future[A] = Future {
     db.withTransaction { connection =>
       val sql = DSL.using(connection, DB.CURRENT_SQLDIALECTT)
@@ -47,7 +47,7 @@ class DBModule extends AbstractModule {
   def configure = {
     bind(classOf[DBInitializer]).asEagerSingleton
   }
-  
+
 }
 
 @Singleton
@@ -60,10 +60,10 @@ class DBInitializer @Inject() (db: Database, userService: UserService, implicit 
       initDB(connection)
     }
   }
-  
+
   /** Database setup **/
   private def initDB(connection: Connection) = {
-    
+
     // Splitting by ; is not 100% robust - but should be sufficient for our own schema file
     val statement = connection.createStatement
 
@@ -76,14 +76,14 @@ class DBInitializer @Inject() (db: Database, userService: UserService, implicit 
       })
 
     statement.executeBatch()
-    statement.close()    
-    
+    statement.close()
+
     val f = for {
       _ <- userService.insertUser("recogito", "recogito@example.com", "recogito")
       _ <- userService.insertUserRole("recogito", Roles.Admin)
     } yield()
-    
+
     f.recover { case t: Throwable => t.printStackTrace() }
-  } 
-  
+  }
+
 }

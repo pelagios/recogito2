@@ -1,4 +1,4 @@
-package storage.migration.legacy
+package storage.es.migration
 
 import java.util.UUID
 import services.{ContentType, HasContentTypeList, HasDate}
@@ -17,7 +17,7 @@ case class LegacyAnnotation(
   lastModifiedAt: DateTime,
   bodies: Seq[LegacyAnnotationBody]
 ) {
-  
+
   def toNewAPI = Annotation(
     annotationId,
     versionId,
@@ -28,7 +28,7 @@ case class LegacyAnnotation(
     lastModifiedAt,
     bodies.map(_.toNewAPI)
   )
-  
+
 }
 
 object LegacyAnnotation extends HasDate {

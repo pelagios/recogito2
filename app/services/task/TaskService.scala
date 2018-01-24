@@ -7,7 +7,7 @@ import services.BaseService
 import services.generated.Tables.TASK
 import services.generated.tables.records.TaskRecord
 import scala.concurrent.{ ExecutionContext, Future }
-import storage.DB
+import storage.db.DB
 
 case class TaskType(private val name: String) {
   
