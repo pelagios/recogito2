@@ -37,7 +37,7 @@ private[tei] class TEIParserWorkerActor(
       taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
       
       TEIParserService.extractEntities(part, new File(documentDir, part.getFile))
-        .flatMap(annotationService.insertOrUpdateAnnotations(_)).map { failed =>
+        .flatMap(annotationService.upsertAnnotations(_)).map { failed =>
           if (failed.size == 0) {
             taskService.setCompleted(taskId)
           } else {

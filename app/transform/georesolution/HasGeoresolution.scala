@@ -73,7 +73,7 @@ trait HasGeoresolution {
         case Some(resolvable) =>
           val f = for {
             annotation <- resolveOne(resolvable, counter)
-            (success, _) <- annotationService.insertOrUpdateAnnotation(annotation)
+            (success, _) <- annotationService.upsertAnnotation(annotation)
           } yield (success)
           
           Await.result(f, 10.seconds)

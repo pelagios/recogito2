@@ -21,12 +21,14 @@ import play.api.mvc.{ControllerComponents, ResponseHeader, Result}
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.http.HttpEntity
 import scala.concurrent.{ExecutionContext, Future}
+import storage.migration.AnnotationMigrationUtil
 import transform.tiling.TilingService
 
 @Singleton
 class BackupAdminController @Inject() (
     val components: ControllerComponents,
     val config: Configuration,
+    val migrationUtil: AnnotationMigrationUtil,
     val users: UserService,
     val visits: VisitService,
     val silhouette: Silhouette[Security.Env],
@@ -92,6 +94,11 @@ class BackupAdminController @Inject() (
           else InternalServerError("Something went wrong.")
         }
     }
+  }
+  
+  def runMigration = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
+    migrationUtil.runMigration
+    Ok("Good Luck.")
   }
 
 }

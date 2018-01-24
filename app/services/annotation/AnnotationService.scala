@@ -23,8 +23,7 @@ class AnnotationService @Inject() (
     * @return a boolean flag indicating successful completion, the internal ElasticSearch
     * version, and the previous version of the annotation, if any.
     */
-  def insertOrUpdateAnnotation(annotation: Annotation, versioned: Boolean = true): Future[(Boolean, Option[Annotation])] = {
-
+  def upsertAnnotation(annotation: Annotation, versioned: Boolean = true): Future[(Boolean, Option[Annotation])] = {
     val fResolveEntityReferences = {
       val entityURIs = annotation.bodies.flatMap(_.uri)
       val fResolved = Future.sequence(entityURIs.map(entityService.findByURI(_)))
@@ -45,25 +44,29 @@ class AnnotationService @Inject() (
       
     for {
       resolvedEntities <- fResolveEntityReferences
-      maybePrevious <- findById(annotation.annotationId)
+      maybePrevious <- if (versioned) findById(annotation.annotationId) 
+                       else Future.successful(None)
       stored <- upsertAnnotation(addUnionIds(annotation, resolvedEntities))
-      storedToHistory <- if (stored) insertVersion(annotation)
-                         else Future.successful(false)
-    } yield (storedToHistory, maybePrevious.map(_._1))
-
+      success <- if (stored) {
+                   if (versioned) insertVersion(annotation)
+                   else Future.successful(true)
+                 } else {
+                   Future.successful(false)
+                 }
+    } yield (success, maybePrevious.map(_._1))
   }
 
-  def insertOrUpdateAnnotations(annotations: Seq[Annotation], retries: Int = ES.MAX_RETRIES): Future[Seq[Annotation]] =
+  def upsertAnnotations(annotations: Seq[Annotation], versioned: Boolean = true, retries: Int = ES.MAX_RETRIES): Future[Seq[Annotation]] =
     annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
       future.flatMap { failedAnnotations =>
-        insertOrUpdateAnnotation(annotation).map { case (success, _) =>
+        upsertAnnotation(annotation).map { case (success, _) =>
           if (success) failedAnnotations else failedAnnotations :+ annotation
         }
       }
     } flatMap { failed =>
       if (failed.size > 0 && retries > 0) {
         Logger.warn(failed.size + " annotations failed to import - retrying")
-        insertOrUpdateAnnotations(failed, retries - 1)
+        upsertAnnotations(failed, versioned, retries - 1)
       } else {
         Logger.info("Successfully imported " + (annotations.size - failed.size) + " annotations")
         if (failed.size > 0)
@@ -195,7 +198,7 @@ class AnnotationService @Inject() (
             // The annotation was already deleted at the rollback state - do nothing
             Future.successful(true)
           else
-            insertOrUpdateAnnotation(historyRecord.asAnnotation, false).map(_._1)
+            upsertAnnotation(historyRecord.asAnnotation, false).map(_._1)
 
         case None =>
           // The annotation did not exist at the rollback time - delete

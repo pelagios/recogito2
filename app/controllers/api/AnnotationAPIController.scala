@@ -177,7 +177,7 @@ class AnnotationAPIController @Inject() (
         if (accesslevel.canWrite) {
           val annotation = stubToAnnotation(annotationStub, username)
           val f = for {
-            (annotationStored, previousVersion) <- annotationService.insertOrUpdateAnnotation(annotation)
+            (annotationStored, previousVersion) <- annotationService.upsertAnnotation(annotation)
             success <- if (annotationStored)
                          contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
                        else
@@ -210,7 +210,7 @@ class AnnotationAPIController @Inject() (
             doc.fileparts.find(_.getId == partIds.head) match {
               case Some(filepart) =>
                 val annotations = annotationStubs.map(stub => stubToAnnotation(stub, username))
-                annotationService.insertOrUpdateAnnotations(annotations).map { failed =>
+                annotationService.upsertAnnotations(annotations).map { failed =>
                   if (failed.size == 0)
                     // TODO add username and timestamp
                     jsonOk(Json.toJson(annotations))

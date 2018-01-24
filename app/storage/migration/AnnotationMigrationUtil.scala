@@ -6,16 +6,17 @@ import com.sksamuel.elastic4s.searches.RichSearchResponse
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
-import services.annotation.HasAnnotationIndexing
+import services.annotation.AnnotationService
 import services.entity.EntityService
 import storage.migration.legacy.LegacyAnnotation
 import storage.ES
 
 class AnnotationMigrationUtil @Inject()(
+  annotationService: AnnotationService,
   entityService: EntityService,
   implicit val ctx: ExecutionContext,
   implicit val es: ES
-) extends HasAnnotationIndexing {
+) {
 
   implicit object LegacyAnnotationHitReader extends HitReader[LegacyAnnotation] {
     override def read(hit: Hit): Either[Throwable, LegacyAnnotation] =
@@ -29,7 +30,11 @@ class AnnotationMigrationUtil @Inject()(
   private def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
       es.client execute { searchScroll(scrollId) keepAlive "5m" }
   
-  private def reindex(hits: Seq[LegacyAnnotation]): Future[Boolean] = ???
+  private def reindex(hits: Seq[LegacyAnnotation]): Future[Boolean] =
+    annotationService.upsertAnnotations(
+      annotations = hits.map(_.toNewAPI), 
+      versioned = false
+    ).map(_.isEmpty)
   
   private def migrateBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] =
     if (response.hits.isEmpty) {
@@ -44,11 +49,13 @@ class AnnotationMigrationUtil @Inject()(
       }
     }
   
-  private def fetchFirstBatch =
+  def runMigration: Future[Boolean] =
     es.client execute {
       search(SOURCE_INDEX_LEGACY / ES.ANNOTATION) query matchAllQuery limit 200 scroll "5m"
     } flatMap { migrateBatch(_) } map { success =>
-      
+      if (success) play.api.Logger.info("Migration completed successfully. Yay!")
+      else play.api.Logger.info("Migration stopped. Something went wrong.")
+      success
     }
   
 }

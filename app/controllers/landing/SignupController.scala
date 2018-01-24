@@ -135,7 +135,7 @@ class SignupController @Inject() (
 
     for {
       _ <- documents.importDocument(document, Seq((filepart, fileInputStream)))    
-      _ <- annotations.insertOrUpdateAnnotation(Json.fromJson[Annotation](annotation).get)
+      _ <- annotations.upsertAnnotation(Json.fromJson[Annotation](annotation).get)
     } yield ()
   }
 

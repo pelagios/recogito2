@@ -153,7 +153,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         .map(stub => stub.toAnnotation(docId, fileparts))
         .filter(annotation => filepartIds.contains(annotation.annotates.filepartId))
 
-      annotationService.insertOrUpdateAnnotations(annotations.toSeq)
+      annotationService.upsertAnnotations(annotations.toSeq)
     }
 
     def restore() = {

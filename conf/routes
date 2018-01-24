@@ -43,6 +43,7 @@ GET     /admin/users                                 controllers.admin.users.Use
 
 GET     /admin/backup                                controllers.admin.backup.BackupAdminController.index
 POST    /admin/restore                               controllers.admin.backup.BackupAdminController.restore
+GET     /admin/run-migration                         controllers.admin.backup.BackupAdminController.runMigration
 
 GET     /admin/visits/export                         controllers.admin.backup.BackupAdminController.exportVisits
 GET     /admin/visits/purge                          controllers.admin.backup.BackupAdminController.deleteVisitsOlderThan(date: Option[String])
