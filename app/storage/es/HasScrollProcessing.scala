@@ -4,12 +4,17 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import scala.concurrent.{ExecutionContext, Future}
 
-class HasScrollProcessing(implicit es: ES, ctx: ExecutionContext) {
+trait HasScrollProcessing {
 
-  private def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
+  private def fetchNextBatch(scrollId: String)(implicit es: ES, ctx: ExecutionContext) =
     es.client execute { searchScroll(scrollId) keepAlive "5m" }
 
-  def scroll(fn: RichSearchResponse => Future[Boolean], response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] =
+  def scroll(
+    fn: RichSearchResponse => Future[Boolean],
+    response: RichSearchResponse,
+    cursor: Long = 0l
+  )(implicit es: ES, ctx: ExecutionContext): Future[Boolean] = 
+    
     if (response.hits.isEmpty) {
       Future.successful(true)
     } else {

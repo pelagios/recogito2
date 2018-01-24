@@ -19,7 +19,7 @@ import storage.es.{ES, HasAggregations}
 class EntityServiceImpl @Inject()(
   implicit val ctx: ExecutionContext,
   implicit val es: ES
-) extends EntityService with HasAggregations {
+) extends EntityService with EntityServiceDeleteImpl with HasAggregations {
   
   implicit object EntityIndexable extends Indexable[Entity] {
     override def json(e: Entity): String = 
@@ -216,7 +216,5 @@ class EntityServiceImpl @Inject()(
   
   override def searchEntitiesInDocument(query: String, docId: String, eType: Option[EntityType] = None, 
     offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Page[IndexedEntity]] = ???
-    
-  override def deleteByAuthoritySource(source: String): Future[Boolean] = ???
-  
+     
 }

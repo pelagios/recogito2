@@ -1,10 +1,11 @@
-package services.entity.removal
+package services.entity
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
 import storage.es.ES
+import storage.es.HasScrollProcessing
 
 /** Implements delete functionality for entity records.
   *
@@ -12,14 +13,11 @@ import storage.es.ES
   * a complex process. Therefore we split this out into a separate source
   * file.
   */
-class EntityServicerRemoveImpl(
-  implicit val ctx: ExecutionContext,
-  implicit val es: ES
-) {
+trait EntityServiceDeleteImpl extends HasScrollProcessing { self: EntityServiceImpl =>
   
   private def deleteBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] = ???
   
-  def deleteByAuthoritySource(source: String): Future[Boolean] =
+  override def deleteByAuthoritySource(source: String): Future[Boolean] =
     es.client execute {
       search(ES.RECOGITO / ES.ENTITY) query {
         termQuery("is_conflation_of.source_authority" -> source)
