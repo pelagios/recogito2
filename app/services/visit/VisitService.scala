@@ -52,7 +52,7 @@ class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) ex
     
     def writeToFile(response: RichSearchResponse): Future[Boolean] = 
       Future {
-        val visits= response.to[Visit]
+        val visits = response.to[Visit]
         exporter.writeBatch(visits)
       } map { _ => true 
       } recover { case t: Throwable =>

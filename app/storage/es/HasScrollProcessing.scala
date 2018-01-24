@@ -8,7 +8,7 @@ trait HasScrollProcessing {
 
   private def fetchNextBatch(scrollId: String)(implicit es: ES, ctx: ExecutionContext) =
     es.client execute { searchScroll(scrollId) keepAlive "5m" }
-
+  
   def scroll(
     fn: RichSearchResponse => Future[Boolean],
     response: RichSearchResponse,
@@ -26,6 +26,27 @@ trait HasScrollProcessing {
           }
         else
           Future.successful(success)
+      }
+    }
+  
+  def scrollReportErrors(
+    fn: RichSearchResponse => Future[Seq[String]],
+    response: RichSearchResponse,
+    cursor: Long = 0l,
+    failedIds: Seq[String] = Seq.empty[String]
+  )(implicit es: ES, ctx: ExecutionContext): Future[Seq[String]] = 
+    
+    if (response.hits.isEmpty) {
+      Future.successful(failedIds)
+    } else {
+      fn(response).flatMap { failed =>
+        val processed = cursor + response.hits.size
+        if (processed < response.totalHits)
+          fetchNextBatch(response.scrollId).flatMap { response =>
+            scrollReportErrors(fn, response, processed).map(_ ++ failed)
+          }
+        else
+          Future.successful(failed)
       }
     }
 

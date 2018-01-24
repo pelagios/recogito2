@@ -96,6 +96,6 @@ class MockEntityService(implicit ctx: ExecutionContext) extends EntityService {
     limit  : Int = ES.MAX_SIZE
   ): Future[Page[IndexedEntity]] = ???
   
-  def deleteByAuthoritySource(source: String): Future[Boolean] = ???
+  def deleteBySourceAuthority(authority: String): Future[Boolean] = ???
   
 }

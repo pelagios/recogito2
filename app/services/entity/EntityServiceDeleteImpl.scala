@@ -24,8 +24,10 @@ trait EntityServiceDeleteImpl extends HasScrollProcessing with HasAnnotationInde
     * basically a nested loop where the "outer" iteration is the scroll through the entity
     * index, while the "inner" iteration is the scroll through the annotations for each
     * entity batch.  
+    * 
+    * @return a list of IDs that failed to update
     */
-  private def processAnnotationBatch(affectedUris: Seq[String])(response: RichSearchResponse): Future[Boolean] = {
+  private def processAnnotationBatch(affectedUris: Seq[String])(response: RichSearchResponse): Future[Seq[String]] = {
     val annotations = response.to[(Annotation, Long)]
     
     val updated = annotations.map { case (annotation, version) =>
@@ -50,18 +52,23 @@ trait EntityServiceDeleteImpl extends HasScrollProcessing with HasAnnotationInde
           update(a.annotationId.toString) in ES.RECOGITO / ES.ANNOTATION doc a version v
         }
       )
-    } map { ES.logFailures(_) } 
+    } map { response => 
+      if (response.hasFailures)
+        response.failures.map(f => Logger.warn(f.failureMessage))
+      
+      response.failures.map(_.id)
+    } 
   }
     
   /** Annotations that reference records from the given source will remain as they are,
     * except that the unionIds will be removed from their bodies.  
     */
-  private def rewriteAnnotations(uris: Seq[String]): Future[Boolean] =
+  private def rewriteAnnotations(uris: Seq[String]): Future[Seq[String]] =
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION) query boolQuery.should (
         uris.map { uri => termQuery("bodies.reference.uri" -> uri) }
       ) limit 50 version true scroll "5m" 
-    } flatMap { scroll(processAnnotationBatch(uris), _) }
+    } flatMap { scrollReportErrors(processAnnotationBatch(uris), _) }
     
   /** We can safely assume that every entity contains at least one record from the given 
     * authority. First, we'll remove those. If there were are records from other sources
@@ -95,8 +102,8 @@ trait EntityServiceDeleteImpl extends HasScrollProcessing with HasAnnotationInde
     for {
       deleted <- deleteEntities(toDelete)
       updated <- upsertEntities(toUpdate)
-      referencesRemoved <- rewriteAnnotations(affectedURIs)
-    } yield (deleted && updated && referencesRemoved)
+      failedRewrites <- rewriteAnnotations(affectedURIs)
+    } yield (deleted && updated && failedRewrites.isEmpty)
   }
   
   override def deleteBySourceAuthority(authority: String): Future[Boolean] =
