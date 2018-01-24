@@ -14,23 +14,31 @@ class ReferenceRewriterImpl @Inject()(implicit ctx: ExecutionContext, es: ES)
 
   private val SCROLL_BATCH_SIZE = 200
 
-  private def reindexBatch(batch: Seq[(Annotation, Long)]): Future[Boolean] =
-    es.client execute {
-      bulk(batch.map { case (annotation, version) =>
-        update(annotation.annotationId.toString) in ES.RECOGITO / ES.ANNOTATION doc annotation version version
-      })
-    } map { ES.logFailures(_) }
+  private def reindexBatch(batch: Seq[(Annotation, Long)]): Future[Boolean] = {
+    if (batch.isEmpty) {
+      Future.successful(true)
+    } else {
+      es.client execute {
+        bulk(batch.map { case (annotation, version) =>
+          update(annotation.annotationId.toString) in ES.RECOGITO / ES.ANNOTATION doc annotation version version
+        })
+      } map { ES.logFailures(_) }
+    }
+  }
 
   private def updateBatch(response: RichSearchResponse, entitiesAfter: Seq[IndexedEntity], cursor: Long = 0l): Future[Boolean] =
     response.to[(Annotation, Long)].toSeq match {
       case Nil => Future.successful(true)
       case annotationsAndIds =>
-        val updated = annotationsAndIds.map { case (before, id) =>
+        val changed = annotationsAndIds.flatMap { case (before, id) =>
           val after = addUnionIds(before, entitiesAfter)
-          (after, id)
+
+          // Don't make unnecessary updates if the union Id didn't change 
+          if (after == before) None
+          else Some((after, id))
         }
 
-        reindexBatch(updated).flatMap { success =>
+        reindexBatch(changed).flatMap { success =>
           val rewritten = cursor + annotationsAndIds.size
           if (rewritten < response.totalHits)
             fetchNextBatch(response.scrollId).flatMap { response =>
