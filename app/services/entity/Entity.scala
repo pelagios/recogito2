@@ -73,6 +73,19 @@ case class Entity (
 
   /** Shorthand: links **/
   lazy val links = isConflationOf.flatMap(_.links)
+  
+  /** Comparison method that ignores records' lastSyncedAt property **/
+  def equalsIgnoreLastSynced(that: Entity): Boolean = {
+    val now = DateTime.now
+    
+    def copyWithoutSyncedAt(e: Entity) = 
+     e.copy(isConflationOf = e.isConflationOf.map(_.copy(lastSyncedAt = now)))
+        
+    val a = copyWithoutSyncedAt(this) 
+    val b = copyWithoutSyncedAt(that)
+    
+    a equals b
+  }
 
 }
 

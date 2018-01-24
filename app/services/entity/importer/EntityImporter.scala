@@ -101,7 +101,20 @@ class EntityImporter (
     val toDelete = idsBefore diff idsAfter
     entityService.deleteEntities(toDelete)
   }
-
+  
+  /** Returns true only if the import has actually changed anything about the affected entities **/
+  private def hasChanged(entitiesBefore: Seq[IndexedEntity], entitiesAfter: Seq[IndexedEntity]): Boolean =
+    if (entitiesBefore.size != entitiesAfter.size) {
+      // Different number of entities before and after - definitely changed
+      true
+    } else {
+      // Same number - compare pairwise
+      val pairwiseEquals = entitiesBefore.zip(entitiesAfter).map { case (before, after) =>
+        before.entity equalsIgnoreLastSynced after.entity
+      }
+      pairwiseEquals.exists(_ == false)
+    }
+    
   /** Imports a single record into the index
     *
     * @return true if the import was successful, false otherwise  
@@ -118,8 +131,14 @@ class EntityImporter (
       upsertSuccess <- entityService.upsertEntities(entitiesAfter)
       deleteSuccess <- if (upsertSuccess) deleteMerged(entitiesBefore, entitiesAfter)
                        else Future.successful(false)
-      rewriteSuccess <- if (deleteSuccess) rewriter.rewriteReferencesTo(entitiesBefore, entitiesAfter)
-                       else Future.successful(false)
+      rewriteSuccess <- if (deleteSuccess) {
+                          if (hasChanged(entitiesBefore, entitiesAfter))
+                            rewriter.rewriteReferencesTo(entitiesBefore, entitiesAfter)
+                          else
+                            Future.successful(true)
+                        } else {
+                          Future.successful(false)
+                        }
     } yield (rewriteSuccess)
     
     f.map { success =>

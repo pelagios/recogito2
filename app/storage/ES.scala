@@ -30,7 +30,7 @@ class ESModule extends AbstractModule {
 object ES extends ElasticSearchSanitizer {
   
   // Index name
-  val RECOGITO = "recogito_v3"
+  val RECOGITO = "recogito"
       
   // Mapping type names
   val ANNOTATION         = "annotation"

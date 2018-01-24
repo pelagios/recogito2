@@ -22,9 +22,9 @@ class AnnotationMigrationUtil @Inject()(
       Right(Json.fromJson[LegacyAnnotation](Json.parse(hit.sourceAsString)).get)
   }
 
-  private val SOURCE_INDEX_LEGACY = "recogito"
+  private val SOURCE_INDEX_LEGACY = "recogito_v22"
   
-  private val DEST_INDEX_NEW = "recogito-new"
+  private val DEST_INDEX_NEW = "recogito"
   
   private def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
       es.client execute { searchScroll(scrollId) keepAlive "5m" }

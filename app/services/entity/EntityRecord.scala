@@ -54,6 +54,11 @@ case class EntityRecord (
 
 ) {
 
+  /** Utility to create a cloned record, with all URIs normalized **/
+  lazy val normalize = copy(
+     uri = EntityRecord.normalizeURI(uri),
+     links = links.map(_.normalize))
+  
   /** For convenience: all close and exact match URIs **/
   lazy val directMatches =
     links.filter(l => l.linkType == LinkType.CLOSE_MATCH || l.linkType == LinkType.EXACT_MATCH)
@@ -75,11 +80,14 @@ case class EntityRecord (
     thisIdentifiers.intersect(otherIdentifiers).size > 0
   }
   
-  /** Utility to create a cloned record, with all URIs normalized **/
-  lazy val normalize = copy(
-     uri = EntityRecord.normalizeURI(uri),
-     links = links.map(_.normalize))
-
+  /** Comparison method that ignores the lastSyncedAt property **/
+  def equalsIgnoreLastSynced(that: EntityRecord): Boolean = {
+    val now = DateTime.now
+    val a = this.copy(lastSyncedAt = now)
+    val b = that.copy(lastSyncedAt = now)
+    a equals b
+  }
+  
 }
 
 object EntityRecord extends HasDate with HasGeometry with HasNullableSeq {

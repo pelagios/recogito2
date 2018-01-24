@@ -16,7 +16,7 @@ class ReferenceRewriterImpl @Inject()(implicit ctx: ExecutionContext, es: ES)
 
   private def reindexBatch(batch: Seq[(Annotation, Long)]): Future[Boolean] = {
     if (batch.isEmpty) {
-      Future.successful(true)
+      Future.successful(true) // If there were no changes detected, this method might be handed an empty list
     } else {
       es.client execute {
         bulk(batch.map { case (annotation, version) =>
