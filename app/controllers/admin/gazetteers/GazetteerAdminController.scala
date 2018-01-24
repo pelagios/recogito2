@@ -78,7 +78,9 @@ class GazetteerAdminController @Inject() (
   }
   
   def deleteGazetteer(name: String) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
-    entities.deleteByAuthoritySource(name).map { _ =>
+    entities.deleteBySourceAuthority(name).map { success =>
+      if (success) Logger.info("Delete complete. Everything fine. Congratulations")
+      else Logger.warn("Delete complete but something went wrong.")
       Status(200)
     }
   }

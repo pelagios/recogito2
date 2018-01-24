@@ -102,7 +102,7 @@ object EntityBuilder {
     fromRecords(allRecords, entityType, internalId)
   }
   
-  def fromRecords(records: Seq[EntityRecord], entityType: EntityType, internalId: UUID) = {
+  def fromRecords(records: Seq[EntityRecord], entityType: EntityType, unionId: UUID) = {
     val mostDetailed = getMostDetailedRecord(records)
 
     val (geom, point) = getPreferredLocation(records)
@@ -113,7 +113,7 @@ object EntityBuilder {
     }
 
     Entity(
-      internalId,
+      unionId,
       entityType,
       mostDetailed.title,
       geom, point,

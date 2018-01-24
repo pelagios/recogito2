@@ -45,6 +45,6 @@ trait EntityService {
     limit  : Int = ES.MAX_SIZE
   ): Future[Page[IndexedEntity]]
   
-  def deleteByAuthoritySource(source: String): Future[Boolean]
+  def deleteBySourceAuthority(source: String): Future[Boolean]
   
 }
