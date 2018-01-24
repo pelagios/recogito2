@@ -8,14 +8,14 @@ import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.AnnotationService
 import services.entity.EntityService
-import storage.es.ES
+import storage.es.{ES, HasScrollProcessing}
 
 class AnnotationMigrationUtil @Inject()(
   annotationService: AnnotationService,
   entityService: EntityService,
   implicit val ctx: ExecutionContext,
   implicit val es: ES
-) {
+) extends HasScrollProcessing {
 
   implicit object LegacyAnnotationHitReader extends HitReader[LegacyAnnotation] {
     override def read(hit: Hit): Either[Throwable, LegacyAnnotation] =
@@ -26,32 +26,18 @@ class AnnotationMigrationUtil @Inject()(
 
   private val DEST_INDEX_NEW = "recogito"
 
-  private def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
-      es.client execute { searchScroll(scrollId) keepAlive "5m" }
-
-  private def reindex(hits: Seq[LegacyAnnotation]): Future[Boolean] =
+  private def reindex(response: RichSearchResponse): Future[Boolean] = {
+    val hits = response.to[LegacyAnnotation]
     annotationService.upsertAnnotations(
       annotations = hits.map(_.toNewAPI),
       versioned = false
     ).map(_.isEmpty)
-
-  private def migrateBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] =
-    if (response.hits.isEmpty) {
-      Future.successful(true)
-    } else {
-      reindex(response.to[LegacyAnnotation]).flatMap { success =>
-        val reindexedAnnotations = cursor + response.hits.size
-        if (reindexedAnnotations < response.totalHits)
-          fetchNextBatch(response.scrollId).flatMap(migrateBatch(_, reindexedAnnotations).map(_ && success))
-        else
-          Future.successful(success)
-      }
-    }
+  }
 
   def runMigration: Future[Boolean] =
     es.client execute {
       search(SOURCE_INDEX_LEGACY / ES.ANNOTATION) query matchAllQuery limit 200 scroll "5m"
-    } flatMap { migrateBatch(_) } map { success =>
+    } flatMap { scroll(reindex, _) } map { success =>
       if (success) play.api.Logger.info("Migration completed successfully. Yay!")
       else play.api.Logger.info("Migration stopped. Something went wrong.")
       success

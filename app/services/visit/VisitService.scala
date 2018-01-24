@@ -13,9 +13,10 @@ import scala.util.Try
 import services.{HasDate, HasTryToEither}
 import storage.es.ES
 import org.elasticsearch.index.reindex.DeleteByQueryAction
+import storage.es.HasScrollProcessing
 
 @Singleton
-class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasDate {
+class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasScrollProcessing with HasDate {
  
   implicit object VisitIndexable extends Indexable[Visit] {
     override def json(v: Visit): String = Json.stringify(Json.toJson(v))
@@ -49,41 +50,25 @@ class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) ex
   def scrollExport()(implicit creator: TemporaryFileCreator): Future[Path] = {
     val exporter = CsvExporter.createNew()
     
-    def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
-      es.client execute { searchScroll(scrollId) keepAlive "1m" }
-    
-    def writeToFile(hits: Seq[Visit]): Future[Boolean] = Future {
-      exporter.writeBatch(hits)
-    } map { _ => true 
-    } recover { case t: Throwable =>
-      t.printStackTrace()
-      false
-    }
-    
-    def exportBatch(response: RichSearchResponse, cursor: Long = 0l): Future[Boolean] = {
-      if (response.hits.isEmpty) {
-        Future.successful(true)
-      } else {
-        writeToFile(response.to[Visit]).flatMap { success =>
-          val writtenRecords = cursor + response.hits.size
-          if (writtenRecords < response.totalHits)
-            fetchNextBatch(response.scrollId).flatMap(exportBatch(_, writtenRecords).map(_ && success))
-          else
-            Future.successful(success)
-        }
+    def writeToFile(response: RichSearchResponse): Future[Boolean] = 
+      Future {
+        val visits= response.to[Visit]
+        exporter.writeBatch(visits)
+      } map { _ => true 
+      } recover { case t: Throwable =>
+        t.printStackTrace()
+        false
       }
-    }
-    
+
     es.client execute {
-      search(ES.RECOGITO / ES.VISIT) query matchAllQuery limit 200 scroll "1m"
-    } flatMap { exportBatch(_) } map { success =>
+      search(ES.RECOGITO / ES.VISIT) query matchAllQuery limit 200 scroll "5m"
+    } flatMap { scroll(writeToFile, _) } map { success =>
       exporter.close()
       if (success) exporter.path else throw new RuntimeException()
     } recover { case t: Throwable =>
       Try(exporter.close())
       throw t
     }
-   
   }
   
   def deleteOlderThan(date: DateTime): Future[Boolean] =
