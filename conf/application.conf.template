@@ -73,7 +73,7 @@ play.modules {
   enabled += storage.db.DBModule
   enabled += storage.es.ESModule
 
-  disabled += "com.mohiva.play.silhouette.api.actions.SecuredErrorHandlerModule"
+  disabled += com.mohiva.play.silhouette.api.actions.SecuredErrorHandlerModule
 }
 
 akka {
