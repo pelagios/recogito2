@@ -29,25 +29,4 @@ trait HasScrollProcessing {
       }
     }
   
-  def scrollReportErrors(
-    fn: RichSearchResponse => Future[Seq[String]],
-    response: RichSearchResponse,
-    cursor: Long = 0l,
-    failedIds: Seq[String] = Seq.empty[String]
-  )(implicit es: ES, ctx: ExecutionContext): Future[Seq[String]] = 
-    
-    if (response.hits.isEmpty) {
-      Future.successful(failedIds)
-    } else {
-      fn(response).flatMap { failed =>
-        val processed = cursor + response.hits.size
-        if (processed < response.totalHits)
-          fetchNextBatch(response.scrollId).flatMap { response =>
-            scrollReportErrors(fn, response, processed).map(_ ++ failed)
-          }
-        else
-          Future.successful(failed)
-      }
-    }
-
 }
