@@ -26,50 +26,55 @@ class ReferenceRewriterImpl @Inject()(implicit ctx: ExecutionContext, es: ES)
     }
   }
 
-  private def updateBatch(response: RichSearchResponse, entitiesAfter: Seq[IndexedEntity], cursor: Long = 0l): Future[Boolean] =
-    response.to[(Annotation, Long)].toSeq match {
-      case Nil => Future.successful(true)
-      case annotationsAndIds =>
-        val changed = annotationsAndIds.flatMap { case (before, id) =>
-          val after = addUnionIds(before, entitiesAfter)
+  private def updateBatch(response: RichSearchResponse, entitiesAfter: Seq[IndexedEntity], cursor: Long = 0l): Future[Boolean] = {
+    val annotations = response.to[(Annotation, Long)].toSeq
+    if (annotations.isEmpty) {
+      Future.successful(true)
+    } else {    
+      val changed = annotations.flatMap { case (before, id) =>
+        val after = addUnionIds(before, entitiesAfter)
 
-          // Don't make unnecessary updates if the union Id didn't change 
-          if (after == before) None
-          else Some((after, id))
-        }
+        // Don't make unnecessary updates if the union Id didn't change 
+        if (after == before) None
+        else Some((after, id))
+      }
 
-        reindexBatch(changed).flatMap { success =>
-          val rewritten = cursor + annotationsAndIds.size
-          if (rewritten < response.totalHits)
-            fetchNextBatch(response.scrollId).flatMap { response =>
-              updateBatch(response, entitiesAfter, rewritten)
-            }
-          else
-            Future.successful(success)
-        }
+      reindexBatch(changed).flatMap { success =>
+        val rewritten = cursor + annotations.size
+        if (rewritten < response.totalHits)
+          fetchNextBatch(response.scrollId).flatMap { response =>
+            updateBatch(response, entitiesAfter, rewritten)
+          }
+        else
+          Future.successful(success)
+      }
     }
+  }
 
   private def fetchNextBatch(scrollId: String): Future[RichSearchResponse] =
     es.client execute {
       searchScroll(scrollId) keepAlive "5m"
     }
 
-  private def fetchFirstBatch(referencedEntities: Seq[IndexedEntity]) =
+  private def fetchFirstBatch(entitiesBefore: Seq[IndexedEntity], entitiesAfter: Seq[IndexedEntity]) = {
+    // Potentially, changes can happen for all entity URIs, before and after
+    val affectedUris = 
+      (entitiesBefore ++ entitiesAfter)
+        .flatMap(_.entity.isConflationOf.map(_.uri)).distinct
+    
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION) query constantScoreQuery {
-        should(referencedEntities.map { e =>
-          termQuery("bodies.reference.union_id" -> e.entity.unionId.toString)
+        should(affectedUris.map { uri =>
+          termQuery("bodies.reference.uri" -> uri)
         })
       } version true limit SCROLL_BATCH_SIZE scroll "5m"
     }
+  }
 
   override def rewriteReferencesTo(entitiesBefore: Seq[IndexedEntity], entitiesAfter: Seq[IndexedEntity]): Future[Boolean] =
-    if (entitiesBefore.isEmpty)
-      Future.successful(true)
-    else
-      for {
-        affectedAnnotations <- fetchFirstBatch(entitiesBefore)
-        success <- updateBatch(affectedAnnotations, entitiesAfter)
-      } yield (success)
+    for {
+      affectedAnnotations <- fetchFirstBatch(entitiesBefore, entitiesAfter)
+      success <- updateBatch(affectedAnnotations, entitiesAfter)
+    } yield (success)
 
 }

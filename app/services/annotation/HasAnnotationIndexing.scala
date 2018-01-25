@@ -1,6 +1,7 @@
 package services.annotation
 
 import com.sksamuel.elastic4s.{HitReader, Indexable, Hit}
+import java.util.UUID
 import play.api.libs.json.Json
 import scala.util.Try
 import services.HasTryToEither
@@ -24,14 +25,18 @@ trait HasAnnotationIndexing {
       Try(Json.fromJson[Annotation](Json.parse(hit.sourceAsString)).get, hit.version)
   }
   
+  private def copyWithUnionId(body: AnnotationBody, unionId: Option[UUID]) =
+    body.copy(reference = body.reference.map(_.copy(unionId = unionId)))
+  
   def addUnionIds(annotation: Annotation, resolvedIndexed: Seq[IndexedEntity]) = {
     val resolved = resolvedIndexed.map(_.entity)
     annotation.copy(bodies = annotation.bodies.map { body =>
-      val referencedEntity = body.uri.flatMap(uri => resolved.find(_.uris.contains(uri)))
+      val referencedEntity = body.uri.flatMap(uri => resolved.find(_.uris.contains(uri)))      
       referencedEntity match {
-        case None => body // No referenced entity, just return original body
-        case Some(e) =>
-          body.copy(reference = body.reference.map(_.copy(unionId = Some(e.unionId))))
+        // No referenced entity - remove unionId (if any)
+        case None => copyWithUnionId(body, None)
+        // Found referenced entity - set unionId accordingly
+        case Some(e) => copyWithUnionId(body, Some(e.unionId))
       }
     })
   }

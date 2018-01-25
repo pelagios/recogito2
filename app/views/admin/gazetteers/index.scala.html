@@ -5,9 +5,17 @@
     <title>Recogito Administration - Gazetteers</title>
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     <script>
-      jQuery.on('click', '.gazetteer-list li', function(e) {
-        var gazetteer = jQuery(e.target).closest('li').data('gazetteer');
-        console.log(gazetteer);
+      jQuery(document).ready(function() {
+        jQuery('.gazetteer-list').on('click', 'li', function(e) {
+          var gazetteer = jQuery(e.target).closest('li').data('gazetteer');
+
+          jsRoutes.controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(gazetteer)
+            .ajax().done(function() {
+              console.log('deleted.');
+            });
+
+          return false;
+        });
       });
     </script>
   </head>
@@ -24,7 +32,7 @@
       <div class="gazetteer-list">
         <ul>
           @for(gazetteer <- gazetteers) {
-            <li data-gazetteer="@gazetteer">@gazetteer</li>
+            <li data-gazetteer="@gazetteer">@gazetteer <a href="#">Delete</a></li>
           }
         </ul>
       </div>
