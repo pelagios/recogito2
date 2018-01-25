@@ -1,4 +1,4 @@
-package services.entity.builtin.crosswalks.rdf
+package services.entity.builtin.importer.crosswalks.rdf
 
 import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory}
 import java.io.{File, FileInputStream}

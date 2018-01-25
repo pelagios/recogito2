@@ -8,8 +8,8 @@ import javax.inject.{Inject, Singleton}
 import services.document.DocumentService
 import services.entity.EntityType
 import services.entity.builtin.EntityService
-import services.entity.builtin.crosswalks.geojson._
-import services.entity.builtin.crosswalks.rdf._
+import services.entity.builtin.importer.crosswalks.geojson._
+import services.entity.builtin.importer.crosswalks.rdf._
 import services.entity.builtin.importer.EntityImporterFactory
 import services.user.UserService
 import services.user.Roles._

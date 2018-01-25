@@ -13,7 +13,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import services.entity._
-import services.entity.builtin.crosswalks.rdf.PelagiosRDFCrosswalk
+import services.entity.builtin.importer.crosswalks.rdf.PelagiosRDFCrosswalk
 
 @RunWith(classOf[JUnitRunner])
 class EntityImporterSpec extends Specification {

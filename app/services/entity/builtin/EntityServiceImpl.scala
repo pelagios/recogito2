@@ -193,11 +193,14 @@ class EntityServiceImpl @Inject()(
       }
 
     def resolveEntities(unionIds: Seq[String]): Future[Seq[IndexedEntity]] =
-      es.client execute {
-        multiget (
-          unionIds.map { id => get(id) from ES.RECOGITO / ES.ENTITY }
-        )
-      } map { _.items.map(_.to[IndexedEntity]) }
+      if (unionIds.isEmpty)
+        Future.successful(Seq.empty[IndexedEntity])
+      else
+        es.client execute {
+          multiget (
+            unionIds.map { id => get(id) from ES.RECOGITO / ES.ENTITY }
+          )
+        } map { _.items.map(_.to[IndexedEntity]) }
 
     val f = for {
       counts <- fAggregateIds

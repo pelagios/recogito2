@@ -1,4 +1,4 @@
-package services.entity.builtin.crosswalks.geojson
+package services.entity.builtin.importer.crosswalks.geojson
 
 import com.vividsolutions.jts.geom.Geometry
 import services.HasGeometry

@@ -1,4 +1,4 @@
-package services.entity.builtin.crosswalks.rdf
+package services.entity.builtin.importer.crosswalks.rdf
 
 import java.io.{File, FileInputStream, InputStream}
 import services.entity._
@@ -8,9 +8,9 @@ import org.pelagios.api.PeriodOfTime
 
 object PelagiosRDFCrosswalk {
 
-  private def toLinks(uris: Seq[String], linkType: LinkType.Value) = 
+  private def toLinks(uris: Seq[String], linkType: LinkType.Value) =
     uris.map(uri => Link(EntityRecord.normalizeURI(uri), linkType))
-  
+
   private def convertPeriodOfTime(period: PeriodOfTime): TemporalBounds = {
     val startDate = period.start
     val endDate = period.end.getOrElse(startDate)
