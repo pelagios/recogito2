@@ -2,6 +2,8 @@
 
 [![Project Stats](https://www.openhub.net/p/recogito2/widgets/project_thin_badge.gif)](https://www.openhub.net/p/recogito2)
 
+__Current version: [v2.2](https://github.com/pelagios/recogito2/releases/tag/v2.2)__
+
 Home of [Recogito](http://recogito.pelagios.org) - a Linked Data annotation tool for texts and
 images, developed by [Pelagios](http://commons.pelagios.org). Track our progress on
 [Waffle.io](http://waffle.io/pelagios/recogito2).
