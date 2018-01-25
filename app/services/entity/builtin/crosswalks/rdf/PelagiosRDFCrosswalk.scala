@@ -1,4 +1,4 @@
-package services.entity.crosswalks.rdf
+package services.entity.builtin.crosswalks.rdf
 
 import java.io.{File, FileInputStream, InputStream}
 import services.entity._

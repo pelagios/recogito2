@@ -1,11 +1,11 @@
-package services.entity.importer
+package services.entity.builtin.importer
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import javax.inject.Inject
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
-import services.entity.IndexedEntity
+import services.entity.builtin.IndexedEntity
 import storage.es.ES
 import services.annotation.{Annotation, HasAnnotationIndexing}
 

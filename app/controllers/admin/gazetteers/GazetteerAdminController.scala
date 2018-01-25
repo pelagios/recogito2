@@ -6,10 +6,11 @@ import controllers.{BaseAuthController, Security}
 import java.io.FileInputStream
 import javax.inject.{Inject, Singleton}
 import services.document.DocumentService
-import services.entity.{EntityService, EntityType}
-import services.entity.crosswalks.geojson._
-import services.entity.crosswalks.rdf._
-import services.entity.importer.EntityImporterFactory
+import services.entity.EntityType
+import services.entity.builtin.EntityService
+import services.entity.builtin.crosswalks.geojson._
+import services.entity.builtin.crosswalks.rdf._
+import services.entity.builtin.importer.EntityImporterFactory
 import services.user.UserService
 import services.user.Roles._
 import org.webjars.play.WebJarsUtil

@@ -1,4 +1,4 @@
-package services.entity.importer
+package services.entity.builtin
 
 import com.vividsolutions.jts.geom.Geometry
 import java.util.UUID
@@ -15,22 +15,22 @@ import services.entity._
 
 @RunWith(classOf[JUnitRunner])
 class EntityBuilderSpec extends Specification with HasGeometry {
-  
+
   val json = Source.fromFile("test/resources/services/entity/crosswalks/geonames_sample.json").getLines().mkString("\n")
-  
+
   lazy val multipoly = {
     val geom = (Json.parse(json) \\ "geometry").head
     Json.fromJson[Geometry](geom).get
   }
-  
+
   "The EntityBuilder" should {
-    
+
     "build a proper centroid for a MultiPolygon" in {
       val centroid = EntityBuilder.getCentroid(multipoly)
       centroid.x.isNaN must equalTo(false)
       centroid.y.isNaN must equalTo(false)
     }
-    
+
     "create a proper entity from the sample record" in {
       val record = EntityRecord(
         "http://sws.geonames.org/1281843",
@@ -47,14 +47,14 @@ class EntityBuilderSpec extends Specification with HasGeometry {
         Seq.empty[String],
         None,
         Seq(
-          Link("http://www.wikidata.org/wiki/Q2709111", LinkType.CLOSE_MATCH), 
+          Link("http://www.wikidata.org/wiki/Q2709111", LinkType.CLOSE_MATCH),
           Link("http://en.wikipedia.org/wiki/Vaavu_Atoll", LinkType.CLOSE_MATCH)
         ))
-        
+
       val entity = EntityBuilder.fromRecords(Seq(record), EntityType.PLACE, UUID.randomUUID)
       entity.representativePoint.isDefined must equalTo(true)
     }
-    
+
   }
-  
+
 }

@@ -1,4 +1,4 @@
-package services.entity
+package services.entity.builtin
 
 import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
@@ -13,16 +13,17 @@ import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import services.{HasTryToEither, Page}
+import services.entity.{Entity, EntityType}
 import storage.es.{ES, HasAggregations}
 
 @Singleton
 class EntityServiceImpl @Inject()(
   implicit val ctx: ExecutionContext,
   implicit val es: ES
-) extends EntityService with EntityServiceDeleteImpl with HasAggregations {
-  
+) extends EntityService with EntityDeleteImpl with HasAggregations {
+
   implicit object EntityIndexable extends Indexable[Entity] {
-    override def json(e: Entity): String = 
+    override def json(e: Entity): String =
       try { Json.stringify(Json.toJson(e)) } catch { case t: Throwable =>
         play.api.Logger.info(e.toString)
         throw t
@@ -35,24 +36,24 @@ class EntityServiceImpl @Inject()(
       Try(IndexedEntity(e.get, Some(hit.version)))
     }
   }
-  
+
   private def toPage(response: RichSearchResponse, offset: Int, limit: Int): Page[IndexedEntity] =
     Page(response.tookInMillis, response.totalHits, offset, limit, response.to[IndexedEntity])
-  
+
   override def countEntities(eType: Option[EntityType] = None): Future[Long] = eType match {
     case Some(t) =>
       es.client execute {
         search(ES.RECOGITO / ES.ENTITY) query {
-          termQuery("entity_type" -> t.toString)  
+          termQuery("entity_type" -> t.toString)
         } limit 0
       } map { _.totalHits }
-      
+
     case _ =>
-      es.client execute { 
-        search(ES.RECOGITO / ES.ENTITY) limit 0 
+      es.client execute {
+        search(ES.RECOGITO / ES.ENTITY) limit 0
       } map { _.totalHits }
   }
-  
+
   override def listAuthorities(eType: Option[EntityType] = None): Future[Seq[(String, Long)]] = {
     val base = eType match {
       case Some(t) =>
@@ -60,23 +61,23 @@ class EntityServiceImpl @Inject()(
       case _ =>
           search(ES.RECOGITO / ES.ENTITY)
     }
-    
-    es.client execute { 
+
+    es.client execute {
       base size 0 aggs (
         termsAggregation("by_authority") field ("is_conflation_of.source_authority") size ES.MAX_SIZE
-      ) 
+      )
     } map { response =>
       parseTermsAggregation(response.aggregations.termsResult("by_authority")).toSeq
     }
   }
-  
+
   override def upsertEntities(entities: Seq[IndexedEntity]): Future[Boolean] = {
     val queries = entities.map { e =>
       e.version match {
-        case Some(version) => 
+        case Some(version) =>
           update(e.entity.unionId.toString) in ES.RECOGITO / ES.ENTITY doc e.entity version version
-          
-        case None => 
+
+        case None =>
           indexInto(ES.RECOGITO / ES.ENTITY) id e.entity.unionId.toString doc e.entity
       }
     }
@@ -95,7 +96,7 @@ class EntityServiceImpl @Inject()(
       }
     }
   }
-  
+
   override def deleteEntities(ids: Seq[UUID]): Future[Boolean] = {
     if (ids.isEmpty) {
       Future.successful(true)
@@ -108,18 +109,18 @@ class EntityServiceImpl @Inject()(
       } map { ES.logFailures(_) }
     }
   }
-  
+
   override def findByURI(uri: String): Future[Option[IndexedEntity]] =
     es.client execute {
       search(ES.RECOGITO / ES.ENTITY) query termQuery("is_conflation_of.uri" -> uri) limit 2
-    } map { _.to[IndexedEntity].toList match { 
-      case Nil => None 
+    } map { _.to[IndexedEntity].toList match {
+      case Nil => None
       case Seq(e) => Some(e)
-      case results  => 
+      case results  =>
         Logger.warn(s"Search for ${uri} returned ${results.size} results")
         None
     }}
-  
+
   override def findConnected(uris: Seq[String]): Future[Seq[IndexedEntity]] =
     es.client execute {
       search(ES.RECOGITO / ES.ENTITY) query boolQuery.should {
@@ -127,16 +128,16 @@ class EntityServiceImpl @Inject()(
         uris.map(uri => termQuery("is_conflation_of.links.uri" -> uri))
       } version true limit ES.MAX_SIZE
     } map { _.to[IndexedEntity] }
-  
+
   override def searchEntities(
     q: String,
-    eType: Option[EntityType] = None, 
+    eType: Option[EntityType] = None,
     offset: Int = 0,
     limit: Int = ES.MAX_SIZE,
     sortFrom: Option[Coordinate] = None
   ): Future[Page[IndexedEntity]] = {
-   
-    val query = 
+
+    val query =
       search(ES.RECOGITO / ES.ENTITY) query {
         boolQuery.should(
           // Treat as standard query string query first...
@@ -157,7 +158,7 @@ class EntityServiceImpl @Inject()(
           )
         )
     } start offset limit limit
-    
+
     es.client execute {
      sortFrom match {
        case None => query
@@ -171,16 +172,16 @@ class EntityServiceImpl @Inject()(
     *
     * Since we don't use ES parent/child relations via an associative entity any more,
     * this now happens via a two-stage process:
-    *  
+    *
     * 1. entity identifiers are aggregated from the annotations on the document
     * 2. union IDs are resolved against the index using a multiget query
     */
-  override def listEntitiesInDocument(docId: String, eType: Option[EntityType] = None, 
+  override def listEntitiesInDocument(docId: String, eType: Option[EntityType] = None,
     offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Page[(IndexedEntity, Long)]] = {
-    
+
     val startTime = System.currentTimeMillis
-    
-    val fAggregateIds: Future[Map[String, Long]] = 
+
+    val fAggregateIds: Future[Map[String, Long]] =
       es.client execute {
         search (ES.RECOGITO / ES.ANNOTATION) query {
           termQuery("annotates.document_id" -> docId)
@@ -190,31 +191,31 @@ class EntityServiceImpl @Inject()(
       } map { response =>
         parseTermsAggregation(response.aggregations.termsResult("by_union_id"))
       }
-    
-    def resolveEntities(unionIds: Seq[String]): Future[Seq[IndexedEntity]] = 
+
+    def resolveEntities(unionIds: Seq[String]): Future[Seq[IndexedEntity]] =
       es.client execute {
         multiget (
           unionIds.map { id => get(id) from ES.RECOGITO / ES.ENTITY }
         )
       } map { _.items.map(_.to[IndexedEntity]) }
-            
+
     val f = for {
       counts <- fAggregateIds
       entities <- resolveEntities(counts.map(_._1).toSeq)
     } yield (counts, entities)
-    
+
     f.map { case (counts, entities) =>
       val took = System.currentTimeMillis - startTime
-      
+
       val zipped = counts.zip(entities).map { case ((unionId, count), entity) =>
         (entity, count)
       }.toSeq
-      
+
       Page(took, 0l, 0, ES.MAX_SIZE, zipped)
     }
   }
-  
-  override def searchEntitiesInDocument(query: String, docId: String, eType: Option[EntityType] = None, 
+
+  override def searchEntitiesInDocument(query: String, docId: String, eType: Option[EntityType] = None,
     offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Page[IndexedEntity]] = ???
-     
+
 }

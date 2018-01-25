@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.Coordinate
 import controllers.{BaseOptAuthController, HasPrettyPrintJSON, Security}
 import javax.inject.{Inject, Singleton}
 import services.document.DocumentService
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import services.user.UserService
 import services.user.Roles._
 import play.api.Configuration

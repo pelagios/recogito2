@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.AnnotationService
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import storage.es.{ES, HasScrollProcessing}
 
 class AnnotationMigrationUtil @Inject()(

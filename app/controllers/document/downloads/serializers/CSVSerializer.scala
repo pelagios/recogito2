@@ -9,14 +9,15 @@ import kantan.csv.CsvConfiguration
 import kantan.csv.CsvConfiguration.{Header, QuotePolicy}
 import kantan.csv.ops._
 import kantan.csv.engine.commons._
-import services.ContentType
-import services.annotation.{Annotation, AnnotationBody, AnnotationService}
-import services.document.DocumentInfo
-import services.entity.{Entity, EntityService, EntityType}
-import services.generated.tables.records.DocumentFilepartRecord
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{Future, ExecutionContext}
 import scala.io.Source
+import services.ContentType
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
+import services.document.DocumentInfo
+import services.entity.{Entity, EntityType}
+import services.entity.builtin.EntityService
+import services.generated.tables.records.DocumentFilepartRecord
 import storage.uploads.Uploads
 
 trait CSVSerializer extends BaseSerializer with HasCSVParsing {

@@ -6,7 +6,7 @@ import play.api.Logger
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import services.entity.EntityRecord
-import services.entity.importer.EntityImporter
+import services.entity.builtin.importer.EntityImporter
 
 class DumpLoader {
   

@@ -4,7 +4,8 @@ import com.vividsolutions.jts.geom.Coordinate
 import java.util.UUID
 import services.ContentType
 import services.annotation._
-import services.entity.{EntityService, EntityType}
+import services.entity.EntityType
+import services.entity.builtin.EntityService
 import services.task.TaskService
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime

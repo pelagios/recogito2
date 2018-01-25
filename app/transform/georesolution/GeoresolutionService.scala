@@ -4,7 +4,7 @@ import akka.actor.{ ActorSystem, Props }
 import java.io.File
 import javax.inject.{ Inject, Singleton }
 import services.annotation.AnnotationService
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import services.task.{ TaskService, TaskType }
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.ExecutionContext

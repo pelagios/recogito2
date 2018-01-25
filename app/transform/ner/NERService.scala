@@ -5,7 +5,7 @@ import java.io.File
 import javax.inject.{Inject, Singleton}
 import services.ContentType
 import services.annotation.AnnotationService
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import services.task.{TaskService, TaskType}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.pelagios.recogito.sdk.ner._

@@ -5,7 +5,7 @@ import java.io.File
 import java.util.UUID
 import services.ContentType
 import services.annotation._
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import services.task._
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime

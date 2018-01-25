@@ -3,10 +3,10 @@ package services.annotation
 import com.sksamuel.elastic4s.ElasticDsl._
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import services.entity.{EntityService, IndexedEntity}
 import org.joda.time.DateTime
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
+import services.entity.builtin.{EntityService, IndexedEntity}
 import storage.es.ES
 
 @Singleton

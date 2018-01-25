@@ -9,7 +9,7 @@ import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import kantan.codecs.Result.Success
 import services.annotation.AnnotationService
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import services.task.{ TaskService, TaskStatus }
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.{ Await, ExecutionContext }

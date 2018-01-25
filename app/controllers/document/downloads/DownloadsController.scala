@@ -10,7 +10,7 @@ import javax.inject.{Inject, Singleton}
 import services.ContentType
 import services.annotation.AnnotationService
 import services.document.{DocumentInfo, DocumentService}
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import services.user.UserService
 import org.apache.jena.riot.RDFFormat
 import org.webjars.play.WebJarsUtil

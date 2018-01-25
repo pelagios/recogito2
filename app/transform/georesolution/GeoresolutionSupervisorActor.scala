@@ -5,7 +5,7 @@ import java.io.File
 import services.ContentType
 import services.annotation.AnnotationService
 import services.task.TaskService
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext

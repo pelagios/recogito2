@@ -3,7 +3,7 @@ package transform.ner
 import akka.actor.Props
 import java.io.File
 import services.annotation.AnnotationService
-import services.entity.EntityService
+import services.entity.builtin.EntityService
 import services.task.TaskService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import scala.concurrent.ExecutionContext

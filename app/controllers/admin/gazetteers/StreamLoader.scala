@@ -5,7 +5,7 @@ import akka.stream.scaladsl._
 import akka.util.ByteString
 import java.io.InputStream
 import services.entity.EntityRecord
-import services.entity.importer.EntityImporter
+import services.entity.builtin.importer.EntityImporter
 import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{Await, ExecutionContext}

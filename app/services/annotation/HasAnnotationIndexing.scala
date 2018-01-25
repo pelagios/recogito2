@@ -4,7 +4,7 @@ import com.sksamuel.elastic4s.{HitReader, Indexable, Hit}
 import play.api.libs.json.Json
 import scala.util.Try
 import services.HasTryToEither
-import services.entity.IndexedEntity
+import services.entity.builtin.IndexedEntity
 
 /** Common annotation de/serialization code for indexing.
   *  

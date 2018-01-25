@@ -1,27 +1,28 @@
-package services.entity.importer
+package services.entity.builtin.importer
 
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}
-import services.entity._
+import services.entity.{Entity, EntityRecord, EntityType}
+import services.entity.builtin.{EntityBuilder, EntityService, IndexedEntity}
 import storage.es.ES
 
 class EntityImporter (
   entityService    : EntityService,
   rewriter         : ReferenceRewriter,
-  ENTITY_TYPE      : EntityType, 
+  ENTITY_TYPE      : EntityType,
   implicit val es  : ES,
   implicit val ctx : ExecutionContext
 ) extends HasBatchImport {
-  
+
   /** Maximum number of URIs we will concatenate to an OR query **/
   private val MAX_URIS_IN_QUERY = 100
-  
+
   /** If indexing takes longer than this, we'll throttle the import **/
   private val THROTTLING_THRESHOLD = 2000
-  
+
   /** Throttling happens with a break of this value (ms) **/
   private val THROTTLE_DURATION = 5000
-  
+
   /** Fetches all entities from the index that will be affected from adding this record **/
   private[entity] def getAffectedEntities(normalizedRecord: EntityRecord): Future[Seq[IndexedEntity]] = {
     // We need to query for this record's URI as well as all close/exactMatches
@@ -33,8 +34,8 @@ class EntityImporter (
 
     entityService.findConnected(identifiers)
   }
-  
-  /** Takes a list of N records and conflates them to M entities, based on their link information **/ 
+
+  /** Takes a list of N records and conflates them to M entities, based on their link information **/
   private[entity] def conflateRecursive(records: Seq[EntityRecord], entities: Seq[Entity] = Seq.empty[Entity]): Seq[Entity] = {
 
     def conflateOne(r: EntityRecord, entities: Seq[Entity]): Seq[Entity] = {
@@ -51,9 +52,9 @@ class EntityImporter (
         conflateOne(records.head, entities) // process the head of the list
       )
   }
-  
+
   /** Computes the reconflation of a new (normalized) record and the list of affected entities.
-    * 
+    *
     * Uses 'conflateRecursive' (above) to do the actual work.
     */
   private def reconflate(normalizedRecord: EntityRecord, affectedEntities: Seq[IndexedEntity]) = {
@@ -72,13 +73,13 @@ class EntityImporter (
         // Replace the old version in the list
         affectedRecords.patch(replaceIdx, Seq(normalizedRecord), 1)
     }
-    
+
     val conflatedItems: Seq[IndexedEntity] = {
       val entitiesAfterConflation = conflateRecursive(records)
 
       if (sorted.size > 0 && sorted.size != entitiesAfterConflation.size)
         Logger.info(s"Re-conflating ${sorted.size} entites to ${entitiesAfterConflation.size}")
-      
+
         // In case multiple entities are merged, retain internal id
         if (sorted.size > 0 && entitiesAfterConflation.size == 1) {
           val oneBefore = sorted.head
@@ -94,14 +95,14 @@ class EntityImporter (
     // Pass back places before and after conflation
     (sorted, conflatedItems)
   }
-  
+
   private def deleteMerged(entitiesBefore: Seq[IndexedEntity], entitiesAfter: Seq[IndexedEntity]): Future[Boolean] = {
     def idsBefore = entitiesBefore.map(_.entity.unionId).distinct
     def idsAfter = entitiesAfter.map(_.entity.unionId).distinct
     val toDelete = idsBefore diff idsAfter
     entityService.deleteEntities(toDelete)
   }
-  
+
   /** Returns true only if the import has actually changed anything about the affected entities **/
   private def hasChanged(entitiesBefore: Seq[IndexedEntity], entitiesAfter: Seq[IndexedEntity]): Boolean =
     if (entitiesBefore.size != entitiesAfter.size) {
@@ -114,10 +115,10 @@ class EntityImporter (
       }
       pairwiseEquals.exists(_ == false)
     }
-    
+
   /** Imports a single record into the index
     *
-    * @return true if the import was successful, false otherwise  
+    * @return true if the import was successful, false otherwise
     */
   override def importRecord(record: EntityRecord): Future[Boolean] = {
     val startTime = System.currentTimeMillis()
@@ -125,7 +126,7 @@ class EntityImporter (
 
     // Reconflation step
     val fReconflate = getAffectedEntities(normalized).map { affected => reconflate(normalized, affected) }
-    
+
     val f = for {
       (entitiesBefore, entitiesAfter) <- fReconflate
       upsertSuccess <- entityService.upsertEntities(entitiesAfter)
@@ -140,7 +141,7 @@ class EntityImporter (
                           Future.successful(false)
                         }
     } yield (rewriteSuccess)
-    
+
     f.map { success =>
       val took = System.currentTimeMillis - startTime
       if (took > THROTTLING_THRESHOLD) {
@@ -150,5 +151,5 @@ class EntityImporter (
       success
     }
   }
-  
+
 }

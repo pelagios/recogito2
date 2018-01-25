@@ -1,4 +1,4 @@
-package services.entity.importer;
+package services.entity.builtin.importer;
 
 import play.api.Logger
 import scala.concurrent.{ExecutionContext, Future}

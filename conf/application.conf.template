@@ -68,7 +68,7 @@ db.default.password="postgres-password-goes-here"
 play.modules {
   enabled += controllers.SilhouetteSecurity
 
-  enabled += services.entity.EntityServiceModule
+  enabled += services.entity.builtin.EntityServiceModule
 
   enabled += storage.db.DBModule
   enabled += storage.es.ESModule

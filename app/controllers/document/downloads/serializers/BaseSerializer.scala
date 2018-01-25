@@ -1,14 +1,15 @@
 package controllers.document.downloads.serializers
 
 import java.io.File
-import services.ContentType
-import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import services.entity.{Entity, EntityRecord, EntityService, EntityType}
 import play.api.Logger
 import scala.concurrent.ExecutionContext
+import services.ContentType
+import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
+import services.document.DocumentInfo
+import services.entity.{Entity, EntityRecord, EntityType}
+import services.entity.builtin.EntityService
 import storage.es.ES
 import storage.uploads.Uploads
-import services.document.DocumentInfo
 
 trait BaseSerializer {
   

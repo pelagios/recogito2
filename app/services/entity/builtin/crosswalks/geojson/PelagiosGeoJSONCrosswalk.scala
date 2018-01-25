@@ -1,4 +1,4 @@
-package services.entity.crosswalks.geojson
+package services.entity.builtin.crosswalks.geojson
 
 import com.vividsolutions.jts.geom.{Coordinate, Geometry}
 import java.io.InputStream

@@ -1,12 +1,12 @@
-package services.entity.importer
+package services.entity.builtin
 
+import java.util.UUID
 import com.vividsolutions.jts.geom.{Coordinate, Geometry, GeometryFactory}
 import services.entity._
-import java.util.UUID
 
 object EntityBuilder {
-  
-  /** Picks a 'most detailed' record we can use for representative metadata 
+
+  /** Picks a 'most detailed' record we can use for representative metadata
     *
     * For the time being, we'll use number of names + number of links as
     * a measure. In addition, we'll boost the score if matches contain
@@ -17,23 +17,23 @@ object EntityBuilder {
       val score = record.directMatches.size + record.names.size
       val boostWikidata = record.directMatches.contains("www.wikidata.org")
       val boostWikipedia = record.directMatches.contains("wikipedia.org")
-      
-      val boost = 
+
+      val boost =
         if (boostWikidata && boostWikipedia) 1.44
         else if (boostWikidata || boostWikipedia) 1.2
         else 1
-        
+
       // Sort descending
       - score * boost
     }.head
-    
+
   /** Robust way to compute a centroid from a geometry.
     *
     * Unfortunately, JTS will generate the following "valid" centroid
     * for MultiPoly geometries: Coordinate(NaN, NaN, NaN)
     * This method works around this... JTS feature.
     */
-  private[importer] def getCentroid(geom: Geometry) = {
+  private[builtin] def getCentroid(geom: Geometry) = {
     val centroid = geom.getCentroid.getCoordinate
     if (centroid.x.isNaN || centroid.y.isNaN) {
       val coords = geom.getCoordinates
@@ -44,9 +44,9 @@ object EntityBuilder {
       centroid
     }
   }
-          
+
   /** A set of conventions to select reasonable 'representative geometry' for an entity **/
-  private def getPreferredLocation(records: Seq[EntityRecord]): (Option[Geometry], Option[Coordinate]) = {    
+  private def getPreferredLocation(records: Seq[EntityRecord]): (Option[Geometry], Option[Coordinate]) = {
     // Rule 1: prefer DARE for representative point
     val dareRecord =
       records.filter(_.uri.contains("dare.ht.lu.se/places")).headOption
@@ -92,7 +92,7 @@ object EntityBuilder {
 
   /** Joins the given record and entities to a single entity.
     *
-    * By convention, the "biggest" entity (the one with the largest number of 
+    * By convention, the "biggest" entity (the one with the largest number of
     * records) determines the internal ID.
     */
   def join(normalizedRecord: EntityRecord, entities: Seq[Entity], entityType: EntityType): Entity = {
@@ -101,7 +101,7 @@ object EntityBuilder {
     val allRecords = entities.flatMap(_.isConflationOf) :+ normalizedRecord
     fromRecords(allRecords, entityType, internalId)
   }
-  
+
   def fromRecords(records: Seq[EntityRecord], entityType: EntityType, unionId: UUID) = {
     val mostDetailed = getMostDetailedRecord(records)
 
@@ -120,5 +120,5 @@ object EntityBuilder {
       temporalBoundsUnion,
       records)
   }
-  
+
 }
