@@ -34,7 +34,6 @@ libraryDependencies ++= Seq(
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.6.1",
   "com.sksamuel.elastic4s" %% "elastic4s-tcp" % "5.6.1",
 
-  "com.typesafe.akka" %% "akka-contrib" % "2.5.8",
   "com.typesafe.akka" %% "akka-testkit" % "2.5.8" % Test,
 
   "com.typesafe.play" %% "play-iteratees" % "2.6.1",

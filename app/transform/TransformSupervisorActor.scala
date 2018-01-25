@@ -1,10 +1,9 @@
 package transform
 
-import akka.actor.{ Actor, ActorRef }
-import akka.contrib.pattern.Aggregator
+import akka.actor.{Actor, ActorRef}
 import java.io.File
-import services.task.{ TaskType, TaskService }
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.task.{TaskType, TaskService}
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 
