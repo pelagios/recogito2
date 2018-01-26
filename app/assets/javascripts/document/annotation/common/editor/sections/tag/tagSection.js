@@ -1,23 +1,27 @@
 define([
   'common/config',
-  'document/annotation/common/editor/sections/section'
-], function(Config, Section) {
+  'document/annotation/common/editor/sections/section',
+  'document/annotation/common/editor/sections/tag/tagAutocomplete'
+], function(Config, Section, TagAutocomplete) {
 
   var DELETE_WIDTH = 23,
 
       ANIM_DURATION = 150;
 
-  var TagSection = function(parent, annotation) {
+  var TagSection = function(parent, annotation, allAnnotationsOnPage) {
 
     var element = (Config.writeAccess) ? jQuery(
           '<div class="section tags">' +
             '<ul></ul>' +
-            '<div contenteditable="true" spellcheck="false" class="add-tag" data-placeholder="Add tag..." />' +
+            // TODO need to re-style this to an input[type=text]
+            // '<div contenteditable="true" spellcheck="false" class="add-tag" data-placeholder="Add tag..." />' +
+            '<input type="text" class="add-tag"></input>' +
           '</div>') : jQuery('<div class="section tags readonly"><ul></ul></div>'),
 
         taglist = element.find('ul'),
-
         textarea = element.find('.add-tag'),
+
+        autocomplete = new TagAutocomplete(element, textarea, allAnnotationsOnPage),
 
         queuedUpdates = [],
 

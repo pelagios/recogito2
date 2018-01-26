@@ -10,6 +10,7 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/common/page/annotations',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/image/iiif/iiifImageInfo',
@@ -39,8 +40,9 @@ require([
     /** The app is instantiated after the image manifest was loaded **/
     var App = function(imageProperties) {
 
-      // TODO handle difference between Zoomify and IIIF, based on Config.contentType
-      var contentNode = document.getElementById('image-pane'),
+      var annotations = new Annotations(),
+
+          contentNode = document.getElementById('image-pane'),
 
           toolbar = new Toolbar(),
 
@@ -53,8 +55,8 @@ require([
           selector = new SelectionHandler(contentNode, olMap, highlighter),
 
           editor = (Config.writeAccess) ?
-            new WriteEditor(contentNode, selector, { autoscroll: false }) :
-            new ReadEditor(contentNode, { autoscroll: false }),
+            new WriteEditor(contentNode, selector, annotations.readOnly(), { autoscroll: false }) :
+            new ReadEditor(contentNode, annotations.readOnly(), { autoscroll: false }),
 
           help = new Help(),
 

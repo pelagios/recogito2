@@ -22,7 +22,8 @@ define([
   HasEvents) {
 
   /** Represents a list of editor sections and provides utility methods **/
-  var SectionList = function(editorEl) {
+  var SectionList = function(editorEl, allAnnotations) {
+
     var self = this,
 
         transcriptionSectionEl = editorEl.find('.transcription-sections'),
@@ -176,7 +177,9 @@ define([
         },
 
         initTagSection = function(annotation) {
-          var tagSection = new TagSection(tagSectionEl, annotation);
+          // Note: the tag section makes use of allAnnotations to provide the
+          // page-sensitive autocomplete drop-down
+          var tagSection = new TagSection(tagSectionEl, annotation, allAnnotations);
           sections.push(tagSection);
         },
 

@@ -3,9 +3,10 @@ define([
   'common/api',
   'common/config',
   'document/annotation/common/page/header'
-], function(API, Config, Header, LoadIndicator) {
+], function(API, Config, Header) {
 
-  var BaseApp = function(highlighter, selector) {
+  var BaseApp = function(annotations, highlighter, selector) {
+    this.annotations = annotations;
     this.highlighter = highlighter;
     this.selector = selector;
     this.header = new Header();
@@ -21,6 +22,7 @@ define([
             jQuery('html, body').animate({ scrollTop: scrollTo });
         };
 
+    this.annotations.add(annotations);
     this.header.incrementAnnotationCount(annotations.length);
     // var startTime = new Date().getTime();
     this.highlighter.initPage(annotations);

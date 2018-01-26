@@ -10,6 +10,7 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/common/page/annotations',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/table/bulk/bulkEditorPlace',
@@ -22,6 +23,7 @@ require([
   Config,
   ReadEditor,
   WriteEditor,
+  Annotations,
   LoadIndicator,
   BaseApp,
   PlaceBulkEditor,
@@ -34,6 +36,8 @@ require([
   var App = function(results) {
 
     var self = this,
+
+        annotations = new Annotations(),
 
         contentNode = document.getElementById('table-container'),
 
@@ -77,8 +81,8 @@ require([
         selector = new SelectionHandler(grid, highlighter),
 
         editor = (Config.writeAccess) ?
-          new WriteEditor(contentNode, selector) :
-          new ReadEditor(contentNode),
+          new WriteEditor(contentNode, annotations.readOnly(), selector) :
+          new ReadEditor(contentNode, annotations.readOnly()),
 
         onBulkAnnotation = function(type) {
           if (type === 'PLACE')

@@ -1,7 +1,7 @@
 
 define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
-  var ReadEditor = function(container, options) {
+  var ReadEditor = function(container, annotations, options) {
     var self = this,
 
         element = (function() {
@@ -30,7 +30,7 @@ define(['document/annotation/common/editor/editorBase'], function(EditorBase) {
 
     this.openSelection = openSelection;
 
-    EditorBase.apply(this, [ container, element, options ]);
+    EditorBase.apply(this, [ container, element, annotations, options ]);
 
     // Editor closes on ESC key
     self.on('escape', self.close.bind(self));

@@ -10,7 +10,7 @@ define([
   'document/annotation/common/editor/sections/sectionList'
 ], function(AnnotationUtils, HasEvents, SectionList) {
 
-  var EditorBase = function(container, element, opts) {
+  var EditorBase = function(container, element, annotations, opts) {
     var self = this,
 
         /** Handles common key events **/
@@ -31,7 +31,7 @@ define([
 
     this.autoscroll = (opts && opts.autoscroll) ? opts.autoscroll : true;
 
-    this.sectionList = new SectionList(element);
+    this.sectionList = new SectionList(element, annotations);
     this.currentSelection = false;
 
     // Monitor key events

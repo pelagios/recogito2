@@ -6,6 +6,7 @@ define([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
+  'document/annotation/common/page/annotations',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
@@ -18,6 +19,7 @@ define([
   Config,
   ReadEditor,
   WriteEditor,
+  Annotations,
   LoadIndicator,
   BaseApp,
   Toolbar,
@@ -27,17 +29,19 @@ define([
 
     var self = this,
 
+        annotations = new Annotations(),
+
         loadIndicator = new LoadIndicator(),
 
         containerNode = document.getElementById('main'),
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
-        phraseAnnotator = new PhraseAnnotator(contentNode, highlighter),
+        phraseAnnotator = new PhraseAnnotator(contentNode, highlighter);
 
-        editor = (Config.writeAccess) ?
-          new WriteEditor(containerNode, selector) :
-          new ReadEditor(containerNode),
+        var editor = (Config.writeAccess) ?
+          new WriteEditor(containerNode, annotations.readOnly(), selector) :
+          new ReadEditor(containerNode, annotations.readOnly()),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
@@ -104,7 +108,7 @@ define([
     toolbar.on('annotationModeChanged', editor.setAnnotationMode);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
-    BaseApp.apply(this, [ highlighter, selector ]);
+    BaseApp.apply(this, [ annotations, highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
 
