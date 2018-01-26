@@ -10,8 +10,9 @@ define([
           '<div class="info-text">' +
             '<div class="no-match">' +
               '<div class="label"></div>' +
-              '<button class="btn tiny change">Search</button> ' +
-              '<button class="btn tiny delete icon">&#xf014;</button>' +
+              '<button class="btn tiny change" title="Use advanced search to find a match">Search</button> ' +
+              '<button class="btn tiny flag icon" title="Flag this place as unidentified">&#xf11d;</button> ' +
+              '<button class="btn tiny delete icon" title="Not a place - remove">&#xf014;</button>' +
             '</div>' +
           '</div>') : jQuery(
           // Simplified version for read-only mode
@@ -23,8 +24,11 @@ define([
 
         labelEl = element.find('.label'),
 
+        btnFlag = element.find('.flag'),
+
         labelNoAutoMatch =
           '<h3>No automatic match found</h3>',
+
         labelFlagged =
           '<h3>Flagged as Not Identifiable</h3>' +
           '<p>A place no-one could resolve yet</p>',
@@ -37,15 +41,20 @@ define([
         render = function() {
           containerEl.html(element);
 
-          if (verificationStatus.value === 'NOT_IDENTIFIABLE') {
-            labelEl.html(labelFlagged);
-            containerEl.append(overlayFlagged);
-          } else {
+          if (verificationStatus.value === 'NOT_IDENTIFIABLE')
+            setFlagged();
+          else
             labelEl.html(labelNoAutoMatch);
-          }
+        },
+
+        setFlagged = function() {
+          labelEl.html(labelFlagged);
+          btnFlag.remove();
+          containerEl.append(overlayFlagged);
         };
 
     this.render = render;
+    this.setFlagged = setFlagged;
 
     Card.apply(this, [ element ]);
 

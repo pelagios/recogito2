@@ -133,6 +133,14 @@ define([
           queuedUpdates.push(function() { placeBody.status.value = 'VERIFIED'; });
         },
 
+        /** Handles 'flag' click **/
+        onFlag = function() {
+          card.setFlagged();
+          queuedUpdates.push(function() {
+            placeBody.status.value = 'NOT_IDENTIFIABLE';
+          });
+        },
+
         hasChanged = function() {
           return queuedUpdates.length > 0;
         },
@@ -161,6 +169,7 @@ define([
     init();
 
     element.on('click', '.unverified-confirm', onConfirm);
+    element.on('click', '.flag', onFlag);
 
     // Change and delete events are simple passed on
     element.on('click', '.unverified-change, .change', function() { self.fireEvent('change'); });
