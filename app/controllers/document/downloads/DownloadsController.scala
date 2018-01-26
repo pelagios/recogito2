@@ -58,9 +58,9 @@ object FieldMapping {
 @Singleton
 class DownloadsController @Inject() (
   val components: ControllerComponents,
-  val config: Configuration,
   val users: UserService,
   val silhouette: Silhouette[Security.Env],
+  implicit val config: Configuration,
   implicit val mimeTypes: FileMimeTypes,
   implicit val tmpFile: TemporaryFileCreator,
   implicit val uploads: Uploads,

@@ -84,12 +84,12 @@ object AnnotationStatusStub extends HasDate {
 @Singleton
 class AnnotationAPIController @Inject() (
     val components: ControllerComponents,
-    val config: Configuration,
     val annotationService: AnnotationService,
     val contributions: ContributionService,
     val documents: DocumentService,
     val silhouette: Silhouette[Security.Env],
     val users: UserService,
+    implicit val config: Configuration,
     implicit val mimeTypes: FileMimeTypes,
     implicit val tmpFile: TemporaryFileCreator,
     implicit val uploads: Uploads,

@@ -14,13 +14,10 @@ import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord
 import play.api.libs.json.Json
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{ExecutionContext, Future}
+import storage.TempDir
 import storage.uploads.Uploads
-import java.security.DigestInputStream
-import play.api.libs.Files.TemporaryFileCreator
 
 trait BackupWriter extends HasBackupValidation { self: HasConfig =>
-  
-  private val TMP = System.getProperty("java.io.tmpdir")
   
   private val BUFFER_SIZE = 2048
   
@@ -66,7 +63,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     }
     
     def getAnnotationsAsStream(docId: String, annotations: Seq[Annotation], parts: Seq[DocumentFilepartRecord]): InputStream = {
-      val path = Paths.get(TMP, s"${docId}_annotations.json")
+      val path = Paths.get(TempDir.get()(self.config), s"${docId}_annotations.json")
       val tmp = tmpFile.create(path)
       val writer = new PrintWriter(path.toFile)
       annotations.foreach(a => writer.println(Json.stringify(Json.toJson(a))))
@@ -75,7 +72,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     }
     
     Future {
-      tmpFile.create(Paths.get(TMP, s"${doc.id}.zip"))
+      tmpFile.create(Paths.get(TempDir.get()(self.config), s"${doc.id}.zip"))
     } flatMap { zipFile =>
       val zipStream = new ZipOutputStream(new FileOutputStream(zipFile.path.toFile))
 

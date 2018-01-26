@@ -10,10 +10,9 @@ import services.entity.{Entity, EntityRecord, EntityType}
 import services.entity.builtin.EntityService
 import storage.es.ES
 import storage.uploads.Uploads
+import controllers.document.downloads.DownloadsController
 
 trait BaseSerializer {
-  
-  protected val TMP_DIR = System.getProperty("java.io.tmpdir")
 
   private def sortByCharOffset(annotations: Seq[Annotation]) =
     annotations.sortWith { (a, b) =>

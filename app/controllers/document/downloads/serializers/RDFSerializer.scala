@@ -1,18 +1,20 @@
 package controllers.document.downloads.serializers
 
-import java.io.{ File, FileOutputStream }
+import java.io.{File, FileOutputStream}
 import java.nio.file.Paths
 import java.util.UUID
 import services.HasDate
-import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import services.document.{ DocumentInfo, DocumentService }
-import org.apache.jena.rdf.model.{ Model, ModelFactory }
-import org.apache.jena.riot.{ RDFDataMgr, RDFFormat }
-import org.apache.jena.vocabulary.{ DCTerms, RDF }
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
+import services.document.{DocumentInfo, DocumentService}
+import org.apache.jena.rdf.model.{Model, ModelFactory}
+import org.apache.jena.riot.{RDFDataMgr, RDFFormat}
+import org.apache.jena.vocabulary.{DCTerms, RDF}
+import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
-import play.api.mvc.{ AnyContent, Request }
+import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.ExecutionContext
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
+import storage.TempDir
 
 sealed class BaseVocab(val getURI: String) {
   
@@ -85,7 +87,8 @@ trait RDFSerializer extends BaseSerializer with HasDate {
   }
   
   def documentToRDF(doc: DocumentInfo, format: RDFFormat)(implicit documentService: DocumentService,
-      annotationService: AnnotationService, request: Request[AnyContent], tmpFile: TemporaryFileCreator, ctx: ExecutionContext) = {
+      annotationService: AnnotationService, request: Request[AnyContent], tmpFile: TemporaryFileCreator,
+      ctx: ExecutionContext, conf: Configuration) = {
     
     val baseUri = controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL 
       
@@ -100,7 +103,7 @@ trait RDFSerializer extends BaseSerializer with HasDate {
         createDocumentResource(doc, baseUri, model)
         annotations.foreach(t => createAnnotationResource(doc, t._1, baseUri, model))
       
-        val tmp = tmpFile.create(Paths.get(TMP_DIR, s"${UUID.randomUUID}.ttl"))
+        val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.ttl"))
         val os = java.nio.file.Files.newOutputStream(tmp.path)
         RDFDataMgr.write(os, model, format)
         os.close()

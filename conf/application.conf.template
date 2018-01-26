@@ -38,6 +38,11 @@ recogito.upload.dir = uploads
 # Default max. disk space per user in MB
 recogito.upload.quota = 200
 
+# Temp directory location
+# No need to set this normally. Only use this if you want Recogito to use a different
+# directory than the OS default.
+# recogito.temp.dir = /tmp
+
 # E-Mail encryption key (optional)
 recogito.email.key = "my secret key"
 

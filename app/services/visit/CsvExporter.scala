@@ -8,6 +8,7 @@ import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import play.api.libs.Files.{TemporaryFile, TemporaryFileCreator}
 import services.HasDate
+import storage.TempDir
 
 class CsvExporter private (private val tmp: TemporaryFile, val writer: CsvWriter[Seq[String]]) extends HasDate {
   
@@ -39,9 +40,8 @@ class CsvExporter private (private val tmp: TemporaryFile, val writer: CsvWriter
 
 object CsvExporter {
   
-  private val TMP_DIR = System.getProperty("java.io.tmpdir")
-  
-  def createNew()(implicit creator: TemporaryFileCreator): CsvExporter = {
+ def createNew()(implicit creator: TemporaryFileCreator, conf: play.api.Configuration): CsvExporter = {
+    val tmpDir = TempDir.get()(conf)
     val header = Seq(
       "URL", 
       "REFERER", 
@@ -58,7 +58,7 @@ object CsvExporter {
       "VISITED_DOC_CONTENT_TYPE",
       "ACCESS_LEVEL")
 
-    val tmp = creator.create(Paths.get(TMP_DIR, s"${UUID.randomUUID}.csv"))
+    val tmp = creator.create(Paths.get(tmpDir, s"${UUID.randomUUID}.csv"))
     val file = tmp.path.toFile
     val config = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(header))
     val writer = file.asCsvWriter[Seq[String]](config)

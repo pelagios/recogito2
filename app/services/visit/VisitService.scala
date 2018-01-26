@@ -6,17 +6,16 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import java.nio.file.Path
 import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.Files.{TemporaryFile, TemporaryFileCreator}
 import scala.concurrent.{Future, ExecutionContext}
 import scala.util.Try
 import services.{HasDate, HasTryToEither}
-import storage.es.ES
-import org.elasticsearch.index.reindex.DeleteByQueryAction
-import storage.es.HasScrollProcessing
+import storage.es.{ES, HasScrollProcessing}
 
 @Singleton
-class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasScrollProcessing with HasDate {
+class VisitService @Inject() (implicit val es: ES, val ctx: ExecutionContext, val config: Configuration) extends HasScrollProcessing with HasDate {
  
   implicit object VisitIndexable extends Indexable[Visit] {
     override def json(v: Visit): String = Json.stringify(Json.toJson(v))

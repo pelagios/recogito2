@@ -2,24 +2,29 @@ package services.image
 
 import java.io.File
 import java.nio.file.Paths
+import play.api.Configuration
+import play.api.libs.Files.TemporaryFileCreator
 import services.annotation.Annotation
 import services.document.DocumentInfo
 import services.generated.tables.records.DocumentFilepartRecord
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 import storage.uploads.Uploads
 import sys.process._
-import play.api.libs.Files.TemporaryFileCreator
+import storage.TempDir
 
 object ImageService {
 
-  private val TMP = System.getProperty("java.io.tmpdir")
-
-  def cutout(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation)(implicit uploads: Uploads, ctx: ExecutionContext, tmp: TemporaryFileCreator) = Future {
+  def cutout(
+    doc: DocumentInfo,
+    part: DocumentFilepartRecord,
+    annotation: Annotation
+  )(implicit uploads: Uploads, ctx: ExecutionContext, tmpCreator: TemporaryFileCreator, config: Configuration) = Future {
+    val tmpDir = TempDir.get()
     val dir = uploads.getDocumentDir(doc.ownerName, doc.id).get
     
     val sourceFile = new File(dir, part.getFile)
-    val croppedTmp = tmp.create(Paths.get(TMP, s"${annotation.annotationId}.jpg"))
+    val croppedTmp = tmpCreator.create(Paths.get(tmpDir, s"${annotation.annotationId}.jpg"))
     val croppedFile = croppedTmp.path.toAbsolutePath.toString
     
     val anchor = ImageAnchor.parse(annotation.anchor)
@@ -33,14 +38,14 @@ object ImageService {
     
     anchor match {
       case tbox: TiltedBoxAnchor =>    
-        val rotatedTmp = tmp.create(Paths.get(TMP, s"${annotation.annotationId}.rot.jpg"))
+        val rotatedTmp = tmpCreator.create(Paths.get(tmpDir, s"${annotation.annotationId}.rot.jpg"))
         val rotatedFile = rotatedTmp.path.toAbsolutePath.toString
         val angleDeg = 180 * tbox.a / Math.PI
                 
         s"vips similarity $croppedFile $rotatedFile --angle $angleDeg" !
 
         // TODO can rotate and crop happen in the same vips command?
-        val clippedTmp = tmp.create(Paths.get(TMP, s"${annotation.annotationId}.clip.jpg"))
+        val clippedTmp = tmpCreator.create(Paths.get(tmpDir, s"${annotation.annotationId}.clip.jpg"))
         val clippedFile = clippedTmp.path.toAbsolutePath.toString
         
         val a =  ImageAnchor.getQuadrant(tbox.a) match {

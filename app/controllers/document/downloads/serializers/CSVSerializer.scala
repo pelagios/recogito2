@@ -9,6 +9,7 @@ import kantan.csv.CsvConfiguration
 import kantan.csv.CsvConfiguration.{Header, QuotePolicy}
 import kantan.csv.ops._
 import kantan.csv.engine.commons._
+import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{Future, ExecutionContext}
 import scala.io.Source
@@ -19,8 +20,9 @@ import services.entity.{Entity, EntityType}
 import services.entity.builtin.EntityService
 import services.generated.tables.records.DocumentFilepartRecord
 import storage.uploads.Uploads
+import storage.TempDir
 
-trait CSVSerializer extends BaseSerializer with HasCSVParsing {
+trait CSVSerializer extends BaseSerializer with HasCSVParsing { 
 
   private val EMPTY     = ""
   
@@ -30,8 +32,13 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
     }
 
   /** Exports the annotations for the document to the standard Recogito CSV output format **/ 
-  def annotationsToCSV(documentId: String)(implicit annotationService: AnnotationService, entityService: EntityService, 
-    tmpFile: TemporaryFileCreator, ctx: ExecutionContext) = {
+  def annotationsToCSV(documentId: String)(
+    implicit annotationService: AnnotationService,
+             entityService: EntityService, 
+             tmpFile: TemporaryFileCreator,
+             conf: Configuration,
+             ctx: ExecutionContext
+  ) = {
 
     def serializeOne(a: Annotation, places: Seq[Entity]): Seq[String] = {
       val firstEntity = getFirstEntityBody(a)
@@ -72,7 +79,7 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
       scala.concurrent.blocking {
         val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
         
-        val tmp = tmpFile.create(Paths.get(TMP_DIR, s"${UUID.randomUUID}.csv"))
+        val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
         val underlying = tmp.path.toFile
         val config = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(header))
         val writer = underlying.asCsvWriter[Seq[String]](config)
@@ -91,14 +98,16 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
     doc: DocumentInfo
   )(
     implicit annotationService: AnnotationService, 
-      entityService: EntityService,
-      uploads: Uploads,
-      tmpFile: TemporaryFileCreator,
-      ctx: ExecutionContext): Future[(File, String)] = {
+             entityService: EntityService,
+             uploads: Uploads,
+             tmpFile: TemporaryFileCreator,
+             conf: Configuration,
+             ctx: ExecutionContext
+  ): Future[(File, String)] = {
     
     def createZip(parts: Seq[(DocumentFilepartRecord, File)]): File = {
       // val tmp = tmpFile.create(TMP_DIR, UUID.randomUUID + ".zip")
-      val p = Paths.get(TMP_DIR, s"${UUID.randomUUID}.zip")
+      val p = Paths.get(TempDir.get(), s"${UUID.randomUUID}.zip")
       val tmp = tmpFile.create(p)
       val zip = new ZipOutputStream(java.nio.file.Files.newOutputStream(p))
       
@@ -158,7 +167,7 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
             "recogito_lat",
             "recogito_lon")
      
-        val p = Paths.get(TMP_DIR, s"${UUID.randomUUID}.csv")
+        val p = Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv")
         val tmp = tmpFile.create(p)
         val underlying = p.toFile
         val writerConfig = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(headerFields))
