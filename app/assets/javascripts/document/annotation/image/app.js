@@ -25,6 +25,7 @@ require([
   Config,
   ReadEditor,
   WriteEditor,
+  Annotations,
   LoadIndicator,
   BaseApp,
   IIIFImageInfo,
@@ -55,7 +56,7 @@ require([
           selector = new SelectionHandler(contentNode, olMap, highlighter),
 
           editor = (Config.writeAccess) ?
-            new WriteEditor(contentNode, selector, annotations.readOnly(), { autoscroll: false }) :
+            new WriteEditor(contentNode, annotations.readOnly(), selector, { autoscroll: false }) :
             new ReadEditor(contentNode, annotations.readOnly(), { autoscroll: false }),
 
           help = new Help(),
@@ -90,7 +91,7 @@ require([
       toolbar.on('toolChanged', onToolChanged);
       toolbar.on('toggleHelp', onToggleHelp);
 
-      BaseApp.apply(this, [ highlighter, selector ]);
+      BaseApp.apply(this, [ annotations, highlighter, selector ]);
 
       viewer.on('fullscreen', onToggleFullscreen);
 

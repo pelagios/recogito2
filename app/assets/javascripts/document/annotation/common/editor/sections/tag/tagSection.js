@@ -13,9 +13,7 @@ define([
     var element = (Config.writeAccess) ? jQuery(
           '<div class="section tags">' +
             '<ul></ul>' +
-            // TODO need to re-style this to an input[type=text]
-            // '<div contenteditable="true" spellcheck="false" class="add-tag" data-placeholder="Add tag..." />' +
-            '<input type="text" class="add-tag"></input>' +
+            '<input type="text" class="add-tag" placeholder="Add tag..."></input>' +
           '</div>') : jQuery('<div class="section tags readonly"><ul></ul></div>'),
 
         taglist = element.find('ul'),
@@ -128,7 +126,7 @@ define([
 
         /** Tags that are currently in 'draft' in the edit field **/
         getDraftTags = function() {
-          var str = textarea.text().trim(); //.split(',');
+          var str = textarea.val().trim(); //.split(',');
           if (str)
             return str.split(',');
           else
@@ -142,7 +140,7 @@ define([
             jQuery.each(tags, function(idx, chars) {
               addTag(chars.trim());
             });
-            textarea.empty();
+            textarea.val('');
             return false;
           }
         },

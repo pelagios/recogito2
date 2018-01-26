@@ -1,4 +1,6 @@
-define([], function() {
+define([
+  'common/utils/annotationUtils'
+], function(Utils) {
 
   var Annotations = function() {
 
@@ -7,7 +9,17 @@ define([], function() {
         uniqueTags = [],
 
         add = function(annotations) {
-          console.log('Adding ' + annotations.length + ' annotations');
+          // TODO just a quick hack to parse unique tags
+          annotations.forEach(function(a) {
+            var tags = Utils.getBodiesOfType(a, 'TAG').map(function(t) {
+                  return t.value;
+                });
+
+            tags.forEach(function(tag) {
+              if (uniqueTags.indexOf(tag) < 0)
+                uniqueTags.push(tag);
+            });
+          });
         },
 
         remove = function(annotation) {
@@ -19,13 +31,12 @@ define([], function() {
         },
 
         getUniqueTags = function() {
-          return ['my', 'tags', 'foobar'];
+          return uniqueTags;
         },
 
         getAnnotations = function(filter) {
 
         };
-
 
     this.add = add;
     this.remove = remove;

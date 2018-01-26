@@ -14,16 +14,21 @@
   margin-top:14px;
   margin-left:-8px;
   width:450px;
+  .rounded-corners(3px);
   .box-shadow(2px, 2px, 42px, rgba(0, 0, 0, 0.4));
-  .rounded-corners(4px);
   font-family:PTSansNarrow;
   cursor:auto;
 
+  .annotation-editor-popup-inner > div:first-child {
+    .rounded-corners-top(3px);
+  }
+
+  .annotation-editor-popup-inner > div:last-child {
+    .rounded-corners-bottom(3px);
+  }
+
   .annotation-editor-popup-inner {
-    .rounded-corners(4px);
-    overflow:hidden;
     perspective:1px;
-    background-color:@blueish-white;
     color:@nightsky-type;
 
     .category-buttons {

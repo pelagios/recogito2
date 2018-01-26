@@ -6,9 +6,10 @@
  */
 define([
   'common/utils/annotationUtils',
+  'common/config',
   'common/hasEvents',
   'document/annotation/common/editor/sections/sectionList'
-], function(AnnotationUtils, HasEvents, SectionList) {
+], function(AnnotationUtils, Config, HasEvents, SectionList) {
 
   var EditorBase = function(container, element, annotations, opts) {
     var self = this,
@@ -33,6 +34,9 @@ define([
 
     this.sectionList = new SectionList(element, annotations);
     this.currentSelection = false;
+
+    // Remove 'transcription' container in text mode
+    element.find('.transcription-sections').remove();
 
     // Monitor key events
     jQuery(document.body).keydown(onKeyDown);
