@@ -47,7 +47,7 @@ define([
     self.header.showStatusSaving();
     API.storeAnnotation(annotationStub)
        .done(function(annotation) {
-         // Update header info
+         self.annotations.add(annotation);
          self.header.incrementAnnotationCount();
          self.header.updateContributorInfo(Config.me);
          self.header.showStatusSaved();
@@ -75,7 +75,7 @@ define([
     self.header.showStatusSaving();
     API.storeAnnotationBatch(annotationStubs)
        .done(function(annotations) {
-         // Update header info
+         self.annotations.add(annotations);
          self.header.incrementAnnotationCount(annotations.length);
          self.header.updateContributorInfo(Config.me);
          self.header.showStatusSaved();

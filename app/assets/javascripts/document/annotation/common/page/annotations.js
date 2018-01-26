@@ -10,7 +10,8 @@ define([
 
         add = function(annotations) {
           // TODO just a quick hack to parse unique tags
-          annotations.forEach(function(a) {
+          var arr = (jQuery.isArray(annotations)) ? annotations : [ annotations ];
+          arr.forEach(function(a) {
             var tags = Utils.getBodiesOfType(a, 'TAG').map(function(t) {
                   return t.value;
                 });
