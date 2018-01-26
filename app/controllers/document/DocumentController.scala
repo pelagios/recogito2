@@ -30,7 +30,7 @@ class DocumentController @Inject() (
   def initialDocumentView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationView(docId, 1))
   }
-  
+
   /** Common retrieval code for tiles and manifests **/
   private def getTilesetFile(document: DocumentRecord, part: DocumentFilepartRecord, filepath: String): Future[Option[File]] = Future {
     scala.concurrent.blocking {
@@ -51,25 +51,23 @@ class DocumentController @Inject() (
 
   /** Gets the image manifest for the given document part.
     * - for uploaded images, returns the Zoomify ImageProperties.xml file
-    * - for IIIF, returns a redirect to the original location of the IIIF info.json   
-    * - in case the document is not an image, returns a BadRequest   
+    * - for IIIF, returns a redirect to the original location of the IIIF info.json
+    * - in case the document is not an image, returns a BadRequest
     */
   def getImageManifest(docId: String, partNo: Int) = silhouette.UserAwareAction.async { implicit request =>
     documentPartResponse(docId, partNo, request.identity, { case (doc, currentPart, accesslevel) =>
       ContentType.withName(currentPart.getContentType) match {
-        
         case Some(ContentType.IMAGE_UPLOAD) =>
           getTilesetFile(doc.document, currentPart, "ImageProperties.xml").map {
             case Some(file) => Ok.sendFile(file)
             case None => InternalServerError
           }
-          
+
         case Some(ContentType.IMAGE_IIIF) =>
           Future.successful(Redirect(currentPart.getFile))
-          
+
         case _ =>
           Future.successful(BadRequest)
-          
       }
     })
   }
@@ -86,14 +84,14 @@ class DocumentController @Inject() (
 
   /** Returns a thumbnail file for the given document part **/
   def getThumbnail(docId: String, partNo: Int) = silhouette.UserAwareAction.async { implicit request =>
-    
+
     import services.ContentType._
-    
+
     def iiifThumbnailURL(iiifUrl: String) =
       iiifUrl.substring(0, iiifUrl.length - 9) + "full/160,/0/default.jpg"
-    
+
     documentPartResponse(docId, partNo, request.identity, { case (doc, currentPart, accesslevel) =>
-      if (currentPart.getContentType == IMAGE_IIIF.toString) {        
+      if (currentPart.getContentType == IMAGE_IIIF.toString) {
         Future.successful(Redirect(iiifThumbnailURL(currentPart.getFile)))
       } else {
         uploads.openThumbnail(doc.ownerName, docId, currentPart.getFile).map {
@@ -103,7 +101,7 @@ class DocumentController @Inject() (
       }
     })
   }
-  
+
   /** Gets the raw content for the given document part **/
   def getRaw(docId: String, partNo: Int, lines: Option[Int]) = silhouette.UserAwareAction.async { implicit request =>
     documentPartResponse(docId, partNo, request.identity, { case (document, currentPart, accesslevel) =>
@@ -117,7 +115,7 @@ class DocumentController @Inject() (
                 Ok(Source.fromFile(file).getLines().take(limit).mkString("\n"))
                   .as("text/csv")
                   .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + currentPart.getId + "." + limit + ".csv" })
-                
+
               case None =>
                 Ok.sendFile(file)
             }

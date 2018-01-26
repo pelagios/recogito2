@@ -379,7 +379,7 @@ class AnnotationAPIController @Inject() (
 
           case None => {
             // Annotation on a non-existing document? Can't happen except DB integrity is broken
-            Logger.warn("Annotation points to document " + annotation.annotates.documentId + " but not in DB")
+            Logger.warn(s"Annotation points to document ${annotation.annotates.documentId} but not in DB")
             Future.successful(InternalServerError)
           }
         }

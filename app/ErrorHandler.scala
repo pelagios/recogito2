@@ -14,10 +14,10 @@ class ErrorHandler @Inject() (
   ) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
 
   override def onProdServerError(request: RequestHeader, exception: UsefulException) =
-    Future.successful(InternalServerError("A server error occurred: " + exception.getMessage))
+    Future.successful(InternalServerError(s"An error occurred: ${exception.getMessage}"))
 
   override def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
-    if (statusCode == 413)      // Request entity too large
+    if (statusCode == 413) // Request entity too large
       Future.successful(EntityTooLarge("Could not upload the file - too large"))
     else if (statusCode == 404) // Not Found
       Future.successful(NotFound(views.html.error404()))

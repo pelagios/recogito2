@@ -73,15 +73,15 @@ trait MetadataActions { self: SettingsController =>
       documentMetadataForm.bindFromRequest.fold(
         formWithErrors =>
           Future.successful(BadRequest(views.html.document.settings.metadata(formWithErrors, doc, request.identity))),
-        
+
         f =>
           documents.updateMetadata(
             docId, f.title, f.author, f.dateFreeform, f.description, f.language, f.source, f.edition, f.license, f.attribution
-          ).map { success => 
+          ).map { success =>
            if (success)
               Redirect(controllers.document.settings.routes.SettingsController.showDocumentSettings(docId, Some("metadata")))
                 .flashing("success" -> "Your settings have been saved.")
-            else 
+            else
               Redirect(controllers.document.settings.routes.SettingsController.showDocumentSettings(docId, Some("metadata")))
                 .flashing("error" -> "There was an error while saving your settings.")
           }.recover { case t:Throwable =>
@@ -92,31 +92,29 @@ trait MetadataActions { self: SettingsController =>
       )
     })
   }
-  
+
   def updateFilepartMetadata(docId: String, partId: UUID) = self.silhouette.SecuredAction.async { implicit request =>
-    
+
     def bindFromRequest(): Either[String, FilepartMetadata] =
       getFormParam("title") match {
         case Some(title) if title.isEmpty => Left("Title required")
         case Some(title) => Right(FilepartMetadata(title, getFormParam("source")))
         case None => Left("Title required")
       }
-  
+
     documentAdminAction(docId, request.identity.username, { doc =>
       // Make sure we're not updating a part that isn't in this document
       if (doc.fileparts.exists(_.getId == partId)) {
         bindFromRequest() match {
-          case Right(partMetadata) => 
+          case Right(partMetadata) =>
             documents.updateFilepartMetadata(doc.id, partId, partMetadata.title, partMetadata.source).map { success =>
-              if (success)
-                Ok
-              else
-                InternalServerError
+              if (success) Ok
+              else InternalServerError
             }
-            
+
           case Left(error) =>
             Future.successful(BadRequest(error))
-        }       
+        }
       } else {
         Future.successful(BadRequest)
       }

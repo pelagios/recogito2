@@ -63,7 +63,7 @@ class AnnotationController @Inject() (
             Redirect(routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo)
               .withFragment(annotationId.toString).toString)
           })
-            
+
           case None => Future.successful(NotFound)
         }
 
@@ -92,20 +92,20 @@ class AnnotationController @Inject() (
     loggedInUser: Option[User],
     accesslevel: DocumentAccessLevel
   )(implicit request: RequestHeader) = {
-    
+
     logDocumentView(doc.document, Some(currentPart), accesslevel)
-    
+
     // Needed in any case - start now (val)
     val fCountAnnotations = annotations.countByDocId(doc.id)
-    
+
     // Needed only for Text and TEI - start on demand (def)
-    def fReadTextfile() = uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile) 
-      
+    def fReadTextfile() = uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile)
+
     ContentType.withName(currentPart.getContentType) match {
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
         fCountAnnotations.map(c => Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c)))
-          
+
       case Some(ContentType.TEXT_PLAIN) =>
         fReadTextfile() flatMap {
           case Some(content) =>
@@ -113,10 +113,10 @@ class AnnotationController @Inject() (
 
           case None =>
             // Filepart found in DB, but not file on filesystem
-            Logger.error("Filepart recorded in the DB is missing on the filesystem: " + doc.ownerName + ", " + doc.id)
+            Logger.error(s"Filepart recorded in the DB is missing on the filesystem: ${doc.ownerName}, ${doc.id}")
             Future.successful(InternalServerError)
         }
-      
+
       case Some(ContentType.TEXT_TEIXML) =>
         fReadTextfile flatMap {
           case Some(content) =>
@@ -124,13 +124,13 @@ class AnnotationController @Inject() (
               val preview = previewFromTEI(content)
               Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c))
             }
-              
+
           case None =>
             // Filepart found in DB, but not file on filesystem
-            Logger.error("Filepart recorded in the DB is missing on the filesystem: " + doc.ownerName + ", " + doc.id)
+            Logger.error(s"Filepart recorded in the DB is missing on the filesystem: ${doc.ownerName}, ${doc.id}")
             Future.successful(InternalServerError)
         }
-        
+
       case Some(ContentType.DATA_CSV) =>
         fCountAnnotations.map(c => Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, c)))
 
@@ -138,7 +138,7 @@ class AnnotationController @Inject() (
         // Unknown content type in DB, or content type we don't have an annotation view for - should never happen
         Future.successful(InternalServerError)
     }
-    
+
   }
 
 }
