@@ -30,3 +30,17 @@ landing.index.news.html=Wir freuen uns dass ab sofort die Ortsdaten des \
   chinesischen Kaiserzeit, von 221 v. Chr. bis 1911. Herzlichen Dank an Lex Berman und das \
   <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> für \
   diese grossartige Initiative!
+
+# Key messages
+landing.index.tiles.1.title=Sammlungen Teilen
+landing.index.tiles.1.text=Lade Texte und Bilder hoch. Erstelle eigene Sammlungen. Arbeite \
+  individuell oder im Team.
+landing.index.tiles.2.title=Kooperativ Annotieren
+landing.index.tiles.2.text=Erstelle Notizen, Tags und Kommentare. Recogito speichert die \
+  volle Versionshistorie.
+landing.index.tiles.3.title=Semantik Inklusive
+landing.index.tiles.3.text=Verknüpfe Orte und Personen einfach mit kontrollierten Vokabularen und \
+  Thesauri.
+landing.index.tiles.4.title=Open Data
+landing.index.tiles.4.text=Veröffentliche die Ergebnisse deiner Arbeit am Web - einfach und als \
+  Linked Open Data.
