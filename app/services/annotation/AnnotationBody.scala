@@ -46,7 +46,7 @@ case class AnnotationBody (
   
 }
 
-object AnnotationBody extends Enumeration with HasDate {
+object AnnotationBody extends Enumeration {
 
   type Type = Value
 
@@ -63,14 +63,19 @@ object AnnotationBody extends Enumeration with HasDate {
   val TAG = Value("TAG")
 
   val TRANSCRIPTION = Value("TRANSCRIPTION")
-
+  
   implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] =
     Format(
       JsPath.read[String].map(AnnotationBody.withName(_)),
       Writes[AnnotationBody.Type](t => JsString(t.toString))
     )
 
-  implicit val annotationBodyFormat: Format[AnnotationBody] = (
+}
+
+/** Backend/ES serialization includes the union Id (which is for internal use only) **/
+object BackendAnnotationBody extends HasDate {
+
+  implicit val backendAnnotationBodyFormat: Format[AnnotationBody] = (
     (JsPath \ "type").format[AnnotationBody.Value] and
     (JsPath \ "last_modified_by").formatNullable[String] and
     (JsPath \ "last_modified_at").format[DateTime] and
@@ -81,3 +86,26 @@ object AnnotationBody extends Enumeration with HasDate {
   )(AnnotationBody.apply, unlift(AnnotationBody.unapply))
 
 }
+
+/** Frontend serialization includes only URIs **/
+object FrontendAnnotationBody extends HasDate {
+
+  implicit val frontendAnnotationBodyWrites: Writes[AnnotationBody] = (
+    (JsPath \ "type").write[AnnotationBody.Value] and
+    (JsPath \ "last_modified_by").writeNullable[String] and
+    (JsPath \ "last_modified_at").write[DateTime] and
+    (JsPath \ "value").writeNullable[String] and
+    (JsPath \ "uri").writeNullable[String] and
+    (JsPath \ "note").writeNullable[String] and
+    (JsPath \ "status").writeNullable[AnnotationStatus]
+  )(b => (
+      b.hasType,
+      b.lastModifiedBy,
+      b.lastModifiedAt,
+      b.value,
+      b.reference.map(_.uri),
+      b.note,
+      b.status))
+
+}
+

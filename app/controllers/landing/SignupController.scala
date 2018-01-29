@@ -132,6 +132,9 @@ class SignupController @Inject() (
           "content_type" -> filepart.getContentType
         )
       )
+      
+    // Backend annotation format
+    import services.annotation.BackendAnnotation._
 
     for {
       _ <- documents.importDocument(document, Seq((filepart, fileInputStream)))    

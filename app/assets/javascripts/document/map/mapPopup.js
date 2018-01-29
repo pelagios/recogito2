@@ -71,9 +71,8 @@ define([
             // Important: not all PLACE bodies in the annotation necessarily
             // refer to this place!
             jQuery.each(placeBodies, function(j, b) {
-              var uri = (b.reference) ? b.reference.uri : false;
-              if (uri && placeURIs.indexOf(uri) > -1 && distinctURIs.indexOf(uri) < 0)
-                distinctURIs.push(uri);
+              if (b.uri && placeURIs.indexOf(b.uri) > -1 && distinctURIs.indexOf(b.uri) < 0)
+                distinctURIs.push(b.uri);
             });
           });
 

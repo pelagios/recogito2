@@ -47,7 +47,7 @@ case class AnnotationBodyStub(
   lastModifiedBy: Option[String],
   lastModifiedAt: Option[DateTime],
   value         : Option[String],
-  uri           : Option[Reference],
+  uri           : Option[String],
   note          : Option[String],
   status        : Option[AnnotationStatusStub])
 
@@ -58,7 +58,7 @@ object AnnotationBodyStub extends HasDate {
     (JsPath \ "last_modified_by").readNullable[String] and
     (JsPath \ "last_modified_at").readNullable[DateTime] and
     (JsPath \ "value").readNullable[String] and
-    (JsPath \ "reference").readNullable[Reference] and
+    (JsPath \ "uri").readNullable[String] and
     (JsPath \ "note").readNullable[String] and
     (JsPath \ "status").readNullable[AnnotationStatusStub]
   )(AnnotationBodyStub.apply _)
@@ -100,6 +100,9 @@ class AnnotationAPIController @Inject() (
       with HasTextSnippets
       with HasTEISnippets
       with HasCSVParsing {
+  
+  // Frontent serialization format
+  import services.annotation.FrontendAnnotation._
 
   def listAnnotationsInDocument(docId: String) = listAnnotations(docId, None)
 

@@ -90,7 +90,7 @@ define([
                   bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
                   coord = topPlace.representative_point;
 
-              placeBody.reference = { uri: bestRecord.uri };
+              placeBody.uri = bestRecord.uri;
               fillTemplate(bestRecord, verificationStatus, lastModified, coord);
             } else {
               fillTemplate(false, verificationStatus, lastModified);
@@ -103,7 +103,7 @@ define([
           var lastModified = { by: Config.me, at: new Date() };
 
           // Diffs contain uri and status info
-          if (placeBody.reference.uri !== diff.uri && diff.uri) {
+          if (placeBody.uri !== diff.uri && diff.uri) {
             // There's a new URI - update the place card
             fillFromURI(diff.uri, diff.status, lastModified);
           } else if (!diff.uri) {
@@ -117,9 +117,9 @@ define([
             delete placeBody.last_modified_at;
             placeBody.status = diff.status;
             if (diff.uri)
-              placeBody.reference.uri = diff.uri;
+              placeBody.uri = diff.uri;
             else
-              delete placeBody.reference.uri;
+              delete placeBody.uri;
           });
         },
 
@@ -156,9 +156,9 @@ define([
 
         init = function() {
           var lastModified = { by: placeBody.last_modified_by, at: placeBody.last_modified_at };
-          if (placeBody.reference)
+          if (placeBody.uri)
             // Resolve the URI contained in the annotation body
-            fillFromURI(placeBody.reference.uri, placeBody.status, lastModified);
+            fillFromURI(placeBody.uri, placeBody.status, lastModified);
           else if (opt_toponym && placeBody.status.value === 'UNVERIFIED')
             // No URI - if the annotation is still UNVERIFIED, fetch a suggestion
             fillFromToponym(opt_toponym, placeBody.status, lastModified);

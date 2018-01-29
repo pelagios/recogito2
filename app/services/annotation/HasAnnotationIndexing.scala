@@ -15,6 +15,9 @@ import services.entity.builtin.IndexedEntity
   * we extract this into a re-usable trait.
   */
 trait HasAnnotationIndexing {
+  
+  // Frontent serialization format
+  import services.annotation.BackendAnnotation._
 
   implicit object AnnotationIndexable extends Indexable[Annotation] {
     override def json(a: Annotation): String = Json.stringify(Json.toJson(a))

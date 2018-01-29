@@ -61,12 +61,12 @@ require([
           // Loop through all place bodies of all annotations
           jQuery.each(annotations, function(i, annotation) {
             jQuery.each(AnnotationUtils.getBodiesOfType(annotation, 'PLACE'), function(j, placeBody) {
-              if (placeBody.reference) {
-                var annotationsAtPlace = annotationsByGazetteerURI[placeBody.reference.uri];
+              if (placeBody.uri) {
+                var annotationsAtPlace = annotationsByGazetteerURI[placeBody.uri];
                 if (annotationsAtPlace)
                   annotationsAtPlace.push(annotation);
                 else
-                  annotationsByGazetteerURI[placeBody.reference.uri] = [ annotation ];
+                  annotationsByGazetteerURI[placeBody.uri] = [ annotation ];
               }
             });
           });

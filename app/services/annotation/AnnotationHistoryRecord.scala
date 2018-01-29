@@ -45,6 +45,9 @@ case class AnnotationHistoryRecord (
 
 object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
   
+  // Backend serialization
+  import services.annotation.BackendAnnotationBody._
+  
   protected def fromOptBoolean(o: Option[Boolean]) =
     o.getOrElse(false)
 

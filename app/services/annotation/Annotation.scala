@@ -29,9 +29,12 @@ object AnnotatedObject extends HasContentTypeList {
 
 }
 
-object Annotation extends HasDate {
-
-  implicit val annotationFormat: Format[Annotation] = (
+object BackendAnnotation extends HasDate {
+  
+  // Backend body serialization
+  import services.annotation.BackendAnnotationBody._
+  
+  implicit val backendAnnotationFormat: Format[Annotation] = (
     (JsPath \ "annotation_id").format[UUID] and
     (JsPath \ "version_id").format[UUID] and
     (JsPath \ "annotates").format[AnnotatedObject] and
@@ -42,4 +45,22 @@ object Annotation extends HasDate {
     (JsPath \ "bodies").format[Seq[AnnotationBody]]
   )(Annotation.apply, unlift(Annotation.unapply))
 
+}
+
+object FrontendAnnotation extends HasDate {
+
+  // Frontend body serialization
+  import services.annotation.FrontendAnnotationBody._
+  
+  implicit val frontendAnnotationWrites: Writes[Annotation] = (
+    (JsPath \ "annotation_id").write[UUID] and
+    (JsPath \ "version_id").write[UUID] and
+    (JsPath \ "annotates").write[AnnotatedObject] and
+    (JsPath \ "contributors").write[Seq[String]] and
+    (JsPath \ "anchor").write[String] and
+    (JsPath \ "last_modified_by").writeNullable[String] and
+    (JsPath \ "last_modified_at").write[DateTime] and
+    (JsPath \ "bodies").write[Seq[AnnotationBody]]
+  )(unlift(Annotation.unapply))
+  
 }
