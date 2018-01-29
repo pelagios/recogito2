@@ -19,6 +19,8 @@ class TestAnnotationValidator extends HasAnnotationValidation
 @RunWith(classOf[JUnitRunner])
 class HasAnnotationValidationSpec extends Specification {
   
+  import services.annotation.BackendAnnotation._
+  
   val validator = new TestAnnotationValidator()
   
   private def loadAnnotation(name: String) =

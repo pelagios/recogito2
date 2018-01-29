@@ -1,4 +1,4 @@
-@()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+@()(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
@@ -37,11 +37,15 @@
         </span>
 
         <span class="links">
-          <a href="@controllers.help.routes.HelpController.showTutorial()">Tutorial</a>
+          <a href="@controllers.help.routes.HelpController.showTutorial()">
+            @messages("landing.index.link.tutorial")
+          </a>
         </span>
 
         <span class="header-buttons">
-          <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm(None)" class="btn outline">Log In</a>
+          <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm(None)" class="btn outline">
+            @messages("landing.index.link.login")
+          </a>
         </span>
       </div>
     </div>
@@ -49,40 +53,50 @@
     <div class="jumbotron">
       <div class="inner">
         <div class="jumbotron-left">
-          <h2>Linked Data annotation</br>without the pointy brackets</h2>
+          <h2>
+            @messages("landing.index.jumbotron.tagline.1")</br>
+            @messages("landing.index.jumbotron.tagline.2")
+          </h2>
           <p>
-            Create maps from text. Annotate images. Connect your
-            research to other data on the Web and make it more open, visible
-            and re-usable. Without the need to become a Semantic Web expert.
+            @messages("landing.index.jumbotron.blurb")
           </p>
-          <a href="@controllers.help.routes.HelpController.showTutorial()">Learn More</a>
+          <a href="@controllers.help.routes.HelpController.showTutorial()">
+            @messages("landing.index.jumbotron.label.learn_more")
+          </a>
         </div> <!-- jumbotron-left -->
 
         <div class="jumbotron-right">
           <form action="/signup" method="POST" autocomplete="off">
             <dl id="username_field">
               <dd>
-                <input type="text" id="username" name="username" placeholder="Pick a username" autocomplete="off"/>
+                <input type="text" id="username" name="username" autocomplete="off"
+                  placeholder="@messages("landing.index.registration_form.placeholder.username")" />
               </dd>
             </dl>
 
             <dl id="email_field">
               <dd>
-                <input type="text" id="email" name="email"placeholder="Your email address" autocomplete="off"/>
+                <input type="text" id="email" name="email" autocomplete="off"
+                  placeholder="@messages("landing.index.registration_form.placeholder.email")"/>
               </dd>
             </dl>
 
             <dl id="password_field">
               <dd>
-                <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="off"/>
+                <input type="password" id="password" name="password" autocomplete="off"
+                  placeholder="@messages("landing.index.registration_form.placeholder.password")"/>
               </dd>
             </dl>
 
-            <button type="submit" class="btn">Register for Recogito</button>
+            <button type="submit" class="btn">
+              @messages("landing.index.registration_form.placeholder.register")
+            </button>
 
             <p class="disclaimer">
-              By signing up, you confirm that you have read and agree to our
-              <a href="@controllers.landing.routes.SignupController.showSignupForm">Terms and Conditions of Use</a>.
+              @messages("landing.index.registration_form.disclaimer.text_before")<!--
+              --><a href="@controllers.landing.routes.SignupController.showSignupForm">
+                @messages("landing.index.registration_form.disclaimer.link")</a><!--
+              -->@messages("landing.index.registration_form.disclaimer.text_after")
             </p>
           </form>
         </div> <!-- jumbotron-right -->
@@ -92,16 +106,14 @@
     <div class="featurette inner">
       <div class="columns">
         <div class="one-quarter column">
-          <h3>New in Recogito:<br/>China Historical GIS</h3>
+          <h3>
+            @messages("landing.index.news.title")<br/>
+            @messages("landing.index.news.subtitle")
+          </h3>
         </div>
         <div class="three-quarters column">
           <p>
-            We are excited to announce that data from the
-            <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a>
-            is now available in Recogito. This adds more than 71,000 places of Dynastic
-            China from 221 BCE to 1911 CE to our geographical index. Our thanks to Lex
-            Berman and the <a href="http://gis.harvard.edu/" target="_blank">Harvard
-            Center for Geographic Analysis</a> for maintaining this brilliant resource!
+            @Html(messages("landing.index.news.html"))
           </p>
         </div>
       </div>

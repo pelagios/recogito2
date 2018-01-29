@@ -15,6 +15,8 @@ import play.api.libs.json.Json
 @RunWith(classOf[JUnitRunner])
 class AnnotationSpec extends Specification {
   
+  import services.annotation.BackendAnnotation._
+  
   private val DATE_TIME_PATTERN = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
   
   "The sample text annotation" should {

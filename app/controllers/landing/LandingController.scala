@@ -8,11 +8,13 @@ import services.user.UserService
 import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
+import play.api.i18n.Langs
 import play.api.libs.json.Json
 import play.api.mvc.{ Action, AbstractController }
 import scala.concurrent.ExecutionContext
 import play.api.mvc.ControllerComponents
 import com.mohiva.play.silhouette.api.Silhouette
+import play.api.i18n.I18nSupport
 
 @Singleton
 class LandingController @Inject() (
@@ -25,9 +27,9 @@ class LandingController @Inject() (
     implicit val ctx: ExecutionContext,
     implicit val visits: VisitService,
     implicit val webjars: WebJarsUtil
-) extends AbstractController(components) with HasConfig with HasUserService with HasVisitLogging with HasPrettyPrintJSON {
-
-  def index = silhouette.UserAwareAction { implicit request =>
+) extends AbstractController(components) with HasConfig with HasUserService with HasVisitLogging with HasPrettyPrintJSON with I18nSupport {
+  
+  def index = silhouette.UserAwareAction { implicit request =>    
     request.identity match {
       case Some(user) =>
         Redirect(controllers.my.routes.MyRecogitoController.index(user.username, None, None, None, None, None))

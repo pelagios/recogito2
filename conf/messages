@@ -1,0 +1,32 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Splash page
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+landing.index.page_title=Welcome to Recogito
+landing.index.link.tutorial=Tutorial
+landing.index.link.login=Log In
+
+# Jumbotron and registration
+landing.index.jumbotron.tagline.1=Linked Data annnotation
+landing.index.jumbotron.tagline.2=without the pointy brackets
+landing.index.jumbotron.blurb=Create maps from text. Annotate images. Connect your research \
+  to other data on the Web and make it more open, visible and re-usable. Without \
+  the need to become a Semantic Web expert.
+landing.index.jumbotron.label.learn_more=Learn More
+landing.index.registration_form.placeholder.username=Pick a username
+landing.index.registration_form.placeholder.email=Your email address
+landing.index.registration_form.placeholder.password=Create a password
+landing.index.registration_form.placeholder.register=Register for Recogito
+landing.index.registration_form.disclaimer.text_before=By signing up, you confirm that you have \
+  read and agree to our
+landing.index.registration_form.disclaimer.link=Terms and Conditions of Use
+landing.index.registration_form.disclaimer.text_after=.
+
+# News
+landing.index.news.title=New in Recogito:
+landing.index.news.subtitle=China Historical GIS
+landing.index.news.html=We are excited to announce that data from the \
+  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> is now \
+  available in Recogito. This adds more than 71,000 places of Dynastic China from 221 BCE to 1911 \
+  CE to our geographical index. Our thanks to Lex Berman and the \
+  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> for \
+  maintaining this brilliant resource!

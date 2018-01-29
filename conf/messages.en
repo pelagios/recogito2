@@ -1,8 +1,0 @@
-# Splash page
-landing.index.title=Welcome to Recogito
-landing.index.link.tutorial=Tutorial
-landing.index.link.login=Log In
-landing.index.register.placeholder.username=Pick a username
-landing.index.register.placeholder.email=Your email address
-landing.index.register.placeholder.password=Create a password
-landing.index.register.placeholder.register=Register for Recogito

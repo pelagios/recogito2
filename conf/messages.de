@@ -1,0 +1,32 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Splash page
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+landing.index.page_title=Recogito
+landing.index.link.tutorial=Tutorial
+landing.index.link.login=Log In
+
+# Jumbotron and registration
+landing.index.jumbotron.tagline.1=Linked Data Annotation
+landing.index.jumbotron.tagline.2=ohne die spitzen Klammern
+landing.index.jumbotron.blurb=Erstelle Karten aus Text. Annotiere Bilder. Bringe deine \
+  Forschungsergebnisse ins World Wide Web und mache sie offener, sichtbarer und \
+  für andere wiederverwendbar. Ohne dass du dafür zum Semantic Web Experten werden musst.
+landing.index.jumbotron.label.learn_more=Erfahre mehr
+landing.index.registration_form.placeholder.username=Benutzername
+landing.index.registration_form.placeholder.email=Deine E-Mail Adresse
+landing.index.registration_form.placeholder.password=Wähle ein Password
+landing.index.registration_form.placeholder.register=Account Erstellen
+landing.index.registration_form.disclaimer.text_before=Mit dem Erstellen eines Recogito \
+  Accounts stimmst du unseren
+landing.index.registration_form.disclaimer.link=Nutzungsbedingungen
+landing.index.registration_form.disclaimer.text_after=' zu'.
+
+# News
+landing.index.news.title=Neu in Recogito:
+landing.index.news.subtitle=China Historical GIS
+landing.index.news.html=Wir freuen uns dass ab sofort die Ortsdaten des \
+  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> in \
+  Recogito verfügbar sind. Das erweitert unseren geographischen Index um mehr als 71.000 Orte der \
+  chinesischen Kaiserzeit, von 221 v. Chr. bis 1911. Herzlichen Dank an Lex Berman und das \
+  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> für \
+  diese grossartige Initiative!
