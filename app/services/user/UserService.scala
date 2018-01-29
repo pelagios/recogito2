@@ -16,7 +16,7 @@ import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.jooq.{ Record, SelectWhereStep }
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.cache.SyncCacheApi
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,12 +33,14 @@ class UserService @Inject() (
     implicit val ctx: ExecutionContext,
     implicit val db: DB
   ) extends BaseService with HasConfig with HasEncryption with IdentityService[User] {
+  
+  Logger.warn("starting user service")
 
   private val DEFAULT_QUOTA = config.getOptional[Int]("recogito.upload.quota").getOrElse(200) // The default default
 
   // Required by Silhouette auth framework
   override def retrieve(loginInfo: LoginInfo): Future[Option[User]] = findByUsername(loginInfo.providerKey)
-
+  
   def countUsers() = db.query { sql =>
     sql.selectCount().from(USER).fetchOne(0, classOf[Int])
   }

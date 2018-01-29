@@ -8,6 +8,7 @@ import services.user.UserService
 import services.user.Roles
 import org.jooq.impl.DSL
 import org.jooq.{ SQLDialect, DSLContext }
+import play.api.Logger
 import play.api.db.Database
 import scala.collection.JavaConversions._
 import scala.concurrent.{ ExecutionContext, Future }
@@ -53,12 +54,15 @@ class DBModule extends AbstractModule {
 @Singleton
 class DBInitializer @Inject() (db: Database, userService: UserService, implicit val ctx: ExecutionContext) {
 
-  // Does the user table exist? Run schema generation if not.
   db.withConnection { connection =>
+    // Does the user table exist? Run schema generation if not.
     if (!DSL.using(connection, DB.CURRENT_SQLDIALECTT).meta().getTables.map(_.getName.toLowerCase).contains("user")) {
       play.api.Logger.info("Empty database - initializing...")
       initDB(connection)
     }
+    
+    // Is the user table empty? If so, create the default admin user 
+    createDefaultUserIfEmpty()
   }
 
   /** Database setup **/
@@ -77,13 +81,27 @@ class DBInitializer @Inject() (db: Database, userService: UserService, implicit 
 
     statement.executeBatch()
     statement.close()
-
-    val f = for {
-      _ <- userService.insertUser("recogito", "recogito@example.com", "recogito")
-      _ <- userService.insertUserRole("recogito", Roles.Admin)
-    } yield()
-
-    f.recover { case t: Throwable => t.printStackTrace() }
   }
+  
+  private def createDefaultUserIfEmpty() =
+    userService.countUsers.map { count =>
+      if (count == 0) {
+        Logger.warn("#######################################################")
+        Logger.warn("# Empty user table - creating default recogito/recogito")
+        Logger.warn("#######################################################")
+        
+        val f = for {
+          _ <- userService.insertUser("recogito", "recogito@example.com", "recogito")
+          _ <- userService.insertUserRole("recogito", Roles.Admin)
+        } yield()
+  
+        f.map { _ =>
+          Logger.warn("# Done. Make sure to remove this user in production!")
+          Logger.warn("#######################################################")
+        } recover { case t: Throwable => t.printStackTrace() }
+      }
+    } recover { case t: Throwable =>
+      t.printStackTrace()
+    }
 
 }
