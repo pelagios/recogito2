@@ -5,13 +5,14 @@
  *
  */
 define([
+  'i18n!common/i18n/document/annotation/nls/editor',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
   'document/annotation/common/editor/editorBase',
   'document/annotation/common/editor/textEntryField',
   'document/annotation/common/georesolution/georesolutionPanel'
-], function(AnnotationUtils, PlaceUtils, API, EditorBase, TextEntryField, GeoresolutionPanel) {
+], function(I18N, AnnotationUtils, PlaceUtils, API, EditorBase, TextEntryField, GeoresolutionPanel) {
 
   var WriteEditor = function(container, annotations, selectionHandler, options) {
     var self = this,
@@ -25,17 +26,17 @@ define([
                     '<div class="category-buttons">' +
                       '<div class="category-container">' +
                         '<div class="category place">' +
-                          '<span class="icon">&#xf041;</span> Place' +
+                          '<span class="icon">&#xf041;</span> ' + I18N.label_place +
                         '</div>' +
                       '</div>' +
                       '<div class="category-container">' +
                         '<div class="category person">' +
-                          '<span class="icon">&#xf007;</span> Person' +
+                          '<span class="icon">&#xf007;</span> ' + I18N.label_person +
                         '</div>' +
                       '</div>' +
                       '<div class="category-container">' +
                         '<div class="category event">' +
-                          '<span class="icon">&#xf005;</span> Event' +
+                          '<span class="icon">&#xf005;</span> ' + I18N.label_event +
                         '</div>' +
                       '</div>' +
                     '</div>' +
@@ -64,7 +65,7 @@ define([
         btnOk = element.find('button.ok'),
 
         replyField = new TextEntryField(element.find('.reply-section'), {
-          placeholder : 'Add a comment...',
+          placeholder : I18N.placeholder_add_comment,
           cssClass    : 'reply',
           bodyType    : 'COMMENT'
         }),

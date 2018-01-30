@@ -6,7 +6,6 @@ require.config({
 require([], function() {
 
   jQuery(document).ready(function() {
-
     var widget = jQuery('.recogito-rightnow'),
 
         annotationsEl = widget.find('.annotations h3'),

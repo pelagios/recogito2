@@ -1,8 +1,9 @@
 define([
+  'i18n!common/i18n/document/annotation/nls/editor',
   'common/config',
   'document/annotation/common/editor/sections/section',
   'document/annotation/common/editor/sections/tag/tagAutocomplete'
-], function(Config, Section, TagAutocomplete) {
+], function(I18N, Config, Section, TagAutocomplete) {
 
   var DELETE_WIDTH = 23,
 
@@ -13,7 +14,7 @@ define([
     var element = (Config.writeAccess) ? jQuery(
           '<div class="section tags">' +
             '<ul></ul>' +
-            '<input type="text" class="add-tag" placeholder="Add tag..."></input>' +
+            '<input type="text" class="add-tag" placeholder="' + I18N.placeholder_add_tag + '"></input>' +
           '</div>') : jQuery('<div class="section tags readonly"><ul></ul></div>'),
 
         taglist = element.find('ul'),

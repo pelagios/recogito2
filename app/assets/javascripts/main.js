@@ -1,7 +1,10 @@
 require.config({
   baseUrl : "/assets/javascripts",
   fileExclusionRegExp : /^lib$/,
-  paths: { marked: '../../../web-modules/main/webjars/lib/marked/marked.min' },
+  paths: {
+    marked: '../../../web-modules/main/webjars/lib/marked/marked.min',
+    i18n: '../../../../../public/vendor/i18n'
+  },
   modules : [
     { name : 'admin/dashboard' },
     { name : 'admin/maintenance' },
@@ -23,5 +26,5 @@ require.config({
     { name : 'my/upload/step2' },
     { name : 'my/upload/step3' },
     { name : 'my/index' }
- ]
+  ]
 });
