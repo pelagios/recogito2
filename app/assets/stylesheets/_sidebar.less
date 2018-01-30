@@ -8,69 +8,69 @@
   background-color:@nightsky;
   font-family:OpenSans;
   box-sizing:border-box;
+}
 
-  .sidebar-header {
-    background-color:@ocean;
-    height:70px;
-    box-sizing:border-box;
-    padding:12px 10px;
-    font-family:PTSansNarrow;
-    font-size:15px;
+.sidebar-header {
+  background-color:@ocean;
+  height:70px;
+  box-sizing:border-box;
+  padding:12px 10px;
+  font-family:PTSansNarrow;
+  font-size:15px;
+  width:@sidebar-width;
 
-    a { text-decoration:none; }
+  a { text-decoration:none; }
 
-    h1, h2 {
-      margin:0;
-      padding:0;
-      line-height:125%;
-      font-weight:normal;
-    }
-
-    h1 {
-      font-size:20px;
-      color:#fff;
-    }
-
-    h2 {
-      font-size:15px;
-      color:@lightblue-type-disabled;
-    }
-
-  } /** .sidebar-header **/
-
-  ul.menu {
-    position:relative;
-    list-style-type:none;
+  h1, h2 {
     margin:0;
-    padding:10px 0;
+    padding:0;
+    line-height:125%;
+    font-weight:normal;
+  }
+
+  h1 {
+    font-size:20px;
+    color:#fff;
+  }
+
+  h2 {
+    font-size:15px;
+    color:@lightblue-type-disabled;
+  }
+
+} /** .sidebar-header **/
+
+ul.menu {
+  position:relative;
+  list-style-type:none;
+  margin:0;
+  padding:10px 0;
 
 
-    li.active {
-      background-color:rgba(255, 255, 255, 0.3);
-    }
+  li.active {
+    background-color:rgba(255, 255, 255, 0.3);
+  }
 
-    li:not(.active):hover {
-      background-color:rgba(255, 255, 255, 0.15);
-    }
+  li:not(.active):hover {
+    background-color:rgba(255, 255, 255, 0.15);
+  }
 
-    a {
-      font-size:14px;
-      color:rgba(255, 255, 255, 0.4);
-      box-sizing:border-box;
-      width:100%;
-      display:inline-block;
-      padding:6px 20px;
-      text-decoration:none;
-    }
+  a {
+    font-size:14px;
+    color:rgba(255, 255, 255, 0.4);
+    box-sizing:border-box;
+    width:100%;
+    display:inline-block;
+    padding:6px 20px;
+    text-decoration:none;
+  }
 
-    li.active > a, a:hover {
-      color:#fff;
-    }
+  li.active > a, a:hover {
+    color:#fff;
+  }
 
-    .icon {
-      padding-right:5px;
-    }
-
+  .icon {
+    padding-right:5px;
   }
 
 }

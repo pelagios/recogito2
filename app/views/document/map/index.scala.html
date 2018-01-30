@@ -25,13 +25,15 @@
   </head>
   <body>
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "map")
-
-    <div class="sidebar">
-      @views.html.sidebarHeader(doc.owner)
-    </div>
+    @views.html.sidebarHeader(doc.owner)
 
     <div class="map-container">
       <div class="map"></div>
+
+      <!--div class="map-options">
+
+      </div-->
+
       <div class="map-controls">
         <div class="layers control icon" title="Change base layer">&#xf0c9;</div>
         <div class="zoom">

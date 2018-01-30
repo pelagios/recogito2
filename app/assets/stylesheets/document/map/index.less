@@ -3,12 +3,19 @@
 @import "../_map.less";
 @import "../_placedetails.less";
 
+.sidebar-header {
+  position:absolute;
+  top:0;
+  height:71px;
+  border-bottom:1px solid darken(@ocean, 3%);
+}
+
 .map-container {
   position:absolute;
   top:71px;
   right:0;
   bottom:0;
-  left:200px;
+  left:0;
 
   .map-controls {
     position:absolute;
@@ -16,7 +23,23 @@
     right:20px;
   }
 
+  .map-options {
+    position:absolute;
+    bottom:20px;
+    left:20px;
+    background-color:#fff;
+    width:280px;
+    height:36px;
+    line-height:37px;
+    font-size:14px;
+    color:@lightblue-type;
+    cursor:pointer;
+    .rounded-corners(2px);
+  }
+
 }
+
+
 
 .map td {
   border-color:@lightgrey-border-darker !important;
