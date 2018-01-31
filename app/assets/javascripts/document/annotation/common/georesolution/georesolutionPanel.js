@@ -1,12 +1,12 @@
 define([
   'document/annotation/common/georesolution/searchresultCard',
-  'common/map/map',
+  'common/map/basemap',
   'common/ui/countries',
   'common/ui/formatting',
   'common/utils/placeUtils',
   'common/api',
   'common/hasEvents'
-], function(ResultCard, Map, Countries, Formatting, PlaceUtils, API, HasEvents) {
+], function(ResultCard, BaseMap, Countries, Formatting, PlaceUtils, API, HasEvents) {
 
   var GeoresolutionPanel = function() {
 
@@ -96,7 +96,7 @@ define([
            */
           unlocatedPopup = false,
 
-          map = new Map(element.find('.map')),
+          map = new BaseMap(element.find('.map')),
 
           markerLayer = L.layerGroup(),
 

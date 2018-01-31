@@ -22,7 +22,7 @@ define([
             jQuery('html, body').animate({ scrollTop: scrollTo });
         };
 
-    this.annotations.add(annotations);
+    this.annotations.set(annotations);
     this.header.incrementAnnotationCount(annotations.length);
     // var startTime = new Date().getTime();
     this.highlighter.initPage(annotations);

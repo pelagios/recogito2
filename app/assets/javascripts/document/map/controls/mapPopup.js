@@ -3,7 +3,8 @@ define([
   'common/config',
   'common/ui/formatting',
   'common/utils/annotationUtils',
-  'common/utils/placeUtils'], function(API, Config, Formatting, AnnotationUtils, PlaceUtils) {
+  'common/utils/placeUtils'
+], function(API, Config, Formatting, AnnotationUtils, PlaceUtils) {
 
   var SLIDE_DURATION = 250;
 
@@ -157,11 +158,7 @@ define([
           }
         },
 
-        /**
-         * Fetches the preview snippet for an annotation via the API
-         *
-         * TODO needs to be revised once we have image snippets as well.
-         */
+        /** Fetches the preview snippet for an annotation via the API **/
         fetchSnippet = function() {
           return API.getAnnotation(annotations[currentAnnotationIdx].annotation_id, true);
         },

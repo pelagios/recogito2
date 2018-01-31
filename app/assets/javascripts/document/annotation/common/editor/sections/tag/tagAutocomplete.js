@@ -7,9 +7,9 @@ define([], function() {
                 var matches = [],
                     qLow = query.toLowerCase();
 
-                annotations.getUniqueTags().forEach(function(tag) {
+                annotations.listUniqueTags().forEach(function(tag) {
                   if (tag.toLowerCase().indexOf(qLow) === 0)
-                    matches.push(tag);  
+                    matches.push(tag);
                 });
 
                 responseFn(matches);

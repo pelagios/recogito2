@@ -4,7 +4,7 @@ define(['common/map/layerswitcher'], function(LayerSwitcher) {
 
       DEFAULT_CENTER = new L.LatLng(37.98, 23.73);
 
-  var Map = function(element) {
+  var BaseMap = function(element) {
 
     var Layers =  {
 
@@ -75,6 +75,6 @@ define(['common/map/layerswitcher'], function(LayerSwitcher) {
     this.leafletMap = map;
   };
 
-  return Map;
+  return BaseMap;
 
 });
