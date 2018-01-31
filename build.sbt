@@ -54,6 +54,8 @@ libraryDependencies ++= Seq(
 
   "org.apache.jena" % "jena-arq" % "3.1.0",
 
+  "org.apache.logging.log4j" % "log4j-to-slf4j" % "2.8.2",
+
   "org.geotools" % "gt-geojson" % "14.3",
 
   "org.jooq" % "jooq" % "3.7.2",
