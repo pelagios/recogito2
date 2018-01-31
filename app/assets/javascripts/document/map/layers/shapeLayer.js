@@ -1,19 +1,12 @@
-define(['document/map/palette'], function(Palette) {
+define([], function() {
 
-  var BASE_STYLE = {
-        color       : Palette.DEFAULT_STROKE_COLOR,
-        fillColor   : Palette.DEFAULT_FILL_COLOR,
-        opacity     : 1,
-        weight      : 1.5,
-        fillOpacity : 0.5
-      };
-
-  var ShapeLayer = function(map) {
+  var ShapeLayer = function(map, mapStyle) {
 
     var shapeLayer = L.layerGroup(),
 
         addShape = function(place) {
-          return L.geoJson(place.representative_geometry, BASE_STYLE).addTo(shapeLayer);
+          var style = mapStyle.getShapeStyle(place);
+          return L.geoJson(place.representative_geometry, style).addTo(shapeLayer);
         },
 
         // TODO clean up - shouldn't expose this to the outside

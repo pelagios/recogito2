@@ -5,8 +5,18 @@ define([
   'document/map/controls/filterPanel',
   'document/map/controls/mapPopup',
   'document/map/layers/pointLayer',
-  'document/map/layers/shapeLayer'
-], function(BaseMap, AnnotationUtils, PlaceUtils, FilterPanel, MapPopup, PointLayer, ShapeLayer) {
+  'document/map/layers/shapeLayer',
+  'document/map/style/mapStyle'
+], function(
+  BaseMap,
+  AnnotationUtils,
+  PlaceUtils,
+  FilterPanel,
+  MapPopup,
+  PointLayer,
+  ShapeLayer,
+  MapStyle
+) {
 
   var TOUCH_DISTANCE_THRESHOLD = 18;
 
@@ -16,9 +26,11 @@ define([
 
     var self = this,
 
-        pointLayer = new PointLayer(this),
+        mapStyle = new MapStyle(),
 
-        shapeLayer = new ShapeLayer(this),
+        pointLayer = new PointLayer(this, mapStyle),
+
+        shapeLayer = new ShapeLayer(this, mapStyle),
 
         filterPanel = new FilterPanel(jQuery('.map-container'), jQuery('.toggle-filterpanel')),
 
@@ -48,7 +60,9 @@ define([
           buildLookupTable(annotationView.listAll());
 
           pointLayer.init(annotationsByGazetteerURI);
-          shapeLayer.init(annotationsByGazetteerURI);          
+          shapeLayer.init(annotationsByGazetteerURI);
+
+          filterPanel.init(annotationView);
         },
 
         setPlaces = function(places) {

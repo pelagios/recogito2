@@ -1,23 +1,10 @@
-define(['document/map/palette'], function(Palette) {
+define([], function() {
 
   var MAX_MARKER_SIZE  = 11,
 
-      MIN_MARKER_SIZE = 4,
+      MIN_MARKER_SIZE = 4;
 
-      BASE_STYLE = {
-        color       : Palette.DEFAULT_STROKE_COLOR,
-        fillColor   : Palette.DEFAULT_FILL_COLOR,
-        opacity     : 1,
-        weight      : 1.5,
-        fillOpacity : 1
-      },
-
-      // TODO for future use
-      getStyle = function(col) {
-        return jQuery.extend({}, BASE_STYLE, {});
-      };
-
-  var PointLayer = function(map) {
+  var PointLayer = function(map, mapStyle) {
 
     var pointLayer = L.layerGroup(),
 
@@ -57,9 +44,8 @@ define(['document/map/palette'], function(Palette) {
           // The epic struggle between Leaflet vs. GeoJSON
           var latlng = [place.representative_point[1], place.representative_point[0]],
               annotationsForPlace = map.getAnnotationsForPlace(place),
-              color = '#fff',// getColor(annotationsForPlace),
               markerSize = markerScaleFn(annotationsForPlace.length),
-              style = jQuery.extend({}, getStyle(color), { radius: markerSize });
+              style = jQuery.extend({}, mapStyle.getPointStyle(place), { radius: markerSize });
 
           return L.circleMarker(latlng, style).addTo(pointLayer);
         },

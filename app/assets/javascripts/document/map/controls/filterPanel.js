@@ -15,6 +15,10 @@ define([], function() {
 
         legend = element.find('ul.legend'),
 
+        init = function(annotationView) {
+
+        },
+
         open = function() {
           element.velocity('slideDown', { duration: SLIDE_DURATION });
         },
@@ -30,8 +34,10 @@ define([], function() {
 
     toggleButton.click(toggle);
 
-    this.open = open;
     this.close = close;
+    this.init = init;
+    this.open = open;
+
   };
 
   return FilterPanel;
