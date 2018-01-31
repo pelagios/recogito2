@@ -62,7 +62,7 @@ define([
           pointLayer.init(annotationsByGazetteerURI);
           shapeLayer.init(annotationsByGazetteerURI);
 
-          filterPanel.init(annotationView);
+          mapStyle.init(annotationView);
         },
 
         setPlaces = function(places) {

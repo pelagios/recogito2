@@ -27,6 +27,13 @@ define(function() {
       return bodies;
     },
 
+    /** Shorthand **/
+    getTags : function(annotation) {
+      return this.getBodiesOfType(annotation, 'TAG').map(function(t) {
+        return t.value;
+      });
+    },
+
     /**
      * Returns the first 'entity body' found in the annotation,
      * i.e. the first body that's of PLACE, PERSON or EVENT type.

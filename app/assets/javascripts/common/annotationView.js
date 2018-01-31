@@ -19,6 +19,14 @@ define([
           uniqueTags = [];
         },
 
+        add = function() {
+          // TODO implement
+        },
+
+        remove = function() {
+          // TODO implement
+        },
+
         getFiltered = function(filter) {
           return annotation.filter(filter);
         },
@@ -28,11 +36,7 @@ define([
                 uniqueTags = [];
 
                 annotations.forEach(function(a) {
-                  var tags = Utils.getBodiesOfType(a, 'TAG').map(function(t) {
-                        return t.value;
-                      });
-
-                  tags.forEach(function(tag) {
+                  Utils.getTags(a).forEach(function(tag) {
                     if (uniqueTags.indexOf(tag) < 0)
                       uniqueTags.push(tag);
                   });
@@ -49,6 +53,8 @@ define([
           return annotations;
         };
 
+    this.add = add;
+    this.remove = remove;
     this.set = set;
 
     // This way we can hand out a 'read-only' reference to other UI components.

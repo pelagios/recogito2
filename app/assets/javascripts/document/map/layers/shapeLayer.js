@@ -5,7 +5,7 @@ define([], function() {
     var shapeLayer = L.layerGroup(),
 
         addShape = function(place) {
-          var style = mapStyle.getShapeStyle(place);
+          var style = mapStyle.getShapeStyle(place, map.getAnnotationsForPlace(place));
           return L.geoJson(place.representative_geometry, style).addTo(shapeLayer);
         },
 

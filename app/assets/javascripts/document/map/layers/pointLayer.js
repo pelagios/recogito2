@@ -41,11 +41,17 @@ define([], function() {
         },
 
         addMarker = function(place) {
-          // The epic struggle between Leaflet vs. GeoJSON
+              // The epic struggle between Leaflet vs. GeoJSON
           var latlng = [place.representative_point[1], place.representative_point[0]],
+
+              // TODO not nice - should link annotations to the place somehow
               annotationsForPlace = map.getAnnotationsForPlace(place),
+
               markerSize = markerScaleFn(annotationsForPlace.length),
-              style = jQuery.extend({}, mapStyle.getPointStyle(place), { radius: markerSize });
+
+              style = jQuery.extend({},
+                mapStyle.getPointStyle(place, annotationsForPlace),
+                { radius: markerSize });
 
           return L.circleMarker(latlng, style).addTo(pointLayer);
         },
