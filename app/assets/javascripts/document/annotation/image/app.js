@@ -13,7 +13,7 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
-  'document/annotation/common/page/annotations',
+  'document/annotation/common/page/annotationView',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/image/iiif/iiifImageInfo',
@@ -28,7 +28,7 @@ require([
   Config,
   ReadEditor,
   WriteEditor,
-  Annotations,
+  AnnotationView,
   LoadIndicator,
   BaseApp,
   IIIFImageInfo,
@@ -44,7 +44,7 @@ require([
     /** The app is instantiated after the image manifest was loaded **/
     var App = function(imageProperties) {
 
-      var annotations = new Annotations(),
+      var annotations = new AnnotationView(),
 
           contentNode = document.getElementById('image-pane'),
 

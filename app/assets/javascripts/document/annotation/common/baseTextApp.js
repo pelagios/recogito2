@@ -2,7 +2,7 @@ define([
   'common/ui/alert',
   'common/ui/formatting',
   'common/utils/annotationUtils',
-  'common/annotations',
+  'common/annotationView',
   'common/api',
   'common/config',
   'document/annotation/common/editor/editorRead',
@@ -15,7 +15,7 @@ define([
   Alert,
   Formatting,
   AnnotationUtils,
-  Annotations,
+  AnnotationView,
   API,
   Config,
   ReadEditor,
@@ -29,7 +29,7 @@ define([
 
     var self = this,
 
-        annotations = new Annotations(),
+        annotations = new AnnotationView(),
 
         loadIndicator = new LoadIndicator(),
 

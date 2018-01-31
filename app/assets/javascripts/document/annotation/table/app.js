@@ -13,7 +13,7 @@ require([
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
-  'document/annotation/common/page/annotations',
+  'document/annotation/common/page/annotationView',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/table/bulk/bulkEditorPlace',
@@ -26,7 +26,7 @@ require([
   Config,
   ReadEditor,
   WriteEditor,
-  Annotations,
+  AnnotationView,
   LoadIndicator,
   BaseApp,
   PlaceBulkEditor,
@@ -40,7 +40,7 @@ require([
 
     var self = this,
 
-        annotations = new Annotations(),
+        annotations = new AnnotationView(),
 
         contentNode = document.getElementById('table-container'),
 

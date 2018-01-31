@@ -7,9 +7,9 @@ define([
     else return true;
   };
 
-  var Annotations = function() {
+  var Annotations = function(initial) {
 
-    var annotations = [],
+    var annotations = (initial) ? initial : [],
 
         uniqueTags = [],
 

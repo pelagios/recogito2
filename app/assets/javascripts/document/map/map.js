@@ -25,7 +25,7 @@ define([
         /** Lookup table { gazetteerUri -> [ annotation] } **/
         annotationsByGazetteerURI,
 
-        setAnnotations = function(annotations) {
+        setAnnotations = function(annotationView) {
           var buildLookupTable = function(annotations) {
                   annotationsByGazetteerURI = {};
 
@@ -45,10 +45,10 @@ define([
                   });
                 };
 
-          buildLookupTable(annotations);
+          buildLookupTable(annotationView.listAll());
 
           pointLayer.init(annotationsByGazetteerURI);
-          shapeLayer.init(annotationsByGazetteerURI);
+          shapeLayer.init(annotationsByGazetteerURI);          
         },
 
         setPlaces = function(places) {

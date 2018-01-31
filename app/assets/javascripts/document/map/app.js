@@ -4,18 +4,20 @@ require.config({
 });
 
 require([
+  'common/annotationView',
   'common/api',
   'common/config',
   'document/map/map'
-], function(API, Config, Map) {
+], function(AnnotationView, API, Config, Map) {
 
   jQuery(document).ready(function() {
 
     var map = new Map(jQuery('.map')),
 
         /** Init the map with the annotations and fetch places **/
-        onAnnotationsLoaded = function(annotations) {
-          map.setAnnotations(annotations);
+        onAnnotationsLoaded = function(a) {
+          var annotations = new AnnotationView(a);
+          map.setAnnotations(annotations.readOnly());
           return API.listPlacesInDocument(Config.documentId, 0, 2000);
         },
 
