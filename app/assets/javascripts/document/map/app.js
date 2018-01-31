@@ -10,7 +10,20 @@ require([
   'common/utils/placeUtils',
   'common/api',
   'common/config',
-  'document/map/mapPopup'], function(Map, Formatting, AnnotationUtils, PlaceUtils, API, Config, MapPopup) {
+  'document/map/filterPanel',
+  'document/map/mapPopup',
+  'document/map/palette'
+], function(
+  Map,
+  Formatting,
+  AnnotationUtils,
+  PlaceUtils,
+  API,
+  Config,
+  FilterPanel,
+  MapPopup,
+  Palette
+) {
 
   var MAX_MARKER_SIZE  = 11,
 
@@ -30,7 +43,11 @@ require([
 
       SHAPE_STYLE = jQuery.extend({}, POINT_STYLE, { fillOpacity: 0.5 }),
 
-      TOUCH_DISTANCE_THRESHOLD = 18;
+      TOUCH_DISTANCE_THRESHOLD = 18,
+
+      pointStyle = function(col) {
+        return jQuery.extend({}, POINT_STYLE, { fillColor: col.light, color: col.dark });
+      };
 
   jQuery(document).ready(function() {
 
@@ -39,6 +56,8 @@ require([
         pointMarkerLayer = L.layerGroup(),
 
         regionMarkerLayer = L.layerGroup(),
+
+        filterPanel = new FilterPanel(jQuery('.map-container'), jQuery('.toggle-filterpanel')),
 
         /** Lookup table { gazetteerUri -> [ annotation] } **/
         annotationsByGazetteerURI = {},
@@ -77,13 +96,20 @@ require([
           return API.listPlacesInDocument(Config.documentId, 0, 2000);
         },
 
+        /** Hard-wired dummy. Returns colour based on tag **/
+        getColor = function(annotations) {
+          return Palette.getRandomPair();
+        },
+
         onPlacesLoaded = function(response) {
 
           var createPointMarker = function(place) {
                 // The epic struggle between Leaflet vs. GeoJSON
                 var latlng = [place.representative_point[1], place.representative_point[0]],
-                    markerSize = markerScaleFn(getAnnotationsForPlace(place).length),
-                    style = jQuery.extend({}, POINT_STYLE, { radius: markerSize });
+                    annotationsForPlace = getAnnotationsForPlace(place),
+                    color = getColor(annotationsForPlace),
+                    markerSize = markerScaleFn(annotationsForPlace.length),
+                    style = jQuery.extend({}, pointStyle(color), { radius: markerSize });
 
                 return L.circleMarker(latlng, style).addTo(pointMarkerLayer);
               },

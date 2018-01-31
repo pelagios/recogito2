@@ -14,6 +14,7 @@
     @Html(webJarsUtil.css("leaflet.css"))
     @Html(webJarsUtil.script("leaflet.js"))
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.script("velocity.min.js"))
     @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/map/app.js")))
     <script>
       window.config = {
@@ -30,9 +31,10 @@
     <div class="map-container">
       <div class="map"></div>
 
-      <!--div class="map-options">
-
-      </div-->
+      <div class="toggle-filterpanel">
+        <span class="icon">&#xf013;</span>
+        Change colour and filter settings
+      </div>
 
       <div class="map-controls">
         <div class="layers control icon" title="Change base layer">&#xf0c9;</div>
