@@ -2,16 +2,27 @@ define([
   'common/utils/annotationUtils'
 ], function(Utils) {
 
-  var isEmpty = function(maybeArr) {
-    if (maybeArr && maybeArr.length > 0) return false;
-    else return true;
-  };
-
   var Annotations = function(initial) {
 
     var annotations = (initial) ? initial : [],
 
         uniqueTags = [],
+
+        contributors = [],
+
+        isEmpty = function(maybeArr) {
+          if (maybeArr && maybeArr.length > 0) return false;
+          else return true;
+        },
+
+        collectInto = function(fn, arr) {
+          annotations.forEach(function(a) {
+            fn(a).forEach(function(value) {
+              if (arr.indexOf(value) < 0)
+                arr.push(value);
+            });
+          });
+        },
 
         set = function(a) {
           annotations = (jQuery.isArray(a)) ? a : [ a ];
@@ -32,21 +43,17 @@ define([
         },
 
         listUniqueTags = function() {
-          var buildUniqueTags = function() {
-                uniqueTags = [];
-
-                annotations.forEach(function(a) {
-                  Utils.getTags(a).forEach(function(tag) {
-                    if (uniqueTags.indexOf(tag) < 0)
-                      uniqueTags.push(tag);
-                  });
-                });
-              };
-
+          var getTags = function(a) { return Utils.getTags(a); };
           if (isEmpty(uniqueTags))
-            buildUniqueTags();
-
+            collectInto(getTags, uniqueTags);
           return uniqueTags;
+        },
+
+        listContributors = function() {
+          var getContributors = function(a) { return a.contributors; };
+          if (isEmpty(contributors))
+            collectInto(getContributors, contributors);
+          return contributors;
         },
 
         listAll = function() {
@@ -62,9 +69,10 @@ define([
     // write access. But returning new copies every time seems too costly.
     this.readOnly = function() {
       return {
-        getFiltered: getFiltered,
-        listUniqueTags: listUniqueTags,
-        listAll : listAll
+        getFiltered      : getFiltered,
+        listContributors : listContributors,
+        listUniqueTags   : listUniqueTags,
+        listAll          : listAll
       };
     };
   };

@@ -1,15 +1,25 @@
 define([
   'common/hasEvents',
   'document/map/style/rules/baseRule',
+  'document/map/style/rules/byContributorRule',
   'document/map/style/rules/byStatusRule',
   'document/map/style/rules/byTagRule',
   'document/map/style/legend',
   'document/map/style/palette'
-], function(HasEvents, Rules, ByStatusRule, ByTagRule, Legend, Palette) {
+], function(
+  HasEvents,
+  Rules,
+  ByContributorRule,
+  ByStatusRule,
+  ByTagRule,
+  Legend,
+  Palette
+) {
 
   var RULES = {
-    BY_TAG: ByTagRule,
-    BY_STATUS: ByStatusRule
+    BY_CONTRIBUTOR : ByContributorRule,
+    BY_STATUS      : ByStatusRule,
+    BY_TAG         : ByTagRule
   };
 
   var MapStyle = function() {
