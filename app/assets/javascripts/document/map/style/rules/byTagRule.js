@@ -44,16 +44,22 @@ define([
         // TODO remove redundancy with getShapeStyle
         getPointStyle = function(place, annotations) {
           var tags = getTags(annotations);
-          if (tags.length > 0) {
+          if (tags.length == 1)
             return MapStyle.pointStyle(legend[tags[0]]);
-          }
+          else if (tags.length > 1)
+            return MapStyle.POINT_MULTI;
+          else
+            return MapStyle.POINT_DISABLED;
         },
 
         getShapeStyle = function(place, annotations) {
           var tags = getTags(annotations);
-          if (tags.length > 0) {
+          if (tags.length == 1)
             return MapStyle.shapeStyle(legend[tags[0]]);
-          }
+          else if (tags.length > 1)
+            return MapStyle.SHAPE_MULTI;
+          else
+            return MapStyle.SHAPE_DISABLED;
         };
 
     initLegend();

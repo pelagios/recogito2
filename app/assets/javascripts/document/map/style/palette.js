@@ -27,8 +27,7 @@ define([], function() {
     '#84d2f4': '#56a9cb',
     '#cad93f': '#9ca92c',
     '#f5c8af': '#c99579',
-    '#9ac483': '#729a5c',
-    '#9e9ea2': '#656566'
+    '#9ac483': '#729a5c'
   };
 
   return {
@@ -67,8 +66,7 @@ define([], function() {
       '#84d2f4',
       '#cad93f',
       '#f5c8af',
-      '#9ac483',
-      '#9e9ea2'
+      '#9ac483'
     ],
 
     /** (Currently) just a lookup, not an actual computation **/

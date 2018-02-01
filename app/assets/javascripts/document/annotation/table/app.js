@@ -9,11 +9,11 @@ require.config({
 
 require([
   'common/ui/alert',
+  'common/annotationView',
   'common/api',
   'common/config',
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
-  'document/annotation/common/page/annotationView',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
   'document/annotation/table/bulk/bulkEditorPlace',
@@ -22,11 +22,11 @@ require([
   'document/annotation/table/selection/selectionHandler'
 ], function(
   Alert,
+  AnnotationView,
   API,
   Config,
   ReadEditor,
   WriteEditor,
-  AnnotationView,
   LoadIndicator,
   BaseApp,
   PlaceBulkEditor,
