@@ -23,6 +23,8 @@ define([
                   '<option value="BY_STATUS">Status</option>' +
                   '<option value="BY_CONTRIBUTOR">Contributor</option>' +
                   '<option value="BY_ACTIVITY" disabled="true">Latest activity</option>' +
+                  '<option value="BY_ACTIVITY" disabled="true">First occurrence</option>' +
+                  '<option value="BY_ACTIVITY" disabled="true">Last occurrence</option>' +
                 '</select>' +
               '</div>' +
               '<ul class="values">' +
