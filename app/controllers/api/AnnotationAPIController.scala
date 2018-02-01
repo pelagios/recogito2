@@ -132,12 +132,12 @@ class AnnotationAPIController @Inject() (
   }
 
   private def stubToAnnotation(stub: AnnotationStub, user: String) = {
-    val now = DateTime.now()
+    val now = DateTime.now()       
     Annotation(
       stub.annotationId.getOrElse(UUID.randomUUID),
       UUID.randomUUID,
       stub.annotates,
-      Seq(user),
+      (stub.bodies.flatMap(_.lastModifiedBy) :+ user).distinct,
       stub.anchor,
       Some(user),
       now,
