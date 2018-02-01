@@ -20,9 +20,15 @@ define([], function() {
           },{
             source: prefixMatcher
           });
+        },
+
+        hide = function() {
+          textarea.typeahead('close');
         };
 
     init();
+
+    this.hide = hide;
   };
 
   return TagAutocomplete;

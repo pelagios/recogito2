@@ -141,6 +141,7 @@ define([
             jQuery.each(tags, function(idx, chars) {
               addTag(chars.trim());
             });
+            autocomplete.hide();
             textarea.val('');
             return false;
           }
