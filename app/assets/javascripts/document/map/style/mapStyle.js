@@ -1,12 +1,15 @@
 define([
   'common/hasEvents',
   'document/map/style/rules/byTagRule',
+  'document/map/style/legend',
   'document/map/style/palette'
-], function(HasEvents, ByTag, Palette) {
+], function(HasEvents, ByTagRule, Legend, Palette) {
 
   var MapStyle = function() {
 
     var self = this,
+
+        legend = new Legend(jQuery('.map-container'), jQuery('.toggle-legend')),
 
         annotations = false,
 
@@ -14,6 +17,10 @@ define([
 
         init = function(annotationView) {
           annotations = annotationView;
+
+          // TODO for testing only
+          currentRule = new ByTagRule(annotationView);
+          legend.setLegend(currentRule.getLegend());
         },
 
         change = function(name) {

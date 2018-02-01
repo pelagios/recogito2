@@ -2,20 +2,18 @@ define([
   'common/map/basemap',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
-  'document/map/controls/filterPanel',
-  'document/map/controls/mapPopup',
   'document/map/layers/pointLayer',
   'document/map/layers/shapeLayer',
-  'document/map/style/mapStyle'
+  'document/map/style/mapStyle',
+  'document/map/mapPopup'
 ], function(
   BaseMap,
   AnnotationUtils,
   PlaceUtils,
-  FilterPanel,
-  MapPopup,
   PointLayer,
   ShapeLayer,
-  MapStyle
+  MapStyle,
+  MapPopup
 ) {
 
   var TOUCH_DISTANCE_THRESHOLD = 18;
@@ -31,8 +29,6 @@ define([
         pointLayer = new PointLayer(this, mapStyle),
 
         shapeLayer = new ShapeLayer(this, mapStyle),
-
-        filterPanel = new FilterPanel(jQuery('.map-container'), jQuery('.toggle-filterpanel')),
 
         /** Lookup table { gazetteerUri -> [ annotation] } **/
         annotationsByGazetteerURI,

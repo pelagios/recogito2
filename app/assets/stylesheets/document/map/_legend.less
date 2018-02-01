@@ -1,0 +1,49 @@
+.map-container {
+
+  .toggle-legend, .map-legend {
+    position:absolute;
+    left:20px;
+    width:230px;
+    box-sizing:border-box;
+    background-color:#fff;
+    .rounded-corners(2px);
+    font-size:16px;
+    .noselect();
+    .icon { font-size:14px; }
+  }
+
+  .toggle-legend {
+    bottom:20px;
+    padding:0 10px;
+    height:34px;
+    line-height:34px;
+    color:@grey-type;
+    cursor:pointer;
+    .icon { padding-right:3px; }
+  }
+
+  .map-legend {
+    padding:10px 15px;
+    bottom:64px;
+
+    ul {
+      margin:0;
+      padding:0;
+      list-style-type:none;
+
+      .key {
+        position:relative;
+        top:2px;
+        display:inline-block;
+        width:12px;
+        height:12px;
+        border:2px solid #000;
+        margin-right:7px;
+        .rounded-corners(3px);
+      }
+
+    }
+
+  }
+
+}

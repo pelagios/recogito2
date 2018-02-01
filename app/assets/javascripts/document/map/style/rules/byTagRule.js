@@ -23,6 +23,10 @@ define([
           });
         },
 
+        getLegend = function() {
+          return legend;
+        },
+
         getTags = function(annotations) {
           var asSet = annotations.reduce(function(set, annotation) {
                 if (set.size < 2) {
@@ -53,6 +57,7 @@ define([
 
     initLegend();
 
+    this.getLegend = getLegend;
     this.getPointStyle = getPointStyle;
     this.getShapeStyle = getShapeStyle;
   };
