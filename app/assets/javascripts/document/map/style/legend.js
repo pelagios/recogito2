@@ -1,16 +1,14 @@
 define([
   'common/hasEvents',
+  'document/map/style/rules/baseRule',
   'document/map/style/palette'
-], function(HasEvents, Palette) {
+], function(HasEvents, Rules, Palette) {
 
   var SLIDE_DURATION = 100;
 
   var Legend = function(parentEl, toggleButton) {
 
     var self = this,
-
-        // To work anround the otherwise circular dependency
-        MapStyle = require('document/map/style/mapStyle'),
 
         element = jQuery(
           '<div class="map-legend">' +
@@ -49,8 +47,8 @@ define([
 
           element.find('.key.multi').css('backgroundColor', '#fff');
           element.find('.key.no-val').css({
-            borderColor: MapStyle.POINT_DISABLED.color,
-            backgroundColor: MapStyle.POINT_DISABLED.fillColor
+            borderColor: Rules.POINT_DISABLED.color,
+            backgroundColor: Rules.POINT_DISABLED.fillColor
           });
         },
 
