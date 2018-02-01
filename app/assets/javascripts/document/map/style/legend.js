@@ -69,6 +69,10 @@ define([
           });
         },
 
+        clear = function() {
+          legend.empty();
+        },
+
         open = function() {
           element.velocity('slideDown', { duration: SLIDE_DURATION });
         },
@@ -84,6 +88,7 @@ define([
 
     init();
 
+    this.clear = clear;
     this.close = close;
     this.open = open;
     this.setLegend = setLegend;

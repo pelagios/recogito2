@@ -33,23 +33,39 @@
       margin:0;
       padding:10px 15px;
       list-style-type:none;
+    }
 
-      .key {
-        position:relative;
-        top:3px;
-        display:inline-block;
-        width:14px;
-        height:14px;
-        border:2px solid #000;
-        margin-right:7px;
-        .rounded-corners(3px);
+    .style-selection, .values {
+      border-bottom:1px solid @lightgrey-border-darker;
+    }
+
+    .style-selection {
+      padding:10px 15px;
+      position:relative;
+
+      select {
+        position:absolute;
+        top:10px;
+        right:15px;
+        box-shadow:none;
       }
 
     }
 
-    .non-distinct {
+    .values {
+      min-height:30px;
       background-color:@blueish-white;
-      border-top:1px solid @lightgrey-border-darker;
+    }
+
+    .key {
+      position:relative;
+      top:3px;
+      display:inline-block;
+      width:14px;
+      height:14px;
+      border:2px solid #000;
+      margin-right:7px;
+      .rounded-corners(3px);
     }
 
   }

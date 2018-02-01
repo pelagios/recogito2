@@ -21,16 +21,6 @@ define([
 
         init = function(annotationView) {
           annotations = annotationView;
-
-
-
-          // TODO for testing only
-          // currentRule = new ByTagRule(annotationView);
-          // legend.setLegend(currentRule.getLegend());
-        },
-
-        change = function(name) {
-
         },
 
         getPointStyle = function(place, annotations) {
@@ -54,7 +44,7 @@ define([
             legend.setLegend(currentRule.getLegend());
           } else {
             currentRule = false;
-            // TODO clear legend
+            legend.clear();
           }
 
           self.fireEvent('change', name);
@@ -62,7 +52,6 @@ define([
 
     legend.on('changeStyle', onChangeStyle);
 
-    this.change = change;
     this.init = init;
     this.getPointStyle = getPointStyle;
     this.getShapeStyle = getShapeStyle;
