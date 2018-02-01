@@ -63,7 +63,7 @@ define([
     fillColor   : Palette.DEFAULT_FILL_COLOR,
     opacity     : 1,
     weight      : 1.5,
-    fillOpacity : 0.8
+    fillOpacity : 0.6
   };
 
   MapStyle.pointStyle = function(color) {

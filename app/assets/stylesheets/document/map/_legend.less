@@ -3,7 +3,7 @@
   .toggle-legend, .map-legend {
     position:absolute;
     left:20px;
-    width:230px;
+    width:250px;
     box-sizing:border-box;
     background-color:#fff;
     .rounded-corners(2px);
@@ -25,11 +25,15 @@
   .map-legend {
     padding:10px 15px;
     bottom:64px;
+    max-height:80%;
+    overflow-y:auto;
+    overflow-x:hidden;
 
     ul {
       margin:0;
       padding:0;
       list-style-type:none;
+
 
       .key {
         position:relative;
