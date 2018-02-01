@@ -18,10 +18,11 @@ define([
                 '<span>Color by<span>' +
                 '<select>' +
                   '<option selected="true" value>-</option>' +
-                  '<option value="BY_PART" disabled="true">Document part</option>' +
-                  '<option value="BY_STATUS">Verification Status</option>' +
                   '<option value="BY_TAG">Tag</option>' +
+                  '<option value="BY_PART" disabled="true">Part</option>' +
+                  '<option value="BY_STATUS">Status</option>' +
                   '<option value="BY_CONTRIBUTOR">Contributor</option>' +
+                  '<option value="BY_ACTIVITY" disabled="true">Latest activity</option>' +
                 '</select>' +
               '</div>' +
               '<ul class="values">' +
