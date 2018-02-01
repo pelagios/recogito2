@@ -19,8 +19,8 @@ define([
           annotations = annotationView;
 
           // TODO for testing only
-          currentRule = new ByTagRule(annotationView);
-          legend.setLegend(currentRule.getLegend());
+          // currentRule = new ByTagRule(annotationView);
+          // legend.setLegend(currentRule.getLegend());
         },
 
         change = function(name) {
