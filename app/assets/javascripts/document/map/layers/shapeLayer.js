@@ -9,6 +9,14 @@ define([], function() {
           return L.geoJson(place.representative_geometry, style).addTo(shapeLayer);
         },
 
+        redraw = function() {
+          shapeLayer.getLayers().forEach(function(l) {
+            var place = l.place,
+                annotations = map.getAnnotationsForPlace(place);
+            l.setStyle(mapStyle.getShapeStyle(place, annotations));
+          });
+        },
+
         // TODO clean up - shouldn't expose this to the outside
         // TODO currently used by map.selectNearest
         getLayers = function() {
@@ -20,6 +28,7 @@ define([], function() {
     this.addShape = addShape;
     this.getLayers = getLayers;
     this.init = function() {}; // For future use
+    this.redraw = redraw;
   };
 
   return ShapeLayer;

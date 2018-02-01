@@ -56,6 +56,18 @@ define([], function() {
           return L.circleMarker(latlng, style).addTo(pointLayer);
         },
 
+        redraw = function() {
+          pointLayer.getLayers().forEach(function(l) {
+            var place = l.place,
+                annotations = map.getAnnotationsForPlace(place),
+                style = jQuery.extend({},
+                  mapStyle.getPointStyle(place, annotations),
+                  { radius: l.getRadius() });
+
+            l.setStyle(style);
+          });
+        },
+
         // TODO clean up - shouldn't expose this to the outside
         // TODO currently used by map.selectNearest
         getLayers = function() {
@@ -68,6 +80,7 @@ define([], function() {
     this.bringToFront = bringToFront;
     this.getLayers = getLayers;
     this.init = initMarkerScaleFn;
+    this.redraw = redraw;
   };
 
   return PointLayer;

@@ -55,8 +55,8 @@ define([
 
           buildLookupTable(annotationView.listAll());
 
-          pointLayer.init(annotationsByGazetteerURI);
           shapeLayer.init(annotationsByGazetteerURI);
+          pointLayer.init(annotationsByGazetteerURI);
 
           mapStyle.init(annotationView);
         },
@@ -79,6 +79,11 @@ define([
           });
 
           pointLayer.bringToFront();
+        },
+
+        redraw = function() {
+          shapeLayer.redraw();
+          pointLayer.redraw();
         },
 
         getAnnotationsForPlace = function(place) {
@@ -134,6 +139,8 @@ define([
             }
           }
         };
+
+    mapStyle.on('change', redraw);
 
     this.getAnnotationsForPlace = getAnnotationsForPlace;
     this.setAnnotations = setAnnotations;

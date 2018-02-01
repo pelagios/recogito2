@@ -5,6 +5,10 @@ define([
   'document/map/style/palette'
 ], function(HasEvents, ByTagRule, Legend, Palette) {
 
+  var RULES = {
+    'BY_TAG': ByTagRule
+  };
+
   var MapStyle = function() {
 
     var self = this,
@@ -17,6 +21,8 @@ define([
 
         init = function(annotationView) {
           annotations = annotationView;
+
+
 
           // TODO for testing only
           // currentRule = new ByTagRule(annotationView);
@@ -39,7 +45,22 @@ define([
             return currentRule.getShapeStyle(place, annotations);
           else
             return MapStyle.DEFAULT_SHAPE_STYLE;
+        },
+
+        onChangeStyle = function(name) {
+          var rule = RULES[name];
+          if (rule) {
+            currentRule = new rule(annotations);
+            legend.setLegend(currentRule.getLegend());
+          } else {
+            currentRule = false;
+            // TODO clear legend
+          }
+
+          self.fireEvent('change', name);
         };
+
+    legend.on('changeStyle', onChangeStyle);
 
     this.change = change;
     this.init = init;

@@ -1,18 +1,31 @@
 define([
+  'common/hasEvents',
   'document/map/style/palette'
-], function(Palette) {
+], function(HasEvents, Palette) {
 
   var SLIDE_DURATION = 100;
 
   var Legend = function(parentEl, toggleButton) {
 
+    var self = this,
+
         // To work anround the otherwise circular dependency
-    var MapStyle = require('document/map/style/mapStyle'),
+        MapStyle = require('document/map/style/mapStyle'),
 
         element = jQuery(
           '<div class="map-legend">' +
             '<div class="map-legend-head"></div>' +
             '<div class="map-legend-body">' +
+              '<div class="style-selection">' +
+                '<span>Color by<span>' +
+                '<select>' +
+                  '<option selected="true" value>-</option>' +
+                  '<option value="BY_PART" disabled="true">Document part</option>' +
+                  '<option value="BY_STATUS" disabled="true">Verification Status</option>' +
+                  '<option value="BY_TAG">Tag</option>' +
+                  '<option value="BY_USER" disabled="true">User</option>' +
+                '</select>' +
+              '</div>' +
               '<ul class="values">' +
               '</ul>' +
               '<ul class="non-distinct">' +
@@ -24,8 +37,16 @@ define([
 
         legend = element.find('ul.values'),
 
+        selection = element.find('select'),
+
         init = function() {
           toggleButton.click(toggle);
+
+          selection.change(function(e) {
+            var val = (this.value) ? this.value : undefined;
+            self.fireEvent('changeStyle', val);
+          });
+
           element.find('.key.multi').css('backgroundColor', '#fff');
           element.find('.key.no-val').css({
             borderColor: MapStyle.POINT_DISABLED.color,
@@ -66,7 +87,10 @@ define([
     this.close = close;
     this.open = open;
     this.setLegend = setLegend;
+
+    HasEvents.apply(this);
   };
+  Legend.prototype = Object.create(HasEvents.prototype);
 
   return Legend;
 
