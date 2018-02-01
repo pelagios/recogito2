@@ -21,7 +21,7 @@ define([
                 '<select>' +
                   '<option selected="true" value>-</option>' +
                   '<option value="BY_PART" disabled="true">Document part</option>' +
-                  '<option value="BY_STATUS" disabled="true">Verification Status</option>' +
+                  '<option value="BY_STATUS">Verification Status</option>' +
                   '<option value="BY_TAG">Tag</option>' +
                   '<option value="BY_USER" disabled="true">User</option>' +
                 '</select>' +

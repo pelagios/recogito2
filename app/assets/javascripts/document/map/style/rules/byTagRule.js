@@ -13,12 +13,11 @@ define([
         /** tag -> color lookup table **/
         legend = {},
 
-        initLegend = function() {
-          var tags = annotationView.listUniqueTags(),
-              colors = (tags.length > 10) ? Palette.CATEGORY_17 : Palette.CATEGORY_10,
+        initLegend = function(values) {
+          var colors = (values.length > 10) ? Palette.CATEGORY_17 : Palette.CATEGORY_10,
               numColors = colors.length;
 
-          tags.forEach(function(tag, idx) {
+          values.forEach(function(tag, idx) {
             var colIdx = idx % numColors;
             legend[tag] = colors[colIdx];
           });
@@ -62,7 +61,7 @@ define([
             return MapStyle.SHAPE_DISABLED;
         };
 
-    initLegend();
+    initLegend(annotationView.listUniqueTags());
 
     this.getLegend = getLegend;
     this.getPointStyle = getPointStyle;
