@@ -16,11 +16,17 @@
       "last_modified_by": { "type": "keyword" },
       "last_modified_at": { "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
       "bodies": {
+        "type": "nested",
         "properties": {
           "type": { "type": "keyword" },
           "last_modified_by": { "type": "keyword" },
           "last_modified_at": {  "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ssZ" },
-          "value": { "type": "text" },
+          "value": {
+            "type": "text",
+            "fields": {
+               "raw": { "type": "keyword" }
+            }
+          },
           "reference": {
             "properties": {
               "uri": { "type": "keyword" },
