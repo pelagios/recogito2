@@ -1,0 +1,46 @@
+@(
+  title: String,
+  doc: services.document.DocumentInfo,
+  currentUser: Option[services.user.User],
+  accessLevel: services.document.DocumentAccessLevel,
+  activeTab: Option[String]
+)(content: Html)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>@title | @doc.author.map(_ + ": ")@doc.title</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/stats/index.css")"/>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+  </head>
+  <body>
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "stats")
+
+    <div class="sidebar">
+      @views.html.sidebarHeader(doc.owner)
+
+      <ul class="menu">
+        <li @if(activeTab == Some("activity")) { class="active" }>
+          <a href="?tab=activity">
+            <span class="icon">&#xf080;</span> <span class="label">Activity</span>
+          </a>
+        </li>
+
+        <li @if(activeTab == Some("entities")) { class="active" }>
+          <a href="?tab=entities">
+            <span class="icon">&#xf234;</span> <span class="label">Entities</span>
+          </a>
+        </li>
+
+        <li @if(activeTab == Some("tags")) { class="active" }>
+          <a href="?tab=tags">
+            <span class="icon">&#xf02c;</span> <span class="label">Tags</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="content">
+      @content
+    </div>
+  </body>
+</html>

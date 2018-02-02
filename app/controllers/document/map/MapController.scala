@@ -28,7 +28,9 @@ class MapController @Inject() (
 
   def showMap(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     documentReadResponse(documentId, request.identity,  { case (doc, accesslevel) =>
+      
       logDocumentView(doc.document, None, accesslevel)
+      
       annotations.countByDocId(documentId).map { documentAnnotationCount =>
         Ok(views.html.document.map.index(doc, request.identity, accesslevel, documentAnnotationCount))
       }

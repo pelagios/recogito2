@@ -21,7 +21,7 @@
       </li>
 
       <li class="tooltip bottom@if(activeView == "stats") { active}">
-        <a href="@controllers.document.stats.routes.StatsController.showDocumentStats(document.getId)">
+        <a href="@controllers.document.stats.routes.StatsController.showDocumentStats(document.getId, None)">
           <span class="icon">&#xe8ae;</span>
           <span class="hint">Annotation statistics</span>
         </a>

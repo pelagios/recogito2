@@ -4,7 +4,7 @@
   sharingPolicies: Seq[services.generated.tables.records.SharingPolicyRecord]
  )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
-@_layout("Recogito | Settings - Sharing", doc, currentUser, Some("sharing")) {
+@_layout("Settings | Sharing", doc, currentUser, Some("sharing")) {
   <div class="panel share-public">
     <h2>Public Access</h2>
     <div class="inner">

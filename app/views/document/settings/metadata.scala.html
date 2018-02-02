@@ -4,7 +4,7 @@
   currentUser: services.user.User
 )(implicit header: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil, messages: Messages, flash: Flash)
 
-@_layout("Recogito | Settings - Metadata", doc, currentUser, Some("metadata")) {
+@_layout("Settings | Metadata", doc, currentUser, Some("metadata")) {
   <div class="document-metadata panel centered">
     <h2>Document Metadata</h2>
     @flash.get("success").map { msg =>
