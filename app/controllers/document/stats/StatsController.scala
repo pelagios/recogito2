@@ -10,13 +10,10 @@ import services.user.Roles._
 import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{AnyContent, Request, Result, ControllerComponents}
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.mvc.Result
-import play.api.mvc.Request
-import play.api.mvc.AnyContent
 
 @Singleton
 class StatsController @Inject() (
