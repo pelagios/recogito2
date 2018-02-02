@@ -55,7 +55,7 @@ trait BaseSerializer {
 
   protected def getFirstEntityBody(a: Annotation): Option[AnnotationBody] = {
     import AnnotationBody._
-    a.bodies.find(b => b.hasType == PERSON || b.hasType == PLACE )
+    a.bodies.find(b => Set(PERSON, PLACE, EVENT).contains(b.hasType))
   }
   
   protected def getCommentBodies(a: Annotation): Seq[AnnotationBody] =
