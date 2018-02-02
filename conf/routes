@@ -65,7 +65,8 @@ GET     /document/:id/edit                           controllers.document.annota
 GET     /document/:id/map                            controllers.document.map.MapController.showMap(id: String)
 
 GET     /document/:id/stats                          controllers.document.stats.StatsController.showDocumentStats(id: String, tab: Option[String])
-GET     /document/:id/stats/tags.json                controllers.document.stats.StatsController.getTagStats(id: String)
+GET     /document/:id/stats/tags.json                controllers.document.stats.StatsController.getTagsAsJSON(id: String)
+GET     /document/:id/stats/tags.csv                 controllers.document.stats.StatsController.getTagsAsCSV(id: String)
 
 GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
 GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String, export_tables: Boolean ?= false)

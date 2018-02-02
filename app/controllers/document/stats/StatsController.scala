@@ -14,6 +14,9 @@ import play.api.mvc.ControllerComponents
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ExecutionContext, Future}
+import play.api.mvc.Result
+import play.api.mvc.Request
+import play.api.mvc.AnyContent
 
 @Singleton
 class StatsController @Inject() (
@@ -33,7 +36,6 @@ class StatsController @Inject() (
     (JsPath \ "count").write[Long]
   )(t => (t._1, t._2))
   
-  /** TODO this view should be available without login, if the document is set to public **/
   def showDocumentStats(documentId: String, tab: Option[String]) = silhouette.UserAwareAction.async { implicit request =>
     documentReadResponse(documentId, request.identity,  { case (doc, accesslevel) =>
       logDocumentView(doc.document, None, accesslevel)      
@@ -53,10 +55,22 @@ class StatsController @Inject() (
     })
   }
   
-  def getTagStats(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
-    statsService.getTagStats(documentId).map { buckets =>
-      jsonOk(Json.toJson(buckets))
+  private def getTags(documentId: String)(action: (Seq[(String, Long)], Request[AnyContent]) => Result) =
+    silhouette.UserAwareAction.async { implicit request =>
+      documentReadResponse(documentId, request.identity,  { case (doc, accesslevel) =>
+          statsService.getTagStats(documentId).map { buckets =>
+            action(buckets, request.request)
+          }
+        }
+      )
     }
+  
+  def getTagsAsJSON(documentId: String) = getTags(documentId) { case (buckets, request) =>
+    jsonOk(Json.toJson(buckets))(request)
+  }
+  
+  def getTagsAsCSV(documentId: String) = getTags(documentId) { case(buckets, request) =>
+    Ok("coming soon")
   }
 
 }

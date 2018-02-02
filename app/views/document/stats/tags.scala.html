@@ -5,5 +5,9 @@
  )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Tag Statistics", doc, currentUser, accessLevel, Some("tags")) {
-  <p>The document annotations stats page is still under construction. Bear with us.</p>
+  <div>
+    <p>
+      <a href="@controllers.document.stats.routes.StatsController.getTagsAsCSV(doc.id)">Download tag vocabulary &amp; stats as CSV</a>
+    </p>
+  </div>
 }
