@@ -10,32 +10,56 @@ define([
 
         contributors = [],
 
+        /** Checks if an array is undefined or empty **/
         isEmpty = function(maybeArr) {
           if (maybeArr && maybeArr.length > 0) return false;
           else return true;
         },
 
+        /** Shorthand to add to an array of distinct elements, since we're lacking a decent set **/
+        addIfNotExists = function(element, array) {
+          if (array.indexOf(element) < 0)
+           array.push(element);
+        },
+
+        /**
+         * Utility function to collect values into an array of distinct elements.
+         *
+         * Implements the functionality common to building the uniqueTags, contributor etc. sets.
+         */
         collectInto = function(fn, arr) {
           annotations.forEach(function(a) {
             fn(a).forEach(function(value) {
-              if (arr.indexOf(value) < 0)
-                arr.push(value);
+              addIfNotExists(value, arr);
             });
           });
         },
 
-        set = function(a) {
-          annotations = (jQuery.isArray(a)) ? a : [ a ];
-          // Reset unique tags array (will be rebuilt on next access)
+        /** Resets the derived sets (uniqueTags, contributors etc.) **/
+        resetDerivedSets = function() {
           uniqueTags = [];
+          contributors = [];
         },
 
-        add = function() {
-          // TODO implement
+        /** Add an annotation or array of annotations to the view **/
+        add = function(a) {
+          var newAnnotations = (jQuery.isArray(a)) ? a : [ a ];
+          annotations = annotations.concat(newAnnotations);
+
+          // This could be optimized. We could just add to the existing.
+          // But before that, we'd need to check if empty (i.e. not a one-liner, and
+          // performance increase might be minimal unless for really long lists of
+          // annotations
+          resetDerivedSets();
         },
 
-        remove = function() {
-          // TODO implement
+        /** Removes an annotatoin or array of annotations to the view **/
+        remove = function(a) {
+          var idx = annotations.indexOf(a);
+          if (idx > -1) {
+            annotations.splice(idx, 1);
+            resetDerivedSets();
+          }
         },
 
         getFiltered = function(filter) {
@@ -62,7 +86,6 @@ define([
 
     this.add = add;
     this.remove = remove;
-    this.set = set;
 
     // This way we can hand out a 'read-only' reference to other UI components.
     // Note that the annotation array as such is mutable, so we can't actually prevent

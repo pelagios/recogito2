@@ -198,7 +198,7 @@ require([
     dataView.onRowsChanged.subscribe(onRowsChanged);
     dataView.setItems(data);
 
-    BaseApp.apply(this, [ highlighter, selector ]);
+    BaseApp.apply(this, [ annotations, highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
 
