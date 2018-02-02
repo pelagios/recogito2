@@ -61,7 +61,7 @@ define([
 
   var BaseStyleRule = function(annotationView, getValues, opts) {
 
-    var legend = {},
+    var settings = jQuery.extend({}, opts, { legend: {} }),
 
         initLegend = function() {
           var colors = (opts.values.length > 10) ? Palette.CATEGORY_17 : Palette.CATEGORY_10,
@@ -69,18 +69,18 @@ define([
 
           opts.values.forEach(function(tag, idx) {
             var colIdx = idx % numColors;
-            legend[tag] = colors[colIdx];
+            settings.legend[tag] = colors[colIdx];
           });
         },
 
-        getLegend = function() {
-          return legend;
+        getSettings = function() {
+          return settings;
         },
 
         getStyle = function(place, annotations, styles) {
           var values = getValues(place, annotations);
           if (values.length == 1)
-            return styles.fn(legend[values[0]]);
+            return styles.fn(settings.legend[values[0]]);
           else if (values.length > 1)
             return styles.multi;
           else
@@ -105,7 +105,7 @@ define([
 
     initLegend();
 
-    this.getLegend = getLegend;
+    this.getSettings = getSettings;
     this.getPointStyle = getPointStyle;
     this.getShapeStyle = getShapeStyle;
   };

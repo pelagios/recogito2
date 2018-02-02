@@ -53,7 +53,7 @@ define([
                   });
                 };
 
-          buildLookupTable(annotationView.listAll());
+          buildLookupTable(annotationView.listAnnotations());
 
           shapeLayer.init(annotationsByGazetteerURI);
           pointLayer.init(annotationsByGazetteerURI);

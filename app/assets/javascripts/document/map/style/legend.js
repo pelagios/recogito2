@@ -12,23 +12,21 @@ define([
 
         element = jQuery(
           '<div class="map-legend">' +
-            '<div class="map-legend-head"></div>' +
+            '<div class="style-selection">' +
+              '<span>Color by<span>' +
+              '<select>' +
+                '<option selected="true" value>-</option>' +
+                '<option value="BY_TAG">Tag</option>' +
+                '<option value="BY_PART" disabled="true">Part</option>' +
+                '<option value="BY_STATUS">Status</option>' +
+                '<option value="BY_CONTRIBUTOR">Contributor</option>' +
+                '<option value="BY_ACTIVITY" disabled="true">Latest activity</option>' +
+                '<option value="BY_ACTIVITY" disabled="true">First occurrence</option>' +
+                '<option value="BY_ACTIVITY" disabled="true">Last occurrence</option>' +
+              '</select>' +
+            '</div>' +
             '<div class="map-legend-body">' +
-              '<div class="style-selection">' +
-                '<span>Color by<span>' +
-                '<select>' +
-                  '<option selected="true" value>-</option>' +
-                  '<option value="BY_TAG">Tag</option>' +
-                  '<option value="BY_PART" disabled="true">Part</option>' +
-                  '<option value="BY_STATUS">Status</option>' +
-                  '<option value="BY_CONTRIBUTOR">Contributor</option>' +
-                  '<option value="BY_ACTIVITY" disabled="true">Latest activity</option>' +
-                  '<option value="BY_ACTIVITY" disabled="true">First occurrence</option>' +
-                  '<option value="BY_ACTIVITY" disabled="true">Last occurrence</option>' +
-                '</select>' +
-              '</div>' +
-              '<ul class="values">' +
-              '</ul>' +
+              '<ul class="values"></ul>' +
               '<ul class="non-distinct">' +
                 '<li><span class="key multi" /><span class="label">Multiple values</span></li>' +
                 '<li><span class="key no-val" /><span class="label">No value</span></li>' +
@@ -39,6 +37,8 @@ define([
         legend = element.find('ul.values'),
 
         selection = element.find('select'),
+
+        nonDistinct = element.find('.non-distinct').hide(),
 
         init = function() {
           toggleButton.click(toggle);
@@ -55,9 +55,9 @@ define([
           });
         },
 
-        setLegend = function(values) {
+        update = function(settings) {
           legend.empty();
-          jQuery.each(values, function(name, color) {
+          jQuery.each(settings.legend, function(name, color) {
             var row = jQuery(
               '<li><span class="key"></span><span class="label">' + name + '</span></li>');
 
@@ -68,6 +68,8 @@ define([
 
             legend.append(row);
           });
+
+          if (settings.hasNonDistinct) nonDistinct.show(); else nonDistinct.hide();
         },
 
         clear = function() {
@@ -92,7 +94,7 @@ define([
     this.clear = clear;
     this.close = close;
     this.open = open;
-    this.setLegend = setLegend;
+    this.update = update;
 
     HasEvents.apply(this);
   };

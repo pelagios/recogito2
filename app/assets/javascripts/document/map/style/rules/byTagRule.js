@@ -7,7 +7,8 @@ define([
 
         // To work anround the otherwise circular dependency
     var opts = {
-          values: annotationView.listUniqueTags()
+          values: annotationView.listUniqueTags(),
+          hasNonDistinct: true
         },
 
         getValues = function(place, annotations) {

@@ -54,7 +54,7 @@ define([
           var rule = RULES[name];
           if (rule) {
             currentRule = new rule(annotations);
-            legend.setLegend(currentRule.getLegend());
+            legend.update(currentRule.getSettings());
           } else {
             currentRule = false;
             legend.clear();

@@ -5,7 +5,6 @@
     left:20px;
     width:250px;
     box-sizing:border-box;
-    background-color:#fff;
     .rounded-corners(2px);
     font-size:16px;
     .noselect();
@@ -17,6 +16,7 @@
     padding:0 10px;
     height:34px;
     line-height:34px;
+    background-color:#fff;
 
     cursor:pointer;
     .icon { padding-right:3px; }
@@ -28,20 +28,19 @@
     max-height:80%;
     overflow-y:auto;
     overflow-x:hidden;
+    background-color:@blueish-white;
 
     ul {
       margin:0;
-      padding:10px 15px;
+      padding:0;
       list-style-type:none;
-    }
-
-    .style-selection, .values {
-      border-bottom:1px solid @lightgrey-border-darker;
     }
 
     .style-selection {
       padding:10px 15px;
       position:relative;
+      background-color:#fff;
+      border-bottom:1px solid @lightgrey-border-darker;
 
       select {
         position:absolute;
@@ -56,24 +55,21 @@
 
     }
 
-    .values {
-      min-height:60px;
-      background-color:@blueish-white;
-    }
+    .map-legend-body {
+      padding:10px 15px;
+      min-height:50px;
 
-    .non-distinct {
-      background-color:@blueish-white;
-    }
+      .key {
+        position:relative;
+        top:1px;
+        display:inline-block;
+        width:11px;
+        height:11px;
+        border:1px solid #000;
+        margin-right:7px;
+        .rounded-corners(1px);
+      }
 
-    .key {
-      position:relative;
-      top:1px;
-      display:inline-block;
-      width:11px;
-      height:11px;
-      border:1px solid #000;
-      margin-right:7px;
-      .rounded-corners(1px);
     }
 
   }

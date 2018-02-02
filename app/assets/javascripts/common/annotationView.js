@@ -6,9 +6,9 @@ define([
 
     var annotations = (initial) ? initial : [],
 
-        uniqueTags = [],
-
         contributors = [],
+
+        uniqueTags = [],
 
         /** Checks if an array is undefined or empty **/
         isEmpty = function(maybeArr) {
@@ -27,18 +27,20 @@ define([
          *
          * Implements the functionality common to building the uniqueTags, contributor etc. sets.
          */
-        collectInto = function(fn, arr) {
-          annotations.forEach(function(a) {
-            fn(a).forEach(function(value) {
-              addIfNotExists(value, arr);
+        collectIntoIfEmpty = function(fn, arr) {
+          if (isEmpty(arr))
+            annotations.forEach(function(a) {
+              fn(a).forEach(function(value) {
+                addIfNotExists(value, arr);
+              });
             });
-          });
         },
 
         /** Resets the derived sets (uniqueTags, contributors etc.) **/
         resetDerivedSets = function() {
-          uniqueTags = [];
           contributors = [];
+          parts = [];
+          uniqueTags = [];
         },
 
         /** Add an annotation or array of annotations to the view **/
@@ -66,21 +68,19 @@ define([
           return annotation.filter(filter);
         },
 
-        listUniqueTags = function() {
-          var getTags = function(a) { return Utils.getTags(a); };
-          if (isEmpty(uniqueTags))
-            collectInto(getTags, uniqueTags);
-          return uniqueTags;
-        },
-
         listContributors = function() {
           var getContributors = function(a) { return a.contributors; };
-          if (isEmpty(contributors))
-            collectInto(getContributors, contributors);
+          collectIntoIfEmpty(getContributors, contributors);
           return contributors;
         },
 
-        listAll = function() {
+        listUniqueTags = function() {
+          var getTags = function(a) { return Utils.getTags(a); };
+          collectIntoIfEmpty(getTags, uniqueTags);
+          return uniqueTags;
+        },
+
+        listAnnotations = function() {
           return annotations;
         };
 
@@ -95,7 +95,7 @@ define([
         getFiltered      : getFiltered,
         listContributors : listContributors,
         listUniqueTags   : listUniqueTags,
-        listAll          : listAll
+        listAnnotations  : listAnnotations
       };
     };
   };
