@@ -64,12 +64,28 @@ define([
     var settings = jQuery.extend({}, opts, { legend: {} }),
 
         initLegend = function() {
-          var colors = (opts.values.length > 10) ? Palette.CATEGORY_17 : Palette.CATEGORY_10,
+
+          var choosePalette = function(numValues, palettes) {
+                    // Sort available palettes by length, longest first
+                var sorted = palettes.sort(function(a, b) { return b.length - a.length; }),
+                    selected = sorted[0]; // Default to longest if none is long enough
+
+                // Take the shortest that has enough colors
+                sorted.forEach(function(palette) {
+                  if (palette.length >= numValues)
+                    selected = palette;
+                });
+
+                return selected;
+              };
+
+          var availableScales = opts.colorScales || [ Palette.CATEGORY_10, Palette.CATEGORY_17 ],
+              colors = choosePalette(opts.values.length, availableScales),
               numColors = colors.length;
 
-          opts.values.forEach(function(tag, idx) {
+          opts.values.forEach(function(val, idx) {
             var colIdx = idx % numColors;
-            settings.legend[tag] = colors[colIdx];
+            settings.legend[val] = colors[colIdx];
           });
         },
 

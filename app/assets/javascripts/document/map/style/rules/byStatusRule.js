@@ -5,7 +5,8 @@ define([
   var ByStatusRule = function(annotationView) {
 
     var opts = {
-          values: [ 'VERIFIED', 'UNVERIFIED' ]
+          values: [ 'VERIFIED', 'UNVERIFIED' ],
+          colorScales: [ [ '#31a354', '#7f7f7f' ] ]
         },
 
         getValues = function(place, annotations) {
