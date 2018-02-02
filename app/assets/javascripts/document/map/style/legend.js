@@ -10,6 +10,11 @@ define([
 
     var self = this,
 
+        btnLabel = {
+          closed: 'Change colour and filter settings',
+          open: 'Hide colour and filter settings'
+        },
+
         element = jQuery(
           '<div class="map-legend">' +
             '<div class="style-selection">' +
@@ -38,9 +43,12 @@ define([
 
         selection = element.find('select'),
 
+        buttonLabel = toggleButton.find('.label'),
+
         nonDistinct = element.find('.non-distinct').hide(),
 
         init = function() {
+          buttonLabel.html(btnLabel.closed);
           toggleButton.click(toggle);
 
           selection.change(function(e) {
@@ -78,10 +86,12 @@ define([
 
         open = function() {
           element.velocity('slideDown', { duration: SLIDE_DURATION });
+          buttonLabel.html(btnLabel.open);
         },
 
         close = function() {
           element.velocity('slideUp', { duration: SLIDE_DURATION });
+          buttonLabel.html(btnLabel.closed);
         },
 
         toggle = function() {

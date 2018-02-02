@@ -7,7 +7,7 @@ define([
         // To work anround the otherwise circular dependency
     var opts = {
           values: annotationView.listContributors(),
-          hasNonDistinct: true
+          hasNonDistinct: annotationView.listContributors().length > 1
         },
 
         getValues = function(place, annotations) {

@@ -39,7 +39,6 @@ define([
         /** Resets the derived sets (uniqueTags, contributors etc.) **/
         resetDerivedSets = function() {
           contributors = [];
-          parts = [];
           uniqueTags = [];
         },
 
