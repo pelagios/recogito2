@@ -5,7 +5,6 @@ define([
 
   var ByTagRule = function(annotationView) {
 
-        // To work anround the otherwise circular dependency
     var opts = {
           values: annotationView.listUniqueTags(),
           hasNonDistinct: true

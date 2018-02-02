@@ -22,12 +22,12 @@ define([
               '<select>' +
                 '<option selected="true" value>-</option>' +
                 '<option value="BY_TAG">Tag</option>' +
-                '<option value="BY_PART" disabled="true">Part</option>' +
+                '<option value="BY_PART">Part</option>' +
                 '<option value="BY_STATUS">Status</option>' +
                 '<option value="BY_CONTRIBUTOR">Contributor</option>' +
                 '<option value="BY_ACTIVITY" disabled="true">Latest activity</option>' +
-                '<option value="BY_ACTIVITY" disabled="true">First occurrence</option>' +
-                '<option value="BY_ACTIVITY" disabled="true">Last occurrence</option>' +
+                '<option value="BY_FIRST_OCCURRENCE" disabled="true">First occurrence</option>' +
+                '<option value="BY_LAST_OCCURRENCE" disabled="true">Last occurrence</option>' +
               '</select>' +
             '</div>' +
             '<div class="map-legend-body">' +
@@ -66,8 +66,9 @@ define([
         update = function(settings) {
           legend.empty();
           jQuery.each(settings.legend, function(name, color) {
-            var row = jQuery(
-              '<li><span class="key"></span><span class="label">' + name + '</span></li>');
+            var label = (settings.formatter) ? settings.formatter(name) : name,
+                row = jQuery(
+                  '<li><span class="key"></span><span class="label">' + label + '</span></li>');
 
             row.find('.key').css({
               backgroundColor: color,
@@ -82,6 +83,7 @@ define([
 
         clear = function() {
           legend.empty();
+          nonDistinct.hide();
         },
 
         open = function() {

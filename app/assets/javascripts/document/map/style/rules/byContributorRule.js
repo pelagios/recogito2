@@ -4,7 +4,6 @@ define([
 
   var ByContributorRule = function(annotationView) {
 
-        // To work anround the otherwise circular dependency
     var opts = {
           values: annotationView.listContributors(),
           hasNonDistinct: annotationView.listContributors().length > 1

@@ -6,7 +6,15 @@ define([
 
     var opts = {
           values: [ 'VERIFIED', 'UNVERIFIED' ],
-          colorScales: [ [ '#31a354', '#7f7f7f' ] ]
+          colorScales: [ [ '#31a354', '#7f7f7f' ] ],
+          formatter: function(key) {
+            switch (key) {
+              case 'VERIFIED':
+                return 'Verified';
+              default:
+                return 'Not verified';
+            }
+          }
         },
 
         getValues = function(place, annotations) {

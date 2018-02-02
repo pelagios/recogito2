@@ -20,7 +20,12 @@
       window.config = {
         @if(currentUser.isDefined) { me: '@currentUser.get.username', }
         documentId: '@doc.id',
-        documentOwner: '@doc.ownerName'
+        documentOwner: '@doc.ownerName',
+        parts: [
+          @Html(doc.fileparts.map { part =>
+            Html(s"{ title: '${part.getTitle}', id: '${part.getId}' }")
+          }.mkString(",\n"))
+        ]
       }
     </script>
   </head>
