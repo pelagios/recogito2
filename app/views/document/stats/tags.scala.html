@@ -5,9 +5,15 @@
  )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Tag Statistics", doc, currentUser, accessLevel, Some("tags")) {
-  <div>
-    <p>
-      <a href="@controllers.document.stats.routes.StatsController.getTagsAsCSV(doc.id)">Download tag vocabulary &amp; stats as CSV</a>
-    </p>
+  <div class="panel">
+    <h2>Tag Use</h2>
+    <div class="inner">
+
+
+
+      <p class="download-csv">
+        <a href="@controllers.document.stats.routes.StatsController.getTagsAsCSV(doc.id)">Download CSV</a>
+      </p>
+    </div>
   </div>
 }
