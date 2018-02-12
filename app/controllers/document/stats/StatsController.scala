@@ -2,7 +2,12 @@ package controllers.document.stats
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, Security, HasVisitLogging, HasPrettyPrintJSON}
+import java.io.{ByteArrayOutputStream, PrintWriter}
 import javax.inject.{Inject, Singleton}
+import kantan.csv._
+import kantan.csv.ops._
+import kantan.csv.CsvConfiguration.{Header, QuotePolicy}
+import kantan.csv.engine.commons._
 import services.annotation.stats.AnnotationStatsService
 import services.document.DocumentService
 import services.user.UserService
@@ -28,10 +33,20 @@ class StatsController @Inject() (
   implicit val ctx: ExecutionContext
 ) extends BaseOptAuthController(components, config, documents, users) with HasVisitLogging with HasPrettyPrintJSON {
   
+  private val CSV_CONFIG = CsvConfiguration(',', '"', QuotePolicy.WhenNeeded, Header.None)
+  
   implicit val tuple2Writes: Writes[Tuple2[String, Long]] = (
     (JsPath \ "value").write[String] and
     (JsPath \ "count").write[Long]
   )(t => (t._1, t._2))
+  
+  private def toCSV(stats: Seq[(String, Long)]): String = {
+    val out = new ByteArrayOutputStream()
+    val writer = out.asCsvWriter[(String, Long)](CSV_CONFIG)
+    stats.foreach(writer.write(_))
+    writer.close()
+    new String(out.toByteArray, "UTF-8")
+  }
   
   def showDocumentStats(documentId: String, tab: Option[String]) = silhouette.UserAwareAction.async { implicit request =>
     documentReadResponse(documentId, request.identity,  { case (doc, accesslevel) =>
@@ -67,7 +82,7 @@ class StatsController @Inject() (
   }
   
   def getTagsAsCSV(documentId: String) = getTags(documentId) { case(buckets, request) =>
-    Ok("coming soon")
+    Ok(toCSV(buckets)).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}_tags.csv" })
   }
 
 }
