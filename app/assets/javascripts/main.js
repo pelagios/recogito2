@@ -19,6 +19,7 @@ require.config({
     { name : 'document/settings/metadata' },
     { name : 'document/settings/history' },
     { name : 'document/settings/sharing' },
+    { name : 'document/stats/tags' },
     { name : 'help/tutorial'},
     { name : 'landing/index' },
     { name : 'my/settings/account' },

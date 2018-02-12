@@ -11,6 +11,7 @@
     <title>@title | @doc.author.map(_ + ": ")@doc.title</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/stats/index.css")"/>
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.script("numeral.min.js"))
   </head>
   <body>
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "stats")

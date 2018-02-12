@@ -6,14 +6,23 @@
 
 @_layout("Tag Statistics", doc, currentUser, accessLevel, Some("tags")) {
   <div class="panel">
-    <h2>Tag Use</h2>
+    <h2>Tags <span class="tags-total"></h2>
     <div class="inner">
-
-
-
+      <table class="tags-by-count stats"></table>
       <p class="download-csv">
         <a href="@controllers.document.stats.routes.StatsController.getTagsAsCSV(doc.id)">Download CSV</a>
       </p>
     </div>
   </div>
+
+  <script>
+    window.config = {
+      documentId: '@doc.id'
+    }
+  </script>
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/stats/tags.js")))
+
+  @helper.javascriptRouter("jsRoutes")(
+    controllers.document.stats.routes.javascript.StatsController.getTagsAsJSON
+  )
 }
