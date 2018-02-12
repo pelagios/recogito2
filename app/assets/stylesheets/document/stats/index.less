@@ -30,7 +30,7 @@
 
 table.stats {
   min-width:550px;
-  max-width:720px;
+  max-width:820px;
   margin:0 0 30px 0;
 
   .meter {
@@ -46,16 +46,18 @@ table.stats {
     padding-bottom:2px;
   }
 
-  td:first-child {
+  td:first-child, td:last-child {
     width:1%;
+    white-space:nowrap;
+  }
+
+  td:first-child {
     padding-right:10px;
   }
 
   td:last-child {
-    width:1%;
-    white-space:nowrap;
-    text-align:right;
     padding-left:10px;
+    text-align:right;
   }
 
   .bar {
