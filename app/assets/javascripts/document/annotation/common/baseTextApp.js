@@ -64,14 +64,16 @@ define([
           var currentCSSPath = colorschemeStylesheet.attr('href'),
               basePath = currentCSSPath.substr(0, currentCSSPath.lastIndexOf('/'));
 
-          if (mode === 'BY_TYPE')
-            colorschemeStylesheet.attr('href', basePath + '/colorByType.css');
-          else if (mode === 'BY_STATUS')
-            colorschemeStylesheet.attr('href', basePath + '/colorByStatus.css');
-          else
-            colorschemeStylesheet.attr('href', basePath + '/colorByProperty.css');
+          highlighter.setColorscheme(false);
 
-          // TODO highlighter.setColorscheme(...)
+          if (mode === 'BY_TYPE') {
+            colorschemeStylesheet.attr('href', basePath + '/colorByType.css');
+          } else if (mode === 'BY_STATUS') {
+            colorschemeStylesheet.attr('href', basePath + '/colorByStatus.css');
+          } else {
+            colorschemeStylesheet.attr('href', basePath + '/colorByProperty.css');
+            highlighter.setColorscheme(mode); // All others are property-based schemes!
+          }
         },
 
         onColorschemeChanged = function(mode) {

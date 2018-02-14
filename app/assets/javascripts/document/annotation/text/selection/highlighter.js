@@ -4,12 +4,18 @@ define([
   'document/annotation/text/selection/style/byTagStyle'
 ], function(AnnotationUtils, AbstractHighlighter, ByTagStyle) {
 
-  var TEXT = 3; // HTML DOM node type for text nodes
+  var TEXT = 3, // HTML DOM node type for text nodes
+
+      STYLES = {
+        'BY_TAG': ByTagStyle
+      };
 
   var Highlighter = function(rootNode) {
 
+    var currentStyle = false,
+
         /** Recursively gets all text nodes inside a given node **/
-    var walkTextNodes = function(node, stopOffset, nodeArray) {
+        walkTextNodes = function(node, stopOffset, nodeArray) {
           var nodes = (nodeArray) ? nodeArray : [],
 
               offset = (function() {
@@ -161,10 +167,10 @@ define([
 
           jQuery.each(spans, function(idx, span) {
             span.className = cssClass;
-
-            // TODO dummy for testing
-            // span.style.backgroundColor = ByTagStyle.getColor(annotation);
-
+            if (currentStyle)
+              span.style.backgroundColor = currentStyle.getColor(annotation);
+            else
+              span.style.backgroundColor = null;
           });
         },
 
@@ -342,6 +348,15 @@ define([
 
           if (annotation)
             return { annotation: annotation, bounds: spans[0].getBoundingClientRect() };
+        },
+
+        setColorscheme = function(name) {
+          currentStyle = STYLES[name];
+
+          // Redraw all
+          jQuery('.annotation').each(function(idx, span) {
+            updateStyles(span.annotation, [ span ]);
+          });
         };
 
     this.bindToElements = bindToElements;
@@ -353,6 +368,7 @@ define([
     this.initPage = initPage;
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
+    this.setColorscheme = setColorscheme;
     this.updateStyles = updateStyles;
     this.wrapRange = wrapRange;
 
