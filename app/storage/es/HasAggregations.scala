@@ -2,6 +2,7 @@ package storage.es
 
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import scala.collection.JavaConverters._
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
 
 trait HasAggregations {
 

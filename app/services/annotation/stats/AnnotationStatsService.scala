@@ -21,13 +21,13 @@ class AnnotationStatsService @Inject() (
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.document_id" -> documentId)
-      } size 0 aggregations (
+      } aggregations (
         nestedAggregation("per_body", "bodies") subaggs (
           filterAggregation("tags_only").query(termQuery("bodies.type" -> AnnotationBody.TAG.toString)) subaggs (
             termsAggregation("by_tag") field ("bodies.value.raw")
           )
         )
-      ) 
+      ) size 0 
     } map { _.aggregations
       .getAs[InternalNested]("per_body").getAggregations
       .get[InternalFilter]("tags_only").getAggregations

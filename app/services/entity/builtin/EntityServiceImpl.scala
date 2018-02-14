@@ -7,6 +7,8 @@ import com.vividsolutions.jts.geom.Coordinate
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import org.elasticsearch.common.geo.GeoPoint
+import org.elasticsearch.search.aggregations.bucket.nested.InternalNested
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
 import org.elasticsearch.search.sort.SortOrder
 import play.api.Logger
 import play.api.libs.json.Json
@@ -186,10 +188,15 @@ class EntityServiceImpl @Inject()(
         search (ES.RECOGITO / ES.ANNOTATION) query {
           termQuery("annotates.document_id" -> docId)
         } aggregations (
-          termsAggregation("by_union_id") field("bodies.reference.union_id") size ES.MAX_SIZE
+          nestedAggregation("per_body", "bodies") subaggs (
+            termsAggregation("by_union_id") field("bodies.reference.union_id") size ES.MAX_SIZE
+          )
         ) size 0
       } map { response =>
-        parseTermsAggregation(response.aggregations.termsResult("by_union_id"))
+        val terms = response.aggregations
+          .getAs[InternalNested]("per_body")
+          .getAggregations.get[StringTerms]("by_union_id")
+        parseTermsAggregation(terms)
       }
 
     def resolveEntities(unionIds: Seq[String]): Future[Seq[IndexedEntity]] =
