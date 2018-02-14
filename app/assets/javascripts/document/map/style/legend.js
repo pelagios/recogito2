@@ -1,8 +1,8 @@
 define([
+  'common/ui/palette',
   'common/hasEvents',
   'document/map/style/rules/baseRule',
-  'document/map/style/palette'
-], function(HasEvents, Rules, Palette) {
+], function(Palette, HasEvents, Rules) {
 
   var SLIDE_DURATION = 100;
 

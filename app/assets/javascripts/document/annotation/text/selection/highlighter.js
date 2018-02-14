@@ -1,7 +1,8 @@
 define([
   'common/utils/annotationUtils',
-  'document/annotation/common/selection/abstractHighlighter'
-], function(AnnotationUtils, AbstractHighlighter) {
+  'document/annotation/common/selection/abstractHighlighter',
+  'document/annotation/text/selection/style/byTagStyle'
+], function(AnnotationUtils, AbstractHighlighter, ByTagStyle) {
 
   var TEXT = 3; // HTML DOM node type for text nodes
 
@@ -160,6 +161,10 @@ define([
 
           jQuery.each(spans, function(idx, span) {
             span.className = cssClass;
+
+            // TODO dummy for testing
+            // span.style.backgroundColor = ByTagStyle.getColor(annotation);
+
           });
         },
 

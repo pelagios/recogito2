@@ -66,8 +66,12 @@ define([
 
           if (mode === 'BY_TYPE')
             colorschemeStylesheet.attr('href', basePath + '/colorByType.css');
-          else
+          else if (mode === 'BY_STATUS')
             colorschemeStylesheet.attr('href', basePath + '/colorByStatus.css');
+          else
+            colorschemeStylesheet.attr('href', basePath + '/colorByProperty.css');
+
+          // TODO highlighter.setColorscheme(...)
         },
 
         onColorschemeChanged = function(mode) {
