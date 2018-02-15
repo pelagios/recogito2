@@ -1,14 +1,14 @@
 define([
   'common/utils/annotationUtils',
-  'document/map/style/palette'
+  'document/annotation/text/selection/style/palette'
 ], function(AnnotationUtils, Palette) {
 
   var LEGEND = {},
 
       newColor = function(tag) {
         var registeredTags = Object.keys(LEGEND),
-            idx = registeredTags.length % Palette.CATEGORY_17.length,
-            color = Palette.CATEGORY_17[idx];
+            idx = registeredTags.length % Palette.CATEGORY_9.length,
+            color = Palette.CATEGORY_9[idx];
 
         LEGEND[tag] = color;
         return color;
@@ -16,16 +16,15 @@ define([
 
   return {
 
-    getColor: function(annotation) {
+    getStyle: function(annotation) {
       var tags = AnnotationUtils.getTags(annotation),
-
-          // TODO hack
-          first = (tags.length > 0) ? tags[0] : false;
+          first = (tags.length > 0) ? tags[0] : false, // TODO temporary - color by first tag only
+          storedColor, color;
 
       if (first) {
-        var storedColor = LEGEND[first],
-            color = (storedColor) ? storedColor : newColor(first);
-        return color;
+        storedColor = LEGEND[first];
+        color = (storedColor) ? storedColor : newColor(first);
+        return { 'title': tags.join(', '), 'color': color };
       }
     }
 

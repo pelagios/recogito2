@@ -166,11 +166,16 @@ define([
             cssClass += ' ' + statusValues.join(' ');
 
           jQuery.each(spans, function(idx, span) {
+            var style = (currentStyle) ? currentStyle.getStyle(annotation) : null;
             span.className = cssClass;
-            if (currentStyle)
-              span.style.backgroundColor = currentStyle.getColor(annotation);
-            else
+
+            if (style) {
+              span.style.backgroundColor = style.color;
+              span.title = style.title;
+            } else {
               span.style.backgroundColor = null;
+              span.removeAttribute('title');
+            }
           });
         },
 
