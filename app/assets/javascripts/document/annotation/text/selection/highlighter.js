@@ -172,7 +172,10 @@ define([
             if (style) {
               span.style.backgroundColor = style.color;
               span.title = style.title;
-              if (style.hasMultiple) jQuery(span).addClass('multiple');
+              if (style.hasMultiple) {
+                jQuery(span).addClass('multiple');
+                span.dataset.num = '2';
+              }
             } else {
               span.style.backgroundColor = null;
               span.removeAttribute('title');
