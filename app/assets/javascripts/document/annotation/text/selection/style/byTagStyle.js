@@ -24,7 +24,12 @@ define([
       if (first) {
         storedColor = LEGEND[first];
         color = (storedColor) ? storedColor : newColor(first);
-        return { 'title': tags.join(', '), 'color': color };
+
+        return {
+          title: tags.join(', '),
+          color: color,
+          hasMultiple: tags.length > 1
+        };
       }
     }
 

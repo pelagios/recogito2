@@ -172,9 +172,11 @@ define([
             if (style) {
               span.style.backgroundColor = style.color;
               span.title = style.title;
+              if (style.hasMultiple) jQuery(span).addClass('multiple');
             } else {
               span.style.backgroundColor = null;
               span.removeAttribute('title');
+              jQuery(span).removeClass('multiple');
             }
           });
         },

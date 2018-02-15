@@ -1,7 +1,20 @@
+@import "../../../_globals.less";
+
 .annotation {
+  position:relative;
   border-style:dotted;
   border-width:0 0 1px 0;
   border-color:rgba(76, 76, 76, 0.6);
   background-color:rgba(82, 82, 82, 0.2);
   cursor:pointer;
+}
+
+.annotation.multiple::after {
+  content:'\0f02c';
+  font-size:14px;
+  position:absolute;
+  left:-11px;
+  top:-16px;
+  display:inline-block;
+  color:@grey-type;
 }
