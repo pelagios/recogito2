@@ -15,6 +15,7 @@ import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import com.mohiva.play.silhouette.impl.util.{DefaultFingerprintGenerator, SecureRandomIDGenerator}
 import com.mohiva.play.silhouette.password.BCryptPasswordHasher
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
+import javax.inject.Inject
 import services.user.{User, UserService}
 import services.user.Roles.Role
 import net.codingwell.scalaguice.ScalaModule
@@ -25,8 +26,6 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import scala.reflect.ClassTag
-import javax.inject.Inject
-import play.api.http.HeaderNames
 
 class SilhouetteSecurity extends AbstractModule with ScalaModule {
 
@@ -172,7 +171,6 @@ class RecogitoSecuredErrorHandler @Inject()() extends SecuredErrorHandler {
   }
 
   override def onNotAuthorized(implicit request: RequestHeader) = {
-    play.api.Logger.info("bar")
     Future.successful(
       Results.Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm())
         .withSession("access_uri" -> request.uri)
