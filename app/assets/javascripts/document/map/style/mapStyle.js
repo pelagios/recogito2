@@ -1,5 +1,4 @@
 define([
-  'common/ui/palette',
   'common/hasEvents',
   'document/map/style/rules/baseRule',
   'document/map/style/rules/byContributorRule',
@@ -7,15 +6,16 @@ define([
   'document/map/style/rules/byStatusRule',
   'document/map/style/rules/byTagRule',
   'document/map/style/legend',
+  'document/map/style/palette'
 ], function(
-  Palette,
   HasEvents,
   Rules,
   ByContributorRule,
   ByPartRule,
   ByStatusRule,
   ByTagRule,
-  Legend
+  Legend,
+  Palette
 ) {
 
   var RULES = {

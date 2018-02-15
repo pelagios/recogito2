@@ -1,7 +1,7 @@
 define([
-  'common/ui/palette',
-  'common/utils/annotationUtils'
-], function(Palette, AnnotationUtils) {
+  'common/utils/annotationUtils',
+  'document/map/style/palette'
+], function(AnnotationUtils, Palette) {
 
   var LEGEND = {},
 

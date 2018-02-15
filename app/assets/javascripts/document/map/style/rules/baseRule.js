@@ -1,5 +1,5 @@
 define([
-  'common/ui/palette'
+  'document/map/style/palette'
 ], function(Palette) {
 
   var DEFAULT_POINT_STYLE = {
