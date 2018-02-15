@@ -28,7 +28,7 @@ define([
         return {
           title: tags.join(', '),
           color: color,
-          hasMultiple: tags.length > 1
+          count: tags.length
         };
       }
     }

@@ -172,9 +172,9 @@ define([
             if (style) {
               span.style.backgroundColor = style.color;
               span.title = style.title;
-              if (style.hasMultiple) {
+              if (style.count && style.count > 1) {
                 jQuery(span).addClass('multiple');
-                span.dataset.num = '2';
+                span.dataset.num = style.count;
               }
             } else {
               span.style.backgroundColor = null;
