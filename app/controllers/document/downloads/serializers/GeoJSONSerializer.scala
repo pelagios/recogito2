@@ -8,6 +8,7 @@ import org.geotools.geometry.jts.JTSFactoryFinder
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
+import scala.util.Try
 import services.{ContentType, HasGeometry}
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.document.DocumentInfo
@@ -72,7 +73,8 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         
       val factory = JTSFactoryFinder.getGeometryFactory()
       
-      def toDouble(str: String) = str.trim().replace(",", ".").toDouble
+      def toDouble(str: String) = 
+        Try(str.trim().replace(",", ".").toDouble).toOption
 
       def rowToFeature(row: List[String], index: Int) = {
         val anchor = "row:" + index
@@ -82,8 +84,13 @@ trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
         val id = row(fieldMapping.FIELD_ID)
         
         val geometry = (fieldMapping.FIELD_LATITUDE, fieldMapping.FIELD_LONGITUDE) match {
-          case (Some(lat), Some(lon)) =>
-            Some(factory.createPoint(new Coordinate(toDouble(row(lon)), toDouble(row(lat)))))
+          case (Some(latIdx), Some(lonIdx)) =>
+            val maybeLat = toDouble(row(latIdx))
+            val maybeLon = toDouble(row(lonIdx))
+            (maybeLat, maybeLon) match {
+              case (Some(lat), Some(lon)) => Some(factory.createPoint(new Coordinate(lon, lat)))
+              case _ => None
+            }
             
           case _ => None
         }
