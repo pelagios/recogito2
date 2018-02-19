@@ -21,7 +21,7 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{Await, Future, ExecutionContext}
 import scala.concurrent.duration._
 
-case class SignupData(username: String, email: String, password: String)
+case class SignupData(username: String, email: String, password: String, agreedToTerms: Boolean)
 
 @Singleton
 class SignupController @Inject() (
@@ -89,7 +89,8 @@ class SignupController @Inject() (
     mapping(
       "username" -> nonEmptyText(minLength=3, maxLength=16).verifying(isNotReserved).verifying(usernameValidAndAvailable),
       "email" -> email.verifying(emailAvailable),
-      "password" -> nonEmptyText
+      "password" -> nonEmptyText,
+      "agreeTos" -> checked("Agree to our Terms of Use")
     )(SignupData.apply)(SignupData.unapply)
   )
   

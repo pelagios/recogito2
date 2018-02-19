@@ -16,6 +16,13 @@
         </p>
 
         <ul>
+          <li><strong>Storage of private information.</strong> You acknowledge that Recogito will
+            store your E-Mail address. This is for the purpose of sending out instructions for
+            resetting your password in case you forget it. We will not use this address to send out
+            information on a regular basis (newsletters, etc.) We may, however, use it to
+            get in touch with specific important or urgent information, should the need ever
+            arise.</li>
+
           <li>You may upload any documents that you wish to your own private workspace on
             Recogito. You may also invite other Recogito users to collaborate. However,
             you and your collaborators must not make any copyrighted materials open to
@@ -34,12 +41,6 @@
             immediately remove materials suspected of violating copyright laws and suspend
             access during any account review. In the case of disputed materials, we will
             follow UK copyright laws unless otherwise noted.</li>
-
-          <li>You acknowledge that Recogito will store the E-Mail address you provide when signing
-            up. This is for the purpose of sending out instructions for resetting your password in
-            case you forget it. We will <strong>not</strong> send out any general information,
-            newsletters, etc. We may, however, use the address to get in touch with specific
-            important or urgent information, should the need ever arise in the future.</li>
 
           <li>You consent to have all your annotations released immediately into the public under
             the <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative
@@ -71,6 +72,7 @@
           @helper.inputText(signupForm("username"), args = 'placeholder -> "Enter a Username...", 'autocomplete -> "off")
           @helper.inputText(signupForm("email"), args = 'placeholder -> "Email", 'autocomplete -> "off")
           @helper.inputPassword(signupForm("password"), args = 'placeholder -> "Password", 'autocomplete -> "off")
+          @helper.checkbox(signupForm("agreeTos"))
           <p class="disclaimer">
             By signing up, you confirm that you have read and agree to our Terms and Conditions of Use.
           </p>

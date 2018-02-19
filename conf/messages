@@ -16,10 +16,8 @@ landing.index.registration_form.placeholder.username=Pick a username
 landing.index.registration_form.placeholder.email=Your email address
 landing.index.registration_form.placeholder.password=Create a password
 landing.index.registration_form.placeholder.register=Register for Recogito
-landing.index.registration_form.disclaimer.text_before=By signing up, you confirm that you have \
-  read and agree to our
-landing.index.registration_form.disclaimer.link=Terms and Conditions of Use
-landing.index.registration_form.disclaimer.text_after=.
+landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
+  and the storage of your E-Mail address.
 
 # News
 landing.index.news.title=New in Recogito:

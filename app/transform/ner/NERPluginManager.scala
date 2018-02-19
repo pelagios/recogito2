@@ -8,8 +8,6 @@ import scala.collection.JavaConverters._
 
 object NERPluginManager {
   
-  private val PLUGIN_DIR = new File("plugins")
-  
   val plugins = {
     Logger.info("Loading available NER plugins...")
     val serviceLoader = ServiceLoader.load(classOf[NERPlugin], Thread.currentThread().getContextClassLoader)

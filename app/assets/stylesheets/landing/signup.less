@@ -46,11 +46,41 @@
   margin-left:60%;
   width:40%;
 
+  #agreeTos_field {
+    display:inline;
+
+    dd {
+      display:inline;
+    }
+
+    dd.info {
+      display:none;
+    }
+
+    input[type=checkbox] {
+      display:inline;
+      -webkit-appearance:checkbox;
+    }
+
+  }
+
+  dd.error::after {
+    content:' ';
+    display:block;
+  }
+
   .disclaimer {
+    display:inline;
     margin:10px auto 20px auto;
     padding:0;
     font-size:15px;
     width:220px;
+  }
+
+  .disclaimer::after {
+    content:' ';
+    display:block;
+    padding-bottom:20px;
   }
 
 }

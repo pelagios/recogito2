@@ -93,10 +93,10 @@
             </button>
 
             <p class="disclaimer">
-              @messages("landing.index.registration_form.disclaimer.text_before")<!--
-              --><a href="@controllers.landing.routes.SignupController.showSignupForm">
-                @messages("landing.index.registration_form.disclaimer.link")</a><!--
-              -->@messages("landing.index.registration_form.disclaimer.text_after")
+              <input type="checkbox" id="agreeTos" name="agreeTos" value="true"/>
+              <label for="agreeTos">
+                @Html(messages("landing.index.registration_form.disclaimer.text", controllers.landing.routes.SignupController.showSignupForm))
+              </label>
             </p>
           </form>
         </div> <!-- jumbotron-right -->
