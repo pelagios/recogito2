@@ -8,9 +8,15 @@ object PluginRegistry {
   
   private val PLUGIN_DIR = new File("plugins") 
 
-  Logger.info("Loading plugin configurations")
+  Logger.info("Loading plugin configurations:")
   
   private val configs: Seq[Config] = findFilesRecursive("plugin.conf", PLUGIN_DIR).map(ConfigFactory.parseFile(_))
+  
+  configs.foreach { c =>
+    Logger.info(s"  ${c.getString("extends")}.${c.getString("title")}")
+  }
+  
+  Logger.info(s"${configs.size} configurations found")
   
   /** Recursively walks a directory, looking for files with the given name **/
   private def findFilesRecursive(name: String, dir: File): Seq[File] = {
