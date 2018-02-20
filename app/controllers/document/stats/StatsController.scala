@@ -18,6 +18,7 @@ import play.api.Configuration
 import play.api.mvc.{AnyContent, Request, Result, ControllerComponents}
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import plugins.PluginRegistry
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -34,6 +35,9 @@ class StatsController @Inject() (
 ) extends BaseOptAuthController(components, config, documents, users) with HasVisitLogging with HasPrettyPrintJSON {
   
   private val CSV_CONFIG = CsvConfiguration(',', '"', QuotePolicy.WhenNeeded, Header.None)
+  
+  // TODO DUMMY!
+  private val plugins = PluginRegistry.getPlugins("js.stats")
   
   implicit val tuple2Writes: Writes[Tuple2[String, Long]] = (
     (JsPath \ "value").write[String] and
@@ -59,7 +63,7 @@ class StatsController @Inject() (
           Future.successful(Ok(views.html.document.stats.entities(doc, request.identity, accesslevel)))
           
         case Some(t) if t == "tags" =>
-          Future.successful(Ok(views.html.document.stats.tags(doc, request.identity, accesslevel)))
+          Future.successful(Ok(views.html.document.stats.tags(doc, request.identity, accesslevel, plugins)))
           
         case _ =>
           Future.successful(Ok(views.html.document.stats.activity(doc, request.identity, accesslevel)))
