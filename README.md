@@ -1,7 +1,5 @@
 # Recogito
 
-[![Project Stats](https://www.openhub.net/p/recogito2/widgets/project_thin_badge.gif)](https://www.openhub.net/p/recogito2)
-
 __Current version: [v2.2](https://github.com/pelagios/recogito2/releases/tag/v2.2)__
 
 Home of [Recogito](http://recogito.pelagios.org) - a Linked Data annotation tool for texts and
@@ -12,7 +10,7 @@ images, developed by [Pelagios](http://commons.pelagios.org). Track our progress
 
 * Java 8 JDK
 * [SBT](http://www.scala-sbt.org/) (version 1.0.x)
-* PostgreSQL DB (tested with version 9.3)
+* PostgreSQL DB (tested with version 9.5)
 * __Important: as of version 2.2, Recogito requires an installation of
   [ElasticSearch v5.6.5](https://www.elastic.co/downloads/past-releases/elasticsearch-5-6-5).
   Automatic fallback to an embedded ElasticSearch index is no longer supported.__
@@ -37,16 +35,7 @@ images, developed by [Pelagios](http://commons.pelagios.org). Track our progress
 
 ## Importing gazetteers
 
-* A gazetteer dump file from the [Digital Atlas of the Roman Empire](http://dare.ht.lu.se/) (in [Pelagios
-  Gazetteer Interconnection Format](http://github.com/pelagios/pelagios-cookbook/wiki/Pelagios-Gazetteer-Interconnection-Format))
-  is included in the `/gazetteers` folder.
-* You can import this gazetteer to Recogito on the Gazetteer Administration page at
-  [http://localhost:9000/admin/gazetteers](http://localhost:9000/admin/gazetteers). Note that you
-  need to be logged in with a user that has administrator privileges (e.g. the default 'recogito').
-* __WARNING__ the admin pages are work in progress. Don't expect any fancy functionality or styling
-  there yet! Importing gazetteers can take a while, and there is no progress display yet. Bear with
-  us. You can track progress through Recogito's JSON Place API at [http://localhost:9000/api/place/search?q=*&pretty=true](http://localhost:9000/api/place/search?q=*&pretty=true)
-* It's not possible to upload controlled vocabularies for persons, periods or events yet.
+Documentation on how to import gazetteers is [on the Wiki](https://github.com/pelagios/recogito2/wiki/Importing-Gazetteers).
 
 ## Running in production
 
