@@ -1,0 +1,34 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Splash page
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+landing.index.page_title=به Recogito خوش آمدید
+landing.index.link.tutorial=آموزش
+landing.index.link.login=ورود
+
+# Jumbotron and registration
+landing.index.jumbotron.tagline.1=حاشيه نویسی Linked Data
+landing.index.jumbotron.tagline.2=بدون کمانک
+landing.index.jumbotron.blurb=ایجاد نقشه از متن. حاشیه نویسی تصاویر. تحقیق خود را با سایر داده ها در وب مرتبط کنید و آن را قابل مشاهده و قابل استفاده مجدد کنید. بدون نیاز به تخصص در زمینه وب معنایی.
+landing.index.jumbotron.label.learn_more=Learn More
+landing.index.registration_form.placeholder.username=انتخاب نام کاربری
+landing.index.registration_form.placeholder.email=نشانی ایمیل
+landing.index.registration_form.placeholder.password=رمز ورود
+landing.index.registration_form.placeholder.register=ثبت نام
+landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
+  and the storage of your E-Mail address.
+
+# News
+landing.index.news.title=کاربر جدید
+landing.index.news.subtitle=GIS تاریخی چین
+landing.index.news.html=خوشحالیم به اطلاع برسانیم که داده های <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> هم اکنون در Recogito فابل دسترسی هستند که بیش از ۷۱ هزار مکان تاریخی از زمان امپراطوری چین بین سالهای ٢٢۱ قبل از میلاد تا ۱۹۱۱ پس از میلاد را در بر میگیرد. با تشکر از Lex Berman و مرکز تحلیل جغرافیایی هارواد (Harvard Center for Geographic Analysis) برای حفظ و نگهداری این منبع ارزشمند.
+
+# Key messages
+landing.index.tiles.1.title=مجموعه های به اشتراک گذاشته شده
+landing.index.tiles.1.text= متن ها و تصاویر را بارگذاری کنید. مجموعه خود را ایجاد نمایید. دیگران را به همکاری دعوت نمایید.
+landing.index.tiles.2.title=حاشیه نویسی گروهی
+landing.index.tiles.2.text=توضيحات و برچسب اضافه کنید. بحث کنید. Recogito پروانه ایجاد و تاریخچه نسخه برداری محتوا را حفظ و مدیریت می کند.
+landing.index.tiles.3.title=Semantics Included
+landing.index.tiles.3.text=Tag places and persons with controlled vocabularies easily with \
+  built-in support features.
+landing.index.tiles.4.title=داده باز (Open Data)
+landing.index.tiles.4.text=نتایج خود را روی وب نمایش دهید. داده های خود را بعنوان Linked Open Data منتشر نمایید.
