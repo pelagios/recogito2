@@ -15,8 +15,8 @@ landing.index.registration_form.placeholder.username=Kies een gebruikersnaam
 landing.index.registration_form.placeholder.email=Emailadres
 landing.index.registration_form.placeholder.password=Kies een wachtwoord
 landing.index.registration_form.placeholder.register=Register voor Recogito
-landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
-  and the storage of your E-Mail address.
+landing.index.registration_form.disclaimer.text=Accepteer de <a href="{0}">gebruiksvooorwaarden</a> \
+  en geef toestemming om uw emailadres op te slaan.
 
 # News
 landing.index.news.title=Nieuw in Recogito:
@@ -24,18 +24,16 @@ landing.index.news.subtitle=China Historical GIS
 landing.index.news.text=De data van <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> is nu beschikbaar in Recogito. Hiermee zijn meer dan 71.000 plaatsnamen uit het Chinese Keizerrijk van 221 v. Chr. tot 1911 aan onze geografische index toegevoegd. Met dank aan Lex Berman en het <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> voor het onderhouden van deze resource!
 
 # Tiles
-landing.index.tiles.1.title=Shared Collections
-landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite others \
-  to collaborate.
-landing.index.tiles.2.title=Collaborative Annotation
-landing.index.tiles.2.text=Create notes. Tag. Discuss. Recogito tracks provenance and maintains \
-  version history.
-landing.index.tiles.3.title=Semantics Included
-landing.index.tiles.3.text=Tag places and persons with controlled vocabularies easily with \
-  built-in support features.
+landing.index.tiles.1.title=Gedeelde collecties
+landing.index.tiles.1.text=Text en afbeeldingen uploaden. Bouw uw eigen collecties. Nodig anderen \
+  uit om mee te werken.
+landing.index.tiles.2.title=Gezamenlijke annotatie
+landing.index.tiles.2.text=Maak notities. Tag. Bespreek. Recogito houdt de provenance bij en \
+  slaat oude versies op.
+landing.index.tiles.3.title=Inclusief Semantiek
+landing.index.tiles.3.text=Tag makkelijk locaties en personen met een vocabulaire en ingebouwde functies.
 landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Show the results of your work on the Web. Publish your data as Linked \
-  Open Data.
+landing.index.tiles.4.text=Laat uw resultaten zien op het Web. Publiceer uw data als Linked Open Data. 
 
 # Recogito Right Now
 landing.index.right_now=Recogito Right Now
