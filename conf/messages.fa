@@ -1,4 +1,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.annotations = Annotations
+common.users = Users
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=به Recogito خوش آمدید
@@ -9,7 +15,7 @@ landing.index.header.link.login=ورود
 landing.index.jumbotron.tagline.1=حاشيه نویسی Linked Data
 landing.index.jumbotron.tagline.2=بدون کمانک
 landing.index.jumbotron.blurb=ایجاد نقشه از متن. حاشیه نویسی تصاویر. تحقیق خود را با سایر داده ها در وب مرتبط کنید و آن را قابل مشاهده و قابل استفاده مجدد کنید. بدون نیاز به تخصص در زمینه وب معنایی.
-landing.index.jumbotron.label.learn_more=Learn More
+landing.index.jumbotron.learn_more=Learn More
 
 landing.index.registration_form.placeholder.username=انتخاب نام کاربری
 landing.index.registration_form.placeholder.email=نشانی ایمیل

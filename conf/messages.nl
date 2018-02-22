@@ -1,4 +1,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.annotations = Annotaties
+common.users = Gebruikers 
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Welkom bij Recogito
@@ -7,9 +13,9 @@ landing.index.header.link.login=Inloggen
 
 # Jumbotron
 landing.index.jumbotron.tagline.1=Linked Data annotatie
-landing.index.jumbotron.tagline.2=zonder de accolades
+landing.index.jumbotron.tagline.2=zonder de moeilijke haakjes
 landing.index.jumbotron.blurb=Creeër landkaarten van tekst. Annoteer afbeeldingen. Verbind uw onderzoek met andere databronnen op het Web en maak het zichtbaarder en herbruikbaar. Semantic Web expertise is niet nodig.
-landing.index.jumbotron.label.learn_more=Meer weten
+landing.index.jumbotron.learn_more=Meer weten
 
 landing.index.registration_form.placeholder.username=Kies een gebruikersnaam
 landing.index.registration_form.placeholder.email=Emailadres
@@ -33,8 +39,8 @@ landing.index.tiles.2.text=Maak notities. Tag. Bespreek. Recogito houdt de prove
 landing.index.tiles.3.title=Inclusief Semantiek
 landing.index.tiles.3.text=Tag makkelijk locaties en personen met een vocabulaire en ingebouwde functies.
 landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Laat uw resultaten zien op het Web. Publiceer uw data als Linked Open Data. 
+landing.index.tiles.4.text=Laat uw resultaten zien op het Web. Publiceer uw data als Linked Open Data.
 
 # Recogito Right Now
-landing.index.right_now=Recogito Right Now
-landing.index.edits_last_24hrs=Edits last 24hrs
+landing.index.right_now=Recogito nu
+landing.index.edits_last_24hrs=Wijzigingen 24 uur

@@ -1,4 +1,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.annotations = Annotations
+common.users = Users
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Καλωσήλθατε στο Recogito
@@ -9,7 +15,7 @@ landing.index.header.link.login=Σύνδεση
 landing.index.jumbotron.tagline.1=Επισημείωση διασυνδεδεμένων δεδομένων
 landing.index.jumbotron.tagline.2=χωρίς τα άγκυστρα
 landing.index.jumbotron.blurb=Δημιουργήστε χάρτες από κείμενα. Επισημειώστε εικόνες. Συνδέστε την έρευνά σας με άλλα δεδομένα στο διαδίκτυο, βελτιώστε την ορατότητα και προωθηστε την επανάχρησή της. Χωρίς να χρειάζεται εξειδίκευση στο σημασιολογικό ιστό.
-landing.index.jumbotron.label.learn_more=Learn More
+landing.index.jumbotron.learn_more=Μάθετε περισσότερα
 
 landing.index.registration_form.placeholder.username=Επιλέξετε όνομα χρήστη
 landing.index.registration_form.placeholder.email=Διεύθυνση ηλεκτρονικού ταχυδρομείου
@@ -19,29 +25,28 @@ landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms
   and the storage of your E-Mail address.
 
 # News
-landing.index.news.title=New in Recogito:
+landing.index.news.title=Πρώτη φορά στο Recogito
 landing.index.news.subtitle=China Historical GIS
-landing.index.news.text=We are excited to announce that data from the \
-  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> is now \
-  available in Recogito. This adds more than 71,000 places of Dynastic China from 221 BCE to 1911 \
-  CE to our geographical index. Our thanks to Lex Berman and the \
-  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> for \
-  maintaining this brilliant resource!
+landing.index.news.text=Ανακοινώνουμε με χαρά ότι δεδομένα του <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China \
+  Historical GIS είναι πλέον διαθέσιμα στο Recogito. Περισσότεροι από 71.000 τόποι της εποχής \
+  των δυναστειών στην Κίνα από το 221 π.Χ. ως το 1911 μ.Χ. προστίθενται στο γεωγραφικό μας \
+  ευρετήριο. Εκφράζουμε τις ευχαριστίες μας στον Lex Berman και στο \
+  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographical Analysis</a> \
+  για τη διαχείριση αυτής της σημαντικής πηγής.
 
 # Tiles
-landing.index.tiles.1.title=Shared Collections
-landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite others \
-  to collaborate.
-landing.index.tiles.2.title=Collaborative Annotation
-landing.index.tiles.2.text=Create notes. Tag. Discuss. Recogito tracks provenance and maintains \
-  version history.
-landing.index.tiles.3.title=Semantics Included
-landing.index.tiles.3.text=Tag places and persons with controlled vocabularies easily with \
-  built-in support features.
-landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Show the results of your work on the Web. Publish your data as Linked \
-  Open Data.
+landing.index.tiles.1.title=Κοινές συλλογές
+landing.index.tiles.1.text=Ανεβάστε κείμενα και εικόνες. Δημιουργήστε τις δικές σας συλλογές. Προσκαλέστε άλλους για συνεργασία.
+landing.index.tiles.2.title=Συλλογική επισημείωση
+landing.index.tiles.2.text=Δημιουργήστε σημειώσεις και ετικέτες. Συζητήστε. Το Recogito καταγράφει \
+  την προέλευση και διατηρεί ιστορικό εκδοχών.
+landing.index.tiles.3.title=Σημασιολογικός ιστός
+landing.index.tiles.3.text=Βάλτε ετικέτες σε τόπους και ανθρώπους εύκολα με τη χρήση ελεγχόμενων \
+  λεξιλογίων και ενσωματωμένων λειτουργιών.
+landing.index.tiles.4.title=Ανοικτά δεδομένα
+landing.index.tiles.4.text=Παρουσιάστε τα αποτελέσματα της εργασίας σας στο διαδίκτυο. Δημοσιεύστε \
+  τα δεδομένα σας ως Ανοικτά  Διασυνδεδεμένα Δεδομένα.
 
 # Recogito Right Now
-landing.index.right_now=Recogito Right Now
-landing.index.edits_last_24hrs=Edits last 24hrs
+landing.index.right_now=Το Recogito τώρα
+landing.index.edits_last_24hrs=Τροποποιήσεις το τελευταίο 24ωρο

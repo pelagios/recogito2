@@ -1,4 +1,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.annotations = Annotations
+common.users = Users
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Benvenuti in Recogito
@@ -11,7 +17,7 @@ landing.index.jumbotron.tagline.2=without the pointy brackets
 landing.index.jumbotron.blurb=Crea mappe dal testo. Annota immagini. Connetti la tua ricerca ai \
   dati che sono disponibili in rete, per renderla più visibile e disponibile per riuso. Senza dover \
   diventare un esperto di Semantic Web.
-landing.index.jumbotron.label.learn_more=Più informazioni
+landing.index.jumbotron.learn_more=Più informazioni
 
 landing.index.registration_form.placeholder.username=Scegli un nome utente
 landing.index.registration_form.placeholder.email=Indirizzo email

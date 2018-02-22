@@ -1,4 +1,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.annotations = Annotations
+common.users = Users
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Bienvenue sur Recogito
@@ -8,10 +14,11 @@ landing.index.header.link.login=Se connecter
 # Jumbotron
 landing.index.jumbotron.tagline.1=Créez des annotations pour le
 landing.index.jumbotron.tagline.2=web de données de manière intuitive
-landing.index.jumbotron.blurb=Cartographiez des textes. Annotez des images. Mettez vos données de \
-  recherche en relation avec d''autres données présentes sur le web, donnez leur de la visibilité \
-  et rendez les partageables, sans avoir d''être un spécialiste du web sémantique.
-landing.index.jumbotron.label.learn_more=En savoir plus
+landing.index.jumbotron.blurb=Créez des cartes à partir de données géographiques issues de textes. \
+  Annotez des images. Mettez vos données de recherche en relation avec d'autres données présentes \
+  sur le web, augmentez leur visibilité en les rendant partageables, sans avoir besoin d'être un \
+  expert des technologies du Web Sémantique.
+landing.index.jumbotron.learn_more=En savoir plus
 
 landing.index.registration_form.placeholder.username=Choisissez un nom d'utilisateur
 landing.index.registration_form.placeholder.email=Courriel
@@ -46,5 +53,5 @@ landing.index.tiles.4.text=Affichez les résultats de votre travail sur le Web. 
   données sous forme de données  liées ouvertes.
 
 # Recogito Right Now
-landing.index.right_now=Recogito Right Now
-landing.index.edits_last_24hrs=Edits last 24hrs
+landing.index.right_now=L''actualité de Recogito
+landing.index.edits_last_24hrs=Modifications des 24 dernières heures

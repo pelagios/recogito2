@@ -59,7 +59,7 @@
             @messages("landing.index.jumbotron.blurb")
           </p>
           <a href="@controllers.help.routes.HelpController.showTutorial()">
-            @messages("landing.index.jumbotron.label.learn_more")
+            @messages("landing.index.jumbotron.learn_more")
           </a>
         </div> <!-- jumbotron-left -->
 
@@ -148,23 +148,23 @@
     <div class="recogito-rightnow">
       <div class="rn-title">
         <span class="outline-icon">&#xe87f;</span>
-        <h2>Recogito Right Now</h2>
+        <h2>@messages("landing.index.right_now")</h2>
       </div>
 
       <div class="rn-widget">
         <div class="rn-segment annotations">
           <h3>&nbsp;</h3>
-          <p>Annotations</p>
+          <p>@messages("common.annotations")</p>
         </div>
 
         <div class="rn-segment edits">
           <h3>&nbsp;</h3>
-          <p>Edits last 24hrs</p>
+          <p>@messages("landing.index.edits_last_24hrs")</p>
         </div>
 
         <div class="rn-segment users">
           <h3>&nbsp;</h3>
-          <p>Users</p>
+          <p>@messages("common.users")</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,10 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.annotations = Annotations
+common.users = Users
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Welcome to Recogito
@@ -6,11 +12,10 @@ landing.index.header.link.tutorial=Tutorial
 landing.index.header.link.login=Log In
 
 # Jumbotron
-landing.index.jumbotron.tagline.1=Linked Data annnotation
+landing.index.jumbotron.tagline.1=Semantic Annotation
 landing.index.jumbotron.tagline.2=without the pointy brackets
-landing.index.jumbotron.blurb=Create maps from text. Annotate images. Connect your research \
-  to other data on the Web and make it more open, visible and re-usable. Without \
-  the need to become a Semantic Web expert.
+landing.index.jumbotron.blurb=Work on texts and images. Identify and mark named entities. Use \
+  the data in other tools or connect to other data on the Web. Without the need to learn code.
 landing.index.jumbotron.learn_more=Learn More
 
 landing.index.registration_form.placeholder.username=Pick a username
@@ -32,17 +37,16 @@ landing.index.news.text=We are excited to announce that data from the \
 
 # Tiles
 landing.index.tiles.1.title=Shared Collections
-landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite others \
-  to collaborate.
+landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite \
+  others to collaborate.
 landing.index.tiles.2.title=Collaborative Annotation
 landing.index.tiles.2.text=Create notes. Tag. Discuss. Recogito tracks provenance and maintains \
   version history.
 landing.index.tiles.3.title=Semantics Included
-landing.index.tiles.3.text=Tag places and persons with controlled vocabularies easily with \
-  built-in support features.
+landing.index.tiles.3.text=Tag places, people and events and reveal the relations between them.
 landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Show the results of your work on the Web. Publish your data as Linked \
-  Open Data.
+landing.index.tiles.4.text=Export your data into other tools. Make the results of your work more \
+  open, visible and re-usable.
 
 # Recogito Right Now
 landing.index.right_now=Recogito Right Now
