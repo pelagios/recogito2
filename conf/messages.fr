@@ -1,23 +1,23 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-landing.index.page_title=Willkommen bei Recogito
+landing.index.page_title=Bienvenue sur Recogito
 landing.index.link.tutorial=Tutorial
 landing.index.link.login=Log In
 
 # Jumbotron and registration
 landing.index.jumbotron.tagline.1=Linked Data Annotation
 landing.index.jumbotron.tagline.2=ohne die spitzen Klammern
-landing.index.jumbotron.blurb=Karten aus Text erstellen. Bilder annotieren. Mit anderen \
-  Datenquellen verbinden und im Web sichtbar und wiederverwendbar machen. \
-  Alles ohne Expertenwissen!
-landing.index.jumbotron.label.learn_more=Mehr erfahren
+landing.index.jumbotron.blurb=Erstelle Karten aus Text. Annotiere Bilder. Bringe deine \
+  Forschungsergebnisse ins World Wide Web und mache sie offener, sichtbarer und \
+  für andere wiederverwendbar. Ohne dass du dafür zum Semantic Web Experten werden musst.
+landing.index.jumbotron.label.learn_more=Erfahre mehr
 landing.index.registration_form.placeholder.username=Benutzername
-landing.index.registration_form.placeholder.email=Deine Email Adresse
+landing.index.registration_form.placeholder.email=Deine E-Mail Adresse
 landing.index.registration_form.placeholder.password=Wähle ein Password
 landing.index.registration_form.placeholder.register=Account Erstellen
-landing.index.registration_form.disclaimer.text=Stimmen Sie unseren <a href="{0}">Benutzungsbedingungen</a> \
-  und dem Speichern Ihrer Email-Adresse zu.
+landing.index.registration_form.disclaimer.text=Ich stimme den <a href="{0}">Nutzungsbedingungen</a> \
+  und dem Speichern meiner E-Mail Adresse zu.
 
 # News
 landing.index.news.title=Neu in Recogito:

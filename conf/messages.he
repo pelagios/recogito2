@@ -6,8 +6,8 @@ landing.index.link.tutorial=Tutorial
 landing.index.link.login=Log In
 
 # Jumbotron and registration
-landing.index.jumbotron.tagline.1=Linked Data annnotation
-landing.index.jumbotron.tagline.2=without the pointy brackets
+landing.index.jumbotron.tagline.1=תיוג נתונים מקושרים
+landing.index.jumbotron.tagline.2=ללא הסוגריים המחודדות
 landing.index.jumbotron.blurb=Create maps from text. Annotate images. Connect your research \
   to other data on the Web and make it more open, visible and re-usable. Without \
   the need to become a Semantic Web expert.

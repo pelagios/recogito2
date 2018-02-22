@@ -12,7 +12,7 @@ play.http.secret.key = "changeme"
 
 # The application languages
 # ~~~~~
-play.i18n.langs = [ "en", "de", "fa", "el" ]
+play.i18n.langs = [ "de", "el", "fa", "fr", "he", "it", "nl", "tr", "en" ]
 
 # Maximum size for file uploads
 # ~~~~~

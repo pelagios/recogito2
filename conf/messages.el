@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Splash page
+# Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Καλωσήλθατε στο Recogito
 landing.index.link.tutorial=Οδηγος χρήσης
