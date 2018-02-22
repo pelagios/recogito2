@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations = Annotations
-common.users = Users
+common.annotations=Annotations
+common.users=Users
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page

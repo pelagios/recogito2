@@ -24,15 +24,15 @@
     <thead>
       <tr>
         @views.html.tableHeader(Seq(
-          "author" -> "Author",
-          "title" -> "Title",
-          "language" -> "Language",
-          "date_freeform" -> "Date",
-          "uploaded_at" -> "Uploaded",
-          "last_modified_at" -> "Last edit",
-          "last_modified_by" -> "By",
-          "annotations" -> "Annotations",
-          "is_public" -> "Public"
+          "author" -> messages("my.table.header.author"),
+          "title" -> messages("my.table.header.title"),
+          "language" -> messages("my.table.header.language"),
+          "date_freeform" -> messages("my.table.header.date"),
+          "uploaded_at" -> messages("my.table.header.uploaded"),
+          "last_modified_at" -> messages("my.table.header.last_edit"),
+          "last_modified_by" -> messages("my.table.header.by"),
+          "annotations" -> messages("common.annotations"),
+          "is_public" -> messages("my.table.header.public")
         ), Some(sortBy), Some(sortOrder))
       </tr>
     </thead>

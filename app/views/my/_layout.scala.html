@@ -76,7 +76,7 @@
 
       <div class="tools">
         <div class="searchbox">
-          <input class="search inline" type="text" placeholder="Search..."/>
+          <input class="search inline" type="text" placeholder="@messages("my.tools.search")"/>
           <button class="search icon">&#xf002;</button>
         </div>
 
@@ -88,7 +88,7 @@
         <button class="nostyle add-folder" title="Create new folder">&#xe890;</button>
 
         <div class="import">
-          <a class="btn" href="@controllers.my.routes.UploadController.showStep1(user.username.toLowerCase)">New Document</a>
+          <a class="btn" href="@controllers.my.routes.UploadController.showStep1(user.username.toLowerCase)">@messages("my.tools.new_document")</a>
         </div>
 
       </div> <!-- .tools -->

@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations = Annotations
-common.users = Users
+common.annotations=Annotations
+common.users=Users
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
@@ -59,5 +59,21 @@ my.header.joined_on=Joined on
 my.header.account_settings=Account Settings
 my.header.space_used=Used
 my.header.logout=Logout
+
 my.tabs.my_documents=My Documents
 my.tabs.shared_with_me=Shared with me
+
+my.tools.search=Search
+my.tools.new_document=New Document
+
+my.table.header.author=Author
+my.table.header.title=Title
+my.table.header.language=Language
+my.table.header.date=Date
+my.table.header.uploaded=Uploaded
+my.table.header.last_edit=Last edit
+my.table.header.by=By
+my.table.header.public=Public
+my.table.header.owner=Owner
+my.table.header.shared_by=Shared by
+my.table.header.access_level=Access

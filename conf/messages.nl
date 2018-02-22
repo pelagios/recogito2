@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations = Annotaties
-common.users = Gebruikers 
+common.annotations=Annotaties
+common.users=Gebruikers
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
@@ -44,3 +44,29 @@ landing.index.tiles.4.text=Laat uw resultaten zien op het Web. Publiceer uw data
 # Recogito Right Now
 landing.index.right_now=Recogito nu
 landing.index.edits_last_24hrs=Wijzigingen 24 uur
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal space
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my.header.joined_on=Lid sinds
+my.header.account_settings=Profielinstellingen
+my.header.space_used=Gebruikt
+my.header.logout=Uitloggen
+
+my.tabs.my_documents=Mijn Documenten
+my.tabs.shared_with_me=Gedeeld met mij
+
+my.tools.search=Zoeken
+my.tools.new_document=Nieuw document
+
+my.table.header.author=Auteur
+my.table.header.title=Titel
+my.table.header.language=Taal
+my.table.header.date=Datum
+my.table.header.uploaded=Geupload
+my.table.header.last_edit=Laatste wijziging
+my.table.header.by=Door
+my.table.header.public=Publiek
+my.table.header.owner=Eigenaar
+my.table.header.shared_by=Gedeeld door
+my.table.header.access_level=Toegang

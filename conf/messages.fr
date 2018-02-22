@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations = Annotations
-common.users = Users
+common.annotations=Annotations
+common.users=Users
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
@@ -26,7 +26,7 @@ landing.index.registration_form.placeholder.password=Créer un mot de passe
 landing.index.registration_form.placeholder.register=S'inscrire sur Recogito
 landing.index.registration_form.disclaimer.text=Veuillez accepter nos <a href="{0}">conditions \
   d''utilisation</a> et l''enregistrement de votre courriel.
-  
+
 # News
 landing.index.news.title=Nouveau sur Recogito
 landing.index.news.subtitle=SIG historique chinois
@@ -55,3 +55,29 @@ landing.index.tiles.4.text=Affichez les résultats de votre travail sur le Web. 
 # Recogito Right Now
 landing.index.right_now=L''actualité de Recogito
 landing.index.edits_last_24hrs=Modifications des 24 dernières heures
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal space
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my.header.joined_on=Membre depuis le
+my.header.account_settings=Paramètres du compte
+my.header.space_used=Utilisé
+my.header.logout=Déconnexion
+
+my.tabs.my_documents=Mes documents
+my.tabs.shared_with_me=Partagé avec moi
+
+my.tools.search=Rechercher
+my.tools.new_document=Nouveau document
+
+my.table.header.author=Auteur
+my.table.header.title=Titre
+my.table.header.language=Langue
+my.table.header.date=Date
+my.table.header.uploaded=Téléchargé
+my.table.header.last_edit=Dernière édition
+my.table.header.by=Par
+my.table.header.public=Public
+my.table.header.owner=Propriétaire
+my.table.header.shared_by=Partagé par
+my.table.header.access_level=Accès

@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations = Annotations
-common.users = Users
+common.annotations=Annotations
+common.users=Users
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
@@ -43,3 +43,14 @@ landing.index.tiles.4.text=نتایج خود را روی وب نمایش دهی�
 # Recogito Right Now
 landing.index.right_now=Recogito Right Now
 landing.index.edits_last_24hrs=Edits last 24hrs
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal space
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my.header.joined_on=Joined on
+my.header.account_settings=Account Settings
+my.header.space_used=Used
+my.header.logout=Logout
+
+my.tabs.my_documents=My Documents
+my.tabs.shared_with_me=Shared with me
