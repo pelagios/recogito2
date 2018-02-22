@@ -40,10 +40,8 @@
           <a href="@controllers.help.routes.HelpController.showTutorial()">
             @messages("landing.index.header.link.tutorial")
           </a>
-        </span>
 
-        <span class="header-buttons">
-          <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm(None)" class="btn outline">
+          <a class="btn outline login" href="@controllers.landing.routes.LoginLogoutController.showLoginForm(None)">
             @messages("landing.index.header.link.login")
           </a>
         </span>
