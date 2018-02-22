@@ -67,7 +67,6 @@ landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
   <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Follow us on \
   <a href="{3}" target="_blank">Twitter</a>
 
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

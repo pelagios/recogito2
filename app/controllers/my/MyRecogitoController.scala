@@ -86,7 +86,7 @@ class MyRecogitoController @Inject() (
     val startTime = System.currentTimeMillis
     val fSharedCount = documents.countBySharedWith(user.username)
     val pageSize = size.getOrElse(DEFAULT_DOCUMENTS_PER_PAGE)
-
+    
     val fMyDocs =
       if (isSortingByIndex(sortBy)) {
         documents.listAllIdsByOwner(user.username).flatMap { docIds =>
