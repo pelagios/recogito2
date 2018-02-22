@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations=Annotations
-common.users=Users
+common.annotations=Annotazioni
+common.users=Utenti
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
@@ -37,19 +37,28 @@ landing.index.news.text=Siamo felici di annunciare che dati provenineti dal \
   per mantenere questa straordinaria risorsa.
 
 # Tiles
-landing.index.tiles.1.title=Shared Collections
-landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite others \
-  to collaborate.
-landing.index.tiles.2.title=Collaborative Annotation
-landing.index.tiles.2.text=Create notes. Tag. Discuss. Recogito tracks provenance and maintains \
-  version history.
-landing.index.tiles.3.title=Semantics Included
-landing.index.tiles.3.text=Tag places and persons with controlled vocabularies easily with \
-  built-in support features.
+landing.index.tiles.1.title=Collezioni condivise
+landing.index.tiles.1.text=Carica testi e immagini. Crea la tua collezione. Invita altri a collaborare.
+landing.index.tiles.2.title=Annotazione collettiva
+landing.index.tiles.2.text=Crea commenti. Tagga. Discuti. Recogito registra e salva ogni modifica.
+landing.index.tiles.3.title=Semantici incluso
+landing.index.tiles.3.text=Tagga luoghi e persone in dizionari storici e geografici usando le \
+  funzioni interne, facili dausare.
 landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Show the results of your work on the Web. Publish your data as Linked \
-  Open Data.
+landing.index.tiles.4.text=Condividi i risultati del tuo lavoro sul Web. Pubblica la tua ricerca \
+  come Linked Open Data
 
 # Recogito Right Now
-landing.index.right_now=Recogito Right Now
-landing.index.edits_last_24hrs=Edits last 24hrs
+landing.index.right_now=Recogito Adesso
+landing.index.edits_last_24hrs=Modifiche 24 ore
+
+# About
+landing.index.about=Open Source Software realizzato da: <a href="{0}" target="_blank">Austrian Institute \
+  of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
+  <a href="{2}" target="_blank">Humboldt Institute for Internet and Society</a>, \
+  <a href="{3}" target="_blank">The Open University</a> and \
+  <a href="{4}" target="_blank">University of London</a>. Finanziato da Andrew W. Mellon \
+  Foundation.
+landing.index.visit_us=<span class="icon">{0}</span> Vieni a trovarci su \
+  <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Seguici su \
+  <a href="{3}" target="_blank">Twitter</a>
