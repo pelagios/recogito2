@@ -7,28 +7,28 @@ common.users = Users
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-landing.index.page_title=Welcome to Recogito
+landing.index.page_title=Recogito'ya hoşgeldiniz
 landing.index.header.link.tutorial=Tutorial
-landing.index.header.link.login=Log In
+landing.index.header.link.login=Giriş
 
 # Jumbotron
-landing.index.jumbotron.tagline.1=Linked Data annnotation
-landing.index.jumbotron.tagline.2=without the pointy brackets
-landing.index.jumbotron.blurb=Create maps from text. Annotate images. Connect your research \
-  to other data on the Web and make it more open, visible and re-usable. Without \
-  the need to become a Semantic Web expert.
-landing.index.jumbotron.learn_more=Learn More
+landing.index.jumbotron.tagline.1=Bağlı Veri notu
+landing.index.jumbotron.tagline.2=küme parantezleri olmadan
+landing.index.jumbotron.blurb=Metinlerden harita yaratın. Resimlere açıklamalar ekleyin. Böylecr \
+  Semantik Ağ uzmanı olmadan da araştırmanızı Web üzerinden başka verilerle ilişkilendirebilir, \
+  daha görünür ve yeniden kullanılabilir hale getirebilirsiniz.
+landing.index.jumbotron.learn_more=Daha Çok Bilgi Alın
 
-landing.index.registration_form.placeholder.username=Pick a username
-landing.index.registration_form.placeholder.email=Your email address
-landing.index.registration_form.placeholder.password=Create a password
-landing.index.registration_form.placeholder.register=Register for Recogito
-landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
-  and the storage of your E-Mail address.
+landing.index.registration_form.placeholder.username=Kullanıcı adı seçin
+landing.index.registration_form.placeholder.email=E posta adresiniz
+landing.index.registration_form.placeholder.password=Parola seçin
+landing.index.registration_form.placeholder.register=Recogito'ya kaydol
+landing.index.registration_form.disclaimer.text=Lütfen e-posta adresinizin saklanmasını ve \
+  <a href="{0}">Kurallar ve Kullanım Koşullarını</a> kabul ettiğinizi onaylayın.
 
 # News
-landing.index.news.title=New in Recogito:
-landing.index.news.subtitle=China Historical GIS
+landing.index.news.title=Recogito'da yenilikler:
+landing.index.news.subtitle=Tarihi Çin CBS'i
 landing.index.news.text=We are excited to announce that data from the \
   <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> is now \
   available in Recogito. This adds more than 71,000 places of Dynastic China from 221 BCE to 1911 \
@@ -37,9 +37,9 @@ landing.index.news.text=We are excited to announce that data from the \
   maintaining this brilliant resource!
 
 # Tiles
-landing.index.tiles.1.title=Shared Collections
-landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite others \
-  to collaborate.
+landing.index.tiles.1.title=Paylaşılan Koleksiyonlar
+landing.index.tiles.1.text=Metin ya da resim yükleyin. Kendi koleksiyonlarınızı oluşturun. \
+  Çalışmanıza katılmasını istediklerinizi davet edin.
 landing.index.tiles.2.title=Collaborative Annotation
 landing.index.tiles.2.text=Create notes. Tag. Discuss. Recogito tracks provenance and maintains \
   version history.

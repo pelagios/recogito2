@@ -11,6 +11,7 @@ import services.document.DocumentService
 import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
+import play.api.i18n.I18nSupport
 import play.api.mvc.{ControllerComponents, RequestHeader}
 import scala.concurrent.{ExecutionContext, Future}
 import storage.uploads.Uploads
@@ -27,7 +28,7 @@ class MyRecogitoController @Inject() (
     val silhouette: Silhouette[Security.Env],
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarsUtil
-  ) extends BaseController(components, config, users) {
+  ) extends BaseController(components, config, users) with I18nSupport {
 
   private val DEFAULT_DOCUMENTS_PER_PAGE = 10
   

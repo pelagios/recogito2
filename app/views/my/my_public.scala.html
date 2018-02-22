@@ -2,7 +2,7 @@
   owner: services.user.User,
   documents: services.Page[services.generated.tables.records.DocumentRecord],
   currentUser: Option[services.user.User]
-)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>

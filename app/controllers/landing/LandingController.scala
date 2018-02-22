@@ -1,5 +1,6 @@
 package controllers.landing
 
+import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{ HasConfig, HasUserService, HasVisitLogging, HasPrettyPrintJSON, Security }
 import javax.inject.{ Inject, Singleton }
 import services.annotation.AnnotationService
@@ -8,13 +9,10 @@ import services.user.UserService
 import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
-import play.api.i18n.Langs
-import play.api.libs.json.Json
-import play.api.mvc.{ Action, AbstractController }
-import scala.concurrent.ExecutionContext
-import play.api.mvc.ControllerComponents
-import com.mohiva.play.silhouette.api.Silhouette
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
+import play.api.mvc.{Action, AbstractController, ControllerComponents}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class LandingController @Inject() (

@@ -5,7 +5,7 @@
   sharedWithMeCount: Long,
   activeTab: String,
   pageSize: Option[Int]
-)(content: Html)(implicit webJarsUtil: org.webjars.play.WebJarsUtil)
+)(content: Html)(implicit messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
@@ -25,7 +25,7 @@
 
           <p class="member-since">
             <span class="icon">&#xf017;</span>
-            Joined on @user.memberSince.format("d MMM YYYY")
+            @messages("my.header.joined_on") @user.memberSince.format("d MMM YYYY")
           </p>
 
           <div class="used-diskspace">
@@ -33,21 +33,21 @@
               <div class="bar" style="width:@{Math.max(1.5, 100 * usedDiskspace.toDouble / (user.quotaMb * 1024)) }%"></div>
             </div>
             <span class="label">
-              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / 1024) } of @user.quotaMb MB Used
+              @{ new java.text.DecimalFormat("#.##").format(usedDiskspace.toDouble / 1024) } of @user.quotaMb MB @messages("my.header.space_used")
             </span>
           </div>
 
           <p>
             <a class="account-settings" href="@controllers.my.settings.routes.AccountSettingsController.index">
               <span class="icon">&#xf0ad;</span>
-              <span class="label">Account Settings</span>
+              <span class="label">@messages("my.header.account_settings")</span>
             </a>
          </p>
 
           <p>
             <a href="@controllers.landing.routes.LoginLogoutController.logout">
               <span class="icon">&#xf011;</span>
-              <span class="label">Logout</span>
+              <span class="label">@messages("my.header.logout")</span>
             </a>
           </p>
         </div>
@@ -62,11 +62,15 @@
     <div class="toolbar">
       <ul class="tabs">
         <li class="my-documents @if(activeTab == "my") { enabled }">
-          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("my"), None, None, None, pageSize)">My documents (@myDocCount)</a>
+          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("my"), None, None, None, pageSize)">
+            @messages("my.tabs.my_documents") (@myDocCount)
+          </a>
         </li><!--
 
         --><li class="shared-with-me @if(activeTab == "shared") { enabled }">
-          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("shared"), None, None, None, pageSize)">Shared with me (@sharedWithMeCount)</a>
+          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("shared"), None, None, None, pageSize)">
+            @messages("my.tabs.shared_with_me")  (@sharedWithMeCount)
+          </a>
         </li>
       </ul>
 

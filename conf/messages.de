@@ -12,7 +12,7 @@ landing.index.header.link.tutorial=Tutorial
 landing.index.header.link.login=Login
 
 # Jumbotron
-landing.index.jumbotron.tagline.1=Linked Data Annotation
+landing.index.jumbotron.tagline.1=Sematische Annotation
 landing.index.jumbotron.tagline.2=ohne die spitzen Klammern
 landing.index.jumbotron.blurb=Karten aus Text erstellen. Bilder annotieren. Mit anderen \
   Datenquellen verbinden und im Web sichtbar und wiederverwendbar machen. \
@@ -51,3 +51,13 @@ landing.index.tiles.4.text=Ergebnisse online vorstellen. Daten als Linked Data p
 # Recogito Right Now
 landing.index.right_now=Aktivität
 landing.index.edits_last_24hrs=Aktionen letzte 24h
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal space
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my.header.joined_on=Beigetreten am
+my.header.account_settings=Kontoeinstellungen
+my.header.space_used=In Gebrauch
+my.header.logout=Logout
+my.tabs.my_documents=Meine Dokumente
+my.tabs.shared_with_me=Mit mir geteilt
