@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Welcome to Recogito</title>
+    <title>@messages("landing.index.page_title")</title>
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@@pelagiosproject" />
@@ -38,13 +38,13 @@
 
         <span class="links">
           <a href="@controllers.help.routes.HelpController.showTutorial()">
-            @messages("landing.index.link.tutorial")
+            @messages("landing.index.header.link.tutorial")
           </a>
         </span>
 
         <span class="header-buttons">
           <a href="@controllers.landing.routes.LoginLogoutController.showLoginForm(None)" class="btn outline">
-            @messages("landing.index.link.login")
+            @messages("landing.index.header.link.login")
           </a>
         </span>
       </div>
@@ -113,7 +113,7 @@
         </div>
         <div class="three-quarters column">
           <p>
-            @Html(messages("landing.index.news.html"))
+            @Html(messages("landing.index.news.text"))
           </p>
         </div>
       </div>

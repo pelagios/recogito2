@@ -2,8 +2,8 @@
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Bienvenue sur Recogito
-landing.index.link.tutorial=Tutorial
-landing.index.link.login=Log In
+landing.index.header.link.tutorial=Tutorial
+landing.index.header.link.login=Log In
 
 # Jumbotron and registration
 landing.index.jumbotron.tagline.1=Linked Data Annotation
@@ -22,7 +22,7 @@ landing.index.registration_form.disclaimer.text=Ich stimme den <a href="{0}">Nut
 # News
 landing.index.news.title=Neu in Recogito:
 landing.index.news.subtitle=China Historical GIS
-landing.index.news.html=Wir freuen uns dass ab sofort die Ortsdaten des \
+landing.index.news.text=Wir freuen uns dass ab sofort die Ortsdaten des \
   <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> in \
   Recogito verfügbar sind. Das erweitert unseren geographischen Index um mehr als 71.000 Orte der \
   chinesischen Kaiserzeit, von 221 v. Chr. bis 1911. Herzlichen Dank an Lex Berman und das \

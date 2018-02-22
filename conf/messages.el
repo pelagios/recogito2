@@ -2,8 +2,8 @@
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Καλωσήλθατε στο Recogito
-landing.index.link.tutorial=Οδηγος χρήσης
-landing.index.link.login=Σύνδεση
+landing.index.header.link.tutorial=Οδηγος χρήσης
+landing.index.header.link.login=Σύνδεση
 
 # Jumbotron and registration
 landing.index.jumbotron.tagline.1=Επισημείωση διασυνδεδεμένων δεδομένων
@@ -20,7 +20,7 @@ landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms
 # News
 landing.index.news.title=New in Recogito:
 landing.index.news.subtitle=China Historical GIS
-landing.index.news.html=We are excited to announce that data from the \
+landing.index.news.text=We are excited to announce that data from the \
   <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> is now \
   available in Recogito. This adds more than 71,000 places of Dynastic China from 221 BCE to 1911 \
   CE to our geographical index. Our thanks to Lex Berman and the \

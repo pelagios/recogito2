@@ -2,8 +2,8 @@
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=به Recogito خوش آمدید
-landing.index.link.tutorial=آموزش
-landing.index.link.login=ورود
+landing.index.header.link.tutorial=آموزش
+landing.index.header.link.login=ورود
 
 # Jumbotron and registration
 landing.index.jumbotron.tagline.1=حاشيه نویسی Linked Data
@@ -20,7 +20,7 @@ landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms
 # News
 landing.index.news.title=کاربر جدید
 landing.index.news.subtitle=GIS تاریخی چین
-landing.index.news.html=خوشحالیم به اطلاع برسانیم که داده های <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> هم اکنون در Recogito فابل دسترسی هستند که بیش از ۷۱ هزار مکان تاریخی از زمان امپراطوری چین بین سالهای ٢٢۱ قبل از میلاد تا ۱۹۱۱ پس از میلاد را در بر میگیرد. با تشکر از Lex Berman و مرکز تحلیل جغرافیایی هارواد (Harvard Center for Geographic Analysis) برای حفظ و نگهداری این منبع ارزشمند.
+landing.index.news.text=خوشحالیم به اطلاع برسانیم که داده های <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> هم اکنون در Recogito فابل دسترسی هستند که بیش از ۷۱ هزار مکان تاریخی از زمان امپراطوری چین بین سالهای ٢٢۱ قبل از میلاد تا ۱۹۱۱ پس از میلاد را در بر میگیرد. با تشکر از Lex Berman و مرکز تحلیل جغرافیایی هارواد (Harvard Center for Geographic Analysis) برای حفظ و نگهداری این منبع ارزشمند.
 
 # Key messages
 landing.index.tiles.1.title=مجموعه های به اشتراک گذاشته شده

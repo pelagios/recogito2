@@ -2,8 +2,8 @@
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Benvenuti in Recogito
-landing.index.link.tutorial=Tutorial
-landing.index.link.login=Accedi
+landing.index.header.link.tutorial=Tutorial
+landing.index.header.link.login=Accedi
 
 # Jumbotron and registration
 landing.index.jumbotron.tagline.1=Linked Data annnotation
@@ -22,7 +22,7 @@ landing.index.registration_form.disclaimer.text=Acconsenti alle nostre <a href="
 # News
 landing.index.news.title=Novità in Recogito:
 landing.index.news.subtitle=Dizionario geografico-storico della Cina
-landing.index.news.html=Siamo felici di annunciare che dati provenineti dal \
+landing.index.news.text=Siamo felici di annunciare che dati provenineti dal \
   <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">Dizionario geografico-storico della Cina</a> \
   sono ora disponibili su Recogito. Questo aggiunge più di 71.000 luoghi della Cina dinastica (dal \
   221 BCE al 1911 CE) ai nostri indici geografici. Ringraziamo Lex Berman e \

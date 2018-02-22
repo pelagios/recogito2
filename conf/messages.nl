@@ -2,8 +2,8 @@
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Welkom bij Recogito
-landing.index.link.tutorial=Tutorial
-landing.index.link.login=Inloggen
+landing.index.header.link.tutorial=Tutorial
+landing.index.header.link.login=Inloggen
 
 # Jumbotron and registration
 landing.index.jumbotron.tagline.1=Linked Data annotatie
@@ -20,7 +20,7 @@ landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms
 # News
 landing.index.news.title=Nieuw in Recogito:
 landing.index.news.subtitle=China Historical GIS
-landing.index.news.html=De data van <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> is nu beschikbaar in Recogito. Hiermee zijn meer dan 71.000 plaatsnamen uit het Chinese Keizerrijk van 221 v. Chr. tot 1911 aan onze geografische index toegevoegd. Met dank aan Lex Berman en het <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> voor het onderhouden van deze resource!
+landing.index.news.text=De data van <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> is nu beschikbaar in Recogito. Hiermee zijn meer dan 71.000 plaatsnamen uit het Chinese Keizerrijk van 221 v. Chr. tot 1911 aan onze geografische index toegevoegd. Met dank aan Lex Berman en het <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> voor het onderhouden van deze resource!
 
 # Key messages
 landing.index.tiles.1.title=Shared Collections
