@@ -43,3 +43,7 @@ landing.index.tiles.3.text=Tag places and persons with controlled vocabularies e
 landing.index.tiles.4.title=Open Data
 landing.index.tiles.4.text=Show the results of your work on the Web. Publish your data as Linked \
   Open Data.
+
+# Recogito Right Now
+landing.index.right_now=Recogito Right Now
+landing.index.edits_last_24hrs=Edits last 24hrs

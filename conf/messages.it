@@ -5,13 +5,14 @@ landing.index.page_title=Benvenuti in Recogito
 landing.index.header.link.tutorial=Tutorial
 landing.index.header.link.login=Accedi
 
-# Jumbotron and registration
+# Jumbotron
 landing.index.jumbotron.tagline.1=Linked Data annnotation
 landing.index.jumbotron.tagline.2=without the pointy brackets
 landing.index.jumbotron.blurb=Crea mappe dal testo. Annota immagini. Connetti la tua ricerca ai \
   dati che sono disponibili in rete, per renderla più visibile e disponibile per riuso. Senza dover \
   diventare un esperto di Semantic Web.
 landing.index.jumbotron.label.learn_more=Più informazioni
+
 landing.index.registration_form.placeholder.username=Scegli un nome utente
 landing.index.registration_form.placeholder.email=Indirizzo email
 landing.index.registration_form.placeholder.password=Crea una password
@@ -29,7 +30,7 @@ landing.index.news.text=Siamo felici di annunciare che dati provenineti dal \
   <a href="http://gis.harvard.edu/" target="_blank">l'Harvard Center for Geographic Analysis</a> \
   per mantenere questa straordinaria risorsa.
 
-# Key messages
+# Tiles
 landing.index.tiles.1.title=Shared Collections
 landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite others \
   to collaborate.
@@ -42,3 +43,7 @@ landing.index.tiles.3.text=Tag places and persons with controlled vocabularies e
 landing.index.tiles.4.title=Open Data
 landing.index.tiles.4.text=Show the results of your work on the Web. Publish your data as Linked \
   Open Data.
+
+# Recogito Right Now
+landing.index.right_now=Recogito Right Now
+landing.index.edits_last_24hrs=Edits last 24hrs

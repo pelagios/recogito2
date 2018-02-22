@@ -11,13 +11,14 @@ landing.index.page_title=Willkommen bei Recogito
 landing.index.header.link.tutorial=Tutorial
 landing.index.header.link.login=Log In
 
-# Jumbotron and registration
+# Jumbotron
 landing.index.jumbotron.tagline.1=Linked Data Annotation
 landing.index.jumbotron.tagline.2=ohne die spitzen Klammern
 landing.index.jumbotron.blurb=Karten aus Text erstellen. Bilder annotieren. Mit anderen \
   Datenquellen verbinden und im Web sichtbar und wiederverwendbar machen. \
   Alles ohne Expertenwissen!
 landing.index.jumbotron.label.learn_more=Mehr erfahren
+
 landing.index.registration_form.placeholder.username=Benutzername
 landing.index.registration_form.placeholder.email=Deine Email Adresse
 landing.index.registration_form.placeholder.password=Wähle ein Password
@@ -35,7 +36,7 @@ landing.index.news.text=Wir freuen uns dass ab sofort die Ortsdaten des \
   <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> für \
   diese grossartige Initiative!
 
-# Key messages
+# Tiles
 landing.index.tiles.1.title=Sammlungen Teilen
 landing.index.tiles.1.text=Lade Texte und Bilder hoch. Erstelle eigene Sammlungen. Arbeite \
   individuell oder im Team.

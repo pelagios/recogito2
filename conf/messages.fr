@@ -2,43 +2,49 @@
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Bienvenue sur Recogito
-landing.index.header.link.tutorial=Tutorial
-landing.index.header.link.login=Log In
+landing.index.header.link.tutorial=Tutoriel
+landing.index.header.link.login=Se connecter
 
-# Jumbotron and registration
-landing.index.jumbotron.tagline.1=Linked Data Annotation
-landing.index.jumbotron.tagline.2=ohne die spitzen Klammern
-landing.index.jumbotron.blurb=Erstelle Karten aus Text. Annotiere Bilder. Bringe deine \
-  Forschungsergebnisse ins World Wide Web und mache sie offener, sichtbarer und \
-  für andere wiederverwendbar. Ohne dass du dafür zum Semantic Web Experten werden musst.
-landing.index.jumbotron.label.learn_more=Erfahre mehr
-landing.index.registration_form.placeholder.username=Benutzername
-landing.index.registration_form.placeholder.email=Deine E-Mail Adresse
-landing.index.registration_form.placeholder.password=Wähle ein Password
-landing.index.registration_form.placeholder.register=Account Erstellen
-landing.index.registration_form.disclaimer.text=Ich stimme den <a href="{0}">Nutzungsbedingungen</a> \
-  und dem Speichern meiner E-Mail Adresse zu.
+# Jumbotron
+landing.index.jumbotron.tagline.1=Créez des annotations pour le
+landing.index.jumbotron.tagline.2=web de données de manière intuitive
+landing.index.jumbotron.blurb=Cartographiez des textes. Annotez des images. Mettez vos données de \
+  recherche en relation avec d''autres données présentes sur le web, donnez leur de la visibilité \
+  et rendez les partageables, sans avoir d''être un spécialiste du web sémantique.
+landing.index.jumbotron.label.learn_more=En savoir plus
+
+landing.index.registration_form.placeholder.username=Choisissez un nom d'utilisateur
+landing.index.registration_form.placeholder.email=Courriel
+landing.index.registration_form.placeholder.password=Créer un mot de passe
+landing.index.registration_form.placeholder.register=S'inscrire sur Recogito
+landing.index.registration_form.disclaimer.text=Veuillez accepter nos <a href="{0}"> termes et \
+  conditions d'utilisation</a> et de stockage de votre courriel.
 
 # News
-landing.index.news.title=Neu in Recogito:
-landing.index.news.subtitle=China Historical GIS
-landing.index.news.text=Wir freuen uns dass ab sofort die Ortsdaten des \
-  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> in \
-  Recogito verfügbar sind. Das erweitert unseren geographischen Index um mehr als 71.000 Orte der \
-  chinesischen Kaiserzeit, von 221 v. Chr. bis 1911. Herzlichen Dank an Lex Berman und das \
-  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> für \
-  diese grossartige Initiative!
+landing.index.news.title=Nouveau sur Recogito
+landing.index.news.subtitle=SIG historique chinois
+landing.index.news.text=Nous sommes heureux de vous annoncer que les données du \
+  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">Système d''Information \
+  Géographico-Historique de la Chine</a> sont maintenant disponibles. Plus de 71 000 localités \
+  de l''Empire chinois, de 221 avant J.C. à 1911, ont été ajoutées à notre index géographique. \
+  Nous remercions chaleureusement Lex Berman et le \
+  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> pour \
+  leur brillante contribution!
 
-# Key messages
-landing.index.tiles.1.title=Sammlungen Teilen
-landing.index.tiles.1.text=Lade Texte und Bilder hoch. Erstelle eigene Sammlungen. Arbeite \
-  individuell oder im Team.
-landing.index.tiles.2.title=Kooperativ Annotieren
-landing.index.tiles.2.text=Erstelle Notizen, Tags und Kommentare. Recogito speichert die \
-  volle Versionshistorie.
-landing.index.tiles.3.title=Semantik Inklusive
-landing.index.tiles.3.text=Verknüpfe Orte und Personen einfach mit kontrollierten Vokabularen und \
-  Thesauri.
-landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Veröffentliche die Ergebnisse deiner Arbeit am Web - einfach und als \
-  Linked Open Data.
+# Tiles
+landing.index.tiles.1.title=Collections partagées
+landing.index.tiles.1.text=Téléversez textes et images. Constituez votre propre collection. \
+  Invitez d''autres personnes à collaborer.
+landing.index.tiles.2.title=Annotations collaboratives
+landing.index.tiles.2.text=Créez des notes. Balisez. Discutez. Recogito suit les provenances et \
+  maintient l''historique des versions.
+landing.index.tiles.3.title=Enrichi en sémantique
+landing.index.tiles.3.text=Indexez des noms de lieux et des noms de personnes à l''aide d'outils \
+  intégrés et intuififs liés à des vocabulaires contrôlés.
+landing.index.tiles.4.title=Données ouvertes
+landing.index.tiles.4.text=Affichez les résultats de votre travail sur le Web. Publier vos \
+  données sous forme de données  liées ouvertes.
+
+# Recogito Right Now
+landing.index.right_now=Recogito Right Now
+landing.index.edits_last_24hrs=Edits last 24hrs

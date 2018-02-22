@@ -5,11 +5,12 @@ landing.index.page_title=Καλωσήλθατε στο Recogito
 landing.index.header.link.tutorial=Οδηγος χρήσης
 landing.index.header.link.login=Σύνδεση
 
-# Jumbotron and registration
+# Jumbotron
 landing.index.jumbotron.tagline.1=Επισημείωση διασυνδεδεμένων δεδομένων
 landing.index.jumbotron.tagline.2=χωρίς τα άγκυστρα
 landing.index.jumbotron.blurb=Δημιουργήστε χάρτες από κείμενα. Επισημειώστε εικόνες. Συνδέστε την έρευνά σας με άλλα δεδομένα στο διαδίκτυο, βελτιώστε την ορατότητα και προωθηστε την επανάχρησή της. Χωρίς να χρειάζεται εξειδίκευση στο σημασιολογικό ιστό.
 landing.index.jumbotron.label.learn_more=Learn More
+
 landing.index.registration_form.placeholder.username=Επιλέξετε όνομα χρήστη
 landing.index.registration_form.placeholder.email=Διεύθυνση ηλεκτρονικού ταχυδρομείου
 landing.index.registration_form.placeholder.password=Δημιουργήστε κωδικό ασφαλείας
@@ -27,7 +28,7 @@ landing.index.news.text=We are excited to announce that data from the \
   <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> for \
   maintaining this brilliant resource!
 
-# Key messages
+# Tiles
 landing.index.tiles.1.title=Shared Collections
 landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite others \
   to collaborate.
@@ -40,3 +41,7 @@ landing.index.tiles.3.text=Tag places and persons with controlled vocabularies e
 landing.index.tiles.4.title=Open Data
 landing.index.tiles.4.text=Show the results of your work on the Web. Publish your data as Linked \
   Open Data.
+
+# Recogito Right Now
+landing.index.right_now=Recogito Right Now
+landing.index.edits_last_24hrs=Edits last 24hrs
