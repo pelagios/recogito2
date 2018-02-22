@@ -9,7 +9,7 @@ common.users = Users
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Willkommen bei Recogito
 landing.index.header.link.tutorial=Tutorial
-landing.index.header.link.login=Log In
+landing.index.header.link.login=Login
 
 # Jumbotron
 landing.index.jumbotron.tagline.1=Linked Data Annotation
@@ -20,8 +20,8 @@ landing.index.jumbotron.blurb=Karten aus Text erstellen. Bilder annotieren. Mit 
 landing.index.jumbotron.label.learn_more=Mehr erfahren
 
 landing.index.registration_form.placeholder.username=Benutzername
-landing.index.registration_form.placeholder.email=Deine Email Adresse
-landing.index.registration_form.placeholder.password=Wähle ein Password
+landing.index.registration_form.placeholder.email=Email-Adresse
+landing.index.registration_form.placeholder.password=Passwort
 landing.index.registration_form.placeholder.register=Account Erstellen
 landing.index.registration_form.disclaimer.text=Stimmen Sie unseren <a href="{0}">Benutzungsbedingungen</a> \
   und dem Speichern Ihrer Email-Adresse zu.
@@ -29,26 +29,24 @@ landing.index.registration_form.disclaimer.text=Stimmen Sie unseren <a href="{0}
 # News
 landing.index.news.title=Neu in Recogito:
 landing.index.news.subtitle=China Historical GIS
-landing.index.news.text=Wir freuen uns dass ab sofort die Ortsdaten des \
-  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> in \
-  Recogito verfügbar sind. Das erweitert unseren geographischen Index um mehr als 71.000 Orte der \
-  chinesischen Kaiserzeit, von 221 v. Chr. bis 1911. Herzlichen Dank an Lex Berman und das \
-  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> für \
-  diese grossartige Initiative!
+landing.index.news.text=Wir freuen uns, mitteilen zu können, dass die Daten des \
+  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> jetzt \
+  auf Recogito verfügbar sind. Damit wird unser geographischer Index um mehr als 71.000 Orte aus \
+  dem China der Zeit zwischen 221 v.Chr. und 1911 n.Chr. erweitert. Unser Dank gilt Lex Berman und \
+  dem <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> \
+  für die Bereitstellung dieses tollen Datenbestands!
 
 # Tiles
 landing.index.tiles.1.title=Sammlungen Teilen
-landing.index.tiles.1.text=Lade Texte und Bilder hoch. Erstelle eigene Sammlungen. Arbeite \
-  individuell oder im Team.
-landing.index.tiles.2.title=Kooperativ Annotieren
-landing.index.tiles.2.text=Erstelle Notizen, Tags und Kommentare. Recogito speichert die \
-  volle Versionshistorie.
-landing.index.tiles.3.title=Semantik Inklusive
-landing.index.tiles.3.text=Verknüpfe Orte und Personen einfach mit kontrollierten Vokabularen und \
-  Thesauri.
+landing.index.tiles.1.text=Texte und Bilder hochladen, eine eigene Sammlung anlegen, zur \
+  Zusammenarbeit einladen.
+landing.index.tiles.2.title=Kollaborativ Annotieren
+landing.index.tiles.2.text=Notizen anlegen, Tags verwenden, diskutieren. Recogito merkt sich jede \
+  Veränderung.
+landing.index.tiles.3.title=Semantik
+landing.index.tiles.3.text=Orte und Personen ganz einfach mit kontrollierten Vokabularen auszeichnen.
 landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Veröffentliche die Ergebnisse deiner Arbeit am Web - einfach und als \
-  Linked Open Data.
+landing.index.tiles.4.text=Ergebnisse online vorstellen. Daten als Linked Data publizieren.
 
 # Recogito Right Now
 landing.index.right_now=Recogito Right Now
