@@ -13,7 +13,7 @@ landing.index.header.link.login=Login
 
 # Jumbotron
 landing.index.jumbotron.tagline.1=Sematische Annotation
-landing.index.jumbotron.tagline.2=ohne die spitzen Klammern
+landing.index.jumbotron.tagline.2=ohne spitze Klammern
 landing.index.jumbotron.blurb=Karten aus Text erstellen. Bilder annotieren. Mit anderen \
   Datenquellen verbinden und im Web sichtbar und wiederverwendbar machen. \
   Alles ohne Expertenwissen!
@@ -51,6 +51,17 @@ landing.index.tiles.4.text=Ergebnisse online vorstellen. Daten als Linked Data p
 # Recogito Right Now
 landing.index.right_now=Aktivität
 landing.index.edits_last_24hrs=Aktionen letzte 24h
+
+# About
+landing.index.about=Open Source Software von: <a href="{0}" target="_blank">Austrian Institute \
+  of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
+  <a href="{2}" target="_blank">Humboldt Institut für Internet und Gesellschaft</a>, \
+  <a href="{3}" target="_blank">The Open University</a> und \
+  <a href="{4}" target="_blank">University of London</a>. Gefördert von der Andrew W. Mellon \
+  Foundation.
+landing.index.visit_us=<span class="icon">{0}</span> Besuchen Sie uns auf \
+  <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Folgen Sie uns auf \
+  <a href="{3}" target="_blank">Twitter</a>
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space

@@ -15,7 +15,7 @@ landing.index.header.link.login=Log In
 landing.index.jumbotron.tagline.1=Semantic Annotation
 landing.index.jumbotron.tagline.2=without the pointy brackets
 landing.index.jumbotron.blurb=Work on texts and images. Identify and mark named entities. Use \
-  the data in other tools or connect to other data on the Web. Without the need to learn code.
+  your data in other tools or connect to other data on the Web. Without the need to learn code.
 landing.index.jumbotron.learn_more=Learn More
 
 landing.index.registration_form.placeholder.username=Pick a username
@@ -51,6 +51,17 @@ landing.index.tiles.4.text=Export your data into other tools. Make the results o
 # Recogito Right Now
 landing.index.right_now=Recogito Right Now
 landing.index.edits_last_24hrs=Edits last 24hrs
+
+# About
+landing.index.about=Open Source Software by the <a href="{0}" target="_blank">Austrian Institute \
+  of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
+  <a href="{2}" target="_blank">Humboldt Institute for Internet and Society</a>, \
+  <a href="{3}" target="_blank">The Open University</a> and \
+  <a href="{4}" target="_blank">University of London</a>. Funded by the Andrew W. Mellon \
+  Foundation.
+landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
+  <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Follow us on \
+  <a href="{3}" target="_blank">Twitter</a>
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space
