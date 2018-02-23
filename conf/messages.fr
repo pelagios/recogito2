@@ -106,3 +106,13 @@ document.annotation.text.toolbar.color=COULEUR:
 document.annotation.text.toolbar.color.by_type=PAR TYPE D''ENTITÉ
 document.annotation.text.toolbar.color.by_status=PAR STATUS DE VÉRIFICATION
 document.annotation.text.toolbar.color.by_tag=PAR MARQUEUR
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Downloads
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.downloads.annotations.csv.text=Télécharger les annotations sous forme de données tabulaires pour les importer dans une feuille de calcul ou un SIG.
+document.downloads.annotations.rdf.text=Télécharger les annotations et les métadonnées du document en RDF, encodés selon les référenciels de l'Open Annotation et du Dublin Core.
+document.downloads.annotations.geojson.text=Télécharger les coordonnées des lieux dont le géo-référencement est confirmé au format GeoJSON FeatureCollection.
+document.downloads.annotations.kml.text=Télécharger les coordonnées des lieux dont le géo-référencment est confirmé pour affichage dans Google Earth.
+document.downloads.annotations.tei.text=Texte encodé en TEI/XML. Note : seules les annotations des \
+  lieux sont ajoutées pour l'instant. Les annotations redondantes sont exclues.

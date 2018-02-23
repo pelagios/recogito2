@@ -95,3 +95,14 @@ document.annotation.text.toolbar.color=KLEUR:
 document.annotation.text.toolbar.color.by_type=OP ENTITYTYPE
 document.annotation.text.toolbar.color.by_status=OP VERIFICATIESTATUS
 document.annotation.text.toolbar.color.by_tag=OP TAG
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Downloads
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.downloads.annotations.csv.text=Download annotaties als datatabel voor spreadsheet of GIS software.
+document.downloads.annotations.rdf.text=Download annotaties en documentmetadata als RDF, geëncodeerd met Open Annotation en Dublin Core.
+document.downloads.annotations.geojson.text=Bevestigde plaatsen met geotags in het document as GeoJSON FeatureCollection.
+document.downloads.annotations.kml.text=Bevestigde plaatsen met geotags als KML-bestand, voor bekijken in Google Earth.
+document.downloads.annotations.tei.text=Geannoteerde tekst als simpele TEI/XML serialisatie. \
+  NB: alleen plaatsnaamannotaties worden opgenomen in deze versie. Overlappende annotaties worden \
+  gefilterd omdat deze niet door TEI ondersteund worden.

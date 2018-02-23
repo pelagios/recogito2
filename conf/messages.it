@@ -102,3 +102,12 @@ document.annotation.text.toolbar.color=COLORI:
 document.annotation.text.toolbar.color.by_type=PER TIPO DI ENTITÀ
 document.annotation.text.toolbar.color.by_status=PER STATO DI VERIFICA
 document.annotation.text.toolbar.color.by_tag=PER TAG
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Downloads
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.downloads.annotations.csv.text=Scarica le annotazioni come tabelle di dati, pronte per essere importate in foglie elettronici o programmi GIS.
+document.downloads.annotations.rdf.text=Scarica annotazioni e metadata dei documenti in formato RDF, basate sui linguaggi standard Open Annotation e Dublin Core.
+document.downloads.annotations.geojson.text=Scarica i luoghi georisolti e verificati in formato GeoJSON FeatureCollection.
+document.downloads.annotations.kml.text=Scarica i luoghi georisolti e verificati in formato KML, per la visualizzazione in Google Earth.
+document.downloads.annotations.tei.text=Testo annotato in una serializzazione base. Nota bene: solo annotazioni relative ai luoghi sono incluse al momento. Inoltre, annotazioni sovrapposte sono scartate, perché non supportate dallo standard TEI.

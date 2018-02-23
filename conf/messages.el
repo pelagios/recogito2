@@ -61,3 +61,14 @@ landing.index.about=Λογισμικό ανοιχτού κώδικα του  <a 
 landing.index.visit_us=<span class="icon">{0}</span> πισκεφτείτε μας στο \
   <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Ακολουθήστε μας στο \
   <a href="{3}" target="_blank">Twitter</a>
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Downloads
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.downloads.annotations.csv.text=Κατεβάστε τις επισημειώσεις με τη μορφή πίνακα, για να το εισάγετε σε λογισμικό υπολογιστικών φύλλων ή σε ΣΓΠ.
+document.downloads.annotations.rdf.text=Κατεβάστε τις επισημειώσεις και τα μεταδεδομένα εγγράφων με μορφή RDF, κωδικοποιημένα με τη χρήση των προτύπων Open Annotation και Dublin Core.
+document.downloads.annotations.geojson.text=Επιβεβαιωμένες γεωχωρικά εντοπισμένες τοποθεσίες στο έγγραφο σε μορφή GeoJSON FeatureCollection.
+document.downloads.annotations.kml.text=Επιβεβαιωμένες γεωχωρικά εντοπισμένες τοποθεσίες σε μορφή αρχείου KML, για θέαση στο Google Earth.
+document.downloads.annotations.tei.text=Επισημειωμένο κείμενο σε βασική TEI/XML κωδικοποίηση. \
+  Σημείωση: μέχρι στιγμής περιλαμβάνονται μόνο επισημειώσεις τοπωνυμίων. Επίσης, οι \
+  αλληλοεπικαλυπτόμενες επισημειώσεις αφαιρούνται καθώς το TEI δεν τις υποστηρίζει.

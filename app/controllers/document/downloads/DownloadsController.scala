@@ -20,6 +20,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.Files.TemporaryFileCreator
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, ControllerComponents, Result}
 import play.api.http.{HttpEntity, FileMimeTypes}
 import scala.concurrent.{ExecutionContext, Future}
@@ -75,7 +76,8 @@ class DownloadsController @Inject() (
     with RDFSerializer
     with webannotation.WebAnnotationSerializer
     with tei.PlaintextSerializer
-    with tei.TEISerializer {
+    with tei.TEISerializer 
+    with I18nSupport {
   
   private def download(documentId: String, export: DocumentInfo => Future[Result])(implicit request: UserAwareRequest[Security.Env, AnyContent]) = {
     documentReadResponse(documentId, request.identity, { case (docInfo, _) => // Used just for the access permission check
