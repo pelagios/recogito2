@@ -42,9 +42,7 @@ object Visit extends HasDate {
 
 
 case class Client(
-  
-  ip: String,
-  
+
   userAgent: String,
   
   browser: String,
@@ -58,7 +56,6 @@ case class Client(
 object Client {
   
   implicit val clientFormat: Format[Client] = (
-    (JsPath \ "ip").format[String] and
     (JsPath \ "user_agent").format[String] and
     (JsPath \ "browser").format[String] and
     (JsPath \ "os").format[String] and

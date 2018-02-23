@@ -36,7 +36,6 @@ trait HasVisitLogging {
       request.headers.get(HeaderNames.REFERER),
       DateTime.now(),
       Client(
-        request.remoteAddress,
         userAgentHeader.getOrElse("UNKNOWN"),
         userAgent.map(_.getBrowser.getGroup.getName).getOrElse("UNKNOWN"),
         os.map(_.getName).getOrElse("UNKNOWN"),

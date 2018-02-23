@@ -35,7 +35,6 @@ class VisitSpec extends Specification {
       visit.accessLevel must equalTo(Some(DocumentAccessLevel.READ))
       
       val client = visit.client
-      client.ip must equalTo("62.218.164.126")
       client.userAgent must equalTo("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/52.0.2743.116 Chrome/52.0.2743.116 Safari/537.36")
       client.browser must equalTo("CHROME")
       client.os must equalTo("LINUX")
