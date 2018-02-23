@@ -18,6 +18,11 @@ common.document.license=Lizenz
 common.document.attribution=Zusätzliche Angaben
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common button labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.buttons.save_changes=Änderungen Speichern
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Willkommen bei Recogito
@@ -26,7 +31,7 @@ landing.index.header.link.login=Login
 
 # Jumbotron
 landing.index.jumbotron.tagline.1=Sematische Annotation
-landing.index.jumbotron.tagline.2=ohne spitze Klammern
+landing.index.jumbotron.tagline.2=ohne die spitzen Klammern
 landing.index.jumbotron.blurb=Karten aus Text erstellen. Bilder annotieren. Mit anderen \
   Datenquellen verbinden und im Web sichtbar und wiederverwendbar machen. \
   Alles ohne Expertenwissen!
@@ -99,6 +104,26 @@ my.table.header.shared_by=Geteilt von
 my.table.header.access_level=Zugang
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Account settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+account_settings.sidebar.account=Profil
+account_settings.sidebar.password=Passwort
+account_settings.sidebar.restore=Backup Wiederherstellen
+
+account_settings.account.account_settings=Profil
+account_settings.account.email=Email
+account_settings.account.name=Name
+account_settings.account.about_you=Über mich
+account_settings.account.website=Ihre Webseite
+account_settings.account.optional=Optional
+account_settings.account.delete.title=Benutzerkonto löschen
+account_settings.account.delete.warning=Achtung: Die Löschung des Benutzerkontos bedeutet \
+  zugleich, dass alle Ihre Dokumente und Auszeichnungen gelöscht werden. Die Löschung kann \
+  nicht rückgängig gemacht werden. Bitte prüfen Sie, ob Sie Backup-Pakete aller Dokumente \
+  anlegen möchten.
+account_settings.account.delete.button=Benutzerkonto löschen
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.annotation.text.toolbar.annotation_mode=ANNOTATIONSMODUS:
@@ -134,4 +159,3 @@ document.settings.sidebar.delete=Löschen
 
 # Metadata
 document.settings.metadata.document_metadata=Metadaten des Dokuments
-document.settings.metadata.document_metadata.save=Änderungen Speichern

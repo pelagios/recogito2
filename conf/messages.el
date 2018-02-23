@@ -18,6 +18,11 @@ common.document.license=Άδεια χρήσης
 common.document.attribution=Αναφορά δημιουργού
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common button labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.buttons.save_changes=Save Changes
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Καλωσήλθατε στο Recogito

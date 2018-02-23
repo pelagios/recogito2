@@ -1,4 +1,4 @@
-@(user: services.user.User)(implicit flash: Flash)
+@(user: services.user.User)(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 <html>
   <head>
@@ -13,19 +13,19 @@
       <ul class="menu">
         <li>
           <a href="@controllers.my.settings.routes.AccountSettingsController.index">
-            <span class="label">Account</span>
+            <span class="label">@messages("account_settings.sidebar.account")</span>
           </a>
         </li>
 
         <li>
           <a href="@controllers.my.settings.routes.PasswordSettingsController.index">
-            <span class="label">Password</span>
+            <span class="label">@messages("account_settings.sidebar.password")</span>
           </a>
         </li>
 
         <li class="active">
           <a href="#" onclick="return false;">
-            <span class="label">Restore from Backup</span>
+            <span class="label">@messages("account_settings.sidebar.restore")</span>
           </a>
         </li>
       </ul>

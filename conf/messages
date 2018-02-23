@@ -18,6 +18,11 @@ common.document.license=License
 common.document.attribution=Attribution
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common button labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.buttons.save_changes=Save Changes
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Welcome to Recogito
@@ -99,6 +104,25 @@ my.table.header.shared_by=Shared by
 my.table.header.access_level=Access
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Account settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+account_settings.sidebar.account=Account
+account_settings.sidebar.password=Password
+account_settings.sidebar.restore=Restore from Backup
+
+account_settings.account.account_settings=Account Settings
+account_settings.account.email=E-Mail
+account_settings.account.name=Name
+account_settings.account.about_you=About You
+account_settings.account.website=Your Website
+account_settings.account.optional=Optional
+account_settings.account.delete.title=Delete Account
+account_settings.account.delete.warning=Warning: deleting your account will also delete all your \
+  documents and annotations. Make sure have created backups of all documents you want to keep. \
+  Deleting your account is irreversible.
+account_settings.account.delete.button=Delete my account
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.annotation.text.toolbar.annotation_mode=ANNOTATION MODE:
@@ -134,4 +158,3 @@ document.settings.sidebar.delete=Delete
 
 # Metadata
 document.settings.metadata.document_metadata=Document Metadata
-document.settings.metadata.document_metadata.save=Save Changes

@@ -18,6 +18,11 @@ common.document.license=Licenza
 common.document.attribution=Attribuzione
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common button labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.buttons.save_changes=Salva modifiche
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Benvenuti in Recogito
@@ -132,4 +137,3 @@ document.settings.sidebar.delete=Elimina
 
 # Metadata
 document.settings.metadata.document_metadata=Metadata del documento
-document.settings.metadata.document_metadata.save=Salva modifiche

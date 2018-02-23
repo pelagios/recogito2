@@ -18,6 +18,11 @@ common.document.license=Licentie
 common.document.attribution=Attributie
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common button labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.buttons.save_changes=Wijzigingen opslaan
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Welkom bij Recogito
@@ -127,4 +132,3 @@ document.settings.sidebar.delete=Verwijderen
 
 # Metadata
 document.settings.metadata.document_metadata=Documentmetadata
-document.settings.metadata.document_metadata.save=Wijzigingen opslaan

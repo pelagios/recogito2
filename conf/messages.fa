@@ -1,7 +1,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations=Annotations
+common.annotations=حاشیه نویسی ها
 common.users=Users
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -16,6 +16,11 @@ common.document.source=منبع
 common.document.edition=نسخه
 common.document.license=مجوز
 common.document.attribution=ارجاع حق نشر
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common button labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.buttons.save_changes=ذخیره تغییرات
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
@@ -59,13 +64,24 @@ landing.index.edits_last_24hrs=Edits last 24hrs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=Joined on
-my.header.account_settings=Account Settings
-my.header.space_used=Used
-my.header.logout=Logout
+my.header.joined_on=عضو شده از
+my.header.account_settings=تنظیمات کاربری
+my.header.space_used=استفاده شده
+my.header.logout=خروج
 
-my.tabs.my_documents=My Documents
-my.tabs.shared_with_me=Shared with me
+my.tabs.my_documents=مستندات من
+my.tabs.shared_with_me=اشتراک گذاری شده با من
+
+my.tools.search=جستجو
+my.tools.new_document=سند جدید
+
+my.table.header.uploaded=بارگذاری شده
+my.table.header.last_edit=آخرین ویرایش
+my.table.header.by=توسط
+my.table.header.public=عمومی
+my.table.header.owner=صاحب امتیاز
+my.table.header.shared_by=اشتراک گذاری شده توسط
+my.table.header.access_level=دسترسی
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document settings
@@ -78,4 +94,3 @@ document.settings.sidebar.delete=پاک کردن
 
 # Metadata
 document.settings.metadata.document_metadata=فراداده سند
-document.settings.metadata.document_metadata.save=ذخیره تغییرات
