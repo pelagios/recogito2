@@ -15,5 +15,7 @@ define({
     'btn_ok_and_next': 'OK &amp; Next',
     'btn_ok': 'OK'
    },
-  'de': true
+  'de': true,
+  'fr': true,
+  'it': true
 });

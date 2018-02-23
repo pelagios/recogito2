@@ -81,3 +81,17 @@ my.table.header.public=Publiek
 my.table.header.owner=Eigenaar
 my.table.header.shared_by=Gedeeld door
 my.table.header.access_level=Toegang
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Text annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.text.toolbar.annotation_mode=ANNOTATIEMODUS:
+document.annotation.text.toolbar.mode.normal=NORMAAL
+document.annotation.text.toolbar.mode.quick=SNEL
+document.annotation.text.toolbar.mode.quick.places=Plaatsen
+document.annotation.text.toolbar.mode.quick.persons=Personen
+document.annotation.text.toolbar.mode.quick.tags=Tags
+document.annotation.text.toolbar.color=KLEUR:
+document.annotation.text.toolbar.color.by_type=OP ENTITYTYPE
+document.annotation.text.toolbar.color.by_status=OP VERIFICATIESTATUS
+document.annotation.text.toolbar.color.by_tag=OP TAG

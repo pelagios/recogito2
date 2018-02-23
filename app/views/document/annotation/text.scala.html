@@ -5,7 +5,7 @@
   accessLevel: services.document.DocumentAccessLevel,
   annotationCount: Long,
   content: String
- )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+ )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
@@ -46,7 +46,7 @@
       <p class="source">@views.html.document.sourceLink(doc.source)</p>
       <p class="quick-stats">
         <span class="icon comment">&#xf0e5;</span>
-        <span class="annotations">-</span> Annotations
+        <span class="annotations">-</span> @messages("common.annotations")
         &nbsp; &centerdot; &nbsp;
         <span class="icon">&#xf0c0;</span>
         <span class="contributors">No Other Contributors</span>
@@ -60,16 +60,24 @@
     <div class="header-toolbar">
       <ul class="menu">
         <li class="group annotation-mode">
-          <h3>ANNOTATION MODE:</h3>
+          <h3>@messages("document.annotation.text.toolbar.annotation_mode")</h3>
           <ul>
-            <li data-mode="NORMAL" class="active"><span class="label">NORMAL</span></li>
+            <li data-mode="NORMAL" class="active">
+              <span class="label">@messages("document.annotation.text.toolbar.mode.normal")</span>
+            </li>
             <li class="quick has-submenu">
-              <span class="label">QUICK</span>
+              <span class="label">@messages("document.annotation.text.toolbar.mode.quick")</span>
               <div class="submenu" style="display:none;">
                 <ul>
-                  <li data-mode="QUICK" data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
-                  <li data-mode="QUICK" data-type="PERSON"><span class="icon">&#xf007;</span> Persons</li>
-                  <li data-mode="QUICK" data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
+                  <li data-mode="QUICK" data-type="PLACE">
+                    <span class="icon">&#xf041;</span> @messages("document.annotation.text.toolbar.mode.quick.places")
+                  </li>
+                  <li data-mode="QUICK" data-type="PERSON">
+                    <span class="icon">&#xf007;</span> @messages("document.annotation.text.toolbar.mode.quick.persons")
+                  </li>
+                  <li data-mode="QUICK" data-type="TAGS" class="disabled">
+                    <span class="icon">&#xf02c;</span> @messages("document.annotation.text.toolbar.mode.quick.tags")
+                  </li>
                 </ul>
               </div>
             </li>
@@ -77,11 +85,17 @@
         </li>
 
         <li class="group color-scheme">
-          <h3>COLOR:</h3>
+          <h3>@messages("document.annotation.text.toolbar.color")</h3>
           <ul>
-            <li data-scheme="BY_TYPE" class="active"><span class="label">BY ENTITY TYPE</span></li>
-            <li data-scheme="BY_STATUS"><span class="label">BY VERIFICATION STATUS</span></li>
-            <li data-scheme="BY_TAG"><span class="label">BY FIRST TAG</span></li>
+            <li data-scheme="BY_TYPE" class="active">
+              <span class="label">@messages("document.annotation.text.toolbar.color.by_type")</span>
+            </li>
+            <li data-scheme="BY_STATUS">
+              <span class="label">@messages("document.annotation.text.toolbar.color.by_status")</span>
+            </li>
+            <li data-scheme="BY_TAG">
+              <span class="label">@messages("document.annotation.text.toolbar.color.by_tag")</span>
+            </li>
           </ul>
         </li>
       </ul> <!-- .menu -->

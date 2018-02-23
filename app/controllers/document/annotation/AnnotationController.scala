@@ -12,6 +12,7 @@ import services.user.{User, UserService}
 import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Logger}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{ControllerComponents, RequestHeader, Result}
 import scala.concurrent.{ExecutionContext, Future}
 import storage.uploads.Uploads
@@ -30,7 +31,8 @@ class AnnotationController @Inject() (
   implicit val ctx: ExecutionContext
 ) extends BaseOptAuthController(components, config, documents, users)
     with HasTEISnippets
-    with HasVisitLogging {
+    with HasVisitLogging 
+    with I18nSupport {
 
   /** For convenience: redirects to proper annotation view, given various ID combinations  **/
   def resolveAnnotationView(

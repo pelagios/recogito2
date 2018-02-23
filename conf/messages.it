@@ -88,3 +88,17 @@ my.table.header.public=Pubblico
 my.table.header.owner=Proprietario
 my.table.header.shared_by=Condiviso da
 my.table.header.access_level=Accesso
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Text annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.text.toolbar.annotation_mode=MODALITÀ ANNOTAZIONE:
+document.annotation.text.toolbar.mode.normal=NORMALE
+document.annotation.text.toolbar.mode.quick=VELOCE
+document.annotation.text.toolbar.mode.quick.places=Luoghi
+document.annotation.text.toolbar.mode.quick.persons=Persone
+document.annotation.text.toolbar.mode.quick.tags=Tags
+document.annotation.text.toolbar.color=COLORI:
+document.annotation.text.toolbar.color.by_type=PER TIPO DI ENTITÀ
+document.annotation.text.toolbar.color.by_status=PER STATO DI VERIFICA
+document.annotation.text.toolbar.color.by_tag=PER TAG
