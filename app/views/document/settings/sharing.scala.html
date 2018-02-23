@@ -2,7 +2,7 @@
   doc: services.document.DocumentInfo,
   currentUser: services.user.User,
   sharingPolicies: Seq[services.generated.tables.records.SharingPolicyRecord]
- )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+ )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Settings | Sharing", doc, currentUser, Some("sharing")) {
   <div class="panel share-public">

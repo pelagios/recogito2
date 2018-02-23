@@ -5,6 +5,19 @@ common.annotations=Επισημειώσεις
 common.users=Χρήστες
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common document-related labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.document.title=Τίτλος
+common.document.author=Συγγραφέας
+common.document.date=Ημερομηνία
+common.document.description=Περιγραφή
+common.document.language=Γλώσσα
+common.document.source=Πηγή
+common.document.edition=Έκδοση
+common.document.license=Άδεια χρήσης
+common.document.attribution=Αναφορά δημιουργού
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Καλωσήλθατε στο Recogito
@@ -61,6 +74,28 @@ landing.index.about=Λογισμικό ανοιχτού κώδικα του  <a 
 landing.index.visit_us=<span class="icon">{0}</span> πισκεφτείτε μας στο \
   <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Ακολουθήστε μας στο \
   <a href="{3}" target="_blank">Twitter</a>
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal space
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my.header.joined_on=Χρήστης από
+my.header.account_settings=Ρυθμίσεις λογαριασμού
+my.header.space_used=Χρησιμοποιήθηκαν
+my.header.logout=Αποσύνδεση
+
+my.tabs.my_documents=Τα έγγραφά μου
+my.tabs.shared_with_me=Μοιράστηκαν με μένα
+
+my.tools.search=Αναζήτηση
+my.tools.new_document=Νέο έγγραφο
+
+my.table.header.uploaded=Ημερομηνία μεταφόρτωσης
+my.table.header.last_edit=Τελευταία επεξεργασία
+my.table.header.by=Από
+my.table.header.public=Δημόσιο
+my.table.header.owner=Ιδιοκτήτης
+my.table.header.shared_by=Μοιράστηκε από
+my.table.header.access_level=Πρόσβαση
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads

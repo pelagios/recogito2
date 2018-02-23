@@ -3,7 +3,7 @@
   doc: services.document.DocumentInfo,
   currentUser: services.user.User,
   activeTab: Option[String]
-)(content: Html)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+)(content: Html)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
@@ -14,37 +14,42 @@
   <body>
     @views.html.document.iconbar(doc.document, Some(currentUser), services.document.DocumentAccessLevel.ADMIN, "settings")
 
-    <div class="sidebar">
+    <div class="sidebar"@views.html.dir(messages.lang)>
       @views.html.sidebarHeader(doc.owner)
 
       <ul class="menu">
         <li @if(activeTab == Some("metadata")) { class="active" }>
           <a href="?tab=metadata">
-            <span class="icon">&#xf02d;</span> <span class="label">Metadata</span>
+            <span class="icon">&#xf02d;</span>
+            <span class="label">@messages("document.settings.sidebar.metadata")</span>
           </a>
         </li>
 
         <li @if(activeTab == Some("sharing")) { class="active" }>
           <a href="?tab=sharing">
-            <span class="icon">&#xf234;</span> <span class="label">Sharing</span>
+            <span class="icon">&#xf234;</span>
+            <span class="label">@messages("document.settings.sidebar.sharing")</span>
           </a>
         </li>
 
         <li @if(activeTab == Some("history")) { class="active" }>
           <a href="?tab=history">
-            <span class="icon">&#xf1da;</span> <span class="label">Edit History</span>
+            <span class="icon">&#xf1da;</span>
+            <span class="label">@messages("document.settings.sidebar.edit_history")</span>
           </a>
         </li>
 
         <li @if(activeTab == Some("backup")) { class="active" }>
           <a href="?tab=backup">
-            <span class="icon">&#xf0c7;</span> <span class="label">Backup</span>
+            <span class="icon">&#xf0c7;</span>
+            <span class="label">@messages("document.settings.sidebar.backup")</span>
           </a>
         </li>
 
         <li @if(activeTab == Some("delete")) { class="active" }>
           <a href="?tab=delete">
-            <span class="icon">&#xf014;</span> <span class="label">Delete</span>
+            <span class="icon">&#xf014;</span>
+            <span class="label">@messages("document.settings.sidebar.delete")</span>
           </a>
         </li>
       </ul>

@@ -5,6 +5,19 @@ common.annotations=Annotations
 common.users=Users
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common document-related labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.document.title=عنوان
+common.document.author=نویسنده
+common.document.date=تاریخ
+common.document.description=توضیحات
+common.document.language=زبان
+common.document.source=منبع
+common.document.edition=نسخه
+common.document.license=مجوز
+common.document.attribution=ارجاع حق نشر
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=به Recogito خوش آمدید
@@ -53,3 +66,16 @@ my.header.logout=Logout
 
 my.tabs.my_documents=My Documents
 my.tabs.shared_with_me=Shared with me
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.settings.sidebar.metadata=فراداده
+document.settings.sidebar.sharing=به اشتراک گذاری
+document.settings.sidebar.edit_history=ویرایش تاریخچه
+document.settings.sidebar.backup=تهیه پشتیبان
+document.settings.sidebar.delete=پاک کردن
+
+# Metadata
+document.settings.metadata.document_metadata=فراداده سند
+document.settings.metadata.document_metadata.save=ذخیره تغییرات

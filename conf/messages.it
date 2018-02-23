@@ -5,6 +5,19 @@ common.annotations=Annotazioni
 common.users=Utenti
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common document-related labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.document.title=Titolo
+common.document.author=Autore
+common.document.date=Data
+common.document.description=Descrizione
+common.document.language=Lingua
+common.document.source=Fonte
+common.document.edition=Edizione
+common.document.license=Licenza
+common.document.attribution=Attribuzione
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Benvenuti in Recogito
@@ -77,10 +90,6 @@ my.tabs.shared_with_me=Condivisi come me
 my.tools.search=Cerca
 my.tools.new_document=Nuovo documento
 
-my.table.header.author=Autore
-my.table.header.title=Titolo
-my.table.header.language=Lingua
-my.table.header.date=Data
 my.table.header.uploaded=Caricato
 my.table.header.last_edit=Ultima modifica
 my.table.header.by=Da
@@ -111,3 +120,16 @@ document.downloads.annotations.rdf.text=Scarica annotazioni e metadata dei docum
 document.downloads.annotations.geojson.text=Scarica i luoghi georisolti e verificati in formato GeoJSON FeatureCollection.
 document.downloads.annotations.kml.text=Scarica i luoghi georisolti e verificati in formato KML, per la visualizzazione in Google Earth.
 document.downloads.annotations.tei.text=Testo annotato in una serializzazione base. Nota bene: solo annotazioni relative ai luoghi sono incluse al momento. Inoltre, annotazioni sovrapposte sono scartate, perché non supportate dallo standard TEI.
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.settings.sidebar.metadata=Metadata
+document.settings.sidebar.sharing=Condividi
+document.settings.sidebar.edit_history=Storia delle modifiche
+document.settings.sidebar.backup=Backup
+document.settings.sidebar.delete=Elimina
+
+# Metadata
+document.settings.metadata.document_metadata=Metadata del documento
+document.settings.metadata.document_metadata.save=Salva modifiche

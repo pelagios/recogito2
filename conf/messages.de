@@ -5,6 +5,19 @@ common.annotations=Annotationen
 common.users=Benutzer
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common document-related labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.document.title=Titel
+common.document.author=Autor
+common.document.date=Datum
+common.document.description=Beschreibung
+common.document.language=Sprache
+common.document.source=Quelle
+common.document.edition=Ausgabe
+common.document.license=Lizenz
+common.document.attribution=Zusätzliche Angaben
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Willkommen bei Recogito
@@ -77,10 +90,6 @@ my.tabs.shared_with_me=Mit mir geteilt
 my.tools.search=Suche
 my.tools.new_document=Neues Dokument
 
-my.table.header.author=Autor
-my.table.header.title=Titel
-my.table.header.language=Sprache
-my.table.header.date=Datum
 my.table.header.uploaded=Hochgeladen
 my.table.header.last_edit=Letzte Aktivität
 my.table.header.by=Von
@@ -113,3 +122,16 @@ document.downloads.annotations.kml.text=Bestätigte georefenzierte Orte als KML-
 document.downloads.annotations.tei.text=Annotierten Text als einfaches TEI/XML abspeichern. Bitte \
   beachten: aktuell sind nur die Auszeichnungen von Orten eingeschlossen. Weiterhin werden \
   überlappende Auszeichnungen nicht von TEI unterstützt.
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.settings.sidebar.metadata=Metadaten
+document.settings.sidebar.sharing=Freigeben
+document.settings.sidebar.edit_history=Änderungen
+document.settings.sidebar.backup=Backup
+document.settings.sidebar.delete=Löschen
+
+# Metadata
+document.settings.metadata.document_metadata=Metadaten des Dokuments
+document.settings.metadata.document_metadata.save=Änderungen Speichern

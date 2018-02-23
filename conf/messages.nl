@@ -5,6 +5,19 @@ common.annotations=Annotaties
 common.users=Gebruikers
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common document-related labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.document.title=Titel
+common.document.author=Auteur
+common.document.date=Datum
+common.document.description=Beschrijving
+common.document.language=Taal
+common.document.source=Bron
+common.document.edition=Editie
+common.document.license=Licentie
+common.document.attribution=Attributie
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Welkom bij Recogito
@@ -70,10 +83,6 @@ my.tabs.shared_with_me=Gedeeld met mij
 my.tools.search=Zoeken
 my.tools.new_document=Nieuw document
 
-my.table.header.author=Auteur
-my.table.header.title=Titel
-my.table.header.language=Taal
-my.table.header.date=Datum
 my.table.header.uploaded=Geupload
 my.table.header.last_edit=Laatste wijziging
 my.table.header.by=Door
@@ -106,3 +115,16 @@ document.downloads.annotations.kml.text=Bevestigde plaatsen met geotags als KML-
 document.downloads.annotations.tei.text=Geannoteerde tekst als simpele TEI/XML serialisatie. \
   NB: alleen plaatsnaamannotaties worden opgenomen in deze versie. Overlappende annotaties worden \
   gefilterd omdat deze niet door TEI ondersteund worden.
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.settings.sidebar.metadata=Metadata
+document.settings.sidebar.sharing=Delen
+document.settings.sidebar.edit_history=Revisiegeschiedenis
+document.settings.sidebar.backup=Backup
+document.settings.sidebar.delete=Verwijderen
+
+# Metadata
+document.settings.metadata.document_metadata=Documentmetadata
+document.settings.metadata.document_metadata.save=Wijzigingen opslaan

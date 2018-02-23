@@ -5,6 +5,19 @@ common.annotations=Annotations
 common.users=Utilisateurs
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common document-related labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.document.title=Titre
+common.document.author=Auteur
+common.document.date=Date
+common.document.description=Description
+common.document.language=Langue
+common.document.source=Source
+common.document.edition=Edition
+common.document.license=License
+common.document.attribution=Attribution
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Bienvenue sur Recogito
@@ -81,10 +94,6 @@ my.tabs.shared_with_me=Partagé avec moi
 my.tools.search=Rechercher
 my.tools.new_document=Nouveau document
 
-my.table.header.author=Auteur
-my.table.header.title=Titre
-my.table.header.language=Langue
-my.table.header.date=Date
 my.table.header.uploaded=Téléchargé
 my.table.header.last_edit=Dernière édition
 my.table.header.by=Par
@@ -116,3 +125,16 @@ document.downloads.annotations.geojson.text=Télécharger les coordonnées des l
 document.downloads.annotations.kml.text=Télécharger les coordonnées des lieux dont le géo-référencment est confirmé pour affichage dans Google Earth.
 document.downloads.annotations.tei.text=Texte encodé en TEI/XML. Note : seules les annotations des \
   lieux sont ajoutées pour l'instant. Les annotations redondantes sont exclues.
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.settings.sidebar.metadata=Métadonnées
+document.settings.sidebar.sharing=Partager
+document.settings.sidebar.edit_history=Historique d'édition
+document.settings.sidebar.backup=Sauvegarder
+document.settings.sidebar.delete=Effacer
+
+# Metadata
+document.settings.metadata.document_metadata=Métadonnées du document
+document.settings.metadata.document_metadata.save=Sauvegarder les modifications
