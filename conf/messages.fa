@@ -15,7 +15,7 @@ landing.index.header.link.login=ورود
 landing.index.jumbotron.tagline.1=حاشيه نویسی Linked Data
 landing.index.jumbotron.tagline.2=بدون کمانک
 landing.index.jumbotron.blurb=ایجاد نقشه از متن. حاشیه نویسی تصاویر. تحقیق خود را با سایر داده ها در وب مرتبط کنید و آن را قابل مشاهده و قابل استفاده مجدد کنید. بدون نیاز به تخصص در زمینه وب معنایی.
-landing.index.jumbotron.learn_more=Learn More
+landing.index.jumbotron.learn_more=بیشتر بدانید
 
 landing.index.registration_form.placeholder.username=انتخاب نام کاربری
 landing.index.registration_form.placeholder.email=نشانی ایمیل
@@ -35,8 +35,7 @@ landing.index.tiles.1.text= متن ها و تصاویر را بارگذاری ک
 landing.index.tiles.2.title=حاشیه نویسی گروهی
 landing.index.tiles.2.text=توضيحات و برچسب اضافه کنید. بحث کنید. Recogito پروانه ایجاد و تاریخچه نسخه برداری محتوا را حفظ و مدیریت می کند.
 landing.index.tiles.3.title=Semantics Included
-landing.index.tiles.3.text=Tag places and persons with controlled vocabularies easily with \
-  built-in support features.
+landing.index.tiles.3.text=با استفاده از کلمات کنترل شده و با امکان پشتیبانی موجود، افراد و مکان ها را براحتی برچسب گذاری کنید.
 landing.index.tiles.4.title=داده باز (Open Data)
 landing.index.tiles.4.text=نتایج خود را روی وب نمایش دهید. داده های خود را بعنوان Linked Open Data منتشر نمایید.
 

@@ -1,8 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations=Annotations
-common.users=Users
+common.annotations=Επισημειώσεις
+common.users=Χρήστες
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
@@ -50,3 +50,14 @@ landing.index.tiles.4.text=Παρουσιάστε τα αποτελέσματα 
 # Recogito Right Now
 landing.index.right_now=Το Recogito τώρα
 landing.index.edits_last_24hrs=Τροποποιήσεις το τελευταίο 24ωρο
+
+# About
+landing.index.about=Λογισμικό ανοιχτού κώδικα του  <a href="{0}" target="_blank">Αυστριακού Τεχνολογικού \
+  Ινστιτούτου</a>, του <a href="{1}" target="_blank">Exeter University</a>, του \
+  <a href="{2}" target="_blank">Ινστιτούτου Humboldt για το Διαδίκτυο και την Τεχνολογία</a>, του \
+  <a href="{3}" target="_blank">The Open University</a> και του \
+  <a href="{4}" target="_blank">University of London</a>. Με χρηματοδότηση από το Andrew W. Mellon \
+  Foundation.
+landing.index.visit_us=<span class="icon">{0}</span> πισκεφτείτε μας στο \
+  <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Ακολουθήστε μας στο \
+  <a href="{3}" target="_blank">Twitter</a>
