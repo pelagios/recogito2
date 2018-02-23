@@ -57,7 +57,6 @@ class VisitSpec extends Specification {
         Some("http://recogito.pelagios.org/rainer"),
         visitedAt,
         Client(
-          "62.218.164.126",
           "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
           "CHROME",
           "LINUX",

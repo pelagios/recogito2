@@ -2,9 +2,10 @@
  * A base class that encapsulates the common features of comment and transcription sections.
  */
 define([
+  'i18n!common/i18n/document/annotation/nls/editor',
   'common/config',
   'document/annotation/common/editor/sections/section'
-], function(Config, Section) {
+], function(I18N, Config, Section) {
 
   var EditableTextSection = function(element, annotationBody) {
     var self = this,
@@ -16,8 +17,8 @@ define([
 
         dropdownMenu = jQuery(
           '<ul class="edit-dropdown">' +
-            '<li data-fn="edit">Edit</li>' +
-            '<li data-fn="delete">Delete</li>' +
+            '<li data-fn="edit">' + I18N.dropdown_edit + '</li>' +
+            '<li data-fn="delete">' + I18N.dropdown_delete + '</li>' +
           '</ul>'),
 
         toggleEditDropdown = function(e) {

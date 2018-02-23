@@ -6,6 +6,10 @@ define({
 
     'placeholder_add_comment': 'Add a comment...',
     'placeholder_add_tag': 'Add tag...',
+    'placeholder_transcribe': 'Transcribe...',
+
+    'dropdown_edit': 'Edit',
+    'dropdown_delete': 'Delete',
 
     'btn_cancel': 'Cancel',
     'btn_ok_and_next': 'OK &amp; Next',

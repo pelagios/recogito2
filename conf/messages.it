@@ -62,3 +62,29 @@ landing.index.about=Open Source Software realizzato da: <a href="{0}" target="_b
 landing.index.visit_us=<span class="icon">{0}</span> Vieni a trovarci su \
   <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Seguici su \
   <a href="{3}" target="_blank">Twitter</a>
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Personal space
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+my.header.joined_on=Membro di
+my.header.account_settings=Impostazioni dell'account
+my.header.space_used=In uso
+my.header.logout=Disconnetti
+
+my.tabs.my_documents=Miei documenti
+my.tabs.shared_with_me=Condivisi come me
+
+my.tools.search=Cerca
+my.tools.new_document=Nuovo documento
+
+my.table.header.author=Autore
+my.table.header.title=Titolo
+my.table.header.language=Lingua
+my.table.header.date=Data
+my.table.header.uploaded=Caricato
+my.table.header.last_edit=Ultima modifica
+my.table.header.by=Da
+my.table.header.public=Pubblico
+my.table.header.owner=Proprietario
+my.table.header.shared_by=Condiviso da
+my.table.header.access_level=Accesso

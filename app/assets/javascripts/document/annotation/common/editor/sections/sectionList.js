@@ -1,4 +1,5 @@
 define([
+  'i18n!common/i18n/document/annotation/nls/editor',
   'document/annotation/common/editor/sections/comment/commentSection',
   'document/annotation/common/editor/sections/event/eventSection',
   'document/annotation/common/editor/sections/person/personSection',
@@ -10,6 +11,7 @@ define([
   'common/config',
   'common/hasEvents'
 ], function(
+  I18N,
   CommentSection,
   EventSection,
   PersonSection,
@@ -84,7 +86,7 @@ define([
               // Adds an empty 'Transcribe...' text entry field
           var initNewTranscriptionField = function() {
                 newTranscriptionField = new TextEntryField(transcriptionSectionEl, {
-                  placeholder: 'Transcribe...',
+                  placeholder: I18N.placeholder_transcribe,
                   cssClass: 'new-transcription',
                   bodyType: 'TRANSCRIPTION'
                 });

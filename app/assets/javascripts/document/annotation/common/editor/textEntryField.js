@@ -49,7 +49,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
               self.fireEvent('submit');
           }
         };
-
+    
     textarea.keyup(onKeyUp);
     parent.append(element);
 

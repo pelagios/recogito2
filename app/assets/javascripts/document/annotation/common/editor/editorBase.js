@@ -35,8 +35,9 @@ define([
     this.sectionList = new SectionList(element, annotations);
     this.currentSelection = false;
 
-    // Remove 'transcription' container in text mode
-    element.find('.transcription-sections').remove();
+    // Remove 'transcription' container, unless image mode
+    if (Config.contentType.indexOf('IMAGE') < 0)
+      element.find('.transcription-sections').remove();
 
     // Monitor key events
     jQuery(document.body).keydown(onKeyDown);
