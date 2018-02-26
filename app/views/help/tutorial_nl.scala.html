@@ -1,0 +1,299 @@
+@()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+@_layout("Recogito in 10 Minutes", "A quick tutorial of Recogito's most important features. Learn how to create annotations, map places and share your work with others.", "tutorial.css") {
+  <h1>10 Minute Tutorial</h1>
+  <span class="sub-title"><span class="icon">&#xf017;</span> Een korte introductie tot Recogito</span>
+} {
+  <div class="toc-wrapper">
+    <div class="toc">
+      <ul class="internal">
+        <li><a href="#what">Wat is Recogito?</a></li>
+        <li><a href="#upload">Upload een Document</a></li>
+        <li><a href="#annotations">Annotaties Creëren</a></li>
+        <li><a href="#map">Identificatie en Koppelen van Plaatsen</a></li>
+        <li><a href="#export">Data Exporteren</a></li>
+        <li><a href="#invite">Andere gebruikers uitnodigen </a></li>
+      </ul>
+
+      <div class="localized-versions">
+        <h3>This tutorial in</h3>
+        <ul>
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("de")">
+              <img src="@routes.Assets.versioned("images/flags/de.png")"> Deutsch
+            </a>
+          </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("es")">
+              <img src="@routes.Assets.versioned("images/flags/es.png")"> Espa&ntilde;ol
+            </a>
+          </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("it")">
+              <img src="@routes.Assets.versioned("images/flags/it.png")"> Italiano
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="article">
+    <div class="inner">
+      <p>
+        Deze korte tutorial geeft een overzicht van de belangrijkste features van Recogito.
+        <strong>Wat u leert:</strong>
+      </p>
+      <ul>
+        <li>Uploaden van tekst en afbeeldingen</li>
+        <li>Creëren van annotaties</li>
+        <li>Identificatie en linken van plaatsen in documenten</li>
+        <li>Exporteren van data voor hergebruik buiten Recogito</li>
+        <li>Anderen uitnodigen om samen te werken</li>
+      </ul>
+
+      <h2 id="what">Wat is Recogito?</h2>
+
+      <p>
+        Recogito is een online platform voor gezamenlijke documentannotatie. Het wordt gehost door
+        <a href="http://commons.pelagios.org" target="_blank">Pelagios Commons</a>, een digital
+        humanities initiatief voor het beter verbinden van online bronnen over het verleden.
+      </p>
+
+      <p>
+        Recogito biedt een persoonlijke map waar documenten geupload, verzameld en georganiseerd
+        kunnen worden - teksten, afbeeldingen en tabellen - en waar gebruikers samen kunnen werken
+        aan annotatie en interpretatie van deze bronnen. Recogito helpt uw werk zichtbaarder te
+        maken op het Web en om de resultaten als Open Data beschikbaar te maken.
+      </p>
+
+      <p>
+        In deze tutorial worden de belangrijkste aspecten van het werken met Recogito behandeld.
+        Voor de tutorial zijn nodig: een
+        <a href="http://recogito.pelagios.org/signup" target="_blank">Recogito profiel</a>, en
+        twee voorbeeldddocumenten: een platte .txt bestand met wat tekst en een afbeelding.
+      </p>
+
+      <p class="tip">
+        Tip: Open deze tutorial in een apart browservenster (of tab) zodat deze zichtbaar
+        blijft tijdens het doorlopen van de stappen.
+      </p>
+
+      <h2 id="upload">Stap 1. Upload een Document</h2>
+
+      <p>
+        <strong>Documenten</strong> worden gebruikt om materialen in Recogito te organiseren. Elk
+        document kan bestaan uit meerdere bestanden. Voor deze tutorial gebruiken we echter een
+        document dat bestaat uit een enkel tekstbestand.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/new-document.png")">
+      </p>
+
+      <p>
+        Klik <strong>Nieuw Document</strong>.
+      </p>
+
+      <h3>Om een tekstdocument te uploaden</h3>
+      <ol>
+        <li>Geef een titel voor het document en klik <strong>Volgende</strong>.</li>
+        <li>Upload het tekstdocument. Dit kan via <strong>Kies een document om te uploaden</strong>
+          waarna het in de documentbrowser te selecteren is, of een document kan met de muis
+          naar het uploadvenster gesleept worden.</li>
+        <li>Recogito kan automatisch namen herkennen in de tekst met
+          <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank">Named
+          Entity Recognition (NER)</a>. Dit betekent dat het systeem probeert automatisch namen
+          van personen en locaties te herkennen en te pre-annoteren. Kies hiervoor
+          <strong>Pas automatische annotatie</strong> en klik <strong>Volgende</strong>. </li>
+      </ol>
+
+      <p>
+        Het kan even duren voordat het NER systeem klaar is met het analyseren van het document,
+        dit hangt af van de lengte van het document. Als dit klaar is, klik <strong>Done</strong>.
+        Uw eerste document is nu beschikbaar in uw persoonlijke map.
+      </p>
+
+      <h3>Een nieuwe afbeelding uploaden</h3>
+      <p>
+        Herhaal bovenstaande stappen om een nieuw document te creëren voor een afbeelding.
+        In de laatste stap kan het een paar seconden duren voordat Recogito de afbeelding naar
+        heeft getransformeerd naar een afbeelding waar op in en uit te zoomen is.
+        Hierover meer informatie verderop in deze tutorial.
+      </p>
+
+      <h2 id="annotations">Stap 2. Annotaties Creëren</h2>
+      <p>
+        Open uw tekstdocument door een dubbelklik in de lijst. Dit brengt u naar de
+        <strong>annotatie-omgeving</strong>.
+      </p>
+
+      <h3>Het creëren van een tekstannoatie</h3>
+      <p>
+        Selecteer de tekst zoals in de meeste tekstprocessors:  klik en sleep met de muis of
+        dubbelklik op een woord. Commentaren en tags kunnen worden toegevoegd. De geselecteerde
+        tekst kan ook gemarkeerd worden als <strong>Plaats</strong>, <strong>Persoon</strong> of
+        <strong>Gebeurtenis</strong>. (In Stap 3 van de tutorial meer over Plaatsen.)
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/annotation-view.png")">
+      </p>
+
+      <p>
+        Probeer te experimenteren met de annotatie-editor. Delen van de annotatie kunnen apart
+        veranderd of verwijderd worden nadat ze zijn gecreërd. (Om een tag te verwijderen,
+        klik erop om toegang te krijgen tot de knop “Verwijderen”). Het verwijderen van delen van
+        een annotatie zal ook de kleurmarkering in de tekst verwijderen.
+      </p>
+
+      <h3>Het creëren van een annotatie in een afbeelding</h3>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/image-controls.png")" class="inline right">
+        Open het afbeeldingsdocument. Recogito heeft een <strong>zoomfunctie</strong> waarin
+        zelfs afbeeldingen van de hoogste resolutie makkelijk te navigeren zijn. Met de muis of
+        de <span class="key">+</span> <span class="key">-</span> knoppen rechts bovenin kan in-
+        en uitgezoomd worden. Op apparaten met een touchscreen kan het knijpgebaar
+        gebruikt worden. Bekijk verschillende onderdelen van de afbeelding door punten in de
+        afbeelding te verslepen.
+      </p>
+
+      <p>
+        De afbeelding kan <strong>geroteerd</strong> worden. Op een desktop computer, houdt
+        hiervoor <span class="key">SHIFT</span> + <span class="key">Alt</span> vast terwijl u de
+        afbeelding met de muis versleept. Op apparaten met een touchscreen kunt u het knijpgebaar
+        gebruiken. Gebruik de knop met de enkele pijl <span class="key icon">&#xf176;</span> om
+        een afbeelding weer snel naar de startoriëntatie te roteren.
+      </p>
+
+      <p>
+        Uw eerste afbeeldingsannotatie. In de werkbalk is een drop-down menu waar geschakeld kan
+        worden tussen de verschillende selectiemodussen in Recogito: Punt, Rechthoek en
+        Geroteerde Kader. Selecteer <strong>Punt</strong> en maak een annotatie door ergens in
+        de afbeelding te klikken. Schakel terug naar <strong>Beweeg</strong> om terug te gaan
+        naar de standaard afbeeldingsnavigatie.
+      </p>
+
+      <p>
+        Probeer nu een gebied te annoteren: gebruik hiervoor de <strong>Rechthoek</strong>-selectie.
+        Klik eenmaal om de hoek te selecteren waar het gebied begint. Klik nogmaals voor de
+        tegenovergestelde hoek.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/tilted-box.gif")">
+      </p>
+
+      <p>
+        Het <strong>Geroteerd Kader</strong> vergt misschien wat meer oefening; selecteer deze
+        optie van het menu. Klik <strong>en houdt</strong> de muisknop ingedrukt om de onderzijde
+        van het kader te selecteren. Laat de muisknop los. Verplaats de muis om de hoogte van het
+        kader te definiëren en klik als de juiste hoogte bereikt is.
+      </p>
+
+      <p class="tip">
+        Tip: het Geroteerde Kader is handig voor het annoteren van labels in kaarten. Omdat
+        er een expliciete onderlijn is, wordt in de data ook informatie over de oriëntatie van
+        het label opgeslagen.
+      </p>
+
+      <h2 id="map">Stap 3. Identificatie en Koppelen van Plaatsen</h2>
+
+      <p>
+        In Stap 1 is behandeld hoe woorden of woordgroepen in een document geannoteerd en als
+        plaats gemarkeerd kunnen worden. In deze stap leren we hoe deze referentie aan een
+        <a href="@controllers.help.routes.HelpController.showFAQ()#what-is-a-gazetteer">gazetteer</a>
+        te koppelen zodat Recogito deze op een kaart kan laten zien.
+      </p>
+
+      <p>
+        Klik op <strong>Plaats</strong> in de annotatie-editor. Recogito zal proberen een
+        automatische suggestie te geven uit de
+        <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">ondersteunde
+        gazetteers</a>. Deze suggestie kan <strong>bevestigd</strong> worden, of een betere
+        suggestie kan gevonden worden in de gazetteer zoekfunctie. Als er geen geschikte match
+        beschikbaar is, geeft Recogito de mogelijkheid om te markeren dat er geen geschikte
+        match was voor deze referentie.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/create-text-annotation.gif")">
+      </p>
+
+      <p>
+        Om het annotatiewerk te versnellen, zal Recogito automatisch de tekst doorzoeken voor
+        identieke frasen en de optie geven om de gazetteer opnieuw toe te passen voor de
+        gevonden matches.
+      </p>
+
+      <h2 id="export">Stap 4. Data Exporteren</h2>
+
+      <p>
+        Selecteer het <span class="outline-icon">&#xe875;</span> icoon in de hoofdnavigatiebalk.
+        Dit icoon leidt naar een overzicht van de <strong>exportopties</strong>. Naast de
+        exportopties op deze pagina is het ook mogelijk om een backup te downloaden
+        vanaf de pagina met <span class="outline-icon">&#xe8c9;</span> documentinstellingen.
+        We raden aan om regelmatig backups te maken.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/export.png")">
+      </p>
+
+      <h2 id="invite">Stap 5. Andere gebruikers uitnodigen </h2>
+
+      <p>
+        In deze laatste stap wordt uitgelegd hoe documenten gedeeld kunnen worden met andere
+        gebruikers in Recogito zodat in een team samengewerkt kan worden. Selecteer het
+        <span class="outline-icon">&#xe8c9;</span> icoon in de hoofdnavigatiebalk. Dit leidt
+        naar de pagina met <strong>Documentinstellingen</strong>. In de linkerkolom, klik
+        op <strong>Delen</strong>.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/share.gif")">
+      </p>
+
+      <p>
+        Gebruik het zoekveld onderaan het <strong>Medewerkers kader</strong> om een gebruiker
+        toegang te geven tot het document. Er zijn verschillende toegangsniveaus:
+      </p>
+
+      <ul>
+        <li><strong>Lezen</strong> geeft de gebruiker toegang om documenten en annotaties in te
+          zien, maar niet om annotaties en commentaren toe te voegen.</li>
+
+        <li><strong>Schrijven</strong> geeft toegang om het document te bekijken en te annoteren.</li>
+
+        <li><strong>Beheerder</strong> geeft toegang tot annoteren van het document maar ook voor
+          het aanpassen van documentmetadata, het uitnodigen van andere gebruikers en andere
+          handelingen zoals backups downloaden.</li>
+      </ul>
+
+      <h2>Congratulations!</h2>
+
+      <p>
+        U bent nu bekend met de belangrijkste aspecten van Recogito. In deze tutorial heeft u geleerd:
+      </p>
+
+      <ul>
+        <li>Documenten uploaden </li>
+        <li>Annotaties op teksten en afbeeldingen maken</li>
+        <li>Referenties naar plaatsen in teksten aan gazetteers koppelen</li>
+        <li>Data naar verschillende formaten exporteren</li>
+        <li>Andere gebruikers uitnodigen op uw project</li>
+      </ul>
+
+      <p>
+        Voor meer tips en contact met andere gebruikers bezoekt u het
+        <a href="http://commons.pelagios.org/groups/recogito-users/" target="_blank">Recogito Users
+        Forum</a>.
+      </p>
+    </div>
+  </div>
+
+  @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/help/tutorial.js")))
+}
