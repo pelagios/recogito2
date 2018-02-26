@@ -97,6 +97,30 @@ my.table.header.shared_by=Gedeeld door
 my.table.header.access_level=Toegang
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Account settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+account_settings.sidebar.account=Profiel
+account_settings.sidebar.password=Wachtwoord
+account_settings.sidebar.restore=Herstellen van backup
+
+account_settings.account.account_settings=Profiel
+account_settings.account.email=Email
+account_settings.account.name=Naam
+account_settings.account.about_you=Over u
+account_settings.account.website=Uw website
+account_settings.account.optional=Optioneel
+account_settings.account.delete.title=Profiel verwijderen
+account_settings.account.delete.warning=Waarschuwing: het verwijderen van uw profiel verwijdert \
+  ook alle documenten en annotaties. Zorg voor een backup van documenten die u wilt bewaren. \
+  Verwijderde profielen kunnen niet hersteld worden.
+account_settings.account.delete.button=Mijn profiel verwijderen
+
+account_settings.password.change_password=Wachtwoord aanpassen
+account_settings.password.current=Huidig wachtwoord
+account_settings.password.new=Nieuw wachtwoord
+account_settings.password.verify=Verifieer wachtwoord
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.annotation.text.toolbar.annotation_mode=ANNOTATIEMODUS:

@@ -126,6 +126,11 @@ account_settings.account.delete.warning=Attention: supprimer votre compte efface
   documents que vous voulez conserver. La suppression de votre compte est irréversible.
 account_settings.account.delete.button=Supprimer mon compte
 
+account_settings.password.change_password=Changer le mot de passe
+account_settings.password.current=Mot de passe actuel
+account_settings.password.new=Nouveau mot de passe
+account_settings.password.verify=Vérification du mot de passe
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

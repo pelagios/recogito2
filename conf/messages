@@ -122,6 +122,11 @@ account_settings.account.delete.warning=Warning: deleting your account will also
   Deleting your account is irreversible.
 account_settings.account.delete.button=Delete my account
 
+account_settings.password.change_password=Change Password
+account_settings.password.current=Current Password
+account_settings.password.new=New Password
+account_settings.password.verify=Verify Password
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

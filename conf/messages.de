@@ -123,6 +123,11 @@ account_settings.account.delete.warning=Achtung: Die Löschung des Benutzerkonto
   anlegen möchten.
 account_settings.account.delete.button=Benutzerkonto löschen
 
+account_settings.password.change_password=Passwort Ändern
+account_settings.password.current=Aktuelles Password
+account_settings.password.new=Neues Password
+account_settings.password.verify=Passwort bestätigen
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
