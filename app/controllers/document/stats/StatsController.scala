@@ -18,6 +18,7 @@ import play.api.Configuration
 import play.api.mvc.{AnyContent, Request, Result, ControllerComponents}
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.i18n.I18nSupport
 import plugins.PluginRegistry
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,7 +33,10 @@ class StatsController @Inject() (
   implicit val visitService: VisitService,
   implicit val webjars: WebJarsUtil,
   implicit val ctx: ExecutionContext
-) extends BaseOptAuthController(components, config, documents, users) with HasVisitLogging with HasPrettyPrintJSON {
+) extends BaseOptAuthController(components, config, documents, users) 
+    with HasVisitLogging 
+    with HasPrettyPrintJSON 
+    with I18nSupport {
   
   private val CSV_CONFIG = CsvConfiguration(',', '"', QuotePolicy.WhenNeeded, Header.None)
   

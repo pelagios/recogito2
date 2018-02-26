@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Account Settings</title>
+    <title>@messages("account_settings.sidebar.restore")</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/settings/index.css")"/>
   </head>
 
@@ -33,7 +33,7 @@
 
     <div class="content">
       <div class="restore panel centered">
-        <h2>Restore</h2>
+        <h2>@messages("account_settings.sidebar.restore")</h2>
         @flash.get("success").map { msg =>
           <div class="success flash-message"><span class="icon">&#xf00c;</span> @msg</div>
         }
@@ -41,14 +41,11 @@
           <div class="error flash-message"><span class="icon">&#xf00d;</span> @msg</div>
         }
         <div class="inner">
-          <p class="description">
-            You can restore a document from a ZIP package downloaded earlier through Recogito's
-            Backup function.
-          </p>
+          <p class="description">@messages("account_settings.restore.instructions")</p>
           @helper.form(action = controllers.my.settings.routes.RestoreController.restore(), 'enctype -> "multipart/form-data") {
             <input type="file" name="backup" id="backup" onchange="this.form.submit()">
             <label class="btn" for="backup">
-              <span class="icon">&#xf093;</span> Upload ZIP Backup Package
+              <span class="icon">&#xf093;</span> @messages("account_settings.restore.button")
             </label>
           }
         </div>

@@ -9,6 +9,7 @@ import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.ControllerComponents
+import play.api.i18n.I18nSupport
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -20,7 +21,7 @@ class DiscussionController @Inject() (
     val silhouette: Silhouette[Security.Env],
     implicit val webjars: WebJarsUtil,
     implicit val ctx: ExecutionContext
-  ) extends BaseAuthController(components, config, documents, users) {
+  ) extends BaseAuthController(components, config, documents, users) with I18nSupport {
 
   def showDiscussionBoard(documentId: String) = silhouette.SecuredAction.async { implicit request =>
     documentResponse(documentId, request.identity, { case (doc, accesslevel) =>

@@ -3,6 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 common.annotations=Επισημειώσεις
 common.users=Χρήστες
+common.logged_in_as=Σύνδεση ως
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common document-related labels
@@ -20,7 +21,7 @@ common.document.attribution=Αναφορά δημιουργού
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common button labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.buttons.save_changes=Save Changes
+common.buttons.save_changes=Αποθήκευση αλλαγών
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
@@ -126,6 +127,25 @@ account_settings.password.current=Τρέχων κωδικός πρόσβασης
 account_settings.password.new=Νέος κωδικός πρόσβασης
 account_settings.password.verify=Επιβεβαίωση κωδικού πρόσβασης
 
+account_settings.restore.instructions=Μπορείτε να ανακτήσετε ένα έγγραφο από μία δέσμη αρχείων ΖΙΡ \
+  που κατεβάσατε παλαιότερα χρησιμοποιώντας τη λειτουργία δημιουργίας αντιγράφων ασφαλείας \
+  του Recogito.
+account_settings.restore.button=Ανεβάστε μία δέσμη αρχείων ασφαλείας σε μορφή ΖΙΡ
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Text annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.text.toolbar.annotation_mode=ΣΕ ΛΕΙΤΟΥΡΓΊΑ ΕΠΙΣΗΜΕΊΩΣΗΣ:
+document.annotation.text.toolbar.mode.normal=ΚΑΝΟΝΙΚΌ
+document.annotation.text.toolbar.mode.quick=ΓΡΉΓΟΡΟ
+document.annotation.text.toolbar.mode.quick.places=Τόποι
+document.annotation.text.toolbar.mode.quick.persons=Πρόσωπα
+document.annotation.text.toolbar.mode.quick.tags=Ετικέτες
+document.annotation.text.toolbar.color=ΧΡΏΜΑ:
+document.annotation.text.toolbar.color.by_type=ΑΝΆ ΤΎΠΟ ΟΝΤΌΤΗΤΑΣ
+document.annotation.text.toolbar.color.by_status=ΑΝΆ ΚΑΤΆΣΤΑΣΗ ΕΠΙΒΕΒΑΊΩΣΗΣ
+document.annotation.text.toolbar.color.by_tag=ΑΝΆ ΕΤΙΚΈΤΑ
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,3 +156,23 @@ document.downloads.annotations.kml.text=Επιβεβαιωμένες γεωχω�
 document.downloads.annotations.tei.text=Επισημειωμένο κείμενο σε βασική TEI/XML κωδικοποίηση. \
   Σημείωση: μέχρι στιγμής περιλαμβάνονται μόνο επισημειώσεις τοπωνυμίων. Επίσης, οι \
   αλληλοεπικαλυπτόμενες επισημειώσεις αφαιρούνται καθώς το TEI δεν τις υποστηρίζει.
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.settings.sidebar.metadata=Μεταδεδομένα
+document.settings.sidebar.sharing=Διαμοιρασμός
+document.settings.sidebar.edit_history=Ιστορικό επεξεργασίας
+document.settings.sidebar.backup=Δημιουργία αντιγράφου ασφαλείας
+document.settings.sidebar.delete=Διαγραφή
+
+# Metadata
+document.settings.metadata.document_metadata=Μεταδεδομένα εγγράφου
+
+# Sharing
+document.settings.sharing.public_access=Δημόσια πρόσβαση
+document.settings.sharing.visible_to_all=Ορατό από όλους
+document.settings.sharing.public_instructions=Αυτό το έγγραφο θα είναι ορατό στο κοινό. Οι \
+  επισκέπτες μπορούν να δουν τις επισημειώσεις σας, αλλά όχι και να τις επεξεργαστούν. Οι \
+  επισκέπτες μπορούν, επίσης, να κατεβάσουν τα δεδομένα των επισημειώσεων από τη σελίδα της \
+  καταφόρτωσης. Σύνδεσμος για διαμοιρασμό:

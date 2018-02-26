@@ -3,6 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 common.annotations=Annotazioni
 common.users=Utenti
+common.logged_in_as=Logged in as
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common document-related labels
@@ -132,6 +133,10 @@ account_settings.password.current=Attuale password
 account_settings.password.new=Nuova password
 account_settings.password.verify=Verifica la password
 
+account_settings.restore.instructions=Puoi ripristinare un documento dall'archivio ZIP scaricato \
+  in precedenza attraverso la funzione Recogito Backup.
+account_settings.restore.button=Caica un archivio ZIP backup
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,3 +171,10 @@ document.settings.sidebar.delete=Elimina
 
 # Metadata
 document.settings.metadata.document_metadata=Metadata del documento
+
+# Sharing
+document.settings.sharing.public_access=Accesso pubblico
+document.settings.sharing.visible_to_all=Visibile a tutti
+document.settings.sharing.public_instructions=Questo documento sarà visibile a tutti. Gli utenti \
+  possono vedere le tue annotazioni ma non modificare il documento. Gli utenti possono anche \
+  scaricare le annotazioni come data attraverso le opzioni di download. Link per condividere:

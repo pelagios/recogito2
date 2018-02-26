@@ -3,7 +3,7 @@
   currentUser: Option[services.user.User],
   accessLevel: services.document.DocumentAccessLevel,
   activeView: String
- )(implicit request: RequestHeader)
+ )(implicit request: RequestHeader, messages: Messages)
   <div class="header-iconbar">
     <ul>
       <li class="tooltip bottom@if(activeView == "edit") { active}">

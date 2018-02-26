@@ -3,6 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 common.annotations=حاشیه نویسی ها
 common.users=Users
+common.logged_in_as=Logged in as
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common document-related labels

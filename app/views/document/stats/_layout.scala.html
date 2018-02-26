@@ -4,7 +4,7 @@
   currentUser: Option[services.user.User],
   accessLevel: services.document.DocumentAccessLevel,
   activeTab: Option[String]
-)(content: Html)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+)(content: Html)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>

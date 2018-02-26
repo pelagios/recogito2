@@ -6,10 +6,10 @@
 
 @_layout("Settings | Sharing", doc, currentUser, Some("sharing")) {
   <div class="panel share-public">
-    <h2>Public Access</h2>
+    <h2>@messages("document.settings.sharing.public_access")</h2>
     <div class="inner">
       <input type="checkbox" id="public-access" name="public-access" @if(doc.isPublic) { checked="checked" } @if(!doc.license.map(_.isOpen).getOrElse(false)) { disabled="true" } />
-      <label for="public-access">Visible to all</label>
+      <label for="public-access">@messages("document.settings.sharing.visible_to_all")</label>
       @if(doc.license.isEmpty) {
         <span class="license-warning"><span class="icon">&#xf071;</span>
           Set an open license in the <a href="?tab=metadata">metadata settings</a> before enabling public access.
@@ -17,10 +17,7 @@
       } else { @if(!doc.license.get.isOpen) {
         <span class="license-warning"><span class="icon">&#xf071;</span> The document license (@doc.license.get.name) does not permit public access.</span>
       }}
-      <p class="checkbox-details">
-        This document will be visible to the public. Visitors can see your annotations, but
-        not edit. Visitors can also download the annotation data from the download page. Link to share:
-      </p>
+      <p class="checkbox-details">@messages("document.settings.sharing.public_instructions")</p>
       <p class="checkbox-details">
         <input type="text" id="public-link" value="@controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL"/>
       </p>

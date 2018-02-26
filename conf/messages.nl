@@ -3,6 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 common.annotations=Annotaties
 common.users=Gebruikers
+common.logged_in_as=Ingelogd als
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common document-related labels
@@ -120,6 +121,10 @@ account_settings.password.current=Huidig wachtwoord
 account_settings.password.new=Nieuw wachtwoord
 account_settings.password.verify=Verifieer wachtwoord
 
+account_settings.restore.instructions=Via de Recogito Backup Functie kunt u een eerder gedownload \
+  document in een ZIP archief herstellen.
+account_settings.restore.button=Upload ZIP archief
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,3 +161,10 @@ document.settings.sidebar.delete=Verwijderen
 
 # Metadata
 document.settings.metadata.document_metadata=Documentmetadata
+
+# Sharing
+document.settings.sharing.public_access=Publieke toegang
+document.settings.sharing.visible_to_all=Zichtbaar voor allen
+document.settings.sharing.public_instructions=Dit document zal publiekelijk zichtbaar zijn. \
+  Bezoekers kunnen uw annotaties zien maar niet aanpassen. Bezoekers kunnen de annotatiedata \
+  ook downloaden. Link om te delen:

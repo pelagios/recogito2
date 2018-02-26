@@ -3,6 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 common.annotations=Annotations
 common.users=Users
+common.logged_in_as=Logged in as
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common document-related labels
@@ -127,6 +128,10 @@ account_settings.password.current=Current Password
 account_settings.password.new=New Password
 account_settings.password.verify=Verify Password
 
+account_settings.restore.instructions=You can restore a document from a ZIP package downloaded \
+  earlier through Recogito's Backup function.
+account_settings.restore.button=Upload ZIP Backup Package
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,3 +168,10 @@ document.settings.sidebar.delete=Delete
 
 # Metadata
 document.settings.metadata.document_metadata=Document Metadata
+
+# Sharing
+document.settings.sharing.public_access=Public Access
+document.settings.sharing.visible_to_all=Visible to all
+document.settings.sharing.public_instructions=This document will be visible to the public. \
+  Visitors can see your annotations, but not edit. Visitors can also download the annotation \
+  data from the download page. Link to share:

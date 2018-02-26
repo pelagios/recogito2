@@ -3,7 +3,7 @@
   currentUser: Option[services.user.User],
   accessLevel: services.document.DocumentAccessLevel,
   p: Seq[plugins.PluginConf]
- )(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+ )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Tag Statistics", doc, currentUser, accessLevel, Some("tags")) {
   <div class="panel">

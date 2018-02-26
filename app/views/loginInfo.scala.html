@@ -1,7 +1,7 @@
-@(currentUser: Option[services.user.User])(implicit request: RequestHeader)
+@(currentUser: Option[services.user.User])(implicit request: RequestHeader, messages: Messages)
 @if(currentUser.isDefined) {
   <div class="logged-in">
-    Logged in as
+    @messages("common.logged_in_as")
     <a class="to-index" href="@controllers.my.routes.MyRecogitoController.index(currentUser.get.username.toLowerCase, None, None, None, None, None)">
       @{ Option(currentUser.get.realName) match {
         case Some(name) => name

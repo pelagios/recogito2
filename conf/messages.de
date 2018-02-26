@@ -3,6 +3,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 common.annotations=Annotationen
 common.users=Benutzer
+common.logged_in_as=Angemeldet als
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common document-related labels
@@ -128,6 +129,10 @@ account_settings.password.current=Aktuelles Password
 account_settings.password.new=Neues Password
 account_settings.password.verify=Passwort bestätigen
 
+account_settings.restore.instructions=Ein Dokument aus dem vorher angelegten ZIP Backup-Paket \
+  kann hochgeladen werden.
+account_settings.restore.button=ZIP Backup-Paket hochladen
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -164,3 +169,9 @@ document.settings.sidebar.delete=Löschen
 
 # Metadata
 document.settings.metadata.document_metadata=Metadaten des Dokuments
+
+# Sharing
+document.settings.sharing.public_access=Öffentlicher Zugang
+document.settings.sharing.visible_to_all=Für alle sichtbar
+document.settings.sharing.public_instructions=Das Dokument ist für alle sichtbar. Besucher können \
+  Ihre Annotationen sehen, aber nicht bearbeiten. Link:

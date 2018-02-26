@@ -11,6 +11,7 @@ import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.ControllerComponents
+import play.api.i18n.I18nSupport
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -24,7 +25,7 @@ class MapController @Inject() (
     implicit val visitService: VisitService,
     implicit val ctx: ExecutionContext,
     implicit val webjars: WebJarsUtil
-  ) extends BaseOptAuthController(components, config, document, users) with HasVisitLogging {
+  ) extends BaseOptAuthController(components, config, document, users) with HasVisitLogging with I18nSupport {
 
   def showMap(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     documentReadResponse(documentId, request.identity,  { case (doc, accesslevel) =>
