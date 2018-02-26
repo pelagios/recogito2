@@ -23,6 +23,11 @@ common.document.attribution=Attribuzione
 common.buttons.save_changes=Salva modifiche
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common button labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.buttons.save_changes=Salva modifiche
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Benvenuti in Recogito
@@ -102,6 +107,30 @@ my.table.header.public=Pubblico
 my.table.header.owner=Proprietario
 my.table.header.shared_by=Condiviso da
 my.table.header.access_level=Accesso
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Account settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+account_settings.sidebar.account=Profilo
+account_settings.sidebar.password=Passoword
+account_settings.sidebar.restore=Ripristina dal backup
+
+account_settings.account.account_settings=Profilo
+account_settings.account.email=Email
+account_settings.account.name=Nome
+account_settings.account.about_you=Chi sei
+account_settings.account.website=Il tuo sito web
+account_settings.account.optional=Facoltativo
+account_settings.account.delete.title=Elimina profilo
+account_settings.account.delete.warning=Attenzione: cancellare il tuo profilo comporta la \
+  cancellazione di tutti i tuoi documenti e annotazioni. Assicurati di aver creato un backup dei \
+  documenti che vuoi conservare. Cancellare il tuo profilo è un'operazine irreversibile.
+account_settings.account.delete.button=Elimina il mio conto
+
+account_settings.password.change_password=Cambia la password
+account_settings.password.current=Attuale password
+account_settings.password.new=Nuova password
+account_settings.password.verify=Verifica la password
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation

@@ -103,6 +103,30 @@ my.table.header.shared_by=Μοιράστηκε από
 my.table.header.access_level=Πρόσβαση
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Account settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+account_settings.sidebar.account=Λογαριασμός
+account_settings.sidebar.password=Κωδικός πρόσβασης
+account_settings.sidebar.restore=Ανάκτηση από αντίγραφο ασφαλείας
+
+account_settings.account.account_settings=Λογαριασμός
+account_settings.account.email=Λογαριασμός ηλεκτρονικού ταχυδρομείου
+account_settings.account.name=Όνομα
+account_settings.account.about_you=Σχετικά με εσάς
+account_settings.account.website=Η ιστοσελίδα σας
+account_settings.account.optional=Προεραιτικό
+account_settings.account.delete.title=Διαγραφή λογαριασμού
+account_settings.account.delete.warning=Προειδοποίηση: διαγράφοντας το λογαριασμό σας θα διαγράψετε \
+  και όλα τα έγγραφα και τις επισημειώσεις σας. Βεβαιωθείτε ότι έχετε αντίγραφο ασφαλείας όλων \
+  των εγγράφων που θέλετε να κρατήσετε. Η διαγραφή του λογαριασμού είναι τελεσίδικη.
+account_settings.account.delete.button=Διαγραφή του λογαρισμού μου
+
+account_settings.password.change_password=Αλλαγή κωδικού πρόσβασης
+account_settings.password.current=Τρέχων κωδικός πρόσβασης
+account_settings.password.new=Νέος κωδικός πρόσβασης
+account_settings.password.verify=Επιβεβαίωση κωδικού πρόσβασης
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.downloads.annotations.csv.text=Κατεβάστε τις επισημειώσεις με τη μορφή πίνακα, για να το εισάγετε σε λογισμικό υπολογιστικών φύλλων ή σε ΣΓΠ.
