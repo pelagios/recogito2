@@ -138,28 +138,31 @@ define([], function() {
 
 
     if (ol.has.CANVAS) {
-      /*
       this.setTileLoadFunction(function(tile, url) {
         var img = tile.getImage();
-        goog.events.listenOnce(img, goog.events.EventType.LOAD, function() {
+
+        img.addEventListener('load', function()  {
           if (img.naturalWidth > 0 &&
               (img.naturalWidth != tileSize || img.naturalHeight != tileSize)) {
 
-            var canvas = goog.dom.createElement(goog.dom.TagName.CANVAS);
+            var canvas = document.createElement('CANVAS');
             canvas.width = tileSize;
             canvas.height = tileSize;
 
             var ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
 
-            var key = goog.object.findKey(tile, function(v) {return v == img;});
-            if (key) tile[key] = canvas;
+            for (var key in tile) {
+              var value = tile[key];
+              if (value == img)
+                tile[key] = canvas;
+            }
           }
 
         }, true);
+
         img.src = url;
       });
-      */
     }
 
   };
