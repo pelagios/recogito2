@@ -79,7 +79,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
   "org.webjars" % "jquery-ui" % "1.11.4",
-  "org.webjars" % "leaflet" % "0.7.7",
+  "org.webjars" % "leaflet" % "1.3.1",
   "org.webjars" % "numeral-js" % "1.5.3-1",
   "org.webjars" % "openlayers" % "4.5.0",
   "org.webjars" % "papa-parse" % "4.1.0-1",

@@ -117,7 +117,7 @@ define([
               markers = pointLayer.getLayers().concat(shapeLayer.getLayers());
 
           markers.forEach(function (marker) {
-            var markerLatLng = marker.getBounds().getCenter(),
+            var markerLatLng = marker.getLatLng(), // .getBounds().getCenter(),
                 distSq =
                   Math.pow(latlng.lat - markerLatLng.lat, 2) +
                   Math.pow(latlng.lng - markerLatLng.lng, 2);
