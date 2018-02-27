@@ -5,16 +5,11 @@
 
 @_layout("Settings | Backup & Restore", doc, currentUser, Some("backup")) {
   <div class="backup panel centered">
-    <h2>Backup</h2>
+    <h2>@messages("document.settings.backup.backup")</h2>
     <div class="inner">
-      <p class="description">
-        The backup package includes document metadata, files, and annotations. You can use
-        it to restore your work to Recogito at a later date. Back up your work regularly
-        as an added safety measure. Please note that the <u>edit history is currently not
-        included</u> in the backup package.
-      </p>
+      <p class="description">@Html(messages("document.settings.backup.description"))</p>
       <a class="btn" href="@controllers.document.settings.routes.SettingsController.exportAsZip(doc.id)">
-        <span class="icon">&#xf019;</span> Download ZIP Backup Package
+        <span class="icon">&#xf019;</span> @messages("document.settings.backup.button")
       </a>
     </div>
   </div>

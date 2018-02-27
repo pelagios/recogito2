@@ -25,11 +25,10 @@
   </div>
 
   <div class="panel share-collab">
-    <h2>Collaborators</h2>
+    <h2>@messages("document.settings.sharing.collaborators")</h2>
     <div class="inner">
       <p class="no-collaborators description-text" @if(!sharingPolicies.isEmpty) { style="display:none" }>
-        This document doesn't have any collaborators yet.
-        Use the form below to add a collaborator.
+        @messages("document.settings.sharing.collaborators.none")
       </p>
       <table class="collaborators">
         @for(shared <- sharingPolicies) {
@@ -47,7 +46,7 @@
     </div>
     <div class="add-collaborators">
       <form>
-        <input type="text" name="collaborator" placeholder="Enter username"/>
+        <input type="text" name="collaborator" placeholder="@messages("document.settings.sharing.collaborators.enter_username")"/>
       <form>
     </div>
   </div>

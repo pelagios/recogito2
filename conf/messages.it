@@ -178,3 +178,11 @@ document.settings.sharing.visible_to_all=Visibile a tutti
 document.settings.sharing.public_instructions=Questo documento sarà visibile a tutti. Gli utenti \
   possono vedere le tue annotazioni ma non modificare il documento. Gli utenti possono anche \
   scaricare le annotazioni come data attraverso le opzioni di download. Link per condividere:
+
+# Backup
+document.settings.backup.backup=Backup
+document.settings.backup.description=L''archivio backup include metadata, file e annotazioni \
+  relative al documento. Puoi utilizzarlo per ripristinare il tuo lavoro in Recogito \
+  successivamente. Crea backup del tuo lavoro regolarmente, per renderlo più sicuro. Nota \
+  bene: la storia delle modifiche <u>non è attualmemte parte dell'archivio di backup</u>.
+document.settings.backup.button=Scarica archivio ZIP di backup

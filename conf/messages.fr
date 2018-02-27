@@ -177,4 +177,17 @@ document.settings.sharing.public_access=Accès public
 document.settings.sharing.visible_to_all=Visible par tous
 document.settings.sharing.public_instructions=Ce document sera public. Les visiteurs peuvent voir \
   vos annotations, mais ne peuvent pas éditer. Les visiteurs peuvent également télécharger les \
-  données d'annotation à partir de la page de téléchargement. Lien pour partage: 
+  données d'annotation à partir de la page de téléchargement. Lien pour partage:
+
+document.settings.sharing.collaborators=Collaborateur·rice·s
+document.settings.sharing.collaborators.none=Ce document n'a pas encore de collaborateur·rice·s. \
+  Utilisez le formulaire ci-dessous pour en ajouter un·e.
+document.settings.sharing.collaborators.enter_username=Entrer un nom d''utilisateur
+
+# Backup
+document.settings.backup.backup=Sauvegarder
+document.settings.backup.description=Le paquet de sauvegarde comprend le document, les annotations \
+  et les métadonnées. Vous pouvez les utiliser pour restaurer ultérieurement votre travail sur \
+  Recogito. Pour plus de sécurité, sauvegardez votre travail régulièrement. Veuillez noter que \
+  <u>l''historique d''édition n''est pas encore inclus</u> dans le paquet de sauvegarde.
+document.settings.backup.button=Télécharger une archive ZIP

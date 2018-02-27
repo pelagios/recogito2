@@ -175,3 +175,16 @@ document.settings.sharing.visible_to_all=Visible to all
 document.settings.sharing.public_instructions=This document will be visible to the public. \
   Visitors can see your annotations, but not edit. Visitors can also download the annotation \
   data from the download page. Link to share:
+
+document.settings.sharing.collaborators=Collaborators
+document.settings.sharing.collaborators.none=This document doesn''t have any collaborators yet. \
+  Use the form below to add a collaborator.
+document.settings.sharing.collaborators.enter_username=Enter username
+
+# Backup
+document.settings.backup.backup=Backup
+document.settings.backup.description=The backup package includes document metadata, files, and \
+  annotations. You can use it to restore your work to Recogito at a later date. Back up your work \
+  regularly as an added safety measure. Please note that the <u>edit history is currently not \
+  included</u> in the backup package.
+document.settings.backup.button=Download ZIP Backup Package

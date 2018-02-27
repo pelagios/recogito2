@@ -168,3 +168,16 @@ document.settings.sharing.visible_to_all=Zichtbaar voor allen
 document.settings.sharing.public_instructions=Dit document zal publiekelijk zichtbaar zijn. \
   Bezoekers kunnen uw annotaties zien maar niet aanpassen. Bezoekers kunnen de annotatiedata \
   ook downloaden. Link om te delen:
+
+document.settings.sharing.collaborators=Met medewerking van:
+document.settings.sharing.collaborators.none=This document doesn''t have any collaborators yet. \
+  Use the form below to add a collaborator.
+document.settings.sharing.collaborators.enter_username=Voeg gebruikersnaam in
+
+# Backup
+document.settings.backup.backup=Backup
+document.settings.backup.description=Backups bevatten documentmetadata, bestanden en annotaties. \
+  U kunt dit gebruiken om uw werk op een later moment te herstellen in Recogito. Maak \
+  regelmatig backups van uw werk. NB: de <u>revisiegeschiedenis is momenteel geen onderdeel van de \
+  backup</u>.
+document.settings.backup.button=Download Backup ZIP archief

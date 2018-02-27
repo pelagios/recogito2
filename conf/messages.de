@@ -175,3 +175,17 @@ document.settings.sharing.public_access=Öffentlicher Zugang
 document.settings.sharing.visible_to_all=Für alle sichtbar
 document.settings.sharing.public_instructions=Das Dokument ist für alle sichtbar. Besucher können \
   Ihre Annotationen sehen, aber nicht bearbeiten. Link:
+
+document.settings.sharing.collaborators=BeiträgerInnen
+document.settings.sharing.collaborators.none=This document doesn''t have any collaborators yet. \
+  Use the form below to add a collaborator.
+document.settings.sharing.collaborators.enter_username=Benutzername
+
+
+# Backup
+document.settings.backup.backup=Backup
+document.settings.backup.description=Das Backup-Paket umfasst Metadaten-Dateien und die \
+  Annotationen. Es kann genutzt werden, um Ihre Arbeit zu einem späteren Zeitpunkt \
+  wiederherzustellen. Legen Sie regelmäßig ein Backup als zusätzliche Sicherungsmaßnahme an. \
+  Bitte beachten Sie dass die Versionsgeschichte <u>nicht Teil des Backup-Pakets</u> ist.
+document.settings.backup.button=ZIP Backup Paket herunterladen
