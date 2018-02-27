@@ -81,7 +81,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jquery-ui" % "1.11.4",
   "org.webjars" % "leaflet" % "0.7.7",
   "org.webjars" % "numeral-js" % "1.5.3-1",
-  "org.webjars" % "openlayers" % "3.13.0",
+  "org.webjars" % "openlayers" % "4.5.0",
   "org.webjars" % "papa-parse" % "4.1.0-1",
   "org.webjars" % "requirejs" % "2.1.22",
   "org.webjars" % "slick" % "1.6.0",
