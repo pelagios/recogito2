@@ -55,7 +55,7 @@
       </ul>
     </div> <!-- .sidebar -->
 
-    <div class="content">
+    <div class="content"@views.html.dir(messages.lang)>
       @content
     </div>
   </body>

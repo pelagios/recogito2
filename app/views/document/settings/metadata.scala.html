@@ -46,15 +46,15 @@
   </div>
 
   <div class="part-metadata panel centered">
-    <h2>Document Parts <span class="num-files">(@doc.fileparts.size file@if(doc.fileparts.size > 1){s})</span></h2>
+    <h2>@messages("document.settings.metadata.document_parts") <span class="num-files">(@doc.fileparts.size file@if(doc.fileparts.size > 1){s})</span></h2>
     <div class="flash-message" style="display:none;"></div>
     <div class="inner">
-      <p><span class="icon">&#xf047;</span> Drag to change order</p>
+      <p><span class="icon">&#xf047;</span> @messages("document.settings.metadata.drag_to_change")</p>
       <ul>
         @for(part <- doc.fileparts) {
           <li class="filepart" data-id="@part.getId">
             @part.getTitle
-            <button class="btn small"><span class="icon">&#xf040;</span> Edit Part Metadata</button>
+            <button class="btn small"><span class="icon">&#xf040;</span> @messages("document.settings.metadata.edit_part")</button>
           </li>
         }
       </ul>

@@ -168,6 +168,9 @@ document.settings.sidebar.delete=Διαγραφή
 
 # Metadata
 document.settings.metadata.document_metadata=Μεταδεδομένα εγγράφου
+document.settings.metadata.document_parts=Μέρη εγγράφου
+document.settings.metadata.edit_part=Επεξεργασία επιμέρους μεταδεδομένων
+document.settings.metadata.drag_to_change=Σύρατε για να αλλάξετε σειρά
 
 # Sharing
 document.settings.sharing.public_access=Δημόσια πρόσβαση

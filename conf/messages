@@ -168,6 +168,9 @@ document.settings.sidebar.delete=Delete
 
 # Metadata
 document.settings.metadata.document_metadata=Document Metadata
+document.settings.metadata.document_parts=Document Parts
+document.settings.metadata.edit_part=Edit Part Metadata
+document.settings.metadata.drag_to_change=Drag to change order
 
 # Sharing
 document.settings.sharing.public_access=Public Access

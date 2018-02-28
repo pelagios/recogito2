@@ -85,6 +85,56 @@ my.table.header.shared_by=اشتراک گذاری شده توسط
 my.table.header.access_level=دسترسی
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Account settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+account_settings.sidebar.account=حساب کاربری
+account_settings.sidebar.password=رمز ورود
+account_settings.sidebar.restore=بازیابی از نسخه پشتیبان
+
+account_settings.account.account_settings=حساب کاربری
+account_settings.account.email=ایمیل
+account_settings.account.name=نام
+account_settings.account.about_you=درباره شما
+account_settings.account.website=وبسایت شما
+account_settings.account.optional=انتخابی
+account_settings.account.delete.title=پاک کردن حساب کاربری
+account_settings.account.delete.warning=هشدار: با پاک کردن حساب کاربری تمامی اسناد و حاشیه نویسی های شما نیز پاک خواهد شد. ابتدا مطمئن شوید که ازتمام اسنادی که ممایل به نگهداری آنها هستید پشتیبان تهیه نموده اید. پاک کردن حساب کاربری غیر قابل بازگشت است.
+account_settings.account.delete.button=حساب کاربری من را پاک کنید
+
+account_settings.password.change_password=تغییر رمز ورود
+account_settings.password.current=رمز ورود جاری
+account_settings.password.new=رمز ورود جدید
+account_settings.password.verify=تائید رمز ورود
+
+account_settings.restore.instructions=میتوانید سندی را از بسته ی فشرده ای که پیشتر از طریق پشتیبان Recogito بارگیری شده است بازیابی کنید.
+account_settings.restore.button=بارگذاری بسته پشتیبان فشرده شده
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Text annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.text.toolbar.annotation_mode=حالت حاشیه نویسی
+document.annotation.text.toolbar.mode.normal=عادی
+document.annotation.text.toolbar.mode.quick=سریع
+document.annotation.text.toolbar.mode.quick.places=مکان ها
+document.annotation.text.toolbar.mode.quick.persons=افراد
+document.annotation.text.toolbar.mode.quick.tags=برچسب ها
+document.annotation.text.toolbar.color=رنگ
+document.annotation.text.toolbar.color.by_type=براساس نوع موجودیت
+document.annotation.text.toolbar.color.by_status=براساس وضعیت تائید شده
+document.annotation.text.toolbar.color.by_tag=براساس برچسب
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Downloads
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.downloads.annotations.csv.text=بارگیری حاشیه نویسی ها در قالب جدول
+document.downloads.annotations.rdf.text=بارگیری حاشیه نویسی ها و اسناد در قالب RDF، کدگذاری شده با استفاده از Open Annotation و Dublin Core
+document.downloads.annotations.geojson.text=Confirmed geo-located places in the document as a GeoJSON FeatureCollection.
+document.downloads.annotations.kml.text=Confirmed geo-located places as KML file, for viewing in Google Earth.
+document.downloads.annotations.tei.text=Annotated text in a basic TEI/XML serialization. Note: only \
+  place name annotations are included at the moment. Also, overlapping annotations are filtered \
+  out as TEI does not support them.
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.settings.sidebar.metadata=فراداده
@@ -95,3 +145,23 @@ document.settings.sidebar.delete=پاک کردن
 
 # Metadata
 document.settings.metadata.document_metadata=فراداده سند
+document.settings.metadata.document_parts=اجزا(بخش ها)ی سند
+document.settings.metadata.edit_part=ویرایش فراداده این جزء
+document.settings.metadata.drag_to_change=بکشید تا ترتیب را تغییر دهید
+
+# Sharing
+document.settings.sharing.public_access=دسترسی عمومی
+document.settings.sharing.visible_to_all=قابل دیدن برای همه
+document.settings.sharing.public_instructions=این سند برای همه قابل دیدن خواهد بود.بازدید کنندگان میتوانند حاشیه نویسی های شما را بخوانند ولی امکان ویرایش نخواهند داشت. بازدیدکنندگان همچنین قادر به بارگیری حاشیه نویسی های شما از طریق خواهند صفحه بارگیری خواهند بود. لینک اشتراک گذاری:
+
+document.settings.sharing.collaborators=همکاران
+document.settings.sharing.collaborators.none=این سند تاکنون هیچ همکاری نداشته است. برای اضافه کردن همکار جدید از فرم زیر استفاده نمایید.
+document.settings.sharing.collaborators.enter_username=نام کاربری خورد را وارد کنید
+
+# Backup
+document.settings.backup.backup=پشتیبان
+document.settings.backup.description=The backup package includes document metadata, files, and \
+  annotations. You can use it to restore your work to Recogito at a later date. Back up your work \
+  regularly as an added safety measure. Please note that the <u>edit history is currently not \
+  included</u> in the backup package.
+document.settings.backup.button=بارگیری بسته پشتیبان فشرده شده

@@ -171,6 +171,9 @@ document.settings.sidebar.delete=Effacer
 
 # Metadata
 document.settings.metadata.document_metadata=Métadonnées du document
+document.settings.metadata.document_parts=Parties de document
+document.settings.metadata.edit_part=Metadonnées issues de l'édition
+document.settings.metadata.drag_to_change=Glisser pour modifier l'ordre
 
 # Sharing
 document.settings.sharing.public_access=Accès public

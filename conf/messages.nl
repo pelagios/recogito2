@@ -161,6 +161,9 @@ document.settings.sidebar.delete=Verwijderen
 
 # Metadata
 document.settings.metadata.document_metadata=Documentmetadata
+document.settings.metadata.document_parts=Documentonderdelen
+document.settings.metadata.edit_part=Wijzig metadata onderdeel
+document.settings.metadata.drag_to_change=Sleep om volgorde aan te passen
 
 # Sharing
 document.settings.sharing.public_access=Publieke toegang
