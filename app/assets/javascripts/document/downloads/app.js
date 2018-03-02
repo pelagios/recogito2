@@ -188,8 +188,9 @@ require([
         // For lack of a better option, we pull header fields from the first part *only*,
         // It's in the responsibility of the user if they want deal with a mix of tables with
         // different schemas. Recogito will only support the base case.
+        isHTTPS = location.protocol === 'https:',
         dataURL = jsRoutes.controllers.document.DocumentController
-          .getRaw(Config.documentId, Config.dataPartSequenceNo[0], CSV_SNIPPET_SIZE).absoluteURL(),
+          .getRaw(Config.documentId, Config.dataPartSequenceNo[0], CSV_SNIPPET_SIZE).absoluteURL(isHTTPS),
 
         payloadField = jQuery('.gazetteer #json'),
 
