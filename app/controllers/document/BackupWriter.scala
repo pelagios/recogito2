@@ -20,7 +20,7 @@ import storage.uploads.Uploads
 trait BackupWriter extends HasBackupValidation { self: HasConfig =>
   
   // Backend annotation format
-  import services.annotation.BackendAnnotation._
+  import services.annotation.FrontendAnnotation._
   
   private val BUFFER_SIZE = 2048
   
