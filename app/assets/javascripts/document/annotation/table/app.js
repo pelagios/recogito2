@@ -216,8 +216,9 @@ require([
 
   /** On page load, fetch and parse the CSV and instantiate the app **/
   jQuery(document).ready(function() {
-    var dataURL = jsRoutes.controllers.document.DocumentController
-          .getRaw(Config.documentId, Config.partSequenceNo).absoluteURL(),
+    var isHTTPS = location.protocol === 'https:',
+        dataURL = jsRoutes.controllers.document.DocumentController
+          .getRaw(Config.documentId, Config.partSequenceNo).absoluteURL(isHTTPS),
 
         onLoadComplete = function(results) {
           new App(results);
