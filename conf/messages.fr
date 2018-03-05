@@ -46,17 +46,6 @@ landing.index.registration_form.placeholder.register=S''inscrire sur Recogito
 landing.index.registration_form.disclaimer.text=Veuillez accepter nos <a href="{0}">conditions \
   d''utilisation</a> et l''enregistrement de votre courriel.
 
-# News
-landing.index.news.title=Nouveau sur Recogito
-landing.index.news.subtitle=SIG historique chinois
-landing.index.news.text=Nous sommes heureux de vous annoncer que les données du \
-  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">Système d''Information \
-  Géographico-Historique de la Chine</a> sont maintenant disponibles. Plus de 71 000 localités \
-  de l''Empire chinois, de 221 avant J.C. à 1911, ont été ajoutées à notre index géographique. \
-  Nous remercions chaleureusement Lex Berman et le \
-  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> pour \
-  leur brillante contribution!
-
 # Tiles
 landing.index.tiles.1.title=Collections partagées
 landing.index.tiles.1.text=Téléversez textes et images. Constituez votre propre collection. \

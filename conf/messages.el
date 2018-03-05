@@ -43,16 +43,6 @@ landing.index.registration_form.placeholder.register=Εγγραφείτε στο
 landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
   and the storage of your E-Mail address.
 
-# News
-landing.index.news.title=Πρώτη φορά στο Recogito
-landing.index.news.subtitle=China Historical GIS
-landing.index.news.text=Ανακοινώνουμε με χαρά ότι δεδομένα του <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China \
-  Historical GIS είναι πλέον διαθέσιμα στο Recogito. Περισσότεροι από 71.000 τόποι της εποχής \
-  των δυναστειών στην Κίνα από το 221 π.Χ. ως το 1911 μ.Χ. προστίθενται στο γεωγραφικό μας \
-  ευρετήριο. Εκφράζουμε τις ευχαριστίες μας στον Lex Berman και στο \
-  <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographical Analysis</a> \
-  για τη διαχείριση αυτής της σημαντικής πηγής.
-
 # Tiles
 landing.index.tiles.1.title=Κοινές συλλογές
 landing.index.tiles.1.text=Ανεβάστε κείμενα και εικόνες. Δημιουργήστε τις δικές σας συλλογές. Προσκαλέστε άλλους για συνεργασία.

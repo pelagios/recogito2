@@ -43,11 +43,6 @@ landing.index.registration_form.placeholder.register=ثبت نام
 landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
   and the storage of your E-Mail address.
 
-# News
-landing.index.news.title=کاربر جدید
-landing.index.news.subtitle=GIS تاریخی چین
-landing.index.news.text=خوشحالیم به اطلاع برسانیم که داده های <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> هم اکنون در Recogito فابل دسترسی هستند که بیش از ۷۱ هزار مکان تاریخی از زمان امپراطوری چین بین سالهای ٢٢۱ قبل از میلاد تا ۱۹۱۱ پس از میلاد را در بر میگیرد. با تشکر از Lex Berman و مرکز تحلیل جغرافیایی هارواد (Harvard Center for Geographic Analysis) برای حفظ و نگهداری این منبع ارزشمند.
-
 # Tiles
 landing.index.tiles.1.title=مجموعه های به اشتراک گذاشته شده
 landing.index.tiles.1.text= متن ها و تصاویر را بارگذاری کنید. مجموعه خود را ایجاد نمایید. دیگران را به همکاری دعوت نمایید.

@@ -4,6 +4,16 @@ _Oct XX, 2017_
 We are excited to announce that Recogito now offers support for TEI/XML encoded text documents.
 At the moment, this feature is beta.
 
+# News: Recogito in your language
+_March 05, 2018_
+
+Thanks to the efforts of our fantastic community, Recogito is becoming available in more
+and more languages. Is your browser set to __Dutch__, __French__, __German__, __Greek__ or
+__Italian__? Much of Recogito will now come in proper translation. __Farsi__, __Hebrew__ and __Turkish__ are in the works, too. And you can help!
+[Drop us a note](mailto:commons@pelagios.org). Visit our
+[translation sheet](https://docs.google.com/spreadsheets/d/1HkpZsVgn_3dQbht9sIXB7hTL4OSrzwxhWlmskVChc7g/edit#gid=0).
+Fill some blanks in your language, or add a new one.
+
 # New in Recogito: China Historical GIS
 _Sept 13, 2017_
 

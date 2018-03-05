@@ -45,16 +45,6 @@ landing.index.registration_form.placeholder.register=Account Erstellen
 landing.index.registration_form.disclaimer.text=Stimmen Sie unseren <a href="{0}">Benutzungsbedingungen</a> \
   und dem Speichern Ihrer Email-Adresse zu.
 
-# News
-landing.index.news.title=Neu in Recogito:
-landing.index.news.subtitle=China Historical GIS
-landing.index.news.text=Wir freuen uns, mitteilen zu können, dass die Daten des \
-  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> jetzt \
-  auf Recogito verfügbar sind. Damit wird unser geographischer Index um mehr als 71.000 Orte aus \
-  dem China der Zeit zwischen 221 v.Chr. und 1911 n.Chr. erweitert. Unser Dank gilt Lex Berman und \
-  dem <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> \
-  für die Bereitstellung dieses tollen Datenbestands!
-
 # Tiles
 landing.index.tiles.1.title=Sammlungen Teilen
 landing.index.tiles.1.text=Texte und Bilder hochladen, eine eigene Sammlung anlegen, zur \

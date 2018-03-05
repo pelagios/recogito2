@@ -43,11 +43,6 @@ landing.index.registration_form.placeholder.register=Register voor Recogito
 landing.index.registration_form.disclaimer.text=Accepteer de <a href="{0}">gebruiksvooorwaarden</a> \
   en geef toestemming om uw emailadres op te slaan.
 
-# News
-landing.index.news.title=Nieuw in Recogito:
-landing.index.news.subtitle=China Historical GIS
-landing.index.news.text=De data van <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a> is nu beschikbaar in Recogito. Hiermee zijn meer dan 71.000 plaatsnamen uit het Chinese Keizerrijk van 221 v. Chr. tot 1911 aan onze geografische index toegevoegd. Met dank aan Lex Berman en het <a href="http://gis.harvard.edu/" target="_blank">Harvard Center for Geographic Analysis</a> voor het onderhouden van deze resource!
-
 # Tiles
 landing.index.tiles.1.title=Gedeelde collecties
 landing.index.tiles.1.text=Text en afbeeldingen uploaden. Bouw uw eigen collecties. Nodig anderen \

@@ -50,16 +50,6 @@ landing.index.registration_form.placeholder.register=Registrati su Recogito
 landing.index.registration_form.disclaimer.text=Acconsenti alle nostre <a href="{0}">condizioni d''uso</a> \
   e alla raccolta del tuo indirizzo email.
 
-# News
-landing.index.news.title=Novità in Recogito:
-landing.index.news.subtitle=Dizionario geografico-storico della Cina
-landing.index.news.text=Siamo felici di annunciare che dati provenineti dal \
-  <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">Dizionario geografico-storico della Cina</a> \
-  sono ora disponibili su Recogito. Questo aggiunge più di 71.000 luoghi della Cina dinastica (dal \
-  221 BCE al 1911 CE) ai nostri indici geografici. Ringraziamo Lex Berman e \
-  <a href="http://gis.harvard.edu/" target="_blank">l'Harvard Center for Geographic Analysis</a> \
-  per mantenere questa straordinaria risorsa.
-
 # Tiles
 landing.index.tiles.1.title=Collezioni condivise
 landing.index.tiles.1.text=Carica testi e immagini. Crea la tua collezione. Invita altri a collaborare.
