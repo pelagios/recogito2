@@ -15,8 +15,9 @@ require([
 ], function(Config, BaseTextApp, Highlighter, SelectionHandler) {
 
   jQuery(document).ready(function() {
-    var teiURL = jsRoutes.controllers.document.DocumentController
-          .getRaw(Config.documentId, Config.partSequenceNo).absoluteURL(),
+    var isHTTPS = location.protocol === 'https:',
+        teiURL = jsRoutes.controllers.document.DocumentController
+          .getRaw(Config.documentId, Config.partSequenceNo).absoluteURL(isHTTPS),
 
         contentNode = document.getElementById('content'),
 
