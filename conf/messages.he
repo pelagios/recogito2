@@ -20,9 +20,7 @@ landing.index.header.link.login=כניסה
 # Jumbotron
 landing.index.jumbotron.tagline.1=תיוג נתונים מקושרים
 landing.index.jumbotron.tagline.2=ללא הסוגריים המחודדות
-landing.index.jumbotron.blurb=Create maps from text. Annotate images. Connect your research \
-  to other data on the Web and make it more open, visible and re-usable. Without \
-  the need to become a Semantic Web expert.
+landing.index.jumbotron.blurb=Create maps from text. Annotate images. Connect your research to other data on the Web and make it more open, visible and re-usable. Without the need to become a Semantic Web expert.
 landing.index.jumbotron.learn_more=עוד
 
 landing.index.registration_form.placeholder.username=שם משתמש/ת

@@ -33,9 +33,7 @@ landing.index.header.link.login=Login
 # Jumbotron
 landing.index.jumbotron.tagline.1=Semantische Annotation
 landing.index.jumbotron.tagline.2=ohne die spitzen Klammern
-landing.index.jumbotron.blurb=Karten aus Text erstellen. Bilder annotieren. Mit anderen \
-  Datenquellen verbinden und im Web sichtbar und wiederverwendbar machen. \
-  Alles ohne Expertenwissen!
+landing.index.jumbotron.blurb=Karten aus Text erstellen. Bilder annotieren. Mit anderen Datenquellen verbinden und im Web sichtbar und wiederverwendbar machen. Alles ohne Expertenwissen!
 landing.index.jumbotron.learn_more=Mehr erfahren
 
 landing.index.registration_form.placeholder.username=Benutzername

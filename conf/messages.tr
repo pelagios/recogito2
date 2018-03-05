@@ -20,9 +20,7 @@ landing.index.header.link.login=Giriş
 # Jumbotron
 landing.index.jumbotron.tagline.1=Bağlı Veri notu
 landing.index.jumbotron.tagline.2=küme parantezleri olmadan
-landing.index.jumbotron.blurb=Metinlerden harita yaratın. Resimlere açıklamalar ekleyin. Böylecr \
-  Semantik Ağ uzmanı olmadan da araştırmanızı Web üzerinden başka verilerle ilişkilendirebilir, \
-  daha görünür ve yeniden kullanılabilir hale getirebilirsiniz.
+landing.index.jumbotron.blurb=Metinlerden harita yaratın. Resimlere açıklamalar ekleyin. Böylecr Semantik Ağ uzmanı olmadan da araştırmanızı Web üzerinden başka verilerle ilişkilendirebilir, daha görünür ve yeniden kullanılabilir hale getirebilirsiniz.
 landing.index.jumbotron.learn_more=Daha Çok Bilgi Alın
 
 landing.index.registration_form.placeholder.username=Kullanıcı adı seçin
