@@ -64,9 +64,11 @@ class ReferenceRewriterImpl @Inject()(implicit ctx: ExecutionContext, es: ES)
     
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION) query constantScoreQuery {
-        should(affectedUris.map { uri =>
-          termQuery("bodies.reference.uri" -> uri)
-        })
+        nestedQuery("bodies") query {
+          should(affectedUris.map { uri =>
+            termQuery("bodies.reference.uri" -> uri)
+          })
+        }
       } version true limit SCROLL_BATCH_SIZE scroll "5m"
     }
   }
