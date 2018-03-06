@@ -28,13 +28,19 @@ class LandingController @Inject() (
 ) extends AbstractController(components) with HasConfig with HasUserService with HasVisitLogging with HasPrettyPrintJSON with I18nSupport {
   
   def index = silhouette.UserAwareAction { implicit request =>    
-    request.identity match {
-      case Some(user) =>
-        Redirect(controllers.my.routes.MyRecogitoController.index(user.username, None, None, None, None, None))
-
-      case None =>
-        logPageView()
-        Ok(views.html.landing.index())
+    // Temporary hack only
+    request.queryString.get("lang").flatMap(_.headOption) match {
+      case Some(lang) =>
+        Redirect(routes.LandingController.index).withLang(play.api.i18n.Lang(lang))
+      case None =>   
+        request.identity match {
+          case Some(user) =>
+            Redirect(controllers.my.routes.MyRecogitoController.index(user.username, None, None, None, None, None))
+    
+          case None =>
+            logPageView()
+            Ok(views.html.landing.index())
+        }
     }
   }
   
