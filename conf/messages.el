@@ -65,8 +65,8 @@ landing.index.about=Λογισμικό ανοιχτού κώδικα του  <a 
   Ινστιτούτου</a>, του <a href="{1}" target="_blank">Exeter University</a>, του \
   <a href="{2}" target="_blank">Ινστιτούτου Humboldt για το Διαδίκτυο και την Τεχνολογία</a>, του \
   <a href="{3}" target="_blank">The Open University</a> και του \
-  <a href="{4}" target="_blank">University of London</a>. Με χρηματοδότηση από το Andrew W. Mellon \
-  Foundation.
+  <a href="{4}" target="_blank">University of London</a>. Με χρηματοδότηση από το \
+  <a href="{5}" target="_blank">Andrew W. Mellon Foundation</a>.
 landing.index.visit_us=<span class="icon">{0}</span> πισκεφτείτε μας στο \
   <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Ακολουθήστε μας στο \
   <a href="{3}" target="_blank">Twitter</a>

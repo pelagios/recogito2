@@ -64,8 +64,8 @@ landing.index.about=Open Source Software door: <a href="{0}" target="_blank">Aus
   of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
   <a href="{2}" target="_blank">Humboldt Institut for Internet and Society</a>, \
   <a href="{3}" target="_blank">The Open University</a> en \
-  <a href="{4}" target="_blank">University of London</a>. Gefinancierd door: Andrew W. Mellon \
-  Foundation.
+  <a href="{4}" target="_blank">University of London</a>. Gefinancierd door: \
+  <a href="{5}" target="_blank">Andrew W. Mellon Foundation</a>.
 landing.index.visit_us=<span class="icon">{0}</span> Bezoek onze \
   <a href="{1}" target="_blank">Github</a> pagina <span class="icon">{2}</span> Volg ons op \
   <a href="{3}" target="_blank">Twitter</a>

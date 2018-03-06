@@ -45,7 +45,7 @@ landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms
 
 # News
 landing.index.news.title=News:
-landing.index.news.subtitle=Recogito in your language \
+landing.index.news.subtitle=Recogito in your language <br/>\
   <img class="flag" src="assets/images/flags/en_uk.png"> \
   <img class="flag" src="assets/images/flags/nl.png"> \
   <img class="flag" src="assets/images/flags/fr.png"> \
@@ -83,8 +83,8 @@ landing.index.about=Open Source Software by the <a href="{0}" target="_blank">Au
   of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
   <a href="{2}" target="_blank">Humboldt Institute for Internet and Society</a>, \
   <a href="{3}" target="_blank">The Open University</a> and \
-  <a href="{4}" target="_blank">University of London</a>. Funded by the Andrew W. Mellon \
-  Foundation.
+  <a href="{4}" target="_blank">University of London</a>. Funded by the \
+  <a href="{5}" target="_blank">Andrew W. Mellon Foundation</a>.
 landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
   <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Follow us on \
   <a href="{3}" target="_blank">Twitter</a>

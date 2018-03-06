@@ -61,17 +61,6 @@ landing.index.tiles.4.text=Affichez les résultats de votre travail sur le Web. 
 landing.index.right_now=L''actualité de Recogito
 landing.index.edits_last_24hrs=Modifications 24h
 
-# About
-landing.index.about=Open Source Software by the <a href="{0}" target="_blank">Austrian Institute \
-  of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
-  <a href="{2}" target="_blank">Humboldt Institute for Internet and Society</a>, \
-  <a href="{3}" target="_blank">The Open University</a> and \
-  <a href="{4}" target="_blank">University of London</a>. Funded by the Andrew W. Mellon \
-  Foundation.
-landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
-  <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Follow us on \
-  <a href="{3}" target="_blank">Twitter</a>
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
