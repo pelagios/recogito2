@@ -52,7 +52,7 @@ landing.index.tiles.2.text=Créez des notes. Balisez. Discutez. Recogito suit le
   maintient l''historique des versions.
 landing.index.tiles.3.title=Enrichi en sémantique
 landing.index.tiles.3.text=Indexez des noms de lieux et des noms de personnes à l''aide d'outils \
-  intégrés et intuififs liés à des vocabulaires contrôlés.
+  intégrés et intuitifs liés à des vocabulaires contrôlés.
 landing.index.tiles.4.title=Données ouvertes
 landing.index.tiles.4.text=Affichez les résultats de votre travail sur le Web. Publiez vos \
   données sous forme de données  liées ouvertes.
