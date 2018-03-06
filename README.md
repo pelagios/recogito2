@@ -1,6 +1,6 @@
 # Recogito
 
-__Current version: [v2.2](https://github.com/pelagios/recogito2/releases/tag/v2.2)__
+__Current version: [v3.0-RC](https://github.com/pelagios/recogito2/releases/tag/v3.0-rc)__
 
 Home of [Recogito](http://recogito.pelagios.org) - a Linked Data annotation tool for texts and
 images, developed by [Pelagios](http://commons.pelagios.org). Track our progress on
