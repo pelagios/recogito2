@@ -39,7 +39,7 @@ landing.index.jumbotron.learn_more=En savoir plus
 landing.index.registration_form.placeholder.username=Choisissez un nom d'utilisateur
 landing.index.registration_form.placeholder.email=Courriel
 landing.index.registration_form.placeholder.password=Créez un mot de passe
-landing.index.registration_form.placeholder.register=S''inscrire sur Recogito
+landing.index.registration_form.placeholder.register=Inscrivez-vous sur Recogito
 landing.index.registration_form.disclaimer.text=Veuillez accepter nos <a href="{0}">conditions \
   d''utilisation</a> et l''enregistrement de votre courriel.
 
@@ -52,7 +52,7 @@ landing.index.tiles.2.text=Créez des notes. Balisez. Discutez. Recogito suit le
   maintient l''historique des versions.
 landing.index.tiles.3.title=Enrichi en sémantique
 landing.index.tiles.3.text=Indexez des noms de lieux et des noms de personnes à l''aide d'outils \
-  intégrés et intuififs liés à des vocabulaires contrôlés.
+  intégrés et intuitifs liés à des vocabulaires contrôlés.
 landing.index.tiles.4.title=Données ouvertes
 landing.index.tiles.4.text=Affichez les résultats de votre travail sur le Web. Publiez vos \
   données sous forme de données  liées ouvertes.
