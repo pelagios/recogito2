@@ -27,13 +27,13 @@ common.buttons.save_changes=Αποθήκευση αλλαγών
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Καλωσήλθατε στο Recogito
-landing.index.header.link.tutorial=Οδηγος χρήσης
+landing.index.header.link.tutorial=Οδηγός χρήσης
 landing.index.header.link.login=Σύνδεση
 
 # Jumbotron
 landing.index.jumbotron.tagline.1=Επισημείωση διασυνδεδεμένων δεδομένων
 landing.index.jumbotron.tagline.2=χωρίς τα άγκυστρα
-landing.index.jumbotron.blurb=Δημιουργήστε χάρτες από κείμενα. Επισημειώστε εικόνες. Συνδέστε την έρευνά σας με άλλα δεδομένα στο διαδίκτυο, βελτιώστε την ορατότητα και προωθηστε την επανάχρησή της. Χωρίς να χρειάζεται εξειδίκευση στο σημασιολογικό ιστό.
+landing.index.jumbotron.blurb=Δημιουργήστε χάρτες από κείμενα. Επισημειώστε εικόνες. Συνδέστε την έρευνά σας με άλλα δεδομένα στο διαδίκτυο, βελτιώστε την ορατότητα και προωθήστε την επανάχρησή της. Χωρίς να χρειάζεται εξειδίκευση στο σημασιολογικό ιστό.
 landing.index.jumbotron.learn_more=Μάθετε περισσότερα
 
 landing.index.registration_form.placeholder.username=Επιλέξετε όνομα χρήστη
