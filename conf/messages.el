@@ -33,15 +33,15 @@ landing.index.header.link.login=Σύνδεση
 # Jumbotron
 landing.index.jumbotron.tagline.1=Επισημείωση διασυνδεδεμένων δεδομένων
 landing.index.jumbotron.tagline.2=χωρίς τα άγκυστρα
-landing.index.jumbotron.blurb=Δημιουργήστε χάρτες από κείμενα. Επισημειώστε εικόνες. Συνδέστε την έρευνά σας με άλλα δεδομένα στο διαδίκτυο, βελτιώστε την ορατότητα και προωθήστε την επανάχρησή της. Χωρίς να χρειάζεται εξειδίκευση στο σημασιολογικό ιστό.
+landing.index.jumbotron.blurb=Δημιουργήστε χάρτες από κείμενα. Επισημειώστε εικόνες. Συνδέστε την έρευνά σας με άλλα δεδομένα στο διαδίκτυο, βελτιώστε την ορατότητα και προωθήστε την επανάχρησή της. Χωρίς να απαιτείται ειδίκευση στο σημασιολογικό ιστό.
 landing.index.jumbotron.learn_more=Μάθετε περισσότερα
 
-landing.index.registration_form.placeholder.username=Επιλέξετε όνομα χρήστη
+landing.index.registration_form.placeholder.username=Επιλέξτε όνομα χρήστη
 landing.index.registration_form.placeholder.email=Διεύθυνση ηλεκτρονικού ταχυδρομείου
 landing.index.registration_form.placeholder.password=Δημιουργήστε κωδικό ασφαλείας
 landing.index.registration_form.placeholder.register=Εγγραφείτε στο Recogito
-landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
-  and the storage of your E-Mail address.
+landing.index.registration_form.disclaimer.text=Συμφωνήστε με τους <a href="{0}">Όρους και Προϋποθέσεις Χρήσης</a> \
+  και την αποθήκευση της διεύθυνσης ηλεκτρονικού ταχυδρομείου σας.
 
 # Tiles
 landing.index.tiles.1.title=Κοινές συλλογές
@@ -67,7 +67,7 @@ landing.index.about=Λογισμικό ανοιχτού κώδικα του  <a 
   <a href="{3}" target="_blank">The Open University</a> και του \
   <a href="{4}" target="_blank">University of London</a>. Με χρηματοδότηση από το \
   <a href="{5}" target="_blank">Andrew W. Mellon Foundation</a>.
-landing.index.visit_us=<span class="icon">{0}</span> πισκεφτείτε μας στο \
+landing.index.visit_us=<span class="icon">{0}</span> Επισκεφτείτε μας στο \
   <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Ακολουθήστε μας στο \
   <a href="{3}" target="_blank">Twitter</a>
 
@@ -105,12 +105,12 @@ account_settings.account.email=Λογαριασμός ηλεκτρονικού �
 account_settings.account.name=Όνομα
 account_settings.account.about_you=Σχετικά με εσάς
 account_settings.account.website=Η ιστοσελίδα σας
-account_settings.account.optional=Προεραιτικό
+account_settings.account.optional=Προαιρετικό
 account_settings.account.delete.title=Διαγραφή λογαριασμού
 account_settings.account.delete.warning=Προειδοποίηση: διαγράφοντας το λογαριασμό σας θα διαγράψετε \
   και όλα τα έγγραφα και τις επισημειώσεις σας. Βεβαιωθείτε ότι έχετε αντίγραφο ασφαλείας όλων \
   των εγγράφων που θέλετε να κρατήσετε. Η διαγραφή του λογαριασμού είναι τελεσίδικη.
-account_settings.account.delete.button=Διαγραφή του λογαρισμού μου
+account_settings.account.delete.button=Διαγραφή του λογαριασμού μου
 
 account_settings.password.change_password=Αλλαγή κωδικού πρόσβασης
 account_settings.password.current=Τρέχων κωδικός πρόσβασης
@@ -139,7 +139,7 @@ document.annotation.text.toolbar.color.by_tag=ΑΝΆ ΕΤΙΚΈΤΑ
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.downloads.annotations.csv.text=Κατεβάστε τις επισημειώσεις με τη μορφή πίνακα, για να το εισάγετε σε λογισμικό υπολογιστικών φύλλων ή σε ΣΓΠ.
+document.downloads.annotations.csv.text=Κατεβάστε τις επισημειώσεις με τη μορφή πίνακα, για να τον εισάγετε σε λογισμικό υπολογιστικών φύλλων ή σε GIS.
 document.downloads.annotations.rdf.text=Κατεβάστε τις επισημειώσεις και τα μεταδεδομένα εγγράφων με μορφή RDF, κωδικοποιημένα με τη χρήση των προτύπων Open Annotation και Dublin Core.
 document.downloads.annotations.geojson.text=Επιβεβαιωμένες γεωχωρικά εντοπισμένες τοποθεσίες στο έγγραφο σε μορφή GeoJSON FeatureCollection.
 document.downloads.annotations.kml.text=Επιβεβαιωμένες γεωχωρικά εντοπισμένες τοποθεσίες σε μορφή αρχείου KML, για θέαση στο Google Earth.
@@ -171,7 +171,7 @@ document.settings.sharing.public_instructions=Αυτό το έγγραφο θα 
   καταφόρτωσης. Σύνδεσμος για διαμοιρασμό:
 
 # Backup
-document.settings.backup.backup=Δημιουργία αρχείου ασφαλείας
+document.settings.backup.backup=Δημιουργία αντιγράφου ασφαλείας
 document.settings.backup.description=Η δέσμη αρχείων ασφαλείας περιλαμβάνει τα μεταδεδομένα του \
   εγγράφου, τα αρχεία και τις επισημειώσεις. Μπορείτε να το χρησιμοποιήσετε για να ανακτήσετε \
   την εργασία σας στο Recogito σε κατοπινό χρόνο. Δημιουργείτε τακτικά δέσμη αρχείων \
