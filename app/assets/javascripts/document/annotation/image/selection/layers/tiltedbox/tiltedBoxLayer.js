@@ -52,7 +52,7 @@ define([
             if(Geom2D.intersects(coord[0], - coord[1], rect))
               found.push({
                 annotation: annotation,
-                mapBounds: rect
+                imageBounds: rect
               });
           });
 

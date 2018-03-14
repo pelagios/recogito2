@@ -83,41 +83,20 @@ define([
 
         changeZoom = function(increment) {
           var view = olMap.getView(),
-              currentZoom = view.getZoom(),
-              animation = ol.animation.zoom({
-                duration: 250, resolution: view.getResolution()
-              });
+              current = view.getZoom();
 
-          olMap.beforeRender(animation);
-          view.setZoom(currentZoom + increment);
+          view.animate({ zoom: current + increment, duration: 250 });
         },
 
         updateRotationIcon = function() {
           var rotation = olMap.getView().getRotation();
-
           resetRotationIcon.css({
             transform: 'rotate(' + rotation + 'rad)',
           });
         },
 
         resetRotation = function() {
-          var view = olMap.getView(),
-
-              currentRotation = (function() {
-                var r = view.getRotation() % (2 * Math.PI);
-                if (r < -Math.PI)
-                  r += 2 * Math.PI;
-                else if (r > Math.PI)
-                  r -= 2 * Math.PI;
-                return r;
-              })(),
-
-              animation = ol.animation.rotate({
-                duration: 250, rotation: currentRotation
-              });
-
-          olMap.beforeRender(animation);
-          view.setRotation(0);
+          olMap.getView().animate({ rotation: 0, duration: 250 });
         },
 
         toggleFullscreen = function() {

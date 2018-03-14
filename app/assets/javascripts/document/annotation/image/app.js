@@ -44,7 +44,9 @@ require([
     /** The app is instantiated after the image manifest was loaded **/
     var App = function(imageProperties) {
 
-      var annotations = new AnnotationView(),
+      var self = this,
+
+          annotations = new AnnotationView(),
 
           contentNode = document.getElementById('image-pane'),
 
@@ -89,6 +91,20 @@ require([
               help.close();
             else
               help.open();
+          },
+
+          /**
+           * Helper that wraps a function with preceding selector.clearSelection.
+           * We need this due to the difference between text and image annotation.
+           * In image annotation annotation updates and deletes need an explicit
+           * call to selector.clear. In text annotation, this isn't needed, so the
+           * BaseApp doesn't do it.
+           */
+          withClearSelection = function(fn) {
+            return function(arg) {
+              selector.clearSelection();
+              fn(arg);
+            };
           };
 
       toolbar.on('toolChanged', onToolChanged);
@@ -98,11 +114,12 @@ require([
 
       viewer.on('fullscreen', onToggleFullscreen);
 
-      selector.on('select', editor.openSelection);
+      selector.on('changeShape', editor.updateAnchor.bind(editor));
+      selector.on('select', editor.openSelection.bind(editor));
 
       editor.on('createAnnotation', this.onCreateAnnotation.bind(this));
-      editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
-      editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
+      editor.on('updateAnnotation', withClearSelection(this.onUpdateAnnotation.bind(this)));
+      editor.on('deleteAnnotation', withClearSelection(this.onDeleteAnnotation.bind(this)));
 
       olMap.on('postrender', onMapMove);
 

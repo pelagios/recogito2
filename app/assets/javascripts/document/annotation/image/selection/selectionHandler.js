@@ -1,9 +1,7 @@
 define([
   'document/annotation/common/selection/abstractSelectionHandler',
-  'document/annotation/image/selection/layers/point/pointDrawingTool',
-  'document/annotation/image/selection/layers/rect/rectDrawingTool',
-  'document/annotation/image/selection/layers/tiltedbox/tiltedBoxDrawingTool'
-], function(AbstractSelectionHandler, PointDrawingTool, RectDrawingTool, TiltedBoxDrawingTool) {
+  'document/annotation/image/selection/drawingCanvas'
+], function(AbstractSelectionHandler, DrawingCanvas) {
 
     var SelectionHandler = function(containerEl, olMap, highlighter) {
 
@@ -13,100 +11,75 @@ define([
 
           currentSelection = false,
 
-          currentDrawingTool = false,
+          drawingCanvas = new DrawingCanvas(containerEl, olMap),
 
-          drawingTools = {
-            point : new PointDrawingTool(olMap),
-            rect  : new RectDrawingTool(olMap),
-            tbox  : new TiltedBoxDrawingTool(containerEl, olMap)
-          },
-
-          attachEventHandlers = function() {
-            jQuery.each(drawingTools, function(key, tool) {
-              tool.on('newSelection', onNewSelection);
-            });
-          },
-
-          onNewSelection = function(selection) {
-            currentSelection = selection;
-            self.fireEvent('select', addScreenBounds(currentSelection));
-          },
-
-          /** Converts the given map-coordinate bounds to viewport bounds **/
-          mapBoundsToScreenBounds = function(mapBounds) {
+          addViewportBounds = function(selection) {
             var offset = jQuery(containerEl).offset(),
+                b = selection.origBounds, // Shorthand
 
-                pxBounds = mapBounds.map(function(coord) {
-                  return olMap.getPixelFromCoordinate([ coord.x, - coord.y ]);
-                }),
+                corners = [
+                  [ b.left,  - b.top ],
+                  [ b.right, - b.top ],
+                  [ b.right, - b.bottom ],
+                  [ b.left,  - b.bottom ]
+                ].map(function(c) {
+                  return olMap.getPixelFromCoordinate(c);
+                });
 
-                bbox = (function() {
-                  var x = pxBounds.map(function(px) { return px[0]; }),
-                      y = pxBounds.map(function(px) { return px[1]; }),
-
-                      top = Math.min.apply(null, y) + offset.top ,
-                      right = Math.max.apply(null, x) + offset.left,
-                      bottom = Math.max.apply(null, y) + offset.top,
-                      left = Math.min.apply(null, x) + offset.left;
-
-                  return {
-                    top    : top,
-                    right  : right,
-                    bottom : bottom,
-                    left   : left,
-                    width  : right - left,
-                    height : bottom - top
-                  };
-                })();
-
-            return bbox;
-          },
-
-          addScreenBounds = function(selection) {
-            var clone = jQuery.extend({}, selection);
-            clone.bounds = mapBoundsToScreenBounds(selection.mapBounds);
-            return clone;
+            return {
+              annotation: selection.annotation,
+              bounds : {
+                top    : corners[0][1] + offset.top,
+                right  : corners[1][0] + offset.left,
+                bottom : corners[2][1] + offset.top,
+                left   : corners[0][0] + offset.left,
+                width  : corners[1][0] - corners[0][0],
+                height : corners[2][1] - corners[0][1],
+              },
+              origBounds : selection.origBounds
+            };
           },
 
           /** @override **/
           getSelection = function() {
-            if (currentSelection)
-              return addScreenBounds(currentSelection);
+            return drawingCanvas.getSelection();
           },
 
-          /** @override **/
+          /**
+           * Reminder: this is used to set a selection based on a URL hash.
+           * @override
+           */
           setSelection = function(selection) {
             currentSelection = selection;
-            if (selection)
-              self.fireEvent('select', addScreenBounds(currentSelection));
+            if (selection) {
+              // Adds viewportbounds in place - not the nicest solution...
+              var withBounds = addViewportBounds(selection);
+              selection.bounds = withBounds.bounds;
+
+              // Remove from highlighter and add to drawing canvas
+              highlighter.removeAnnotation(selection.annotation);
+              drawingCanvas.setSelection(selection);
+
+              self.fireEvent('select', selection);
+            }
           },
 
           /** @override **/
           clearSelection = function() {
-            if (currentDrawingTool)
-              currentDrawingTool.clearSelection();
+            drawingCanvas.stopDrawing();
+            if (currentSelection)
+              highlighter.convertSelectionToAnnotation(currentSelection);
             currentSelection = false;
           },
 
           /** Enable the drawing tool with the given name **/
-          setEnabled = function(toolKey) {
-            var tool = (toolKey) ? drawingTools[toolKey] : false;
-
-            if (tool != currentDrawingTool) {
-              if (currentDrawingTool)
-                currentDrawingTool.setEnabled(false);
-
-              if (tool)
-                tool.setEnabled(true);
-            }
-
-            currentDrawingTool = tool;
+          setEnabled = function(shapeType) {
+            if (shapeType) drawingCanvas.startDrawing(shapeType);
+            else drawingCanvas.stopDrawing();
           },
 
           updateSize = function() {
-            jQuery.each(drawingTools, function(key, tool) {
-              tool.updateSize();
-            });
+            drawingCanvas.refresh();
           },
 
           onMouseMove = function(e) {
@@ -126,30 +99,21 @@ define([
             }
           },
 
-          onClick = function(e) {
-            if (currentDrawingTool) {
-              // Just forward to the drawing tool
-              currentDrawingTool.createNewSelection(e);
-            } else {
-              var previousSelection = currentSelection;
-              currentSelection = highlighter.getAnnotationAt(e);
-
-              if (currentSelection) {
-                // Click selected an existing annotation
-                if (currentSelection !== previousSelection)
-                  // Selection change
-                  self.fireEvent('select', addScreenBounds(currentSelection));
-              } else {
-                // No annotation - deselect
-                self.fireEvent('select');
-              }
-            }
+          onMouseClick = function(e) {
+            currentHover = highlighter.getAnnotationAt(e);
+            if (currentHover)
+              // Click selected an existing annotation
+              setSelection(currentHover);
+            else
+              // Deselect
+              self.fireEvent('select');
           };
 
       olMap.on('pointermove', onMouseMove);
-      olMap.on('click', onClick);
+      olMap.on('click', onMouseClick);
 
-      attachEventHandlers();
+      drawingCanvas.on('create', self.forwardEvent('select'));
+      drawingCanvas.on('changeShape', self.forwardEvent('changeShape'));
 
       this.getSelection = getSelection;
       this.setSelection = setSelection;

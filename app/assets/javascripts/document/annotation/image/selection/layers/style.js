@@ -29,7 +29,7 @@ define([], function() {
     BOX_FILL_OPACITY : 0.2,
 
     /** OpenLayers-ready box style **/
-    BOX : (function(foo) {
+    BOX : (function() {
 
       // Cf. http://stackoverflow.com/questions/28004153/setting-vector-feature-fill-opacity-when-you-have-a-hexadecimal-color
       var baseGrey = ol.color.asArray('#323232'),

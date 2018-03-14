@@ -15,18 +15,17 @@ define([
             w = parseInt(args[2].substring(2)),
             h = parseInt(args[3].substring(2));
 
-        return  { x: x,  y: y, w: w, h: h };
-      },
-
-      /** Converts xywh bounds to coordinates **/
-      boundsToCoords = function(b) {
-        return [
-          [b.x, -b.y],
-          [b.x, -(b.y + b.h)],
-          [(b.x + b.w), - (b.y + b.h)],
-          [(b.x + b.w), -b.y],
-          [b.x, -b.y]
-        ];
+        return  {
+          x: x,  y: y, w: w, h: h,
+          bounds : { top: y, right: x + w, bottom: y + h, left: x },
+          coords : [
+            [x, - y],
+            [x, - (y + h)],
+            [x + w, - (y + h)],
+            [x + w, - y],
+            [x, - y]
+          ]
+        };
       };
 
   var RectLayer = function(olMap) {
@@ -36,8 +35,8 @@ define([
         rectVectorSource = new ol.source.Vector({}),
 
         computeSize = function(annotation) {
-          var bounds = parseAnchor(annotation.anchor);
-          return bounds.w * bounds.h;
+          var parsed = parseAnchor(annotation.anchor);
+          return parsed.w * parsed.h;
         },
 
         getAnnotationAt = function(e) {
@@ -53,7 +52,7 @@ define([
 
             return {
               annotation: hoveredFeatures[0].get('annotation'),
-              mapBounds: self.pointArrayToBounds(hoveredFeatures[0].getGeometry().getCoordinates()[0])
+              origBounds: hoveredFeatures[0].get('origBounds')
             };
           }
         },
@@ -63,18 +62,18 @@ define([
           if (feature)
             return {
               annotation: feature.get('annotation'),
-              mapBounds: self.pointArrayToBounds(feature.getGeometry().getCoordinates()[0])
+              origBounds: feature.get('origBounds')
             };
         },
 
         addAnnotation = function(annotation) {
-          var bounds = parseAnchor(annotation.anchor),
-              coords = boundsToCoords(bounds),
+          var parsed = parseAnchor(annotation.anchor),
               feature = new ol.Feature({
-                'geometry': new ol.geom.Polygon([ coords ])
+                'geometry': new ol.geom.Polygon([ parsed.coords ])
               });
 
           feature.set('annotation', annotation, true);
+          feature.set('origBounds', parsed.bounds, true);
           rectVectorSource.addFeature(feature);
         },
 
@@ -83,7 +82,12 @@ define([
         },
 
         refreshAnnotation = function(annotation) {
-          // TODO style change depending on annotation properties
+          var existing = findById(annotation.annotation_id);
+          if (existing) {
+            // TODO doesn't happen yet
+          } else {
+            addAnnotation(annotation);
+          }
         },
 
         removeAnnotation = function(annotation) {

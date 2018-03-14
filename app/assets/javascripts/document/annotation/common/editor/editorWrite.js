@@ -145,9 +145,13 @@ define([
         onOK = function() {
           var reply = replyField.getBody(), selection,
               currentAnnotation = self.currentSelection.annotation,
-              hasChanged = reply || self.sectionList.hasChanged();
+              hasChanged = self.updatedAnchor || reply || self.sectionList.hasChanged();
 
           if (hasChanged || annotationMode.mode === 'QUICK') {
+            // Commit anchor changes
+            if (self.updatedAnchor)
+              self.currentSelection.annotation.anchor = self.updatedAnchor;
+
             // Commit changes in sections
             self.sectionList.commitChanges();
 
@@ -177,7 +181,7 @@ define([
             selectionHandler.clearSelection();
           }
 
-          element.hide();
+          self.close();
         },
 
         /** Shortcut: triggers OK and moves the editor to the next annotation **/
@@ -227,6 +231,13 @@ define([
     // TODO handle click on background document -> cancel
   };
   WriteEditor.prototype = Object.create(EditorBase.prototype);
+
+  EditorBase.prototype.updateAnchor = function(selection) {
+    if (selection) {
+      this.updatedAnchor = selection.annotation.anchor;
+      this.setPosition(selection.bounds);
+    }
+  };
 
   /** Extends the clear method provided by EditorBase **/
   WriteEditor.prototype.clear = function() {

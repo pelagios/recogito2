@@ -14,6 +14,7 @@
     position:absolute;
     top:20px;
     right:20px;
+    z-index:2;
 
     .zoom, .fullscreen, .reset-rotation {
       .box-shadow(2px, 2px, 12px, rgba(0, 0, 0, 0.15));
@@ -36,10 +37,11 @@
 
 }
 
-canvas.tiltedbox-drawing {
+canvas.drawing-canvas {
   position:absolute;
   top:0;
   left:0;
   width:100%;
   height:100%;
+  z-index:1;
 }
