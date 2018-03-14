@@ -16,6 +16,7 @@ define({
     'btn_ok': 'OK'
    },
   'de': true,
+  'fa': true,
   'fr': true,
   'it': true
 });

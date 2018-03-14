@@ -1,9 +1,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations=حاشیه نویسی ها
-common.users=Users
-common.logged_in_as=Logged in as
+common.annotations=حاشیه نویسی
+common.users=کاربران
+common.logged_in_as=ورود با عنوان
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common document-related labels
@@ -40,22 +40,25 @@ landing.index.registration_form.placeholder.username=انتخاب نام کار�
 landing.index.registration_form.placeholder.email=نشانی ایمیل
 landing.index.registration_form.placeholder.password=رمز ورود
 landing.index.registration_form.placeholder.register=ثبت نام
-landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
-  and the storage of your E-Mail address.
+landing.index.registration_form.disclaimer.text=با قوانین  و شرایط </a> ما<a href="{0}">و ذخیره نشانی ایمیلتان موافقت کنید.
 
 # Tiles
 landing.index.tiles.1.title=مجموعه های به اشتراک گذاشته شده
 landing.index.tiles.1.text= متن ها و تصاویر را بارگذاری کنید. مجموعه خود را ایجاد نمایید. دیگران را به همکاری دعوت نمایید.
 landing.index.tiles.2.title=حاشیه نویسی گروهی
 landing.index.tiles.2.text=توضيحات و برچسب اضافه کنید. بحث کنید. Recogito پروانه ایجاد و تاریخچه نسخه برداری محتوا را حفظ و مدیریت می کند.
-landing.index.tiles.3.title=Semantics Included
+landing.index.tiles.3.title=معناشناسی
 landing.index.tiles.3.text=با استفاده از کلمات کنترل شده و با امکان پشتیبانی موجود، افراد و مکان ها را براحتی برچسب گذاری کنید.
 landing.index.tiles.4.title=داده باز (Open Data)
 landing.index.tiles.4.text=نتایج خود را روی وب نمایش دهید. داده های خود را بعنوان Linked Open Data منتشر نمایید.
 
 # Recogito Right Now
-landing.index.right_now=Recogito Right Now
-landing.index.edits_last_24hrs=Edits last 24hrs
+landing.index.right_now=فعالیت های جاری در Recogito
+landing.index.edits_last_24hrs=ویرایش ها در ۲۴ ساعت گذشته
+
+# About
+landing.index.about="نرم افزار متن باز توسط موسسه تکنولوژی اتریشی (Austrian Institute of Technology)، دانشگاه اکستر (University of Exeter)، موسسه اینترنت و جامعه هومبولت ( Humboldt Institute for Internet and Society)، دانشگاه باز انگستان (The Open Universtity) و دانشگاه لندن (University of London). تامین بودجه توسط بنیاد Andrew W. Mellon Foundation.
+landing.index.visit_us=<span class="icon">{2}</span><a href="{3}" target="_blank">ما را در توییتر و </a> <span class="icon">{0}</span> <a href="{1}" target="_blank">Github</a> دنبال کنید"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space
@@ -123,11 +126,9 @@ document.annotation.text.toolbar.color.by_tag=براساس برچسب
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.downloads.annotations.csv.text=بارگیری حاشیه نویسی ها در قالب جدول
 document.downloads.annotations.rdf.text=بارگیری حاشیه نویسی ها و اسناد در قالب RDF، کدگذاری شده با استفاده از Open Annotation و Dublin Core
-document.downloads.annotations.geojson.text=Confirmed geo-located places in the document as a GeoJSON FeatureCollection.
-document.downloads.annotations.kml.text=Confirmed geo-located places as KML file, for viewing in Google Earth.
-document.downloads.annotations.tei.text=Annotated text in a basic TEI/XML serialization. Note: only \
-  place name annotations are included at the moment. Also, overlapping annotations are filtered \
-  out as TEI does not support them.
+document.downloads.annotations.geojson.text= مکان های جغرافیایی تائید شده این سند در قالب GeoJSON FeatureCollection.
+document.downloads.annotations.kml.text= مکان های جغرافیایی تائید شده این سند در قالب KML برای مشاهده در Google Earth.
+document.downloads.annotations.tei.text=متن حاشیه نویسی شده در قالب TEI/XML. توجه: در حال حاضر تنها شامل نام مکان ها می باشد. همچنین حاشیه نویسی های دارای اشتراک و همپوشانی بدلیل عدم پشتیبانی استاندارد TEI حذف شده اند. 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document settings
