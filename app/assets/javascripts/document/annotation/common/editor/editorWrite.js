@@ -242,6 +242,7 @@ define([
   /** Extends the clear method provided by EditorBase **/
   WriteEditor.prototype.clear = function() {
     this.replyField.clear();
+    this.updatedAnchor = undefined;
     EditorBase.prototype.clear.call(this);
   };
 

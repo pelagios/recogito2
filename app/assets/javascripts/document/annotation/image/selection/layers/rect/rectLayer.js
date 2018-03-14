@@ -1,8 +1,7 @@
 define([
-  'document/annotation/image/selection/layers/geom2D',
   'document/annotation/image/selection/layers/layer',
   'document/annotation/image/selection/layers/style'
-], function(Geom2D, Layer, Style) {
+], function(Layer, Style) {
 
   /** Constants **/
   var MIN_SELECTION_DISTANCE = 5;

@@ -1,16 +1,14 @@
 define([
   'common/config',
-  'document/annotation/image/selection/layers/geom2D',
-  'document/annotation/image/selection/layers/layer',
-  'document/annotation/image/selection/layers/style'
-], function(Config, Geom2D, Layer, Style) {
+  'common/hasEvents'
+], function(Config, HasEvents) {
 
       /** Constants **/
   var TWO_PI = 2 * Math.PI,
 
       HANDLE_RADIUS = 6;
 
-  var Rect2DrawingTool = function(canvas, olMap, opt_selection) {
+  var RectDrawingTool = function(canvas, olMap, opt_selection) {
 
     var self = this,
 
@@ -278,10 +276,10 @@ define([
     // Start rendering loop
     render();
 
-    Layer.apply(this, [ olMap ]);
+    HasEvents.apply(this);
   };
-  Rect2DrawingTool.prototype = Object.create(Layer.prototype);
+  RectDrawingTool.prototype = Object.create(HasEvents.prototype);
 
-  return Rect2DrawingTool;
+  return RectDrawingTool;
 
 });
