@@ -32,7 +32,7 @@ define(function() {
     this.handlers[event] = handler;
   };
 
-  /** Removes all event handler from this component. **/
+  /** Removes all event handlers from this component. **/
   HasEvents.prototype.off = function(event) {
     delete this.handlers[event];
   };

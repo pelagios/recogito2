@@ -39,7 +39,7 @@ define([
 
         /**
          * Attach mouse and key event handlers, init the canvas size
-         * and remove cursor (the drawing tools will provide it)
+         * and remove cursor (the drawing tools will provide it).
          */
         init = function() {
           canvas.mousemove(onMouseMove);
@@ -50,7 +50,7 @@ define([
           jQuery(document).keydown(onKeyDown);
           jQuery(document).keyup(onKeyUp);
 
-          refresh();
+          resize();
 
           setCursor();
         },
@@ -58,7 +58,7 @@ define([
         /**
          * Re-initializes the canvas properties based on the current container size.
          */
-        refresh = function() {
+        resize = function() {
           canvas.attr('width', canvas.width());
           canvas.attr('height', canvas.height());
 
@@ -93,8 +93,9 @@ define([
          * Returns the current selection if any.
          */
         getSelection = function() {
-          if (currentDrawingTool)
-            return toViewportSelection(currentDrawingTool.getSelection());
+          var currentSelection = (currentDrawingTool) ? currentDrawingTool.getSelection() : false;
+          if (currentSelection)
+            return toViewportSelection(currentSelection);
         },
 
         /**
@@ -119,7 +120,8 @@ define([
                 };
               };
 
-          stopDrawing();
+          if (currentDrawingTool)
+            currentDrawingTool.destroy();
 
           if (toolFn) {
             currentDrawingTool = new toolFn(self, olMap, opt_selection);
@@ -132,13 +134,21 @@ define([
         },
 
         /**
-         * Stops drawing by destroying the current drawing tool instance and hiding the canvas.
+         * Clears the canvas and resets the current drawing tool (if any), so we can
+         * start drawing a new selection.
          */
-        stopDrawing = function() {
-          if (currentDrawingTool) {
+        reset = function() {
+          if (currentDrawingTool) currentDrawingTool.reset();
+        },
+
+        /**
+         * De-activates the canvas by destroying the current drawing tool instance
+         * and hiding the canvas element.
+         */
+        hide = function() {
+          if (currentDrawingTool)
             currentDrawingTool.destroy();
-            canvas.hide();
-          }
+          canvas.hide();
         },
 
         /** Clears the canvas **/
@@ -217,21 +227,22 @@ define([
         };
 
     // Reset canvas on window resize
-    jQuery(window).on('resize', refresh);
+    jQuery(window).on('resize', resize);
 
     // Used by the selectionHandler
     this.getSelection = getSelection;
     this.setSelection = setSelection;
     this.startDrawing = startDrawing;
-    this.stopDrawing = stopDrawing;
-    this.refresh = refresh;
+    this.hide = hide;
+    this.reset = reset;
+    this.resize = resize;
 
     // Used by the drawing tools
     this.setForwardEvents = setForwardEvents;
     this.setCursor = setCursor;
     this.clear = clear;
 
-    // Properties initialized on .init and .refresh
+    // Properties initialized on .init and .resize
     this.ctx = undefined;
     this.width = undefined;
     this.height = undefined;

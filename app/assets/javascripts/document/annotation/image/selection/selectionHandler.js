@@ -7,9 +7,11 @@ define([
 
       var self = this,
 
+          // Keeps track of the selection currently under the mouse pointer
           currentHover = false,
 
-          currentSelection = false,
+          // When editing an existing selection, we keep a handle on the original
+          selectionBefore = false,
 
           drawingCanvas = new DrawingCanvas(containerEl, olMap),
 
@@ -50,7 +52,8 @@ define([
            * @override
            */
           setSelection = function(selection) {
-            currentSelection = selection;
+            selectionBefore = selection;
+
             if (selection) {
               // Adds viewportbounds in place - not the nicest solution...
               var withBounds = addViewportBounds(selection);
@@ -66,16 +69,22 @@ define([
 
           /** @override **/
           clearSelection = function() {
-            drawingCanvas.stopDrawing();
-            if (currentSelection)
-              highlighter.convertSelectionToAnnotation(currentSelection);
-            currentSelection = false;
+            if (selectionBefore) {
+              // If edit was on an existing selection, move back to the highlighter and hide canvas
+              highlighter.convertSelectionToAnnotation(selectionBefore);
+              drawingCanvas.hide();
+            } else {
+              // Otherwise just reset the canvas, so we can keep drawing
+              drawingCanvas.reset();
+            }
+
+            selectionBefore = false;
           },
 
           /** Enable the drawing tool with the given name **/
           setEnabled = function(shapeType) {
             if (shapeType) drawingCanvas.startDrawing(shapeType);
-            else drawingCanvas.stopDrawing();
+            else drawingCanvas.hide();
           },
 
           updateSize = function() {

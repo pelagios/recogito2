@@ -142,8 +142,8 @@ define([
             // Stop drawing
             isDrawing = false;
             if (!opt_selection) self.fireEvent('create', getSelection());
-          } else {
-            // Start drawing
+          } else if (!currentShape) {
+            // Start drawing (unless we already have a shape)
             isDrawing = true;
             currentShape = {
               start: [ mouseX, mouseY ],
@@ -240,19 +240,20 @@ define([
           canvas.clear();
           if (currentShape) drawCurrentShape(canvas.ctx, hoverTarget);
 
-          // Don't draw cursor if we are drawing or there's a hover target
-          if (!(isDrawing || hoverTarget)) drawDot(canvas.ctx, [ mouseX, mouseY ], { blur: true });
+          if (!hoverTarget)
+            canvas.setCursor('crosshair'); // Not hovering over shape? Default crosshair cursor
+          else if (hoverTarget === 'SHAPE')
+            canvas.setCursor('move'); // Hovering over the shape? MOVE/GRAB cursor
+          else
+            canvas.setCursor(); // Handles? No cursor
 
-          // If we're hovering over the shape, set cursor to hand
-          if (hoverTarget === 'SHAPE') canvas.setCursor('move');
-          else canvas.setCursor();
-
-          // TODO change, so we can stop the animation on .setEnabled(false)
           if (running) requestAnimationFrame(render);
         },
 
-        clearSelection = function() {
+        reset = function() {
           currentShape = false;
+          isDrawing = false;
+          isModifying = false;
         },
 
         destroy = function() {
@@ -263,14 +264,17 @@ define([
           canvas.off('drag');
         };
 
+    // Set default crosshair cursor
+    canvas.setCursor('crosshair');
+
     // Attach mouse handlers
     canvas.on('mousemove', onMouseMove);
     canvas.on('mousedown', onMouseDown);
     canvas.on('click', onMouseClick);
     canvas.on('drag', onMouseDrag);
 
-    this.clearSelection = clearSelection;
     this.getSelection = getSelection;
+    this.reset = reset;
     this.destroy = destroy;
 
     // Start rendering loop
