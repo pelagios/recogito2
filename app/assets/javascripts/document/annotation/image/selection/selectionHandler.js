@@ -88,7 +88,7 @@ define([
           },
 
           updateSize = function() {
-            drawingCanvas.refresh();
+            drawingCanvas.resize();
           },
 
           onMouseMove = function(e) {

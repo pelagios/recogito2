@@ -211,17 +211,12 @@ define([
 
         getSelection = function() {
           if (currentShape) {
-            var b = getCanvasBounds(),
+            var imageBounds = getImageBounds(),
 
-                // TODO redundant - can derive this more easily from currentShape.imageBounds
-
-                topLeft = olMap.getCoordinateFromPixel([ b.left, b.top ]),
-                bottomRight = olMap.getCoordinateFromPixel([ b.right, b.bottom ]),
-
-                x =   Math.round(topLeft[0]),
-                y = - Math.round(topLeft[1]),
-                w =   Math.round(bottomRight[0] - topLeft[0]),
-                h =   Math.round(topLeft[1] - bottomRight[1]),
+                x =   Math.round(imageBounds.left),
+                y = - Math.round(imageBounds.bottom),
+                w =   Math.round(imageBounds.width),
+                h =   Math.round(imageBounds.height),
 
                 anchor = 'rect:x=' + x + ',y=' + y + ',w=' + w + ',h=' + h;
 
@@ -237,8 +232,8 @@ define([
 
             return {
               annotation: annotation,
-              canvasBounds: getCanvasBounds(), // Bounds in canvas coordinate system
-              imageBounds: { top: y, right: x + w, bottom: y + h, left: x } // Bounds in original image
+              canvasBounds: getCanvasBounds(),
+              imageBounds: imageBounds
             };
           }
         },
