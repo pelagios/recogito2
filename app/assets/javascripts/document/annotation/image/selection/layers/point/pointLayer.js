@@ -3,7 +3,11 @@ define([
   'document/annotation/image/selection/layers/style'
 ], function(Layer, Style) {
 
-  var MIN_SELECTION_DISTANCE = 10;
+  var MIN_SELECTION_DISTANCE = 10,
+
+      pointToBounds = function(xy) {
+        return { top: - xy[1], right: xy[0], bottom: - xy[1], left: xy[0], width: 0, height: 0 };
+      };
 
   var PointLayer = function(olMap) {
 
@@ -19,7 +23,7 @@ define([
           if (closestPoint && self.computePxDistance(e.pixel, closestPoint) < MIN_SELECTION_DISTANCE) {
             return {
               annotation: closestFeature.get('annotation'),
-              mapBounds: self.pointArrayToBounds([ closestPoint ])
+              imageBounds: pointToBounds(closestPoint)
             };
           }
         },
@@ -31,7 +35,7 @@ define([
             point = feature.getGeometry().getCoordinates();
             return {
               annotation: feature.get('annotation'),
-              mapBounds: self.pointArrayToBounds([ point ])
+              imageBounds: pointToBounds(point)
             };
           }
         },

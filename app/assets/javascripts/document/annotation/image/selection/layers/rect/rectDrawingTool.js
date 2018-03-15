@@ -1,26 +1,12 @@
 define([
   'common/config',
-  'common/hasEvents',
+  'document/annotation/image/selection/layers/baseDrawingTool',
   'document/annotation/image/selection/layers/geom2D'
-], function(Config, HasEvents, Geom2D) {
-
-      /** Constants **/
-  var TWO_PI = 2 * Math.PI,
-
-      HANDLE_RADIUS = 6,
-
-      // TODO we can move this into a super class later on
-      imageToCanvas = function(olMap, xy) {
-        return olMap.getPixelFromCoordinate([xy[0], xy[1]])
-          .map(function(v) { return Math.round(v); });
-      },
-
-      canvasToImage = function(olMap, xy) {
-        return olMap.getCoordinateFromPixel([xy[0], xy[1]])
-          .map(function(v) { return Math.round(v); });
-      };
+], function(Config, BaseTool, Geom2D) {
 
   var RectDrawingTool = function(canvas, olMap, opt_selection) {
+    // Extend at start, so that we have base prototype methods available on init (currentShape!)
+    BaseTool.apply(this, [ olMap ]);
 
     var self = this,
 
@@ -41,10 +27,9 @@ define([
         currentShape = (function() {
           if (opt_selection) {
             var b = opt_selection.imageBounds;
-
             return {
-              canvasStart : imageToCanvas(olMap, [ b.left, - b.top ]),
-              canvasEnd   : imageToCanvas(olMap, [ b.right, - b.bottom ]),
+              canvasStart : self.imageToCanvas([ b.left, - b.top ]),
+              canvasEnd   : self.imageToCanvas([ b.right, - b.bottom ]),
               imageStart  : [ b.left, - b.top ],
               imageEnd    : [ b.right, - b.bottom ]
             };
@@ -58,21 +43,21 @@ define([
           currentShape = (currentShape) ? jQuery.extend({}, currentShape, diff) : diff;
 
           if (diff.canvasStart && !diff.imageStart)
-            currentShape.imageStart = canvasToImage(olMap, diff.canvasStart);
+            currentShape.imageStart = self.canvasToImage(diff.canvasStart);
 
           if (diff.canvasEnd && !diff.imageEnd)
-            currentShape.imageEnd = canvasToImage(olMap, diff.canvasEnd);
+            currentShape.imageEnd = self.canvasToImage(diff.canvasEnd);
 
           if (diff.imageStart && !diff.canvasStart)
-            currentShape.canvasStart = imageToCanvas(olMap, diff.imageStart);
+            currentShape.canvasStart = self.imageToCanvas(diff.imageStart);
 
           if (diff.imageEnd && !diff.canvasEnd)
-            currentShape.canvasEnd = imageToCanvas(olMap, diff.imageEnd);
+            currentShape.canvasEnd = self.imageToCanvas(diff.imageEnd);
         },
 
         /** Returns the bounds of the current shape (if any) in canvas coordinate space **/
         getCanvasBounds = function() {
-          if (currentShape)
+          if (currentShape) {
             return {
               top    : Math.min(currentShape.canvasStart[1], currentShape.canvasEnd[1]),
               right  : Math.max(currentShape.canvasStart[0], currentShape.canvasEnd[0]),
@@ -81,6 +66,7 @@ define([
               width  : Math.abs(currentShape.canvasEnd[0] - currentShape.canvasStart[0]),
               height : Math.abs(currentShape.canvasEnd[1] - currentShape.canvasStart[1])
             };
+          }
         },
 
         /** Returns the bounds of the current shape (if any) in image coordinate space **/
@@ -99,8 +85,8 @@ define([
         /** Refreshes the canvas position of the current shape, according to the image state **/
         refreshPosition = function() {
           if (currentShape) {
-            currentShape.canvasStart = imageToCanvas(olMap, currentShape.imageStart);
-            currentShape.canvasEnd = imageToCanvas(olMap, currentShape.imageEnd);
+            currentShape.canvasStart = self.imageToCanvas(currentShape.imageStart);
+            currentShape.canvasEnd = self.imageToCanvas(currentShape.imageEnd);
           }
         },
 
@@ -128,10 +114,10 @@ define([
                 return function() {
                   if (xy) {
                     var x = xy[0], y = xy[1];
-                    return mouseX <= x + HANDLE_RADIUS &&
-                           mouseX >= x - HANDLE_RADIUS &&
-                           mouseY >= y - HANDLE_RADIUS &&
-                           mouseY <= y + HANDLE_RADIUS;
+                    return mouseX <= x + BaseTool.HANDLE_RADIUS &&
+                           mouseX >= x - BaseTool.HANDLE_RADIUS &&
+                           mouseY >= y - BaseTool.HANDLE_RADIUS &&
+                           mouseY <= y + BaseTool.HANDLE_RADIUS;
                   }
                 };
               },
@@ -150,12 +136,9 @@ define([
                          hoverXY[1] <= bounds.bottom;
               };
 
-          if (isOverStartHandle())
-            return 'START_HANDLE';
-          else if (isOverEndHandle())
-            return 'END_HANDLE';
-          else if (isOverShape())
-            return 'SHAPE';
+          if (isOverStartHandle())    return 'START_HANDLE';
+          else if (isOverEndHandle()) return 'END_HANDLE';
+          else if (isOverShape())     return 'SHAPE';
         },
 
         onMouseMove = function(e) {
@@ -173,9 +156,6 @@ define([
         },
 
         onMouseClick = function(e) {
-          mouseX = e.offsetX;
-          mouseY = e.offsetY;
-
           if (isDrawing) {
             // Stop drawing
             isDrawing = false;
@@ -220,46 +200,8 @@ define([
 
                 anchor = 'rect:x=' + x + ',y=' + y + ',w=' + w + ',h=' + h;
 
-                annotation = {
-                  annotates: {
-                    document_id: Config.documentId,
-                    filepart_id: Config.partId,
-                    content_type: Config.contentType
-                  },
-                  anchor: anchor,
-                  bodies: []
-                };
-
-            return {
-              annotation: annotation,
-              canvasBounds: getCanvasBounds(),
-              imageBounds: imageBounds
-            };
+            return self.buildSelection(anchor, getCanvasBounds(), imageBounds);
           }
-        },
-
-        drawDot = function(ctx, xy, opts) {
-          var hasBlur = (opts) ? opts.blur || opts.hover : false, // Hover implies blur
-              isHover = (opts) ? opts.hover : false;
-
-          // Black Outline
-          ctx.beginPath();
-          ctx.lineWidth = 4;
-          ctx.shadowBlur = (hasBlur) ? 6 : 0;
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-          ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-          ctx.arc(xy[0], xy[1], HANDLE_RADIUS, 0, TWO_PI);
-          ctx.stroke();
-
-          // Inner dot (white stroke + color fill)
-          ctx.beginPath();
-          ctx.shadowBlur = 0;
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = '#fff';
-          ctx.fillStyle = (isHover) ? 'orange' : '#000';
-          ctx.arc(xy[0], xy[1], HANDLE_RADIUS, 0, TWO_PI);
-          ctx.fill();
-          ctx.stroke();
         },
 
         drawCurrentShape = function(ctx, hoverTarget) {
@@ -304,8 +246,8 @@ define([
           ctx.restore();
 
           // Start/end dots
-          drawDot(ctx, currentShape.canvasStart, { hover: hoverTarget === 'START_HANDLE' });
-          drawDot(ctx, currentShape.canvasEnd, { hover: hoverTarget === 'END_HANDLE' });
+          self.drawDot(ctx, currentShape.canvasStart, { hover: hoverTarget === 'START_HANDLE' });
+          self.drawDot(ctx, currentShape.canvasEnd, { hover: hoverTarget === 'END_HANDLE' });
         },
 
         render = function() {
@@ -354,10 +296,8 @@ define([
 
     // Start rendering loop
     render();
-
-    HasEvents.apply(this);
   };
-  RectDrawingTool.prototype = Object.create(HasEvents.prototype);
+  RectDrawingTool.prototype = Object.create(BaseTool.prototype);
 
   return RectDrawingTool;
 

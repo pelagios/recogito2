@@ -1,67 +1,158 @@
 define([
   'common/config',
-  'document/annotation/image/selection/layers/layer',
-  'document/annotation/image/selection/layers/style'
-], function(Config, Layer, Style) {
+  'document/annotation/image/selection/layers/baseDrawingTool'
+], function(Config, BaseTool) {
 
-  var PointDrawingTool = function(olMap) {
+  var pointToBounds = function(xy) {
+        return { top: xy[1], right: xy[0], bottom: xy[1], left: xy[0], width: 0, height: 0 };
+      };
+
+  var PointDrawingTool = function(canvas, olMap, opt_selection) {
+    BaseTool.apply(this, [ olMap ]);
 
     var self = this,
 
-        pointVectorSource = new ol.source.Vector({}),
+        mouseX, mouseY,
 
-        drawPoint = function(coordinate) {
-          var pointFeature = new ol.Feature({
-                'geometry': new ol.geom.Point(coordinate)
-              });
+        // Setting this to false will stop the animation loop
+        running = true,
 
-          pointVectorSource.clear(true);
-          pointVectorSource.addFeature(pointFeature);
+        /**
+         * Either false or an object with coordinates in canvas and image systems.
+         *
+         * { canvasXY: [], imageXY: [] }
+         */
+        currentPoint = (function() {
+          if (opt_selection) {
+            var b = opt_selection.imageBounds;
+            return {
+              canvasXY: self.imageToCanvas([ b.left, - b.top ]),
+              imageXY: [ b.left, - b.top ]
+            };
+          } else {
+            return false;
+          }
+        })(),
+
+        isModifying = false,
+
+        isHovering = function() {
+          if (currentPoint) {
+            var x = currentPoint.canvasXY[0],
+                y = currentPoint.canvasXY[1];
+
+            return mouseX <= x + BaseTool.HANDLE_RADIUS &&
+              mouseX >= x - BaseTool.HANDLE_RADIUS &&
+              mouseY >= y - BaseTool.HANDLE_RADIUS &&
+              mouseY <= y + BaseTool.HANDLE_RADIUS;
+          }
         },
 
-        /** The simplest possible drawing case: draws a point at the given coordinate **/
-        createNewSelection = function(e) {
-          var x = Math.round(e.coordinate[0]),
-              y = Math.abs(Math.round(e.coordinate[1])),
+        shiftPoint = function(dx, dy) {
+          var cx = currentPoint.canvasXY[0] + dx,
+              cy = currentPoint.canvasXY[1] + dy;
 
-              annotation = {
-                annotates: {
-                  document_id: Config.documentId,
-                  filepart_id: Config.partId,
-                  content_type: Config.contentType
-                },
-                anchor: 'point:' + x + ',' + y,
-                bodies: []
-              },
-
-              mapBounds = self.pointArrayToBounds([ e.coordinate ]);
-
-          drawPoint(e.coordinate);
-
-          self.fireEvent('newSelection', {
-            isNew: true,
-            annotation: annotation,
-            mapBounds: mapBounds
-          });
+          currentPoint.canvasXY = [cx, cy];
+          currentPoint.imageXY = self.canvasToImage([cx, cy]);
         },
 
-        clearSelection = function() {
-          pointVectorSource.clear(true);
+        onMouseMove = function(e) {
+          mouseX = e.offsetX;
+          mouseY = e.offsetY;
+        },
+
+        onMouseDown = function(e) {
+          mouseX = e.offsetX;
+          mouseY = e.offsetY;
+          isModifying = isHovering();
+        },
+
+        onMouseClick = function(e) {
+          if (!currentPoint) {
+            currentPoint = {
+              canvasXY: [ mouseX, mouseY ],
+              imageXY: self.canvasToImage([ mouseX, mouseY ])
+            };
+
+            if (!opt_selection) self.fireEvent('create', getSelection());
+          }
+        },
+
+        onMouseDrag = function(e) {
+          var dx = e.originalEvent.movementX,
+              dy = e.originalEvent.movementY;
+
+          if (isModifying) {
+            canvas.setForwardEvents(false);
+            shiftPoint(dx, dy);
+            self.fireEvent('changeShape', getSelection());
+          } else {
+            canvas.setForwardEvents(true);
+          }
+        },
+
+        /** Refreshes the canvas position, according to the image state **/
+        refreshPosition = function() {
+          if (currentPoint)
+            currentPoint.canvasXY = self.imageToCanvas(currentPoint.imageXY);
+        },
+
+        getSelection = function() {
+          if (currentPoint) {
+            var x =   Math.round(currentPoint.imageXY[0]),
+                y = - Math.round(currentPoint.imageXY[1]),
+
+                anchor = 'point:' + x + ',' + y;
+
+            return self.buildSelection(
+              anchor,
+              pointToBounds(currentPoint.canvasXY),
+              pointToBounds(currentPoint.imageXY));
+          }
+        },
+
+        render = function() {
+          var hover = isHovering();
+
+          canvas.clear();
+          if (currentPoint) self.drawDot(canvas.ctx, currentPoint.canvasXY, { hover: hover });
+
+          if (hover) canvas.setCursor();
+          else canvas.setCursor('crosshair');
+
+          if (running) requestAnimationFrame(render);
+        },
+
+        reset = function() {
+          currentPoint = false;
+        },
+
+        destroy = function() {
+          running = false;
+          canvas.off('mousemove');
+          canvas.off('mousedown');
+          canvas.off('click');
+          canvas.off('drag');
         };
 
-    olMap.addLayer(new ol.layer.Vector({
-      source: pointVectorSource,
-      style: Style.POINT_HI
-    }));
+    // Set default crosshair cursor
+    canvas.setCursor('crosshair');
 
-    this.createNewSelection = createNewSelection;
-    this.clearSelection = clearSelection;
-    this.setEnabled = function() {}; // Not needed
-    this.updateSize = function() {}; // Not needed
+    // Attach mouse handlers
+    canvas.on('mousemove', onMouseMove);
+    canvas.on('mousedown', onMouseDown);
+    canvas.on('click', onMouseClick);
+    canvas.on('drag', onMouseDrag);
 
-    Layer.apply(this, [ olMap ]);
+    this.refreshPosition = refreshPosition;
+    this.getSelection = getSelection;
+    this.reset = reset;
+    this.destroy = destroy;
+
+    // Start rendering loop
+    render();
   };
-  PointDrawingTool.prototype = Object.create(Layer.prototype);
+  PointDrawingTool.prototype = Object.create(BaseTool.prototype);
 
   return PointDrawingTool;
 

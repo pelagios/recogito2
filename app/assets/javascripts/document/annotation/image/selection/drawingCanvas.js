@@ -9,7 +9,7 @@ define([
       MIN_DRAG_TIME = 150; // Everything below that threshold = click, otherwise drag
 
       TOOLS = {
-        // point : new PointDrawingTool(olMap),
+        point : PointDrawingTool,
         rect  : RectDrawingTool
         // tbox  : new TiltedBoxDrawingTool(containerEl, olMap)
       };
@@ -109,8 +109,10 @@ define([
          * Opens the given selection in the appropriate drawing tool.
          */
         setSelection = function(selection) {
-          // TODO branch based on anchor type
-          startDrawing('rect', selection);
+          var anchor = selection.annotation.anchor;
+              shapeType = anchor.substring(0, anchor.indexOf(':'));
+
+          startDrawing(shapeType, selection);
         },
 
         /**
