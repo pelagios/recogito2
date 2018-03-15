@@ -47,6 +47,9 @@ define([
           canvas.mouseup(onMouseUp);
           canvas.bind('wheel', onMouseWheel);
 
+          // We trigger 'mouseup' behavior when the mouse leaves the canvas
+          canvas.mouseleave(onMouseUp);
+
           jQuery(document).keydown(onKeyDown);
           jQuery(document).keyup(onKeyUp);
 
