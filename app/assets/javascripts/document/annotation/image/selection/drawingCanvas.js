@@ -38,7 +38,7 @@ define([
         currentDrawingTool = false,
 
         /**
-         * Attach mouse and key event handlers, init the canvas size
+         * Attach mouse, key and map state change event handlers, init the canvas size
          * and remove cursor (the drawing tools will provide it).
          */
         init = function() {
@@ -50,9 +50,16 @@ define([
           jQuery(document).keydown(onKeyDown);
           jQuery(document).keyup(onKeyUp);
 
+          olMap.on('postrender', onPostRender);
+
           resize();
 
           setCursor();
+        },
+
+        /** Called right after the map state (position, rotation, zoom) changed **/
+        onPostRender = function() {
+          if (currentDrawingTool) currentDrawingTool.refreshPosition();
         },
 
         /**
@@ -85,7 +92,7 @@ define([
               width  : selection.canvasBounds.width,
               height : selection.canvasBounds.height
             },
-            origBounds : selection.origBounds
+            imageBounds : selection.imageBounds
           };
         },
 
@@ -175,8 +182,8 @@ define([
           self.fireEvent('mousemove', e);
 
           if (isMouseDown) {
-            self.fireEvent('drag', e);
             if (forwardEvents) forwardMouseMove();
+            self.fireEvent('drag', e);
           }
         },
 

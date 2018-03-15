@@ -1,12 +1,24 @@
 define([
   'common/config',
-  'common/hasEvents'
-], function(Config, HasEvents) {
+  'common/hasEvents',
+  'document/annotation/image/selection/layers/geom2D'
+], function(Config, HasEvents, Geom2D) {
 
       /** Constants **/
   var TWO_PI = 2 * Math.PI,
 
-      HANDLE_RADIUS = 6;
+      HANDLE_RADIUS = 6,
+
+      // TODO we can move this into a super class later on
+      imageToCanvas = function(olMap, xy) {
+        return olMap.getPixelFromCoordinate([xy[0], xy[1]])
+          .map(function(v) { return Math.round(v); });
+      },
+
+      canvasToImage = function(olMap, xy) {
+        return olMap.getCoordinateFromPixel([xy[0], xy[1]])
+          .map(function(v) { return Math.round(v); });
+      };
 
   var RectDrawingTool = function(canvas, olMap, opt_selection) {
 
@@ -21,52 +33,94 @@ define([
         // Setting this to false will stop the animation loop
         running = true,
 
-        // { start: [], end [] } or false
+        /**
+         * Either false or an object with start/end coordinates in canvas and image systems.
+         *
+         * { canvasStart: [], canvasEnd: [], imageStart: [], imageEnd: [] }
+         */
         currentShape = (function() {
-          if (opt_selection)
-            return {
-              start: olMap.getPixelFromCoordinate([
-                  opt_selection.origBounds.left,
-                - opt_selection.origBounds.top
-              ]).map(function(v) { return Math.round(v); }),
+          if (opt_selection) {
+            var b = opt_selection.imageBounds;
 
-              end: olMap.getPixelFromCoordinate([
-                  opt_selection.origBounds.right,
-                - opt_selection.origBounds.bottom
-              ]).map(function(v) { return Math.round(v); })
+            return {
+              canvasStart : imageToCanvas(olMap, [ b.left, - b.top ]),
+              canvasEnd   : imageToCanvas(olMap, [ b.right, - b.bottom ]),
+              imageStart  : [ b.left, - b.top ],
+              imageEnd    : [ b.right, - b.bottom ]
             };
-          else
+          } else {
             return false;
+          }
         })(),
 
-        getShapeBounds = function() {
+        /** Updates the shape with the given diff, converting canvas/image coords if needed **/
+        updateShape = function(diff) {
+          currentShape = (currentShape) ? jQuery.extend({}, currentShape, diff) : diff;
+
+          if (diff.canvasStart && !diff.imageStart)
+            currentShape.imageStart = canvasToImage(olMap, diff.canvasStart);
+
+          if (diff.canvasEnd && !diff.imageEnd)
+            currentShape.imageEnd = canvasToImage(olMap, diff.canvasEnd);
+
+          if (diff.imageStart && !diff.canvasStart)
+            currentShape.canvasStart = imageToCanvas(olMap, diff.imageStart);
+
+          if (diff.imageEnd && !diff.canvasEnd)
+            currentShape.canvasEnd = imageToCanvas(olMap, diff.imageEnd);
+        },
+
+        /** Returns the bounds of the current shape (if any) in canvas coordinate space **/
+        getCanvasBounds = function() {
           if (currentShape)
             return {
-              top    : Math.min(currentShape.start[1], currentShape.end[1]),
-              right  : Math.max(currentShape.start[0], currentShape.end[0]),
-              bottom : Math.max(currentShape.start[1], currentShape.end[1]),
-              left   : Math.min(currentShape.start[0], currentShape.end[0]),
-              width  : Math.abs(currentShape.end[0] - currentShape.start[0]),
-              height : Math.abs(currentShape.end[1] - currentShape.start[1])
+              top    : Math.min(currentShape.canvasStart[1], currentShape.canvasEnd[1]),
+              right  : Math.max(currentShape.canvasStart[0], currentShape.canvasEnd[0]),
+              bottom : Math.max(currentShape.canvasStart[1], currentShape.canvasEnd[1]),
+              left   : Math.min(currentShape.canvasStart[0], currentShape.canvasEnd[0]),
+              width  : Math.abs(currentShape.canvasEnd[0] - currentShape.canvasStart[0]),
+              height : Math.abs(currentShape.canvasEnd[1] - currentShape.canvasStart[1])
             };
         },
 
-        shiftSelection = function(dx, dy) {
+        /** Returns the bounds of the current shape (if any) in image coordinate space **/
+        getImageBounds = function() {
+          if (currentShape)
+            return {
+              top    : Math.min(currentShape.imageStart[1], currentShape.imageEnd[1]),
+              right  : Math.max(currentShape.imageStart[0], currentShape.imageEnd[0]),
+              bottom : Math.max(currentShape.imageStart[1], currentShape.imageEnd[1]),
+              left   : Math.min(currentShape.imageStart[0], currentShape.imageEnd[0]),
+              width  : Math.abs(currentShape.imageEnd[0] - currentShape.imageStart[0]),
+              height : Math.abs(currentShape.imageEnd[1] - currentShape.imageStart[1])
+            };
+        },
+
+        /** Refreshes the canvas position of the current shape, according to the image state **/
+        refreshPosition = function() {
           if (currentShape) {
-            currentShape.start =
-              [ currentShape.start[0] + dx, currentShape.start[1] + dy ];
-            currentShape.end =
-              [ currentShape.end[0] + dx, currentShape.end[1] + dy ];
+            currentShape.canvasStart = imageToCanvas(olMap, currentShape.imageStart);
+            currentShape.canvasEnd = imageToCanvas(olMap, currentShape.imageEnd);
           }
+        },
+
+        shiftShape = function(dx, dy) {
+          if (currentShape)
+            updateShape({
+              canvasStart: [ currentShape.canvasStart[0] + dx, currentShape.canvasStart[1] + dy ],
+              canvasEnd:   [ currentShape.canvasEnd[0] + dx, currentShape.canvasEnd[1] + dy ]
+            });
         },
 
         shiftHandle = function(handle, dx, dy) {
           if (handle === 'START_HANDLE')
-            currentShape.start =
-              [ currentShape.start[0] + dx, currentShape.start[1] + dy ];
+            updateShape({ canvasStart: [
+              currentShape.canvasStart[0] + dx, currentShape.canvasStart[1] + dy
+            ]});
           else if (handle == 'END_HANDLE')
-            currentShape.end =
-              [ currentShape.end[0] + dx, currentShape.end[1] + dy ];
+            updateShape({ canvasEnd: [
+              currentShape.canvasEnd[0] + dx, currentShape.canvasEnd[1] + dy
+            ]});
         },
 
         getHoverTarget = function() {
@@ -82,16 +136,18 @@ define([
                 };
               },
 
-              isOverStartHandle = isOverHandle(currentShape.start),
-              isOverEndHandle = isOverHandle(currentShape.end),
+              isOverStartHandle = isOverHandle(currentShape.canvasStart),
+              isOverEndHandle = isOverHandle(currentShape.canvasEnd),
 
               isOverShape = function() {
-                var bounds = getShapeBounds();
+                var bounds = getImageBounds(),
+                    hoverXY = olMap.getCoordinateFromPixel([mouseX, mouseY]);
+
                 if (bounds)
-                  return mouseX >= bounds.left &&
-                         mouseX <= bounds.right &&
-                         mouseY >= bounds.top &&
-                         mouseY <= bounds.bottom;
+                  return hoverXY[0] >= bounds.left &&
+                         hoverXY[0] <= bounds.right &&
+                         hoverXY[1] >= bounds.top &&
+                         hoverXY[1] <= bounds.bottom;
               };
 
           if (isOverStartHandle())
@@ -105,7 +161,8 @@ define([
         onMouseMove = function(e) {
           mouseX = e.offsetX;
           mouseY = e.offsetY;
-          if (isDrawing) currentShape.end = [ mouseX, mouseY ];
+          if (isDrawing)
+            updateShape({ canvasEnd: [ mouseX, mouseY ] });
         },
 
         /** Triggers on click as well as on drag start **/
@@ -113,6 +170,24 @@ define([
           mouseX = e.offsetX;
           mouseY = e.offsetY;
           isModifying = getHoverTarget();
+        },
+
+        onMouseClick = function(e) {
+          mouseX = e.offsetX;
+          mouseY = e.offsetY;
+
+          if (isDrawing) {
+            // Stop drawing
+            isDrawing = false;
+            if (!opt_selection) self.fireEvent('create', getSelection());
+          } else if (!currentShape) {
+            // Start drawing - unless we already have a shape
+            isDrawing = true;
+            updateShape({
+              canvasStart: [ mouseX, mouseY ],
+              canvasEnd: [ mouseX, mouseY ]
+            });
+          }
         },
 
         onMouseDrag = function(e) {
@@ -126,35 +201,19 @@ define([
           if (isModifying === 'START_HANDLE' || isModifying === 'END_HANDLE')
             // Move only the handle
             shiftHandle(isModifying, dx, dy);
-          else
-            // Move the shape on the screen (with or without background map)
-            shiftSelection(dx, dy);
+          else if (isModifying === 'SHAPE')
+            // Move the shape
+            shiftShape(dx, dy);
 
           // If it's a modification, fire changeShape event
           if (isModifying) self.fireEvent('changeShape', getSelection());
         },
 
-        onMouseClick = function(e) {
-          mouseX = e.offsetX;
-          mouseY = e.offsetY;
-
-          if (isDrawing) {
-            // Stop drawing
-            isDrawing = false;
-            if (!opt_selection) self.fireEvent('create', getSelection());
-          } else if (!currentShape) {
-            // Start drawing (unless we already have a shape)
-            isDrawing = true;
-            currentShape = {
-              start: [ mouseX, mouseY ],
-              end:   [ mouseX, mouseY ]
-            };
-          }
-        },
-
         getSelection = function() {
           if (currentShape) {
-            var b = getShapeBounds(),
+            var b = getCanvasBounds(),
+
+                // TODO redundant - can derive this more easily from currentShape.imageBounds
 
                 topLeft = olMap.getCoordinateFromPixel([ b.left, b.top ]),
                 bottomRight = olMap.getCoordinateFromPixel([ b.right, b.bottom ]),
@@ -178,8 +237,8 @@ define([
 
             return {
               annotation: annotation,
-              canvasBounds: getShapeBounds(), // Bounds in canvas coordinate system
-              origBounds: { top: y, right: x + w, bottom: y + h, left: x } // Bounds in original image
+              canvasBounds: getCanvasBounds(), // Bounds in canvas coordinate system
+              imageBounds: { top: y, right: x + w, bottom: y + h, left: x } // Bounds in original image
             };
           }
         },
@@ -209,29 +268,49 @@ define([
         },
 
         drawCurrentShape = function(ctx, hoverTarget) {
-          var bounds = getShapeBounds(),
+          var startX = currentShape.canvasStart[0],
+              startY = currentShape.canvasStart[1],
+
+              endX = currentShape.canvasEnd[0],
+              endY = currentShape.canvasEnd[1],
+
+              // Center of the rect = center of rotation
+              centerX = (startX + endX) / 2,
+              centerY = (startY + endY) / 2,
+
+              // One of the corner points, so we can compute the proper dimensions in canvas space
+              corner = olMap.getPixelFromCoordinate([
+                currentShape.imageEnd[0], currentShape.imageStart[1]
+              ]),
+
+              w = Geom2D.len(startX, startY, corner[0], corner[1]),
+              h = Geom2D.len(endX, endY, corner[0], corner[1]),
+
+              rot = olMap.getView().getRotation(),
 
               strokeColor = (hoverTarget === 'SHAPE') ? 'orange' : '#fff';
 
               // Shorthand
-              strokeRect = function(x, y, w, h, width, col) {
+              strokeRect = function(w, h, width, col) {
                 ctx.beginPath();
                 ctx.shadowBlur = 0;
                 ctx.lineWidth = width;
                 ctx.strokeStyle = col;
-                ctx.rect(x, y, w, h);
+                ctx.rect(-w / 2, - h / 2, w, h);
                 ctx.stroke();
               };
 
           // Rect
-          strokeRect(bounds.left, bounds.top, bounds.width, bounds.height, 2, strokeColor);
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate(rot);
+          strokeRect(w, h, 2, strokeColor);
+          strokeRect(w + 1, h + 1, 1, '#000');
+          ctx.restore();
 
-          // Outline
-          strokeRect(bounds.left - 0.5, bounds.top - 0.5, bounds.width + 1, bounds.height + 1, 1, '#000');
-
-          // Corner dots
-          drawDot(ctx, currentShape.start, { hover: hoverTarget === 'START_HANDLE' });
-          drawDot(ctx, currentShape.end, { hover: hoverTarget === 'END_HANDLE' });
+          // Start/end dots
+          drawDot(ctx, currentShape.canvasStart, { hover: hoverTarget === 'START_HANDLE' });
+          drawDot(ctx, currentShape.canvasEnd, { hover: hoverTarget === 'END_HANDLE' });
         },
 
         render = function() {
@@ -273,6 +352,7 @@ define([
     canvas.on('click', onMouseClick);
     canvas.on('drag', onMouseDrag);
 
+    this.refreshPosition = refreshPosition;
     this.getSelection = getSelection;
     this.reset = reset;
     this.destroy = destroy;

@@ -17,7 +17,7 @@ define([
 
           addViewportBounds = function(selection) {
             var offset = jQuery(containerEl).offset(),
-                b = selection.origBounds, // Shorthand
+                b = selection.imageBounds, // Shorthand
 
                 corners = [
                   [ b.left,  - b.top ],
@@ -38,7 +38,7 @@ define([
                 width  : corners[1][0] - corners[0][0],
                 height : corners[2][1] - corners[0][1],
               },
-              origBounds : selection.origBounds
+              imageBounds : selection.imageBounds
             };
           },
 

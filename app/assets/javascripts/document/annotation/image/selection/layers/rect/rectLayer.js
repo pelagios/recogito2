@@ -51,7 +51,7 @@ define([
 
             return {
               annotation: hoveredFeatures[0].get('annotation'),
-              origBounds: hoveredFeatures[0].get('origBounds')
+              imageBounds: hoveredFeatures[0].get('imageBounds')
             };
           }
         },
@@ -61,7 +61,7 @@ define([
           if (feature)
             return {
               annotation: feature.get('annotation'),
-              origBounds: feature.get('origBounds')
+              imageBounds: feature.get('imageBounds')
             };
         },
 
@@ -72,7 +72,7 @@ define([
               });
 
           feature.set('annotation', annotation, true);
-          feature.set('origBounds', parsed.bounds, true);
+          feature.set('imageBounds', parsed.bounds, true);
           rectVectorSource.addFeature(feature);
         },
 
