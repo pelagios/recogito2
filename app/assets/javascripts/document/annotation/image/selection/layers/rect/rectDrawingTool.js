@@ -153,7 +153,7 @@ define([
           if (isDrawing) {
             // Stop drawing
             isDrawing = false;
-            if (!opt_selection) self.fireEvent('create', getSelection());
+            self.fireEvent('create', getSelection());
           } else if (!currentShape) {
             // Start drawing - unless we already have a shape
             isDrawing = true;

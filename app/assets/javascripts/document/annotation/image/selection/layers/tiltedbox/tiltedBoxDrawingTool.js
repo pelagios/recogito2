@@ -92,11 +92,25 @@ define([
           return [ baseEndX - anchorX, baseEndY - anchorY ];
         },
 
-        /** Shorthand to get the box coordinates of the current shape **/
+        /** Shorthand to get the box coordinates of the current shape in canvas coord space **/
         getShapeCanvasCoords = function() {
           var anchor   = currentShape.anchor.canvasXY,
               baseEnd  = currentShape.baseEnd.canvasXY,
               opposite = currentShape.opposite.canvasXY,
+
+              // Vector baseEnd -> opposite
+              fx = opposite[0] - baseEnd[0],
+              fy = opposite[1] - baseEnd[1];
+
+          // Coordinates in clockwise direction
+          return [ anchor, [ anchor[0] + fx, anchor[1] + fy ], opposite, baseEnd ];
+        },
+
+        /** Shorthand to get the box coordinates of the current shape in image coord space **/
+        getImageCanvasCoords = function() {
+          var anchor   = currentShape.anchor.imageXY,
+              baseEnd  = currentShape.baseEnd.imageXY,
+              opposite = currentShape.opposite.imageXY,
 
               // Vector baseEnd -> opposite
               fx = opposite[0] - baseEnd[0],
@@ -152,6 +166,7 @@ define([
               isStateBaseline = false;
               isStateExtrude = false;
               updateShape({ opposite: { canvasXY: getFloatingOpposite() } });
+              self.fireEvent('create', getSelection());
             }
           } else {
             // Start new shape
@@ -173,44 +188,6 @@ define([
 
           if (isModifying === 'SHAPE')
             shiftShape(dx, dy);
-
-          /*
-          if (isModifying === 'START_HANDLE' || isModifying === 'END_HANDLE')
-            // Move only the handle
-            shiftHandle(isModifying, dx, dy);
-          else if (isModifying === 'SHAPE')
-            // Move the shape
-            shiftShape(dx, dy);
-
-          // If it's a modification, fire changeShape event
-          if (isModifying) self.fireEvent('changeShape', getSelection());
-          */
-        },
-
-        getSelection = function() {
-
-        },
-
-        refreshPosition = function() {
-          if (currentShape) {
-            currentShape.anchor.canvasXY = self.imageToCanvas(currentShape.anchor.imageXY);
-            currentShape.baseEnd.canvasXY = self.imageToCanvas(currentShape.baseEnd.imageXY);
-
-            if (currentShape.opposite)
-              currentShape.opposite.canvasXY = self.imageToCanvas(currentShape.opposite.imageXY);
-          }
-        },
-
-        reset = function() {
-
-        },
-
-        destroy = function() {
-          running = false;
-          canvas.off('mousemove');
-          canvas.off('mousedown');
-          canvas.off('click');
-          canvas.off('drag');
         },
 
         drawCurrentShape = function(ctx, hoverTarget) {
@@ -296,6 +273,53 @@ define([
           self.drawHandle(ctx, [ anchorX, anchorY ], { hover: hoverTarget === 'SHAPE' });
         },
 
+        getSelection = function() {
+          if (currentShape) {
+            var canvasBounds = self.coordsToBounds(getShapeCanvasCoords()),
+                imageBounds = self.coordsToBounds(getImageCanvasCoords()),
+
+                anchorX = currentShape.anchor.imageXY[0],
+                anchorY = currentShape.anchor.imageXY[1],
+
+                baseEndX = currentShape.baseEnd.imageXY[0],
+                baseEndY = currentShape.baseEnd.imageXY[1],
+
+                oppositeX = currentShape.opposite.imageXY[0],
+                oppositeY = currentShape.opposite.imageXY[1],
+
+                // Baseline vector
+                dx = baseEndX - anchorX,
+                dy = baseEndY - anchorY,
+
+                // Vectore base end -> opposite
+                dh = [ oppositeX - baseEndX, oppositeY - baseEndY ],
+
+                corr = (dx < 0 && dy >= 0) ? Math.PI : ((dx < 0 && dy <0) ? - Math.PI : 0),
+
+                baselineAngle = Math.atan(dy / dx) + corr,
+                baselineLength = Math.sqrt(dx * dx + dy * dy),
+                height = Math.sqrt(dh[0] * dh[0] + dh[1] * dh[1]),
+
+                anchor;
+
+            if (corr === 0 && dh[1] < 0)
+              height = -1 * height;
+            else if (corr < 0 && dh[0] < 0)
+              height = -1 * height;
+            else if (corr > 0 && dh[0] > 0)
+              height = -1 * height;
+
+            anchor = 'tbox:' +
+              'x=' + Math.round(anchorX) + ',' +
+              'y=' + Math.round(Math.abs(anchorX)) + ',' +
+              'a=' + baselineAngle + ',' +
+              'l=' + Math.round(baselineLength) + ',' +
+              'h=' + Math.round(height);
+
+            return self.buildSelection(anchor, canvasBounds, imageBounds);
+          }
+        },
+
         render = function() {
           var hoverTarget = getHoverTarget();
 
@@ -314,61 +338,32 @@ define([
             canvas.setCursor('crosshair');
 
           if (running) requestAnimationFrame(render);
-        };
-
-        /*
-        finalizeAnnotation = function(e, callback) {
-          var annotationStub = {
-                annotates: {
-                  document_id: Config.documentId,
-                  filepart_id: Config.partId,
-                  content_type: Config.contentType
-                },
-                bodies: []
-              },
-
-              imageAnchorCoords = olMap.getCoordinateFromPixel([ anchorX, anchorY ]),
-              imageEndCoords = olMap.getCoordinateFromPixel([ baseEndX, baseEndY ]),
-              imageOppositeCoords = olMap.getCoordinateFromPixel([ oppositeX, oppositeY ]),
-
-              dx = imageEndCoords[0] - imageAnchorCoords[0],
-              dy = imageEndCoords[1] - imageAnchorCoords[1],
-              dh = [
-                imageOppositeCoords[0] - imageEndCoords[0],
-                imageOppositeCoords[1] - imageEndCoords[1]
-              ],
-
-              corr = (dx < 0 && dy >= 0) ? Math.PI : ((dx < 0 && dy <0) ? - Math.PI : 0),
-
-              baselineAngle = Math.atan(dy / dx) + corr,
-              baselineLength = Math.sqrt(dx * dx + dy * dy),
-              height = Math.sqrt(dh[0]*dh[0] + dh[1]*dh[1]);
-
-          if (corr === 0 && dh[1] < 0)
-            height = -1 * height;
-          else if (corr < 0 && dh[0] < 0)
-            height = -1 * height;
-          else if (corr > 0 && dh[0] > 0)
-            height = -1 * height;
-
-          // Reset state
-          extrude = false;
-          painting = false;
-
-          annotationStub.anchor ='tbox:' +
-            'x=' + Math.round(imageAnchorCoords[0]) + ',' +
-            'y=' + Math.round(Math.abs(imageAnchorCoords[1])) + ',' +
-            'a=' + baselineAngle + ',' +
-            'l=' + Math.round(baselineLength) + ',' +
-            'h=' + Math.round(height);
-
-          self.fireEvent('newSelection', {
-            isNew      : true,
-            annotation : annotationStub,
-            mapBounds  : self.pointArrayToBounds([ imageAnchorCoords ])
-          });
         },
-        */
+
+        refreshPosition = function() {
+          if (currentShape) {
+            currentShape.anchor.canvasXY = self.imageToCanvas(currentShape.anchor.imageXY);
+            currentShape.baseEnd.canvasXY = self.imageToCanvas(currentShape.baseEnd.imageXY);
+
+            if (currentShape.opposite)
+              currentShape.opposite.canvasXY = self.imageToCanvas(currentShape.opposite.imageXY);
+          }
+        },
+
+        reset = function() {
+          currentShape = false;
+          isStateBaseline = false;
+          isStateExtrude = false;
+          isModifying = false;
+        },
+
+        destroy = function() {
+          running = false;
+          canvas.off('mousemove');
+          canvas.off('mousedown');
+          canvas.off('click');
+          canvas.off('drag');
+        };
 
     // Attach mouse handlers
     canvas.on('mousemove', onMouseMove);

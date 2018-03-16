@@ -22,6 +22,20 @@ define([
       .map(function(v) { return Math.round(v); });
   };
 
+  BaseDrawingTool.prototype.coordsToBounds = function(coords) {
+    var allX = coords.map(function(c) { return c[0]; }),
+        allY = coords.map(function(c) { return c[1]; }),
+
+        maxX = Math.max.apply(null, allX),
+        maxY = Math.max.apply(null, allY),
+        minX = Math.min.apply(null, allX),
+        minY = Math.min.apply(null, allY);
+
+    return {
+      top : minY, right: maxX, bottom: maxY, left: minX, width: maxX - minX, height: maxY - minY
+    };
+  };
+
   BaseDrawingTool.prototype.crossFill = function(diff, destination, canvasKeyOrArray, imageKey) {
     var that = this,
 
