@@ -24,7 +24,6 @@ define([
          *   baseEnd: { canvasXY: [], imageXY: [] },
          *   opposite: { canvasXY: [], imageXY: [] }
          * }
-         *
          */
         currentShape = false,
 
@@ -46,16 +45,39 @@ define([
           if (diff.opposite) self.crossFill(diff.opposite, currentShape.opposite, 'canvasXY', 'imageXY');
         },
 
-        shiftShape = function(dx, dy) {
-          var shiftCoord = function(coord) {
-                return { canvasXY: [ coord.canvasXY[0] + dx, coord.canvasXY[1] + dy ] };
-              };
+        shiftCoord = function(coord, dx, dy) {
+          return { canvasXY: [ coord.canvasXY[0] + dx, coord.canvasXY[1] + dy ] };
+        },
 
+        shiftShape = function(dx, dy) {
           updateShape({
-            anchor   : shiftCoord(currentShape.anchor),
-            baseEnd  : shiftCoord(currentShape.baseEnd),
-            opposite : shiftCoord(currentShape.opposite)
+            anchor   : shiftCoord(currentShape.anchor, dx, dy),
+            baseEnd  : shiftCoord(currentShape.baseEnd, dx, dy),
+            opposite : shiftCoord(currentShape.opposite, dx, dy)
           });
+        },
+
+        shiftBaseline = function(dx, dy) {
+          var baseEndX = currentShape.baseEnd.canvasXY[0],
+              baseEndY = currentShape.baseEnd.canvasXY[1],
+
+              oppositeX = currentShape.opposite.canvasXY[0],
+              oppositeY = currentShape.opposite.canvasXY[1],
+
+              h = Geom2D.len(oppositeX, oppositeY, baseEndX, baseEndY);
+
+          updateShape({ baseEnd: shiftCoord(currentShape.baseEnd, dx, dy) });
+
+          var baseLineAfter = getCanvasBaseline(),
+              normalAfter = Geom2D.normalize([ - baseLineAfter[1], baseLineAfter[0] ]),
+              dOpposite = [ normalAfter[0] * h, normalAfter[1] * h ];
+
+          updateShape({ opposite: {
+            canvasXY: [
+              currentShape.baseEnd.canvasXY[0] - dOpposite[0],
+              currentShape.baseEnd.canvasXY[1] - dOpposite[1]
+            ]
+          }});
         },
 
         /** Computes opposite corner corresponding to the current mouse position **/
@@ -188,6 +210,8 @@ define([
 
           if (isModifying === 'SHAPE')
             shiftShape(dx, dy);
+          else if (isModifying === 'BASE_END_HANDLE')
+            shiftBaseline(dx, dy);
 
           // If it's a modification, fire changeShape event
           if (isModifying) self.fireEvent('changeShape', getSelection());
