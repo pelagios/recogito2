@@ -1,113 +1,58 @@
 define([
-  'common/config',
-  'document/annotation/image/selection/layers/geom2D',
-  'document/annotation/image/selection/layers/layer',
-  'document/annotation/image/selection/layers/style'
-], function(Config, Geom2D, Layer, Style) {
-
-      /** Shorthand **/
-  var TWO_PI = 2 * Math.PI,
+  'document/annotation/image/selection/layers/baseDrawingTool',
+  'document/annotation/image/selection/layers/geom2D'
+], function(BaseTool, Geom2D) {
 
       /** Constants **/
-      MIN_DRAG_TIME = 300,   // Minimum duration of an annotation drag (milliseconds)
-      MIN_LINE_LENGTH = 10;  // Minimum length of a baseline
+  var TWO_PI = 2 * Math.PI;
 
-  var TiltedBoxDrawingTool = function(containerEl, olMap) {
+  var TiltedBoxDrawingTool = function(canvas, olMap, opt_selection) {
+    // Extend at start, so that we have base prototype methods available on init (currentShape!)
+    BaseTool.apply(this, [ olMap ]);
 
     var self = this,
 
-        canvas = (function() {
-          var canvas = jQuery('<canvas class="tiltedbox-drawing"></canvas>');
-          canvas.hide();
-          jQuery(containerEl).append(canvas);
-          return canvas[0];
-        })(),
+        mouseX, mouseY,
 
-        ctx = canvas.getContext('2d'),
+        // Setting this to false will stop the animation loop
+        running = true,
 
-        /** Painting state flags **/
-        painting = false,
-        extrude = false,
+        /**
+         * Either false or an object of the following form:
+         *
+         * {
+         *   anchor: { canvasXY: [], imageXY: [] },
+         *   baseEnd: { canvasXY: [], imageXY: [] },
+         *   opposite: { canvasXY: [], imageXY: [] }
+         * }
+         *
+         */
+        currentShape = false,
 
-        /** Parameters of the current drawing **/
-        anchorX,       // Anchor point
-        anchorY,
-        baseEndX,      // Baseline end
-        baseEndY,
-        oppositeX,     // Coordinate diagonally opposite the anchor point
-        oppositeY,
-        lastClickTime, // Time of last mousedown event
+        // Painting state flags
+        isStateBaseline = false,
+        isStateExtrude = false,
 
-        attachMouseHandlers = function() {
-          // Handlers on the drawing canvas
-          var c = jQuery(canvas);
-          c.mousedown(onMouseDown);
-          c.mousemove(onMouseMove);
-          c.mouseup(onMouseUp);
+        updateShape = function(diff) {
+          // Perform deep clone
+          currentShape = (currentShape) ? jQuery.extend(true, {}, currentShape, diff) : diff;
+
+          if (diff.anchor) self.crossFill(diff.anchor, currentShape.anchor, 'canvasXY', 'imageXY');
+          if (diff.baseEnd) self.crossFill(diff.baseEnd, currentShape.baseEnd, 'canvasXY', 'imageXY');
+          if (diff.opposite) self.crossFill(diff.opposite, currentShape.opposite, 'canvasXY', 'imageXY');
         },
 
-        updateSize = function() {
-          var c = jQuery(canvas);
-          canvas.width = c.width();
-          canvas.height = c.height();
-          ctx.strokeStyle = Style.COLOR_RED;
-          ctx.lineWidth = Style.BOX_BASELINE_WIDTH;
-        },
+        /** Computes opposite corner corresponding to the current mouse position **/
+        getFloatingOpposite = function() {
+          var baseEndX = currentShape.baseEnd.canvasXY[0],
+              baseEndY = currentShape.baseEnd.canvasXY[1],
 
-        clearCanvas = function() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        },
+              baseline = getBaseline(),
 
-        startPainting = function(e) {
-          painting = true;
-          anchorX = (e.offsetX) ? e.offsetX : e.originalEvent.layerX;
-          anchorY = (e.offsetY) ? e.offsetY : e.originalEvent.layerY;
+              normal = Geom2D.normalize([ - baseline[1], baseline[0] ]),
 
-          // Paints a redundant line of 0px length - but saves a few duplicate lines of code
-          paintBaseline(e);
-        },
-
-        paintBaseline = function(e) {
-          var offsetX = (e.offsetX) ? e.offsetX : e.originalEvent.layerX,
-              offsetY = (e.offsetY) ? e.offsetY : e.originalEvent.layerY;
-
-          ctx.fillStyle = Style.COLOR_RED;
-          ctx.beginPath();
-          ctx.arc(anchorX, anchorY, Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
-          ctx.fill();
-          ctx.closePath();
-
-          ctx.beginPath();
-          ctx.moveTo(anchorX, anchorY);
-          ctx.lineTo(offsetX, offsetY);
-          ctx.stroke();
-          ctx.closePath();
-        },
-
-        startExtruding = function(e) {
-          baseEndX = (e.offsetX) ? e.offsetX : e.originalEvent.layerX;
-          baseEndY = (e.offsetY) ? e.offsetY : e.originalEvent.layerY;
-
-          if (Geom2D.len(anchorX, anchorY, baseEndX, baseEndY) > MIN_LINE_LENGTH) {
-            extrude = true;
-          } else {
-            // Reject lines that are too short
-            painting = false;
-            clearCanvas();
-          }
-        },
-
-        paintAnnotation = function(e) {
-              // Baseline vector (start to end)
-          var delta = [ (baseEndX - anchorX), (baseEndY - anchorY) ],
-
-              // Slope of the baseline normal
-              normal = Geom2D.normalize([-1 * delta[1], delta[0]]),
-
-              // Vector baseline->mouse
-              offsetX = (e.offsetX) ? e.offsetX : e.originalEvent.layerX,
-              offsetY = (e.offsetY) ? e.offsetY : e.originalEvent.layerY,
-              toMouse = [ offsetX - baseEndX, offsetY - baseEndY ],
+              // Vector baseline -> mouse
+              toMouse = [ mouseX - baseEndX, mouseY - baseEndY ],
 
               // Projection of toMouse onto normal
               f = [
@@ -117,33 +62,21 @@ define([
                   Math.cos(Geom2D.angleBetween(normal, Geom2D.normalize(toMouse)))
               ];
 
-          oppositeX = baseEndX + f[0];
-          oppositeY = baseEndY + f[1];
-
-          ctx.globalAlpha = Style.BOX_FILL_OPACITY;
-          ctx.fillStyle = Style.COLOR_RED;
-          ctx.beginPath();
-          ctx.moveTo(anchorX, anchorY);
-          ctx.lineTo(anchorX + f[0], anchorY + f[1]);
-          ctx.lineTo(oppositeX, oppositeY);
-          ctx.lineTo(baseEndX, baseEndY);
-          ctx.fill();
-          ctx.closePath();
-          ctx.globalAlpha = 1;
-
-          // Finished baseline
-          ctx.beginPath();
-          ctx.arc(anchorX, anchorY, Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
-          ctx.fill();
-          ctx.closePath();
-
-          ctx.beginPath();
-          ctx.moveTo(anchorX, anchorY);
-          ctx.lineTo(baseEndX, baseEndY);
-          ctx.stroke();
-          ctx.closePath();
+          return [ baseEndX + f[0], baseEndY + f[1] ];
         },
 
+        /** Shorthand to get the baseline vector from the current shape **/
+        getBaseline = function() {
+          var anchorX = currentShape.anchor.canvasXY[0],
+              anchorY = currentShape.anchor.canvasXY[1],
+
+              baseEndX = currentShape.baseEnd.canvasXY[0],
+              baseEndY = currentShape.baseEnd.canvasXY[1];
+
+          return [ baseEndX - anchorX, baseEndY - anchorY ];
+        },
+
+        /*
         finalizeAnnotation = function(e, callback) {
           var annotationStub = {
                 annotates: {
@@ -195,68 +128,177 @@ define([
             mapBounds  : self.pointArrayToBounds([ imageAnchorCoords ])
           });
         },
-
-        onMouseDown = function(e) {
-          lastClickTime = new Date().getTime();
-           if (extrude)
-             // Extrude phase is where box height is defined - click means annotation is done
-             finalizeAnnotation(e);
-           else
-             startPainting(e);
-        },
+        */
 
         onMouseMove = function(e) {
-          if (painting) {
-            clearCanvas();
-            if (extrude)
-              paintAnnotation(e);
-            else
-              paintBaseline(e);
-          }
+          mouseX = e.offsetX;
+          mouseY = e.offsetY;
+
+          if (isStateBaseline)
+            updateShape({ baseEnd: { canvasXY: [ mouseX, mouseY ] } });
         },
 
-        onMouseUp = function(e) {
-          var now = new Date().getTime();
+        onMouseDown = function(e) {
+          mouseX = e.offsetX;
+          mouseY = e.offsetY;
+        },
 
-          if (painting) {
-            if ((now - lastClickTime) < MIN_DRAG_TIME) {
-              // Single click - just clear canvas and ignore
-              painting = false;
-              clearCanvas();
-            } else {
-              startExtruding(e);
+        onMouseClick = function(e) {
+          if (currentShape) {
+            if (isStateBaseline) {
+              // Fix the baseline
+              isStateBaseline = false;
+              isStateExtrude = true;
+              updateShape({ baseEnd: { canvasXY: [ mouseX, mouseY ] } });
+            } else if (isStateExtrude) {
+              // Fix height
+              isStateBaseline = false;
+              isStateExtrude = false;
+              updateShape({ opposite: { canvasXY: getFloatingOpposite() } });
             }
+          } else {
+            // Start new shape
+            isStateBaseline = true;
+            updateShape({
+              anchor: { canvasXY: [ mouseX, mouseY ] },
+              baseEnd: { canvasXY: [ mouseX, mouseY ]}
+            });
           }
         },
 
-        createNewSelection = function(e, callback) {
-          // The tilted-box drawing tool works differently - it overlays a drawing
-          // canvas on .setEnabled(true) handles it's own mouse events
-          // I.e. we can ignore calls to this method.
+        onMouseDrag = function(e) {
+
         },
 
-        clearSelection = function() {
-          clearCanvas();
+        getSelection = function() {
+
         },
 
-        setEnabled = function(enabled) {
-          if (enabled) jQuery(canvas).show(); else jQuery(canvas).hide();
+        refreshPosition = function() {
+          if (currentShape) {
+            currentShape.anchor.canvasXY = self.imageToCanvas(currentShape.anchor.imageXY);
+            currentShape.baseEnd.canvasXY = self.imageToCanvas(currentShape.baseEnd.imageXY);
+
+            if (currentShape.opposite)
+              currentShape.opposite.canvasXY = self.imageToCanvas(currentShape.opposite.imageXY);
+          }
+        },
+
+        reset = function() {
+
+        },
+
+        destroy = function() {
+          running = false;
+          canvas.off('mousemove');
+          canvas.off('mousedown');
+          canvas.off('click');
+          canvas.off('drag');
+        },
+
+        drawCurrentShape = function(ctx) {
+          var anchorX = currentShape.anchor.canvasXY[0],
+              anchorY = currentShape.anchor.canvasXY[1],
+
+              baseEndX = currentShape.baseEnd.canvasXY[0],
+              baseEndY = currentShape.baseEnd.canvasXY[1],
+
+              baseline = [ baseEndX - anchorX, baseEndY - anchorY ],
+
+              // Computes opposite corner coords, based on drawing state
+              getOpposite = function() {
+                if (isStateExtrude)
+                  // Drawing - use mouse position
+                  return getFloatingOpposite();
+                else
+                  // Drawing done - use stored opposite
+                  return currentShape.opposite.canvasXY;
+              },
+
+              drawSmallHandle = function(x, y) {
+                ctx.beginPath();
+                ctx.lineWidth = 0.8;
+                ctx.strokeStyle = '#000';
+                ctx.fillStyle = '#fff';
+                ctx.arc(x, y, 5, 0, TWO_PI);
+                ctx.fill();
+                ctx.stroke();
+                ctx.closePath();
+              },
+
+              drawBaseline = function() {
+                var line = function(fromX, fromY, toX, toY) {
+                      ctx.beginPath();
+                      ctx.moveTo(fromX, fromY);
+                      ctx.lineTo(toX, toY);
+                      ctx.stroke();
+                      ctx.closePath();
+                    };
+
+                ctx.lineWidth = 4.4;
+                ctx.strokeStyle = '#000';
+                line(anchorX, anchorY, baseEndX, baseEndY);
+
+                ctx.lineWidth = 2.8;
+                ctx.strokeStyle = '#fff';
+                line(anchorX, anchorY, baseEndX, baseEndY);
+              },
+
+              drawBox = function() {
+                var opposite = getOpposite(),
+
+                    // Vector baseEnd -> opposite
+                    fx = opposite[0] - baseEndX,
+                    fy = opposite[1] - baseEndY;
+
+                ctx.lineWidth = 0.9;
+                ctx.strokeStyle = '#000';
+
+                ctx.beginPath();
+                ctx.moveTo(anchorX, anchorY);
+                ctx.lineTo(anchorX + fx, anchorY + fy);
+                ctx.lineTo(opposite[0], opposite[1]);
+                ctx.lineTo(baseEndX, baseEndY);
+                ctx.stroke();
+                ctx.closePath();
+
+                drawSmallHandle(opposite[0], opposite[1]);
+              };
+
+          if (!isStateBaseline) drawBox();
+          drawBaseline();
+          drawSmallHandle(baseEndX, baseEndY);
+          self.drawHandle(ctx, [ anchorX, anchorY ]); // Anchor handle
+        },
+
+        render = function() {
+          canvas.clear();
+
+          if (currentShape) drawCurrentShape(canvas.ctx);
+
+          if (isStateBaseline || isStateExtrude)
+            canvas.setCursor();
+          else
+            canvas.setCursor('crosshair');
+
+          if (running) requestAnimationFrame(render);
         };
 
-    attachMouseHandlers();
-    updateSize();
+    // Attach mouse handlers
+    canvas.on('mousemove', onMouseMove);
+    canvas.on('mousedown', onMouseDown);
+    canvas.on('click', onMouseClick);
+    canvas.on('drag', onMouseDrag);
 
-    // Reset canvas on window resize
-    jQuery(window).on('resize', updateSize);
+    this.refreshPosition = refreshPosition;
+    this.getSelection = getSelection;
+    this.reset = reset;
+    this.destroy = destroy;
 
-    this.createNewSelection = createNewSelection;
-    this.clearSelection = clearSelection;
-    this.setEnabled = setEnabled;
-    this.updateSize = updateSize;
-
-    Layer.apply(this, [ olMap ]);
+    // Start rendering loop
+    render();
   };
-  TiltedBoxDrawingTool.prototype = Object.create(Layer.prototype);
+  TiltedBoxDrawingTool.prototype = Object.create(BaseTool.prototype);
 
   return TiltedBoxDrawingTool;
 

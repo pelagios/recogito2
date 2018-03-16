@@ -10,8 +10,8 @@ define([
 
       TOOLS = {
         point : PointDrawingTool,
-        rect  : RectDrawingTool
-        // tbox  : new TiltedBoxDrawingTool(containerEl, olMap)
+        rect  : RectDrawingTool,
+        tbox  : TiltedBoxDrawingTool
       };
 
   var DrawingCanvas = function(containerEl, olMap) {
@@ -208,9 +208,14 @@ define([
         /** Mouse wheel events are always forwarded to OpenLayers **/
         onMouseWheel = function(e) {
           var delta = e.originalEvent.deltaY,
-              dir = delta / Math.abs(delta);
+              dir = delta / Math.abs(delta),
+              anchor = [ e.originalEvent.offsetX, e.originalEvent.offsetY ];
 
-          olView.animate({ zoom: olView.getZoom() - dir, duration: ZOOM_DURATION });
+          olView.animate({
+            zoom: olView.getZoom() - dir,
+            anchor: olMap.getCoordinateFromPixel(anchor),
+            duration: ZOOM_DURATION
+          });
         },
 
         onKeyDown = function(e) {

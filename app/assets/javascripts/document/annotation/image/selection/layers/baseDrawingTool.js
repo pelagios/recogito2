@@ -22,7 +22,30 @@ define([
       .map(function(v) { return Math.round(v); });
   };
 
-  BaseDrawingTool.prototype.drawDot = function(ctx, xy, opts) {
+  BaseDrawingTool.prototype.crossFill = function(diff, destination, canvasKeyOrArray, imageKey) {
+    var that = this,
+
+        crossFillOne = function(cKey, iKey) {
+          if (diff[cKey] || diff[iKey]) {
+            if (diff[cKey] && !diff[iKey])
+              // Cross-fill image coordinate from canvas coordinate
+              destination[iKey] = that.canvasToImage(diff[cKey]);
+
+            else if (diff[iKey] && !diff[cKey])
+              destination[cKey] = that.imageToCanvas(diff[iKey]);
+          }
+        };
+
+    if (jQuery.isArray(canvasKeyOrArray)) {
+      canvasKeyOrArray.map(function(tuple) {
+        crossFillOne(tuple[0], tuple[1]);
+      });
+    } else {
+      crossFillOne(canvasKeyOrArray, imageKey);
+    }
+  };
+
+  BaseDrawingTool.prototype.drawHandle = function(ctx, xy, opts) {
     var hasBlur = (opts) ? opts.blur || opts.hover : false, // Hover implies blur
         isHover = (opts) ? opts.hover : false;
 
@@ -34,6 +57,7 @@ define([
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
     ctx.arc(xy[0], xy[1], BaseDrawingTool.HANDLE_RADIUS, 0, TWO_PI);
     ctx.stroke();
+    ctx.closePath();
 
     // Inner dot (white stroke + color fill)
     ctx.beginPath();
@@ -44,6 +68,7 @@ define([
     ctx.arc(xy[0], xy[1], BaseDrawingTool.HANDLE_RADIUS, 0, TWO_PI);
     ctx.fill();
     ctx.stroke();
+    ctx.closePath();
   };
 
   BaseDrawingTool.prototype.buildSelection = function(anchor, canvasBounds, imageBounds) {

@@ -1,7 +1,6 @@
 define([
-  'common/config',
   'document/annotation/image/selection/layers/baseDrawingTool'
-], function(Config, BaseTool) {
+], function(BaseTool) {
 
   var pointToBounds = function(xy) {
         return { top: xy[1], right: xy[0], bottom: xy[1], left: xy[0], width: 0, height: 0 };
@@ -115,7 +114,7 @@ define([
           var hover = isHovering();
 
           canvas.clear();
-          if (currentPoint) self.drawDot(canvas.ctx, currentPoint.canvasXY, { hover: hover });
+          if (currentPoint) self.drawHandle(canvas.ctx, currentPoint.canvasXY, { hover: hover });
 
           if (hover) canvas.setCursor();
           else canvas.setCursor('crosshair');

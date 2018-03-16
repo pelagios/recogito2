@@ -1,8 +1,7 @@
 define([
-  'common/config',
   'document/annotation/image/selection/layers/baseDrawingTool',
   'document/annotation/image/selection/layers/geom2D'
-], function(Config, BaseTool, Geom2D) {
+], function(BaseTool, Geom2D) {
 
   var RectDrawingTool = function(canvas, olMap, opt_selection) {
     // Extend at start, so that we have base prototype methods available on init (currentShape!)
@@ -40,19 +39,14 @@ define([
 
         /** Updates the shape with the given diff, converting canvas/image coords if needed **/
         updateShape = function(diff) {
+          // Merge the diff with the current shape
           currentShape = (currentShape) ? jQuery.extend({}, currentShape, diff) : diff;
 
-          if (diff.canvasStart && !diff.imageStart)
-            currentShape.imageStart = self.canvasToImage(diff.canvasStart);
-
-          if (diff.canvasEnd && !diff.imageEnd)
-            currentShape.imageEnd = self.canvasToImage(diff.canvasEnd);
-
-          if (diff.imageStart && !diff.canvasStart)
-            currentShape.canvasStart = self.imageToCanvas(diff.imageStart);
-
-          if (diff.imageEnd && !diff.canvasEnd)
-            currentShape.canvasEnd = self.imageToCanvas(diff.imageEnd);
+          // Cross-fill, i.e. update image- from canvas-coords and vice versa
+          self.crossFill(diff, currentShape, [
+            [ 'canvasStart', 'imageStart' ],
+            [ 'canvasEnd', 'imageEnd' ]
+          ]);
         },
 
         /** Returns the bounds of the current shape (if any) in canvas coordinate space **/
@@ -235,6 +229,7 @@ define([
                 ctx.strokeStyle = col;
                 ctx.rect(-w / 2, - h / 2, w, h);
                 ctx.stroke();
+                ctx.closePath();
               };
 
           // Rect
@@ -246,8 +241,8 @@ define([
           ctx.restore();
 
           // Start/end dots
-          self.drawDot(ctx, currentShape.canvasStart, { hover: hoverTarget === 'START_HANDLE' });
-          self.drawDot(ctx, currentShape.canvasEnd, { hover: hoverTarget === 'END_HANDLE' });
+          self.drawHandle(ctx, currentShape.canvasStart, { hover: hoverTarget === 'START_HANDLE' });
+          self.drawHandle(ctx, currentShape.canvasEnd, { hover: hoverTarget === 'END_HANDLE' });
         },
 
         render = function() {
