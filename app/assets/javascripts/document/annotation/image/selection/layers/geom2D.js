@@ -10,14 +10,14 @@ define([], function() {
     },
 
     /** Tests if the given coordinate intersects the rectangle **/
-    intersects : function(x, y, rect) {
+    intersects : function(x, y, coords) {
       var inside = false,
-          j = rect.length - 1,
+          j = coords.length - 1,
           i;
 
-      for (i=0; i<4; i++) {
-        if ((rect[i].y > y) != (rect[j].y > y) &&
-            (x < (rect[j].x - rect[i].x) * (y - rect[i].y) / (rect[j].y-rect[i].y) + rect[i].x)) {
+      for (i=0; i<coords.length; i++) {
+        if ((coords[i][1] > y) != (coords[j][1] > y) &&
+            (x < (coords[j][0] - coords[i][0]) * (y - coords[i][1]) / (coords[j][1]-coords[i][1]) + coords[i][0])) {
               inside = !inside;
         }
         j = i;

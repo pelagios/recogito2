@@ -64,7 +64,7 @@ define([
     ctx.shadowBlur = 0;
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#fff';
-    ctx.fillStyle = (isHover) ? 'orange' : '#000';
+    ctx.fillStyle = (isHover) ? BaseDrawingTool.HOVER_COLOR  : '#000';
     ctx.arc(xy[0], xy[1], BaseDrawingTool.HANDLE_RADIUS, 0, TWO_PI);
     ctx.fill();
     ctx.stroke();
@@ -90,6 +90,7 @@ define([
   };
 
   BaseDrawingTool.HANDLE_RADIUS = 6;
+  BaseDrawingTool.HOVER_COLOR = 'orange';
 
   return BaseDrawingTool;
 
