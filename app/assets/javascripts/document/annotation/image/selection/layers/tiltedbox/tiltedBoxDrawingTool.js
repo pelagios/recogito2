@@ -188,6 +188,9 @@ define([
 
           if (isModifying === 'SHAPE')
             shiftShape(dx, dy);
+
+          // If it's a modification, fire changeShape event
+          if (isModifying) self.fireEvent('changeShape', getSelection());
         },
 
         drawCurrentShape = function(ctx, hoverTarget) {
