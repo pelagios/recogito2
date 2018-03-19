@@ -158,8 +158,9 @@ trait HasTEISnippets extends HasTextSnippets {
   
   def previewFromTEI(xml: String, len: Int = 256): String = {
     val doc = parseXMLString(xml)
-    val body = $(doc).find("body")
-    normalize($(body).text).substring(0, len)
+    val bodyText = normalize($(doc).find("body").text())
+    val limit = Math.min(len, bodyText.size)    
+    bodyText.substring(0, limit)
   }
   
 }
