@@ -8,6 +8,26 @@ define([
 
       SMALL_HANDLE_RADIUS = 5;
 
+  // TODO redundancy with tiltedBoxLayer - refactor and move into common tiltedBox class
+  // TODO make robust against change in argument order
+  var parseAnchor = function(anchor) {
+        var args = anchor.substring(anchor.indexOf(':') + 1).split(','),
+
+            // TODO make this robust against change of argument order
+            x = parseInt(args[0].substring(2)),
+            y = - parseInt(args[1].substring(2)),
+            a = parseFloat(args[2].substring(2)),
+            l = parseFloat(args[3].substring(2)),
+            h = parseFloat(args[4].substring(2)),
+
+            p1 = [ x, y ],
+            p2 = [ x + Math.cos(a) * l, y + Math.sin(a) * l ],
+            p3 = [ p2[0] - h * Math.sin(a), p2[1] + h * Math.cos(a) ],
+            p4 = [ x - h * Math.sin(a), y + h * Math.cos(a) ];
+
+        return { x: x, y: y, a: a, l: l, h: h , coords: [ p1, p2, p3, p4 ]};
+      };
+
   var TiltedBoxDrawingTool = function(canvas, olMap, opt_selection) {
     // Extend at start, so that we have base prototype methods available on init (currentShape!)
     BaseTool.apply(this, [ olMap ]);
@@ -25,7 +45,18 @@ define([
          *   opposite: { canvasXY: [], imageXY: [] }
          * }
          */
-        currentShape = false,
+        currentShape = (function() {
+          if (opt_selection) {
+            var coords = parseAnchor(opt_selection.annotation.anchor).coords;
+            return {
+              anchor:   { canvasXY: self.imageToCanvas(coords[0]), imageXY: coords[0] },
+              baseEnd:  { canvasXY: self.imageToCanvas(coords[1]), imageXY: coords[1] },
+              opposite: { canvasXY: self.imageToCanvas(coords[2]), imageXY: coords[2] }
+            };
+          } else {
+            return false;
+          }
+        })(),
 
         // Painting state flags
         isStateBaseline = false,
@@ -314,8 +345,8 @@ define([
 
         getSelection = function() {
           if (currentShape) {
-            var canvasBounds = self.coordsToBounds(getShapeCanvasCoords()),
-                imageBounds = self.coordsToBounds(getImageCanvasCoords()),
+            var canvasBounds = Geom2D.coordsToBounds(getShapeCanvasCoords()),
+                imageBounds = Geom2D.coordsToBounds(getImageCanvasCoords()),
 
                 anchorX = currentShape.anchor.imageXY[0],
                 anchorY = currentShape.anchor.imageXY[1],
@@ -342,15 +373,15 @@ define([
                 anchor;
 
             if (corr === 0 && dh[1] < 0)
-              height = -1 * height;
+              height = - height;
             else if (corr < 0 && dh[0] < 0)
-              height = -1 * height;
+              height = - height;
             else if (corr > 0 && dh[0] > 0)
-              height = -1 * height;
+              height = - height;
 
             anchor = 'tbox:' +
               'x=' + Math.round(anchorX) + ',' +
-              'y=' + Math.round(Math.abs(anchorX)) + ',' +
+              'y=' + Math.round(Math.abs(anchorY)) + ',' +
               'a=' + baselineAngle + ',' +
               'l=' + Math.round(baselineLength) + ',' +
               'h=' + Math.round(height);

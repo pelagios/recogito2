@@ -9,6 +9,7 @@ define([
 
       /** Helper to compute the rectangle from an annotation geometry **/
       anchorToRect = function(anchor, opt_minheight) {
+
         var minheight = (opt_minheight) ? opt_minheight : 0,
 
             args = anchor.substring(anchor.indexOf(':') + 1).split(','),
@@ -23,10 +24,10 @@ define([
             // Make sure annotation is clickable, even with a height of null
             height = (Math.abs(h) > 1) ? h : minheight,
 
-            p1 = { x: x, y: y },
-            p2 = { x: x + Math.cos(a) * l, y: y - Math.sin(a) * l },
-            p3 = { x: p2.x - height * Math.sin(a), y: p2.y - height * Math.cos(a) },
-            p4 = { x: x - height * Math.sin(a), y: y - height * Math.cos(a) };
+            p1 = [ x, y ],
+            p2 = [ x + Math.cos(a) * l, y - Math.sin(a) * l ],
+            p3 = [ p2[0] - height * Math.sin(a), p2[1] - height * Math.cos(a) ],
+            p4 = [ x - height * Math.sin(a), y - height * Math.cos(a) ];
 
         return [ p1, p2, p3, p4 ];
       };
@@ -43,7 +44,6 @@ define([
         },
 
         getAnnotationAt = function(e) {
-          // TODO optimize with a spatial tree
           var coord = e.coordinate,
               found = [];
 
@@ -52,7 +52,7 @@ define([
             if(Geom2D.intersects(coord[0], - coord[1], rect))
               found.push({
                 annotation: annotation,
-                imageBounds: rect
+                imageBounds: Geom2D.coordsToBounds(rect)
               });
           });
 
@@ -81,14 +81,13 @@ define([
           if (foundAnnotation)
             return {
               annotation: foundAnnotation,
-              mapBounds: anchorToRect(foundAnnotation.anchor)
+              imageBounds: Geom2D.coordsToBounds(anchorToRect(foundAnnotation.anchor))
             };
         },
 
         addAnnotation = function(annotation, renderImmediately) {
           annotations.push(annotation);
-          if (renderImmediately)
-            layer.getSource().changed();
+          if (renderImmediately) layer.getSource().changed();
         },
 
         render = function() {
@@ -96,7 +95,6 @@ define([
         },
 
         drawOne = function(annotation, extent, scale, ctx, color) {
-
           var setStyles = function() {
                 ctx.fillStyle = color;
                 ctx.strokeStyle = color;
@@ -105,11 +103,11 @@ define([
 
               // Helper function to trace a rectangle path
               traceRect = function() {
-                ctx.moveTo(rect[0].x, rect[0].y);
-                ctx.lineTo(rect[1].x, rect[1].y);
-                ctx.lineTo(rect[2].x, rect[2].y);
-                ctx.lineTo(rect[3].x, rect[3].y);
-                ctx.lineTo(rect[0].x, rect[0].y);
+                ctx.moveTo(rect[0][0], rect[0][1]);
+                ctx.lineTo(rect[1][0], rect[1][1]);
+                ctx.lineTo(rect[2][0], rect[2][1]);
+                ctx.lineTo(rect[3][0], rect[3][1]);
+                ctx.lineTo(rect[0][0], rect[0][1]);
               },
 
               drawBox = function() {
@@ -132,8 +130,8 @@ define([
               drawBaseLine = function() {
                 ctx.lineWidth = Style.BOX_BASELINE_WIDTH;
                 ctx.beginPath();
-                ctx.moveTo(rect[0].x, rect[0].y);
-                ctx.lineTo(rect[1].x, rect[1].y);
+                ctx.moveTo(rect[0][0], rect[0][1]);
+                ctx.lineTo(rect[1][0], rect[1][1]);
                 ctx.stroke();
                 ctx.closePath();
               },
@@ -141,13 +139,13 @@ define([
               // Note: currently not used, but we may change drawing style later!
               drawAnchorDot = function() {
                 ctx.beginPath();
-                ctx.arc(rect[0].x, rect[0].y, Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
+                ctx.arc(rect[0][0], rect[0][1], Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
                 ctx.fill();
                 ctx.closePath();
               },
 
-              rect = jQuery.map(anchorToRect(annotation.anchor), function(pt) {
-                return { x: scale * (pt.x - extent[0]), y: scale * (pt.y + extent[3]) };
+              rect = anchorToRect(annotation.anchor).map(function(pt) {
+                return [ scale * (pt[0] - extent[0]), scale * (pt[1] + extent[3]) ];
               });
 
           rect.push(rect[0]); // Close the rect path

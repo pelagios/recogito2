@@ -3,6 +3,20 @@ define([], function() {
 
   return {
 
+    coordsToBounds : function(coords) {
+      var allX = coords.map(function(c) { return c[0]; }),
+          allY = coords.map(function(c) { return c[1]; }),
+
+          maxX = Math.max.apply(null, allX),
+          maxY = Math.max.apply(null, allY),
+          minX = Math.min.apply(null, allX),
+          minY = Math.min.apply(null, allY);
+
+      return {
+        top : minY, right: maxX, bottom: maxY, left: minX, width: maxX - minX, height: maxY - minY
+      };
+    },
+
     /** Computes the angle between two vectors **/
     angleBetween : function(a, b) {
       var dotProduct = a[0] * b[0] + a[1] * b[1];
@@ -47,7 +61,7 @@ define([], function() {
           i, sum = 0;
 
       for (i = 0; i < limit; i++) {
-        sum += coords[i].x * coords[i + 1].y - coords[i].y * coords[i + 1].x;
+        sum += coords[i][0] * coords[i + 1][1] - coords[i][1] * coords[i + 1][0];
       }
 
       return Math.abs(0.5 * sum);
