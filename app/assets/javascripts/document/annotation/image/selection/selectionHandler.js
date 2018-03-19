@@ -83,8 +83,12 @@ define([
 
           /** Enable the drawing tool with the given name **/
           setEnabled = function(shapeType) {
-            if (shapeType) drawingCanvas.startDrawing(shapeType);
-            else drawingCanvas.hide();
+            if (shapeType) {
+              drawingCanvas.startDrawing(shapeType);
+            } else {
+              if (selectionBefore) highlighter.convertSelectionToAnnotation(selectionBefore);
+              drawingCanvas.hide();
+            }
           },
 
           updateSize = function() {

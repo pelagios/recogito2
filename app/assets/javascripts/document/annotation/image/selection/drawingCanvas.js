@@ -158,8 +158,7 @@ define([
          * and hiding the canvas element.
          */
         hide = function() {
-          if (currentDrawingTool)
-            currentDrawingTool.destroy();
+          if (currentDrawingTool) currentDrawingTool.destroy();
           canvas.hide();
         },
 

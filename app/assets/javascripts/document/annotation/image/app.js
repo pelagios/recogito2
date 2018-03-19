@@ -79,6 +79,7 @@ require([
           onToolChanged = function(toolKey) {
             if (toolKey === 'move') {
               jQuery(contentNode).removeClass('edit');
+              editor.close();
               selector.setEnabled(false);
             } else {
               jQuery(contentNode).addClass('edit');
