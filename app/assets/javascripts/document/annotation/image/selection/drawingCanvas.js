@@ -200,6 +200,7 @@ define([
 
         onMouseUp = function(e) {
           isMouseDown = false;
+          self.fireEvent('mouseup', e);
           var now = new Date().getTime();
           if ((now - lastClickTime) < MIN_DRAG_TIME)
             self.fireEvent('click', e);

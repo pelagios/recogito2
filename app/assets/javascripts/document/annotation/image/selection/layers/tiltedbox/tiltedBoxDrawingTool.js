@@ -80,6 +80,12 @@ define([
           }});
         },
 
+        shiftOpposite = function() {
+          updateShape({ opposite: {
+            canvasXY: getFloatingOpposite()
+          }});
+        },
+
         /** Computes opposite corner corresponding to the current mouse position **/
         getFloatingOpposite = function() {
           var baseEndX = currentShape.baseEnd.canvasXY[0],
@@ -176,6 +182,10 @@ define([
           isModifying = getHoverTarget();
         },
 
+        onMouseUp = function() {
+          isModifying = false;
+        },
+
         onMouseClick = function(e) {
           if (currentShape) {
             if (isStateBaseline) {
@@ -212,6 +222,8 @@ define([
             shiftShape(dx, dy);
           else if (isModifying === 'BASE_END_HANDLE')
             shiftBaseline(dx, dy);
+          else if (isModifying === 'OPPOSITE_HANDLE')
+            shiftOpposite();
 
           // If it's a modification, fire changeShape event
           if (isModifying) self.fireEvent('changeShape', getSelection());
@@ -348,7 +360,7 @@ define([
         },
 
         render = function() {
-          var hoverTarget = getHoverTarget();
+          var hoverTarget = (isModifying) ? isModifying : getHoverTarget();
 
           canvas.clear();
           if (currentShape) drawCurrentShape(canvas.ctx, hoverTarget);
@@ -395,6 +407,7 @@ define([
     // Attach mouse handlers
     canvas.on('mousemove', onMouseMove);
     canvas.on('mousedown', onMouseDown);
+    canvas.on('mouseup', onMouseUp);
     canvas.on('click', onMouseClick);
     canvas.on('drag', onMouseDrag);
 
