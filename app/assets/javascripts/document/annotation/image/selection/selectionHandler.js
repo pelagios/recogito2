@@ -1,7 +1,8 @@
 define([
+  'common/config',
   'document/annotation/common/selection/abstractSelectionHandler',
   'document/annotation/image/selection/drawingCanvas'
-], function(AbstractSelectionHandler, DrawingCanvas) {
+], function(Config, AbstractSelectionHandler, DrawingCanvas) {
 
     var SelectionHandler = function(containerEl, olMap, highlighter) {
 
@@ -44,14 +45,23 @@ define([
 
           /** @override **/
           getSelection = function() {
-            return drawingCanvas.getSelection();
+            if (Config.writeAccess)
+              return drawingCanvas.getSelection();
+            else if (selectionBefore)
+              // In read-only mode, selection can only be an existing annotation,
+              // and the drawing canvas is never in use
+              return addViewportBounds(selectionBefore);
           },
 
           /**
-           * Reminder: this is used to set a selection based on a URL hash.
+           * Reminder: this is used to set a selection...
+           *  i) ...based on a URL hash
+           * ii) ...when clicking an existing shape
            * @override
            */
           setSelection = function(selection) {
+            // console.log(selection);
+
             selectionBefore = selection;
 
             if (selection) {
@@ -60,8 +70,10 @@ define([
               selection.bounds = withBounds.bounds;
 
               // Remove from highlighter and add to drawing canvas
-              highlighter.removeAnnotation(selection.annotation);
-              drawingCanvas.setSelection(selection);
+              if (Config.writeAccess) {
+                highlighter.removeAnnotation(selection.annotation);
+                drawingCanvas.setSelection(selection);
+              }
 
               self.fireEvent('select', selection);
             }
