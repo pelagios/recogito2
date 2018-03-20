@@ -25,8 +25,8 @@ define([
           if (opt_selection) {
             var b = opt_selection.imageBounds;
             return {
-              canvasXY: self.imageToCanvas([ b.left, - b.top ]),
-              imageXY: [ b.left, - b.top ]
+              canvasXY: self.imageToCanvas([ b.left, b.top ]),
+              imageXY: [ b.left, b.top ]
             };
           } else {
             return false;

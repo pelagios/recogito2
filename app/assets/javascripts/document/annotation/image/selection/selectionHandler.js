@@ -1,8 +1,9 @@
 define([
   'common/config',
   'document/annotation/common/selection/abstractSelectionHandler',
-  'document/annotation/image/selection/drawingCanvas'
-], function(Config, AbstractSelectionHandler, DrawingCanvas) {
+  'document/annotation/image/selection/drawingCanvas',
+  'document/annotation/image/selection/layers/geom2D'
+], function(Config, AbstractSelectionHandler, DrawingCanvas, Geom2D) {
 
     var SelectionHandler = function(containerEl, olMap, highlighter) {
 
@@ -21,23 +22,25 @@ define([
                 b = selection.imageBounds, // Shorthand
 
                 corners = [
-                  [ b.left,  - b.top ],
-                  [ b.right, - b.top ],
-                  [ b.right, - b.bottom ],
-                  [ b.left,  - b.bottom ]
+                  [ b.left,  b.top ],
+                  [ b.right, b.top ],
+                  [ b.right, b.bottom ],
+                  [ b.left,  b.bottom ]
                 ].map(function(c) {
                   return olMap.getPixelFromCoordinate(c);
-                });
+                }),
+
+                bounds = Geom2D.coordsToBounds(corners);
 
             return {
               annotation: selection.annotation,
               bounds : {
-                top    : corners[0][1] + offset.top,
-                right  : corners[1][0] + offset.left,
-                bottom : corners[2][1] + offset.top,
-                left   : corners[0][0] + offset.left,
-                width  : corners[1][0] - corners[0][0],
-                height : corners[2][1] - corners[0][1],
+                top    : bounds.top + offset.top,
+                right  : bounds.right  + offset.left,
+                bottom : bounds.bottom + offset.top,
+                left   : bounds.left + offset.left,
+                width  : bounds.width,
+                height : bounds.height
               },
               imageBounds : selection.imageBounds
             };

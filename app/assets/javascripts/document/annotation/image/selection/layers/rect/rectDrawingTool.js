@@ -27,10 +27,10 @@ define([
           if (opt_selection) {
             var b = opt_selection.imageBounds;
             return {
-              canvasStart : self.imageToCanvas([ b.left, - b.top ]),
-              canvasEnd   : self.imageToCanvas([ b.right, - b.bottom ]),
-              imageStart  : [ b.left, - b.top ],
-              imageEnd    : [ b.right, - b.bottom ]
+              canvasStart : self.imageToCanvas([ b.left, b.top ]),
+              canvasEnd   : self.imageToCanvas([ b.right, b.bottom ]),
+              imageStart  : [ b.left, b.top ],
+              imageEnd    : [ b.right, b.bottom ]
             };
           } else {
             return false;

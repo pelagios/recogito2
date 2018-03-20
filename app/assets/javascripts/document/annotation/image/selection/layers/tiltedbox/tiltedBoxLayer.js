@@ -27,7 +27,7 @@ define([
             if(Geom2D.intersects(coord[0], coord[1], anchor.coords))
               found.push({
                 annotation: annotation,
-                imageBounds: Geom2D.coordsToBounds(rect)
+                imageBounds: Geom2D.coordsToBounds(anchor.coords)
               });
           });
 
@@ -95,25 +95,6 @@ define([
                 ctx.beginPath();
                 traceRect();
                 ctx.stroke();
-                ctx.closePath();
-              },
-
-              // Note: currently not used, but we may change drawing style later!
-              drawBaseLine = function() {
-
-                ctx.lineWidth = Style.BOX_BASELINE_WIDTH;
-                ctx.beginPath();
-                ctx.moveTo(rect[0][0], rect[0][1]);
-                ctx.lineTo(rect[1][0], rect[1][1]);
-                ctx.stroke();
-                ctx.closePath();
-              },
-
-              // Note: currently not used, but we may change drawing style later!
-              drawAnchorDot = function() {
-                ctx.beginPath();
-                ctx.arc(rect[0][0], rect[0][1], Style.BOX_ANCHORDOT_RADIUS, 0, TWO_PI);
-                ctx.fill();
                 ctx.closePath();
               },
 

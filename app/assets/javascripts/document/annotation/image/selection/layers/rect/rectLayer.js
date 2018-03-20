@@ -14,13 +14,13 @@ define([
             w = parseInt(args[2].substring(2)),
             h = parseInt(args[3].substring(2));
 
-        return  {
+        return {
           x: x,  y: y, w: w, h: h,
-          bounds : { top: y, right: x + w, bottom: y + h, left: x },
+          bounds : { top: - y, right: x + w, bottom: - y - h, left: x },
           coords : [
             [x, - y],
-            [x, - (y + h)],
-            [x + w, - (y + h)],
+            [x, - y - h],
+            [x + w, - y - h],
             [x + w, - y],
             [x, - y]
           ]

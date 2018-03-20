@@ -6,7 +6,7 @@ define([
   var MIN_SELECTION_DISTANCE = 10,
 
       pointToBounds = function(xy) {
-        return { top: - xy[1], right: xy[0], bottom: - xy[1], left: xy[0], width: 0, height: 0 };
+        return { top: xy[1], right: xy[0], bottom: xy[1], left: xy[0], width: 0, height: 0 };
       };
 
   var PointLayer = function(olMap) {
@@ -40,7 +40,6 @@ define([
           }
         },
 
-        /** Note that this method breaks for annotations that are not point annotations! **/
         addAnnotation = function(annotation) {
           var anchor = annotation.anchor,
               x = parseInt(anchor.substring(anchor.indexOf(':') + 1, anchor.indexOf(','))),
