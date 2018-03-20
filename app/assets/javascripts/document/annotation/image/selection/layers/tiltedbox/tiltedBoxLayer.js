@@ -1,36 +1,12 @@
 define([
   'document/annotation/image/selection/layers/geom2D',
   'document/annotation/image/selection/layers/layer',
-  'document/annotation/image/selection/layers/style'
-], function(Geom2D, Layer, Style) {
+  'document/annotation/image/selection/layers/style',
+  'document/annotation/image/selection/layers/tiltedbox/tiltedBox'
+], function(Geom2D, Layer, Style, TiltedBox) {
 
       /** Shorthand **/
-  var TWO_PI = 2 * Math.PI,
-
-      /** Helper to compute the rectangle from an annotation geometry **/
-      anchorToRect = function(anchor, opt_minheight) {
-
-        var minheight = (opt_minheight) ? opt_minheight : 0,
-
-            args = anchor.substring(anchor.indexOf(':') + 1).split(','),
-
-            // TODO make this robust against change of argument order
-            x = parseInt(args[0].substring(2)),
-            y = parseInt(args[1].substring(2)),
-            a = parseFloat(args[2].substring(2)),
-            l = parseFloat(args[3].substring(2)),
-            h = parseFloat(args[4].substring(2)),
-
-            // Make sure annotation is clickable, even with a height of null
-            height = (Math.abs(h) > 1) ? h : minheight,
-
-            p1 = [ x, y ],
-            p2 = [ x + Math.cos(a) * l, y - Math.sin(a) * l ],
-            p3 = [ p2[0] - height * Math.sin(a), p2[1] - height * Math.cos(a) ],
-            p4 = [ x - height * Math.sin(a), y - height * Math.cos(a) ];
-
-        return [ p1, p2, p3, p4 ];
-      };
+  var TWO_PI = 2 * Math.PI;
 
   var TiltedBoxLayer = function(olMap) {
 
@@ -39,38 +15,34 @@ define([
         annotations = [],
 
         computeSize = function(annotation) {
-          var rect = anchorToRect(annotation.anchor);
-          return Geom2D.getPolygonArea(rect);
+          var anchor = TiltedBox.parseAnchor(annotation.anchor);
+          return Geom2D.getPolygonArea(anchor.coords);
         },
 
         getAnnotationAt = function(e) {
-          var coord = e.coordinate,
-              found = [];
+          var coord = e.coordinate, found = [];
 
           jQuery.each(annotations, function(idx, annotation) {
-            var rect = anchorToRect(annotation.anchor, 5);
-            if(Geom2D.intersects(coord[0], - coord[1], rect))
+            var anchor = TiltedBox.parseAnchor(annotation.anchor, 5);
+            if(Geom2D.intersects(coord[0], coord[1], anchor.coords))
               found.push({
                 annotation: annotation,
                 imageBounds: Geom2D.coordsToBounds(rect)
               });
           });
 
-          if (found.length > 0) {
-            // Sort by size, ascending
-            found.sort(function(a, b) {
-              var sizeA = computeSize(a.annotation),
-                  sizeB = computeSize(b.annotation);
+          // Sort by size, ascending
+          found.sort(function(a, b) {
+            var sizeA = computeSize(a.annotation),
+                sizeB = computeSize(b.annotation);
 
-              return sizeA - sizeB;
-            });
-            return found[0];
-          }
+            return sizeA - sizeB;
+          });
+          return found[0];
         },
 
         findById = function(id) {
           var foundAnnotation;
-
           jQuery.each(annotations, function(idx, annotation) {
             if (annotation.annotation_id === id) {
               foundAnnotation = annotation;
@@ -81,7 +53,7 @@ define([
           if (foundAnnotation)
             return {
               annotation: foundAnnotation,
-              imageBounds: Geom2D.coordsToBounds(anchorToRect(foundAnnotation.anchor))
+              imageBounds: Geom2D.coordsToBounds(TiltedBox.parseAnchor(foundAnnotation.anchor).coords)
             };
         },
 
@@ -128,6 +100,7 @@ define([
 
               // Note: currently not used, but we may change drawing style later!
               drawBaseLine = function() {
+
                 ctx.lineWidth = Style.BOX_BASELINE_WIDTH;
                 ctx.beginPath();
                 ctx.moveTo(rect[0][0], rect[0][1]);
@@ -144,8 +117,8 @@ define([
                 ctx.closePath();
               },
 
-              rect = anchorToRect(annotation.anchor).map(function(pt) {
-                return [ scale * (pt[0] - extent[0]), scale * (pt[1] + extent[3]) ];
+              rect = TiltedBox.parseAnchor(annotation.anchor).coords.map(function(pt) {
+                return [ scale * (pt[0] - extent[0]), scale * (extent[3] - pt[1]) ];
               });
 
           rect.push(rect[0]); // Close the rect path

@@ -42,8 +42,10 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
 
     SMALL_HANDLE_RADIUS : SMALL_HANDLE_RADIUS,
 
-    parseAnchor : function(anchor) {
-      var args = anchor.substring(anchor.indexOf(':') + 1).split(','),
+    parseAnchor : function(anchor, opt_minheight) {
+      var min_height = (opt_minheight) ? opt_minheight : 0,
+
+          args = anchor.substring(anchor.indexOf(':') + 1).split(','),
 
           // TODO make this robust against change of argument order
           x = parseInt(args[0].substring(2)),
@@ -52,10 +54,12 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
           l = parseFloat(args[3].substring(2)),
           h = parseFloat(args[4].substring(2)),
 
+          height = (Math.abs(h) > min_height) ? h : min_height,
+
           p1 = [ x, y ],
           p2 = [ x + Math.cos(a) * l, y + Math.sin(a) * l ],
-          p3 = [ p2[0] - h * Math.sin(a), p2[1] + h * Math.cos(a) ],
-          p4 = [ x - h * Math.sin(a), y + h * Math.cos(a) ];
+          p3 = [ p2[0] - height * Math.sin(a), p2[1] + height * Math.cos(a) ],
+          p4 = [ x - height * Math.sin(a), y + height * Math.cos(a) ];
 
       return { x: x, y: y, a: a, l: l, h: h , coords: [ p1, p2, p3, p4 ]};
     },
