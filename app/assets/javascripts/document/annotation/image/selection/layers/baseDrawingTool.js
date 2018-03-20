@@ -4,7 +4,33 @@ define([
 ], function(Config, HasEvents) {
 
   /** Constants **/
-  var TWO_PI = 2 * Math.PI;
+  var TWO_PI = 2 * Math.PI,
+
+      drawHandle = function(ctx, xy, opts) {
+        var hasBlur = (opts) ? opts.blur || opts.hover : false, // Hover implies blur
+            isHover = (opts) ? opts.hover : false;
+
+        // Black Outline
+        ctx.beginPath();
+        ctx.lineWidth = 4;
+        ctx.shadowBlur = (hasBlur) ? 6 : 0;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.arc(xy[0], xy[1], BaseDrawingTool.HANDLE_RADIUS, 0, TWO_PI);
+        ctx.stroke();
+        ctx.closePath();
+
+        // Inner dot (white stroke + color fill)
+        ctx.beginPath();
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#fff';
+        ctx.fillStyle = (isHover) ? BaseDrawingTool.HOVER_COLOR  : '#000';
+        ctx.arc(xy[0], xy[1], BaseDrawingTool.HANDLE_RADIUS, 0, TWO_PI);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
+      };
 
   var BaseDrawingTool = function(olMap) {
     this.olMap = olMap;
@@ -45,32 +71,6 @@ define([
     }
   };
 
-  BaseDrawingTool.prototype.drawHandle = function(ctx, xy, opts) {
-    var hasBlur = (opts) ? opts.blur || opts.hover : false, // Hover implies blur
-        isHover = (opts) ? opts.hover : false;
-
-    // Black Outline
-    ctx.beginPath();
-    ctx.lineWidth = 4;
-    ctx.shadowBlur = (hasBlur) ? 6 : 0;
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.arc(xy[0], xy[1], BaseDrawingTool.HANDLE_RADIUS, 0, TWO_PI);
-    ctx.stroke();
-    ctx.closePath();
-
-    // Inner dot (white stroke + color fill)
-    ctx.beginPath();
-    ctx.shadowBlur = 0;
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#fff';
-    ctx.fillStyle = (isHover) ? BaseDrawingTool.HOVER_COLOR  : '#000';
-    ctx.arc(xy[0], xy[1], BaseDrawingTool.HANDLE_RADIUS, 0, TWO_PI);
-    ctx.fill();
-    ctx.stroke();
-    ctx.closePath();
-  };
-
   BaseDrawingTool.prototype.buildSelection = function(anchor, canvasBounds, imageBounds) {
     var annotation = {
           annotates: {
@@ -88,6 +88,10 @@ define([
       imageBounds : imageBounds
     };
   };
+
+  /** For convenience exposted both as a static & instance method **/
+  BaseDrawingTool.drawHandle = drawHandle;
+  BaseDrawingTool.prototype.drawHandle = BaseDrawingTool.drawHandle;
 
   BaseDrawingTool.HANDLE_RADIUS = 6;
   BaseDrawingTool.HOVER_COLOR = 'orange';
