@@ -64,20 +64,27 @@ define([
         },
 
         shiftBaseline = function(dx, dy) {
-          var baseEnd = currentShape.baseEnd.canvasXY,
+          var pivot = currentShape.pivot.canvasXY,
+              baseEnd = currentShape.baseEnd.canvasXY,
               opposite = currentShape.opposite.canvasXY,
-              h = Geom2D.len(opposite[0], opposite[1], baseEnd[0], baseEnd[1]);
+              h = Geom2D.len(opposite[0], opposite[1], baseEnd[0], baseEnd[1]),
+
+              angle =
+                Geom2D.angleOf(Geom2D.vec(pivot, baseEnd)) -
+                Geom2D.angleOf(Geom2D.vec(pivot, opposite)),
+
+              orientation = (angle > 0) ? 1 : -1;
 
           updateShape({ baseEnd: shiftCoord(currentShape.baseEnd, dx, dy) });
 
           var baseLineAfter = getCanvasBaseline(),
-              normalAfter = Geom2D.normalize([ - baseLineAfter[1], baseLineAfter[0] ]),
+              normalAfter = Geom2D.normalize([ orientation * baseLineAfter[1], - orientation * baseLineAfter[0] ]),
               dOpposite = [ normalAfter[0] * h, normalAfter[1] * h ];
 
           updateShape({ opposite: {
             canvasXY: [
-              currentShape.baseEnd.canvasXY[0] - dOpposite[0],
-              currentShape.baseEnd.canvasXY[1] - dOpposite[1]
+              currentShape.baseEnd.canvasXY[0] + dOpposite[0],
+              currentShape.baseEnd.canvasXY[1] + dOpposite[1]
             ]
           }});
         },

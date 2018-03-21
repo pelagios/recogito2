@@ -23,6 +23,10 @@ define([], function() {
       return Math.acos(dotProduct);
     },
 
+    angleOf : function(a) {
+      return Math.atan2(a[1], a[0]);
+    },
+
     /** Tests if the given coordinate intersects the rectangle **/
     intersects : function(x, y, coords) {
       var inside = false,
@@ -38,6 +42,10 @@ define([], function() {
       }
 
       return inside;
+    },
+
+    vec : function(from, to) {
+      return [ to[0] - from[0], to[1] - from[1] ];
     },
 
     /** Computes the length of a vector **/
