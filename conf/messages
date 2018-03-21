@@ -28,6 +28,7 @@ common.buttons.save_changes=Save Changes
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Welcome to Recogito
 landing.index.header.link.tutorial=Tutorial
+landing.index.header.link.about=About
 landing.index.header.link.login=Log In
 
 # Jumbotron
