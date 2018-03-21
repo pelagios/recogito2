@@ -146,7 +146,7 @@ require(['common/config'], function(Config) {
 
               // Can hopefully be replaced at some point...
               isIIIFUrl = function(url) {
-                if (url.indexOf('http://') === 0 || url.indexOf('http://') === 0)
+                if (url.indexOf('http://') === 0 || url.indexOf('https://') === 0)
                   return url.indexOf('/info.json') === url.length - 10;
                 else
                   return false;
