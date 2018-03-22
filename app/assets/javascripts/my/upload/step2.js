@@ -122,6 +122,10 @@ require(['common/config'], function(Config) {
 
               refresh();
               jQuery('input.next').prop('disabled', false);
+            },
+
+            error: function(e) {
+              console.log(e.responseText);
             }
           });
         };
@@ -145,14 +149,11 @@ require(['common/config'], function(Config) {
           var link = e.dataTransfer.getData('URL'),
 
               // Can hopefully be replaced at some point...
-              isIIIFUrl = function(url) {
-                if (url.indexOf('http://') === 0 || url.indexOf('https://') === 0)
-                  return url.indexOf('/info.json') === url.length - 10;
-                else
-                  return false;
+              isUrl = function(url) {
+                return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0);
               };
 
-          if (link && isIIIFUrl(link))
+          if (link && isUrl(link))
             registerIIIFSource(link);
         }
       });

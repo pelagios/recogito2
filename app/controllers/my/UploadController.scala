@@ -25,6 +25,12 @@ import scala.language.implicitConversions
 import transform.ner.NERService
 import transform.tei.TEIParserService
 import transform.tiling.TilingService
+import transform.iiif.IIIFParser
+import transform.iiif.ResourceType
+import transform.iiif.IIIF
+import play.api.libs.ws.WSClient
+import scala.util.Success
+import scala.util.Failure
 
 case class UploadSuccess(contentType: String)
 
@@ -43,6 +49,7 @@ class UploadController @Inject() (
     val teiParserService: TEIParserService,
     val nerService: NERService,
     implicit val webjars: WebJarsUtil,
+    implicit val ws: WSClient,
     implicit val ctx: ExecutionContext,
     implicit val system: ActorSystem
   ) extends BaseAuthController(components, config, documents, users) with I18nSupport with HasPrettyPrintJSON {
@@ -141,10 +148,40 @@ class UploadController @Inject() (
     })
 
     def registerIIIFSource(pendingUpload: UploadRecord) =
-      request.body.asFormUrlEncoded.flatMap(_.get("iiif_source").map(_.headOption)).flatten match {
+      request.body.asFormUrlEncoded.flatMap(_.get("iiif_source").flatMap(_.headOption)) match {
         case Some(url) =>
-          uploads.insertRemoteFilepart(pendingUpload.getId, username, ContentType.IMAGE_IIIF, url).map(success =>
-            if (success) Ok else InternalServerError)
+          // Identify type of IIIF URL - image or item manifest? 
+          IIIFParser.identify(url).flatMap {  
+            case Success(IIIF.IMAGE_INFO) =>            
+              uploads.insertRemoteFilepart(pendingUpload.getId, username, ContentType.IMAGE_IIIF, url).map(success =>
+              if (success) Ok else InternalServerError)
+            
+            case Success(IIIF.MANIFEST) =>
+              IIIFParser.fetchManifest(url).flatMap { 
+                case Success(manifest) =>
+                  val inserts = 
+                    manifest.sequences.flatMap(_.canvases.map(_.images)).flatten
+                    .map { image =>
+                      uploads.insertRemoteFilepart(
+                        pendingUpload.getId,
+                        username,
+                        ContentType.IMAGE_IIIF,
+                        image.service)
+                    }
+                  
+                  Future.sequence(inserts).map { result =>
+                    if (result.contains(false)) InternalServerError
+                    else Ok
+                  }
+                  
+                // Manifest parse error
+                case Failure(e) =>
+                  Future.successful(BadRequest(e.getMessage))                  
+              }
+              
+            case Failure(e) =>
+              Future.successful(BadRequest(e.getMessage))
+          }
 
         case None =>
           // POST without IIIF URL? Not possible through the UI!
