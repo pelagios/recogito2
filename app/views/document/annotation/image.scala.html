@@ -113,14 +113,14 @@
           @if(part == currentPart) {
             <li class="active">
               <a href="#" onclick="return false;">
-                <img class="lazy" src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
+                <img class="lazy" data-original="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
           } else {
             <li>
               <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, part.getSequenceNo)">
-                <img class="lazy" src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
+                <img class="lazy" data-original="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
