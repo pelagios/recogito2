@@ -19,6 +19,7 @@
     @Html(webJarsUtil.script("jquery-ui.min.js"))
     @Html(webJarsUtil.script("velocity.min.js"))
     @Html(webJarsUtil.script("jquery.timeago.js"))
+    @Html(webJarsUtil.script("jquery.lazyload.min.js"))
     @Html(webJarsUtil.script("typeahead.jquery.min.js"))
     @Html(webJarsUtil.script("ol.js"))
     @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/image/app.js")))
@@ -112,7 +113,7 @@
           @if(part == currentPart) {
             <li class="active">
               <a href="#" onclick="return false;">
-                <img src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
+                <img class="lazy" src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>

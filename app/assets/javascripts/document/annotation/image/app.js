@@ -182,6 +182,8 @@ require([
             new App(imageProperties);
           };
 
+      jQuery('.lazy').lazyload();
+
       setImagePaneTop();
       loadIndicator.init(imagePane);
 
