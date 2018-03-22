@@ -120,7 +120,7 @@
           } else {
             <li>
               <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, part.getSequenceNo)">
-                <img src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
+                <img class="lazy" src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
