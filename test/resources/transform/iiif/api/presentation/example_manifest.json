@@ -1,0 +1,113 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "http://example.org/iiif/book1/manifest",
+  "@type": "sc:Manifest",
+  "label": "Book 1",
+  "metadata": [
+    {"label": "Author", "value": "Anne Author"},
+    {"label": "Published", "value": [
+        {"@value": "Paris, circa 1400", "@language": "en"},
+        {"@value": "Paris, environ 1400", "@language": "fr"}
+      ]
+    },
+    {"label": "Notes", "value": ["Text of note 1", "Text of note 2"]},
+    {"label": "Source",
+     "value": "<span>From: <a href=\"http://example.org/db/1.html\">Some Collection</a></span>"}
+  ],
+  "description": "A longer description of this example book. It should give some real information.",
+  "thumbnail": {
+    "@id": "http://example.org/images/book1-page1/full/80,100/0/default.jpg",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "http://example.org/images/book1-page1",
+      "profile": "http://iiif.io/api/image/2/level1.json"
+    }
+  },
+  "viewingDirection": "right-to-left",
+  "viewingHint": "paged",
+  "navDate": "1856-01-01T00:00:00Z",
+  "license": "http://rightsstatements.org/vocab/NoC-NC/1.0/",
+  "attribution": "Provided by Example Organization",
+  "logo": {
+    "@id": "http://example.org/logos/institution1.jpg",
+    "service": {
+        "@context": "http://iiif.io/api/image/2/context.json",
+        "@id": "http://example.org/service/inst1",
+        "profile": "http://iiif.io/api/image/2/level2.json"
+    }
+  },
+  "related":{
+    "@id": "http://example.org/videos/video-book1.mpg",
+    "format": "video/mpeg"
+  },
+  "service": {
+    "@context": "http://example.org/ns/jsonld/context.json",
+    "@id": "http://example.org/service/example",
+    "profile": "http://example.org/docs/example-service.html"
+  },
+  "seeAlso": {
+    "@id": "http://example.org/library/catalog/book1.xml",
+    "format": "text/xml",
+    "profile": "http://example.org/profiles/bibliographic"
+  },
+  "rendering": {
+    "@id": "http://example.org/iiif/book1.pdf",
+    "label": "Download as PDF",
+    "format": "application/pdf"
+  },
+  "within": "http://example.org/collections/books/",
+  "sequences": [
+    {
+      "@context": "http://iiif.io/api/presentation/2/context.json",
+      "@id": "http://example.org/iiif/book1/sequence/normal",
+      "@type": "sc:Sequence",
+      "label": "Current Page Order",
+      "viewingDirection": "left-to-right",
+      "viewingHint": "paged",
+      "startCanvas": "http://example.org/iiif/book1/canvas/p2",
+      "canvases": [
+        {
+          "@context": "http://iiif.io/api/presentation/2/context.json",
+          "@id": "http://example.org/iiif/book1/canvas/p1",
+          "@type": "sc:Canvas",
+          "label": "p. 1",
+          "height": 1000,
+          "width": 750,
+          "thumbnail" : {
+            "@id" : "http://example.org/iiif/book1/canvas/p1/thumb.jpg",
+            "@type": "dctypes:Image",
+            "height": 200,
+            "width": 150
+          },
+          "images": [
+            {
+              "@context": "http://iiif.io/api/presentation/2/context.json",
+              "@id": "http://example.org/iiif/book1/annotation/p0001-image",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "http://example.org/iiif/book1/res/page1.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "http://example.org/images/book1-page1",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                },
+                "height":2000,
+                "width":1500
+              },
+              "on": "http://example.org/iiif/book1/canvas/p1"
+            }
+          ],
+          "otherContent": [
+            {
+              "@id": "http://example.org/iiif/book1/list/p1",
+              "@type": "sc:AnnotationList"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
