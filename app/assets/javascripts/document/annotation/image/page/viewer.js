@@ -48,7 +48,7 @@ define([
           new ol.proj.Projection({
             code: 'ZOOMIFY',
             units: 'pixels',
-            extent: [0, 0, w, h]
+            extent: [0, -h, w, 0]
           }) : new ol.proj.Projection({
             code: 'IIIF',
             units: 'pixels',
@@ -61,24 +61,22 @@ define([
             size: [ w, h ]
           }) : new IIIFSource(imageProperties),
 
-        tileLayer = new ol.layer.Tile({ source: tileSource }),
+        tileLayer = new ol.layer.Tile({
+          source: tileSource
+        }),
 
         olMap = new ol.Map({
           target: 'image-pane',
           layers: [ tileLayer ],
           controls: [],
-          // Need to disable keyboard interactions, otherwise interferes with editor popup
           interactions: ol.interaction.defaults({ keyboard: false }),
           view: new ol.View({
-            projection: projection,
-            center: [w / 2, - (h / 2)],
-            zoom: 0,
-            minResolution: 0.125
+            projection: projection
           })
         }),
 
         zoomToExtent = function() {
-          olMap.getView().fit([0, -h, w, 0], olMap.getSize());
+          olMap.getView().fit(projection.getExtent(), { nearest: true });
         },
 
         changeZoom = function(increment) {

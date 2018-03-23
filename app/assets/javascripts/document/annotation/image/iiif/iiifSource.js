@@ -136,7 +136,6 @@ define([], function() {
       }
     }]);
 
-
     if (ol.has.CANVAS) {
       this.setTileLoadFunction(function(tile, url) {
         var img = tile.getImage();
@@ -164,7 +163,6 @@ define([], function() {
         img.src = url;
       });
     }
-
   };
   IIIFSource.prototype = Object.create(ol.source.TileImage.prototype);
 
