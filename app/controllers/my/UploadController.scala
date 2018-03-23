@@ -159,14 +159,21 @@ class UploadController @Inject() (
             case Success(IIIF.MANIFEST) =>
               IIIFParser.fetchManifest(url).flatMap { 
                 case Success(manifest) =>
-                  val inserts = 
-                    manifest.sequences.flatMap(_.canvases.map(_.images)).flatten
-                    .map { image =>
-                      uploads.insertRemoteFilepart(
-                        pendingUpload.getId,
-                        username,
-                        ContentType.IMAGE_IIIF,
-                        image.service)
+
+                  // The weirdness of IIIF canvases. In order to get a label for the images,
+                  // we zip the images with the label of the canvas they are on (images don't
+                  // seem to have labels).
+                  val imagesAndLabels = manifest.sequences.flatMap(_.canvases).flatMap { canvas =>
+                    canvas.images.map((_, canvas.label))
+                  }
+
+                  val inserts = imagesAndLabels.map { case (image, label) =>
+                    uploads.insertRemoteFilepart(
+                      pendingUpload.getId,
+                      username,
+                      ContentType.IMAGE_IIIF,
+                      image.service,
+                      Some(label.value))
                     }
                   
                   Future.sequence(inserts).map { result =>

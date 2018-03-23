@@ -99,7 +99,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
       
       ContentType.fromFile(file) match {
         case Right(contentType) => {
-          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.username, title, contentType.toString, file.getName, filesizeKb, null)
+          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.username, title, contentType.toString, file.getName, filesizeKb, null, null)
           sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
           Right(filepartRecord)
         }
@@ -112,11 +112,19 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
   }
   
   /** Inserts a new remote filepart - metadata goes to the DB, content stays external **/
-  def insertRemoteFilepart(uploadId: Int, owner: String, contentType: ContentType, url: String) = db.withTransaction { sql =>
-    val id = UUID.randomUUID
-    val title = url // TODO how should we derive a sensible title?
+  def insertRemoteFilepart(uploadId: Int, owner: String, 
+      contentType: ContentType, url: String, title: Option[String] = None) = db.withTransaction { sql =>
+        
+    val filepartRecord = 
+      new UploadFilepartRecord(
+        UUID.randomUUID, 
+        uploadId, 
+        owner, 
+        title.getOrElse(url), 
+        contentType.toString, 
+        url, 
+        null, null, null)
     
-    val filepartRecord = new UploadFilepartRecord(id, uploadId, owner, title, contentType.toString, url, null, null)
     val rows = sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     rows == 1
   }

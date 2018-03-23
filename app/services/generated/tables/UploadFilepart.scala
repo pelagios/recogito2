@@ -94,6 +94,11 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	val SOURCE : TableField[UploadFilepartRecord, String] = createField("source", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
+	 * The column <code>public.upload_filepart.sequence_no</code>.
+	 */
+	val SEQUENCE_NO : TableField[UploadFilepartRecord, Integer] = createField("sequence_no", org.jooq.impl.SQLDataType.INTEGER, "")
+
+	/**
 	 * Create a <code>public.upload_filepart</code> table reference
 	 */
 	def this() = {

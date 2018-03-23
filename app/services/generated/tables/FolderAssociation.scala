@@ -79,7 +79,7 @@ class FolderAssociation(alias : String, aliased : Table[FolderAssociationRecord]
 	}
 
 	override def getReferences : List[ ForeignKey[FolderAssociationRecord, _] ] = {
-		return Arrays.asList[ ForeignKey[FolderAssociationRecord, _] ](Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY)
+		return Arrays.asList[ ForeignKey[FolderAssociationRecord, _] ](Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY, Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY)
 	}
 
 	override def as(alias : String) : FolderAssociation = {
