@@ -71,7 +71,9 @@ define([
           controls: [],
           interactions: ol.interaction.defaults({ keyboard: false }),
           view: new ol.View({
-            projection: projection
+            projection: projection,
+            zoom: 0,
+            minResolution: 0.125
           })
         }),
 
