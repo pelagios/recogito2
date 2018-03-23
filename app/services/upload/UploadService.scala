@@ -112,9 +112,9 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
   }
   
   /** Inserts a new remote filepart - metadata goes to the DB, content stays external **/
-  def insertRemoteFilepart(uploadId: Int, owner: String, 
-      contentType: ContentType, url: String, title: Option[String] = None) = db.withTransaction { sql =>
-        
+  def insertRemoteFilepart(uploadId: Int, owner: String, contentType: ContentType, 
+     url: String, title: Option[String] = None, sequenceNo: Option[Int] = None) = db.withTransaction { sql =>
+
     val filepartRecord = 
       new UploadFilepartRecord(
         UUID.randomUUID, 
@@ -123,7 +123,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
         title.getOrElse(url), 
         contentType.toString, 
         url, 
-        null, null, null)
+        null, null, optInt(sequenceNo))
     
     val rows = sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     rows == 1
@@ -189,6 +189,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
         .leftJoin(UPLOAD_FILEPART)
         .on(UPLOAD.ID.equal(UPLOAD_FILEPART.UPLOAD_ID)))
       .where(UPLOAD.OWNER.equal(username))
+      .orderBy(UPLOAD_FILEPART.SEQUENCE_NO)
       .fetchArray()
 
       // Convert to map (Upload -> Seq[Filepart]), filtering out null records returned as result of the join
@@ -215,13 +216,14 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
     sql.insertInto(DOCUMENT).set(document).execute()
 
     val docFileparts = fileparts.zipWithIndex.map { case (part, idx) =>
+      val sequenceNo: Integer = Option(part.getSequenceNo).getOrElse(idx + 1)
       new DocumentFilepartRecord(
         part.getId,
         document.getId,
         part.getTitle,
         part.getContentType,
         part.getFile,
-        idx + 1,
+        sequenceNo,
         part.getSource)
     }
         

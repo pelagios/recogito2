@@ -35,9 +35,15 @@ trait BaseService {
   /** Java-interop helper that turns empty strings to null, so they are properly inserted by JOOQ **/
   protected def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
     
-  /** Optional strings should be turned to null for JOOQ **/
+  /** Optional strings need to be turned to null for JOOQ **/
   protected def optString(str: Option[String]) = str match {
     case Some(str) => nullIfEmpty(str)
+    case None => null
+  }
+  
+  /** Optional Ints need to be turned to Integer/null for JOOQ **/
+  protected def optInt(i: Option[Int]): Integer = i match {
+    case Some(i) => i
     case None => null
   }
   

@@ -167,13 +167,14 @@ class UploadController @Inject() (
                     canvas.images.map((_, canvas.label))
                   }
 
-                  val inserts = imagesAndLabels.map { case (image, label) =>
+                  val inserts = imagesAndLabels.zipWithIndex.map { case ((image, label), idx) =>
                     uploads.insertRemoteFilepart(
                       pendingUpload.getId,
                       username,
                       ContentType.IMAGE_IIIF,
                       image.service,
-                      Some(label.value))
+                      Some(label.value), 
+                      Some(idx + 1)) // Remember: seq no. starts at 1 (because it's used in the URI) 
                     }
                   
                   Future.sequence(inserts).map { result =>
