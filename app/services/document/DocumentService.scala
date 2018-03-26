@@ -171,11 +171,10 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     val hasNonOpenLicense = license.map(acronym =>
       License.fromAcronym(acronym).map(!_.isOpen).getOrElse(true)).getOrElse(true)
       
-    val rowsAffected = // DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)
+    val rowsAffected =
       if (hasNonOpenLicense)
         q.set(DOCUMENT.PUBLIC_VISIBILITY, PublicAccess.PRIVATE.toString)
          .set(DOCUMENT.PUBLIC_ACCESS_LEVEL, null.asInstanceOf[String])
-         //.set(DOCUMENT.PUBLIC_ACCESS_LEVEL, null)
          .where(DOCUMENT.ID.equal(docId))
          .execute()
       else

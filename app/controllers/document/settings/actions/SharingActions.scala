@@ -38,7 +38,7 @@ trait SharingActions { self: SettingsController =>
         else
           documents.setPublicVisibility(documentId, PublicAccess.PRIVATE).map(_ => Ok)
       else
-        // Note: chaning the setting for a closed document is not possible through UI!
+        // Note: changing the setting for a closed document is not possible through UI!
         Future.successful(BadRequest)
     })
   }
