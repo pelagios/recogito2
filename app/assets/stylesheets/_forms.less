@@ -48,19 +48,31 @@ input[type=checkbox] { display:none; }
 
 label { .noselect(); }
 
-input[type=checkbox] + label:before {
+input[type=checkbox] + label:before,
+input[type=radio] + label:before {
   .noselect();
   cursor:pointer;
   font-family:FontAwesome;
   font-size:16px;
   display:inline-block;
-  content:'\f096';
   width:20px;
   text-align:left;
 }
 
+input[type=checkbox] + label:before {
+  content:'\f096';
+}
+
+input[type=radio] + label:before {
+  content:'\f10c';
+}
+
 input[type=checkbox]:checked + label:before {
   content:'\f046';
+}
+
+input[type=radio]:checked + label:before {
+  content:'\f192';
 }
 
 input[type=checkbox][disabled] + label,

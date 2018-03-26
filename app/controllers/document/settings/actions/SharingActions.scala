@@ -8,6 +8,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.Future
+import scala.util.Try
 
 case class CollaboratorStub(collaborator: String, accessLevel: Option[DocumentAccessLevel], newCollaborator: Boolean)
 
@@ -28,19 +29,35 @@ object CollaboratorStub {
 
 trait SharingActions { self: SettingsController =>
     
-  // TODO to be replaced with a more fine-grained config option
-  def setIsPublic(documentId: String, enabled: Boolean) = self.silhouette.SecuredAction.async { implicit request =>
-    documentAdminAction(documentId, request.identity.username, { doc =>
-      // Make sure the license allows public access
-      if (doc.license.map(_.isOpen).getOrElse(false))
-        if (enabled)
-          documents.setPublicVisibility(documentId, PublicAccess.WITH_LINK, Some(PublicAccess.READ_ALL)).map(_ => Ok)
-        else
-          documents.setPublicVisibility(documentId, PublicAccess.PRIVATE).map(_ => Ok)
-      else
-        // Note: changing the setting for a closed document is not possible through UI!
+  def setPublicVisibility(docId: String, v: String) = self.silhouette.SecuredAction.async { implicit request =>
+    Try(PublicAccess.Visibility.withName(v)).toOption match {
+      case Some(visibility) =>
+        documentAdminAction(docId, request.identity.username, { doc =>
+          // Make sure the document has an open license - otherwise visibility cannot be changed
+          val hasOpenLicense = doc.license.map(_.isOpen).getOrElse(false)
+          if (hasOpenLicense) {
+            val accessLevel = (doc.publicAccessLevel, visibility) match {
+              // Keep access level pre-set by the user, if any
+              case (Some(level), _) => Some(level)
+              
+              // No pre-set accesslevel and private visibility -> no access
+              case (None, PublicAccess.PRIVATE) => None
+              
+              // No pre-set accesslevel and public visibility -> read-only
+              case (None, _) => Some(PublicAccess.READ_ALL)
+            }
+            
+            documents.setPublicVisibility(docId, visibility, accessLevel).map(_ => Ok)
+          } else {
+            // Note: changing the setting for a closed document is not possible through the UI
+            Future.successful(BadRequest)
+          }
+        })
+        
+      case None =>
+        // Submitting an invalid value is not possible through the UI
         Future.successful(BadRequest)
-    })
+    }
   }
   
   def addCollaborator(documentId: String) = self.silhouette.SecuredAction.async { implicit request =>

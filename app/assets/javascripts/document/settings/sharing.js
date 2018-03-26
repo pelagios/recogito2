@@ -28,7 +28,7 @@ require(['common/config'], function(Config) {
             '</ul>' +
           '</div>'),
 
-        publicAccessCheckbox = jQuery('#public-access'),
+        publicVisibilityForm = jQuery('#public-visibility'),
         publicAccessLink = jQuery("#public-link"),
 
         noCollaboratorsMessage = jQuery('.no-collaborators'),
@@ -90,15 +90,11 @@ require(['common/config'], function(Config) {
             return false;
         },
 
-        onTogglePublicAccess = function() {
-          var checked = publicAccessCheckbox.is(':checked');
-          publicAccessCheckbox.prop('disabled', true);
-          jsRoutes.controllers.document.settings.SettingsController.setIsPublic(Config.documentId, checked)
+        onChangePublicVisiblity = function() {
+          var value = publicVisibilityForm.find('input:checked').val();
+          jsRoutes.controllers.document.settings.SettingsController.setPublicVisibility(Config.documentId, value)
             .ajax().done(function() {
-              publicAccessCheckbox.prop('disabled', false);
-
-              // TODO extra 'green checkmark' feedback a la GitHub
-
+              // TODO show 'stored' indicator in UI
             });
         },
 
@@ -218,7 +214,7 @@ require(['common/config'], function(Config) {
         };
 
     // Public access panel
-    publicAccessCheckbox.change(onTogglePublicAccess);
+    publicVisibilityForm.change(onChangePublicVisiblity);
     publicAccessLink.focus(function() { jQuery(this).select(); } );
 
     // Add collaborators panel

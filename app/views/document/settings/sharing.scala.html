@@ -7,21 +7,61 @@
 @_layout("Settings | Sharing", doc, currentUser, Some("sharing")) {
   <div class="panel share-public">
     <h2>@messages("document.settings.sharing.public_access")</h2>
-    <div class="inner">
-      <input type="checkbox" id="public-access" name="public-access" @if(doc.isOpenToPublic) { checked="checked" } @if(!doc.license.map(_.isOpen).getOrElse(false)) { disabled="true" } />
-      <label for="public-access">@messages("document.settings.sharing.visible_to_all")</label>
-      @if(doc.license.isEmpty) {
-        <span class="license-warning"><span class="icon">&#xf071;</span>
-          Set an open license in the <a href="?tab=metadata">metadata settings</a> before enabling public access.
-        </span>
-      } else { @if(!doc.license.get.isOpen) {
-        <span class="license-warning"><span class="icon">&#xf071;</span> The document license (@doc.license.get.name) does not permit public access.</span>
-      }}
-      <p class="checkbox-details">@messages("document.settings.sharing.public_instructions")</p>
-      <p class="checkbox-details">
-        <input type="text" id="public-link" value="@controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL"/>
-      </p>
-    </div>
+
+    @defining(!doc.license.map(_.isOpen).getOrElse(false)) { disabled =>
+      <div class="inner">
+        <form id="public-visibility">
+          <div class="sharing-option">
+            <input type="radio" name="public-access" id="pa-off" value="PRIVATE"@if(doc.publicVisibility == services.document.PublicAccess.PRIVATE) { checked="true"}/>
+            <label for="pa-off">
+              <strong>Off</strong>
+              @if(doc.license.isEmpty) {
+                <span class="license-warning"><span class="icon">&#xf071;</span>
+                  Set an open license in the <a href="?tab=metadata">metadata settings</a> before enabling public access.
+                </span>
+              } else { @if(!doc.license.get.isOpen) {
+                <span class="license-warning"><span class="icon">&#xf071;</span> The document license (@doc.license.get.name) does not permit public access.</span>
+              }}
+              <div class="sharing-details">
+                Only people you explicitely add as collaborators can access this document.
+              </div>
+            </label>
+          </div>
+
+          <div class="sharing-option@if(disabled){ disabled}">
+            <input type="radio" name="public-access" id="pa-public" value="PUBLIC"@if(disabled){ disabled="true"}@if(doc.publicVisibility == services.document.PublicAccess.PUBLIC) { checked="true"}/>
+            <label for="pa-public">
+              <strong>Anyone on the Web</strong>
+              <div class="sharing-details">
+                The document is listed on your profile page, and anyone on the Internet can find it.
+              </div>
+            </label>
+          </div>
+
+          <div class="sharing-option@if(disabled){ disabled}">
+            <input type="radio" name="public-access" id="pa-with-link" value="WITH_LINK"@if(disabled){ disabled="true"}@if(doc.publicVisibility == services.document.PublicAccess.WITH_LINK) { checked="true"}/>
+            <label for="pa-with-link">
+              <strong>Anyone with the Link</strong>
+              <div class="sharing-details">
+                The document is accessible to anyone who has the link, but it is not listed
+                on your profile page. Link to share:
+                <input type="text" id="public-link" value="@controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL"/>
+              </div>
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <div class="inner access-level@if(disabled){ disabled}">
+        <strong>Access:</strong> anyone
+        <select@if(disabled){ disabled="true"}>
+          <option>can view</option>
+          <!-- option>can edit</option -->
+        </select>
+        this document.
+        <!-- span class="note">(Editing requires a Recogito account.)</span -->
+      </div>
+    }
   </div>
 
   <div class="panel share-collab">
@@ -61,7 +101,7 @@
   @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/settings/sharing.js")))
   @helper.javascriptRouter("jsRoutes")(
     controllers.my.routes.javascript.MyRecogitoController.index,
-    controllers.document.settings.routes.javascript.SettingsController.setIsPublic,
+    controllers.document.settings.routes.javascript.SettingsController.setPublicVisibility,
     controllers.document.settings.routes.javascript.SettingsController.searchUsers,
     controllers.document.settings.routes.javascript.SettingsController.addCollaborator,
     controllers.document.settings.routes.javascript.SettingsController.removeCollaborator
