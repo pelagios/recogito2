@@ -8,7 +8,7 @@
   <div class="panel share-public">
     <h2>@messages("document.settings.sharing.public_access")</h2>
     <div class="inner">
-      <input type="checkbox" id="public-access" name="public-access" @if(doc.isPublic) { checked="checked" } @if(!doc.license.map(_.isOpen).getOrElse(false)) { disabled="true" } />
+      <input type="checkbox" id="public-access" name="public-access" @if(doc.isOpenToPublic) { checked="checked" } @if(!doc.license.map(_.isOpen).getOrElse(false)) { disabled="true" } />
       <label for="public-access">@messages("document.settings.sharing.visible_to_all")</label>
       @if(doc.license.isEmpty) {
         <span class="license-warning"><span class="icon">&#xf071;</span>

@@ -4,7 +4,6 @@
 package services.generated.tables
 
 
-import java.lang.Boolean
 import java.lang.Class
 import java.lang.String
 import java.sql.Timestamp
@@ -113,14 +112,19 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	val LICENSE : TableField[DocumentRecord, String] = createField("license", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
-	 * The column <code>public.document.is_public</code>.
-	 */
-	val IS_PUBLIC : TableField[DocumentRecord, Boolean] = createField("is_public", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), "")
-
-	/**
 	 * The column <code>public.document.attribution</code>.
 	 */
 	val ATTRIBUTION : TableField[DocumentRecord, String] = createField("attribution", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
+	 * The column <code>public.document.public_visibility</code>.
+	 */
+	val PUBLIC_VISIBILITY : TableField[DocumentRecord, String] = createField("public_visibility", org.jooq.impl.SQLDataType.CLOB.nullable(false).defaulted(true), "")
+
+	/**
+	 * The column <code>public.document.public_access_level</code>.
+	 */
+	val PUBLIC_ACCESS_LEVEL : TableField[DocumentRecord, String] = createField("public_access_level", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * Create a <code>public.document</code> table reference

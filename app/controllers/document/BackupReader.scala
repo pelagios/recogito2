@@ -31,7 +31,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
   def readMetadata(file: File, runAsAdmin: Boolean, forcedOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
 
     def parseDocumentMetadata(json: JsValue) = {
-      // User ID from backup, or create new if allowed (for interop with legacy backups)
+      // Use ID from backup, or create new if allowed (for interop with legacy backups)
       val id = (json \ "id").asOpt[String]
         .getOrElse {
           if (!runAsAdmin) // Only admins may import legacy backups
@@ -50,9 +50,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
           // Only admins can retain the user from the backup metadata - but
           // forceOwner == None && runAsAdmin == false should never happen
           case _ =>
-            if (!runAsAdmin)
-              throw new RuntimeException
-
+            if (!runAsAdmin) throw new RuntimeException
             (json \ "owner").as[String]
         }
 
@@ -71,9 +69,9 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         (json \ "source").asOpt[String].getOrElse(null),
         (json \ "edition").asOpt[String].getOrElse(null),
         (json \ "license").asOpt[String].getOrElse(null),
-        // Default to 'false'
-        (json \ "is_public").asOpt[Boolean].getOrElse(false).asInstanceOf[Boolean],
-        (json \ "attribution").asOpt[String].getOrElse(null))
+        (json \ "attribution").asOpt[String].getOrElse(null),
+        (json \ "public_visibility").asOpt[String].getOrElse(null),
+        (json \ "public_access_level").asOpt[String].getOrElse(null))
     }
 
     def parseFilepartMetadata(documentId: String, json: JsValue) =

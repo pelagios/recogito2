@@ -32,10 +32,21 @@ case class DocumentInfo(document: DocumentRecord, fileparts: Seq[DocumentFilepar
   
   lazy val license: Option[License] = Option(document.getLicense).flatMap(License.fromAcronym(_))
   
-  lazy val isPublic: Boolean = document.getIsPublic
-  
   lazy val attribution: Option[String] = Option(document.getAttribution)
   
+  lazy val publicVisibility: PublicAccess.Visibility =
+    PublicAccess.Visibility.withName(document.getPublicVisibility)
+  
+  lazy val publicAccessLevel: Option[PublicAccess.AccessLevel] =
+    PublicAccess.AccessLevel.withName(document.getPublicAccessLevel)
+    
+  // Shorthands
+  lazy val isOpenToPublic =
+    publicVisibility == PublicAccess.PUBLIC || publicVisibility == PublicAccess.WITH_LINK
+    
+  lazy val isListedInProfile =
+    publicVisibility == PublicAccess.PUBLIC
+    
   /** Convenience methods for filepart access **/
   
   lazy val textParts = fileparts.filter(_.getContentType.startsWith("TEXT"))

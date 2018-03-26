@@ -69,8 +69,9 @@ CREATE TABLE document (
   source TEXT,
   edition TEXT,
   license TEXT,
-  is_public BOOLEAN NOT NULL DEFAULT FALSE,
-  attribution TEXT
+  attribution TEXT,
+  public_visibility TEXT NOT NULL DEFAULT 'PRIVATE',
+  public_access_level TEXT
 );
 CREATE INDEX idx_document_owner ON document(owner);
 

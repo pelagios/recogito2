@@ -72,8 +72,15 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     }
   }
   
-  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel =
+  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel = {
+    
+    // Shorthand
+    val isVisibleToPublic = 
+      document.getPublicVisibility == PublicAccess.PUBLIC.toString ||
+      document.getPublicVisibility == PublicAccess.WITH_LINK.toString
+    
     forUser match {      
+      // Trivial case: the user is the owner of the document
       case Some(user) if (document.getOwner == user) =>
         DocumentAccessLevel.OWNER
       
@@ -83,12 +90,14 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
           case Some(policy) => policy
           
           // No sharing policy, but document might still be public
-          case None => if (document.getIsPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
+          case None => if (isVisibleToPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
         }
 
+      // Anonymous access - the user is not logged in
       case None =>
-        if (document.getIsPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
+        if (isVisibleToPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
     }
+  }
   
   /** Creates a new DocumentRecord from an UploadRecord **/
   private[services] def createDocumentFromUpload(upload: UploadRecord) =
@@ -98,16 +107,16 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
           upload.getCreatedAt,
           upload.getTitle,
           upload.getAuthor,
-          null, // TODO timestamp_numeric
+          null, // TODO date_numeric
           upload.getDateFreeform,
           upload.getDescription,
           upload.getLanguage,
           upload.getSource,
           upload.getEdition,
           upload.getLicense,
-          false,
-          null // TODO attribution
-    )
+          null, // attribution
+          PublicAccess.PRIVATE.toString, // public_visibility
+          null) // public_access_level
   
   /** Imports document and filepart records to DB, and filepart content to user dir **/
   def importDocument(document: DocumentRecord, fileparts: Seq[(DocumentFilepartRecord, InputStream)]) = db.withTransaction { sql =>
@@ -126,18 +135,26 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   }
     
   /** Changes the public visibility flag for the given document **/
-  def setPublicVisibility(docId: String, enabled: Boolean) = db.withTransaction { sql =>
-    sql.update(DOCUMENT).set[java.lang.Boolean](DOCUMENT.IS_PUBLIC, enabled).where(DOCUMENT.ID.equal(docId)).execute()
-  }
+  def setPublicVisibility(docId: String, visibility: PublicAccess.Visibility, accessLevel: Option[PublicAccess.AccessLevel] = None) =
+    db.withTransaction { sql =>
+      sql.update(DOCUMENT)
+         .set(DOCUMENT.PUBLIC_VISIBILITY, visibility.toString)
+         .set(DOCUMENT.PUBLIC_ACCESS_LEVEL, optString(accessLevel.map(_.toString)))
+         .where(DOCUMENT.ID.equal(docId)).execute()
+    }
   
   /** Updates the user-defined metadata fields **/
-  def updateMetadata(docId: String, title: String, author: Option[String], dateFreeform: Option[String], 
-    description: Option[String], language: Option[String], source: Option[String], edition: Option[String],
-    license: Option[String], attribution: Option[String]): Future[Boolean] = db.withTransaction { sql =>  
-
-    // If the update sets the document to a non-open license, make sure is_public is set to false
-    val hasNonOpenLicense = license.map(acronym =>
-      License.fromAcronym(acronym).map(!_.isOpen).getOrElse(true)).getOrElse(true)
+  def updateMetadata(
+      docId: String,
+      title: String,
+      author: Option[String],
+      dateFreeform: Option[String], 
+      description: Option[String],
+      language: Option[String],
+      source: Option[String],
+      edition: Option[String],
+      license: Option[String],
+      attribution: Option[String]): Future[Boolean] = db.withTransaction { sql =>  
       
     val q = sql.update(DOCUMENT)
       .set(DOCUMENT.TITLE, title)
@@ -149,11 +166,18 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
       .set(DOCUMENT.EDITION, optString(edition))
       .set(DOCUMENT.LICENSE, optString(license))
       .set(DOCUMENT.ATTRIBUTION, optString(attribution))
+
+    // If the update sets the document to a non-open license, make sure is_public is set to false
+    val hasNonOpenLicense = license.map(acronym =>
+      License.fromAcronym(acronym).map(!_.isOpen).getOrElse(true)).getOrElse(true)
       
-    val rowsAffected =
+    val rowsAffected = // DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)
       if (hasNonOpenLicense)
-        q.set[java.lang.Boolean](DOCUMENT.IS_PUBLIC, false)
-         .where(DOCUMENT.ID.equal(docId)).execute()
+        q.set(DOCUMENT.PUBLIC_VISIBILITY, PublicAccess.PRIVATE.toString)
+         .set(DOCUMENT.PUBLIC_ACCESS_LEVEL, null.asInstanceOf[String])
+         //.set(DOCUMENT.PUBLIC_ACCESS_LEVEL, null)
+         .where(DOCUMENT.ID.equal(docId))
+         .execute()
       else
         q.where(DOCUMENT.ID.equal(docId)).execute()
     
@@ -299,9 +323,14 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
   
   def countByOwner(owner: String, publicOnly: Boolean = false) = db.query { sql =>
     if (publicOnly)
-      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true))).fetchOne(0, classOf[Int])
+      sql.selectCount().from(DOCUMENT)
+         .where(DOCUMENT.OWNER.equal(owner)
+         .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
+         .fetchOne(0, classOf[Int])
     else
-      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
+      sql.selectCount().from(DOCUMENT)
+         .where(DOCUMENT.OWNER.equal(owner))
+         .fetchOne(0, classOf[Int])
   }
   
   /** Convenience method to list all document IDs owned by the given user **/
@@ -329,9 +358,9 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     Page(System.currentTimeMillis - startTime, total, offset, limit, items)
   }
   
-  /** Retrieves documents from a given owner visible to the given logged in user.
+  /** Retrieves documents from a given owner, visible to the given logged in user.
     *
-    * If there is currently no logged in user, only public documents are returned.  
+    * If there is currently no logged in user, only documents with public_visibility = PUBLIC are returned.  
     */
   def findAccessibleDocuments(
       owner: String,
@@ -347,16 +376,18 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
         
     val queries = Seq(sql.selectCount(), sql.select())
       .map { q => loggedInUser match {
-        
           case Some(loggedIn) =>
             q.from(DOCUMENT)
-              .where(DOCUMENT.OWNER.equalIgnoreCase(owner).and(
-                DOCUMENT.ID.in(sql.select(SHARING_POLICY.DOCUMENT_ID).from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(loggedIn)))
-                  .or(DOCUMENT.IS_PUBLIC.equal(true))))
+             .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
+               .and(DOCUMENT.ID.in(
+                  sql.select(SHARING_POLICY.DOCUMENT_ID).from(SHARING_POLICY)
+                    .where(SHARING_POLICY.SHARED_WITH.equal(loggedIn))
+               ).or(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))))
                  
           case None =>       
-            q.from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner).and(DOCUMENT.IS_PUBLIC.equal(true)))
-            
+            q.from(DOCUMENT)
+              .where(DOCUMENT.OWNER.equal(owner)
+                .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
         }
       }
     
@@ -429,7 +460,10 @@ object DocumentService extends HasDate {
     (JsPath \ "language").writeNullable[String] and
     (JsPath \ "source").writeNullable[String] and
     (JsPath \ "edition").writeNullable[String] and
-    (JsPath \ "is_public").write[Boolean]
+    (JsPath \ "license").writeNullable[String] and
+    (JsPath \ "attribution").writeNullable[String] and
+    (JsPath \ "public_visibility").write[String] and
+    (JsPath \ "public_access_level").writeNullable[String]
   )(d => (
     d.getId,
     d.getOwner,
@@ -442,7 +476,10 @@ object DocumentService extends HasDate {
     Option(d.getLanguage),
     Option(d.getSource),
     Option(d.getEdition),
-    d.getIsPublic
+    Option(d.getLicense),
+    Option(d.getAttribution),
+    d.getPublicVisibility,
+    Option(d.getPublicAccessLevel)
   ))
 
   implicit val documentFilepartRecordWrites: Writes[DocumentFilepartRecord] = (

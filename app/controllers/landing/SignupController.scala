@@ -8,7 +8,7 @@ import java.sql.Timestamp
 import java.util.{Date, UUID}
 import services.ContentType
 import services.annotation.{Annotation, AnnotationService}
-import services.document.DocumentService
+import services.document.{DocumentService, PublicAccess}
 import services.user.UserService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.Configuration
@@ -101,15 +101,16 @@ class SignupController @Inject() (
       new Timestamp(new Date().getTime),
       "Welcome to Recogito",
       "Recogito Team",
-      null, // TODO timestamp_numeric
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      false,
-      null)
+      null, // date_numeric
+      null, // date_freeform
+      null, // description
+      null, // language
+      null, // source
+      null, // edition
+      null, // license
+      null, // attribution
+      PublicAccess.PRIVATE.toString, // public visiblity
+      null) // public access level
     
     val filepart = new DocumentFilepartRecord(
       UUID.randomUUID(),

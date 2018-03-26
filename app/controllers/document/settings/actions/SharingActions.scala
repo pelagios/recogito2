@@ -1,7 +1,7 @@
 package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
-import services.document.DocumentAccessLevel
+import services.document.{DocumentAccessLevel, PublicAccess}
 import services.generated.tables.records.SharingPolicyRecord
 import services.user.Roles._
 import play.api.libs.json._
@@ -28,13 +28,17 @@ object CollaboratorStub {
 
 trait SharingActions { self: SettingsController =>
     
+  // TODO to be replaced with a more fine-grained config option
   def setIsPublic(documentId: String, enabled: Boolean) = self.silhouette.SecuredAction.async { implicit request =>
     documentAdminAction(documentId, request.identity.username, { doc =>
       // Make sure the license allows public access
       if (doc.license.map(_.isOpen).getOrElse(false))
-        documents.setPublicVisibility(documentId, enabled).map(_ => Status(200))
+        if (enabled)
+          documents.setPublicVisibility(documentId, PublicAccess.WITH_LINK, Some(PublicAccess.READ_ALL)).map(_ => Ok)
+        else
+          documents.setPublicVisibility(documentId, PublicAccess.PRIVATE).map(_ => Ok)
       else
-        // Note: setting is_public=true for a close document is not possible through UI!
+        // Note: chaning the setting for a closed document is not possible through UI!
         Future.successful(BadRequest)
     })
   }
