@@ -30,6 +30,7 @@ require(['common/config'], function(Config) {
 
         publicVisibilityForm = jQuery('#public-visibility'),
         publicAccessLink = jQuery("#public-link"),
+        publicAccessLevel = jQuery('.access-level select'),
 
         noCollaboratorsMessage = jQuery('.no-collaborators'),
         collaboratorsTable = jQuery('.collaborators'),
@@ -93,6 +94,14 @@ require(['common/config'], function(Config) {
         onChangePublicVisiblity = function() {
           var value = publicVisibilityForm.find('input:checked').val();
           jsRoutes.controllers.document.settings.SettingsController.setPublicVisibility(Config.documentId, value)
+            .ajax().done(function() {
+              // TODO show 'stored' indicator in UI
+            });
+        },
+
+        onChangePublicAccessLevel = function() {
+          var value = publicAccessLevel.val();
+          jsRoutes.controllers.document.settings.SettingsController.setPublicAccessLevel(Config.documentId, value)
             .ajax().done(function() {
               // TODO show 'stored' indicator in UI
             });
@@ -216,6 +225,7 @@ require(['common/config'], function(Config) {
     // Public access panel
     publicVisibilityForm.change(onChangePublicVisiblity);
     publicAccessLink.focus(function() { jQuery(this).select(); } );
+    publicAccessLevel.change(onChangePublicAccessLevel);
 
     // Add collaborators panel
     initAutosuggest();

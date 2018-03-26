@@ -1,12 +1,13 @@
 package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
-import services.document.{DocumentAccessLevel, PublicAccess}
+import services.document.{DocumentInfo, DocumentAccessLevel, PublicAccess}
 import services.generated.tables.records.SharingPolicyRecord
 import services.user.Roles._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.mvc.Result
 import scala.concurrent.Future
 import scala.util.Try
 
@@ -28,36 +29,53 @@ object CollaboratorStub {
 }
 
 trait SharingActions { self: SettingsController =>
+  
+  def publicAccessAction(docId: String, username: String, fn: DocumentInfo => Future[Result]) =
+    documentAdminAction(docId, username, { doc =>
+      // Make sure the document has an open license - otherwise public access options cannot be changed
+      val hasOpenLicense = doc.license.map(_.isOpen).getOrElse(false)
+      if (hasOpenLicense)
+        fn(doc)
+      else
+        // Note: changing the setting for a closed document is not possible through the UI
+        Future.successful(BadRequest)
+    })
     
   def setPublicVisibility(docId: String, v: String) = self.silhouette.SecuredAction.async { implicit request =>
     Try(PublicAccess.Visibility.withName(v)).toOption match {
       case Some(visibility) =>
-        documentAdminAction(docId, request.identity.username, { doc =>
-          // Make sure the document has an open license - otherwise visibility cannot be changed
-          val hasOpenLicense = doc.license.map(_.isOpen).getOrElse(false)
-          if (hasOpenLicense) {
-            val accessLevel = (doc.publicAccessLevel, visibility) match {
-              // Keep access level pre-set by the user, if any
-              case (Some(level), _) => Some(level)
-              
-              // No pre-set accesslevel and private visibility -> no access
-              case (None, PublicAccess.PRIVATE) => None
-              
-              // No pre-set accesslevel and public visibility -> read-only
-              case (None, _) => Some(PublicAccess.READ_ALL)
-            }
+        publicAccessAction(docId, request.identity.username, { doc =>
+          val accessLevel = (doc.publicAccessLevel, visibility) match {
+            // Keep access level pre-set by the user, if any
+            case (Some(level), _) => Some(level)
             
-            documents.setPublicVisibility(docId, visibility, accessLevel).map(_ => Ok)
-          } else {
-            // Note: changing the setting for a closed document is not possible through the UI
-            Future.successful(BadRequest)
+            // No pre-set accesslevel and private visibility -> no access
+            case (None, PublicAccess.PRIVATE) => None
+            
+            // No pre-set accesslevel and public visibility -> read-only
+            case (None, _) => Some(PublicAccess.READ_ALL)
           }
+          
+          documents.setPublicAccessOptions(docId, visibility, accessLevel).map(_ => Ok)
         })
         
       case None =>
         // Submitting an invalid value is not possible through the UI
         Future.successful(BadRequest)
     }
+  }
+  
+  def setPublicAccessLevel(docId: String, l: String) = self.silhouette.SecuredAction.async { implicit request =>
+    Try(PublicAccess.AccessLevel.withName(l)).toOption.flatten match {
+      case Some(accessLevel) =>
+        publicAccessAction(docId, request.identity.username, { doc =>
+          documents.setPublicAccessLevel(docId, Some(accessLevel)).map(_ => Ok)          
+        })
+        
+      case None =>
+        // Submitting an invalid value is not possible through the UI
+        Future.successful(BadRequest)
+    }  
   }
   
   def addCollaborator(documentId: String) = self.silhouette.SecuredAction.async { implicit request =>

@@ -55,8 +55,8 @@
       <div class="inner access-level@if(disabled){ disabled}">
         <strong>Access:</strong> anyone
         <select@if(disabled){ disabled="true"}>
-          <option>can view</option>
-          <!-- option>can edit</option -->
+          <option value="READ_ALL">can view</option>
+          <!-- option value="WRITE"@if(doc.publicAccessLevel == Some(services.document.PublicAccess.WRITE)) { selected="true"}>can edit</option -->
         </select>
         this document.
         <!-- span class="note">(Editing requires a Recogito account.)</span -->
@@ -102,6 +102,7 @@
   @helper.javascriptRouter("jsRoutes")(
     controllers.my.routes.javascript.MyRecogitoController.index,
     controllers.document.settings.routes.javascript.SettingsController.setPublicVisibility,
+    controllers.document.settings.routes.javascript.SettingsController.setPublicAccessLevel,
     controllers.document.settings.routes.javascript.SettingsController.searchUsers,
     controllers.document.settings.routes.javascript.SettingsController.addCollaborator,
     controllers.document.settings.routes.javascript.SettingsController.removeCollaborator

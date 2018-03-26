@@ -134,11 +134,18 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     }
   }
     
-  /** Changes the public visibility flag for the given document **/
-  def setPublicVisibility(docId: String, visibility: PublicAccess.Visibility, accessLevel: Option[PublicAccess.AccessLevel] = None) =
+  /** Changes the public visibility and access level setting in one go **/
+  def setPublicAccessOptions(docId: String, visibility: PublicAccess.Visibility, accessLevel: Option[PublicAccess.AccessLevel] = None) =
     db.withTransaction { sql =>
       sql.update(DOCUMENT)
          .set(DOCUMENT.PUBLIC_VISIBILITY, visibility.toString)
+         .set(DOCUMENT.PUBLIC_ACCESS_LEVEL, optString(accessLevel.map(_.toString)))
+         .where(DOCUMENT.ID.equal(docId)).execute()
+    }
+  
+  def setPublicAccessLevel(docId: String, accessLevel: Option[PublicAccess.AccessLevel]) =
+    db.query { sql =>
+      sql.update(DOCUMENT)
          .set(DOCUMENT.PUBLIC_ACCESS_LEVEL, optString(accessLevel.map(_.toString)))
          .where(DOCUMENT.ID.equal(docId)).execute()
     }

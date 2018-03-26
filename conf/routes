@@ -84,6 +84,7 @@ GET     /document/:id/settings                       controllers.document.settin
 POST    /document/:id/settings/metadata              controllers.document.settings.SettingsController.updateDocumentMetadata(id: String)
 POST    /document/:id/settings/metadata/part/:ptId   controllers.document.settings.SettingsController.updateFilepartMetadata(id: String, ptId: java.util.UUID)
 PUT     /document/:id/settings/visibility            controllers.document.settings.SettingsController.setPublicVisibility(id: String, visibility: String)
+PUT     /document/:id/settings/accesslevel           controllers.document.settings.SettingsController.setPublicAccessLevel(id: String, accessLevel: String)
 PUT     /document/:id/settings/collaborator          controllers.document.settings.SettingsController.addCollaborator(id: String)
 DELETE  /document/:id/settings/collaborator/:user    controllers.document.settings.SettingsController.removeCollaborator(id: String, user: String)
 GET     /document/:id/settings/collaborator/search   controllers.document.settings.SettingsController.searchUsers(id: String, q: String)
