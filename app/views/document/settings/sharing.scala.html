@@ -15,6 +15,7 @@
             <input type="radio" name="public-access" id="pa-off" value="PRIVATE"@if(doc.publicVisibility == services.document.PublicAccess.PRIVATE) { checked="true"}/>
             <label for="pa-off">
               <strong>Off</strong>
+              <span class="save-notifier">Saved</span>
               @if(doc.license.isEmpty) {
                 <span class="license-warning"><span class="icon">&#xf071;</span>
                   Set an open license in the <a href="?tab=metadata">metadata settings</a> before enabling public access.
@@ -32,6 +33,7 @@
             <input type="radio" name="public-access" id="pa-public" value="PUBLIC"@if(disabled){ disabled="true"}@if(doc.publicVisibility == services.document.PublicAccess.PUBLIC) { checked="true"}/>
             <label for="pa-public">
               <strong>Anyone on the Web</strong>
+              <span class="save-notifier">Saved</span>
               <div class="sharing-details">
                 The document is listed on your profile page, and anyone on the Internet can find it.
               </div>
@@ -42,6 +44,7 @@
             <input type="radio" name="public-access" id="pa-with-link" value="WITH_LINK"@if(disabled){ disabled="true"}@if(doc.publicVisibility == services.document.PublicAccess.WITH_LINK) { checked="true"}/>
             <label for="pa-with-link">
               <strong>Anyone with the Link</strong>
+              <span class="save-notifier">Saved</span>
               <div class="sharing-details">
                 The document is accessible to anyone who has the link, but it is not listed
                 on your profile page. Link to share:

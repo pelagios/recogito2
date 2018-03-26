@@ -92,10 +92,14 @@ require(['common/config'], function(Config) {
         },
 
         onChangePublicVisiblity = function() {
-          var value = publicVisibilityForm.find('input:checked').val();
+          var radio = publicVisibilityForm.find('input:checked'),
+              notifier = radio.next().find('.save-notifier'),
+              value = radio.val();
+
           jsRoutes.controllers.document.settings.SettingsController.setPublicVisibility(Config.documentId, value)
             .ajax().done(function() {
-              // TODO show 'stored' indicator in UI
+              notifier.show();
+              setTimeout(function() { notifier.fadeOut(200); }, 1000);              
             });
         },
 
