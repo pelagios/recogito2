@@ -164,8 +164,6 @@ document.settings.metadata.drag_to_change=Anordung durch Verschieben ändern
 # Sharing
 document.settings.sharing.public_access=Öffentlicher Zugang
 document.settings.sharing.visible_to_all=Für alle sichtbar
-document.settings.sharing.public_instructions=Das Dokument ist für alle sichtbar. Besucher können \
-  Ihre Annotationen sehen, aber nicht bearbeiten. Link:
 
 document.settings.sharing.collaborators=BeiträgerInnen
 document.settings.sharing.collaborators.none=This document doesn''t have any collaborators yet. \

@@ -153,9 +153,6 @@ document.settings.metadata.drag_to_change=Glisser pour modifier l'ordre
 # Sharing
 document.settings.sharing.public_access=Accès public
 document.settings.sharing.visible_to_all=Visible par tous
-document.settings.sharing.public_instructions=Ce document sera public. Les visiteurs peuvent voir \
-  vos annotations, mais ne peuvent pas éditer. Les visiteurs peuvent également télécharger les \
-  données d'annotation à partir de la page de téléchargement. Lien pour partage:
 
 document.settings.sharing.collaborators=Collaborateur·rice·s
 document.settings.sharing.collaborators.none=Ce document n''a pas encore de collaborateur·rice·s. \

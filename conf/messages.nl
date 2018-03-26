@@ -163,9 +163,6 @@ document.settings.metadata.drag_to_change=Sleep om volgorde aan te passen
 # Sharing
 document.settings.sharing.public_access=Publieke toegang
 document.settings.sharing.visible_to_all=Zichtbaar voor allen
-document.settings.sharing.public_instructions=Dit document zal publiekelijk zichtbaar zijn. \
-  Bezoekers kunnen uw annotaties zien maar niet aanpassen. Bezoekers kunnen de annotatiedata \
-  ook downloaden. Link om te delen:
 
 document.settings.sharing.collaborators=Met medewerking van:
 document.settings.sharing.collaborators.none=This document doesn''t have any collaborators yet. \

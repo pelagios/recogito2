@@ -165,10 +165,6 @@ document.settings.metadata.drag_to_change=Σύρατε για να αλλάξε�
 # Sharing
 document.settings.sharing.public_access=Δημόσια πρόσβαση
 document.settings.sharing.visible_to_all=Ορατό από όλους
-document.settings.sharing.public_instructions=Αυτό το έγγραφο θα είναι ορατό στο κοινό. Οι \
-  επισκέπτες μπορούν να δουν τις επισημειώσεις σας, αλλά όχι και να τις επεξεργαστούν. Οι \
-  επισκέπτες μπορούν, επίσης, να κατεβάσουν τα δεδομένα των επισημειώσεων από τη σελίδα της \
-  καταφόρτωσης. Σύνδεσμος για διαμοιρασμό:
 
 # Backup
 document.settings.backup.backup=Δημιουργία αντιγράφου ασφαλείας

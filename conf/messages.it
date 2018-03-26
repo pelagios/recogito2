@@ -166,9 +166,6 @@ document.settings.metadata.drag_to_change=Trascina per cambiare l'ordine
 # Sharing
 document.settings.sharing.public_access=Accesso pubblico
 document.settings.sharing.visible_to_all=Visibile a tutti
-document.settings.sharing.public_instructions=Questo documento sarà visibile a tutti. Gli utenti \
-  possono vedere le tue annotazioni ma non modificare il documento. Gli utenti possono anche \
-  scaricare le annotazioni come data attraverso le opzioni di download. Link per condividere:
 
 # Backup
 document.settings.backup.backup=Backup

@@ -53,13 +53,16 @@
       </div>
 
       <div class="inner access-level@if(disabled){ disabled}">
-        <strong>Access:</strong> anyone
+        Public access is currently read-only. Visitors can see your document and annotations,
+        but not edit. They can also download the annotation data from the download page.
+
+        <!-- strong>Access:</strong> anyone
         <select@if(disabled){ disabled="true"}>
           <option value="READ_ALL">can view</option>
-          <!-- option value="WRITE"@if(doc.publicAccessLevel == Some(services.document.PublicAccess.WRITE)) { selected="true"}>can edit</option -->
+          <option value="WRITE"@if(doc.publicAccessLevel == Some(services.document.PublicAccess.WRITE)) { selected="true"}>can edit</option>
         </select>
         this document.
-        <!-- span class="note">(Editing requires a Recogito account.)</span -->
+        <span class="note">(Editing requires a Recogito account.)</span -->
       </div>
     }
   </div>
