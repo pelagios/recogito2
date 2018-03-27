@@ -91,67 +91,71 @@
       <div class="panel">
         <h2>Annotated Document</h2>
         <div class="inner">
-          @if(doc.hasTextParts) {
-            <ul>
-              <li>
-                <div class="description">
-                  <h3>TEI</h3>
-                  <p>@messages("document.downloads.annotations.tei.text")</p>
-                </div>
-                <div class="button-container">
-                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadTEI(doc.id)" class="btn small"><span class="icon">&#xf019;</span> TEI/XML</a>
-                </div>
-              </li>
-            </ul>
-          } else { @if(doc.hasDataParts) {
-            <ul>
-              @if(doc.dataParts.size == 1) {
+          @if(accessLevel.canReadAll) {
+            @if(doc.hasTextParts) {
+              <ul>
                 <li>
                   <div class="description">
-                    <h3>Merged CSV</h3>
-                    <p>
-                      Your original spreadsheet, with Recogito's additional data appended as extra columns.
-                    </p>
+                    <h3>TEI</h3>
+                    <p>@messages("document.downloads.annotations.tei.text")</p>
                   </div>
                   <div class="button-container">
-                    <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
+                    <a href="@controllers.document.downloads.routes.DownloadsController.downloadTEI(doc.id)" class="btn small"><span class="icon">&#xf019;</span> TEI/XML</a>
                   </div>
                 </li>
-              } else {
-                <li>
-                  <div class="description">
-                    <h3>Merged CSVs</h3>
-                    <p>
-                      Your original spreadsheets, with Recogito's additional data appended as extra columns, packaged in a Zip file.
-                    </p>
-                  </div>
-                  <div class="button-container">
-                    <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> ZIP</a>
-                  </div>
-                </li>
-              }
+              </ul>
+            } else { @if(doc.hasDataParts) {
+              <ul>
+                @if(doc.dataParts.size == 1) {
+                  <li>
+                    <div class="description">
+                      <h3>Merged CSV</h3>
+                      <p>
+                        Your original spreadsheet, with Recogito's additional data appended as extra columns.
+                      </p>
+                    </div>
+                    <div class="button-container">
+                      <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
+                    </div>
+                  </li>
+                } else {
+                  <li>
+                    <div class="description">
+                      <h3>Merged CSVs</h3>
+                      <p>
+                        Your original spreadsheets, with Recogito's additional data appended as extra columns, packaged in a Zip file.
+                      </p>
+                    </div>
+                    <div class="button-container">
+                      <a href="@controllers.document.downloads.routes.DownloadsController.downloadCSV(doc.id, true)" class="btn small"><span class="icon">&#xf019;</span> ZIP</a>
+                    </div>
+                  </li>
+                }
 
-              <li class="two-buttons gazetteer">
-                <div class="description">
-                  <h3>Pelagios Gazetteer GeoJSON</h3>
-                  <p>
-                    Converts your original spreadsheet and annotations to GeoJSON, following
-                    the Pelagios conventions on encoding gazetteers. <u>A field mapping
-                    must be configured before running the conversion.</u>
-                  </p>
-                </div>
-                <div class="button-container">
-                  <a href="#" class="btn orange small settings"><span class="icon">&#xf06a;</span> Settings</a>
-                  <form action="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id, true)" method="POST">
-                    <input type="hidden" id="json" name="json" />
-                    <button type="submit" class="btn small download" disabled="true"><span class="icon">&#xf019;</span> GeoJSON</button>
-                  </form>
-                </div>
-              </li>
-            </ul>
+                <li class="two-buttons gazetteer">
+                  <div class="description">
+                    <h3>Pelagios Gazetteer GeoJSON</h3>
+                    <p>
+                      Converts your original spreadsheet and annotations to GeoJSON, following
+                      the Pelagios conventions on encoding gazetteers. <u>A field mapping
+                      must be configured before running the conversion.</u>
+                    </p>
+                  </div>
+                  <div class="button-container">
+                    <a href="#" class="btn orange small settings"><span class="icon">&#xf06a;</span> Settings</a>
+                    <form action="@controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id, true)" method="POST">
+                      <input type="hidden" id="json" name="json" />
+                      <button type="submit" class="btn small download" disabled="true"><span class="icon">&#xf019;</span> GeoJSON</button>
+                    </form>
+                  </div>
+                </li>
+              </ul>
+            } else {
+              <p class="no-options">No download options available</p>
+            }}
           } else {
-            <p class="no-options">No download options available</p>
-          }}
+            <p class="no-options">Some download options may be unavailable due to access restrictions.</p>
+          }
         </div>
       </div>
 

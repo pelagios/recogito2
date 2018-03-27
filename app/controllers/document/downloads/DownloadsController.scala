@@ -9,7 +9,7 @@ import controllers.document.downloads.serializers._
 import javax.inject.{Inject, Singleton}
 import services.ContentType
 import services.annotation.AnnotationService
-import services.document.{DocumentInfo, DocumentService}
+import services.document.{DocumentInfo, DocumentService, RuntimeAccessLevel}
 import services.entity.builtin.EntityService
 import services.user.UserService
 import org.apache.jena.riot.RDFFormat
@@ -79,11 +79,17 @@ class DownloadsController @Inject() (
     with tei.TEISerializer 
     with I18nSupport {
   
-  private def download(documentId: String, export: DocumentInfo => Future[Result])(implicit request: UserAwareRequest[Security.Env, AnyContent]) = {
-    documentReadResponse(documentId, request.identity, { case (docInfo, _) => // Used just for the access permission check
-      export(docInfo)
+  private def download(
+      documentId: String, 
+      requiredAccessLevel: RuntimeAccessLevel, 
+      export: DocumentInfo => Future[Result]
+  )(implicit request: UserAwareRequest[Security.Env, AnyContent]) = 
+    documentReadResponse(documentId, request.identity, { case (docInfo, userAccessLevel) =>
+      if (userAccessLevel >= requiredAccessLevel)
+        export(docInfo)
+      else
+        Future.successful(Forbidden)
     })
-  }
 
   def showDownloadOptions(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     documentReadResponse(documentId, request.identity, { case (doc, accesslevel) =>
@@ -95,20 +101,28 @@ class DownloadsController @Inject() (
 
   /** Exports either 'plain' annotation CSV, or merges annotations with original DATA_* uploads, if any **/
   def downloadCSV(documentId: String, exportTables: Boolean) = silhouette.UserAwareAction.async { implicit request =>
-    download(documentId, { doc =>
+    documentReadResponse(documentId, request.identity, { case (docInfo, userAccessLevel) =>
       if (exportTables)
-        exportMergedTables(doc).map { case (file, filename) =>
-          Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + filename })
-        }
+        // Merged table export requires READ_ALL privileges
+        if (userAccessLevel.canReadAll)
+          exportMergedTables(docInfo).map { case (file, filename) =>
+            Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + filename })
+          }
+        else
+          Future.successful(Forbidden)
       else
-        annotationsToCSV(documentId).map { csv =>
-          Ok.sendFile(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
-        }
+        // Normal table export only requires READ_DATA privileges
+        if (userAccessLevel.canReadData)
+          annotationsToCSV(documentId).map { csv =>
+            Ok.sendFile(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
+          }
+        else
+          Future.successful(Forbidden)    
     })
   }
   
   private def downloadRDF(documentId: String, format: RDFFormat, extension: String) = silhouette.UserAwareAction.async { implicit request =>
-    download(documentId, { doc =>
+    download(documentId, RuntimeAccessLevel.READ_DATA, { doc =>
       documentToRDF(doc, format).map { file => 
         Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + "." + extension })
       }
@@ -119,7 +133,7 @@ class DownloadsController @Inject() (
   def downloadRDFXML(documentId: String) = downloadRDF(documentId, RDFFormat.RDFXML, "rdf.xml") 
   
   def downloadJSONLD(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
-    download(documentId, { doc =>
+    download(documentId, RuntimeAccessLevel.READ_DATA, { doc =>
       documentToWebAnnotation(doc).map { json =>
         Ok(Json.prettyPrint(json))
           .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".jsonld" })
@@ -156,17 +170,24 @@ class DownloadsController @Inject() (
         Future.successful(BadRequest)
     }
 
-    
-    download(documentId, { doc =>
-      if (asGazetteer)
-        downloadGazetteer(doc)
-      else
-        downloadPlaces
-    })
+     documentReadResponse(documentId, request.identity, { case (docInfo, userAccessLevel) =>
+       if (asGazetteer)
+         // Download as gazetteer requires READ_ALL privileges
+         if (userAccessLevel.canReadAll)
+           downloadGazetteer(docInfo)
+         else
+           Future.successful(Forbidden)
+       else
+         // GeoJSON download only requires READ_DATA privileges
+         if (userAccessLevel.canReadData)
+           downloadPlaces
+         else
+           Future.successful(Forbidden)
+     })     
   }
   
   def downloadTEI(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
-    download(documentId, { doc =>
+    download(documentId, RuntimeAccessLevel.READ_ALL, { doc =>
       val contentTypes = doc.fileparts.flatMap(pt => ContentType.withName(pt.getContentType)).distinct
       
       // At the moment, we only support TEI download for documents that are either plaintext- or TEI-only

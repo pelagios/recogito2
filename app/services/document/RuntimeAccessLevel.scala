@@ -26,6 +26,22 @@ sealed trait RuntimeAccessLevel {
   // Has admin privileges
   val isAdmin: Boolean
   
+  def >=(other: RuntimeAccessLevel) = {
+    
+    import RuntimeAccessLevel._
+    
+    def asNumber(lvl: RuntimeAccessLevel) = lvl match {
+      case FORBIDDEN => 0
+      case READ_DATA => 1
+      case READ_ALL  => 2
+      case WRITE     => 3
+      case ADMIN     => 4
+      case OWNER     => 5
+    }
+      
+    asNumber(this) >= asNumber(other)
+  }
+  
 }
 
 object RuntimeAccessLevel {
