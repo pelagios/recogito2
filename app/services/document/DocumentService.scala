@@ -83,11 +83,13 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     def getPublicAccessLevel(): RuntimeAccessLevel = PublicAccess.AccessLevel.withName(document.getPublicAccessLevel) match {
       case Some(PublicAccess.READ_DATA) => RuntimeAccessLevel.READ_DATA
       case Some(PublicAccess.READ_ALL) => RuntimeAccessLevel.READ_ALL
-      
-      // TODO temporary - will be extended later
-      case Some(PublicAccess.WRITE) => RuntimeAccessLevel.READ_ALL
-      
-      // This should never happen
+      case Some(PublicAccess.WRITE) =>
+        forUser match {
+          case Some(_) => // Write access to any logged-in user
+            RuntimeAccessLevel.WRITE
+          case None => // READ_ALL access to anonymous visitors
+            RuntimeAccessLevel.READ_ALL
+        }
       case None =>
         Logger.warn(s"Document ${document.getId} visible to public, but no access level set")
         RuntimeAccessLevel.FORBIDDEN      
@@ -104,7 +106,6 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
           case Some(policy) => RuntimeAccessLevel.fromSharingLevel(policy)
           
           // No sharing policy, but document might still be public
-          // TODO take into account public sharing level - could be READ_DATA
           case None => 
             if (isVisibleToPublic) getPublicAccessLevel()
             else RuntimeAccessLevel.FORBIDDEN
@@ -112,7 +113,6 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
 
       // Anonymous access - the user is not logged in
       case None =>
-        // TODO take into account public sharing level - could be READ_DATA
         if (isVisibleToPublic) getPublicAccessLevel() 
         else RuntimeAccessLevel.FORBIDDEN
     }
