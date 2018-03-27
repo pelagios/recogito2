@@ -94,20 +94,35 @@ require(['common/config'], function(Config) {
         onChangePublicVisiblity = function() {
           var radio = publicVisibilityForm.find('input:checked'),
               notifier = radio.next().find('.save-notifier'),
+
+              accessSettings = jQuery('.access-level'),
+              select = accessSettings.find('select'),
+
               value = radio.val();
+
+          if (value === 'PRIVATE') {
+            accessSettings.addClass('disabled');
+            select.attr('disabled', true);
+          } else {
+            accessSettings.removeClass('disabled');
+            select.removeAttr('disabled');
+          }
 
           jsRoutes.controllers.document.settings.SettingsController.setPublicVisibility(Config.documentId, value)
             .ajax().done(function() {
               notifier.show();
-              setTimeout(function() { notifier.fadeOut(200); }, 1000);              
+              setTimeout(function() { notifier.fadeOut(200); }, 1000);
             });
         },
 
         onChangePublicAccessLevel = function() {
-          var value = publicAccessLevel.val();
+          var value = publicAccessLevel.val(),
+              notifier = jQuery('.access-level .save-notifier');
+
           jsRoutes.controllers.document.settings.SettingsController.setPublicAccessLevel(Config.documentId, value)
             .ajax().done(function() {
-              // TODO show 'stored' indicator in UI
+              notifier.show();
+              setTimeout(function() { notifier.fadeOut(200); }, 1000);
             });
         },
 

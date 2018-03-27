@@ -55,18 +55,31 @@
         </form>
       </div>
 
-      <div class="inner access-level@if(disabled){ disabled}">
-        Public access is currently read-only. Visitors can see your document and annotations,
-        but not edit. They can also download the annotation data from the download page.
+      @defining(disabled || doc.publicVisibility == services.document.PublicAccess.PRIVATE) { noaccess =>
+        <div class="inner access-level@if(noaccess){ disabled}">
+          <strong>Access:</strong> anyone can
+          <select@if(noaccess){ disabled="true"}>
+            <option value="READ_ALL">
+              view the document.
+            </option>
 
-        <!-- strong>Access:</strong> anyone
-        <select@if(disabled){ disabled="true"}>
-          <option value="READ_ALL">can view</option>
-          <option value="WRITE"@if(doc.publicAccessLevel == Some(services.document.PublicAccess.WRITE)) { selected="true"}>can edit</option>
-        </select>
-        this document.
-        <span class="note">(Editing requires a Recogito account.)</span -->
-      </div>
+            <option value="READ_DATA"@if(doc.publicAccessLevel == Some(services.document.PublicAccess.READ_DATA)) { selected="true"}>
+              see map and downloads, but not the document.
+            </option>
+
+            <option value="WRITE"@if(doc.publicAccessLevel == Some(services.document.PublicAccess.WRITE)) { selected="true"}>
+              annotate the document.
+            </option>
+          </select>
+          <span class="save-notifier">Saved</span>
+
+          <div class="note">
+            Editing requires a Recogito account. Visitors who are not logged in can view the document
+            (if enabled), and download annotation data from the download page. But they can not add
+            annotations, even when public editing is enabled.
+          </div>
+        </div>
+      }
     }
   </div>
 
