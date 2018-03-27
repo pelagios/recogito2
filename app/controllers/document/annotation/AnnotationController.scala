@@ -79,7 +79,7 @@ class AnnotationController @Inject() (
   def showAnnotationView(documentId: String, seqNo: Int) = silhouette.UserAwareAction.async { implicit request =>
     val loggedIn = request.identity
     documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
-      if (accesslevel.canReadAll)
+      if (accesslevel.canReadData)
         renderResponse(doc, currentPart, loggedIn, accesslevel)
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
         Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))
@@ -96,22 +96,30 @@ class AnnotationController @Inject() (
   )(implicit request: RequestHeader) = {
 
     logDocumentView(doc.document, Some(currentPart), accesslevel)
-
+    
     // Needed in any case - start now (val)
     val fCountAnnotations = annotations.countByDocId(doc.id)
 
     // Needed only for Text and TEI - start on demand (def)
     def fReadTextfile() = uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile)
+    
+    // Generic conditional: is the user authorized to see the content? Render 'forbidden' page if not.
+    def ifAuthorized(result: Result, annotationCount: Long) =
+      if (accesslevel.canReadAll) result else Ok(views.html.document.annotation.forbidden(doc, currentPart, loggedInUser, annotationCount))
 
     ContentType.withName(currentPart.getContentType) match {
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
-        fCountAnnotations.map(c => Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c)))
+        fCountAnnotations.map { c => 
+          ifAuthorized(Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c)), c)
+        }
 
       case Some(ContentType.TEXT_PLAIN) =>
         fReadTextfile() flatMap {
           case Some(content) =>
-            fCountAnnotations.map(c => Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, c, content)))
+            fCountAnnotations.map { c => 
+              ifAuthorized(Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, c, content)), c)
+            }
 
           case None =>
             // Filepart found in DB, but not file on filesystem
@@ -124,7 +132,7 @@ class AnnotationController @Inject() (
           case Some(content) =>
             fCountAnnotations.map { c =>
               val preview = previewFromTEI(content)
-              Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c))
+              ifAuthorized(Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c)), c)
             }
 
           case None =>
@@ -134,7 +142,9 @@ class AnnotationController @Inject() (
         }
 
       case Some(ContentType.DATA_CSV) =>
-        fCountAnnotations.map(c => Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, c)))
+        fCountAnnotations.map { c =>
+          ifAuthorized(Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, c)), c)
+        }
 
       case _ =>
         // Unknown content type in DB, or content type we don't have an annotation view for - should never happen

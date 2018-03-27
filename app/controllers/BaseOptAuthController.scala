@@ -42,7 +42,7 @@ abstract class BaseOptAuthController(
     )(implicit ctx: ExecutionContext, request: Request[AnyContent])  = {
     
     documentResponse(documentId, maybeUser, { case (doc, accesslevel) =>
-      if (accesslevel.canReadAll)
+      if (accesslevel.canReadData)
         response(doc, accesslevel)
       else if (maybeUser.isEmpty) // No read rights - but user is not logged in yet 
         Future.successful(

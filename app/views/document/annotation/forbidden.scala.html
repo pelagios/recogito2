@@ -1,0 +1,66 @@
+@(
+  doc: services.document.DocumentInfo,
+  currentPart: services.generated.tables.records.DocumentFilepartRecord,
+  currentUser: Option[services.user.User],
+  annotationCount: Long
+)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/forbidden.css")"/>
+  </head>
+  <body>
+    @views.html.document.iconbar(doc.document, currentUser, services.document.RuntimeAccessLevel.READ_DATA, "edit")
+    <div class="header-infobox">
+      <h1>
+        @doc.author.map(_ + ": ")@doc.title
+      </h1>
+      <h2 class="date">@doc.dateFreeform</h2>
+      <p class="source">@views.html.document.sourceLink(doc.source)</p>
+      <p class="quick-stats">
+        <span class="icon comment">&#xf0e5;</span>
+        <span class="annotations">@annotationCount</span> @messages("common.annotations")
+        &nbsp; &centerdot; &nbsp;
+        <span class="icon">&#xf0c0;</span>
+        <span class="contributors">No Other Contributors</span>
+        @if(doc.license.isDefined) {
+          &nbsp; &centerdot; &nbsp;
+          @views.html.document.licenseInfo(doc.license.get, doc.attribution)
+        }
+      </p>
+    </div> <!-- .header-infobox -->
+
+    <div class="sidebar">
+      @views.html.sidebarHeader(doc.owner)
+
+      <ul class="menu">
+        @for(part <- doc.fileparts) {
+          @if(part == currentPart) {
+            <li class="active">
+              <a href="#" onclick="return false;"><span class="label">@part.getTitle</span></a>
+            </li>
+          } else {
+            <li>
+              <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, part.getSequenceNo)">
+                <span class="label">@part.getTitle</span>
+              </a>
+            </li>
+          }
+        }
+      </ul>
+    </div> <!-- .sidebar -->
+
+    <div id="main">
+      <div id="content" class="forbidden">
+        <p class="empty">
+          The owner of this document has blocked access to the content. You can access the
+          <a href="@controllers.document.map.routes.MapController.showMap(doc.id)">map</a>,
+          <a href="@controllers.document.stats.routes.StatsController.showDocumentStats(doc.id, None)">annotation stats</a> and
+          <a href="@controllers.document.downloads.routes.DownloadsController.showDownloadOptions(doc.id)">downloads</a> pages.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
