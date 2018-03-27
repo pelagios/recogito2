@@ -6,7 +6,7 @@ import controllers.document.settings.actions._
 import javax.inject.{Inject, Singleton}
 import services.annotation.AnnotationService
 import services.contribution.ContributionService
-import services.document.{DocumentService, DocumentInfo, DocumentAccessLevel}
+import services.document.{DocumentService, DocumentInfo, RuntimeAccessLevel}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.user.UserService
 import services.user.Roles._
@@ -98,7 +98,7 @@ class SettingsController @Inject() (
         case s: JsSuccess[T] =>
           documents.getDocumentRecord(documentId, Some(username)).flatMap(_ match {
             case Some((document, accesslevel))
-              if (accesslevel == DocumentAccessLevel.OWNER || accesslevel == DocumentAccessLevel.ADMIN) =>
+              if (accesslevel == RuntimeAccessLevel.OWNER || accesslevel == RuntimeAccessLevel.ADMIN) =>
                 action(document, s.get)
 
             case Some(_) => Future.successful(ForbiddenPage)

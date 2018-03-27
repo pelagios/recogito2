@@ -6,7 +6,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import services.ContentType
 import services.annotation.AnnotationService
-import services.document.{DocumentAccessLevel, DocumentInfo, DocumentService}
+import services.document.{RuntimeAccessLevel, DocumentInfo, DocumentService}
 import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord, UserRecord}
 import services.user.{User, UserService}
 import services.visit.VisitService
@@ -79,7 +79,7 @@ class AnnotationController @Inject() (
   def showAnnotationView(documentId: String, seqNo: Int) = silhouette.UserAwareAction.async { implicit request =>
     val loggedIn = request.identity
     documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
-      if (accesslevel.canRead)
+      if (accesslevel.canReadAll)
         renderResponse(doc, currentPart, loggedIn, accesslevel)
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
         Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))
@@ -92,7 +92,7 @@ class AnnotationController @Inject() (
     doc: DocumentInfo,
     currentPart: DocumentFilepartRecord,
     loggedInUser: Option[User],
-    accesslevel: DocumentAccessLevel
+    accesslevel: RuntimeAccessLevel
   )(implicit request: RequestHeader) = {
 
     logDocumentView(doc.document, Some(currentPart), accesslevel)

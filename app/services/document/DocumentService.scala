@@ -72,7 +72,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     }
   }
   
-  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): DocumentAccessLevel = {
+  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): RuntimeAccessLevel = {
     
     // Shorthand
     val isVisibleToPublic = 
@@ -82,20 +82,22 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
     forUser match {      
       // Trivial case: the user is the owner of the document
       case Some(user) if (document.getOwner == user) =>
-        DocumentAccessLevel.OWNER
+        RuntimeAccessLevel.OWNER
       
       case Some(user) =>
-        sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => DocumentAccessLevel.withName(p.getAccessLevel)) match {
+        sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => SharingLevel.withName(p.getAccessLevel)) match {
           // There's a sharing policy for this user
-          case Some(policy) => policy
+          case Some(policy) => RuntimeAccessLevel.fromSharingLevel(policy)
           
           // No sharing policy, but document might still be public
-          case None => if (isVisibleToPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
+          // TODO take into account public sharing level - could be READ_DATA
+          case None => if (isVisibleToPublic) RuntimeAccessLevel.READ_ALL else RuntimeAccessLevel.FORBIDDEN
         }
 
       // Anonymous access - the user is not logged in
       case None =>
-        if (isVisibleToPublic) DocumentAccessLevel.READ else DocumentAccessLevel.FORBIDDEN
+        // TODO take into account public sharing level - could be READ_DATA
+        if (isVisibleToPublic) RuntimeAccessLevel.READ_ALL else RuntimeAccessLevel.FORBIDDEN
     }
   }
   

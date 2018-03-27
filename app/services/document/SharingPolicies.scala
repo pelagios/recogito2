@@ -11,7 +11,7 @@ import storage.db.DB
 trait SharingPolicies { self: DocumentService =>
   
   /** Upserts a document collaborator sharing policy (policies are unique by (document_id, shared_with) **/
-  def addDocumentCollaborator(documentId: String, sharedBy: String, sharedWith: String, accessLevel: DocumentAccessLevel) = db.query { sql =>
+  def addDocumentCollaborator(documentId: String, sharedBy: String, sharedWith: String, level: SharingLevel) = db.query { sql =>
     val (sharingPolicy, isNewCollaborator) = 
       Option(sql.selectFrom(SHARING_POLICY)
                 .where(SHARING_POLICY.DOCUMENT_ID.equal(documentId)
@@ -22,7 +22,7 @@ trait SharingPolicies { self: DocumentService =>
         // There's a policy for this document/user pair already - update
         policy.setSharedBy(sharedBy)
         policy.setSharedAt(new Timestamp(new Date().getTime))
-        policy.setAccessLevel(accessLevel.toString)
+        policy.setAccessLevel(level.toString)
         (policy, false)
       }
         
@@ -33,7 +33,7 @@ trait SharingPolicies { self: DocumentService =>
           sharedBy,
           sharedWith,
           new Timestamp(new Date().getTime),
-          accessLevel.toString)
+          level.toString)
    
         policy.changed(SHARING_POLICY.ID, false)     
         sql.attach(policy)

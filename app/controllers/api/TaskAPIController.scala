@@ -73,7 +73,7 @@ class TaskAPIController @Inject() (
   def progressByDocument(id: String) = silhouette.SecuredAction.async { implicit request =>    
     documents.getExtendedInfo(id, Some(request.identity.username)).flatMap(_ match {
       case Some((doc, accesslevel)) =>
-        if (accesslevel.canRead) {
+        if (accesslevel.canReadAll) {
           tasks.findByDocument(id).map {
             case Some(taskRecord) => jsonOk(Json.toJson(taskRecord))
             case None => NotFound

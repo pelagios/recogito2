@@ -1,7 +1,7 @@
 @(
   document: services.generated.tables.records.DocumentRecord,
   currentUser: Option[services.user.User],
-  accessLevel: services.document.DocumentAccessLevel,
+  accessLevel: services.document.RuntimeAccessLevel,
   activeView: String
  )(implicit request: RequestHeader, messages: Messages)
   <div class="header-iconbar">

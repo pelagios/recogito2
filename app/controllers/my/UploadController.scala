@@ -283,7 +283,7 @@ class UploadController @Inject() (
   def queryTaskProgress(username: String, docId: String) = silhouette.SecuredAction.async { implicit request =>
     documents.getDocumentRecord(docId, Some(request.identity.username)).flatMap(_ match {
       // Make sure only users with read access can see the progress
-      case Some((document, accesslevel)) if accesslevel.canRead => {
+      case Some((document, accesslevel)) if accesslevel.canReadAll => {
         taskService.findByDocument(docId).map(_ match {
           case Some(result) => jsonOk(Json.toJson(result))
           case None => NotFoundPage

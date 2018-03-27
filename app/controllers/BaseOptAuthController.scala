@@ -1,6 +1,6 @@
 package controllers
 
-import services.document.{DocumentAccessLevel, DocumentInfo, DocumentService}
+import services.document.{RuntimeAccessLevel, DocumentInfo, DocumentService}
 import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord}
 import services.user.{User, UserService}
 import play.api.Configuration
@@ -22,7 +22,7 @@ abstract class BaseOptAuthController(
   protected def documentResponse(
       documentId: String,
       maybeUser: Option[User],
-      response: (DocumentInfo, DocumentAccessLevel) => Future[Result]
+      response: (DocumentInfo, RuntimeAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext) = {
 
     documents.getExtendedInfo(documentId, maybeUser.map(_.username)).flatMap(_ match {
@@ -38,11 +38,11 @@ abstract class BaseOptAuthController(
   protected def documentReadResponse(
       documentId: String,
       maybeUser: Option[User],
-      response: (DocumentInfo, DocumentAccessLevel) => Future[Result]
+      response: (DocumentInfo, RuntimeAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext, request: Request[AnyContent])  = {
     
     documentResponse(documentId, maybeUser, { case (doc, accesslevel) =>
-      if (accesslevel.canRead)
+      if (accesslevel.canReadAll)
         response(doc, accesslevel)
       else if (maybeUser.isEmpty) // No read rights - but user is not logged in yet 
         Future.successful(
@@ -59,7 +59,7 @@ abstract class BaseOptAuthController(
       documentId: String,
       partNo: Int,
       maybeUser: Option[User],
-      response: (DocumentInfo, DocumentFilepartRecord, DocumentAccessLevel) => Future[Result]
+      response: (DocumentInfo, DocumentFilepartRecord, RuntimeAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext, request: Request[AnyContent]) = {
     
     documentReadResponse(documentId, maybeUser, { case (doc, accesslevel) =>

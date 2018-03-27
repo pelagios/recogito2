@@ -52,7 +52,7 @@ class PlaceAPIController @Inject() (
   /** List all places in document - bound to the current user's access level **/
   def listPlacesInDocument(docId: String, offset: Int, size: Int) = silhouette.UserAwareAction.async { implicit request =>
     documentResponse(docId, request.identity, { case (metadata, accesslevel) =>
-      if (accesslevel.canRead)
+      if (accesslevel.canReadData)
         entities.listEntitiesInDocument(docId, Some(EntityType.PLACE), offset, size).map { result =>
           jsonOk(Json.toJson(result.map(_._1.entity)))
         }
@@ -64,7 +64,7 @@ class PlaceAPIController @Inject() (
   /** Search places in document - bound to the current user's access level **/
   def searchPlacesInDocument(query: String, docId: String, offset: Int, size: Int) = silhouette.UserAwareAction.async { implicit request =>
     documentResponse(docId, request.identity, { case (metadata, accesslevel) =>
-      if (accesslevel.canRead)
+      if (accesslevel.canReadData)
         entities.searchEntitiesInDocument(query, docId, Some(EntityType.PLACE), offset, size).map { results =>
           jsonOk(Json.toJson(results.map(_.entity)))
         }

@@ -251,7 +251,7 @@ class AnnotationAPIController @Inject() (
           case Some((doc, accesslevel)) =>
             doc.fileparts.find(_.getId == partId) match {
               case Some(filepart) =>
-                if (accesslevel.canRead) ImageService.cutout(doc, filepart, annotation).map(file =>
+                if (accesslevel.canReadAll) ImageService.cutout(doc, filepart, annotation).map(file =>
                   Ok.sendFile(file))
                 else
                   Future.successful(Forbidden)
@@ -321,7 +321,7 @@ class AnnotationAPIController @Inject() (
         if (includeContext) {
           documents.getExtendedInfo(annotation.annotates.documentId, request.identity.map(_.username)).flatMap {
             case Some((doc, accesslevel)) =>
-              if (accesslevel.canRead)
+              if (accesslevel.canReadData)
                 getContext(doc, annotation).map(context =>
                   jsonOk(Json.toJson(annotation).as[JsObject] ++ Json.obj("context" -> context)))
               else

@@ -3,7 +3,7 @@ package controllers
 import eu.bitwalker.useragentutils.UserAgent
 import services.visit._
 import services.ContentType
-import services.document.DocumentAccessLevel
+import services.document.RuntimeAccessLevel
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime
 import play.api.mvc.{AnyContent, RequestHeader}
@@ -17,7 +17,7 @@ trait HasVisitLogging {
       doc: Option[DocumentRecord],
       part: Option[DocumentFilepartRecord],
       responseFormat: String,
-      accesslevel: Option[DocumentAccessLevel]
+      accesslevel: Option[RuntimeAccessLevel]
     )(implicit request: RequestHeader, visitService: VisitService): Future[Unit] = {
     
     val userAgentHeader = request.headers.get(HeaderNames.USER_AGENT)
@@ -55,7 +55,7 @@ trait HasVisitLogging {
     log(None, None, "text/html", None)
 
   def logDocumentView(
-      doc: DocumentRecord, part: Option[DocumentFilepartRecord], accesslevel: DocumentAccessLevel
+      doc: DocumentRecord, part: Option[DocumentFilepartRecord], accesslevel: RuntimeAccessLevel
     )(implicit request: RequestHeader, visitService: VisitService) = 
       log(Some(doc), part, "text/html", Some(accesslevel))
     

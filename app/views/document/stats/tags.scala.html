@@ -1,7 +1,7 @@
 @(
   doc: services.document.DocumentInfo,
   currentUser: Option[services.user.User],
-  accessLevel: services.document.DocumentAccessLevel,
+  accessLevel: services.document.RuntimeAccessLevel,
   p: Seq[plugins.PluginConf]
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
