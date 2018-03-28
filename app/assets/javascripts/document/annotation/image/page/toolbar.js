@@ -10,7 +10,6 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
     var self = this,
 
         tools = jQuery('.tools'),
-
         toolMenu = tools.find('.has-submenu'),
         toolMenuIcon = tools.find('.has-submenu > .icon'),
         toolMenuLabel = tools.find('.has-submenu > .label'),
@@ -18,9 +17,13 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
         currentTool = 'MOVE',
 
+        changeColor = jQuery('.change-color'),
+
         imagePane = jQuery('#image-pane'),
 
-        initToolDropdown = function() {
+        initDropdownMenus = function() {
+          var colorPickerContainer = changeColor.find('.colorpicker').hide();
+
           if (Config.writeAccess) {
               toolMenuDropdown.hide();
               toolMenu.hover(
@@ -30,6 +33,19 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             // Read-only mode
             toolMenu.addClass('disabled');
           }
+
+          changeColor.hover(
+            function() { colorPickerContainer.show(); },
+            function() { colorPickerContainer.hide(); });
+
+          changeColor.colorpicker({
+            color: 'rgba(50, 50, 50, 0.2)',
+            inline: true,
+            container: changeColor.find('.colorpicker li')
+          }).on('changeColor', function(e) {
+            var color = jQuery.extend({}, e.color.toRGB(), { hex: e.color.toHex() });
+            self.fireEvent('annotationColorChanged', color);
+          });
         },
 
         setTool = function(toolLabel, toolKey) {
@@ -108,7 +124,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           }
         };
 
-    initToolDropdown();
+    initDropdownMenus();
     attachClickHandlers();
 
     jQuery(window).keydown(onKeyDown);

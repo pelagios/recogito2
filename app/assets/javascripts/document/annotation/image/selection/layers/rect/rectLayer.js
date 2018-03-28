@@ -1,7 +1,6 @@
 define([
-  'document/annotation/image/selection/layers/layer',
-  'document/annotation/image/selection/layers/style'
-], function(Layer, Style) {
+  'document/annotation/image/selection/layers/layer'
+], function(Layer) {
 
   /** Constants **/
   var MIN_SELECTION_DISTANCE = 5;
@@ -28,10 +27,37 @@ define([
       };
 
   var RectLayer = function(olMap) {
+    Layer.apply(this, [ olMap ]);
 
     var self = this,
 
         rectVectorSource = new ol.source.Vector({}),
+
+        buildStyle = function() {
+          // Cf. http://stackoverflow.com/questions/28004153/setting-vector-feature-fill-opacity-when-you-have-a-hexadecimal-color
+          var color = ol.color.asArray(self.getColorHex()),
+              stroke = color.slice(),
+              fill = color.slice();
+
+          stroke[3] = self.getStrokeOpacity();
+          fill[3] = self.getFillOpacity();
+
+          return new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color: stroke,
+              width: 1
+            }),
+
+            fill: new ol.style.Fill({
+              color: fill
+            })
+          });
+        },
+
+        rectVectorLayer = new ol.layer.Vector({
+          source: rectVectorSource,
+          style: buildStyle()
+        }),
 
         computeSize = function(annotation) {
           var parsed = parseAnchor(annotation.anchor);
@@ -76,17 +102,8 @@ define([
           rectVectorSource.addFeature(feature);
         },
 
-        render = function() {
-          // Do nothing - the rectangle layer renders immediately in addAnnotation
-        },
-
-        refreshAnnotation = function(annotation) {
-          var existing = findById(annotation.annotation_id);
-          if (existing) {
-            // TODO doesn't happen yet
-          } else {
-            addAnnotation(annotation);
-          }
+        redraw = function() {
+          rectVectorLayer.setStyle(buildStyle());
         },
 
         removeAnnotation = function(annotation) {
@@ -100,25 +117,19 @@ define([
         },
 
         emphasiseAnnotation = function(annotation) {
-          // TODO style change?
+          // TODO for future use
         };
 
-    olMap.addLayer(new ol.layer.Vector({
-      source: rectVectorSource,
-      style: Style.BOX
-    }));
+    olMap.addLayer(rectVectorLayer);
 
     this.computeSize = computeSize;
     this.getAnnotationAt = getAnnotationAt;
     this.findById = findById;
     this.addAnnotation = addAnnotation;
-    this.render = render;
-    this.refreshAnnotation = refreshAnnotation;
+    this.redraw = redraw;
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.emphasiseAnnotation = emphasiseAnnotation;
-
-    Layer.apply(this, [ olMap ]);
   };
   RectLayer.prototype = Object.create(Layer.prototype);
 

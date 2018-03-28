@@ -1,9 +1,8 @@
 define([
   'document/annotation/image/selection/layers/geom2D',
   'document/annotation/image/selection/layers/layer',
-  'document/annotation/image/selection/layers/style',
   'document/annotation/image/selection/layers/tiltedbox/tiltedBox'
-], function(Geom2D, Layer, Style, TiltedBox) {
+], function(Geom2D, Layer, TiltedBox) {
 
       /** Shorthand **/
   var TWO_PI = 2 * Math.PI;
@@ -62,7 +61,7 @@ define([
           if (renderImmediately) layer.getSource().changed();
         },
 
-        render = function() {
+        redraw = function() {
           layer.getSource().changed();
         },
 
@@ -83,15 +82,16 @@ define([
               },
 
               drawBox = function() {
+                var col = self.getColorRGB();
                 // Fill
-                ctx.globalAlpha = Style.BOX_FILL_OPACITY;
+                ctx.globalAlpha = self.getFillOpacity();
                 ctx.beginPath();
                 traceRect();
                 ctx.fill();
                 ctx.closePath();
 
                 // Outline
-                ctx.globalAlpha = Style.BOX_STROKE_OPACITY;
+                ctx.globalAlpha = self.getStrokeOpacity();
                 ctx.beginPath();
                 traceRect();
                 ctx.stroke();
@@ -111,14 +111,14 @@ define([
         /** Drawing loop that renders all annotations to the drawing area **/
         redrawAll = function(extent, resolution, pixelRatio, size, projection) {
           var canvas = document.createElement('canvas'),
-              ctx = canvas.getContext('2d');
+              ctx = canvas.getContext('2d'),
+              color = self.getColorRGB();
 
           canvas.width = size[0];
           canvas.height = size[1];
 
-          // TODO optimize so that stuff outside the visible area isn't drawn
           jQuery.each(annotations, function(idx, annotation) {
-            drawOne(annotation, extent, pixelRatio / resolution, ctx, Style.COLOR_RED);
+            drawOne(annotation, extent, pixelRatio / resolution, ctx, color);
           });
 
           return canvas;
@@ -131,15 +131,11 @@ define([
           })
         }),
 
-        refreshAnnotation = function(annotation) {
-          // TODO style change depending on annotation properties
-        },
-
         removeAnnotation = function(annotation) {
           var idx = annotations.indexOf(annotation);
           if (idx >= 0) {
             annotations.splice(idx, 1);
-            render();
+            redraw();
           }
         },
 
@@ -148,7 +144,7 @@ define([
         },
 
         emphasiseAnnotation = function(annotation) {
-          // TODO style change?
+          // TODO for future use
         };
 
     olMap.addLayer(layer);
@@ -157,8 +153,7 @@ define([
     this.getAnnotationAt = getAnnotationAt;
     this.findById = findById;
     this.addAnnotation = addAnnotation;
-    this.render = render;
-    this.refreshAnnotation = refreshAnnotation;
+    this.redraw = redraw;
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.emphasiseAnnotation = emphasiseAnnotation;

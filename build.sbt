@@ -9,9 +9,10 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 scalacOptions ++= Seq("-feature")
 
 resolvers ++= Seq(
+  "Typesafe" at "http://repo.typesafe.com/typesafe/releases/",
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
   "Open Source Geospatial Foundation Repository" at "http://download.osgeo.org/webdav/geotools/",
-  "http://maven.geotoolkit.org/" at "http://maven.geotoolkit.org/",
+  "Geotoolkit" at "http://maven.geotoolkit.org/",
   "Atlassian Releases" at "https://maven.atlassian.com/public/"
 )
 
@@ -88,6 +89,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "slick" % "1.6.0",
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "velocity" % "1.1.0",
+  "org.webjars.npm" % "bootstrap-colorpicker" % "2.5.2" intransitive(),
   "org.webjars.bower" % "marked" % "0.3.6",
   "org.webjars.bower" % "js-grid" % "1.4.1",
   "org.webjars.bower" % "plotly.js" % "1.12.0",

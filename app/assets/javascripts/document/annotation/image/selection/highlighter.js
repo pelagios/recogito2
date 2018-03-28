@@ -9,9 +9,9 @@ define([
 
           /** The list of layer implementations **/
       var layers = {
-            point : new PointLayer(olMap),
+            tbox  : new TiltedBoxLayer(olMap),
             rect  : new RectLayer(olMap),
-            tbox  : new TiltedBoxLayer(olMap)
+            point : new PointLayer(olMap)
           },
 
           /** Returns the layer appropriate to the annotation **/
@@ -63,18 +63,18 @@ define([
           initPage = function(annotations) {
             jQuery.each(annotations, function(idx, a) {
               var layer = getLayer(a);
-              if (layer) layer.addAnnotation(a);
+              // Add annotations, but don't (necessarily) render them immediatly
+              if (layer) layer.addAnnotation(a, false);
             });
 
             jQuery.each(layers, function(key, layer) {
-              layer.render();
+              layer.redraw();
             });
           },
 
           /** @override **/
           refreshAnnotation = function(annotation) {
-            var layer = getLayer(annotation);
-            if (layer) layer.refreshAnnotation(annotation);
+            // TODO for future use (style change based on annotation properties)
           },
 
           /** @override **/
@@ -92,6 +92,11 @@ define([
           emphasiseAnnotation = function(annotation) {
             var layer = getLayer(annotation);
             if (layer) layer.emphasiseAnnotation(annotation);
+          },
+
+          setAnnotationColor = function(color) {
+            for (var key in layers)
+              layers[key].setColor(color);
           };
 
       this.getAnnotationAt = getAnnotationAt;
@@ -101,6 +106,7 @@ define([
       this.removeAnnotation = removeAnnotation;
       this.convertSelectionToAnnotation = convertSelectionToAnnotation;
       this.emphasiseAnnotation = emphasiseAnnotation;
+      this.setAnnotationColor = setAnnotationColor;
 
       AbstractHighlighter.apply(this);
     };

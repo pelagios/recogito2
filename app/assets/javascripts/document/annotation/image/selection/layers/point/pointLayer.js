@@ -1,7 +1,6 @@
 define([
-  'document/annotation/image/selection/layers/layer',
-  'document/annotation/image/selection/layers/style'
-], function(Layer, Style) {
+  'document/annotation/image/selection/layers/layer'
+], function(Layer) {
 
   var MIN_SELECTION_DISTANCE = 10,
 
@@ -10,10 +9,38 @@ define([
       };
 
   var PointLayer = function(olMap) {
+    Layer.apply(this, [ olMap ]);
 
     var self = this,
 
         pointVectorSource = new ol.source.Vector({}),
+
+        buildStyle = function() {
+          var col = self.getColorRGB(),
+
+              outerCircle = new ol.style.Style({
+                image: new ol.style.Circle({
+                  radius: 7.4,
+                  fill  : new ol.style.Fill({ color: '#fff' }),
+                  stroke: new ol.style.Stroke({ color: '#000', width: 1.1 })
+                })
+              }),
+
+              innerCircle = new ol.style.Style({
+                image: new ol.style.Circle({
+                  radius: 4.4,
+                  fill  : new ol.style.Fill({ color: self.getColorHex() }),
+                  stroke: new ol.style.Stroke({ color: 'rgba(0,0,0,0)', width: 1.1 })
+                })
+              });
+
+          return [ outerCircle, innerCircle ];
+        },
+
+        pointVectorLayer = new ol.layer.Vector({
+          source: pointVectorSource,
+          style: buildStyle()
+        }),
 
         getAnnotationAt = function(e) {
           var closestFeature = pointVectorSource.getClosestFeatureToCoordinate(e.coordinate),
@@ -40,7 +67,7 @@ define([
           }
         },
 
-        addAnnotation = function(annotation) {
+        addAnnotation = function(annotation, renderImmediately) {
           var anchor = annotation.anchor,
               x = parseInt(anchor.substring(anchor.indexOf(':') + 1, anchor.indexOf(','))),
               y = - parseInt(anchor.substring(anchor.indexOf(',') + 1)),
@@ -52,12 +79,8 @@ define([
           pointVectorSource.addFeature(pointFeature);
         },
 
-        render = function() {
-          // Do nothing - the point layer renders immediately in addAnnotation
-        },
-
-        refreshAnnotation = function(annotation) {
-          // TODO style change depending on annotation properties
+        redraw = function() {
+          pointVectorLayer.setStyle(buildStyle());
         },
 
         removeAnnotation = function(annotation) {
@@ -74,22 +97,16 @@ define([
           // TODO style change?
         };
 
-    olMap.addLayer(new ol.layer.Vector({
-      source: pointVectorSource,
-      style: Style.POINT
-    }));
+    olMap.addLayer(pointVectorLayer);
 
     this.getAnnotationAt = getAnnotationAt;
     this.findById = findById;
     this.addAnnotation = addAnnotation;
-    this.render = render;
-    this.refreshAnnotation = refreshAnnotation;
+    this.redraw = redraw;
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.emphasiseAnnotation = emphasiseAnnotation;
     this.computeSize = function() { return 0; }; // It's a point
-
-    Layer.apply(this, [ olMap ]);
   };
   PointLayer.prototype = Object.create(Layer.prototype);
 

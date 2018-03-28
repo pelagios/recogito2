@@ -2,6 +2,16 @@ define(['common/hasEvents'], function(HasEvents) {
 
   var Layer = function(olMap) {
     this.olMap = olMap;
+
+    // Default color
+    this.color = {
+      r: 50,
+      g: 50,
+      b: 50,
+      a: 0.2,
+      hex: '#323232'
+    };
+
     HasEvents.apply(this);
   };
   Layer.prototype = Object.create(HasEvents.prototype);
@@ -37,6 +47,31 @@ define(['common/hasEvents'], function(HasEvents) {
     });
 
     return feature;
+  };
+
+  Layer.prototype.setColor = function(color) {
+    this.color = color;
+    this.redraw();
+  };
+
+  Layer.prototype.getColorRGB = function() {
+    return 'rgb(' + this.color.r + ',' + this.color.g + ',' + this.color.b + ')';
+  };
+
+  Layer.prototype.getColorRGBA = function() {
+    return 'rgba(' + this.color.r + ',' + this.color.g + ',' + this.color.b + ',' + this.color.a + ')';
+  };
+
+  Layer.prototype.getColorHex = function() {
+    return this.color.hex;
+  };
+
+  Layer.prototype.getStrokeOpacity = function() {
+    return Math.min(1, this.color.a + 0.3);
+  };
+
+  Layer.prototype.getFillOpacity = function() {
+    return this.color.a;
   };
 
   return Layer;

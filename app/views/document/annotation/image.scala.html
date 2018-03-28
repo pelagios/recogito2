@@ -14,12 +14,14 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image/index.css")"/>
     @Html(webJarsUtil.css("ol.css"))
     @Html(webJarsUtil.css("leaflet.css"))
+    @Html(webJarsUtil.css("bootstrap-colorpicker.min.css"))
     @Html(webJarsUtil.script("leaflet.js"))
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     @Html(webJarsUtil.script("jquery-ui.min.js"))
     @Html(webJarsUtil.script("velocity.min.js"))
     @Html(webJarsUtil.script("jquery.timeago.js"))
     @Html(webJarsUtil.script("jquery.lazyload.min.js"))
+    @Html(webJarsUtil.script("bootstrap-colorpicker.min.js"))
     @Html(webJarsUtil.script("typeahead.jquery.min.js"))
     @Html(webJarsUtil.script("ol.js"))
     @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/image/app.js")))
@@ -84,12 +86,22 @@
           </ul>
         </li> <!-- TOOLS group -->
 
-        <li class="group has-submenu disabled">
+        <li class="group image has-submenu disabled">
           <h3><span class="label">IMAGE</span></h3>
         </li>
 
         <li class="group has-submenu disabled">
           <h3><span class="label">LAYERS</span></h3>
+        </li>
+
+        <li class="group change-color">
+          <h3>
+            <span class="icon">&#xf1fb;</span>
+            <span class="label">OVERLAY COLOR</span>
+          </h3>
+          <div class="submenu colorpicker">
+            <ul><li></liu></ul>
+          </div>
         </li>
 
         <li class="group help">
