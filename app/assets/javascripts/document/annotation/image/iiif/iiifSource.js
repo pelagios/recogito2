@@ -47,11 +47,7 @@ define([], function() {
 
         tileSize = options.tileSize || 256,
 
-        ceil_log2 = function(x) {
-          return Math.ceil(Math.log(x) / Math.LN2);
-        },
-
-        maxZoom = Math.max(ceil_log2(width / tileSize), ceil_log2(height / tileSize)),
+        maxZoom = Math.floor(Math.log(tileSize, 2)),
 
         tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4),
 
@@ -91,7 +87,7 @@ define([], function() {
       crossOrigin: options.crossOrigin,
 
       tileUrlFunction: function(tileCoord, pixelRatio) {
-        var z = tileCoord[0],
+        var z = tileCoord[0] + 1,
             x = tileCoord[1],
             y = -tileCoord[2] - 1,
             sizes = tierSizes[z],

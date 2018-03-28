@@ -78,7 +78,10 @@ define([
         }),
 
         zoomToExtent = function() {
-          olMap.getView().fit(projection.getExtent(), { nearest: true });
+          olMap.getView().fit(projection.getExtent(), {
+            nearest: true,
+            constrainResolution: false
+          });
         },
 
         changeZoom = function(increment) {
