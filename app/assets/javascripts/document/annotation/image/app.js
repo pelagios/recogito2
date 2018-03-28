@@ -87,8 +87,8 @@ require([
             }
           },
 
-          onAnnotationColorChanged = function(rgba) {
-            highlighter.setAnnotationColor(rgba);
+          onOverlayColorChanged = function(color) {
+            highlighter.setOverlayColor(color);
           },
 
           onToggleHelp = function() {
@@ -114,7 +114,7 @@ require([
 
       toolbar.on('toolChanged', onToolChanged);
       toolbar.on('toggleHelp', onToggleHelp);
-      toolbar.on('annotationColorChanged', onAnnotationColorChanged);
+      toolbar.on('overlayColorChanged', onOverlayColorChanged);
 
       BaseApp.apply(this, [ annotations, highlighter, selector ]);
 

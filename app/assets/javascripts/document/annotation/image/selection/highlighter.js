@@ -94,7 +94,7 @@ define([
             if (layer) layer.emphasiseAnnotation(annotation);
           },
 
-          setAnnotationColor = function(color) {
+          setOverlayColor = function(color) {
             for (var key in layers)
               layers[key].setColor(color);
           };
@@ -106,7 +106,7 @@ define([
       this.removeAnnotation = removeAnnotation;
       this.convertSelectionToAnnotation = convertSelectionToAnnotation;
       this.emphasiseAnnotation = emphasiseAnnotation;
-      this.setAnnotationColor = setAnnotationColor;
+      this.setOverlayColor = setOverlayColor;
 
       AbstractHighlighter.apply(this);
     };

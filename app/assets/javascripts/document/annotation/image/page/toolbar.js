@@ -44,7 +44,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             container: changeColor.find('.colorpicker li')
           }).on('changeColor', function(e) {
             var color = jQuery.extend({}, e.color.toRGB(), { hex: e.color.toHex() });
-            self.fireEvent('annotationColorChanged', color);
+            self.fireEvent('overlayColorChanged', color);
           });
         },
 
