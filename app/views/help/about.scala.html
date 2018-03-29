@@ -1,4 +1,4 @@
-@(imprint: Option[String])(implicit request: RequestHeader)
+@(imprint: Option[String], adminEmail: String)(implicit request: RequestHeader)
 @_layout("About | Recogito", "About Recogito", "help.css") {
   <h1>About Recogito</h1>
 } {
@@ -66,7 +66,7 @@
         Regulation 2018 (GDPR)</strong> you are furthermore entitled to demand that we correct or
         delete personal data about you, or otherwise limit or revoke your permission to us to process
         it. If you want to exercise those rights, or have any questions about them, please contact
-        <a href="mailto:commons@@pelagios.org">commons@@pelagios.org</a>.
+        <a href="mailto:commons@@pelagios.org">@adminEmail</a>.
       </p>
 
       <p>
@@ -97,6 +97,10 @@
 
         <li><a href="https://github.com/TEIC/CETEIcean" target="_blank">CETEIcean</a>
           </li>
+
+        <li>Our implementation of the IIIF image API is derived from the code of the
+          <a href="http://klokantech.github.io/iiifviewer/" target="_blank">IIIF Viewer</a> by
+          <a href="https://www.klokantech.com/" target="_blank">Klokan Technologies</a></li>
       </ul>
 
       <p>

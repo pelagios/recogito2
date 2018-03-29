@@ -1,5 +1,6 @@
 # This is the main configuration file for the application.
 # ~~~~~
+admin.email="admin@example.com"
 
 # Secret key
 # ~~~~~

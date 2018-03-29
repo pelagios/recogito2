@@ -4,7 +4,7 @@ import controllers.HasVisitLogging
 import javax.inject.{Inject, Singleton}
 import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
-import play.api.Environment
+import play.api.{Configuration, Environment}
 import play.api.mvc.{Action, AbstractController, ControllerComponents, RequestHeader}
 import play.twirl.api.HtmlFormat
 import scala.io.Source
@@ -13,6 +13,7 @@ import scala.util.Try
 @Singleton
 class HelpController @Inject() (
     val components: ControllerComponents,
+    val config: Configuration,
     val env: Environment,
     implicit val visits: VisitService,
     implicit val webjars: WebJarsUtil
@@ -43,8 +44,10 @@ class HelpController @Inject() (
   def showAbout = Action { implicit request =>
     val imprint = Try(Source.fromFile(env.getFile("conf/imprint"))).toOption
       .map { _.getLines.mkString("\n") }
+    
+    val adminEmail = config.get[String]("admin.email")
       
-    result(views.html.help.about(imprint)) 
+    result(views.html.help.about(imprint, adminEmail)) 
   }
 
 }
