@@ -11,6 +11,7 @@ import services.generated.tables.DocumentFilepart
 import services.generated.tables.FeatureToggle
 import services.generated.tables.Folder
 import services.generated.tables.FolderAssociation
+import services.generated.tables.ServiceAnnouncement
 import services.generated.tables.SharingPolicy
 import services.generated.tables.Task
 import services.generated.tables.Upload
@@ -55,6 +56,11 @@ object Tables {
 	 * The table public.folder_association
 	 */
 	val FOLDER_ASSOCIATION = services.generated.tables.FolderAssociation.FOLDER_ASSOCIATION
+
+	/**
+	 * The table public.service_announcement
+	 */
+	val SERVICE_ANNOUNCEMENT = services.generated.tables.ServiceAnnouncement.SERVICE_ANNOUNCEMENT
 
 	/**
 	 * The table public.sharing_policy

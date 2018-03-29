@@ -2,7 +2,7 @@ package services.visit
 
 import java.util.UUID
 import services.ContentType
-import services.document.DocumentAccessLevel
+import services.document.RuntimeAccessLevel
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -32,7 +32,7 @@ class VisitSpec extends Specification {
       visit.referer must equalTo(Some("http://recogito.pelagios.org/rainer"))
       visit.visitedAt must equalTo(visitedAt)  
       visit.responseFormat must equalTo("text/html")
-      visit.accessLevel must equalTo(Some(DocumentAccessLevel.READ))
+      visit.accessLevel must equalTo(Some(RuntimeAccessLevel.READ_ALL))
       
       val client = visit.client
       client.userAgent must equalTo("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/52.0.2743.116 Chrome/52.0.2743.116 Safari/537.36")
@@ -69,7 +69,7 @@ class VisitSpec extends Specification {
           Some(UUID.randomUUID),
           Some(ContentType.TEXT_PLAIN)
         )),
-        Some(DocumentAccessLevel.READ)
+        Some(RuntimeAccessLevel.READ_ALL)
       )
         
       // Convert to JSON

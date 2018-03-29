@@ -3,6 +3,7 @@ package controllers.landing
 import com.mohiva.play.silhouette.api.{LoginInfo, Silhouette}
 import controllers.{HasConfig, HasUserService, Security}
 import javax.inject.{Inject, Singleton}
+import services.announcement.AnnouncementService
 import services.user.UserService
 import play.api.Configuration
 import play.api.data.Form
@@ -15,6 +16,7 @@ case class LoginData(usernameOrPassword: String, password: String)
 
 @Singleton
 class LoginLogoutController @Inject() (  
+    val announcements: AnnouncementService,
     val components: ControllerComponents,
     val config: Configuration,
     val silhouette: Silhouette[Security.Env],
@@ -50,14 +52,30 @@ class LoginLogoutController @Inject() (
       loginData =>
         users.validateUser(loginData.usernameOrPassword, loginData.password).flatMap {
           case Some(validUser) =>
+            
             val destination = request.session.get("access_uri").getOrElse(routes.LandingController.index.toString)
             users.updateLastLogin(validUser.getUsername)
-            auth.create(LoginInfo(Security.PROVIDER_ID, validUser.getUsername))
+            
+            val fAnnouncement = announcements.findForUser(validUser.getUsername)           
+            val fAuthentication = auth.create(LoginInfo(Security.PROVIDER_ID, validUser.getUsername))
               .flatMap(auth.init(_))
-              .flatMap(auth.embed(_,  
-                Redirect(destination).withSession(request.session - "access_uri")
-              ))
-                        
+              
+            val f = for {
+              announcement <- fAnnouncement
+              authentication <- fAuthentication
+            } yield (announcement, authentication)
+            
+            f.flatMap {
+              case (Some(announcement), authentication) =>
+                auth.embed(authentication, 
+                  Ok(views.html.landing.announcement(announcement.getContent, destination))
+                    .withSession(request.session - "access_uri"))
+                
+              case (None, authentication) =>               
+                auth.embed(authentication,
+                  Redirect(destination).withSession(request.session - "access_uri"))
+            }
+          
           case None => Future(Redirect(routes.LoginLogoutController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
         }
     )

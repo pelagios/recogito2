@@ -1,0 +1,15 @@
+@(announcement: String, destination: String)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito | Service Announcement</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/login.css")"/>
+  </head>
+  <body>
+    <div id="content">
+      @announcement
+
+      <a href="@destination">Continue</a>
+    </div>
+  </body>
+</html>

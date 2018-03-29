@@ -140,3 +140,9 @@ CREATE TABLE task (
   status TEXT NOT NULL DEFAULT 'PENDING',
   progress INTEGER NOT NULL
 );
+
+CREATE TABLE service_announcement (
+  id SERIAL PRIMARY KEY,
+  for_user TEXT NOT NULL UNIQUE REFERENCES "user"(username),
+  content TEXT NOT NULL
+);
