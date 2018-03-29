@@ -251,8 +251,20 @@ class AnnotationAPIController @Inject() (
           case Some((doc, accesslevel)) =>
             doc.fileparts.find(_.getId == partId) match {
               case Some(filepart) =>
-                if (accesslevel.canReadAll) ImageService.cutout(doc, filepart, annotation).map(file =>
-                  Ok.sendFile(file))
+                if (accesslevel.canReadAll)
+                  ContentType.withName(filepart.getContentType) match {
+                    case Some(ContentType.IMAGE_UPLOAD) =>
+                      ImageService.cutout(doc, filepart, annotation).map { file =>
+                        Ok.sendFile(file)
+                      }     
+                      
+                    case Some(ContentType.IMAGE_IIIF) =>
+                      val snippetUrl = ImageService.iiifSnippet(doc, filepart, annotation)
+                      Future.successful(Redirect(snippetUrl))
+                      
+                    case _ => // Should never happen
+                      Future.successful(InternalServerError)
+                  }
                 else
                   Future.successful(Forbidden)
 

@@ -68,5 +68,19 @@ object ImageService {
     }
     
   }
+  
+  def iiifSnippet(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): String = {
+    val b = ImageAnchor.parse(annotation.anchor).bounds
+    
+    val baseUrl = 
+      if (part.getFile.endsWith("/info.json"))
+        part.getFile.substring(0, part.getFile.size - 10)
+      else
+        part.getFile
+    
+    // TODO rotation - don't modify the image in Recogito, rely on the external IIIF server (which may or may not support rotation)
+    
+    s"${baseUrl}/${b.left},${b.top},${b.width},${b.height}/full/0/default.jpg"
+  }
 
 }
