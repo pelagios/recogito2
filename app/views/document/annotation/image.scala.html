@@ -20,7 +20,7 @@
     @Html(webJarsUtil.script("jquery-ui.min.js"))
     @Html(webJarsUtil.script("velocity.min.js"))
     @Html(webJarsUtil.script("jquery.timeago.js"))
-    @Html(webJarsUtil.script("jquery.lazyload.min.js"))
+    @Html(webJarsUtil.script("blazy.min.js"))
     @Html(webJarsUtil.script("bootstrap-colorpicker.min.js"))
     @Html(webJarsUtil.script("typeahead.jquery.min.js"))
     @Html(webJarsUtil.script("ol.js"))
@@ -125,14 +125,14 @@
           @if(part == currentPart) {
             <li class="active">
               <a href="#" onclick="return false;">
-                <img class="lazy" data-original="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
+                <img class="b-lazy" data-src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)" src="placeholder.jpg">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
           } else {
             <li>
               <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, part.getSequenceNo)">
-                <img class="lazy" data-original="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)">
+                <img class="b-lazy" data-src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)" src="placeholder.jpg">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>

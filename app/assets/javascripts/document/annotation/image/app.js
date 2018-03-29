@@ -187,7 +187,12 @@ require([
             new App(imageProperties);
           };
 
-      jQuery('.lazy').lazyload();
+      new Blazy({ // Init image lazy loading lib
+        offset: 0,
+        container: '.sidebar .menu',
+        validateDelay: 200,
+        saveViewportOffsetDelay: 200
+      });
 
       setImagePaneTop();
       loadIndicator.init(imagePane);

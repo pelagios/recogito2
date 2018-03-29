@@ -79,7 +79,7 @@ libraryDependencies ++= Seq(
 
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",
-  "org.webjars" % "jquery.lazyload" % "1.9.3",
+  // "org.webjars" % "jquery.lazyload" % "1.9.3",
   "org.webjars" % "jquery-ui" % "1.11.4",
   "org.webjars" % "leaflet" % "1.3.1",
   "org.webjars" % "numeral-js" % "1.5.3-1",
@@ -90,6 +90,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "velocity" % "1.1.0",
   "org.webjars.npm" % "bootstrap-colorpicker" % "2.5.2" intransitive(),
+  "org.webjars.bower" % "blazy" % "1.8.0",
   "org.webjars.bower" % "marked" % "0.3.6",
   "org.webjars.bower" % "js-grid" % "1.4.1",
   "org.webjars.bower" % "plotly.js" % "1.12.0",

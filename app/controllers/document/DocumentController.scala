@@ -87,8 +87,14 @@ class DocumentController @Inject() (
 
     import services.ContentType._
 
-    def iiifThumbnailURL(iiifUrl: String) =
-      iiifUrl.substring(0, iiifUrl.length - 9) + "full/160,/0/default.jpg"
+    def iiifThumbnailURL(iiifUrl: String) = {
+      val base =
+        if (iiifUrl.endsWith("info.json")) iiifUrl.substring(0, iiifUrl.length - 9)
+        else if (!iiifUrl.endsWith("/")) s"${iiifUrl}/"
+        else iiifUrl
+
+      s"${base}full/160,/0/default.jpg"
+    }
 
     documentPartResponse(docId, partNo, request.identity, { case (doc, currentPart, accesslevel) =>
       if (currentPart.getContentType == IMAGE_IIIF.toString) {
