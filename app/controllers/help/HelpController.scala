@@ -4,12 +4,16 @@ import controllers.HasVisitLogging
 import javax.inject.{Inject, Singleton}
 import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
+import play.api.Environment
 import play.api.mvc.{Action, AbstractController, ControllerComponents, RequestHeader}
 import play.twirl.api.HtmlFormat
+import scala.io.Source
+import scala.util.Try
 
 @Singleton
 class HelpController @Inject() (
     val components: ControllerComponents,
+    val env: Environment,
     implicit val visits: VisitService,
     implicit val webjars: WebJarsUtil
   ) extends AbstractController(components) with HasVisitLogging {
@@ -36,6 +40,11 @@ class HelpController @Inject() (
 
   def showFAQ = Action { implicit request => result(views.html.help.faq()) }
 
-  def showAbout = Action { implicit request => result(views.html.help.about()) }
+  def showAbout = Action { implicit request =>
+    val imprint = Try(Source.fromFile(env.getFile("conf/imprint"))).toOption
+      .map { _.getLines.mkString("\n") }
+      
+    result(views.html.help.about(imprint)) 
+  }
 
 }

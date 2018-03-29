@@ -1,4 +1,4 @@
-@()(implicit request: RequestHeader)
+@(imprint: Option[String])(implicit request: RequestHeader)
 @_layout("About | Recogito", "About Recogito", "help.css") {
   <h1>About Recogito</h1>
 } {
@@ -27,16 +27,10 @@
         Conditions of Use</a> for information.
       </p>
 
-      <h2>1. Imprint</h2>
-      <p>
-        This service is hosted at the<br/>
-        <a href="http://www.ait.ac.at" target="_blank">AIT Austrian Institute of Technology GmbH</a><br/>
-        Giefinggasse 4<br/>1210 Vienna<br/>Austria<br/>
-      </p>
-
-      <p>Contact the AIT Data Protection Officer via
-        <a href="mailto:dpo@@ait.ac.at">dpo@@ait.ac.at</a>
-      </p>
+      @imprint.map { imprint =>
+        <h2>1. Imprint</h2>
+        @Html(imprint)
+      }
 
       <h2>2. Privacy Policy</h2>
 

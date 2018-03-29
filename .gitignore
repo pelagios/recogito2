@@ -1,6 +1,7 @@
 /logs
 /bin
 /conf/application.conf
+/conf/imprint
 /target
 .classpath
 .project
