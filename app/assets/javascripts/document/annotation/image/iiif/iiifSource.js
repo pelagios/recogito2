@@ -47,7 +47,7 @@ define([], function() {
 
         tileSize = options.tileSize || 256,
 
-        maxZoom = Math.floor(Math.log(tileSize, 2)),
+        maxZoom = Math.ceil(Math.log2(Math.max(width / tileSize, height / tileSize))) + 1,
 
         tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4),
 
@@ -61,7 +61,7 @@ define([], function() {
         tierSizes = (function() {
           var tierSizes = [], i;
 
-          for (i = 0; i <= maxZoom; i++) {
+          for (i = 1; i <= maxZoom; i++) {
             var scale = Math.pow(2, maxZoom - i),
                 width_ = Math.ceil(width / scale),
                 height_ = Math.ceil(height / scale),
@@ -87,9 +87,9 @@ define([], function() {
       crossOrigin: options.crossOrigin,
 
       tileUrlFunction: function(tileCoord, pixelRatio) {
-        var z = tileCoord[0] + 1,
+        var z = tileCoord[0],
             x = tileCoord[1],
-            y = -tileCoord[2] - 1,
+            y = - tileCoord[2] - 1,
             sizes = tierSizes[z],
 
             modulo = function(a, b) {
@@ -103,19 +103,16 @@ define([], function() {
         if (!sizes)
           return undefined;
 
-        if (x < 0 || sizes[0] <= x || y < 0 || sizes[1] <= y)
+        if (x < 0 || sizes[0] < x || y < 0 || sizes[1] < y)
           return undefined;
 
-        var scale = Math.pow(2, maxZoom - z),
-            tileBaseSize = tileSize * scale,
-            minx = x * tileBaseSize,
-            miny = y * tileBaseSize,
-            maxx = Math.min(minx + tileBaseSize, width),
-            maxy = Math.min(miny + tileBaseSize, height),
-            query, url, hash;
-
-        maxx = scale * Math.floor(maxx / scale);
-        maxy = scale * Math.floor(maxy / scale);
+          var scale = Math.pow(2, maxZoom - z - 1),
+              tileBaseSize = tileSize * scale,
+              minx = x * tileBaseSize,
+              miny = y * tileBaseSize,
+              maxx = Math.min(minx + tileBaseSize, width),
+              maxy = Math.min(miny + tileBaseSize, height),
+              query, url, hash;
 
         query = '/' + minx + ',' + miny + ',' +
           (maxx - minx) + ',' + (maxy - miny) +

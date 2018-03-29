@@ -73,7 +73,7 @@ define([
           view: new ol.View({
             projection: projection,
             zoom: 0,
-            minResolution: 0.125
+            minResolution: 1
           })
         }),
 
