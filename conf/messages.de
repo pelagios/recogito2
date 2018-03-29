@@ -136,6 +136,19 @@ document.annotation.text.toolbar.color.by_status=NACH STATUS
 document.annotation.text.toolbar.color.by_tag=NACH TAG
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Image annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.image.toolbar.tools=TOOLS
+document.annotation.image.toolbar.tools.move=BEWEGEN
+document.annotation.image.toolbar.tools.point=PUNKT
+document.annotation.image.toolbar.tools.rectangle=RECHTECK
+document.annotation.image.toolbar.tools.tilted_box=GEKIPPTE BOX
+
+document.annotation.image.toolbar.image=BILD
+document.annotation.image.toolbar.layers=EBENEN
+document.annotation.image.toolbar.help=HILFE
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.downloads.annotations.csv.text=Herunteraden der Daten für den Import in ein Programm zur Tabellenkalkulation oder in ein GIS.

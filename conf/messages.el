@@ -137,6 +137,19 @@ document.annotation.text.toolbar.color.by_status=ΑΝΆ ΚΑΤΆΣΤΑΣΗ ΕΠ�
 document.annotation.text.toolbar.color.by_tag=ΑΝΆ ΕΤΙΚΈΤΑ
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Image annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.image.toolbar.tools=Εργαλεία
+document.annotation.image.toolbar.tools.move=Μετακίνηση
+document.annotation.image.toolbar.tools.point=Σημείο
+document.annotation.image.toolbar.tools.rectangle=Ορθογώνιο
+document.annotation.image.toolbar.tools.tilted_box=Κεκλιμένο κουτί
+
+document.annotation.image.toolbar.image=Εικόνα
+document.annotation.image.toolbar.layers=Επίπεδα
+document.annotation.image.toolbar.help=Βοήθεια
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.downloads.annotations.csv.text=Κατεβάστε τις επισημειώσεις με τη μορφή πίνακα, για να τον εισάγετε σε λογισμικό υπολογιστικών φύλλων ή σε GIS.

@@ -66,20 +66,26 @@
     <div class="header-toolbar">
       <ul class="menu">
         <li class="group tools">
-          <h3>TOOLS:</h3>
+          <h3>@messages("document.annotation.image.toolbar.tools"):</h3>
           <ul>
             <li data-tool-label="MOVE" data-tool-key="move" class="active">
               <span class="icon">&#xf256;</span>
-              <span class="label">MOVE</span>
+              <span class="label">@messages("document.annotation.image.toolbar.tools.move")</span>
             </li>
             <li data-tool-label="POINT" data-tool-key="point" class="has-submenu">
               <span class="icon">&#xf05b;</span>
-              <span class="label">POINT</span>
+              <span class="label">@messages("document.annotation.image.toolbar.tools.point")</span>
               <div class="submenu" style="display:none;">
                 <ul>
-                  <li data-tool-label="POINT" data-tool-key="point"><span class="icon">&#xf05b;</span> POINT</li>
-                  <li data-tool-label="RECTANGLE" data-tool-key="rect"><span class="icon"><span class="rect"></span></span> RECTANGLE</li>
-                  <li data-tool-label="TILTED BOX" data-tool-key="tbox"><span class="icon"><span class="tilted-box"></span></span> TILTED BOX</li>
+                  <li data-tool-label="@messages("document.annotation.image.toolbar.tools.point")" data-tool-key="point">
+                    <span class="icon">&#xf05b;</span> @messages("document.annotation.image.toolbar.tools.point")
+                  </li>
+                  <li data-tool-label="@messages("document.annotation.image.toolbar.tools.rectangle")" data-tool-key="rect"><span class="icon">
+                    <span class="rect"></span></span> @messages("document.annotation.image.toolbar.tools.rectangle")
+                  </li>
+                  <li data-tool-label="@messages("document.annotation.image.toolbar.tools.tilted_box")" data-tool-key="tbox">
+                    <span class="icon"><span class="tilted-box"></span></span> @messages("document.annotation.image.toolbar.tools.tilted_box")
+                  </li>
                 </ul>
               </div>
             </li>
@@ -87,11 +93,11 @@
         </li> <!-- TOOLS group -->
 
         <li class="group image has-submenu disabled">
-          <h3><span class="label">IMAGE</span></h3>
+          <h3><span class="label">@messages("document.annotation.image.toolbar.image")</span></h3>
         </li>
 
         <li class="group has-submenu disabled">
-          <h3><span class="label">LAYERS</span></h3>
+          <h3><span class="label">@messages("document.annotation.image.toolbar.layers")</span></h3>
         </li>
 
         <li class="group change-color">
@@ -105,7 +111,7 @@
         </li>
 
         <li class="group help">
-          <h3><span class="label">HELP</span></h3>
+          <h3><span class="label">@messages("document.annotation.image.toolbar.help")</span></h3>
         </li>
       </ul> <!-- .menu -->
 

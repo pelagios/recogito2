@@ -122,6 +122,19 @@ document.annotation.text.toolbar.color.by_status=براساس وضعیت تائ�
 document.annotation.text.toolbar.color.by_tag=براساس برچسب
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Image annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.image.toolbar.tools=ابزارها
+document.annotation.image.toolbar.tools.move=حرکت
+document.annotation.image.toolbar.tools.point=نقطه
+document.annotation.image.toolbar.tools.rectangle=مستطیل
+document.annotation.image.toolbar.tools.tilted_box=جعبه عنوان گذاری شده
+
+document.annotation.image.toolbar.image=تصویر
+document.annotation.image.toolbar.layers=لایه ها
+document.annotation.image.toolbar.help=کمک
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.downloads.annotations.csv.text=بارگیری حاشیه نویسی ها در قالب جدول

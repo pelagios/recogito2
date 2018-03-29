@@ -126,6 +126,19 @@ document.annotation.text.toolbar.color.by_status=PAR STATUS DE VÉRIFICATION
 document.annotation.text.toolbar.color.by_tag=PAR MARQUEUR
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Image annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.image.toolbar.tools=OUTILS
+document.annotation.image.toolbar.tools.move=NAVIGUER
+document.annotation.image.toolbar.tools.point=POINT
+document.annotation.image.toolbar.tools.rectangle=RECTANGLE
+document.annotation.image.toolbar.tools.tilted_box=BOÎTE PIVOTANTE
+
+document.annotation.image.toolbar.image=IMAGE
+document.annotation.image.toolbar.layers=CALQUES
+document.annotation.image.toolbar.help=AIDE
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.downloads.annotations.csv.text=Télécharger les annotations sous forme de données tabulaires pour les importer dans une feuille de calcul ou un SIG.

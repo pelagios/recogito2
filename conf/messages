@@ -155,6 +155,19 @@ document.annotation.text.toolbar.color.by_status=BY VERIFICATION STATUS
 document.annotation.text.toolbar.color.by_tag=BY FIRST TAG
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Image annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.image.toolbar.tools=TOOLS
+document.annotation.image.toolbar.tools.move=MOVE
+document.annotation.image.toolbar.tools.point=POINT
+document.annotation.image.toolbar.tools.rectangle=RECTANGLE
+document.annotation.image.toolbar.tools.tilted_box=TILTED BOX
+
+document.annotation.image.toolbar.image=IMAGE
+document.annotation.image.toolbar.layers=LAYERS
+document.annotation.image.toolbar.help=HELP
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.downloads.annotations.csv.text=Download annotations as a data table for importing into spreadsheet software or a GIS.
