@@ -125,14 +125,18 @@
           @if(part == currentPart) {
             <li class="active">
               <a href="#" onclick="return false;">
-                <img class="b-lazy" data-src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)" src="placeholder.jpg">
+                <img class="b-lazy"
+                     data-src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)"
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAABCAQAAADzhm3tAAAADUlEQVR42mNkGAUUAQACggACpDKLkQAAAABJRU5ErkJggg==">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
           } else {
             <li>
               <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, part.getSequenceNo)">
-                <img class="b-lazy" data-src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)" src="placeholder.jpg">
+                <img class="b-lazy"
+                     data-src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)"
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAABCAQAAADzhm3tAAAADUlEQVR42mNkGAUUAQACggACpDKLkQAAAABJRU5ErkJggg==">
                 <span class="label">@part.getTitle</span>
               </a>
             </li>
