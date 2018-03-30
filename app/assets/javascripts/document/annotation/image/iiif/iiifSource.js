@@ -100,7 +100,7 @@ define([], function() {
               return r * b < 0 ? r + b : r;
             };
 
-        if (maxZoom < z)
+        if (maxZoom < z - 1)
           return undefined;
 
         if (!sizes)
