@@ -51,6 +51,7 @@ define(['common/ui/alert'], function(Alert) {
             resolutions.push(r_);
             r_ *= 2;
           }
+
           return resolutions;
         };
 

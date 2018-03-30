@@ -47,10 +47,7 @@ define([], function() {
 
         tileSize = options.tileSize || 256,
 
-        maxZoom =
-          Math.round(
-            Math.log2(Math.max(width, height) / tileSize)
-          ),
+        maxZoom = Math.ceil(Math.log2(Math.ceil(Math.max(width, height) / tileSize))),
 
         tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4),
 
@@ -83,7 +80,7 @@ define([], function() {
 
       tileGrid: new ol.tilegrid.TileGrid({
         resolutions: logicalResolutions.reverse(),
-        origin: [ 0, 0 ],
+        extent: [0, - height, width, 0],
         tileSize: logicalTileSize
       }),
 
@@ -99,6 +96,10 @@ define([], function() {
               var r = a % b;
               return r * b < 0 ? r + b : r;
             };
+
+
+        console.log(width, height, z, tierSizes);
+
 
         if (z > maxZoom)
           return undefined;
