@@ -97,10 +97,6 @@ define([], function() {
               return r * b < 0 ? r + b : r;
             };
 
-
-        console.log(width, height, z, tierSizes);
-
-
         if (z > maxZoom)
           return undefined;
 
@@ -110,8 +106,8 @@ define([], function() {
         if (x < 0 || y < 0 || sizes[0] < x || sizes[1] < y)
           return undefined;
 
-        var scale = Math.pow(2, maxZoom - z),
-            tileBaseSize = tileSize * scale,
+        var scale = logicalResolutions[z],
+            tileBaseSize = Math.min(tileSize * scale, Math.max(width, height)),
             minx = x * tileBaseSize,
             miny = y * tileBaseSize,
             tileW = Math.min(tileBaseSize, width - minx),
