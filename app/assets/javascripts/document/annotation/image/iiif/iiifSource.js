@@ -118,7 +118,7 @@ define([], function() {
             query, url, hash;
 
         query = '/' + minx + ',' + miny + ',' + tileW + ',' + tileH +
-          '/' + Math.ceil(tileW / scale) + ',/0/' + quality + '.' + extension;
+          '/pct:' + (100 / scale) + '/0/' + quality + '.' + extension;
 
         if (jQuery.isArray(baseUrl)) {
           hash = (x << z) + y;
