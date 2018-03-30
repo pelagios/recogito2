@@ -48,8 +48,8 @@ define([], function() {
         tileSize = options.tileSize || 256,
 
         maxZoom =
-          Math.round(Math.max(
-            Math.log2(width / tileSize), Math.log2(height / tileSize))
+          Math.round(
+            Math.log2(Math.max(width, height) / tileSize)
           ),
 
         tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4),
