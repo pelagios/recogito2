@@ -50,7 +50,7 @@ define([], function() {
         maxZoom =
           Math.round(Math.max(
             Math.log2(width / tileSize), Math.log2(height / tileSize))
-          ) + 1,
+          ),
 
         tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4),
 
@@ -64,7 +64,7 @@ define([], function() {
         tierSizes = (function() {
           var tierSizes = [], i;
 
-          for (i = 1; i <= maxZoom; i++) {
+          for (i = 0; i <= maxZoom; i++) {
             var scale = Math.pow(2, maxZoom - i),
                 width_ = Math.ceil(width / scale),
                 height_ = Math.ceil(height / scale),
@@ -93,23 +93,23 @@ define([], function() {
         var z = tileCoord[0],
             x = tileCoord[1],
             y = - tileCoord[2] - 1,
-            sizes = tierSizes[z + 1],
+            sizes = tierSizes[z],
 
             modulo = function(a, b) {
               var r = a % b;
               return r * b < 0 ? r + b : r;
             };
 
-        if (maxZoom < z - 1)
+        if (z > maxZoom)
           return undefined;
 
         if (!sizes)
           return undefined;
 
-        if (x < 0 || sizes[0] < x || y < 0 || sizes[1] < y)
+        if (x < 0 || y < 0 || sizes[0] < x || sizes[1] < y)
           return undefined;
 
-        var scale = Math.pow(2, maxZoom - z - 1),
+        var scale = Math.pow(2, maxZoom - z),
             tileBaseSize = tileSize * scale,
             minx = x * tileBaseSize,
             miny = y * tileBaseSize,
