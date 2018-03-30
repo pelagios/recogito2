@@ -47,7 +47,10 @@ define([], function() {
 
         tileSize = options.tileSize || 256,
 
-        maxZoom = Math.ceil(Math.log2(Math.max(width / tileSize, height / tileSize))) + 1,
+        maxZoom =
+          Math.round(Math.max(
+            Math.log2(width / tileSize), Math.log2(height / tileSize))
+          ) + 1,
 
         tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4),
 
@@ -90,7 +93,7 @@ define([], function() {
         var z = tileCoord[0],
             x = tileCoord[1],
             y = - tileCoord[2] - 1,
-            sizes = tierSizes[z],
+            sizes = tierSizes[z + 1],
 
             modulo = function(a, b) {
               var r = a % b;
@@ -106,17 +109,16 @@ define([], function() {
         if (x < 0 || sizes[0] < x || y < 0 || sizes[1] < y)
           return undefined;
 
-          var scale = Math.pow(2, maxZoom - z - 1),
-              tileBaseSize = tileSize * scale,
-              minx = x * tileBaseSize,
-              miny = y * tileBaseSize,
-              maxx = Math.min(minx + tileBaseSize, width),
-              maxy = Math.min(miny + tileBaseSize, height),
-              query, url, hash;
+        var scale = Math.pow(2, maxZoom - z - 1),
+            tileBaseSize = tileSize * scale,
+            minx = x * tileBaseSize,
+            miny = y * tileBaseSize,
+            tileW = Math.min(tileBaseSize, width - minx),
+            tileH = Math.min(tileBaseSize, height - miny),
+            query, url, hash;
 
-        query = '/' + minx + ',' + miny + ',' +
-          (maxx - minx) + ',' + (maxy - miny) +
-          '/pct:' + (100 / scale) + '/0/' + quality + '.' + extension;
+        query = '/' + minx + ',' + miny + ',' + tileW + ',' + tileH +
+          '/' + Math.ceil(tileW / scale) + ',/0/' + quality + '.' + extension;
 
         if (jQuery.isArray(baseUrl)) {
           hash = (x << z) + y;
