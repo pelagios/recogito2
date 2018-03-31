@@ -106,7 +106,7 @@ define([], function() {
         if (x < 0 || y < 0 || sizes[0] < x || sizes[1] < y)
           return undefined;
 
-        var scale = options.resolutions[z],
+        var scale = logicalResolutions[z] / devicePixelRatio ,
             tileBaseSize = Math.min(tileSize * scale, Math.max(width, height)),
             minx = x * tileBaseSize,
             miny = y * tileBaseSize,
