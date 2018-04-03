@@ -7,7 +7,7 @@ define([
   'document/annotation/common/editor/sections/section'
 ], function(I18N, Config, Section) {
 
-  var EditableTextSection = function(element, annotationBody) {
+  var EditableTextSection = function(element, annotationBody, opt_menuitems) {
     var self = this,
 
         textEntryDiv = element.find('.text'),
@@ -53,7 +53,7 @@ define([
             var fn = jQuery(e.target).data('fn');
             if (fn === 'delete')
               self.fireEvent('delete');
-            else
+            else if (fn === 'edit')
               self.makeEditable();
           });
 
@@ -69,6 +69,13 @@ define([
       element.find('.edit').hide();
 
     textEntryDiv.html(self.escapeHtml(annotationBody.value));
+
+    if (opt_menuitems)
+      opt_menuitems.forEach(function(m) {
+        var li = jQuery('<li>' + m.label + '</li>');
+        li.click(m.fn);
+        dropdownMenu.append(li);
+      });
 
     this.body = annotationBody;
 

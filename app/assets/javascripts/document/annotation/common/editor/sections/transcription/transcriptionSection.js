@@ -5,11 +5,28 @@ define([
 ], function(EditableTextSection, Formatting, Config) {
 
   var TranscriptionSection = function(parent, transcriptionBody) {
+
     var self = this,
+
+        editNote = function() {
+          var note = prompt('Add note:', transcriptionBody.note);
+          if (note !== null) {
+            if (note) // Non-empty string
+              self.changedNote = { value: note };
+            else
+              self.changedNote = { value: false };
+          }
+          showNote();
+        },
+
+        addNoteMenuItem = [
+          { label: 'Note', fn: editNote }
+        ],
 
         element = jQuery(
           '<div class="section editable-text transcription">' +
             '<div class="text"></div>' +
+            '<div class="note"></div>' +
             '<div class="icon edit">&#xf0dd;</div>' +
             '<div class="last-modified">' +
               '<a class="by" href="/' + transcriptionBody.last_modified_by + '">' +
@@ -21,24 +38,35 @@ define([
             '</div>' +
           '</div>'),
 
-        activateAddNoteFeature = function() {
-          var btnAddNote = jQuery('<span class="icon add-note">&#xf249;</span>').appendTo(element);
-          // Just a temporary hack to test this feature
-          btnAddNote.click(function() {
-            var note = prompt('Add note:', transcriptionBody.note);
-            if (note) {
-              self.changedNote = note;
-            }
-          });
+        noteEl = element.find('.note'),
+
+        showNote = function() {
+          var shown = (self.changedNote) ? self.changedNote.value : transcriptionBody.note;
+          if (shown) {
+            noteEl.html(shown);
+            noteEl.css('display', 'inline');
+          } else {
+            noteEl.html();
+            hideNote();
+          }
+        },
+
+        hideNote = function() {
+          noteEl.css('display', 'none');
         };
 
-    if (Config.hasFeature('multitranscription'))
-      activateAddNoteFeature();
-
+    // Either false (no change) or { value: 'value' || false } for new/deleted note
     this.changedNote = false;
 
     parent.append(element);
-    EditableTextSection.apply(this, [ element, transcriptionBody ]);
+
+    if (Config.hasFeature('multitranscription')) {
+      noteEl.click(editNote);
+      showNote();
+      EditableTextSection.apply(this, [ element, transcriptionBody, addNoteMenuItem ]);
+    } else {
+      EditableTextSection.apply(this, [ element, transcriptionBody ]);
+    }
   };
   TranscriptionSection.prototype = Object.create(EditableTextSection.prototype);
 
@@ -48,7 +76,12 @@ define([
   };
 
   TranscriptionSection.prototype.commit = function() {
-    if (this.changedNote) this.body.note = this.changedNote;
+    if (this.changedNote)
+      if (this.changedNote.value)
+        this.body.note = this.changedNote.value;
+      else
+        delete this.body.note;
+        
     EditableTextSection.prototype.commit.call(this);
   };
 
