@@ -7,6 +7,7 @@ package services.generated.tables
 import java.lang.Class
 import java.lang.Integer
 import java.lang.String
+import java.sql.Timestamp
 import java.util.Arrays
 import java.util.List
 
@@ -66,6 +67,21 @@ class ServiceAnnouncement(alias : String, aliased : Table[ServiceAnnouncementRec
 	 * The column <code>public.service_announcement.content</code>.
 	 */
 	val CONTENT : TableField[ServiceAnnouncementRecord, String] = createField("content", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+
+	/**
+	 * The column <code>public.service_announcement.created_at</code>.
+	 */
+	val CREATED_AT : TableField[ServiceAnnouncementRecord, Timestamp] = createField("created_at", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), "")
+
+	/**
+	 * The column <code>public.service_announcement.viewed_at</code>.
+	 */
+	val VIEWED_AT : TableField[ServiceAnnouncementRecord, Timestamp] = createField("viewed_at", org.jooq.impl.SQLDataType.TIMESTAMP, "")
+
+	/**
+	 * The column <code>public.service_announcement.response</code>.
+	 */
+	val RESPONSE : TableField[ServiceAnnouncementRecord, String] = createField("response", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * Create a <code>public.service_announcement</code> table reference

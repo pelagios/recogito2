@@ -144,5 +144,8 @@ CREATE TABLE task (
 CREATE TABLE service_announcement (
   id SERIAL PRIMARY KEY,
   for_user TEXT NOT NULL UNIQUE REFERENCES "user"(username),
-  content TEXT NOT NULL
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  viewed_at TIMESTAMP WITH TIME ZONE,
+  response TEXT
 );
