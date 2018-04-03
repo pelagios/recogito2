@@ -19,6 +19,11 @@ define([
                        '<td><span class="key">SPACE</span></td>' +
                        '<td>toggle between MOVE and current annotation tool</td>' +
                      '</tr>' +
+
+                     '<tr>' +
+                       '<td><span class="key">ALT</span> + <span class="key">V</span></td>' +
+                       '<td>toggle annotation visibility</td>' +
+                     '</tr>' +
                    '</table>' +
 
                    '<h3>Map Navigation</h3>' +

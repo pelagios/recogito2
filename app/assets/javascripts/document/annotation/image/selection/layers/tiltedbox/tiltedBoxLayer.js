@@ -145,6 +145,10 @@ define([
 
         emphasiseAnnotation = function(annotation) {
           // TODO for future use
+        },
+
+        toggleVisibility = function() {
+          layer.setVisible(!layer.getVisible());
         };
 
     olMap.addLayer(layer);
@@ -157,6 +161,7 @@ define([
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.emphasiseAnnotation = emphasiseAnnotation;
+    this.toggleVisibility = toggleVisibility;
 
     Layer.apply(this, [ olMap ]);
   };

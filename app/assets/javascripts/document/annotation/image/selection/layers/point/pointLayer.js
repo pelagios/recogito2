@@ -95,6 +95,10 @@ define([
 
         emphasiseAnnotation = function(annotation) {
           // TODO style change?
+        },
+
+        toggleVisibility = function() {
+          pointVectorLayer.setVisible(!pointVectorLayer.getVisible());
         };
 
     olMap.addLayer(pointVectorLayer);
@@ -106,6 +110,7 @@ define([
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.emphasiseAnnotation = emphasiseAnnotation;
+    this.toggleVisibility = toggleVisibility;
     this.computeSize = function() { return 0; }; // It's a point
   };
   PointLayer.prototype = Object.create(Layer.prototype);

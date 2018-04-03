@@ -97,7 +97,15 @@ define([
           setOverlayColor = function(color) {
             for (var key in layers)
               layers[key].setColor(color);
+          },
+
+          onKeydown = function(e) {
+            if (e.altKey && e.which === 86) // Alt + V
+              for (var key in layers)
+                layers[key].toggleVisibility();
           };
+
+      jQuery(document).keydown(onKeydown);
 
       this.getAnnotationAt = getAnnotationAt;
       this.findById = findById;

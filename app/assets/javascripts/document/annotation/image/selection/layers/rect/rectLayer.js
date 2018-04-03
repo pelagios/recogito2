@@ -118,6 +118,10 @@ define([
 
         emphasiseAnnotation = function(annotation) {
           // TODO for future use
+        },
+
+        toggleVisibility = function() {
+          rectVectorLayer.setVisible(!rectVectorLayer.getVisible());
         };
 
     olMap.addLayer(rectVectorLayer);
@@ -130,6 +134,7 @@ define([
     this.removeAnnotation = removeAnnotation;
     this.convertSelectionToAnnotation = convertSelectionToAnnotation;
     this.emphasiseAnnotation = emphasiseAnnotation;
+    this.toggleVisibility = toggleVisibility;
   };
   RectLayer.prototype = Object.create(Layer.prototype);
 
