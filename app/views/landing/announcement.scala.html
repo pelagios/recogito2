@@ -3,13 +3,14 @@
 <html>
   <head>
     <title>Recogito | Service Announcement</title>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/login.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/announcement.css")"/>
   </head>
   <body>
     <div id="content">
-      @announcement
-
-      <a href="@destination">Continue</a>
+      <div class="announcement">@Html(announcement)</div>
+      <p>
+        <a class="btn" href="@destination">Continue</a>
+      </p>
     </div>
   </body>
 </html>

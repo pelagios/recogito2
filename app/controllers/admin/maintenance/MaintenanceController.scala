@@ -41,7 +41,18 @@ class MaintenanceController @Inject()(
   }
   
   def insertBroadcast = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
-    announcements.insertBroadcastAnnouncement("Just a test").map(_ => Ok)
+    announcements.insertBroadcastAnnouncement(
+    """<h1>Have a few moments?</h1>
+      <p>
+        We have created a short survey to find out more about our community - and we would love to 
+        hear from you. Answering our survey shouldn't take more than 10 minutes.
+      </p>
+      <p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScNN2BL60pwHkh-OFZZh2BsSdF6hRXUnjB6Ewb06fdqcTXiWg/viewform" target="_blank">
+          Take our survey
+        </a>
+      </p>
+    """).map(_ => Ok)
   }
   
   def deleteAllServiceAnnouncements = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
