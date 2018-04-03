@@ -7,6 +7,7 @@ import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.ControllerComponents
 import scala.concurrent.ExecutionContext
+import services.announcement.AnnouncementService
 import services.document.DocumentService
 import services.upload.UploadService
 import services.user.UserService
@@ -14,6 +15,7 @@ import services.user.Roles._
 
 @Singleton
 class MaintenanceController @Inject()(
+  val announcements: AnnouncementService,
   val components: ControllerComponents, 
   val config: Configuration,
   val documents: DocumentService,
@@ -36,6 +38,17 @@ class MaintenanceController @Inject()(
   
   def deleteAllPending = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     uploads.deleteAllPendingUploads().map(_ => Ok)
+  }
+  
+  def insertBroadcast = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+    announcements.insertBroadcastAnnouncement("Just a test").map(_ => Ok)
+  }
+  
+  def deleteAllServiceAnnouncements = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+    announcements.clearAll().map { success =>
+      if (success) Ok
+      else InternalServerError
+    }
   }
   
 }
