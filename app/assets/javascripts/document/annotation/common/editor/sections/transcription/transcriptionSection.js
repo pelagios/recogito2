@@ -38,6 +38,16 @@ define([
             '</div>' +
           '</div>'),
 
+        appendToParent = function() {
+          var transcriptionsBefore = parent.find('.section.transcription'),
+              idxToInsert = transcriptionsBefore.length;
+
+          if (idxToInsert === 0)
+            parent.prepend(element);
+          else
+            transcriptionsBefore.eq(idxToInsert - 1).after(element);
+        },
+
         noteEl = element.find('.note'),
 
         showNote = function() {
@@ -58,7 +68,7 @@ define([
     // Either false (no change) or { value: 'value' || false } for new/deleted note
     this.changedNote = false;
 
-    parent.append(element);
+    appendToParent();
 
     if (Config.hasFeature('multitranscription')) {
       noteEl.click(editNote);
@@ -81,7 +91,7 @@ define([
         this.body.note = this.changedNote.value;
       else
         delete this.body.note;
-        
+
     EditableTextSection.prototype.commit.call(this);
   };
 

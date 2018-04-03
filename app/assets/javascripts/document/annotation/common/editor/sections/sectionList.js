@@ -91,8 +91,6 @@ define([
                   bodyType: 'TRANSCRIPTION'
                 });
 
-                forwardEvent(newTranscriptionField, 'submit'); // Submit event needs to be handled by editor
-
                 // Make sure the field gets checked for existing text on commit
                 queuedUpdates.push(function() {
                   if (!newTranscriptionField.isEmpty())
@@ -118,7 +116,6 @@ define([
               addExistingTranscription = function(body) {
                 var transcriptionSection = new TranscriptionSection(transcriptionSectionEl, body);
                 handleDelete(transcriptionSection);
-                forwardEvent(transcriptionSection, 'submit'); // Submit event needs to be handled by editor
                 sections.push(transcriptionSection);
               };
 
