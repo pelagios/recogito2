@@ -64,7 +64,7 @@ class AnnouncementService @Inject() (val db: DB, users: UserService, implicit va
     }
     
     def insertBatchesRecursive(offset: Int, numUsers: Int): Future[Boolean] =
-      users.listUsers(offset, offset + BATCH_SIZE, None, None).flatMap { users =>
+      users.listUsers(offset, BATCH_SIZE, None, None).flatMap { users =>
         insertOneBatch(users.items.map(_.getUsername))
       } flatMap { _ =>
         if (offset + BATCH_SIZE >= numUsers)

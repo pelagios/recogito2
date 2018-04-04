@@ -115,16 +115,6 @@ CREATE TABLE sharing_policy (
 CREATE INDEX idx_sharing_policy_document_id ON sharing_policy(document_id);
 CREATE INDEX idx_sharing_policy_shared_with ON sharing_policy(shared_with);
 
--- keep a log of what happened for shared elements
--- e.g. to inform users about what happened
--- CREATE TABLE sharing_event_log (
---   id SERIAL PRIMARY KEY,
---   type_of_action TEXT,
---   action_by TEXT NOT NULL REFERENCES "user"(username),
---   action_at TIMESTAMP WITH TIME ZONE NOT NULL,
---   policy_id INTEGER NOT NULL REFERENCES sharing_policy(id)
--- );
-
 CREATE TABLE task (
   id UUID PRIMARY KEY,
   task_type TEXT NOT NULL,
