@@ -58,7 +58,6 @@ object Keys {
 
 	val IDENTITY_FEATURE_TOGGLE = Identities0.IDENTITY_FEATURE_TOGGLE
 	val IDENTITY_FOLDER = Identities0.IDENTITY_FOLDER
-	val IDENTITY_SERVICE_ANNOUNCEMENT = Identities0.IDENTITY_SERVICE_ANNOUNCEMENT
 	val IDENTITY_SHARING_POLICY = Identities0.IDENTITY_SHARING_POLICY
 	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
 	val IDENTITY_USER_ROLE = Identities0.IDENTITY_USER_ROLE
@@ -112,7 +111,6 @@ object Keys {
 	private object Identities0 extends AbstractKeys {
 		val IDENTITY_FEATURE_TOGGLE : Identity[FeatureToggleRecord, Integer] = AbstractKeys.createIdentity(FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.ID)
 		val IDENTITY_FOLDER : Identity[FolderRecord, Integer] = AbstractKeys.createIdentity(Folder.FOLDER, Folder.FOLDER.ID)
-		val IDENTITY_SERVICE_ANNOUNCEMENT : Identity[ServiceAnnouncementRecord, Integer] = AbstractKeys.createIdentity(ServiceAnnouncement.SERVICE_ANNOUNCEMENT, ServiceAnnouncement.SERVICE_ANNOUNCEMENT.ID)
 		val IDENTITY_SHARING_POLICY : Identity[SharingPolicyRecord, Integer] = AbstractKeys.createIdentity(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
 		val IDENTITY_USER_ROLE : Identity[UserRoleRecord, Integer] = AbstractKeys.createIdentity(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)

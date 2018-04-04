@@ -9,12 +9,28 @@ import services.generated.Tables.SERVICE_ANNOUNCEMENT
 import services.generated.tables.records.ServiceAnnouncementRecord
 import storage.db.DB
 import services.user.UserService
+import java.util.UUID
 
 @Singleton
 class AnnouncementService @Inject() (val db: DB, users: UserService, implicit val ctx: ExecutionContext) extends BaseService {
   
-  def findForUser(username: String): Future[Option[ServiceAnnouncementRecord]] = db.query { sql =>
-    Option(sql.selectFrom(SERVICE_ANNOUNCEMENT).where(SERVICE_ANNOUNCEMENT.FOR_USER.equal(username)).fetchOne())
+  def findLatestUnread(username: String): Future[Option[ServiceAnnouncementRecord]] = db.query { sql =>
+    Option(sql.selectFrom(SERVICE_ANNOUNCEMENT)
+              .where(SERVICE_ANNOUNCEMENT.FOR_USER.equal(username)
+                .and(SERVICE_ANNOUNCEMENT.RESPONSE.isNull))
+              .orderBy(SERVICE_ANNOUNCEMENT.CREATED_AT.desc())
+              .fetchOne())
+  }
+  
+  def confirm(uuid: UUID, username: String, response: String): Future[Boolean] = db.query { sql =>
+    val result =
+      sql.update(SERVICE_ANNOUNCEMENT)
+         .set(SERVICE_ANNOUNCEMENT.VIEWED_AT, new Timestamp(new Date().getTime))
+         .set(SERVICE_ANNOUNCEMENT.RESPONSE, response)
+         .where(SERVICE_ANNOUNCEMENT.ID.equal(uuid).and(SERVICE_ANNOUNCEMENT.FOR_USER.equal(username)))
+         .execute()
+         
+    result == 1
   }
   
   def clearAll(): Future[Boolean] = db.query { sql =>
@@ -31,12 +47,14 @@ class AnnouncementService @Inject() (val db: DB, users: UserService, implicit va
     def insertOneBatch(users: Seq[String]): Future[_] = db.query { sql =>
       sql.batch(users.map { user =>
         sql.insertInto(SERVICE_ANNOUNCEMENT,
+          SERVICE_ANNOUNCEMENT.ID, 
           SERVICE_ANNOUNCEMENT.FOR_USER,
           SERVICE_ANNOUNCEMENT.CONTENT,
           SERVICE_ANNOUNCEMENT.CREATED_AT,
           SERVICE_ANNOUNCEMENT.VIEWED_AT,
           SERVICE_ANNOUNCEMENT.RESPONSE
         ).values(
+          UUID.randomUUID(),
           user,
           content,
           new Timestamp(new Date().getTime),

@@ -5,17 +5,16 @@ package services.generated.tables
 
 
 import java.lang.Class
-import java.lang.Integer
 import java.lang.String
 import java.sql.Timestamp
 import java.util.Arrays
 import java.util.List
+import java.util.UUID
 
 import javax.annotation.Generated
 
 import org.jooq.Field
 import org.jooq.ForeignKey
-import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -56,7 +55,7 @@ class ServiceAnnouncement(alias : String, aliased : Table[ServiceAnnouncementRec
 	/**
 	 * The column <code>public.service_announcement.id</code>.
 	 */
-	val ID : TableField[ServiceAnnouncementRecord, Integer] = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
+	val ID : TableField[ServiceAnnouncementRecord, UUID] = createField("id", org.jooq.impl.SQLDataType.UUID.nullable(false), "")
 
 	/**
 	 * The column <code>public.service_announcement.for_user</code>.
@@ -99,10 +98,6 @@ class ServiceAnnouncement(alias : String, aliased : Table[ServiceAnnouncementRec
 
 	private def this(alias : String, aliased : Table[ServiceAnnouncementRecord]) = {
 		this(alias, aliased, null)
-	}
-
-	override def getIdentity : Identity[ServiceAnnouncementRecord, Integer] = {
-		Keys.IDENTITY_SERVICE_ANNOUNCEMENT
 	}
 
 	override def getPrimaryKey : UniqueKey[ServiceAnnouncementRecord] = {

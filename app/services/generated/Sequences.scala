@@ -35,11 +35,6 @@ object Sequences {
 	val FOLDER_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("folder_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))
 
 	/**
-	 * The sequence <code>public.service_announcement_id_seq</code>
-	 */
-	val SERVICE_ANNOUNCEMENT_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("service_announcement_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))
-
-	/**
 	 * The sequence <code>public.sharing_policy_id_seq</code>
 	 */
 	val SHARING_POLICY_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("sharing_policy_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))

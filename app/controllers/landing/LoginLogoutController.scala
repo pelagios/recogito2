@@ -2,6 +2,7 @@ package controllers.landing
 
 import com.mohiva.play.silhouette.api.{LoginInfo, Silhouette}
 import controllers.{HasConfig, HasUserService, Security}
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import services.announcement.AnnouncementService
 import services.user.UserService
@@ -56,7 +57,7 @@ class LoginLogoutController @Inject() (
             val destination = request.session.get("access_uri").getOrElse(routes.LandingController.index.toString)
             users.updateLastLogin(validUser.getUsername)
             
-            val fAnnouncement = announcements.findForUser(validUser.getUsername)           
+            val fAnnouncement = announcements.findLatestUnread(validUser.getUsername)           
             val fAuthentication = auth.create(LoginInfo(Security.PROVIDER_ID, validUser.getUsername))
               .flatMap(auth.init(_))
               
@@ -68,7 +69,7 @@ class LoginLogoutController @Inject() (
             f.flatMap {
               case (Some(announcement), authentication) =>
                 auth.embed(authentication, 
-                  Ok(views.html.landing.announcement(announcement.getContent, destination))
+                  Ok(views.html.landing.announcement(announcement.getId, announcement.getContent, destination))
                     .withSession(request.session - "access_uri"))
                 
               case (None, authentication) =>               
@@ -79,6 +80,13 @@ class LoginLogoutController @Inject() (
           case None => Future(Redirect(routes.LoginLogoutController.showLoginForm()).flashing(MESSAGE -> INVALID_LOGIN))
         }
     )
+  }
+
+  def confirmServiceAnnouncement(id: UUID, response: String, destination: Option[String]) = silhouette.SecuredAction.async { implicit request =>
+    announcements.confirm(id, request.identity.username, response).map { success =>
+      if (success) destination.map(Redirect(_)).getOrElse(Redirect(routes.LandingController.index))
+      else InternalServerError
+    }
   }
 
   def logout = silhouette.SecuredAction.async { implicit request =>

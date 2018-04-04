@@ -142,10 +142,12 @@ CREATE TABLE task (
 );
 
 CREATE TABLE service_announcement (
-  id SERIAL PRIMARY KEY,
-  for_user TEXT NOT NULL UNIQUE REFERENCES "user"(username),
+  id UUID PRIMARY KEY,
+  for_user TEXT NOT NULL REFERENCES "user"(username),
   content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   viewed_at TIMESTAMP WITH TIME ZONE,
   response TEXT
 );
+CREATE INDEX idx_service_announcement_for_user ON service_announcement(for_user);
+CREATE INDEX idx_service_announcement_created_at ON service_announcement(created_at);

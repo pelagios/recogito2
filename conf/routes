@@ -14,6 +14,7 @@ GET     /signup                                      controllers.landing.SignupC
 POST    /signup                                      controllers.landing.SignupController.processSignup
 GET     /login                                       controllers.landing.LoginLogoutController.showLoginForm(destination: Option[String] ?= None)
 POST    /login                                       controllers.landing.LoginLogoutController.processLogin
+GET     /login/confirm-announcment                   controllers.landing.LoginLogoutController.confirmServiceAnnouncement(id: java.util.UUID, response: String, destination: Option[String] ?= None)
 GET     /logout                                      controllers.landing.LoginLogoutController.logout
 GET     /reset_password                              controllers.landing.ResetPasswordController.showResetForm
 POST    /reset_password                              controllers.landing.ResetPasswordController.resetPassword

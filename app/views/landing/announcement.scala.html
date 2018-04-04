@@ -1,4 +1,8 @@
-@(announcement: String, destination: String)
+@(
+  announcementId: java.util.UUID,
+  content: String,
+  destination: String
+)
 <!DOCTYPE html>
 <html>
   <head>
@@ -7,9 +11,9 @@
   </head>
   <body>
     <div id="content">
-      <div class="announcement">@Html(announcement)</div>
+      <div class="announcement">@Html(content)</div>
       <p>
-        <a class="btn" href="@destination">Continue</a>
+        <a class="btn" href="@controllers.landing.routes.LoginLogoutController.confirmServiceAnnouncement(announcementId, "OK", Some(destination))">Continue</a>
       </p>
     </div>
   </body>

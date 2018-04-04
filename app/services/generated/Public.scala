@@ -58,7 +58,6 @@ class Public extends SchemaImpl("public") {
 		return Arrays.asList[Sequence[_]](
 			Sequences.FEATURE_TOGGLE_ID_SEQ,
 			Sequences.FOLDER_ID_SEQ,
-			Sequences.SERVICE_ANNOUNCEMENT_ID_SEQ,
 			Sequences.SHARING_POLICY_ID_SEQ,
 			Sequences.UPLOAD_ID_SEQ,
 			Sequences.USER_ROLE_ID_SEQ)
