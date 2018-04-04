@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/upload/wizard.css")"/>
     @Html(webJarsUtil.script("dropzone.min.js"))
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.script("velocity.min.js"))
     @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/my/upload/step2.js")))
     <script>
       window.config = { owner: '@username' }
@@ -30,7 +31,16 @@
       <form action="@controllers.my.routes.UploadController.storeFilepart(username)" id="dropzone">
         <h2>Drag Files Here</h2>
         <p>or</p>
-        <div id="choose-file" class="choose-file btn btn-large btn-blue"><span class="icon">&#xf055;</span> Choose a File to Attach</div>
+        <span id="choose-file" class="choose-file btn btn-large btn-blue">
+          <span class="icon">&#xf055;</span>
+          <span class="label">Choose a File to Attach</span>
+        </span>
+        <span class="btn btn-large btn-blue iiif">
+          <span class="icon">&#xf0c1;</span>
+          <span class="label">Import from IIIF Service</span>
+          <input type="text" placeholder="Paste or drag URL" />
+          <span class="status-indicator"></span>
+        </span>
         <p class="formats">Supported formats: plain text (UTF-8), <!-- TEI/XML, --> image files, CSV (UTF-8)</p>
       </form>
 
@@ -38,7 +48,9 @@
         <div id="uploaded-before">@for(filepart <- fileparts) {
             <div class="dz-preview dz-file-preview" data-id="@filepart.getId" data-type="@filepart.getContentType">
               <div class="dz-details">
-                <div class="dz-size">@formatSize(filepart.getFilesizeKb)</div>
+                <div class="dz-size">@if(Option(filepart.getFilesizeKb).isDefined) {
+                  @formatSize(filepart.getFilesizeKb)
+                }</div>
                 <div class="dz-filename"><span>@filepart.getTitle</span></div>
               </div>
               <div class="dz-progress"><span class="dz-upload" style="width:100%"></span></div>

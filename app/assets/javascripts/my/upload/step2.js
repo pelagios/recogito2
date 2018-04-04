@@ -16,6 +16,9 @@ require(['common/config'], function(Config) {
           '  <div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
           '</div>',
 
+        iiifButton = jQuery('.btn.iiif'),
+        iiifInput = iiifButton.find('input'),
+
         btnNext = jQuery('input.next'),
 
         nerPanel = jQuery('.ner'),
@@ -24,6 +27,22 @@ require(['common/config'], function(Config) {
 
         // State maintained independently, since we need to uncheck when hiding the panel!
         nerCheckboxState = true,
+
+        toggleIIIFInput = function() {
+          var label = iiifButton.find('.label'),
+
+              opts = { duration: 150 },
+
+              showInput = function() {
+                label.velocity({ width: 0 }, opts);
+                iiifInput.show();
+                iiifInput.velocity({ width: 280 }, opts);
+                iiifInput.focus();
+              };
+
+          if (label.width() !== 0)
+            showInput();
+        },
 
         /** Returns true if there are any text uploads in the list **/
         doUploadsIncludeText = function() {
@@ -109,25 +128,39 @@ require(['common/config'], function(Config) {
           refresh();
         },
 
-        registerIIIFSource = function(url) {
-          jsRoutes.controllers.my.UploadController.storeFilepart(Config.owner).ajax({
-            data: { iiif_source: url },
+        onPasteIIIFUrl = function() {
+          var indicator = iiifButton.find('.status-indicator'),
 
-            success: function(result) {
-              // TODO just a hack to demo the principle!
-              var preview = jQuery(previewTemplate);
-              preview.find('.dz-filename span').html(url);
-              preview.find('.dz-upload').css('width', '100%');
-              jQuery('#uploaded').append(preview);
+              url = iiifInput.val(),
 
-              refresh();
-              jQuery('input.next').prop('disabled', false);
-            },
+              registerSource = function() {
+                indicator.addClass('pending');
+                jsRoutes.controllers.my.UploadController.storeFilepart(Config.owner).ajax({
+                  data: { iiif_source: url },
 
-            error: function(e) {
-              console.log(e.responseText);
-            }
-          });
+                  success: function(result) {
+                    indicator.removeClass('pending');
+                    indicator.addClass('ok');
+                    jQuery('input.next').prop('disabled', false);
+                  },
+
+                  error: function(e) {
+                    indicator.removeClass('pending');
+                    indicator.addClass('failed');
+                  }
+                });
+              };
+
+          if (url.indexOf('http') === 0)
+            registerSource();
+          else
+            indicator.addClass('failed');
+        },
+
+        onDropIIIFUrl = function(e) {
+          var url = e.originalEvent.dataTransfer.getData('text');
+          iiifInput.val(url);
+          onPasteIIIFUrl();
         };
 
       new Dropzone('#dropzone', {
@@ -143,22 +176,15 @@ require(['common/config'], function(Config) {
           this.on('removedfile', onDelete);
           this.on('success', onUploadSuccess);
           this.on('error', onUploadError);
-        },
-
-        drop: function(e) {
-          var link = e.dataTransfer.getData('URL'),
-
-              // Can hopefully be replaced at some point...
-              isUrl = function(url) {
-                return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0);
-              };
-
-          if (link && isUrl(link))
-            registerIIIFSource(link);
         }
       });
 
     jQuery('#uploaded').on('click', '.dz-remove', onDelete);
+
+    iiifButton.click(toggleIIIFInput);
+    iiifInput.bind('input', onPasteIIIFUrl);
+    iiifInput.bind('drop', onDropIIIFUrl);
+
     refresh();
   });
 

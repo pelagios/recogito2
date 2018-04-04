@@ -5,10 +5,87 @@
   border:2px dashed @lightgrey-type;
   text-align:center;
   color:@lightgrey-type;
+  white-space:nowrap;
 
-  .choose-file .icon {
+  .btn .icon {
     font-size:16px;
     margin-right:5px;
+  }
+
+  .btn.iiif {
+    position:relative;
+
+    .label {
+      width:160px;
+      display:inline-block;
+      overflow:hidden;
+      vertical-align:bottom;
+      text-align:left;
+    }
+
+    input {
+      width:0px;
+      overflow:hidden;
+      position:relative;
+      right:0;
+      border:none;
+      padding:2px 5px;
+      background-color:fade(#fff, 25%);
+      display:none;
+      color:#fff;
+      font-size:15px;
+      .rounded-corners(1px);
+    }
+
+    .status-indicator {
+      position:absolute;
+      right:14px;
+      width:17px;
+      padding-left:3px;
+    }
+
+    .status-indicator.ok::after {
+      content: '\f00c';
+      text-shadow:none;
+      font-family:FontAwesome;
+      color:#20db0d;
+    }
+
+    .status-indicator.failed::after {
+      content: '\f00d';
+      text-shadow:none;
+      font-family:FontAwesome;
+      color:#ff434c;
+    }
+
+    .status-indicator.pending::after {
+      content:'';
+      position:relative;
+      top:2px;
+      display:inline-block;
+      width:17px;
+      height:17px;
+      border:2px solid fade(#fff, 35%);
+      border-top:2px solid #fff;
+      border-radius:50%;
+      -webkit-animation:loadRotation 1s infinite linear;
+              animation:loadRotation 1s infinite linear;
+    }
+
+    @-webkit-keyframes loadRotation {
+      from { -webkit-transform: rotate(0deg); }
+      to   { -webkit-transform: rotate(359deg); }
+    }
+    @keyframes loadRotation {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(359deg); }
+    }
+
+    input::-webkit-input-placeholder { color:#fff; }
+    input::-moz-placeholder { color:#fff; }
+    input:-moz-placeholder { color:#fff; }
+    input:-ms-input-placeholder { color:#fff; }
+
   }
 
   .formats {
