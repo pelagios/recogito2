@@ -232,11 +232,22 @@ define([
         },
 
         onTouchMove = function(e) {
-          var touch = e.originalEvent.changedTouches[0];
-          e.originalEvent.movementX = touch.clientX - lastTouchXY[0];
-          e.originalEvent.movementY = touch.clientY - lastTouchXY[1];
+          var touch = e.originalEvent.changedTouches[0],
+
+              dx = touch.clientX - lastTouchXY[0],
+              dy = touch.clientY - lastTouchXY[1],
+
+              forwardDrag = function() {
+                var destView = [ self.center[0] - dx, self.center[1] - dy ];
+                    destMap = olMap.getCoordinateFromPixel(destView);
+
+                olView.setCenter(destMap);
+              };
+
+
+
+          if (forwardEvents) forwardDrag();
           lastTouchXY = [ touch.clientX, touch.clientY ];
-          onMouseMove(e);
         },
 
         onKeyDown = function(e) {
