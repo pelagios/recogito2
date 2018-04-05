@@ -252,27 +252,34 @@ define([
           patchTouchEvent(e);
           onMouseUp(e);
 
+          canvas.css('pointer-events', 'auto');
+
           return false;
         },
 
         onTouchMove = function(e) {
-          var touch = e.originalEvent.changedTouches[0],
+          if (e.originalEvent.changedTouches.length === 1) {
+            var touch = e.originalEvent.changedTouches[0],
 
-              dx = touch.clientX - lastTouchXY[0],
-              dy = touch.clientY - lastTouchXY[1];
+                dx = touch.clientX - lastTouchXY[0],
+                dy = touch.clientY - lastTouchXY[1];
 
-          e.offsetX = touch.clientX - self.offset.left;
-          e.offsetY = touch.clientY - self.offset.top;
+            e.offsetX = touch.clientX - self.offset.left;
+            e.offsetY = touch.clientY - self.offset.top;
 
-          e.originalEvent.movementX = dx;
-          e.originalEvent.movementY = dy;
+            e.originalEvent.movementX = dx;
+            e.originalEvent.movementY = dy;
 
-          onMouseMove(e);
+            onMouseMove(e);
 
-          lastTouchXY = [ touch.clientX, touch.clientY ];
+            lastTouchXY = [ touch.clientX, touch.clientY ];
 
-          // jQuery way of cancelling an event (reliably)
-          return false;
+            // jQuery way of cancelling an event (reliably)
+            return false;
+          } else {
+            // Let OpenLayers handle all multi-touch events
+            canvas.css('pointer-events', 'none');
+          }
         },
 
         onKeyDown = function(e) {
