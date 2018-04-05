@@ -52,6 +52,7 @@ define([
           if (Config.IS_TOUCH) {
             canvas.bind('touchstart', onTouchStart);
             canvas.bind('touchmove', onTouchMove);
+            canvas.bind('touchend', onTouchEnd);
           }
 
           // We trigger 'mouseup' behavior when the mouse leaves the canvas
@@ -225,17 +226,32 @@ define([
           });
         },
 
-        onTouchStart = function(e) {
+        /** Adds the essential mouse event properties to touch events **/
+        patchTouchEvent = function(e) {
           var touch = e.originalEvent.changedTouches[0];
-
           e.offsetX = touch.clientX - self.offset.left;
           e.offsetY = touch.clientY - self.offset.top;
+          return e;
+        },
 
+        onTouchStart = function(e) {
+          var touch = e.originalEvent.changedTouches[0];
           lastTouchXY = [ touch.clientX, touch.clientY ];
 
+          patchTouchEvent(e);
           onMouseDown(e);
 
           // jQuery way of cancelling an event (reliably)
+          return false;
+        },
+
+        onTouchEnd = function(e) {
+          var touch = e.originalEvent.changedTouches[0];
+          lastTouchXY = [ touch.clientX, touch.clientY ];
+
+          patchTouchEvent(e);
+          onMouseUp(e);
+
           return false;
         },
 
