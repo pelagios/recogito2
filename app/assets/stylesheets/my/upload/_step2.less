@@ -28,13 +28,15 @@
       overflow:hidden;
       position:relative;
       right:0;
-      border:none;
-      padding:2px 5px;
-      background-color:fade(#fff, 25%);
+      border-style:solid;
+      border-width:0 0 1px 0;
+      border-color:#fff;
+      padding:2px 0;
+      background-color:transparent;
       display:none;
+      box-shadow:none;
       color:#fff;
       font-size:15px;
-      .rounded-corners(1px);
     }
 
     .status-indicator {
@@ -81,10 +83,10 @@
       to   { transform: rotate(359deg); }
     }
 
-    input::-webkit-input-placeholder { color:#fff; }
-    input::-moz-placeholder { color:#fff; }
-    input:-moz-placeholder { color:#fff; }
-    input:-ms-input-placeholder { color:#fff; }
+    input::-webkit-input-placeholder { color:rgba(255, 255, 255, 0.7); }
+    input::-moz-placeholder          { color:rgba(255, 255, 255, 0.7); }
+    input:-moz-placeholder           { color:rgba(255, 255, 255, 0.7); }
+    input:-ms-input-placeholder      { color:rgba(255, 255, 255, 0.7); }
 
   }
 

@@ -68,7 +68,6 @@ require([
 
           onToggleFullscreen = function(isFullscreen) {
             selector.updateSize();
-            olMap.updateSize();
           },
 
           onMapMove = function() {
