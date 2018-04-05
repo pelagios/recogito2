@@ -235,18 +235,14 @@ define([
         },
 
         onTouchStart = function(e) {
-          if (e.originalEvent.touches.length === 1) {
-            var touch = e.originalEvent.changedTouches[0];
-            lastTouchXY = [ touch.clientX, touch.clientY ];
+          var touch = e.originalEvent.changedTouches[0];
+          lastTouchXY = [ touch.clientX, touch.clientY ];
 
-            patchTouchEvent(e);
-            onMouseDown(e);
+          patchTouchEvent(e);
+          onMouseDown(e);
 
-            // jQuery way of cancelling an event (reliably)
-            return false;
-          } else {
-            canvas.css('pointer-events', 'none');
-          }
+          // jQuery way of cancelling an event (reliably)
+          return false;
         },
 
         onTouchEnd = function(e) {
@@ -256,34 +252,27 @@ define([
           patchTouchEvent(e);
           onMouseUp(e);
 
-          canvas.css('pointer-events', 'auto');
-
           return false;
         },
 
         onTouchMove = function(e) {
-          if (e.originalEvent.touches.length === 1) {
-            var touch = e.originalEvent.changedTouches[0],
+          var touch = e.originalEvent.changedTouches[0],
 
-                dx = touch.clientX - lastTouchXY[0],
-                dy = touch.clientY - lastTouchXY[1];
+              dx = touch.clientX - lastTouchXY[0],
+              dy = touch.clientY - lastTouchXY[1];
 
-            e.offsetX = touch.clientX - self.offset.left;
-            e.offsetY = touch.clientY - self.offset.top;
+          e.offsetX = touch.clientX - self.offset.left;
+          e.offsetY = touch.clientY - self.offset.top;
 
-            e.originalEvent.movementX = dx;
-            e.originalEvent.movementY = dy;
+          e.originalEvent.movementX = dx;
+          e.originalEvent.movementY = dy;
 
-            onMouseMove(e);
+          onMouseMove(e);
 
-            lastTouchXY = [ touch.clientX, touch.clientY ];
+          lastTouchXY = [ touch.clientX, touch.clientY ];
 
-            // jQuery way of cancelling an event (reliably)
-            return false;
-          } else {
-            // Let OpenLayers handle all multi-touch events
-            canvas.css('pointer-events', 'none');
-          }
+          // jQuery way of cancelling an event (reliably)
+          return false;
         },
 
         onKeyDown = function(e) {
