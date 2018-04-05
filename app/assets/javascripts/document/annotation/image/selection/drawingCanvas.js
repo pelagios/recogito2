@@ -1,9 +1,10 @@
 define([
+  'common/config',
   'common/hasEvents',
   'document/annotation/image/selection/layers/point/pointDrawingTool',
   'document/annotation/image/selection/layers/rect/rectDrawingTool',
   'document/annotation/image/selection/layers/tiltedbox/tiltedBoxDrawingTool'
-], function(HasEvents, PointDrawingTool, RectDrawingTool, TiltedBoxDrawingTool) {
+], function(Config, HasEvents, PointDrawingTool, RectDrawingTool, TiltedBoxDrawingTool) {
 
   var ZOOM_DURATION = 250,
       MIN_DRAG_TIME = 150; // Everything below that threshold = click, otherwise drag
@@ -24,8 +25,9 @@ define([
 
         olView = olMap.getView(),
 
-        // Tracks mouse state
+        // Tracks mouse/touch state
         isMouseDown = false,
+        lastTouchXY = false,
         lastClickTime,
 
         // Tracks key state (rotation)
@@ -46,6 +48,11 @@ define([
           canvas.mousedown(onMouseDown);
           canvas.mouseup(onMouseUp);
           canvas.bind('wheel', onMouseWheel);
+
+          if (Config.IS_TOUCH) {
+            canvas.bind('touchstart', onTouchStart);
+            canvas.bind('touchmove', onTouchMove);
+          }
 
           // We trigger 'mouseup' behavior when the mouse leaves the canvas
           canvas.mouseleave(onMouseUp);
@@ -216,6 +223,20 @@ define([
             anchor: olMap.getCoordinateFromPixel(anchor),
             duration: ZOOM_DURATION
           });
+        },
+
+        onTouchStart = function(e) {
+          var touch = e.originalEvent.changedTouches[0];
+          lastTouchXY = [ touch.clientX, touch.clientY ];
+          onMouseDown(e);
+        },
+
+        onTouchMove = function(e) {
+          var touch = e.originalEvent.changedTouches[0];
+          e.originalEvent.movementX = touch.clientX - lastTouchXY[0];
+          e.originalEvent.movementY = touch.clientY - lastTouchXY[1];
+          lastTouchXY = [ touch.clientX, touch.clientY ];
+          onMouseMove(e);
         },
 
         onKeyDown = function(e) {

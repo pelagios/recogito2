@@ -17,8 +17,6 @@ define(function() {
           // break
           return;
 
-        console.log(event);
-
         simulatedEvent.initMouseEvent(type, true, true, window, 1,
           touch.screenX, touch.screenY, touch.clientX, touch.clientY,
           false, false, false, false, 0, null);
