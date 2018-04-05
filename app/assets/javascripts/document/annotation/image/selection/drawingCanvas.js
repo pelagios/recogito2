@@ -234,6 +234,9 @@ define([
           lastTouchXY = [ touch.clientX, touch.clientY ];
 
           onMouseDown(e);
+
+          // jQuery way of cancelling an event (reliably)
+          return false;
         },
 
         onTouchMove = function(e) {
@@ -244,13 +247,16 @@ define([
 
           e.offsetX = touch.clientX - self.offset.left;
           e.offsetY = touch.clientY - self.offset.top;
-          
+
           e.originalEvent.movementX = dx;
           e.originalEvent.movementY = dy;
 
           onMouseMove(e);
 
           lastTouchXY = [ touch.clientX, touch.clientY ];
+
+          // jQuery way of cancelling an event (reliably)
+          return false;
         },
 
         onKeyDown = function(e) {
