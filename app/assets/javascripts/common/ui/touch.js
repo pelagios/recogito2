@@ -5,7 +5,7 @@ define(function() {
         var touch = event.changedTouches[0],
             simulatedEvent = document.createEvent('MouseEvent'),
             type;
-            
+
         // Translate event types
         if (event.type === 'touchstart')
           type = 'mousedown';
@@ -16,6 +16,8 @@ define(function() {
         else
           // break
           return;
+
+        console.log(event);
 
         simulatedEvent.initMouseEvent(type, true, true, window, 1,
           touch.screenX, touch.screenY, touch.clientX, touch.clientY,
