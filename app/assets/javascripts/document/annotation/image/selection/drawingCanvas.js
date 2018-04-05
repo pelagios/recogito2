@@ -227,7 +227,12 @@ define([
 
         onTouchStart = function(e) {
           var touch = e.originalEvent.changedTouches[0];
+
+          e.offsetX = touch.clientX - self.offset.left;
+          e.offsetY = touch.clientY - self.offset.top;
+
           lastTouchXY = [ touch.clientX, touch.clientY ];
+
           onMouseDown(e);
         },
 
@@ -235,18 +240,16 @@ define([
           var touch = e.originalEvent.changedTouches[0],
 
               dx = touch.clientX - lastTouchXY[0],
-              dy = touch.clientY - lastTouchXY[1],
+              dy = touch.clientY - lastTouchXY[1];
 
-              forwardDrag = function() {
-                var destView = [ self.center[0] - dx, self.center[1] - dy ];
-                    destMap = olMap.getCoordinateFromPixel(destView);
+          e.offsetX = touch.clientX - self.offset.left;
+          e.offsetY = touch.clientY - self.offset.top;
+          
+          e.originalEvent.movementX = dx;
+          e.originalEvent.movementY = dy;
 
-                olView.setCenter(destMap);
-              };
+          onMouseMove(e);
 
-
-
-          if (forwardEvents) forwardDrag();
           lastTouchXY = [ touch.clientX, touch.clientY ];
         },
 
