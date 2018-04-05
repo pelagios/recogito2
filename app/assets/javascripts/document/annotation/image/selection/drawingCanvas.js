@@ -235,14 +235,18 @@ define([
         },
 
         onTouchStart = function(e) {
-          var touch = e.originalEvent.changedTouches[0];
-          lastTouchXY = [ touch.clientX, touch.clientY ];
+          if (e.originalEvent.touches.length === 1) {
+            var touch = e.originalEvent.changedTouches[0];
+            lastTouchXY = [ touch.clientX, touch.clientY ];
 
-          patchTouchEvent(e);
-          onMouseDown(e);
+            patchTouchEvent(e);
+            onMouseDown(e);
 
-          // jQuery way of cancelling an event (reliably)
-          return false;
+            // jQuery way of cancelling an event (reliably)
+            return false;
+          } else {
+            canvas.css('pointer-events', 'none');
+          }
         },
 
         onTouchEnd = function(e) {
@@ -258,7 +262,7 @@ define([
         },
 
         onTouchMove = function(e) {
-          if (e.originalEvent.changedTouches.length === 1) {
+          if (e.originalEvent.touches.length === 1) {
             var touch = e.originalEvent.changedTouches[0],
 
                 dx = touch.clientX - lastTouchXY[0],
