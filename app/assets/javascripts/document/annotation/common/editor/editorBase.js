@@ -30,7 +30,7 @@ define([
     this.container = container;
     this.element = element;
 
-    this.autoscroll = (opts && opts.autoscroll) ? opts.autoscroll : true;
+    this.autoscroll = (opts && opts.autoscroll) ? opts.autoscroll : false;
 
     this.sectionList = new SectionList(element, annotations);
     this.currentSelection = false;
