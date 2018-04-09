@@ -1,10 +1,11 @@
 define([
   'common/config',
   'common/hasEvents',
+  'document/annotation/image/selection/layers/placeflag/placeFlagDrawingTool',
   'document/annotation/image/selection/layers/point/pointDrawingTool',
   'document/annotation/image/selection/layers/rect/rectDrawingTool',
   'document/annotation/image/selection/layers/tiltedbox/tiltedBoxDrawingTool'
-], function(Config, HasEvents, PointDrawingTool, RectDrawingTool, TiltedBoxDrawingTool) {
+], function(Config, HasEvents, PlaceFlagDrawingTool, PointDrawingTool, RectDrawingTool, TiltedBoxDrawingTool) {
 
   var ZOOM_DURATION = 250,
       MIN_DRAG_TIME = 150; // Everything below that threshold = click, otherwise drag
@@ -12,7 +13,8 @@ define([
       TOOLS = {
         point : PointDrawingTool,
         rect  : RectDrawingTool,
-        tbox  : TiltedBoxDrawingTool
+        tbox  : TiltedBoxDrawingTool,
+        mpt   : PlaceFlagDrawingTool
       };
 
   var DrawingCanvas = function(containerEl, olMap) {
