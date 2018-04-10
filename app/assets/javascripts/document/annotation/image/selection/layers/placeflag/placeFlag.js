@@ -91,6 +91,7 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
     },
 
     renderShape : function(ctx, root, pivot, baseEnd, opposite, hover) {
+      console.log(hover);
       drawBox(ctx, pivot, baseEnd, opposite, hover);
       this.renderBaseline(ctx, root, pivot, baseEnd, hover);
     }

@@ -75,6 +75,41 @@ define([
           return [ baseEnd[0] + f[0], baseEnd[1] + f[1] ];
         },
 
+        getBoxCanvasCoords = function() {
+          var pivot    = currentShape.pivot.canvasXY,
+              baseEnd  = currentShape.baseEnd.canvasXY,
+              opposite = currentShape.opposite.canvasXY,
+
+              // Vector baseEnd -> opposite
+              fx = opposite[0] - baseEnd[0],
+              fy = opposite[1] - baseEnd[1];
+
+          // Coordinates in clockwise direction
+          return [ pivot, [ pivot[0] + fx, pivot[1] + fy ], opposite, baseEnd ];
+        },
+
+        getHoverTarget = function() {
+          var isOverHandle = function(coord, radius) {
+                if (coord) {
+                  var x = coord.canvasXY[0], y = coord.canvasXY[1];
+                  return mouseX <= x + radius && mouseX >= x - radius &&
+                         mouseY >= y - radius && mouseY <= y + radius;
+                }
+              };
+
+          if (currentShape && currentShape.opposite)
+            if (isOverHandle(currentShape.root, BaseTool.HANDLE_RADIUS))
+              return 'ROOT';
+            else if (Geom2D.intersects(mouseX, mouseY, getBoxCanvasCoords()))
+              return 'SHAPE';
+            else if (isOverHandle(currentShape.pivot, 6))
+              return 'SHAPE';
+            else if (isOverHandle(currentShape.baseEnd, 6))
+              return 'BASE_END_HANDLE';
+            else if (isOverHandle(currentShape.opposite, 6))
+              return 'OPPOSITE_HANDLE';
+        },
+
         onMouseMove = function(e) {
           mouseX = e.offsetX;
           mouseY = e.offsetY;
@@ -167,7 +202,8 @@ define([
                 currentShape.root.canvasXY,
                 currentShape.pivot.canvasXY,
                 currentShape.baseEnd.canvasXY,
-                currentShape.opposite.canvasXY);
+                currentShape.opposite.canvasXY,
+                getHoverTarget());
           }
 
           // Default cursor
