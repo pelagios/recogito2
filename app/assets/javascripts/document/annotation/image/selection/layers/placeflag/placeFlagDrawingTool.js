@@ -88,6 +88,23 @@ define([
           return [ pivot, [ pivot[0] + fx, pivot[1] + fy ], opposite, baseEnd ];
         },
 
+        shiftCoord = function(coord, dx, dy) {
+          return { canvasXY: [ coord.canvasXY[0] + dx, coord.canvasXY[1] + dy ] };
+        },
+
+        shiftRoot = function(dx, dy) {
+          updateShape({ root: shiftCoord(currentShape.root, dx, dy) });
+        },
+
+        shiftShape = function(dx, dy) {
+          // TODO lots of redundancy removal should be possible...
+          updateShape({
+            pivot: shiftCoord(currentShape.pivot, dx, dy),
+            baseEnd: shiftCoord(currentShape.baseEnd, dx, dy),
+            opposite: shiftCoord(currentShape.opposite, dx, dy)
+          });
+        },
+
         getHoverTarget = function() {
           var isOverHandle = function(coord, radius) {
                 if (coord) {
@@ -125,7 +142,7 @@ define([
         onMouseDown = function(e) {
           mouseX = e.offsetX;
           mouseY = e.offsetY;
-          // isModifying = getHoverTarget();
+          isModifying = getHoverTarget();
         },
 
         onMouseUp = function() {
@@ -154,6 +171,31 @@ define([
               pivot: { canvasXY: [ mouseX, mouseY ]}
             });
           }
+        },
+
+        onMouseDrag = function(e) {
+          var dx = e.originalEvent.movementX,
+              dy = e.originalEvent.movementY;
+
+          // Don't drag the background map if the shape is being modfied
+          if (isModifying) canvas.setForwardEvents(false);
+          else canvas.setForwardEvents(true);
+
+
+          if (isModifying === 'ROOT')
+            shiftRoot(dx, dy);
+          else if (isModifying === 'SHAPE')
+            shiftShape(dx, dy);
+
+          /*
+          else if (isModifying === 'BASE_END_HANDLE')
+            shiftBaseline(dx, dy);
+          else if (isModifying === 'OPPOSITE_HANDLE')
+            shiftOpposite();
+          */
+
+          // If it's a modification, fire changeShape event
+          // if (isModifying) self.fireEvent('changeShape', getSelection());
         },
 
         refreshPosition = function() {
@@ -185,6 +227,8 @@ define([
         };
 
         render = function() {
+          var hoverTarget = getHoverTarget();
+
           canvas.clear();
 
           if (currentShape) {
@@ -203,11 +247,13 @@ define([
                 currentShape.pivot.canvasXY,
                 currentShape.baseEnd.canvasXY,
                 currentShape.opposite.canvasXY,
-                getHoverTarget());
+                hoverTarget);
           }
 
           // Default cursor
-          if (paintState)
+          if (hoverTarget === 'SHAPE')
+            canvas.setCursor('move');
+          else if (paintState || hoverTarget)
             canvas.setCursor();
           else
             canvas.setCursor('crosshair');
@@ -220,7 +266,7 @@ define([
     canvas.on('mousedown', onMouseDown);
     canvas.on('mouseup', onMouseUp);
     canvas.on('click', onMouseClick);
-    // canvas.on('drag', onMouseDrag);
+    canvas.on('drag', onMouseDrag);
 
     this.refreshPosition = refreshPosition;
     this.getSelection = getSelection;

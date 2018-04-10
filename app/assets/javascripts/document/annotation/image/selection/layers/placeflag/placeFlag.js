@@ -5,7 +5,7 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
 
   var TWO_PI = 2 * Math.PI,
 
-      drawLine = function(ctx, from, to) {
+      drawLine = function(ctx, from, to, hover) {
         var line = function() {
               ctx.beginPath();
               ctx.moveTo(from[0], from[1]);
@@ -19,7 +19,7 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
         line(ctx, from, to);
 
         ctx.lineWidth = 2.8;
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = (hover) ? BaseTool.HOVER_COLOR : '#fff';
         line(ctx, from, to);
       },
 
@@ -80,18 +80,17 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
       ctx.stroke();
       ctx.closePath();
 
-      drawDot(ctx, pivot, 5);
+      drawDot(ctx, pivot, 5, hover === 'SHAPE');
       BaseTool.drawHandle(ctx, root, { hover: hover === 'ROOT' });
     },
 
     renderBaseline : function(ctx, root, pivot, baseEnd, hover) {
-      drawLine(ctx, pivot, baseEnd); // Baseline
+      drawLine(ctx, pivot, baseEnd, hover === 'SHAPE'); // Baseline
       this.renderTether(ctx, root, pivot, hover); // Root point, tether + tether handle
-      drawDot(ctx, baseEnd, 5, true); // Baseline end handle
+      drawDot(ctx, baseEnd, 5, hover === 'BASE_END_HANDLE'); // Baseline end handle
     },
 
     renderShape : function(ctx, root, pivot, baseEnd, opposite, hover) {
-      console.log(hover);
       drawBox(ctx, pivot, baseEnd, opposite, hover);
       this.renderBaseline(ctx, root, pivot, baseEnd, hover);
     }
