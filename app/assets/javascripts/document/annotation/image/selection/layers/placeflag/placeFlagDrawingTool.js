@@ -4,6 +4,10 @@ define([
   'document/annotation/image/selection/layers/geom2D'
 ], function(PlaceFlag, BaseTool, Geom2D) {
 
+  var pointToBounds = function(xy) {
+        return { top: xy[1], right: xy[0], bottom: xy[1], left: xy[0], width: 0, height: 0 };
+      };
+
   var PlaceFlagDrawingTool = function(canvas, olMap, opt_selection) {
     // Extends the tilted box tool
     BaseTool.apply(this, [ olMap ]);
@@ -105,6 +109,36 @@ define([
           });
         },
 
+        shiftBaseline = function(dx, dy) {
+          var pivot = currentShape.pivot.canvasXY,
+              baseEnd = currentShape.baseEnd.canvasXY,
+              opposite = currentShape.opposite.canvasXY,
+              h = Geom2D.len(opposite[0], opposite[1], baseEnd[0], baseEnd[1]),
+
+              angle =
+                Geom2D.angleOf(Geom2D.vec(pivot, baseEnd)) -
+                Geom2D.angleOf(Geom2D.vec(pivot, opposite)),
+
+              orientation = (angle > 0) ? 1 : -1;
+
+          updateShape({ baseEnd: shiftCoord(currentShape.baseEnd, dx, dy) });
+
+          var baseLineAfter = getCanvasBaseline(),
+              normalAfter = Geom2D.normalize([ orientation * baseLineAfter[1], - orientation * baseLineAfter[0] ]),
+              dOpposite = [ normalAfter[0] * h, normalAfter[1] * h ];
+
+          updateShape({ opposite: {
+            canvasXY: [
+              currentShape.baseEnd.canvasXY[0] + dOpposite[0],
+              currentShape.baseEnd.canvasXY[1] + dOpposite[1]
+            ]
+          }});
+        },
+
+        shiftOpposite = function() {
+          updateShape({ opposite: { canvasXY: getFloatingOpposite() }});
+        },
+
         getHoverTarget = function() {
           var isOverHandle = function(coord, radius) {
                 if (coord) {
@@ -162,6 +196,7 @@ define([
             } else {
               // Fix opposite - and done
               paintState = false;
+              self.fireEvent('create', getSelection());
             }
           } else {
             // Start new shape
@@ -186,16 +221,13 @@ define([
             shiftRoot(dx, dy);
           else if (isModifying === 'SHAPE')
             shiftShape(dx, dy);
-
-          /*
           else if (isModifying === 'BASE_END_HANDLE')
             shiftBaseline(dx, dy);
           else if (isModifying === 'OPPOSITE_HANDLE')
             shiftOpposite();
-          */
 
           // If it's a modification, fire changeShape event
-          // if (isModifying) self.fireEvent('changeShape', getSelection());
+          if (isModifying) self.fireEvent('changeShape', getSelection());
         },
 
         refreshPosition = function() {
@@ -210,7 +242,18 @@ define([
         },
 
         getSelection = function() {
+          if (currentShape) {
+            /*
+            var x =   Math.round(currentShape.root.imageXY[0]),
+                y = - Math.round(currentShape.root.imageXY[1]),
+                anchor = '';
+            */
 
+            return self.buildSelection(
+              'mpt',
+              pointToBounds(currentShape.root.canvasXY),
+              pointToBounds(currentShape.root.imageXY));
+          }
         },
 
         reset = function() {
@@ -227,7 +270,7 @@ define([
         };
 
         render = function() {
-          var hoverTarget = getHoverTarget();
+          var hoverTarget = isModifying || getHoverTarget();
 
           canvas.clear();
 
