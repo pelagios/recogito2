@@ -14,7 +14,7 @@ define([
         point : PointDrawingTool,
         rect  : RectDrawingTool,
         tbox  : TiltedBoxDrawingTool,
-        lbx   : LinkedBoxDrawingTool
+        lbox  : LinkedBoxDrawingTool
       };
 
   var DrawingCanvas = function(containerEl, olMap) {

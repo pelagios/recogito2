@@ -58,6 +58,61 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
   // Public methods
   return {
 
+    parseAnchor : function(anchor, opt_minheight) {
+      var min_height = (opt_minheight) ? opt_minheight : 0,
+
+          args = anchor.substring(anchor.indexOf(':') + 1).split(','),
+
+          // TODO make this robust against change of argument order
+          rx = parseInt(args[0].substring(3)),
+          ry = parseInt(args[1].substring(3)),
+          px = parseInt(args[2].substring(3)),
+          py = parseInt(args[3].substring(3)),
+          a  = parseFloat(args[4].substring(2)),
+          l  = parseFloat(args[5].substring(2)),
+          h  = parseFloat(args[6].substring(2)),
+
+          height = (Math.abs(h) > min_height) ? h : min_height,
+
+          p1 = [ px, - py ],
+          p2 = [ px + Math.cos(a) * l, - py + Math.sin(a) * l],
+          p3 = [ p2[0] - height * Math.sin(a), p2[1] + height * Math.cos(a) ],
+          p4 = [ px - height * Math.sin(a), - py + height * Math.cos(a) ];
+
+      return { rx: rx, ry: ry, px: px, py: py, a: a, l: l, h: h , coords: [ p1, p2, p3, p4 ]};
+    },
+
+    getAnchor : function(root, pivot, baseEnd, opposite) {
+          // Baseline vector
+      var dx = baseEnd[0] - pivot[0],
+          dy = baseEnd[1] - pivot[1],
+
+          // Vector base end -> opposite
+          dh = [ opposite[0] - baseEnd[0], opposite[1] - baseEnd[1] ],
+
+          corr = (dx < 0 && dy >= 0) ? Math.PI : ((dx < 0 && dy <0) ? - Math.PI : 0),
+
+          baselineAngle = Math.atan(dy / dx) + corr,
+          baselineLength = Math.sqrt(dx * dx + dy * dy),
+          height = Math.sqrt(dh[0] * dh[0] + dh[1] * dh[1]);
+
+      if (corr === 0 && dh[1] < 0)
+        height = - height;
+      else if (corr < 0 && dh[0] < 0)
+        height = - height;
+      else if (corr > 0 && dh[0] > 0)
+        height = - height;
+
+      return 'lbox:' +
+        'rx=' + Math.round(root[0]) + ',' +
+        'ry=' + Math.round(Math.abs(root[1])) + ',' +
+        'px=' + Math.round(pivot[0]) + ',' +
+        'py=' + Math.round(Math.abs(pivot[1])) + ',' +
+        'a=' + baselineAngle + ',' +
+        'l=' + Math.round(baselineLength) + ',' +
+        'h=' + Math.round(height);
+    },
+
     renderTether : function(ctx, root, pivot, hover) {
       var nook = function(inset) {
             var x = (inset) ? pivot[0] : pivot[0] - 1,

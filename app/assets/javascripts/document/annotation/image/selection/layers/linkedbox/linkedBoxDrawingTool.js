@@ -243,14 +243,12 @@ define([
 
         getSelection = function() {
           if (currentShape) {
-            /*
-            var x =   Math.round(currentShape.root.imageXY[0]),
-                y = - Math.round(currentShape.root.imageXY[1]),
-                anchor = '';
-            */
-
             return self.buildSelection(
-              'mpt',
+              LinkedBox.getAnchor(
+                currentShape.root.imageXY,
+                currentShape.pivot.imageXY,
+                currentShape.baseEnd.imageXY,
+                currentShape.opposite.imageXY),
               pointToBounds(currentShape.root.canvasXY),
               pointToBounds(currentShape.root.imageXY));
           }
