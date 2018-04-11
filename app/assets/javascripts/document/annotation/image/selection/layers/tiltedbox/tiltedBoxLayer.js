@@ -4,9 +4,6 @@ define([
   'document/annotation/image/selection/layers/tiltedbox/tiltedBox'
 ], function(Geom2D, Layer, TiltedBox) {
 
-      /** Shorthand **/
-  var TWO_PI = 2 * Math.PI;
-
   var TiltedBoxLayer = function(olMap) {
 
     var self = this,
