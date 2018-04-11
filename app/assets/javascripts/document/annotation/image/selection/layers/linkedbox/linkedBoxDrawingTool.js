@@ -1,14 +1,14 @@
 define([
-  'document/annotation/image/selection/layers/placeflag/placeFlag',
+  'document/annotation/image/selection/layers/linkedbox/linkedBox',
   'document/annotation/image/selection/layers/baseDrawingTool',
   'document/annotation/image/selection/layers/geom2D'
-], function(PlaceFlag, BaseTool, Geom2D) {
+], function(LinkedBox, BaseTool, Geom2D) {
 
   var pointToBounds = function(xy) {
         return { top: xy[1], right: xy[0], bottom: xy[1], left: xy[0], width: 0, height: 0 };
       };
 
-  var PlaceFlagDrawingTool = function(canvas, olMap, opt_selection) {
+  var LinkedBoxDrawingTool = function(canvas, olMap, opt_selection) {
     // Extends the tilted box tool
     BaseTool.apply(this, [ olMap ]);
 
@@ -276,16 +276,16 @@ define([
 
           if (currentShape) {
             if (paintState === 'PIVOT')
-              PlaceFlag.renderTether(canvas.ctx,
+              LinkedBox.renderTether(canvas.ctx,
                 currentShape.root.canvasXY,
                 currentShape.pivot.canvasXY);
             else if (paintState == 'BASELINE')
-              PlaceFlag.renderBaseline(canvas.ctx,
+              LinkedBox.renderBaseline(canvas.ctx,
                 currentShape.root.canvasXY,
                 currentShape.pivot.canvasXY,
                 currentShape.baseEnd.canvasXY);
             else
-              PlaceFlag.renderShape(canvas.ctx,
+              LinkedBox.renderShape(canvas.ctx,
                 currentShape.root.canvasXY,
                 currentShape.pivot.canvasXY,
                 currentShape.baseEnd.canvasXY,
@@ -318,8 +318,8 @@ define([
 
     render();
   };
-  PlaceFlagDrawingTool.prototype = Object.create(BaseTool.prototype);
+  LinkedBoxDrawingTool.prototype = Object.create(BaseTool.prototype);
 
-  return PlaceFlagDrawingTool;
+  return LinkedBoxDrawingTool;
 
 });
