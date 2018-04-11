@@ -28,7 +28,16 @@ define([
          */
         currentShape = (function() {
           if (opt_selection) {
-            // TODO
+            var anchor = LinkedBox.parseAnchor(opt_selection.annotation.anchor),
+                root = [ anchor.rx, - anchor.ry ],
+                coords = anchor.coords;
+
+            return {
+              root: { canvasXY: self.imageToCanvas(root), imageXY: root },
+              pivot:   { canvasXY: self.imageToCanvas(coords[0]), imageXY: coords[0] },
+              baseEnd:  { canvasXY: self.imageToCanvas(coords[1]), imageXY: coords[1] },
+              opposite: { canvasXY: self.imageToCanvas(coords[2]), imageXY: coords[2] }
+            };
           } else {
             return false;
           }
