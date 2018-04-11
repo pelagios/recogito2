@@ -46,6 +46,10 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             var color = jQuery.extend({}, e.color.toRGB(), { hex: e.color.toHex() });
             self.fireEvent('overlayColorChanged', color);
           });
+
+          // TODO remove once linked box gets rolled out publicly
+          if (Config.hasFeature('linkedbox'))
+            jQuery('#lbox-menuitem').css('display', 'initial');
         },
 
         setTool = function(toolLabel, toolKey) {

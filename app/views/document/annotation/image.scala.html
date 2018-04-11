@@ -86,9 +86,12 @@
                   <li data-tool-label="@messages("document.annotation.image.toolbar.tools.tilted_box")" data-tool-key="tbox">
                     <span class="icon"><span class="tilted-box"></span></span> @messages("document.annotation.image.toolbar.tools.tilted_box")
                   </li>
-                  <li data-tool-label="LINKED BOX" data-tool-key="lbox">
+
+                  <!-- disable for now - actived via JS, only for users with appropriate feature toggle -->
+                  <li style="display:none" id="lbox-menuitem" data-tool-label="LINKED BOX" data-tool-key="lbox">
                     <span class="icon"><span class=linked-box"></span></span> LINKED BOX
                   </li>
+
                 </ul>
               </div>
             </li>
