@@ -201,7 +201,7 @@ define([
               // Fix the baseline and start defining height
               paintState = 'OPPOSITE';
               updateShape({ baseEnd: { canvasXY: [ mouseX, mouseY ] } });
-            } else {
+            } else if (paintState === 'OPPOSITE') {
               // Fix opposite - and done
               paintState = false;
               updateShape({ opposite: { canvasXY: getFloatingOpposite() } });

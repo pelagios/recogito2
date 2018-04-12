@@ -133,7 +133,10 @@ define([
                 }, {
                   duration: FULLSCREEN_SLIDE_DURATION,
                   step: function() { olMap.updateSize(); },
-                  complete: function() { self.fireEvent('fullscreen', isFullscreen); }
+                  complete: function() {
+                    olMap.updateSize();
+                    self.fireEvent('fullscreen', isFullscreen);
+                  }
                 });
               };
 
