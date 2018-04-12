@@ -71,9 +71,10 @@ require([
           },
 
           onMapMove = function() {
-            var selection = selector.getSelection();
-            if (selection)
-              editor.setPosition(selection.bounds);
+            if (editor.isOpen()) {
+              var selection = selector.getSelection();
+              if (selection) editor.setPosition(selection.bounds);
+            }
           },
 
           onToolChanged = function(toolKey) {

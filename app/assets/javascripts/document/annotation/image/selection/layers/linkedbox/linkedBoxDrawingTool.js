@@ -197,22 +197,22 @@ define([
             if (paintState === 'PIVOT') {
               // Fix the Pivot and start defining the baseline
               paintState = 'BASELINE';
-              updateShape({ baseEnd: { canvasXY: [ mouseX, mouseY ] } });
+              updateShape({ pivot: { canvasXY: [ mouseX, mouseY ]} });
             } else if (paintState === 'BASELINE') {
               // Fix the baseline and start defining height
               paintState = 'OPPOSITE';
-              updateShape({ opposite: { canvasXY: [ mouseX, mouseY ] } });
+              updateShape({ baseEnd: { canvasXY: [ mouseX, mouseY ] } });
             } else {
               // Fix opposite - and done
               paintState = false;
+              updateShape({ opposite: { canvasXY: [ mouseX, mouseY ] } });
               self.fireEvent('create', getSelection());
             }
           } else {
             // Start new shape
             paintState = 'PIVOT';
             updateShape({
-              root: { canvasXY: [ mouseX, mouseY ] },
-              pivot: { canvasXY: [ mouseX, mouseY ]}
+              root: { canvasXY: [ mouseX, mouseY ] }
             });
           }
         },
@@ -285,12 +285,18 @@ define([
             if (paintState === 'PIVOT')
               LinkedBox.renderTether(canvas.ctx,
                 currentShape.root.canvasXY,
-                currentShape.pivot.canvasXY);
-            else if (paintState == 'BASELINE')
+                [ mouseX, mouseY ]);
+            else if (paintState === 'BASELINE')
               LinkedBox.renderBaseline(canvas.ctx,
                 currentShape.root.canvasXY,
                 currentShape.pivot.canvasXY,
-                currentShape.baseEnd.canvasXY);
+                [ mouseX, mouseY ]);
+            else if (paintState === 'OPPOSITE')
+              LinkedBox.renderShape(canvas.ctx,
+                currentShape.root.canvasXY,
+                currentShape.pivot.canvasXY,
+                currentShape.baseEnd.canvasXY,
+                [ mouseX, mouseY ]);
             else
               LinkedBox.renderShape(canvas.ctx,
                 currentShape.root.canvasXY,
