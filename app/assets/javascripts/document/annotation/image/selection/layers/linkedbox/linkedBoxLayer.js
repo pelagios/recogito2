@@ -87,16 +87,19 @@ define([
 
               drawTether = function() {
                 var col = self.getColorRGB(),
-
+                    radius = 4 * window.devicePixelRatio,
                     root = [ scale * (anchor.rx - extent[0]), scale * (extent[3] + anchor.ry) ];
 
-                // Filled circle
-                ctx.beginPath();
+                // Root circle
                 ctx.globalAlpha = 1.0;
-                ctx.arc(root[0], root[1], 2.5, 0, TWO_PI);
+                ctx.beginPath();
+                ctx.arc(root[0], root[1], radius, 0, TWO_PI);
                 ctx.fill();
+                ctx.closePath();
+
                 ctx.globalAlpha = self.getStrokeOpacity();
-                ctx.arc(root[0], root[1], 5, 0, TWO_PI);
+                ctx.beginPath();
+                ctx.arc(root[0], root[1], radius * 1.7, 0, TWO_PI);
                 ctx.stroke();
                 ctx.closePath();
 
