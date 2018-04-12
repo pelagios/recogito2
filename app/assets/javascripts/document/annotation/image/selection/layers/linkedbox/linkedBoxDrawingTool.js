@@ -110,7 +110,6 @@ define([
         },
 
         shiftShape = function(dx, dy) {
-          // TODO lots of redundancy removal should be possible...
           updateShape({
             pivot: shiftCoord(currentShape.pivot, dx, dy),
             baseEnd: shiftCoord(currentShape.baseEnd, dx, dy),
@@ -205,7 +204,7 @@ define([
             } else {
               // Fix opposite - and done
               paintState = false;
-              updateShape({ opposite: { canvasXY: [ mouseX, mouseY ] } });
+              updateShape({ opposite: { canvasXY: getFloatingOpposite() } });
               self.fireEvent('create', getSelection());
             }
           } else {
@@ -296,7 +295,7 @@ define([
                 currentShape.root.canvasXY,
                 currentShape.pivot.canvasXY,
                 currentShape.baseEnd.canvasXY,
-                [ mouseX, mouseY ]);
+                getFloatingOpposite());
             else
               LinkedBox.renderShape(canvas.ctx,
                 currentShape.root.canvasXY,

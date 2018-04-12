@@ -46,15 +46,15 @@ define([
          * and remove cursor (the drawing tools will provide it).
          */
         init = function() {
-          canvas.mousemove(onMouseMove);
-          canvas.mousedown(onMouseDown);
-          canvas.mouseup(onMouseUp);
-          canvas.bind('wheel', onMouseWheel);
-
           if (Config.IS_TOUCH) {
             canvas.bind('touchstart', onTouchStart);
             canvas.bind('touchmove', onTouchMove);
             canvas.bind('touchend', onTouchEnd);
+          } else {
+            canvas.mousemove(onMouseMove);
+            canvas.mousedown(onMouseDown);
+            canvas.mouseup(onMouseUp);
+            canvas.bind('wheel', onMouseWheel);
           }
 
           // We trigger 'mouseup' behavior when the mouse leaves the canvas
