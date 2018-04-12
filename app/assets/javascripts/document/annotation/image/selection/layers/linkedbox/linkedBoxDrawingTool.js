@@ -222,7 +222,7 @@ define([
               dy = e.originalEvent.movementY;
 
           // Don't drag the background map if the shape is being modfied
-          if (isModifying) canvas.setForwardEvents(false);
+          if (isModifying || paintState) canvas.setForwardEvents(false);
           else canvas.setForwardEvents(true);
 
 

@@ -209,10 +209,12 @@ define([
 
         onMouseDrag = function(e) {
           var dx = e.originalEvent.movementX,
-              dy = e.originalEvent.movementY;
+              dy = e.originalEvent.movementY,
 
-          // Don't drag the background map if the shape is being modfied
-          if (isModifying) canvas.setForwardEvents(false);
+              // Don't drag the background map if the shape is being modfied
+              dontDrag = isModifying || isStateBaseline || isStateExtrude;
+
+          if (dontDrag) canvas.setForwardEvents(false);
           else canvas.setForwardEvents(true);
 
           if (isModifying === 'SHAPE')

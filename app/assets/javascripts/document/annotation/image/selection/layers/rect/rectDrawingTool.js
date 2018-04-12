@@ -169,7 +169,7 @@ define([
               dy = e.originalEvent.movementY;
 
           // Don't drag the background map if the shape is being modfied
-          if (isModifying) canvas.setForwardEvents(false);
+          if (isModifying || isDrawing) canvas.setForwardEvents(false);
           else canvas.setForwardEvents(true);
 
           if (isModifying === 'START_HANDLE' || isModifying === 'END_HANDLE')
