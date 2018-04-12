@@ -165,12 +165,11 @@ define([
         },
 
         onMouseDrag = function(e) {
-          var hoverTarget = getHoverTarget(),
-              dx = e.originalEvent.movementX,
+          var dx = e.originalEvent.movementX,
               dy = e.originalEvent.movementY;
 
           // Don't drag the background map if the shape is being modfied
-          if (isModifying || hoverTarget) canvas.setForwardEvents(false);
+          if (isModifying) canvas.setForwardEvents(false);
           else canvas.setForwardEvents(true);
 
           if (isModifying === 'START_HANDLE' || isModifying === 'END_HANDLE')
