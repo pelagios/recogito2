@@ -45,7 +45,7 @@ define([
           return new ol.style.Style({
             stroke: new ol.style.Stroke({
               color: stroke,
-              width: 1
+              width: window.devicePixelRatio
             }),
 
             fill: new ol.style.Fill({

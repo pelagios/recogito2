@@ -73,7 +73,7 @@ define([
           var setStyles = function() {
                 ctx.fillStyle = color;
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 1;
+                ctx.lineWidth = (window.devicePixelRatio) ? window.devicePixelRatio : 1;
               },
 
               // Helper function to trace a rectangle path
@@ -113,6 +113,7 @@ define([
 
               drawBox = function() {
                 var col = self.getColorRGB();
+
                 // Fill
                 ctx.globalAlpha = self.getFillOpacity();
                 ctx.beginPath();
