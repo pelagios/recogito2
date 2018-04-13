@@ -9,7 +9,8 @@ CREATE TABLE "user" (
   bio TEXT,
   website TEXT,
   quota_mb INT NOT NULL DEFAULT 200,
-  last_login TIMESTAMP WITH TIME ZONE NOT NULL
+  last_login TIMESTAMP WITH TIME ZONE NOT NULL,
+  gdpr_opt_in BOOLEAN
 );
 CREATE INDEX idx_user_email ON "user"(email);
 

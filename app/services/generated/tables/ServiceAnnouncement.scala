@@ -105,7 +105,7 @@ class ServiceAnnouncement(alias : String, aliased : Table[ServiceAnnouncementRec
 	}
 
 	override def getKeys : List[ UniqueKey[ServiceAnnouncementRecord] ] = {
-		return Arrays.asList[ UniqueKey[ServiceAnnouncementRecord] ](Keys.SERVICE_ANNOUNCEMENT_PKEY, Keys.SERVICE_ANNOUNCEMENT_FOR_USER_KEY)
+		return Arrays.asList[ UniqueKey[ServiceAnnouncementRecord] ](Keys.SERVICE_ANNOUNCEMENT_PKEY)
 	}
 
 	override def getReferences : List[ ForeignKey[ServiceAnnouncementRecord, _] ] = {

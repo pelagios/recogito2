@@ -155,7 +155,12 @@ class SignupController @Inject() (
 
       signupData => {
         val fUser = for {
-          user <- users.insertUser(signupData.username, signupData.email, signupData.password)
+          user <- users.insertUser(
+                    signupData.username, 
+                    signupData.email, 
+                    signupData.password,
+                    signupData.agreedToTerms) // Form validation enforces agreed = true
+                  
           _ <- importOnboardingContent(user.getUsername)
         } yield user
         

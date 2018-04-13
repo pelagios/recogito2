@@ -4,6 +4,7 @@
 package services.generated.tables
 
 
+import java.lang.Boolean
 import java.lang.Class
 import java.lang.Integer
 import java.lang.String
@@ -100,6 +101,11 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	 * The column <code>public.user.last_login</code>.
 	 */
 	val LAST_LOGIN : TableField[UserRecord, Timestamp] = createField("last_login", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), "")
+
+	/**
+	 * The column <code>public.user.gdpr_opt_in</code>.
+	 */
+	val GDPR_OPT_IN : TableField[UserRecord, Boolean] = createField("gdpr_opt_in", org.jooq.impl.SQLDataType.BOOLEAN, "")
 
 	/**
 	 * Create a <code>public.user</code> table reference

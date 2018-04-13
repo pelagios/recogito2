@@ -78,11 +78,11 @@ class UserService @Inject() (
     Page(System.currentTimeMillis - startTime, total, offset, limit, users)
   } 
 
-  def insertUser(username: String, email: String, password: String) = db.withTransaction { sql =>
+  def insertUser(username: String, email: String, password: String, optIn: Boolean) = db.withTransaction { sql =>
     val now = new Timestamp(new Date().getTime)
     val salt = randomSalt()
     val user = new UserRecord(username, encrypt(email), computeHash(salt + password), salt,
-      now, null, null, null, DEFAULT_QUOTA, now)
+      now, null, null, null, DEFAULT_QUOTA, now, optIn)
     sql.insertInto(USER).set(user).execute()
     user
   }

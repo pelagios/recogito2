@@ -71,7 +71,6 @@ object Keys {
 	val FEATURE_TOGGLE_PKEY = UniqueKeys0.FEATURE_TOGGLE_PKEY
 	val FOLDER_PKEY = UniqueKeys0.FOLDER_PKEY
 	val SERVICE_ANNOUNCEMENT_PKEY = UniqueKeys0.SERVICE_ANNOUNCEMENT_PKEY
-	val SERVICE_ANNOUNCEMENT_FOR_USER_KEY = UniqueKeys0.SERVICE_ANNOUNCEMENT_FOR_USER_KEY
 	val SHARING_POLICY_PKEY = UniqueKeys0.SHARING_POLICY_PKEY
 	val SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY = UniqueKeys0.SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY
 	val TASK_PKEY = UniqueKeys0.TASK_PKEY
@@ -122,7 +121,6 @@ object Keys {
 		val FEATURE_TOGGLE_PKEY : UniqueKey[FeatureToggleRecord] = AbstractKeys.createUniqueKey(FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.ID)
 		val FOLDER_PKEY : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
 		val SERVICE_ANNOUNCEMENT_PKEY : UniqueKey[ServiceAnnouncementRecord] = AbstractKeys.createUniqueKey(ServiceAnnouncement.SERVICE_ANNOUNCEMENT, ServiceAnnouncement.SERVICE_ANNOUNCEMENT.ID)
-		val SERVICE_ANNOUNCEMENT_FOR_USER_KEY : UniqueKey[ServiceAnnouncementRecord] = AbstractKeys.createUniqueKey(ServiceAnnouncement.SERVICE_ANNOUNCEMENT, ServiceAnnouncement.SERVICE_ANNOUNCEMENT.FOR_USER)
 		val SHARING_POLICY_PKEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val SHARING_POLICY_DOCUMENT_ID_SHARED_WITH_KEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.DOCUMENT_ID, SharingPolicy.SHARING_POLICY.SHARED_WITH)
 		val TASK_PKEY : UniqueKey[TaskRecord] = AbstractKeys.createUniqueKey(Task.TASK, Task.TASK.ID)

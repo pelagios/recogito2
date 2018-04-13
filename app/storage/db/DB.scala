@@ -91,7 +91,7 @@ class DBInitializer @Inject() (db: Database, userService: UserService, implicit 
         Logger.warn("#######################################################")
         
         val f = for {
-          _ <- userService.insertUser("recogito", "recogito@example.com", "recogito")
+          _ <- userService.insertUser("recogito", "recogito@example.com", "recogito", false)
           _ <- userService.insertUserRole("recogito", Roles.Admin)
         } yield()
   
