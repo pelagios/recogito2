@@ -1,9 +1,10 @@
 define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
   var ICONS = {
-    POINT     : '&#xf05b',
-    RECTANGLE : '<span class="rect"></span>',
-    TBOX   : '<span class="tilted-box"></span>'
+    point : '&#xf05b',
+    rect  : '<span class="rect"></span>',
+    tbox  : '<span class="tilted-box"></span>',
+    lbox  : '<span class="linked-box"></span>'
   };
 
   var Toolbar = function() {
@@ -59,6 +60,9 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             tools.find('[data-tool-key="move"]').addClass('active');
           } else {
             // Submenu selection
+            console.log(toolKey);
+            console.log(toolMenuIcon);
+            console.log(ICONS[toolKey]);
             toolMenu.addClass('active');
             toolMenu.data('tool-label', toolLabel);
             toolMenu.data('tool-key', toolKey);

@@ -41,24 +41,47 @@ body {
     display:inline-block;
     width:14px;
     padding-right:3px;
-  }
+    position:relative;
 
-  .icon .rect {
-    display:inline-block;
-    border:1px dotted @nightsky-type;
-    width:11px;
-    height:7px;
-  }
+    .rect {
+      display:inline-block;
+      border:1px dotted @nightsky-type;
+      width:11px;
+      height:7px;
+    }
 
-  .icon .tilted-box {
-    display:inline-block;
-    margin-left:1px;
-    border-width:1px;
-    border-color:@nightsky-type;
-    border-style:dotted dotted solid dotted;
-    width:11px;
-    height:5px;
-    .rotate(-19deg);
+    .tilted-box {
+      display:inline-block;
+      margin-left:1px;
+      border-width:1px;
+      border-color:@nightsky-type;
+      border-style:dotted dotted solid dotted;
+      width:11px;
+      height:5px;
+      .rotate(-19deg);
+    }
+
+    .linked-box {
+      display:inline-block;
+      margin-left:1px;
+      border:1px solid @nightsky-type;
+      width:10px;
+      height:5px;
+      .rotate(-9deg);
+    }
+
+    .linked-box::before {
+      content:'';
+      display:inline-block;
+      position:absolute;
+      top:4px;
+      left:-4px;
+      width:5px;
+      height:5px;
+      .rounded-corners(50%);
+      background-color:@nightsky-type;
+    }
+
   }
 
   li.disabled {
