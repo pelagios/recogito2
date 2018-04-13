@@ -5,6 +5,7 @@ import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import javax.inject.{Inject, Singleton}
 import services.{HasDate, SortOrder}
 import services.annotation.AnnotationService
+import services.announcement.AnnouncementService
 import services.contribution.ContributionService
 import services.document.DocumentService
 import services.upload.UploadService
@@ -29,6 +30,7 @@ class UserAdminController @Inject() (
   val config: Configuration,
   val silhouette: Silhouette[Security.Env],
   implicit val annotations: AnnotationService,
+  implicit val announcements: AnnouncementService,
   implicit val contributions: ContributionService,
   implicit val ctx: ExecutionContext,
   implicit val documents: DocumentService,

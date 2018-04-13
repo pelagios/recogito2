@@ -3,6 +3,7 @@ package controllers.my.settings
 import com.mohiva.play.silhouette.api.{Silhouette, LoginInfo}
 import controllers.{HasUserService, HasConfig, Security}
 import javax.inject.Inject
+import services.announcement.AnnouncementService
 import services.annotation.AnnotationService
 import services.contribution.ContributionService
 import services.user.Roles._
@@ -29,6 +30,7 @@ class AccountSettingsController @Inject() (
   val components: ControllerComponents,
   val config: Configuration,
   val silhouette: Silhouette[Security.Env],
+  implicit val announcements: AnnouncementService,
   implicit val annotations: AnnotationService,
   implicit val contributions: ContributionService,
   implicit val ctx: ExecutionContext,

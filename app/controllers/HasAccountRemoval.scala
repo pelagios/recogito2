@@ -2,6 +2,7 @@ package controllers
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
+import services.announcement.AnnouncementService
 import services.annotation.AnnotationService
 import services.contribution.ContributionService
 import services.document.DocumentService
@@ -36,7 +37,8 @@ trait HasAccountRemoval {
     }
   }
   
-  def deleteUserAccount(username: String)(implicit 
+  def deleteUserAccount(username: String)(implicit
+    announcements: AnnouncementService,
     annotations: AnnotationService,
     context: ExecutionContext,
     contributions: ContributionService,
@@ -53,11 +55,15 @@ trait HasAccountRemoval {
     
     // Delete sharing policies shared by and with this user
     val fDeleteSharingPolicies = documents.deleteAffectedPolicies(username)
+    
+    // Delete pending/archived announcements for this user, if any
+    val fDeleteAnnouncements = announcements.deleteForUser(username)
         
     for {
       ids <- fOwnedDocumentIds
       _ <- fDeletePendingUpload
       _ <- fDeleteSharingPolicies
+      _ <- fDeleteAnnouncements
       
       // Delete owned documents, document_fileparts & sharing policies linked to them
       _ <- documents.deleteByOwner(username) 

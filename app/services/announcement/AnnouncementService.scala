@@ -34,11 +34,16 @@ class AnnouncementService @Inject() (val db: DB, users: UserService, implicit va
   }
   
   def clearAll(): Future[Boolean] = db.query { sql =>
-    val result = sql.deleteFrom(SERVICE_ANNOUNCEMENT).execute()
+    sql.deleteFrom(SERVICE_ANNOUNCEMENT).execute()
     true
   } recover { case t: Throwable =>
     t.printStackTrace()
     false
+  }
+  
+  def deleteForUser(username: String) = db.query { sql =>
+    sql.deleteFrom(SERVICE_ANNOUNCEMENT)
+       .where(SERVICE_ANNOUNCEMENT.FOR_USER.equal(username)).execute()
   }
   
   def insertBroadcastAnnouncement(content: String): Future[Boolean] =  {
