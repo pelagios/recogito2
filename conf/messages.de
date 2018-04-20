@@ -28,7 +28,7 @@ common.buttons.save_changes=Änderungen Speichern
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Willkommen bei Recogito
 landing.index.header.link.tutorial=Tutorial
-landing.index.header.link.login=Login
+landing.index.header.link.login=Anmelden
 
 # Jumbotron
 landing.index.jumbotron.tagline.1=Semantische Annotation
@@ -76,7 +76,7 @@ landing.index.visit_us=<span class="icon">{0}</span> Besuchen Sie uns auf \
 my.header.joined_on=Beigetreten am
 my.header.account_settings=Kontoeinstellungen
 my.header.space_used=In Gebrauch
-my.header.logout=Logout
+my.header.logout=Abmelden
 
 my.tabs.my_documents=Meine Dokumente
 my.tabs.shared_with_me=Mit mir geteilt
