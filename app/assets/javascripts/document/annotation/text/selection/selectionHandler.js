@@ -54,13 +54,37 @@ define([
                   .add(jQuery(selection.focusNode)) // start node of the selection
                   .closest('.annotation-editor-popup').length > 0,
 
-              selectedRange, annotation, bounds, spans;
+              // Util function to check if the selection is an exact overlap to any
+              // annotations that already exist at this point
+              getExactOverlaps = function(newAnnotation, selectedSpans) {
+                // All existing annotations at this point
+                var existingAnnotations = [];
+
+                selectedSpans.forEach(function(span) {
+                  var enclosingAnnotationSpans = jQuery(span).closest('.annotation');
+                      enclosingAnnotation = (enclosingAnnotationSpans.length > 0) ?
+                        enclosingAnnotationSpans[0].annotation : false;
+
+                  if (enclosingAnnotation && existingAnnotations.indexOf(enclosingAnnotation) === -1)
+                    existingAnnotations.push(enclosingAnnotation);
+                });
+
+                if (existingAnnotations.length > 0)
+                  return existingAnnotations.filter(function(anno) {
+                    return anno.anchor == newAnnotation.anchor;
+                  });
+                else
+                  return [];
+              },
+
+              selectedRange, annotation, exactOverlaps, bounds, spans;
 
           // If the mouseup happened on the editor, we'll ignore
           if (isSelectionOnEditor)
             return;
 
-          // Check for new text selection first - takes precedence over clicked annotation span
+          // Check for new text selection first - takes precedence over clicked
+          // annotation span, otherwise we can't create annotations inside exsiting ones
           if (Config.writeAccess &&
               !selection.isCollapsed &&
                selection.rangeCount == 1 &&
@@ -69,21 +93,30 @@ define([
              selectedRange = self.trimRange(selection.getRangeAt(0));
              annotation = self.rangeToAnnotationStub(selectedRange);
              bounds = selectedRange.nativeRange.getBoundingClientRect();
+
              spans = highlighter.wrapRange(selectedRange);
              jQuery.each(spans, function(idx, span) { span.className = 'selection'; });
-
              clearNativeSelection();
 
-             // A new selection
-             currentSelection = {
-               isNew      : true,
-               annotation : annotation,
-               bounds     : bounds,
+             exactOverlaps = getExactOverlaps(annotation, spans);
 
-               // Text-UI specific field - speeds things up a bit
-               // in highlighter.convertSelectionToAnnotation
-               spans      : spans
-             };
+             if (exactOverlaps.length > 0)
+               // User selected over existing - reuse top-most original to avoid stratification
+               currentSelection = {
+                 isNew      : false,
+                 annotation : exactOverlaps[0],
+                 bounds     : bounds
+               };
+             else
+               currentSelection = {
+                 isNew      : true,
+                 annotation : annotation,
+                 bounds     : bounds,
+
+                 // Text-UI specific field - speeds things up a bit
+                 // in highlighter.convertSelectionToAnnotation
+                 spans      : spans
+               };
 
              self.fireEvent('select', currentSelection);
           } else if (annotationSpan.length > 0) {
