@@ -215,10 +215,6 @@ define([
                 return a.start < b.end && a.end > b.start;
               },
 
-              completelyOverlaps = function(a, b) {
-                return a.start === b.start && a.end === b.end;
-              },
-
               setNonOverlappingRange = function(range, offset, length) {
                 var positions = calculateDomPositionWithin(textNodes, [ offset, offset + length ]),
                     startNode = positions[0].node,
@@ -247,15 +243,8 @@ define([
 
             if (previousBounds && intersects(previousBounds, bounds)) {
               positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
-
-              if (completelyOverlaps(previousBounds, bounds)) {
-                range.setStart(positions[0].node, positions[0].offset);
-                range.setEnd(positions[1].node, positions[1].offset);
-              } else {
-                range.setStart(positions[0].node, positions[0].offset);
-                range.setEnd(positions[1].node, positions[1].offset);
-              }
-
+              range.setStart(positions[0].node, positions[0].offset);
+              range.setEnd(positions[1].node, positions[1].offset);
               spans = wrapRange(range);
             } else {
               // Fast rendering through Rangy's API
