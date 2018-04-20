@@ -172,7 +172,7 @@ define([
 
           jQuery.each(spans, function(idx, span) {
             var style = (currentStyle) ? currentStyle.getStyle(annotation) : null;
-            span.className = cssClass;
+            jQuery(span).addClass(cssClass);
 
             if (style) {
               span.style.backgroundColor = style.color;
@@ -215,6 +215,10 @@ define([
                 return a.start < b.end && a.end > b.start;
               },
 
+              perfectlyOverlaps = function(a, b) {
+                return a.start === b.start && a.end === b.end;
+              },
+
               setNonOverlappingRange = function(range, offset, length) {
                 var positions = calculateDomPositionWithin(textNodes, [ offset, offset + length ]),
                     startNode = positions[0].node,
@@ -246,6 +250,8 @@ define([
               range.setStart(positions[0].node, positions[0].offset);
               range.setEnd(positions[1].node, positions[1].offset);
               spans = wrapRange(range);
+              if (perfectlyOverlaps(previousBounds, bounds))
+                spans.forEach(function(span) { span.className = 'stratified'; });
             } else {
               // Fast rendering through Rangy's API
               setNonOverlappingRange(range, anchor, quote.length);
