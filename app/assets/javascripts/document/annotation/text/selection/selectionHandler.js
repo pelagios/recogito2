@@ -1,8 +1,9 @@
 define([
   'common/config',
+  'common/utils/annotationUtils',
   'document/annotation/common/selection/abstractSelectionHandler'],
 
-  function(Config, AbstractSelectionHandler) {
+  function(Config, Utils, AbstractSelectionHandler) {
 
   var SelectionHandler = function(rootNode, highlighter) {
 
@@ -71,7 +72,9 @@ define([
 
                 if (existingAnnotations.length > 0)
                   return existingAnnotations.filter(function(anno) {
-                    return anno.anchor == newAnnotation.anchor;
+                    var isSameAnchor = anno.anchor == newAnnotation.anchor,
+                        isSameQuote = Utils.getQuote(anno) == Utils.getQuote(newAnnotation);
+                    return isSameAnchor && isSameQuote;
                   });
                 else
                   return [];
