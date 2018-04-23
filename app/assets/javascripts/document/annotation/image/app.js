@@ -116,6 +116,7 @@ require([
       toolbar.on('toolChanged', onToolChanged);
       toolbar.on('toggleHelp', onToggleHelp);
       toolbar.on('overlayColorChanged', onOverlayColorChanged);
+      toolbar.on('toggleOverlays', highlighter.toggleOverlays);
 
       BaseApp.apply(this, [ annotations, highlighter, selector ]);
 

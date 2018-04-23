@@ -13,9 +13,9 @@ define([
                   '</h2>' +
                   '<div class="help-body inner">' +
 
-                   '<h3 class="write-only">Keyboard Shortcuts</h3>' +
-                   '<table class="shortcuts write-only">' +
-                     '<tr>' +
+                   '<h3>Keyboard Shortcuts</h3>' +
+                   '<table class="shortcuts">' +
+                     '<tr class="write-only">' +
                        '<td><span class="key">SPACE</span></td>' +
                        '<td>toggle between MOVE and current annotation tool</td>' +
                      '</tr>' +

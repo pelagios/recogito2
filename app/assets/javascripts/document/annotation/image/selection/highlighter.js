@@ -101,13 +101,10 @@ define([
               layers[key].setColor(color);
           },
 
-          onKeydown = function(e) {
-            if (e.altKey && e.which === 86) // Alt + V
-              for (var key in layers)
-                layers[key].toggleVisibility();
+          toggleOverlays = function() {
+            for (var key in layers)
+              layers[key].toggleVisibility();
           };
-
-      jQuery(document).keydown(onKeydown);
 
       this.getAnnotationAt = getAnnotationAt;
       this.findById = findById;
@@ -117,6 +114,7 @@ define([
       this.convertSelectionToAnnotation = convertSelectionToAnnotation;
       this.emphasiseAnnotation = emphasiseAnnotation;
       this.setOverlayColor = setOverlayColor;
+      this.toggleOverlays = toggleOverlays;
 
       AbstractHighlighter.apply(this);
     };

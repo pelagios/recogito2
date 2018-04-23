@@ -132,13 +132,27 @@ body {
       left:-14px;
       top:28px;
 
-      li {
+      li.palette {
         padding:0 10px;
 
         .colorpicker-color {
           display:none;
         }
 
+      }
+
+      li.visibility {
+
+        .icon::before {
+          content:'\f0c8';
+          padding-left:1px;
+          color:lighten(@standard-type, 3%);
+          font-size: 14px;
+        }
+      }
+
+      li.visibility.checked {
+        .icon::before { content:'\f14a'; }
       }
 
     }

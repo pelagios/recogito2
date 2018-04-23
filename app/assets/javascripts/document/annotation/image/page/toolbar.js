@@ -20,6 +20,8 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
         changeColor = jQuery('.change-color'),
 
+        toggleOverlays = changeColor.find('.visibility'),
+
         imagePane = jQuery('#image-pane'),
 
         initDropdownMenus = function() {
@@ -42,15 +44,23 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           changeColor.colorpicker({
             color: 'rgba(50, 50, 50, 0.2)',
             inline: true,
-            container: changeColor.find('.colorpicker li')
+            container: changeColor.find('.colorpicker li.palette')
           }).on('changeColor', function(e) {
             var color = jQuery.extend({}, e.color.toRGB(), { hex: e.color.toHex() });
             self.fireEvent('overlayColorChanged', color);
           });
 
+          toggleOverlays.click(onToggleOverlays);
+
           // TODO remove once linked box gets rolled out publicly
           if (Config.hasFeature('linkedbox'))
             jQuery('#lbox-menuitem').css('display', 'initial');
+        },
+
+        onToggleOverlays = function() {
+          var isChecked = toggleOverlays.hasClass('checked');
+          toggleOverlays.toggleClass('checked');
+          self.fireEvent('toggleOverlays');
         },
 
         setTool = function(toolLabel, toolKey) {
@@ -60,9 +70,6 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
             tools.find('[data-tool-key="move"]').addClass('active');
           } else {
             // Submenu selection
-            console.log(toolKey);
-            console.log(toolMenuIcon);
-            console.log(ICONS[toolKey]);
             toolMenu.addClass('active');
             toolMenu.data('tool-label', toolLabel);
             toolMenu.data('tool-key', toolKey);
@@ -126,8 +133,10 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
               if (Config.writeAccess)
                 toggleTool();
             } else if (key == 112) { // F1
-                toggleHelp();
-                return false; // To prevent browser help from popping up
+              toggleHelp();
+              return false; // To prevent browser help from popping up
+            } else if (e.altKey && key === 86) { // Alt + V
+              onToggleOverlays();
             }
           }
         };
