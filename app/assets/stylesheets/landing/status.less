@@ -1,0 +1,32 @@
+@import "../_globals.less";
+@import "_credentialPage.less";
+
+#content {
+  position:relative;
+  max-width:320px;
+  margin:30px auto;
+  background-color:#fff;
+  .rounded-corners(2px);
+  box-shadow:0 2px 10px 0 rgba(0,0,0,0.2),0 2px 20px 0 rgba(0,0,0,0.2);
+  padding:30px;
+}
+
+table {
+  width:100%;
+}
+
+td.status {
+  font-style:normal;
+  font-weight:bold;
+  color:green;
+  font-size:140%;
+  padding:0 10px;
+}
+
+td.status.down {
+  color:red;
+}
+
+.hidden-summary {
+  display:none;
+}

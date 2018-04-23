@@ -18,6 +18,7 @@ GET     /login/confirm-announcment                   controllers.landing.LoginLo
 GET     /logout                                      controllers.landing.LoginLogoutController.logout
 GET     /reset_password                              controllers.landing.ResetPasswordController.showResetForm
 POST    /reset_password                              controllers.landing.ResetPasswordController.resetPassword
+GET     /status                                      controllers.landing.StatusController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Help area

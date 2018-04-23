@@ -1,0 +1,37 @@
+@(dbStatus: Boolean, idxStatus: Boolean)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Status | Recogito</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/landing/status.css")"/>
+  </head>
+  <body>
+    <div id="content">
+      <table>
+        <tr>
+          <td>Recogito is currently</td><td class="status">UP</td>
+        </tr>
+        <tr>
+          <td>Database</td>
+          @if(dbStatus) {
+            <td class="status">UP</td>
+          } else {
+            <td class="status down">DOWN</td>
+          }
+        </tr>
+        <tr>
+          <td>Index</td>
+          @if(idxStatus) {
+            <td class="status">UP</td>
+          } else {
+            <td class="status down">DOWN</td>
+          }
+        </tr>
+      </table>
+
+      @if(dbStatus && idxStatus) {
+        <p class="hidden-summary">All systems go</p>
+      }
+    </div>
+  </body>
+</html>
