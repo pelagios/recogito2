@@ -4,6 +4,8 @@ version := "2.2"
 
 scalaVersion := "2.11.11"
 
+publishMavenStyle in ThisBuild := false
+
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalacOptions ++= Seq("-feature")
@@ -90,6 +92,7 @@ libraryDependencies ++= Seq(
   "org.webjars.npm" % "bootstrap-colorpicker" % "2.5.2" intransitive(),
   "org.webjars.npm" % "openlayers" % "4.6.4" intransitive(),
   "org.webjars.bower" % "blazy" % "1.8.0",
+  "org.webjars.bower" % "cookieconsent" % "3.0.6",
   "org.webjars.bower" % "marked" % "0.3.6",
   "org.webjars.bower" % "js-grid" % "1.4.1",
   "org.webjars.bower" % "plotly.js" % "1.12.0",

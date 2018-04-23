@@ -38,6 +38,16 @@ require([], function() {
 
               window.setTimeout(function() { refreshStats(); }, 5000);
             });
+        },
+
+        showCookiePopup = function() {
+          window.cookieconsent.initialise({
+            palette: {
+              popup  : { background: '#252e39' },
+              button : { background: '#4483c4' }
+            },
+            position: 'bottom-left'
+          });
         };
 
     // Activate the carousel
@@ -46,6 +56,8 @@ require([], function() {
       autoplaySpeed : 12000,
       pauseOnHover  : true
     });
+
+    showCookiePopup();
 
     // Start stats poll loop
     refreshStats();
