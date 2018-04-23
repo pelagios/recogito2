@@ -12,11 +12,7 @@ define([
         contributorsEl = jQuery('.quick-stats .contributors'),
         attributionEl = jQuery('.attribution'),
 
-        saveMessageEl = (function() {
-          var el = jQuery('<div class="save-msg"></div>');
-          jQuery('.header-iconbar').append(el);
-          return el;
-        })(),
+        saveMessageEl = jQuery('.save-msg'),
 
         saveMessageTimer = false,
 

@@ -46,3 +46,23 @@ canvas.drawing-canvas {
   z-index:1;
   .noselect();
 }
+
+.save-msg.fullscreen {
+  position:absolute;
+  top:50px;
+  margin:0 auto;
+  text-align:center;
+  width:100%;
+  font-size:15px;
+  color:transparent;
+
+  .save-error {
+    display:inline-block;
+    color:@error-msg-type;
+    background-color:@error-msg-bg;
+    padding:0 6px;
+    border:1px solid @error-msg-border;
+    .box-shadow(1px, 1px, 12px, rgba(0, 0, 0, 0.15));
+  }
+
+}

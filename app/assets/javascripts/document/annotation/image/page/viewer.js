@@ -25,6 +25,8 @@ define([
         infobox = jQuery('.header-infobox'),
         toolbar = jQuery('.header-toolbar'),
 
+        saveMsg = jQuery('.save-msg'),
+
         /** Heights/widths we need for fullscreen toggle animation **/
         headerHeight = iconbar.outerHeight() + infobox.outerHeight(),
         toolbarHeight = toolbar.outerHeight(),
@@ -142,6 +144,11 @@ define([
 
           // Change state before animation starts
           isFullscreen = !isFullscreen;
+
+          if (isFullscreen) jQuery(document.body).append(saveMsg);
+          else iconbar.append(saveMsg);
+
+          saveMsg.toggleClass('fullscreen');
 
           toggleHeader();
           toggleSidebar();
