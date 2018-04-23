@@ -103,14 +103,15 @@ define([
 
              exactOverlaps = getExactOverlaps(annotation, spans);
 
-             if (exactOverlaps.length > 0)
+             if (exactOverlaps.length > 0) {
                // User selected over existing - reuse top-most original to avoid stratification
+               clearSelection();
                currentSelection = {
                  isNew      : false,
                  annotation : exactOverlaps[0],
                  bounds     : bounds
                };
-             else
+             } else {
                currentSelection = {
                  isNew      : true,
                  annotation : annotation,
@@ -120,6 +121,7 @@ define([
                  // in highlighter.convertSelectionToAnnotation
                  spans      : spans
                };
+             }
 
              self.fireEvent('select', currentSelection);
           } else if (annotationSpan.length > 0) {

@@ -271,6 +271,8 @@ define([
          * CSS classes, and attaching the annotation object to the elements.
          */
         convertSelectionToAnnotation = function(selection) {
+          console.log('converting selection');
+
           updateStyles(selection.annotation, selection.spans);
 
           // Add a marker class, so we can quickly retrieve all SPANs linked
@@ -290,6 +292,7 @@ define([
         },
 
         refreshAnnotation = function(annotation) {
+          console.log('refreshing');
           var spans = jQuery('[data-id=' + annotation.annotation_id + ']');
           if (spans.length === 0) {
             // No spans with that ID? Could be a post-store refresh of a pending annotation
