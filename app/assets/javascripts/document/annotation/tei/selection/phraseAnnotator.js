@@ -3,32 +3,23 @@
  * prompts the user to re-apply the current annotation.
  */
 define([
-  'common/utils/annotationUtils',
-  'common/config'
-], function(AnnotationUtils, Config) {
+  'document/annotation/tei/selection/pathUtils',
+  'document/annotation/text/selection/phraseAnnotator'
+], function(PathUtils, TextPhraseAnnotator) {
 
-  var PhraseAnnotator = function(contentEl, highlighter) {
+  var TEIPhraseAnnotator = function(contentEl, highlighter) {
+    this.rootNode = contentEl;
+    TextPhraseAnnotator.apply(this, [ contentEl, highlighter ]);
+  };
+  TEIPhraseAnnotator.prototype = Object.create(TextPhraseAnnotator.prototype);
 
-    var countOccurrences = function(phrase) {
+  TEIPhraseAnnotator.prototype.rangeToAnchor = function(selectedRange, textNode, contentEl) {
+    var startDOMPath = PathUtils.getXPath(selectedRange.startContainer),
+        endDOMPath = PathUtils.getXPath(selectedRange.endContainer);
 
-          /*
-          getUnannotatedSegments().reduce(function(sum, textNode) {
-            var split = textNode.nodeValue.split(phrase);
-            return sum + split.length - 1;
-          }, 0);
-          */
-
-          return 0;
-        },
-
-        createSelections = function(annotation) {
-
-        };
-
-    this.countOccurrences = countOccurrences;
-    this.createSelections = createSelections;
+    return PathUtils.toTEIPaths(this.rootNode, startDOMPath, endDOMPath, selectedRange);
   };
 
-  return PhraseAnnotator;
+  return TEIPhraseAnnotator;
 
  });

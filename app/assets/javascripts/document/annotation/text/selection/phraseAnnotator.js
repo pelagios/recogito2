@@ -11,8 +11,11 @@ define([
 
   var PhraseAnnotator = function(contentEl, highlighter) {
 
-    var getUnannotatedSegments = function() {
-          return jQuery.grep(jQuery(contentEl).contents(), function(node) {
+    var that = this,
+
+        getUnannotatedSegments = function() {
+          var unannotatedNodes = jQuery(contentEl).find(':not(.annotation)').addBack().contents();
+          return jQuery.grep(unannotatedNodes, function(node) {
             return node.nodeType == TEXT;
           });
         },
@@ -49,25 +52,14 @@ define([
               },
 
               createSelectionsInTextNode = function(textNode) {
-                var ranges = createRangesInTextNode(textNode);
-
-                return jQuery.map(ranges, function(range) {
-
-                  var computeOffset = function() {
-                        var rangeBefore = rangy.createRange();
-                        rangeBefore.setStart(contentEl, 0);
-                        rangeBefore.setEnd(textNode, range.startOffset);
-
-                        return rangeBefore.toString().length;
-                      },
-
-                      a = {
+                return createRangesInTextNode(textNode).map(function(range) {
+                  var a = {
                         annotates: {
                           document_id: Config.documentId,
                           filepart_id: Config.partId,
                           content_type: Config.contentType
                         },
-                        anchor: 'char-offset:' + computeOffset(),
+                        anchor: that.rangeToAnchor(range, textNode, contentEl),
 
                         bodies: jQuery.map(annotation.bodies, function(body) {
                           return jQuery.extend({}, body);
@@ -97,7 +89,13 @@ define([
 
     this.countOccurrences = countOccurrences;
     this.createSelections = createSelections;
+  };
 
+  PhraseAnnotator.prototype.rangeToAnchor = function(range, textNode, contentEl) {
+    var rangeBefore = rangy.createRange();
+    rangeBefore.setStart(contentEl, 0);
+    rangeBefore.setEnd(textNode, range.startOffset);
+    return 'char-offset:' + rangeBefore.toString().length;
   };
 
   return PhraseAnnotator;
