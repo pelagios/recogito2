@@ -9,8 +9,7 @@ define([
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
-  'document/annotation/text/page/toolbar',
-  'document/annotation/text/selection/phraseAnnotator'
+  'document/annotation/text/page/toolbar'
 ], function(
   Alert,
   Formatting,
@@ -22,10 +21,9 @@ define([
   WriteEditor,
   LoadIndicator,
   BaseApp,
-  Toolbar,
-  PhraseAnnotator) {
+  Toolbar) {
 
-  var App = function(contentNode, highlighter, selector) {
+  var App = function(contentNode, highlighter, selector, phraseAnnotator) {
 
     var self = this,
 
@@ -37,9 +35,7 @@ define([
 
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
-        phraseAnnotator = new PhraseAnnotator(contentNode, highlighter);
-
-        var editor = (Config.writeAccess) ?
+        editor = (Config.writeAccess) ?
           new WriteEditor(containerNode, annotations.readOnly(), selector) :
           new ReadEditor(containerNode, annotations.readOnly()),
 

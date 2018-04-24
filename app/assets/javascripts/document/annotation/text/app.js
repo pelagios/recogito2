@@ -10,15 +10,17 @@ require.config({
 require([
   'document/annotation/common/baseTextApp',
   'document/annotation/text/selection/highlighter',
-  'document/annotation/text/selection/selectionHandler'
-], function(BaseTextApp, Highlighter, SelectionHandler) {
+  'document/annotation/text/selection/selectionHandler',
+  'document/annotation/text/selection/phraseAnnotator'
+], function(BaseTextApp, Highlighter, SelectionHandler, PhraseAnnotator) {
 
   jQuery(document).ready(function() {
     var contentNode = document.getElementById('content'),
         highlighter = new Highlighter(contentNode),
-        selector = new SelectionHandler(contentNode, highlighter);
+        selector = new SelectionHandler(contentNode, highlighter),
+        phraseAnnotator = new PhraseAnnotator(contentNode, highlighter);
 
-    new BaseTextApp(contentNode, highlighter, selector);
+    new BaseTextApp(contentNode, highlighter, selector, phraseAnnotator);
   });
 
 });
