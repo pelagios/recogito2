@@ -1,12 +1,14 @@
 package services.task
 
-import javax.inject.{ Inject, Singleton }
+import akka.actor.ActorSystem
+import javax.inject.{Inject, Singleton}
 import java.sql.Timestamp
 import java.util.UUID
 import services.BaseService
 import services.generated.Tables.TASK
 import services.generated.tables.records.TaskRecord
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 import storage.db.DB
 
 case class TaskType(private val name: String) {
@@ -49,6 +51,14 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
     sql.deleteFrom(TASK)
       .where(TASK.TASK_TYPE.equal(taskType.toString))
       .and(TASK.DOCUMENT_ID.equal(documentId)).execute()
+  }
+  
+  def scheduleForRemoval(uuid: UUID, in: FiniteDuration = 10.minutes)(implicit system: ActorSystem) = {
+    system.scheduler.scheduleOnce(in) {
+      db.withTransaction { sql =>
+        sql.deleteFrom(TASK).where(TASK.ID.equal(uuid)).execute()
+      }
+    }
   }
   
   def updateProgress(uuid: UUID, progress: Int): Future[Unit] = db.withTransaction { sql => 

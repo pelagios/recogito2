@@ -37,13 +37,13 @@ require(['common/config'], function(Config) {
               return completedTasks.length !== runningTasks.length;
             },
 
-            /** Returns true if ALL tasks on this part are COMPLETED **/
+            /** Returns true if all running tasks on this part are COMPLETED **/
             isSuccess = function() {
               var succeededTasks = jQuery.grep(runningTasks, function(task) {
                 return task.status === 'COMPLETED';
               });
 
-              return succeededTasks.length === runningTasks.length;
+              return runningTasks.length > 0 && succeededTasks.length === runningTasks.length;
             },
 
             /** Returns true if ANY task on this part is FAILED **/

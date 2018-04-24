@@ -1,61 +1,52 @@
 package transform.tiling
 
-import akka.actor.{ ActorSystem, Props }
+import akka.actor.ActorSystem
+import akka.routing.RoundRobinPool
 import java.io.File
-import javax.inject.{ Inject, Singleton }
-import services.task.{ TaskService, TaskType }
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import scala.concurrent.{ Future, ExecutionContext }
-import scala.concurrent.duration._
+import javax.inject.{Inject, Singleton}
 import scala.language.postfixOps
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.task.{TaskService, TaskType}
 import storage.uploads.Uploads
 import sys.process._
-import transform._
+
+@Singleton
+class TilingService @Inject() (
+  uploads: Uploads,
+  taskService: TaskService, 
+  system: ActorSystem
+) {
+  
+  val routerProps = 
+    TilingActor.props(taskService)
+      .withRouter(RoundRobinPool(nrOfInstances = 2))
+      
+  val router = system.actorOf(routerProps)
+
+  def spawnTask(
+    document: DocumentRecord,
+    parts   : Seq[DocumentFilepartRecord],
+    args    : Map[String, String] = Map.empty[String, String]
+  ) = parts.foreach { part =>  
+    router ! TilingActor.ProcessImage(
+      document,
+      part,
+      uploads.getDocumentDir(document.getOwner, document.getId).get,
+      args)
+  }
+
+}
 
 object TilingService {
 
   val TASK_TYPE = TaskType("IMAGE_TILING")
   
-  private[tiling] def createZoomify(file: File, destFolder: File)(implicit context: ExecutionContext): Future[Unit] = {
-    Future {
-      s"vips dzsave $file $destFolder --layout zoomify" !
-    } map { result =>
-      if (result == 0)
-        Unit
-      else
-        throw new Exception("Image tiling failed for " + file.getAbsolutePath + " to " + destFolder.getAbsolutePath)
-    }
+  private[tiling] def createZoomify(file: File, destFolder: File) = {
+    
+    val result =  s"vips dzsave $file $destFolder --layout zoomify" !
+    
+    if (result != 0)
+      throw new Exception("Image tiling failed for " + file.getAbsolutePath + " to " + destFolder.getAbsolutePath)
   }
   
-}
-
-@Singleton
-class TilingService @Inject() (uploads: Uploads, taskService: TaskService, ctx: ExecutionContext) extends TransformService {
-
-  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get, args, 10.minutes)
-
-  /** We're splitting this, so we can inject alternative folders for testing **/
-  private[tiling] def spawnTask(
-      document: DocumentRecord,
-      parts: Seq[DocumentFilepartRecord],
-      sourceFolder: File,
-      args: Map[String, String],
-      keepalive: FiniteDuration)(implicit system: ActorSystem): Unit = {
-    
-    val actor = system.actorOf(
-      Props(
-        classOf[TilingSupervisorActor],
-        document,
-        parts,
-        sourceFolder,
-        args,
-        taskService,
-        keepalive,
-        ctx),
-      name = "tile.doc." + document.getId)
-      
-    actor ! TransformTaskMessages.Start
-  }
-
 }
