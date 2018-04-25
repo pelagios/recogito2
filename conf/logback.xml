@@ -26,6 +26,7 @@
   <logger name="akka" level="INFO" />
   <logger name="play" level="INFO" />
   <logger name="application" level="DEBUG" />
+  <logger name="org.pelagios.recogito.plugins" level="INFO"/>
 
   <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
 

@@ -20,17 +20,14 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.mvc.ControllerComponents
+import play.api.libs.ws.WSClient
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
+import scala.util.{Success, Failure}
 import transform.ner.NERService
 import transform.tei.TEIParserService
 import transform.tiling.TilingService
-import transform.iiif.IIIFParser
-import transform.iiif.ResourceType
-import transform.iiif.IIIF
-import play.api.libs.ws.WSClient
-import scala.util.Success
-import scala.util.Failure
+import transform.iiif.{IIIF, IIIFParser}
 
 case class UploadSuccess(contentType: String)
 

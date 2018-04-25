@@ -8,7 +8,7 @@ import scala.util.{Try, Success, Failure}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.task.{TaskService, TaskStatus}
 
-class TilingActor(taskService : TaskService) extends Actor {
+class TilingActor(taskService: TaskService) extends Actor {
   
   def receive = {
     
@@ -49,7 +49,6 @@ object TilingActor {
   case class ProcessImage(
     document : DocumentRecord,
     part     : DocumentFilepartRecord,
-    dir      : File,
-    args     : Map[String, String]) 
+    dir      : File) 
 
 }

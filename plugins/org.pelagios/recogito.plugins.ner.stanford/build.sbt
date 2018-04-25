@@ -2,16 +2,18 @@ name := "recogito-plugin-ner-stanford"
 
 organization := "org.pelagios"
 
-version := "0.0.2"
+version := "0.3"
+
+scalaVersion := "2.11.11"
 
 // Do not append Scala versions to the generated artifacts
 crossPaths := false
 
 /** Runtime dependencies **/
 libraryDependencies ++= Seq(
-  "org.pelagios" % "recogito-plugin-sdk" % "0.0.2" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.0.2/recogito-plugin-sdk-0.0.2.jar",
-  "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
-  "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models"
+  "org.pelagios" % "recogito-plugin-sdk" % "0.3" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.3/recogito-plugin-sdk-0.3.jar",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1" classifier "models"
 )
 
 /** Test dependencies **/

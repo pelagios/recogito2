@@ -1,3 +1,6 @@
+target/classes
+target/resolution-cache
+target/streams
 .classpath
 .project
 .cache-*

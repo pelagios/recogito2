@@ -8,7 +8,7 @@ import services.annotation.AnnotationService
 import services.entity.builtin.EntityService
 import services.task.{TaskService, TaskType}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import org.pelagios.recogito.sdk.ner._
+import org.pelagios.recogito.sdk.ner.Entity
 import play.api.Logger
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,23 +24,10 @@ object NERService {
 
   private var runningPipelines = 0
 
-  private[ner] def parse(text: String)(implicit context: ExecutionContext): Future[Seq[Entity]] = {
-    runningPipelines += 1
-    
-    if (runningPipelines > 5)
-      Logger.warn(runningPipelines + " runnning NER pipelines")
-    
-    Future {
-      scala.concurrent.blocking {
-        // TODO to be extended in the future
-        val ner = NERPluginManager.getDefaultNER
-        val entities = ner.parse(text)
-    
-        runningPipelines -= 1
-
-        entities.asScala
-      }
-    }
+  private[ner] def parse(text: String): Seq[Entity] = {
+    val ner = NERPluginManager.getDefaultNER
+    val entities = ner.parse(text)
+    entities.asScala
   }
   
 }

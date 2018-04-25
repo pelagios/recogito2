@@ -48,8 +48,8 @@ libraryDependencies ++= Seq(
 
   "commons-io" % "commons-io" % "2.4",
 
-  "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2",
-  "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1" classifier "models",
 
   "eu.bitwalker" % "UserAgentUtils" % "1.20",
 
@@ -77,7 +77,7 @@ libraryDependencies ++= Seq(
   "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.7.5",
 
   // Recogito plugin API
-  "org.pelagios" % "recogito-plugin-sdk" % "0.0.2" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.0.2/recogito-plugin-sdk-0.0.2.jar",
+  "org.pelagios" % "recogito-plugin-sdk" % "0.3" from "https://github.com/pelagios/recogito2-plugin-sdk/releases/download/v0.3/recogito-plugin-sdk-0.3.jar",
 
   "org.webjars" % "dropzone" % "4.2.0",
   "org.webjars" % "jquery" % "1.12.0",

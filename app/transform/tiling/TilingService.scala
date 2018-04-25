@@ -19,20 +19,18 @@ class TilingService @Inject() (
   
   val routerProps = 
     TilingActor.props(taskService)
-      .withRouter(RoundRobinPool(nrOfInstances = 2))
+      .withRouter(RoundRobinPool(nrOfInstances = 10))
       
   val router = system.actorOf(routerProps)
 
   def spawnTask(
     document: DocumentRecord,
-    parts   : Seq[DocumentFilepartRecord],
-    args    : Map[String, String] = Map.empty[String, String]
+    parts   : Seq[DocumentFilepartRecord]
   ) = parts.foreach { part =>  
     router ! TilingActor.ProcessImage(
       document,
       part,
-      uploads.getDocumentDir(document.getOwner, document.getId).get,
-      args)
+      uploads.getDocumentDir(document.getOwner, document.getId).get)
   }
 
 }

@@ -54,26 +54,28 @@ private[ner] class NERWorkerActor(
         10.seconds)
         
       taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
-
-      parseFilepart(document, part, documentDir).map { phrases =>
+      
+      try {
+        Logger.info(s"Starting NER on ${part.getId}")
+        val phrases = parseFilepart(document, part, documentDir)
+        Logger.info(s"NER completed on ${part.getId}")
         taskService.updateProgress(taskId, 50)
         
         val places = phrases.filter(_.entityType == EntityType.LOCATION).map(e => Some(EntityGeoresolvable(e)))
         val persons = phrases.filter(_.entityType == EntityType.PERSON)     
         
-        try {
-          resolve(document, part, places, places.size, taskId, (50, 80))
-          
-          // TODO store person annotations
-          
-          taskService.setCompleted(taskId)
-          origSender ! Stopped
-        } catch { case t: Throwable =>
-          t.printStackTrace()
-          taskService.setFailed(taskId, Some(t.getMessage))
-          origSender ! Stopped
-        }        
-      }
+        resolve(document, part, places, places.size, taskId, (50, 80))
+        
+        // TODO store person annotations
+        
+        taskService.setCompleted(taskId)
+        origSender ! Stopped
+      } catch { case t: Throwable =>
+        t.printStackTrace()
+        taskService.setFailed(taskId, Some(t.getMessage))
+        origSender ! Stopped
+      }        
+
     }
     
   }
@@ -86,7 +88,7 @@ private[ner] class NERWorkerActor(
 
       case t => {
         Logger.info("Skipping NER for file of unsupported type " + t + ": " + documentDir.getName + File.separator + part.getFile)
-        Future { Seq.empty[Entity] }
+        Seq.empty[Entity]
       }
     }
 

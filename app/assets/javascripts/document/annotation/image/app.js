@@ -125,7 +125,7 @@ require([
       selector.on('changeShape', editor.updateAnchor.bind(editor));
       selector.on('select', editor.openSelection.bind(editor));
 
-      editor.on('createAnnotation', this.onCreateAnnotation.bind(this));
+      editor.on('createAnnotation', withClearSelection(this.onCreateAnnotation.bind(this)));
       editor.on('updateAnnotation', withClearSelection(this.onUpdateAnnotation.bind(this)));
       editor.on('deleteAnnotation', withClearSelection(this.onDeleteAnnotation.bind(this)));
 

@@ -6,8 +6,6 @@ import org.junit.runner._
 import org.pelagios.recogito.sdk.ner.EntityType
 import play.api.test._
 import play.api.test.Helpers._
-import play.api.inject.guice.GuiceApplicationBuilder
-import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import scala.io.Source
 
@@ -16,13 +14,12 @@ class NERServiceSpec extends Specification {
 
   val TEST_TEXT =
     Source.fromFile("test/resources/transform/ner/text-for-ner-01.txt").getLines().mkString("\n")
-    
-  val application = GuiceApplicationBuilder().build()
-  implicit val executionContext = application.injector.instanceOf[ExecutionContext]
 
   "The NER parse function" should {
 
-    val entities =  Await.result(NERService.parse(TEST_TEXT), 60 seconds)
+    val entities =  NERService.parse(TEST_TEXT)
+    
+    println(entities.toString)
 
     "detect 8 Named Entites in the test text" in {
       entities.size must equalTo (8)
