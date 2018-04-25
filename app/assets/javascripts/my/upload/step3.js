@@ -34,7 +34,7 @@ require(['common/config'], function(Config) {
                 return task.status === 'COMPLETED' || task.status === 'FAILED';
               });
 
-              return completedTasks.length !== runningTasks.length;
+              return runningTasks.length === 0 || completedTasks.length !== runningTasks.length;
             },
 
             /** Returns true if all running tasks on this part are COMPLETED **/

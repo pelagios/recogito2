@@ -1,29 +1,52 @@
 package transform.tei
 
-import akka.actor.{ ActorSystem, Props }
-import java.io.{ File, PrintWriter }
-import javax.inject.{ Inject, Singleton }
-import services.annotation.{ Annotation, AnnotationService }
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import services.task.{ TaskType, TaskService }
+import akka.actor.ActorSystem
+import akka.routing.RoundRobinPool
+import java.io.{File, PrintWriter}
+import javax.inject.{Inject, Singleton}
 import org.joox.JOOX._
 import org.w3c.dom.ranges.DocumentRange
 import scala.collection.JavaConversions._
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.concurrent.duration._
+import services.annotation.{Annotation, AnnotationService}
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.task.{TaskService, TaskType}
 import storage.uploads.Uploads
-import transform.{ TransformService, TransformTaskMessages }
+
+@Singleton
+class TEIParserService @Inject() (
+  uploads: Uploads,
+  annotationService: AnnotationService,
+  taskService: TaskService, 
+  system: ActorSystem
+) {
+  
+  val routerProps = 
+    TEIParserActor.props(taskService, annotationService)
+      .withRouter(RoundRobinPool(nrOfInstances = 10))
+      
+  val router = system.actorOf(routerProps)
+
+  def spawnTask(
+    document: DocumentRecord,
+    parts   : Seq[DocumentFilepartRecord]
+  ) = parts.foreach { part =>  
+    router ! TEIParserActor.ProcessTEI(
+      document,
+      part,
+      uploads.getDocumentDir(document.getOwner, document.getId).get)
+  }
+
+}
 
 object TEIParserService {
 
   val TASK_TYPE = TaskType("TEI_PARSING")
-
-  def extractEntities(
-      part: DocumentFilepartRecord,
-      file: File,
-      replaceOriginalFile: Boolean = true
-  )(implicit ctx: ExecutionContext): Future[Seq[Annotation]] = Future {
-        
+  
+  private[tei] def extractEntities(
+    part: DocumentFilepartRecord,
+    file: File,
+    replaceOriginalFile: Boolean = true
+  ) = {    
     val teiXML = $(file).document()
     val ranges = teiXML.asInstanceOf[DocumentRange]
 
@@ -41,34 +64,4 @@ object TEIParserService {
 
     annotations
   }
-
-}
-
-@Singleton
-class TEIParserService @Inject() (uploads: Uploads, annotationService: AnnotationService, taskService: TaskService, ctx: ExecutionContext) extends TransformService {
-
-  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get, 10.minutes)
-
-  private[tei] def spawnTask(
-      document: DocumentRecord,
-      parts: Seq[DocumentFilepartRecord],
-      sourceFolder: File,
-      keepalive: FiniteDuration)(implicit system: ActorSystem): Unit = {
-
-    val actor = system.actorOf(
-      Props(
-        classOf[TEIParserSupervisorActor],
-        document,
-        parts,
-        sourceFolder,
-        annotationService,
-        taskService,
-        keepalive,
-        ctx),
-      name = "tei.doc." + document.getId)
-
-    actor ! TransformTaskMessages.Start
-  }
-
 }
