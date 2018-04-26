@@ -10,7 +10,7 @@ import services.entity.builtin.EntityService
 import services.task.{TaskService, TaskType}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import storage.uploads.Uploads
-import transform.WorkerActor
+import transform.{WorkerActor, WorkerService}
 
 @Singleton
 class NERService @Inject() (
@@ -19,25 +19,10 @@ class NERService @Inject() (
   taskService: TaskService,
   uploads: Uploads,
   system: ActorSystem
-) {
-  
-  val routerProps = 
-    NERActor.props(taskService, annotationService, entityService)
-      .withRouter(RoundRobinPool(nrOfInstances = 10))
-      
-  val router = system.actorOf(routerProps)
-
-  def spawnTask(
-    document: DocumentRecord,
-    parts   : Seq[DocumentFilepartRecord]
-  ) = parts.foreach { part =>  
-    router ! WorkerActor.WorkOnPart(
-      document,
-      part,
-      uploads.getDocumentDir(document.getOwner, document.getId).get)
-  }
-
-}
+) extends WorkerService(
+  system, uploads,
+  NERActor.props(taskService, annotationService, entityService), 10  
+)
 
 object NERService {
 

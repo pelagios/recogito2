@@ -9,33 +9,17 @@ import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord
 import services.task.{TaskService, TaskType}
 import storage.uploads.Uploads
 import sys.process._
-import transform.WorkerActor
+import transform.{WorkerActor, WorkerService}
 
 @Singleton
 class TilingService @Inject() (
   uploads: Uploads,
   taskService: TaskService, 
   system: ActorSystem
-) {
-  
-  val routerProps = 
-    TilingActor.props(taskService)
-      .withRouter(RoundRobinPool(nrOfInstances = 4))
-      .withDispatcher("contexts.background-workers")
-      
-  val router = system.actorOf(routerProps)
-
-  def spawnTask(
-    document: DocumentRecord,
-    parts   : Seq[DocumentFilepartRecord]
-  ) = parts.foreach { part =>  
-    router ! WorkerActor.WorkOnPart(
-      document,
-      part,
-      uploads.getDocumentDir(document.getOwner, document.getId).get)
-  }
-
-}
+) extends WorkerService(
+  system, uploads,
+  TilingActor.props(taskService), 4
+)      
 
 object TilingService {
 

@@ -11,7 +11,7 @@ import services.annotation.{Annotation, AnnotationService}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.task.{TaskService, TaskType}
 import storage.uploads.Uploads
-import transform.WorkerActor
+import transform.{WorkerActor, WorkerService}
 
 @Singleton
 class TEIParserService @Inject() (
@@ -19,26 +19,10 @@ class TEIParserService @Inject() (
   annotationService: AnnotationService,
   taskService: TaskService, 
   system: ActorSystem
-) {
-  
-  val routerProps = 
-    TEIParserActor.props(taskService, annotationService)
-      .withRouter(RoundRobinPool(nrOfInstances = 10))
-      .withDispatcher("contexts.background-workers")
-      
-  val router = system.actorOf(routerProps)
-
-  def spawnTask(
-    document: DocumentRecord,
-    parts   : Seq[DocumentFilepartRecord]
-  ) = parts.foreach { part =>  
-    router ! WorkerActor.WorkOnPart(
-      document,
-      part,
-      uploads.getDocumentDir(document.getOwner, document.getId).get)
-  }
-
-}
+) extends WorkerService(
+  system, uploads,
+  TEIParserActor.props(taskService, annotationService), 10
+)
 
 object TEIParserService {
 
