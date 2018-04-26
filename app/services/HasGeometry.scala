@@ -12,7 +12,8 @@ trait HasGeometry {
   implicit val geometryFormat: Format[Geometry] =
     Format(
       JsPath.read[JsValue].map { json =>
-        new GeometryJSON(DECIMAL_PRECISION).read(Json.stringify(json))
+        val geom = new GeometryJSON(DECIMAL_PRECISION).read(Json.stringify(json))
+        if (geom.isEmpty) null else geom // Some Java legacy...
       },
       
       Writes[Geometry] { geom =>

@@ -50,7 +50,11 @@ object PelagiosGazetteerFeature extends HasGeometry {
     (JsPath \ "title").read[String] and
     (JsPath \ "descriptions").readNullable[Seq[Description]].map(_.getOrElse(Seq.empty[Description])) and
     (JsPath \ "names").readNullable[Seq[Name]].map(_.getOrElse(Seq.empty[Name])) and
-    (JsPath \ "geometry").readNullable[Geometry] and
+    (JsPath \ "geometry").readNullable[Geometry]
+      .map[Option[Geometry]] {
+        case Some(x) if x == null => None // Avoids Some(null) that happens for bad GeoJSON
+        case other => other
+      } and 
     (JsPath \ "representative_point").readNullable[Coordinate]
   )(PelagiosGazetteerFeature.apply _)
 }
