@@ -62,7 +62,9 @@ require(['common/config'], function(Config) {
           // a lot quicker than using dropzone's queue API
           var uploadsInList = jQuery('.dz-preview'),
               unfinishedUploads = jQuery.grep(uploadsInList, function(el) {
-                return !jQuery(el).data('type');
+                var isComplete = jQuery(el).data('type'), // More reliable, also works for page reloads
+                    isFailed = jQuery(el).hasClass('upload-failed');
+                return !(isComplete || isFailed);
               });
 
           return unfinishedUploads.length > 0;
@@ -120,6 +122,7 @@ require(['common/config'], function(Config) {
         onUploadSuccess = function(e, response) {
           // Set content type returned by server to DOM element data-type attribute
           e.previewElement.dataset.type = response.content_type;
+          jQuery(e.previewElement).addClass('upload-complete');
           refresh();
         },
 
