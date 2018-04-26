@@ -10,6 +10,7 @@ import services.entity.builtin.EntityService
 import services.task.{TaskService, TaskType}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import storage.uploads.Uploads
+import transform.WorkerActor
 
 @Singleton
 class NERService @Inject() (
@@ -30,7 +31,7 @@ class NERService @Inject() (
     document: DocumentRecord,
     parts   : Seq[DocumentFilepartRecord]
   ) = parts.foreach { part =>  
-    router ! NERActor.ProcessText(
+    router ! WorkerActor.WorkOnPart(
       document,
       part,
       uploads.getDocumentDir(document.getOwner, document.getId).get)
