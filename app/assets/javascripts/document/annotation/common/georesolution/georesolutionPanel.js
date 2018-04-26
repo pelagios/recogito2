@@ -126,10 +126,9 @@ define([
           },
 
           openMapPopup = function(popup, marker) {
-            marker.bindPopup(popup[0]);
-            marker.getPopup().on('close', function() { marker.unbindPopup(); });
+            marker.unbindPopup();
             closeUnlocatedPopup();
-            marker.openPopup();
+            marker.bindPopup(popup[0]).openPopup();
           },
 
           openPopup = function(place, opt_marker) {
