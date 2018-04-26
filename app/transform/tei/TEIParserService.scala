@@ -46,7 +46,7 @@ object TEIParserService {
     part: DocumentFilepartRecord,
     file: File,
     replaceOriginalFile: Boolean = true
-  ) = {    
+  ): Seq[Annotation] = {    
     val teiXML = $(file).document()
     val ranges = teiXML.asInstanceOf[DocumentRange]
 
