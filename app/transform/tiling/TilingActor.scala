@@ -9,7 +9,7 @@ import transform.WorkerActor
 
 class TilingActor(taskService: TaskService) extends WorkerActor(TilingService.TASK_TYPE, taskService) {
 
-  def doWork(
+  override def doWork(
     doc: DocumentRecord, 
     part: DocumentFilepartRecord, 
     dir: File, 
