@@ -9,6 +9,7 @@ import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord
 import services.task.{TaskService, TaskType}
 import storage.uploads.Uploads
 import sys.process._
+import transform.WorkerActor
 
 @Singleton
 class TilingService @Inject() (
@@ -27,7 +28,7 @@ class TilingService @Inject() (
     document: DocumentRecord,
     parts   : Seq[DocumentFilepartRecord]
   ) = parts.foreach { part =>  
-    router ! TilingActor.ProcessImage(
+    router ! WorkerActor.WorkOnPart(
       document,
       part,
       uploads.getDocumentDir(document.getOwner, document.getId).get)

@@ -1,43 +1,30 @@
 package transform.tiling
 
-import akka.actor.{Actor, Props}
+import akka.actor.Props
 import java.io.File
-import scala.concurrent.Await
-import scala.concurrent.duration._
-import scala.util.{Try, Success, Failure}
+import java.util.UUID
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import services.task.{TaskService, TaskStatus}
+import services.task.TaskService
+import transform.WorkerActor
 
-class TilingActor(taskService: TaskService) extends Actor {
-  
-  def receive = {
+class TilingActor(taskService: TaskService) extends WorkerActor(TilingService.TASK_TYPE, taskService) {
+
+  def doWork(
+    doc: DocumentRecord, 
+    part: DocumentFilepartRecord, 
+    dir: File, 
+    args: Map[String, String], 
+    taskId: UUID
+  ) = {
+    val filename = part.getFile
+    val tilesetDir = new File(dir, filename.substring(0, filename.lastIndexOf('.')))
     
-    case msg: TilingActor.ProcessImage =>      
-      val filename = msg.part.getFile
-      
-      val tilesetDir =
-        new File(msg.dir, filename.substring(0, filename.lastIndexOf('.')))
-      
-      val taskId = Await.result(
-        taskService.insertTask(
-          TilingService.TASK_TYPE,
-          this.getClass.getName,
-          Some(msg.document.getId),
-          Some(msg.part.getId),
-          Some(msg.document.getOwner)),
-        10.seconds)
-        
-      taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
-      
-      Try(TilingService.createZoomify(new File(msg.dir, filename), tilesetDir)) match {
-        case Success(_) =>
-          taskService.setCompleted(taskId)
-          
-        case Failure(t) =>
-          taskService.setFailed(taskId, Some(t.getMessage))
-      }
-      
-      taskService.scheduleForRemoval(taskId, 10.seconds)(context.system)
+    try {
+      TilingService.createZoomify(new File(dir, filename), tilesetDir)
+      taskService.setCompleted(taskId)
+    } catch { case t: Throwable =>
+      taskService.setFailed(taskId, Some(t.getMessage))
+    }    
   }
   
 }
@@ -45,10 +32,5 @@ class TilingActor(taskService: TaskService) extends Actor {
 object TilingActor {
   
   def props(taskService: TaskService) = Props(classOf[TilingActor], taskService)
-    
-  case class ProcessImage(
-    document : DocumentRecord,
-    part     : DocumentFilepartRecord,
-    dir      : File) 
 
 }
