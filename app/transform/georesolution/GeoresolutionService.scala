@@ -1,57 +1,45 @@
 package transform.georesolution
 
-import akka.actor.{ ActorSystem, Props }
-import java.io.File
-import javax.inject.{ Inject, Singleton }
+import akka.actor.ActorSystem
+import akka.routing.RoundRobinPool
+import javax.inject.{Inject, Singleton}
 import services.annotation.AnnotationService
 import services.entity.builtin.EntityService
-import services.task.{ TaskService, TaskType }
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
-import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.task.{TaskService, TaskType}
 import storage.uploads.Uploads
-import transform._
+
+@Singleton
+class GeoresolutionService @Inject() (
+  annotationService: AnnotationService,
+  entityService: EntityService,
+  taskService: TaskService,
+  uploads: Uploads,
+  system: ActorSystem
+) {
+
+  val routerProps = 
+    GeoresolutionActor.props(taskService, annotationService, entityService)
+      .withRouter(RoundRobinPool(nrOfInstances = 2))
+      
+  val router = system.actorOf(routerProps)
+
+  def spawnTask(
+    document: DocumentRecord,
+    parts   : Seq[DocumentFilepartRecord],
+    args    : Map[String, String]
+  ) = parts.foreach { part =>  
+    router ! GeoresolutionActor.ResolveData(
+      document,
+      part,
+      uploads.getDocumentDir(document.getOwner, document.getId).get,
+      args)
+  }
+  
+}
 
 object GeoresolutionService {
   
   val TASK_TYPE = TaskType("GEORESOLUTION")
 
-}
-
-@Singleton
-class GeoresolutionService @Inject() (
-    annotations: AnnotationService,
-    entities: EntityService,
-    taskService: TaskService,
-    uploads: Uploads,
-    ctx: ExecutionContext) extends TransformService {
-  
-  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get, args, 10.minutes)
-
-  /** We're splitting this, so we can inject alternative folders for testing **/
-  private[georesolution] def spawnTask(
-      document: DocumentRecord,
-      parts: Seq[DocumentFilepartRecord],
-      sourceFolder: File,
-      args: Map[String, String],
-      keepalive: FiniteDuration)(implicit system: ActorSystem): Unit = {
-    
-    val actor = system.actorOf(
-        Props(
-          classOf[GeoresolutionSupervisorActor], 
-          document, 
-          parts,
-          sourceFolder,
-          args,
-          taskService,
-          annotations,
-          entities,
-          keepalive,
-          ctx),
-        name = "georesolution.doc." + document.getId)
-        
-    actor ! TransformTaskMessages.Start
-  }
-  
 }
