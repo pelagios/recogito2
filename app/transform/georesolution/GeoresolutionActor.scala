@@ -1,57 +1,40 @@
 package transform.georesolution
 
-import akka.actor.{Actor, Props}
+import akka.actor.Props
 import com.vividsolutions.jts.geom.Coordinate
 import java.io.File
+import java.util.UUID
 import kantan.csv.CsvConfiguration
 import kantan.csv.CsvConfiguration.{Header, QuotePolicy}
 import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import kantan.codecs.Result.Success
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.util.Try
 import services.annotation.AnnotationService
 import services.entity.builtin.EntityService
-import services.task.{TaskService, TaskStatus}
+import services.task.TaskService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import transform.WorkerActor
 
 class GeoresolutionActor(
   implicit val taskService: TaskService, 
   implicit val annotationService: AnnotationService, 
   implicit val entityService: EntityService
-) extends Actor with HasGeoresolution {
+) extends WorkerActor(GeoresolutionService.TASK_TYPE, taskService) with HasGeoresolution {
   
   type T = Georesolvable
   
   private implicit val ctx = context.dispatcher
   
-  def receive = {
-    
-    case msg: GeoresolutionActor.ResolveData =>
-      val taskId = Await.result(
-        taskService.insertTask(
-          GeoresolutionService.TASK_TYPE,
-          this.getClass.getName,
-          Some(msg.document.getId),
-          Some(msg.part.getId),
-          Some(msg.document.getOwner)),
-        10.seconds)
-        
-      taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
-      
-      try {
-        val toponyms = parse(msg.part, msg.dir, msg.args).toSeq
-        resolve(msg.document, msg.part, toponyms, toponyms.size, taskId)
-        taskService.setCompleted(taskId)
-      } catch { case t: Throwable =>
-        t.printStackTrace()
-        taskService.setFailed(taskId, Some(t.getMessage))
-      }
-      
-      taskService.scheduleForRemoval(taskId, 10.seconds)(context.system)
-    
-  }
+  def doWork(doc: DocumentRecord, part: DocumentFilepartRecord, dir: File, args: Map[String, String], taskId: UUID) =
+    try {
+      val toponyms = parse(part, dir, args).toSeq
+      resolve(doc, part, toponyms, toponyms.size, taskId)
+      taskService.setCompleted(taskId)
+    } catch { case t: Throwable =>
+      t.printStackTrace()
+      taskService.setFailed(taskId, Some(t.getMessage))
+    }
   
   private def parse(part: DocumentFilepartRecord, dir: File, args: Map[String, String]) = {
     val delimiter = args.get("delimiter").map(_.charAt(0)).getOrElse(',')
@@ -95,11 +78,5 @@ object GeoresolutionActor {
   
   def props(taskService: TaskService, annotationService: AnnotationService, entityService: EntityService) =
     Props(classOf[GeoresolutionActor], taskService, annotationService, entityService)
-    
-  case class ResolveData(
-    document : DocumentRecord,
-    part     : DocumentFilepartRecord,
-    dir      : File,
-    args     : Map[String, String]) 
 
 }

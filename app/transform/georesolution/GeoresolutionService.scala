@@ -8,6 +8,7 @@ import services.entity.builtin.EntityService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.task.{TaskService, TaskType}
 import storage.uploads.Uploads
+import transform.WorkerActor
 
 @Singleton
 class GeoresolutionService @Inject() (
@@ -29,7 +30,7 @@ class GeoresolutionService @Inject() (
     parts   : Seq[DocumentFilepartRecord],
     args    : Map[String, String]
   ) = parts.foreach { part =>  
-    router ! GeoresolutionActor.ResolveData(
+    router ! WorkerActor.WorkOnPart(
       document,
       part,
       uploads.getDocumentDir(document.getOwner, document.getId).get,

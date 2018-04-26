@@ -1,6 +1,6 @@
 package transform.ner
 
-import akka.actor.{Actor, Props}
+import akka.actor.Props
 import java.io.File
 import java.util.UUID
 import org.pelagios.recogito.sdk.ner._
