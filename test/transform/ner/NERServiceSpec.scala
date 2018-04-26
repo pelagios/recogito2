@@ -19,8 +19,6 @@ class NERServiceSpec extends Specification {
 
     val entities =  NERService.parse(TEST_TEXT)
     
-    println(entities.toString)
-
     "detect 8 Named Entites in the test text" in {
       entities.size must equalTo (8)
     }

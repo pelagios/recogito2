@@ -1,77 +1,51 @@
 package transform.ner
 
-import akka.actor.{ActorSystem, Props}
-import java.io.File
+import akka.actor.ActorSystem
+import akka.routing.RoundRobinPool
 import javax.inject.{Inject, Singleton}
-import services.ContentType
+import org.pelagios.recogito.sdk.ner.Entity
+import scala.collection.JavaConverters._
 import services.annotation.AnnotationService
 import services.entity.builtin.EntityService
 import services.task.{TaskService, TaskType}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import org.pelagios.recogito.sdk.ner.Entity
-import play.api.Logger
-import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.duration._
 import storage.uploads.Uploads
-import transform._
 
-object NERService { 
+@Singleton
+class NERService @Inject() (
+  annotationService: AnnotationService,
+  entityService: EntityService,
+  taskService: TaskService,
+  uploads: Uploads,
+  system: ActorSystem
+) {
   
+  val routerProps = 
+    NERActor.props(taskService, annotationService, entityService)
+      .withRouter(RoundRobinPool(nrOfInstances = 10))
+      
+  val router = system.actorOf(routerProps)
+
+  def spawnTask(
+    document: DocumentRecord,
+    parts   : Seq[DocumentFilepartRecord]
+  ) = parts.foreach { part =>  
+    router ! NERActor.ProcessText(
+      document,
+      part,
+      uploads.getDocumentDir(document.getOwner, document.getId).get)
+  }
+
+}
+
+object NERService {
+
   val TASK_TYPE = TaskType("NER")
   
-  val SUPPORTED_CONTENT_TYPES = Set(ContentType.TEXT_PLAIN).map(_.toString)
-
-  private var runningPipelines = 0
-
   private[ner] def parse(text: String): Seq[Entity] = {
     val ner = NERPluginManager.getDefaultNER
     val entities = ner.parse(text)
     entities.asScala
   }
-  
-}
-
-@Singleton
-class NERService @Inject() (
-    annotations: AnnotationService,
-    entities: EntityService,
-    taskService: TaskService,
-    uploads: Uploads,
-    ctx: ExecutionContext) extends TransformService {
-
-  /** Spawns a new background parse process.
-    *
-    * The function will throw an exception in case the user data directory
-    * for any of the fileparts does not exist. This should, however, never
-    * happen. If it does, something is seriously broken with the DB integrity.
-    */
-  override def spawnTask(document: DocumentRecord, parts: Seq[DocumentFilepartRecord], args: Map[String, String])(implicit system: ActorSystem): Unit =
-    spawnTask(document, parts, uploads.getDocumentDir(document.getOwner, document.getId).get, args, 10.minutes)
-
-  /** We're splitting this, so we can inject alternative folders for testing **/
-  private[ner] def spawnTask(
-      document: DocumentRecord,
-      parts: Seq[DocumentFilepartRecord],
-      sourceFolder: File,
-      args: Map[String, String],
-      keepalive: FiniteDuration)(implicit system: ActorSystem): Unit = {
     
-    val actor = system.actorOf(
-        Props(
-          classOf[NERSupervisorActor], 
-          document, 
-          parts,
-          sourceFolder,
-          args,
-          taskService,
-          annotations,
-          entities,
-          keepalive,
-          ctx),
-        name = "ner.doc." + document.getId)
-        
-    actor ! TransformTaskMessages.Start
-  }
-
 }
