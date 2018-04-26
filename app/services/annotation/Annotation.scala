@@ -6,6 +6,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import services.generated.tables.records.DocumentFilepartRecord
 
 case class Annotation(
   annotationId: UUID,
@@ -15,7 +16,12 @@ case class Annotation(
   anchor: String,
   lastModifiedBy: Option[String],
   lastModifiedAt: DateTime,
-  bodies: Seq[AnnotationBody])
+  bodies: Seq[AnnotationBody]) {
+  
+  def withBody(body: AnnotationBody) = 
+    this.copy(bodies = this.bodies :+ body.copy(lastModifiedAt = this.lastModifiedAt))
+  
+}
 
 case class AnnotatedObject(documentId: String, filepartId: UUID, contentType: ContentType)
 
@@ -63,4 +69,20 @@ object FrontendAnnotation extends HasDate {
     (JsPath \ "bodies").write[Seq[AnnotationBody]]
   )(unlift(Annotation.unapply))
   
+}
+
+/** Helpers for creating some standard annotation formats **/
+object Annotation {
+  
+  def on(part: DocumentFilepartRecord, anchor: String) =
+    Annotation(
+      UUID.randomUUID(),
+      UUID.randomUUID(),
+      AnnotatedObject(part.getDocumentId, part.getId, ContentType.withName(part.getContentType).get),
+      Seq.empty[String], // contributors
+      anchor,
+      None, // lastModifiedBy
+      new DateTime(),
+      Seq.empty[AnnotationBody])
+
 }

@@ -5,9 +5,11 @@ import java.io.File
 import java.util.UUID
 import org.pelagios.recogito.sdk.ner._
 import play.api.Logger
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import scala.io.Source
 import services.ContentType
-import services.annotation.AnnotationService
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.entity.builtin.EntityService
 import services.task.TaskService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
@@ -42,7 +44,13 @@ class NERActor(
       
       resolve(doc, part, places, places.size, taskId, (50, 80))
       
-      // TODO store person annotations
+      val fInsertPeople = annotationService.upsertAnnotations(persons.map { entity => 
+        Annotation
+          .on(part, "char-offset:" + entity.charOffset)
+          .withBody(AnnotationBody.quoteBody(entity.chars))
+          .withBody(AnnotationBody.personBody())
+      })
+      Await.result(fInsertPeople, 20.minutes)
       
       taskService.setCompleted(taskId)
     } catch { case t: Throwable =>

@@ -69,6 +69,32 @@ object AnnotationBody extends Enumeration {
       JsPath.read[String].map(AnnotationBody.withName(_)),
       Writes[AnnotationBody.Type](t => JsString(t.toString))
     )
+    
+  def quoteBody(quote: String) = 
+    AnnotationBody(
+      AnnotationBody.QUOTE,
+      None, // lastModifiedBy
+      DateTime.now(),
+      Some(quote),
+      None, // reference
+      None, // note
+      None) // status
+      
+  def placeBody(reference: Option[String] = None) = 
+    entityBody(AnnotationBody.PLACE, reference)
+      
+  def personBody(reference: Option[String] = None) = 
+    entityBody(AnnotationBody.PERSON, reference)
+    
+  private def entityBody(hasType: AnnotationBody.Type, reference: Option[String] = None) = 
+    AnnotationBody(
+      hasType,
+      None, // lastModifiedBy
+      DateTime.now(),
+      None, // value
+      reference,
+      None, // note
+      None) // status
 
 }
 
