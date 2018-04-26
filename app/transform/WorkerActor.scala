@@ -28,7 +28,7 @@ abstract class WorkerActor(taskType: TaskType, taskService: TaskService) extends
       // Actual work is left to the subclass to implement
       doWork(msg.document, msg.part, msg.dir, msg.args, taskId)
       
-      taskService.scheduleForRemoval(taskId, 10.seconds)(context.system)
+      taskService.scheduleForRemoval(taskId, 60.minutes)(context.system)
   }
   
   def doWork(doc: DocumentRecord, part: DocumentFilepartRecord, dir: File, args: Map[String, String], taskId: UUID)

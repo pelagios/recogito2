@@ -20,7 +20,8 @@ class TilingService @Inject() (
   
   val routerProps = 
     TilingActor.props(taskService)
-      .withRouter(RoundRobinPool(nrOfInstances = 10))
+      .withRouter(RoundRobinPool(nrOfInstances = 4))
+      .withDispatcher("contexts.background-workers")
       
   val router = system.actorOf(routerProps)
 

@@ -92,6 +92,15 @@ contexts {
           parallelism-max = 9
         }
     }
+    
+    background-workers {
+        type = Dispatcher
+        executor = "thread-pool-executor"
+        thread-pool-executor {
+            fixed-pool-size = 16
+        }
+        throughput = 1
+   }
 }
 
 play.mailer {
