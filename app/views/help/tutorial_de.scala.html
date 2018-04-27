@@ -1,5 +1,5 @@
 @()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
-@_layout("Recogito in 10 Minuten", "Ein kurzes Tutorial zu den wichtigsten Funktionen von Recogito. Lerne wie man Annotationen erstellt, Orte identifiziert, und Dokumente mit anderen teilt.", "tutorial.css") {
+@_layout("Recogito in 10 Minuten", "Ein kurzes Tutorial zu den wichtigsten Funktionen von Recogito. Lerne wie man Annotationen erstellt, Orte identifiziert, und Dokumente mit anderen teilt.", "de", "tutorial.css") {
   <h1>10 Minuten Tutorial</h1>
   <span class="sub-title"><span class="icon">&#xf017;</span> Eine kurze Einf&uuml;hrung in Recogito</span>
 } {
@@ -34,7 +34,7 @@
               <img src="@routes.Assets.versioned("images/flags/it.png")"> Italiano
             </a>
           </li>
-          
+
           <li>
             <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("nl")">
               <img src="@routes.Assets.versioned("images/flags/nl.png")"> Nederlands
