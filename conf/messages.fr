@@ -28,6 +28,7 @@ common.buttons.save_changes=Sauvegarder les modifications
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Bienvenue sur Recogito
 landing.index.header.link.tutorial=Tutoriel
+landing.index.header.link.about=About
 landing.index.header.link.login=Se connecter
 
 # Jumbotron
@@ -42,6 +43,24 @@ landing.index.registration_form.placeholder.password=Créez un mot de passe
 landing.index.registration_form.placeholder.register=Inscrivez-vous sur Recogito
 landing.index.registration_form.disclaimer.text=Veuillez accepter nos <a href="{0}">conditions \
   d''utilisation</a> et l''enregistrement de votre courriel.
+
+# News
+landing.index.news.title=News:
+landing.index.news.subtitle=Recogito in your language <br/>\
+  <img class="flag" src="assets/images/flags/en_uk.png"> \
+  <img class="flag" src="assets/images/flags/nl.png"> \
+  <img class="flag" src="assets/images/flags/fr.png"> \
+  <img class="flag" src="assets/images/flags/de.png"> \
+  <img class="flag" src="assets/images/flags/gr.png"> \
+  <img class="flag" src="assets/images/flags/it.png">
+landing.index.news.text=Thanks to the efforts of our fantastic community, Recogito is becoming \
+  available in more and more languages. Is your browser set to <strong>Dutch</strong>, \
+  <strong>French</strong>, <strong>German</strong>, <strong>Greek</strong> or \
+  <strong>Italian</strong>? Much of Recogito will now come in proper translation. \
+  <strong>Farsi</strong>, <strong>Hebrew</strong> and <strong>Turkish</strong> are in the works, \
+  too. And you can help! <a href="mailto:commons@pelagios.org">Drop us a note</a>. Visit our \
+  <a href="https://docs.google.com/spreadsheets/d/1HkpZsVgn_3dQbht9sIXB7hTL4OSrzwxhWlmskVChc7g/edit#gid=0" target="_blank">translation \
+  sheet</a>. Fill some blanks in your language, or add a new one.
 
 # Tiles
 landing.index.tiles.1.title=Collections partagées
@@ -60,6 +79,17 @@ landing.index.tiles.4.text=Affichez les résultats de votre travail sur le Web. 
 # Recogito Right Now
 landing.index.right_now=L''actualité de Recogito
 landing.index.edits_last_24hrs=Modifs ces dern. 24h
+
+# About
+landing.index.about=Open Source Software by the <a href="{0}" target="_blank">Austrian Institute \
+  of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
+  <a href="{2}" target="_blank">Humboldt Institute for Internet and Society</a>, \
+  <a href="{3}" target="_blank">The Open University</a> and \
+  <a href="{4}" target="_blank">University of London</a>. Funded by the \
+  <a href="{5}" target="_blank">Andrew W. Mellon Foundation</a>.
+landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
+  <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Follow us on \
+  <a href="{3}" target="_blank">Twitter</a>
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space

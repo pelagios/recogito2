@@ -28,6 +28,7 @@ common.buttons.save_changes=Wijzigingen opslaan
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Welkom bij Recogito
 landing.index.header.link.tutorial=Tutorial
+landing.index.header.link.about=About
 landing.index.header.link.login=Inloggen
 
 # Jumbotron
@@ -42,6 +43,24 @@ landing.index.registration_form.placeholder.password=Kies een wachtwoord
 landing.index.registration_form.placeholder.register=Register voor Recogito
 landing.index.registration_form.disclaimer.text=Accepteer de <a href="{0}">gebruiksvooorwaarden</a> \
   en geef toestemming om uw emailadres op te slaan.
+
+# News
+landing.index.news.title=News:
+landing.index.news.subtitle=Recogito in your language <br/>\
+  <img class="flag" src="assets/images/flags/en_uk.png"> \
+  <img class="flag" src="assets/images/flags/nl.png"> \
+  <img class="flag" src="assets/images/flags/fr.png"> \
+  <img class="flag" src="assets/images/flags/de.png"> \
+  <img class="flag" src="assets/images/flags/gr.png"> \
+  <img class="flag" src="assets/images/flags/it.png">
+landing.index.news.text=Thanks to the efforts of our fantastic community, Recogito is becoming \
+  available in more and more languages. Is your browser set to <strong>Dutch</strong>, \
+  <strong>French</strong>, <strong>German</strong>, <strong>Greek</strong> or \
+  <strong>Italian</strong>? Much of Recogito will now come in proper translation. \
+  <strong>Farsi</strong>, <strong>Hebrew</strong> and <strong>Turkish</strong> are in the works, \
+  too. And you can help! <a href="mailto:commons@pelagios.org">Drop us a note</a>. Visit our \
+  <a href="https://docs.google.com/spreadsheets/d/1HkpZsVgn_3dQbht9sIXB7hTL4OSrzwxhWlmskVChc7g/edit#gid=0" target="_blank">translation \
+  sheet</a>. Fill some blanks in your language, or add a new one.
 
 # Tiles
 landing.index.tiles.1.title=Gedeelde collecties
@@ -133,6 +152,19 @@ document.annotation.text.toolbar.color=KLEUR:
 document.annotation.text.toolbar.color.by_type=OP ENTITYTYPE
 document.annotation.text.toolbar.color.by_status=OP VERIFICATIESTATUS
 document.annotation.text.toolbar.color.by_tag=OP TAG
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Image annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.image.toolbar.tools=TOOLS
+document.annotation.image.toolbar.tools.move=MOVE
+document.annotation.image.toolbar.tools.point=POINT
+document.annotation.image.toolbar.tools.rectangle=RECTANGLE
+document.annotation.image.toolbar.tools.tilted_box=TILTED BOX
+
+document.annotation.image.toolbar.image=IMAGE
+document.annotation.image.toolbar.layers=LAYERS
+document.annotation.image.toolbar.help=HELP
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads

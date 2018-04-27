@@ -28,6 +28,7 @@ common.buttons.save_changes=Αποθήκευση αλλαγών
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Καλωσήλθατε στο Recogito
 landing.index.header.link.tutorial=Οδηγός χρήσης
+landing.index.header.link.about=About
 landing.index.header.link.login=Σύνδεση
 
 # Jumbotron
@@ -42,6 +43,24 @@ landing.index.registration_form.placeholder.password=Δημιουργήστε κ
 landing.index.registration_form.placeholder.register=Εγγραφείτε στο Recogito
 landing.index.registration_form.disclaimer.text=Συμφωνήστε με τους <a href="{0}">Όρους και Προϋποθέσεις Χρήσης</a> \
   και την αποθήκευση της διεύθυνσης ηλεκτρονικού ταχυδρομείου σας.
+
+# News
+landing.index.news.title=News:
+landing.index.news.subtitle=Recogito in your language <br/>\
+  <img class="flag" src="assets/images/flags/en_uk.png"> \
+  <img class="flag" src="assets/images/flags/nl.png"> \
+  <img class="flag" src="assets/images/flags/fr.png"> \
+  <img class="flag" src="assets/images/flags/de.png"> \
+  <img class="flag" src="assets/images/flags/gr.png"> \
+  <img class="flag" src="assets/images/flags/it.png">
+landing.index.news.text=Thanks to the efforts of our fantastic community, Recogito is becoming \
+  available in more and more languages. Is your browser set to <strong>Dutch</strong>, \
+  <strong>French</strong>, <strong>German</strong>, <strong>Greek</strong> or \
+  <strong>Italian</strong>? Much of Recogito will now come in proper translation. \
+  <strong>Farsi</strong>, <strong>Hebrew</strong> and <strong>Turkish</strong> are in the works, \
+  too. And you can help! <a href="mailto:commons@pelagios.org">Drop us a note</a>. Visit our \
+  <a href="https://docs.google.com/spreadsheets/d/1HkpZsVgn_3dQbht9sIXB7hTL4OSrzwxhWlmskVChc7g/edit#gid=0" target="_blank">translation \
+  sheet</a>. Fill some blanks in your language, or add a new one.
 
 # Tiles
 landing.index.tiles.1.title=Κοινές συλλογές
