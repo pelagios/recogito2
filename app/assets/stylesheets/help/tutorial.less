@@ -98,6 +98,29 @@
     margin:7px 0 0 25px;
   }
 
+  .linked-box {
+    position:relative;
+    top:-2px;
+    display:inline-block;
+    margin:0 1px 0 7px;
+    border:1px solid @nightsky-type;
+    width:14px;
+    height:7px;
+    .rotate(-9deg);
+  }
+
+  .linked-box::before {
+    content:'';
+    display:inline-block;
+    position:absolute;
+    top:5px;
+    left:-4px;
+    width:6px;
+    height:6px;
+    .rounded-corners(50%);
+    background-color:@nightsky-type;
+  }
+
   .key {
     font-family:"Courier New", Courier, monospace;
     font-size:12px;

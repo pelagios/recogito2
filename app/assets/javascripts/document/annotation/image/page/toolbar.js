@@ -51,10 +51,6 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
           });
 
           toggleOverlays.click(onToggleOverlays);
-
-          // TODO remove once linked box gets rolled out publicly
-          if (Config.hasFeature('linkedbox'))
-            jQuery('#lbox-menuitem').css('display', 'initial');
         },
 
         onToggleOverlays = function() {
