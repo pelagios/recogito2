@@ -86,6 +86,12 @@ define([
           if (isSelectionOnEditor)
             return;
 
+          // Not a selection, but a click outside editor/annotation - deselect
+          if (selection.isCollapsed && annotationSpan.length === 0) {
+            self.fireEvent('select');
+            return;
+          }
+
           // Check for new text selection first - takes precedence over clicked
           // annotation span, otherwise we can't create annotations inside exsiting ones
           if (Config.writeAccess &&
