@@ -215,7 +215,7 @@ define(['common/ui/countries'], function(Countries) {
             } else {
               // Infix
               suffix = pattern.substring(tokenPos + 6);
-              return uri.substring(tokenPos, pattern.indexOf(suffix, tokenPos));
+              return uri.substring(tokenPos, uri.length - suffix.length);
             }
           };
 
