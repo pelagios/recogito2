@@ -11,8 +11,9 @@ require([
   'document/annotation/common/baseTextApp',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler',
-  'document/annotation/text/selection/phraseAnnotator'
-], function(BaseTextApp, Highlighter, SelectionHandler, PhraseAnnotator) {
+  'document/annotation/text/selection/phraseAnnotator',
+  'document/annotation/text/svg/scratchpad'
+], function(BaseTextApp, Highlighter, SelectionHandler, PhraseAnnotator, ScratchPad) {
 
   jQuery(document).ready(function() {
     var contentNode = document.getElementById('content'),
@@ -20,7 +21,12 @@ require([
         selector = new SelectionHandler(contentNode, highlighter),
         phraseAnnotator = new PhraseAnnotator(contentNode, highlighter);
 
+    // TODO dummy only
+    var scratchPad = new ScratchPad();
+
     new BaseTextApp(contentNode, highlighter, selector, phraseAnnotator);
+
+    selector.on('select', scratchPad.draw);
   });
 
 });
