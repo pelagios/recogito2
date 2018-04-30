@@ -149,7 +149,8 @@ object ImageAnchor {
     anchor.substring(0, anchor.indexOf(':')) match {
       case "point" => parsePointAnchor(anchor)
       case "rect"  => parseRectAnchor(anchor)
-      case "tbox"  => parseTiltedBoxAnchor(anchor)
+      case "tbox"  => parseTiltedBoxAnchor(anchor)      
+      case "lbox"  => parseLinkedBoxAnchor(anchor)
     }
   
   private def parseArgs(anchor: String) = 
@@ -181,6 +182,16 @@ object ImageAnchor {
       args.get("a").get.toDouble,
       Math.round(args.get("l").get.toFloat),
       Math.round(args.get("h").get.toFloat))
+  }
+  
+  def parseLinkedBoxAnchor(anchor: String) = {
+    val args = parseArgs(anchor)
+    TiltedBoxAnchor(
+      Math.round(args.get("px").get.toFloat),
+      Math.round(args.get("py").get.toFloat),
+      args.get("a").get.toDouble,
+      Math.round(args.get("l").get.toFloat),
+      Math.round(args.get("h").get.toFloat))  
   }
 
 }
