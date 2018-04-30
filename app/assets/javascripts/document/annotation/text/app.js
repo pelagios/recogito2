@@ -11,9 +11,8 @@ require([
   'document/annotation/common/baseTextApp',
   'document/annotation/text/selection/highlighter',
   'document/annotation/text/selection/selectionHandler',
-  'document/annotation/text/selection/phraseAnnotator',
-  'document/annotation/text/svg/scratchpad'
-], function(BaseTextApp, Highlighter, SelectionHandler, PhraseAnnotator, ScratchPad) {
+  'document/annotation/text/selection/phraseAnnotator'
+], function(BaseTextApp, Highlighter, SelectionHandler, PhraseAnnotator) {
 
   jQuery(document).ready(function() {
     var contentNode = document.getElementById('content'),

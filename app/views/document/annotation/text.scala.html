@@ -81,8 +81,8 @@
                 </ul>
               </div>
             </li>
-            <li data-mode="RELATION">
-              <span class="label">@messages("document.annotation.text.toolbar.mode.relation")
+            <li data-mode="RELATIONS">
+              <span class="label">@messages("document.annotation.text.toolbar.mode.relations")
             </li>
           </ul>
         </li>
@@ -126,13 +126,7 @@
 
     <div id="main">
       <div id="content">@content</div>
-      <svg>
-        <!-- defs>
-          <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L0,6 L9,3 z" fill="#f00" />
-          </marker>
-        </defs -->
-      </svg>
+      <svg id="relations"></svg>
     </div>
 
     @helper.javascriptRouter("jsRoutes")(

@@ -9,7 +9,8 @@ define([
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/page/loadIndicator',
   'document/annotation/common/baseApp',
-  'document/annotation/text/page/toolbar'
+  'document/annotation/text/page/toolbar',
+  'document/annotation/text/relations/relationsLayer'
 ], function(
   Alert,
   Formatting,
@@ -21,7 +22,8 @@ define([
   WriteEditor,
   LoadIndicator,
   BaseApp,
-  Toolbar) {
+  Toolbar,
+  RelationsLayer) {
 
   var App = function(contentNode, highlighter, selector, phraseAnnotator) {
 
@@ -40,6 +42,8 @@ define([
           new ReadEditor(containerNode, annotations.readOnly()),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
+
+        relationsLayer = new RelationsLayer(containerNode, document.getElementById('relations')),
 
         initPage = function() {
           var storedColorscheme = localStorage.getItem('r2.document.edit.colorscheme'),
@@ -104,15 +108,30 @@ define([
 
           // Then prompt the user if they want to re-apply across the doc
           promptReapply();
+        },
+
+        onAnnotationModeChanged = function(m) {
+          editor.setAnnotationMode(m);
+          if (m.mode === 'RELATIONS')
+            relationsLayer.show();
+          else
+            relationsLayer.hide();
+        },
+
+        onSelect = function(selection) {
+          if (relationsLayer.isEnabled())
+            relationsLayer.select(selection);
+          else
+            editor.openSelection(selection);
         };
 
     // Toolbar events
-    toolbar.on('annotationModeChanged', editor.setAnnotationMode);
+    toolbar.on('annotationModeChanged', onAnnotationModeChanged);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
     BaseApp.apply(this, [ annotations, highlighter, selector ]);
 
-    selector.on('select', editor.openSelection);
+    selector.on('select', onSelect);
 
     editor.on('createAnnotation', onCreateAnnotation);
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
