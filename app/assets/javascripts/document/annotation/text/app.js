@@ -21,12 +21,7 @@ require([
         selector = new SelectionHandler(contentNode, highlighter),
         phraseAnnotator = new PhraseAnnotator(contentNode, highlighter);
 
-    // TODO dummy only
-    var scratchPad = new ScratchPad();
-
     new BaseTextApp(contentNode, highlighter, selector, phraseAnnotator);
-
-    selector.on('select', scratchPad.draw);
   });
 
 });

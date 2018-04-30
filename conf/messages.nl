@@ -148,6 +148,7 @@ document.annotation.text.toolbar.mode.quick=SNEL
 document.annotation.text.toolbar.mode.quick.places=Plaatsen
 document.annotation.text.toolbar.mode.quick.persons=Personen
 document.annotation.text.toolbar.mode.quick.tags=Tags
+document.annotation.text.toolbar.mode.relation=RELATIONS
 document.annotation.text.toolbar.color=KLEUR:
 document.annotation.text.toolbar.color.by_type=OP ENTITYTYPE
 document.annotation.text.toolbar.color.by_status=OP VERIFICATIESTATUS

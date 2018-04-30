@@ -149,6 +149,7 @@ document.annotation.text.toolbar.mode.quick=SCHNELLAUSWAHL
 document.annotation.text.toolbar.mode.quick.places=Orte
 document.annotation.text.toolbar.mode.quick.persons=Personen
 document.annotation.text.toolbar.mode.quick.tags=Tags
+document.annotation.text.toolbar.mode.relation=RELATIONS
 document.annotation.text.toolbar.color=FARBE:
 document.annotation.text.toolbar.color.by_type=NACH TYP
 document.annotation.text.toolbar.color.by_status=NACH STATUS

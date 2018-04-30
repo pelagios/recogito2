@@ -135,6 +135,7 @@ document.annotation.text.toolbar.mode.quick=سریع
 document.annotation.text.toolbar.mode.quick.places=مکان ها
 document.annotation.text.toolbar.mode.quick.persons=افراد
 document.annotation.text.toolbar.mode.quick.tags=برچسب ها
+document.annotation.text.toolbar.mode.relation=RELATIONS
 document.annotation.text.toolbar.color=رنگ
 document.annotation.text.toolbar.color.by_type=براساس نوع موجودیت
 document.annotation.text.toolbar.color.by_status=براساس وضعیت تائید شده

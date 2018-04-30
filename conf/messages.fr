@@ -150,6 +150,7 @@ document.annotation.text.toolbar.mode.quick=SAISIE RAPIDE
 document.annotation.text.toolbar.mode.quick.places=Lieux
 document.annotation.text.toolbar.mode.quick.persons=Personnes
 document.annotation.text.toolbar.mode.quick.tags=Marqueurs
+document.annotation.text.toolbar.mode.relation=RELATIONS
 document.annotation.text.toolbar.color=COULEUR:
 document.annotation.text.toolbar.color.by_type=PAR TYPE D''ENTITÉ
 document.annotation.text.toolbar.color.by_status=PAR STATUS DE VÉRIFICATION

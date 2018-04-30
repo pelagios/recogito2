@@ -150,6 +150,7 @@ document.annotation.text.toolbar.mode.quick=ΓΡΉΓΟΡΟ
 document.annotation.text.toolbar.mode.quick.places=Τόποι
 document.annotation.text.toolbar.mode.quick.persons=Πρόσωπα
 document.annotation.text.toolbar.mode.quick.tags=Ετικέτες
+document.annotation.text.toolbar.mode.relation=RELATIONS
 document.annotation.text.toolbar.color=ΧΡΏΜΑ:
 document.annotation.text.toolbar.color.by_type=ΑΝΆ ΤΎΠΟ ΟΝΤΌΤΗΤΑΣ
 document.annotation.text.toolbar.color.by_status=ΑΝΆ ΚΑΤΆΣΤΑΣΗ ΕΠΙΒΕΒΑΊΩΣΗΣ
