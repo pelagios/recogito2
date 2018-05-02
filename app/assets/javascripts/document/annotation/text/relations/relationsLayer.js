@@ -1,4 +1,4 @@
-define([], function() {
+define(['document/annotation/text/relations/connection'], function(Connection) {
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
@@ -14,8 +14,7 @@ define([], function() {
 
         mouseX, mouseY,
 
-        // { path: ..., selection: ... }
-        currentPath = false,
+        currentConnection = false,
 
         isOver = false,
 
@@ -70,20 +69,10 @@ define([], function() {
           return [ x, y ];
         },
 
-        computePath = function(fromSelection, opt_destination) {
-          var start = getHandleXY(fromSelection),
-              end = (opt_destination) ? getHandleElement(opt_destination) : [ mouseX, mouseY ],
-              delta = LINE_OFFSET - BORDER_RADIUS;
+        initConnection = function(fromSelection) {
+          currentConnection = new Connection(svg, fromSelection);
 
-          return 'M' + start[0] + ' ' + (start[1] - 3) +
-            'V' + (start[1] - delta - 0.5) +
-            'A' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + (start[0] + BORDER_RADIUS) + ',' + (start[1] - LINE_OFFSET) +
-            'H' + (end[0] - BORDER_RADIUS + 0.5) +
-            'A' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + end[0] + ',' + (start[1] - delta) +
-            'V' + (end[1] - 3);
-        },
-
-        initPath = function(fromSelection) {
+          /*
           var start = getHandleXY(fromSelection),
               startCircle = document.createElementNS(SVG_NS, 'circle'),
               endCircle = document.createElementNS(SVG_NS, 'circle'),
@@ -105,20 +94,24 @@ define([], function() {
           svg.appendChild(path);
 
           currentPath = { path: path, end: endCircle, selection: fromSelection };
+          */
           render();
         },
 
-        updatePath = function(destination) {
+        updateConnection = function(destination) {
           var end = (destination) ? getHandleElement(destination) : [ mouseX, mouseY ];
 
+          currentConnection.refresh([mouseX, mouseY]);
+          /*
           currentPath.path.setAttribute('d', computePath(currentPath.selection, destination));
           currentPath.end.setAttribute('cx', end[0]);
           currentPath.end.setAttribute('cy', end[1]);
+          */
         },
 
         render = function() {
-          if (currentPath) {
-            if (!isOver) updatePath();
+          if (currentConnection) {
+            if (!isOver) updateConnection();
             requestAnimationFrame(render);
           }
         },
@@ -130,8 +123,8 @@ define([], function() {
 
         onEnterAnnotation = function(e) {
           isOver = true;
-          if (currentPath)
-            updatePath(jQuery(e.target).closest('.annotation'));
+          if (currentConnection)
+            updateConnection(jQuery(e.target).closest('.annotation'));
         },
 
         onLeaveAnnotation = function(e) {
@@ -140,7 +133,7 @@ define([], function() {
 
         select = function(selection) {
           if (selection) {
-            initPath(selection);
+            initConnection(selection);
           }
         };
 
