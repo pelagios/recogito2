@@ -5,7 +5,7 @@ define([], function() {
 
       BORDER_RADIUS = 4,
 
-      LINE_OFFSET = 10,
+      LINE_OFFSET = 8,
 
       ARC_0CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + BORDER_RADIUS + ',' + BORDER_RADIUS,
       ARC_0CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 -' + BORDER_RADIUS + ',' + BORDER_RADIUS,
@@ -45,14 +45,14 @@ define([], function() {
               deltaX = mousePos[0] - getSelectionMiddle(fromSelection) + offset.left,
               deltaY = mousePos[1] - getSelectionTop(fromSelection) + offset.top,
 
-              arc1 = (deltaX > 0) ? ARC_9CW : ARC_3CC,
-              arc2 = (deltaX > 0) ?
-                (deltaY > 0) ? ARC_0CW : ARC_6CC :
-                (deltaY > 0) ? ARC_0CC : ARC_6CW,
+              arc1 = (deltaX < 0) ? ARC_3CC : ARC_9CW,
+              arc2 = (deltaX < 0) ?
+                (deltaY <= 0) ? ARC_6CW : ARC_0CC :
+                (deltaY <= 0) ? ARC_6CC : ARC_0CW,
 
               start = getStart(mousePos);
 
-          return 'M' + (start[0] - offset.left) + ' ' + (start[1] - offset.top) +
+          return 'M' + (start[0] - offset.left - 0.5) + ' ' + (start[1] - offset.top - 0.5) +
                  'v-' + (LINE_OFFSET - BORDER_RADIUS) +
                  arc1 +
                  'h' + (deltaX - 2 * BORDER_RADIUS) +
