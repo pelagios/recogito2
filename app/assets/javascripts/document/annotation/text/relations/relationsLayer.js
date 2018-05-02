@@ -71,42 +71,13 @@ define(['document/annotation/text/relations/connection'], function(Connection) {
 
         initConnection = function(fromSelection) {
           currentConnection = new Connection(svg, fromSelection);
-
-          /*
-          var start = getHandleXY(fromSelection),
-              startCircle = document.createElementNS(SVG_NS, 'circle'),
-              endCircle = document.createElementNS(SVG_NS, 'circle'),
-              path = document.createElementNS(SVG_NS, 'path');
-
-          startCircle.setAttribute('cx', start[0]);
-          startCircle.setAttribute('cy', start[1]);
-          startCircle.setAttribute('r', 4);
-
-          endCircle.setAttribute('cx', start[0]);
-          endCircle.setAttribute('cy', start[1]);
-          endCircle.setAttribute('r', 4);
-          endCircle.setAttribute('class', 'end');
-
-          path.setAttribute('d', computePath(fromSelection));
-
-          svg.appendChild(startCircle);
-          svg.appendChild(endCircle);
-          svg.appendChild(path);
-
-          currentPath = { path: path, end: endCircle, selection: fromSelection };
-          */
+          jQuery(document.body).css('cursor', 'none');
           render();
         },
 
         updateConnection = function(destination) {
           var end = (destination) ? getHandleElement(destination) : [ mouseX, mouseY ];
-
           currentConnection.refresh([mouseX, mouseY]);
-          /*
-          currentPath.path.setAttribute('d', computePath(currentPath.selection, destination));
-          currentPath.end.setAttribute('cx', end[0]);
-          currentPath.end.setAttribute('cy', end[1]);
-          */
         },
 
         render = function() {

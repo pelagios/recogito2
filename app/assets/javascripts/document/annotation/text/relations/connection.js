@@ -24,6 +24,8 @@ define([], function() {
 
         svg = jQuery(svgEl),
 
+        startHandle = document.createElementNS(SVG_NS, 'circle'),
+
         path = document.createElementNS(SVG_NS, 'path'),
 
         getSelectionMiddle = function(selection) {
@@ -42,17 +44,25 @@ define([], function() {
         computePath = function(mousePos) {
           var offset = svg.offset(),
 
+              start = getStart(mousePos),
+
+              startX = start[0] - offset.left - 0.5,
+              startY = start[1] - offset.top - 0.5 + jQuery(window).scrollTop(),
+
               deltaX = mousePos[0] - getSelectionMiddle(fromSelection) + offset.left,
-              deltaY = mousePos[1] - getSelectionTop(fromSelection) + offset.top,
+              deltaY = mousePos[1] - getSelectionTop(fromSelection) + offset.top - jQuery(window).scrollTop(),
 
               arc1 = (deltaX < 0) ? ARC_3CC : ARC_9CW,
               arc2 = (deltaX < 0) ?
                 (deltaY <= 0) ? ARC_6CW : ARC_0CC :
-                (deltaY <= 0) ? ARC_6CC : ARC_0CW,
+                (deltaY <= 0) ? ARC_6CC : ARC_0CW;
 
-              start = getStart(mousePos);
+          startHandle.setAttribute('cx', startX);
+          startHandle.setAttribute('cy', startY + 0.5);
+          startHandle.setAttribute('r', 2.5);
 
-          return 'M' + (start[0] - offset.left - 0.5) + ' ' + (start[1] - offset.top - 0.5) +
+          return 'M' + startX +
+                 ' ' + startY +
                  'v-' + (LINE_OFFSET - BORDER_RADIUS) +
                  arc1 +
                  'h' + (deltaX - 2 * BORDER_RADIUS) +
@@ -61,8 +71,7 @@ define([], function() {
         },
 
         refresh = function(mousePos) {
-          var d = computePath(mousePos);
-          path.setAttribute('d', d);
+          path.setAttribute('d', computePath(mousePos));
         },
 
         setEnd = function(x, y) {
@@ -74,6 +83,7 @@ define([], function() {
         };
 
     svgEl.appendChild(path);
+    svgEl.appendChild(startHandle);
 
     this.refresh = refresh;
     this.destroy = destroy;
