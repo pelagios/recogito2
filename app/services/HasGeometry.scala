@@ -13,7 +13,7 @@ trait HasGeometry {
     Format(
       JsPath.read[JsValue].map { json =>
         val geom = new GeometryJSON(DECIMAL_PRECISION).read(Json.stringify(json))
-        if (geom.isEmpty) null else geom // Some Java legacy...
+        if (geom != null && geom.isEmpty) null else geom // Some Java legacy...
       },
       
       Writes[Geometry] { geom =>
