@@ -32,18 +32,14 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
           container.appendChild(g);
         },
 
-        asNode = function() {
-          var span = elements[0];
-          return { annotation: span.annotation, elements: [ span ] };
-        },
-
         destroy = function() {
           container.removeChild(g);
         };
 
     init();
 
-    this.asNode = asNode;
+    this.annotation = elements.get(0).annotation;
+    this.node = { annotation: this.annotation, elements: [ elements.get(0) ] };
     this.destroy = destroy;
   };
 

@@ -96,6 +96,14 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
           }
         },
 
+        getStartNode = function() {
+          return fromNode;
+        },
+
+        getEndNode = function() {
+          return toNode;
+        },
+
         destroy = function() {
 
         };
@@ -107,6 +115,8 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
     this.dragTo = dragTo;
     this.destroy = destroy;
     this.redraw = redraw;
+    this.getStartNode = getStartNode;
+    this.getEndNode = getEndNode;
   };
 
   return Connection;

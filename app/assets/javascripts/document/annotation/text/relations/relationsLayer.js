@@ -93,14 +93,22 @@ define([
 
         /** Starts a new connection **/
         onMousedown = function(e) {
-          var node = toNode(e);
-          if (node) startNewConnection(node);
+          if (currentConnection) {
+            console.log('closing connection');
+            // TODO
+            currentConnection.destroy();
+            currentConnection = undefined;
+          } else {
+            var node = toNode(e);
+            if (node) startNewConnection(node);
+          }
         },
 
         onMousemove = function(e) {
-          if (currentConnection)
-            if (currentHover) currentConnection.dragTo(currentHover.asNode());
+          if (currentConnection) {
+            if (currentHover) currentConnection.dragTo(currentHover.node);
             else currentConnection.dragTo([ e.offsetX, e.offsetY ]);
+          }
         },
 
         /**
@@ -108,6 +116,12 @@ define([
          * end; or click and hold at the start, drag to end and release.
          */
         onMouseup = function(e) {
+          if (currentHover && currentConnection) {
+            // If this is a different node than the start node, close the connection
+            if (currentHover.annotation !== currentConnection.getStartNode().annotation) {
+              console.log('closing connection');
+            }
+          }
           /*
           if (currentConnection.isComplete())
           else
