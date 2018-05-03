@@ -113,6 +113,7 @@ define([
             // TODO
             currentConnection.destroy();
             currentConnection = undefined;
+            jQuery(document.body).css('cursor', 'auto');
           } else {
             var node = toNode(e);
             if (node) startNewConnection(node);
