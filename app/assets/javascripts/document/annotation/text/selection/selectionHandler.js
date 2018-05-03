@@ -9,6 +9,8 @@ define([
 
     var self = this,
 
+        isEnabled = true,
+
         currentSelection = false,
 
         /** Helper that clears the visible selection by 'unwrapping' the created span elements **/
@@ -43,6 +45,8 @@ define([
         },
 
         onMouseup = function(e) {
+          if (!isEnabled) return;
+
               // Click happend on an existing annotation span?
           var annotationSpan = jQuery(e.target).closest('.annotation'),
 
@@ -164,6 +168,10 @@ define([
             else if (key === 39)
               // Right arrow key
               stepSelection(highlighter.getAnnotationAfter(currentSelection.annotation));
+        },
+
+        setEnabled = function(enabled) {
+          isEnabled = enabled;
         };
 
     jQuery(rootNode).mouseup(onMouseup);
@@ -173,6 +181,7 @@ define([
     this.clearSelection = clearSelection;
     this.getSelection = getSelection;
     this.setSelection = setSelection;
+    this.setEnabled = setEnabled;
 
     AbstractSelectionHandler.apply(this);
   };

@@ -111,18 +111,14 @@ define([
         },
 
         onAnnotationModeChanged = function(m) {
-          editor.setAnnotationMode(m);
-          if (m.mode === 'RELATIONS')
+          if (m.mode === 'RELATIONS') {
+            selector.setEnabled(false);
             relationsLayer.show();
-          else
+          } else {
+            selector.setEnabled(true);
             relationsLayer.hide();
-        },
-
-        onSelect = function(selection) {
-          if (relationsLayer.isEnabled())
-            relationsLayer.select(selection);
-          else
-            editor.openSelection(selection);
+            editor.setAnnotationMode(m);
+          }
         };
 
     // Toolbar events
@@ -131,7 +127,7 @@ define([
 
     BaseApp.apply(this, [ annotations, highlighter, selector ]);
 
-    selector.on('select', onSelect);
+    selector.on('select', editor.openSelection);
 
     editor.on('createAnnotation', onCreateAnnotation);
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));

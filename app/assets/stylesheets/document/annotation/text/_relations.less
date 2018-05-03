@@ -9,13 +9,18 @@ svg {
 
   circle {
     stroke:lighten(@standard-type, 7%);
-    stroke-width:1;
+    stroke-width:1.6;
+    fill:#fff;
+  }
+
+  circle.end {
     fill:lighten(@standard-type, 7%);
   }
 
-  circle.start, circle.hover {
-    stroke-width:1.6;
-    fill:#fff;
+  rect {
+    stroke-width:1.4;
+    stroke:fade(@standard-type, 90%);
+    fill:transparent;
   }
 
   path {
@@ -27,4 +32,8 @@ svg {
     fill:transparent;
   }
 
+}
+
+#main.noselect #content {
+  .noselect();
 }

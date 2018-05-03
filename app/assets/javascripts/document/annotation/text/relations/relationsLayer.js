@@ -1,49 +1,59 @@
-define(['document/annotation/text/relations/connection'], function(Connection) {
+define([
+  'document/annotation/text/relations/connection',
+  'document/annotation/text/relations/hoverEmphasis'
+], function(Connection, HoverEmphasis) {
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
-      BORDER_RADIUS = 4,
+      toSelection = function(e) {
+        var t = jQuery(e.target).closest('.annotation');
+            span = (t.length > 0) ? t[0] : undefined;
 
-      LINE_OFFSET = 10;
+        // TODO we'll support multi-span annotations later
+        if (span)
+          return { annotation: span.annotation, elements: [ span ] };
+      };
 
   var RelationsLayer = function(content, svg) {
 
     var contentEl = jQuery(content),
 
-        enabled = false, // Buffering this, so we don't access DOM each time
-
-        mouseX, mouseY,
-
-        currentConnection = false,
-
+        // Current hover emphasis (regardless of whether we're currently drawing a connection)
         currentHover = false,
 
-        isOver = false,
+        // The connection currently being drawn, if any
+        currentConnection = false,
 
         attachHandlers = function() {
           // Note that the SVG element is transparent to mouse events
+          contentEl.addClass('noselect');
+          contentEl.on('mousedown', onMousedown);
           contentEl.on('mousemove', onMousemove);
+          contentEl.on('mouseup', onMouseup);
           contentEl.on('mouseover', '.annotation', onEnterAnnotation);
           contentEl.on('mouseleave', '.annotation', onLeaveAnnotation);
         },
 
         detachHandlers = function() {
           // Note that the SVG element is transparent to mouse events
+          contentEl.removeClass('noselect');
+          contentEl.off('mousedown', onMousedown);
           contentEl.off('mousemove', onMousemove);
+          contentEl.off('mouseup', onMouseup);
           contentEl.off('mouseover', '.annotation', onEnterAnnotation);
           contentEl.off('mouseleave', '.annotation', onLeaveAnnotation);
         },
 
+        /** Fire up the mouse handlers and show the SVG foreground plate **/
         show = function() {
-          enabled = true;
           attachHandlers();
           svg.style.display = 'initial';
         },
 
+        /** Clear current connection, all shapes, detach mouse handlers and hide the SVG plate **/
         hide = function() {
-          enabled = false;
+          currentConnection = false;
 
-          currentPath = false;
           while (svg.firstChild)
             svg.removeChild(svg.firstChild);
 
@@ -51,55 +61,33 @@ define(['document/annotation/text/relations/connection'], function(Connection) {
           svg.style.display = 'none';
         },
 
-        isEnabled = function() {
-          return enabled;
+        /** Drawing code for 'hover emphasis' **/
+        hover = function(elements) {
+          if (elements) {
+            currentHover = new HoverEmphasis(svg, elements);
+          } else { // Clear hover
+            if (currentHover) currentHover.destroy();
+            currentHover = undefined;
+          }
         },
 
-        getHandleXY = function(fromSelection) {
-          var bounds = fromSelection.bounds, // shorthand
-              startX = Math.round(bounds.x + bounds.width / 2) - jQuery(svg).offset().left,
-              startY = Math.round(bounds.y) - jQuery(svg).offset().top + jQuery(window).scrollTop();
-
-          return [ startX, startY ];
+        /** Emphasise hovered annotation **/
+        onEnterAnnotation = function(e) {
+          // TODO support multi-span annotations
+          var t = jQuery(e.target).closest('.annotation'),
+              elements = (t.length > 0) ? t : undefined;
+          hover(elements);
         },
 
-        getHandleElement = function(el) {
-          var rect = el.get(0).getBoundingClientRect(),
-              x = Math.round(rect.x + rect.width / 2) - jQuery(svg).offset().left,
-              y = Math.round(rect.y) - jQuery(svg).offset().top + jQuery(window).scrollTop();
-
-          return [ x, y ];
+        /** Clear hover emphasis **/
+        onLeaveAnnotation = function(e) {
+          hover();
         },
 
-        initConnection = function(fromSelection) {
+        /** Start drawing a new connection **/
+        startNewConnection = function(fromSelection) {
           currentConnection = new Connection(svg, fromSelection);
           jQuery(document.body).css('cursor', 'none');
-          render();
-        },
-
-        updateConnection = function(destination) {
-          var end = (destination) ? destination[0] : [ mouseX, mouseY ];
-          currentConnection.update(end);
-        },
-
-        hover = function(span) {
-          var xy = getHandleElement(span);
-
-          clearHover();
-
-          currentHover = document.createElementNS(SVG_NS, 'circle');
-          currentHover.setAttribute('cx', xy[0] - 0.5);
-          currentHover.setAttribute('cy', xy[1] + 0.5);
-          currentHover.setAttribute('r', 4);
-          currentHover.setAttribute('class', 'hover');
-
-          svg.appendChild(currentHover);
-        },
-
-        clearHover = function() {
-          if (currentHover)
-            svg.removeChild(currentHover);
-          currentHover = false;
         },
 
         render = function() {
@@ -109,34 +97,37 @@ define(['document/annotation/text/relations/connection'], function(Connection) {
           }
         },
 
+        onMousedown = function(e) {
+          var selection = toSelection(e);
+          if (selection) initConnection(selection);
+        },
+
         onMousemove = function(e) {
           mouseX = e.offsetX;
           mouseY = e.offsetY;
+          /*
+
+          var end = (destination) ? destination[0] : [ mouseX, mouseY ];
+          currentConnection.update(end);
+          */
         },
 
-        onEnterAnnotation = function(e) {
-          isOver = jQuery(e.target).closest('.annotation');
-          if (currentConnection)
-            updateConnection(isOver);
+        /**
+         * Note: we want to support both possible drawing modes: click once for start + once for
+         * end; or click and hold at the start, drag to end and release.
+         */
+        onMouseup = function(e) {
+          var selection = toSelection(e);
+
+          /*
+          if (currentConnection.isComplete())
           else
-            hover(isOver);
-        },
-
-        onLeaveAnnotation = function(e) {
-          clearHover();
-          isOver = false;
-        },
-
-        select = function(selection) {
-          if (selection) {
-            initConnection(selection);
-          }
+            currentConnection.updateConnection(selection)
+          */
         };
 
     this.show = show;
     this.hide = hide;
-    this.select = select;
-    this.isEnabled = isEnabled;
   };
 
   return RelationsLayer;
