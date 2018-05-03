@@ -16,6 +16,8 @@ define(['document/annotation/text/relations/connection'], function(Connection) {
 
         currentConnection = false,
 
+        currentHover = false,
+
         isOver = false,
 
         attachHandlers = function() {
@@ -55,7 +57,7 @@ define(['document/annotation/text/relations/connection'], function(Connection) {
 
         getHandleXY = function(fromSelection) {
           var bounds = fromSelection.bounds, // shorthand
-              startX = Math.round(bounds.x + bounds.width / 2) - 199.5,
+              startX = Math.round(bounds.x + bounds.width / 2) - jQuery(svg).offset().left,
               startY = Math.round(bounds.y) - jQuery(svg).offset().top + jQuery(window).scrollTop();
 
           return [ startX, startY ];
@@ -63,7 +65,7 @@ define(['document/annotation/text/relations/connection'], function(Connection) {
 
         getHandleElement = function(el) {
           var rect = el.get(0).getBoundingClientRect(),
-              x = Math.round(rect.x + rect.width / 2) - 199.5,
+              x = Math.round(rect.x + rect.width / 2) - jQuery(svg).offset().left,
               y = Math.round(rect.y) - jQuery(svg).offset().top + jQuery(window).scrollTop();
 
           return [ x, y ];
@@ -76,8 +78,28 @@ define(['document/annotation/text/relations/connection'], function(Connection) {
         },
 
         updateConnection = function(destination) {
-          var end = (destination) ? getHandleElement(destination) : [ mouseX, mouseY ];
-          currentConnection.refresh([mouseX, mouseY]);
+          var end = (destination) ? destination[0] : [ mouseX, mouseY ];
+          currentConnection.update(end);
+        },
+
+        hover = function(span) {
+          var xy = getHandleElement(span);
+
+          clearHover();
+
+          currentHover = document.createElementNS(SVG_NS, 'circle');
+          currentHover.setAttribute('cx', xy[0] - 0.5);
+          currentHover.setAttribute('cy', xy[1] + 0.5);
+          currentHover.setAttribute('r', 4);
+          currentHover.setAttribute('class', 'hover');
+
+          svg.appendChild(currentHover);
+        },
+
+        clearHover = function() {
+          if (currentHover)
+            svg.removeChild(currentHover);
+          currentHover = false;
         },
 
         render = function() {
@@ -93,12 +115,15 @@ define(['document/annotation/text/relations/connection'], function(Connection) {
         },
 
         onEnterAnnotation = function(e) {
-          isOver = true;
+          isOver = jQuery(e.target).closest('.annotation');
           if (currentConnection)
-            updateConnection(jQuery(e.target).closest('.annotation'));
+            updateConnection(isOver);
+          else
+            hover(isOver);
         },
 
         onLeaveAnnotation = function(e) {
+          clearHover();
           isOver = false;
         },
 

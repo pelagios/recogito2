@@ -3,79 +3,139 @@ define([], function() {
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
-      BORDER_RADIUS = 4,
+      // Rounded corner arc radius
+      BORDER_RADIUS = 3,
 
-      LINE_OFFSET = 8,
+      // Horizontal distance between connection line and annotation highlight
+      LINE_DISTANCE = 6,
 
+      // Possible rounded corner SVG arc configurations: clock position + clockwise/counterclockwise
       ARC_0CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + BORDER_RADIUS + ',' + BORDER_RADIUS,
       ARC_0CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 -' + BORDER_RADIUS + ',' + BORDER_RADIUS,
-
+      ARC_3CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 -' + BORDER_RADIUS + ',' + BORDER_RADIUS,
       ARC_3CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 -' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
-
-      ARC_6CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 ' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
       ARC_6CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 -' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
+      ARC_6CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 ' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
+      ARC_9CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
+      ARC_9CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 ' + BORDER_RADIUS + ',' + BORDER_RADIUS,
 
-      ARC_9CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + BORDER_RADIUS + ',-' + BORDER_RADIUS;
+      // Helper to convert client (viewport) bounds to offset bounds
+      toOffsetBounds = function(clientBounds, offsetContainer) {
+        var offset = offsetContainer.offset(),
+            left = Math.round(clientBounds.left - offset.left),
+            top = Math.round(clientBounds.top - offset.top + jQuery(window).scrollTop());
+
+        return {
+          left  : left,
+          top   : top,
+          right : left + clientBounds.width,
+          bottom: top + clientBounds.height,
+          width : clientBounds.width,
+          height: clientBounds.height
+        };
+      },
+
+      // Shorthand for getting top handle position on bounds
+      getTopHandleXY = function(bounds) {
+        return [
+          bounds.left + bounds.width / 2 - 0.5,
+          bounds.top - 0.5
+        ];
+      },
+
+      // Shorthand for getting bottom handle position on bounds
+      getBottomHandleXY = function(bounds) {
+        return [
+          bounds.left + bounds.width / 2 - 0.5,
+          bounds.bottom + 0.5
+        ];
+      };
 
   var Connection = function(svgEl, fromSelection, opt_toSelection) {
 
         // { annotation: ..., bounds: ... }
     var toSelection = opt_toSelection,
 
-        svg = jQuery(svgEl),
+        svg = jQuery(svgEl), // shorthand
 
-        startHandle = document.createElementNS(SVG_NS, 'circle'),
+        // Note that the selection bounds are useless after scrolling or resize. They
+        // represent viewport bounds at the time of selection, so we store document
+        // offsets instead
+        fromAnnotation = fromSelection.annotation,
+        fromBounds = toOffsetBounds(fromSelection.bounds, svg),
 
+        toAnnotation, toBounds,
+
+        // SVG elements
         path = document.createElementNS(SVG_NS, 'path'),
+        startHandle = document.createElementNS(SVG_NS, 'circle'),
+        endHandle = document.createElementNS(SVG_NS, 'circle'),
 
-        getSelectionMiddle = function(selection) {
-          return selection.bounds.x + selection.bounds.width / 2;
+        setEnd = function(xyOrElement) {
+          if (xyOrElement instanceof Array) {
+            return xyOrElement; // Do nothing
+          } else {
+            // toAnnotation = xyOrSelection.annotation;
+            // toBounds = toOffsetBounds(xyOrSelection.bounds, svg);
+            toBounds = toOffsetBounds(xyOrElement.getBoundingClientRect(), svg);
+            return (fromBounds.top > toBounds.top) ? getBottomHandleXY(toBounds) : getTopHandleXY(toBounds);
+         }
         },
 
-        getSelectionTop = function(selection) {
-          return selection.bounds.y;
-        },
+        update = function(endXYorSelection) {
+          var end = setEnd(endXYorSelection),
 
-        getStart = function(mousePos) {
-          // TODO make sensitive to mouse pos
-          return [ getSelectionMiddle(fromSelection), getSelectionTop(fromSelection) ];
-        },
+              startsAtTop = end[1] <= (fromBounds.top + fromBounds.height / 2),
 
-        computePath = function(mousePos) {
-          var offset = svg.offset(),
+              start = (startsAtTop) ? getTopHandleXY(fromBounds) : getBottomHandleXY(fromBounds),
 
-              start = getStart(mousePos),
+              deltaX = end[0] - start[0],
+              deltaY = end[1] - start[1],
 
-              startX = start[0] - offset.left - 0.5,
-              startY = start[1] - offset.top - 0.5 + jQuery(window).scrollTop(),
+              d = LINE_DISTANCE - BORDER_RADIUS, // Shorthand: vertical straight line length
 
-              deltaX = mousePos[0] - getSelectionMiddle(fromSelection) + offset.left,
-              deltaY = mousePos[1] - getSelectionTop(fromSelection) + offset.top - jQuery(window).scrollTop(),
+              // Path that starts at the top edge of the annotation highlight
+              compileBottomPath = function() {
+                var arc1 = (deltaX > 0) ? ARC_9CC : ARC_3CW,
+                    arc2 = (deltaX > 0) ? ARC_0CW : ARC_0CC;
 
-              arc1 = (deltaX < 0) ? ARC_3CC : ARC_9CW,
-              arc2 = (deltaX < 0) ?
-                (deltaY <= 0) ? ARC_6CW : ARC_0CC :
-                (deltaY <= 0) ? ARC_6CC : ARC_0CW;
+                return 'M' + start[0] +
+                       ' ' + start[1] +
+                       'v' + d +
+                       arc1 +
+                       'h' + (deltaX - 2 * Math.sign(deltaX) * BORDER_RADIUS) +
+                       arc2 +
+                       'V' + end[1];
+              },
 
-          startHandle.setAttribute('cx', startX);
-          startHandle.setAttribute('cy', startY + 0.5);
-          startHandle.setAttribute('r', 2.5);
+              // Path that starts at the bottom edge of the annotation highlight
+              compileTopPath = function() {
+                var arc1 = (deltaX > 0) ? ARC_9CW : ARC_3CC,
+                    arc2 = (deltaX > 0) ?
+                      (deltaY >= 0) ? ARC_0CW : ARC_6CC :
+                      (deltaY >= 0) ? ARC_0CC : ARC_6CW;
 
-          return 'M' + startX +
-                 ' ' + startY +
-                 'v-' + (LINE_OFFSET - BORDER_RADIUS) +
-                 arc1 +
-                 'h' + (deltaX - 2 * BORDER_RADIUS) +
-                 arc2 +
-                 'V' + mousePos[1];
-        },
+                return 'M' + start[0] +
+                       ' ' + start[1] +
+                       'v-' + (LINE_DISTANCE - BORDER_RADIUS) +
+                       arc1 +
+                       'h' + (deltaX - 2 * Math.sign(deltaX) * BORDER_RADIUS) +
+                       arc2 +
+                       'V' + end[1];
+              };
 
-        refresh = function(mousePos) {
-          path.setAttribute('d', computePath(mousePos));
-        },
+          startHandle.setAttribute('cx', start[0]);
+          startHandle.setAttribute('cy', start[1]);
+          startHandle.setAttribute('r', 4);
+          startHandle.setAttribute('class', 'start');
 
-        setEnd = function(x, y) {
+          endHandle.setAttribute('cx', end[0]);
+          endHandle.setAttribute('cy', end[1]);
+          endHandle.setAttribute('r', 3.5);
+          endHandle.setAttribute('class', 'end');
 
+          if (startsAtTop) path.setAttribute('d', compileTopPath());
+          else path.setAttribute('d', compileBottomPath());
         },
 
         destroy = function() {
@@ -84,8 +144,9 @@ define([], function() {
 
     svgEl.appendChild(path);
     svgEl.appendChild(startHandle);
+    svgEl.appendChild(endHandle);
 
-    this.refresh = refresh;
+    this.update = update;
     this.destroy = destroy;
   };
 
