@@ -5,7 +5,7 @@ define([
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
-      toSelection = function(e) {
+      toNode = function(e) {
         var t = jQuery(e.target).closest('.annotation');
             span = (t.length > 0) ? t[0] : undefined;
 
@@ -71,6 +71,13 @@ define([
           }
         },
 
+        /** Start drawing a new connection **/
+        startNewConnection = function(fromNode) {
+          currentConnection = new Connection(svg, fromNode);
+          jQuery(document.body).css('cursor', 'none');
+          render();
+        },
+
         /** Emphasise hovered annotation **/
         onEnterAnnotation = function(e) {
           // TODO support multi-span annotations
@@ -84,32 +91,16 @@ define([
           hover();
         },
 
-        /** Start drawing a new connection **/
-        startNewConnection = function(fromSelection) {
-          currentConnection = new Connection(svg, fromSelection);
-          jQuery(document.body).css('cursor', 'none');
-        },
-
-        render = function() {
-          if (currentConnection) {
-            if (!isOver) updateConnection();
-            requestAnimationFrame(render);
-          }
-        },
-
+        /** Starts a new connection **/
         onMousedown = function(e) {
-          var selection = toSelection(e);
-          if (selection) initConnection(selection);
+          var node = toNode(e);
+          if (node) startNewConnection(node);
         },
 
         onMousemove = function(e) {
-          mouseX = e.offsetX;
-          mouseY = e.offsetY;
-          /*
-
-          var end = (destination) ? destination[0] : [ mouseX, mouseY ];
-          currentConnection.update(end);
-          */
+          if (currentConnection)
+            if (currentHover) currentConnection.dragTo(currentHover.asNode());
+            else currentConnection.dragTo([ e.offsetX, e.offsetY ]);
         },
 
         /**
@@ -117,13 +108,18 @@ define([
          * end; or click and hold at the start, drag to end and release.
          */
         onMouseup = function(e) {
-          var selection = toSelection(e);
-
           /*
           if (currentConnection.isComplete())
           else
             currentConnection.updateConnection(selection)
           */
+        },
+
+        render = function() {
+          if (currentConnection) {
+            currentConnection.redraw();
+            requestAnimationFrame(render);
+          }
         };
 
     this.show = show;
