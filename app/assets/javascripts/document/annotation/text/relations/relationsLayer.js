@@ -5,13 +5,30 @@ define([
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
-      toNode = function(e) {
-        var t = jQuery(e.target).closest('.annotation');
-            span = (t.length > 0) ? t[0] : undefined;
+      getAnnotationSpansRecursive = function(element, a) {
+        var spans = (a) ? a : [ ],
+            parent = element.parentNode;
 
-        // TODO we'll support multi-span annotations later
-        if (span)
-          return { annotation: span.annotation, elements: [ span ] };
+        spans.push(element);
+
+        if (jQuery(parent).hasClass('annotation'))
+          return getAnnotationSpansRecursive(parent, spans);
+        else
+          return spans;
+      },
+
+      toNode = function(e) {
+        var t = jQuery(e.target).closest('.annotation'),
+            sourceSpan = (t.length > 0) ? t[0] : undefined,
+            annotationSpans, annotation, elements;
+
+        if (sourceSpan) {
+          annotationSpans = getAnnotationSpansRecursive(sourceSpan);
+          annotation = annotationSpans[annotationSpans.length - 1].annotation;
+          elements = jQuery('.annotation[data-id="' + annotation.annotation_id + '"]');
+          return { annotation: annotation, elements: elements };
+        }
+
       };
 
   var RelationsLayer = function(content, svg) {
@@ -80,10 +97,8 @@ define([
 
         /** Emphasise hovered annotation **/
         onEnterAnnotation = function(e) {
-          // TODO support multi-span annotations
-          var t = jQuery(e.target).closest('.annotation'),
-              elements = (t.length > 0) ? t : undefined;
-          hover(elements);
+          if (currentHover) hover();
+          hover(toNode(e).elements);
         },
 
         /** Clear hover emphasis **/

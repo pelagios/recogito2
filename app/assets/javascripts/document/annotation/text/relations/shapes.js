@@ -22,6 +22,31 @@ define([], function() {
     ARC_9CW : 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
     ARC_9CC : 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 ' + BORDER_RADIUS + ',' + BORDER_RADIUS,
 
+    getUnionBounds : function(elements) {
+      var bounds = elements.toArray().map(function(el) {
+            return el.getBoundingClientRect();
+          }),
+
+          top = bounds.map(function(b) { return b.top; }),
+          right = bounds.map(function(b) { return b.right; }),
+          bottom = bounds.map(function(b) { return b.bottom; }),
+          left = bounds.map(function(b) { return b.left; }),
+
+          minTop = Math.min.apply(null, top),
+          maxRight = Math.max.apply(null, right),
+          maxBottom = Math.min.apply(null, bottom),
+          minLeft = Math.min.apply(null, left);
+
+      return {
+        top   : minTop,
+        right : maxRight,
+        bottom: maxBottom,
+        left  : minLeft,
+        width : maxRight - minLeft,
+        height: maxBottom - minTop
+      };
+    },
+
     // Helper to convert client (viewport) bounds to offset bounds
     toOffsetBounds : function(clientBounds, offsetContainer) {
       var offset = offsetContainer.offset(),

@@ -4,7 +4,7 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
 
     var showHandle = (opts) ? opts.showHandle : false,
 
-        bounds = Shapes.toOffsetBounds(elements[0].getBoundingClientRect(), jQuery(container)),
+        bounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(elements), jQuery(container)),
 
         g = document.createElementNS(Shapes.SVG_NAMESPACE, 'g'),
 
@@ -39,7 +39,7 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
     init();
 
     this.annotation = elements.get(0).annotation;
-    this.node = { annotation: this.annotation, elements: [ elements.get(0) ] };
+    this.node = { annotation: this.annotation, elements: elements };
     this.destroy = destroy;
   };
 

@@ -10,7 +10,7 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
         // Note that the selection bounds are useless after scrolling or resize. They
         // represent viewport bounds at the time of selection, so we store document
         // offsets instead
-        fromBounds = Shapes.toOffsetBounds(fromNode.elements[0].getBoundingClientRect(), svg),
+        fromBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(fromNode.elements), svg),
 
         // SVG elements
         path = document.createElementNS(Shapes.SVG_NAMESPACE, 'path'),
@@ -25,7 +25,7 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
 
           if (xyOrNode.elements) {
             toNode = xyOrNode;
-            toBounds = Shapes.toOffsetBounds(xyOrNode.elements[0].getBoundingClientRect(), svg);
+            toBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(xyOrNode.elements), svg);
           }
         },
 
