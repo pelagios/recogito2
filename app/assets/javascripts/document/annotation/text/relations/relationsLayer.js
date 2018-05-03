@@ -64,7 +64,7 @@ define([
         /** Drawing code for 'hover emphasis' **/
         hover = function(elements) {
           if (elements) {
-            currentHover = new HoverEmphasis(svg, elements);
+            currentHover = new HoverEmphasis(svg, elements, { showHandle: !currentConnection });
           } else { // Clear hover
             if (currentHover) currentHover.destroy();
             currentHover = undefined;
