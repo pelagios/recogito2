@@ -40,18 +40,20 @@ svg {
   background-color:#fff;
   padding: 1px 6px;
   .rounded-corners(2px);
-  .box-shadow(1px, 1px, 14px, rgba(0, 0, 0, 0.2));
+  .box-shadow(0, 1px, 8px, rgba(0, 0, 0, 0.25));
   transform:translate(-50%, 0);
 
-  input {
-    border:none;
+  span {
+    display:inline-block;
     font-size:15px;
-    width:80px;
+    min-width:50px;
+    min-height:1em;
+    outline:none;
   }
 
-  input:focus {
-    border:none;
-    box-shadow:none;
+  span:empty:before {
+    content:attr(data-placeholder);
+    color:darken(@lightgrey-border-darker, 15%);
   }
 
 }

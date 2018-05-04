@@ -5,20 +5,22 @@ define(['common/hasEvents'], function(HasEvents) {
 
         element = jQuery(
           '<div class="connection-editor-popup">' +
-            '<input type="text" placeholder="Add tag..."></input>' +
+            '<span contentEditable="true" data-placeholder="Add tag..."></span>' +
           '</div>').appendTo(containerEl),
 
-        inputEl = element.find('input'),
+        inputEl = element.find('span'),
 
         init = function() {
           element.css({ top: position[1] - 15, left: position[0] });
           setTimeout(function() { inputEl.focus(); }, 1);
-          inputEl.keyup(onKeyUp);
+          inputEl.keydown(onKeydown);
         },
 
-        onKeyUp = function(e) {
-          if (e.keyCode == 13)
+        onKeydown = function(e) {
+          if (e.keyCode == 13) {
             that.fireEvent('submit');
+            return false;
+          }
         };
 
     init();
