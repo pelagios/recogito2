@@ -1,6 +1,6 @@
 define([], function() {
 
-  var BORDER_RADIUS = 3;
+  var BORDER_RADIUS = 2.5;
 
   return {
 
@@ -10,7 +10,7 @@ define([], function() {
     BORDER_RADIUS : BORDER_RADIUS,
 
     // Horizontal distance between connection line and annotation highlight
-    LINE_DISTANCE : 6,
+    LINE_DISTANCE : 6.5,
 
     // Possible rounded corner SVG arc configurations: clock position + clockwise/counterclockwise
     ARC_0CW : 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + BORDER_RADIUS + ',' + BORDER_RADIUS,
@@ -66,7 +66,7 @@ define([], function() {
     // Shorthand for getting top handle position on bounds
     getTopHandleXY : function(bounds) {
       return [
-        bounds.left + bounds.width / 2 - 0.5,
+        bounds.left + bounds.width / 2 + 0.5,
         bounds.top - 0.5
       ];
     },
@@ -75,7 +75,7 @@ define([], function() {
     getBottomHandleXY : function(bounds) {
       return [
         bounds.left + bounds.width / 2 - 0.5,
-        bounds.bottom + 0.5
+        bounds.bottom - 0.5
       ];
     }
 

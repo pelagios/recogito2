@@ -1,8 +1,13 @@
-define(['document/annotation/text/relations/shapes'], function(Shapes) {
+define([
+  'common/hasEvents',
+  'document/annotation/text/relations/shapes'
+], function(HasEvents, Shapes) {
 
   var Connection = function(svgEl, fromNode, opt_toNode) {
 
-    var svg = jQuery(svgEl), // shorthand
+    var that = this,
+
+        svg = jQuery(svgEl), // shorthand
 
         // { annotation: ..., elements: ... }
         toNode = opt_toNode, toBounds,
@@ -13,12 +18,16 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
         fromBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(fromNode.elements), svg),
 
         // SVG elements
-        path = document.createElementNS(Shapes.SVG_NAMESPACE, 'path'),
+        path        = document.createElementNS(Shapes.SVG_NAMESPACE, 'path'),
         startHandle = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
-        endHandle = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
+        // midHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
+        endHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
 
         // [x,y] array or node object
         currentEnd,
+
+        // [x,y]
+        currentMiddot,
 
         dragTo = function(xyOrNode) {
           currentEnd = xyOrNode;
@@ -27,6 +36,10 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
             toNode = xyOrNode;
             toBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(xyOrNode.elements), svg);
           }
+        },
+
+        attach = function() {
+          that.fireEvent('create', that);
         },
 
         getEnd = function() {
@@ -49,12 +62,20 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
                 deltaX = end[0] - start[0],
                 deltaY = end[1] - start[1],
 
+                half = (Math.abs(deltaX) + Math.abs(deltaY)) / 2, // Half of length, for middot pos computation
+                midX = (half > Math.abs(deltaX)) ? start[0] + deltaX : start[0] + half * Math.sign(deltaX),
+                midY, // computed later
+
                 d = Shapes.LINE_DISTANCE - Shapes.BORDER_RADIUS, // Shorthand: vertical straight line length
 
                 // Path that starts at the top edge of the annotation highlight
                 compileBottomPath = function() {
                   var arc1 = (deltaX > 0) ? Shapes.ARC_9CC : Shapes.ARC_3CW,
                       arc2 = (deltaX > 0) ? Shapes.ARC_0CW : Shapes.ARC_0CC;
+
+                  midY = (half > Math.abs(deltaX)) ?
+                    start[1] + half - Math.abs(deltaX) + Shapes.LINE_DISTANCE :
+                    start[1] + Shapes.LINE_DISTANCE;
 
                   return 'M' + start[0] +
                          ' ' + start[1] +
@@ -71,6 +92,10 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
                       arc2 = (deltaX > 0) ?
                         (deltaY >= 0) ? Shapes.ARC_0CW : Shapes.ARC_6CC :
                         (deltaY >= 0) ? Shapes.ARC_0CC : Shapes.ARC_6CW;
+
+                  midY = (half > Math.abs(deltaX)) ?
+                    start[1] - (half - Math.abs(deltaX)) - Shapes.LINE_DISTANCE :
+                    start[1] - Shapes.LINE_DISTANCE;
 
                   return 'M' + start[0] +
                          ' ' + start[1] +
@@ -93,6 +118,13 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
 
             if (startsAtTop) path.setAttribute('d', compileTopPath());
             else path.setAttribute('d', compileBottomPath());
+
+            currentMiddot = [ midX, midY ];
+
+            // midHandle.setAttribute('cx', midX);
+            // midHandle.setAttribute('cy', midY);
+            // midHandle.setAttribute('r', 3);
+            // midHandle.setAttribute('class', 'mid');
           }
         },
 
@@ -104,20 +136,30 @@ define(['document/annotation/text/relations/shapes'], function(Shapes) {
           return toNode;
         },
 
+        getMiddot = function() {
+          return currentMiddot;
+        },
+
         destroy = function() {
 
         };
 
     svgEl.appendChild(path);
     svgEl.appendChild(startHandle);
+    // svgEl.appendChild(midHandle);
     svgEl.appendChild(endHandle);
 
     this.dragTo = dragTo;
+    this.attach = attach;
     this.destroy = destroy;
     this.redraw = redraw;
     this.getStartNode = getStartNode;
     this.getEndNode = getEndNode;
+    this.getMiddot = getMiddot;
+
+    HasEvents.apply(this);
   };
+  Connection.prototype = Object.create(HasEvents.prototype);
 
   return Connection;
 

@@ -1,7 +1,8 @@
 define([
   'document/annotation/text/relations/connection',
-  'document/annotation/text/relations/hoverEmphasis'
-], function(Connection, HoverEmphasis) {
+  'document/annotation/text/relations/hoverEmphasis',
+  'document/annotation/text/relations/tagEditor'
+], function(Connection, HoverEmphasis, TagEditor) {
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
@@ -111,7 +112,8 @@ define([
           if (currentConnection) {
             console.log('closing connection');
             // TODO
-            currentConnection.destroy();
+            currentConnection.attach();
+            new TagEditor(contentEl, currentConnection.getMiddot());
             currentConnection = undefined;
             jQuery(document.body).css('cursor', 'auto');
           } else {
