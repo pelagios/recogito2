@@ -20,7 +20,7 @@ define([
         // SVG elements
         path        = document.createElementNS(Shapes.SVG_NAMESPACE, 'path'),
         startHandle = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
-        // midHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
+        midHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
         endHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
 
         // [x,y] array or node object
@@ -39,6 +39,7 @@ define([
         },
 
         attach = function() {
+          svgEl.appendChild(midHandle);
           that.fireEvent('create', that);
         },
 
@@ -108,12 +109,12 @@ define([
 
             startHandle.setAttribute('cx', start[0]);
             startHandle.setAttribute('cy', start[1]);
-            startHandle.setAttribute('r', 4);
+            startHandle.setAttribute('r', 3);
             startHandle.setAttribute('class', 'start');
 
             endHandle.setAttribute('cx', end[0]);
             endHandle.setAttribute('cy', end[1]);
-            endHandle.setAttribute('r', 3.5);
+            endHandle.setAttribute('r', 3);
             endHandle.setAttribute('class', 'end');
 
             if (startsAtTop) path.setAttribute('d', compileTopPath());
@@ -121,10 +122,10 @@ define([
 
             currentMiddot = [ midX, midY ];
 
-            // midHandle.setAttribute('cx', midX);
-            // midHandle.setAttribute('cy', midY);
-            // midHandle.setAttribute('r', 3);
-            // midHandle.setAttribute('class', 'mid');
+            midHandle.setAttribute('cx', midX);
+            midHandle.setAttribute('cy', midY);
+            midHandle.setAttribute('r', 4);
+            midHandle.setAttribute('class', 'mid');
           }
         },
 

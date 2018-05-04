@@ -5,7 +5,7 @@ define(['common/hasEvents'], function(HasEvents) {
 
         element = jQuery(
           '<div class="connection-editor-popup">' +
-            '<span contentEditable="true" data-placeholder="Add tag..."></span>' +
+            '<span contentEditable="true" data-placeholder="Tag..."></span>' +
           '</div>').appendTo(containerEl),
 
         inputEl = element.find('span'),
@@ -19,6 +19,7 @@ define(['common/hasEvents'], function(HasEvents) {
         onKeydown = function(e) {
           if (e.keyCode == 13) {
             that.fireEvent('submit');
+            element.remove();
             return false;
           }
         };

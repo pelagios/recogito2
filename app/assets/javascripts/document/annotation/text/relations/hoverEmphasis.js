@@ -1,39 +1,22 @@
 define(['document/annotation/text/relations/shapes'], function(Shapes) {
 
-  var HoverEmphasis = function(container, elements, opts) {
+  var HoverEmphasis = function(container, elements) {
 
-    var showHandle = (opts) ? opts.showHandle : false,
+    var bounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(elements), jQuery(container)),
 
-        bounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(elements), jQuery(container)),
-
-        g = document.createElementNS(Shapes.SVG_NAMESPACE, 'g'),
+        outline = document.createElementNS(Shapes.SVG_NAMESPACE, 'rect'),
 
         init = function() {
-          var handleXY = Shapes.getTopHandleXY(bounds),
-              outline = document.createElementNS(Shapes.SVG_NAMESPACE, 'rect'),
-              handle;
-
           outline.setAttribute('x', bounds.left - 0.5);
           outline.setAttribute('y', bounds.top - 0.5);
           outline.setAttribute('width', bounds.width + 1);
           outline.setAttribute('height', bounds.height);
-
-          g.setAttribute('class', 'hover');
-          g.appendChild(outline);
-
-          if (showHandle) {
-            handle = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle');
-            handle.setAttribute('cx', handleXY[0] - 0.5);
-            handle.setAttribute('cy', handleXY[1] + 0.5);
-            handle.setAttribute('r', 4);
-            g.appendChild(handle);
-          }
-
-          container.appendChild(g);
+          outline.setAttribute('class', 'hover');
+          container.appendChild(outline);
         },
 
         destroy = function() {
-          container.removeChild(g);
+          container.removeChild(outline);
         };
 
     init();

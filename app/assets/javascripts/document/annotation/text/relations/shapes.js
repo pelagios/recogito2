@@ -1,6 +1,6 @@
 define([], function() {
 
-  var BORDER_RADIUS = 2.5;
+  var BORDER_RADIUS = 3;
 
   return {
 
