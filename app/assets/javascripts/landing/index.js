@@ -46,7 +46,12 @@ require([], function() {
               popup  : { background: '#252e39' },
               button : { background: '#4483c4' }
             },
-            position: 'bottom-left'
+            position: 'bottom-left',
+            content: {
+              message: 'Recogito uses cookies only for the purpose of login. Cookies are ' +
+                'removed when you log out.',
+              href: '/help/about#cookies'
+            }
           });
         };
 
