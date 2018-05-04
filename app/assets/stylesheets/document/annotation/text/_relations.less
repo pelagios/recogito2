@@ -1,3 +1,5 @@
+@import "../_autocomplete.less";
+
 svg {
   position:absolute;
   top:0;
@@ -37,15 +39,15 @@ svg {
 
 .connection-editor-popup {
   position:absolute;
-  background-color:#fff;
-  padding: 1px 6px;
   border:1px solid lighten(@standard-type, 7%);
   .rounded-corners(2px);
   .box-shadow(0, 1px, 12px, rgba(0, 0, 0, 0.25));
+  background-color:#fff;
   transform:translate(-50%, 0);
 
-  span {
+  span.input {
     display:inline-block;
+    padding:1px 6px;
     font-size:15px;
     min-width:30px;
     min-height:1em;
@@ -55,6 +57,11 @@ svg {
   span:empty:before {
     content:attr(data-placeholder);
     color:darken(@lightgrey-border-darker, 15%);
+  }
+
+  .tt-menu {
+    margin-top:2px;
+    color:@grey-type;
   }
 
 }

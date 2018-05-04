@@ -1,19 +1,35 @@
 define(['common/hasEvents'], function(HasEvents) {
 
+  // https://github.com/twitter/typeahead.js/issues/235
+  var original = jQuery.fn.val;
+  jQuery.fn.val = function() {
+    if ($(this).is('*[contenteditable=true]'))
+      return jQuery.fn.html.apply(this, arguments);
+    return original.apply(this, arguments);
+  };
+
   var TagEditor = function(containerEl, position) {
     var that = this,
 
         element = jQuery(
           '<div class="connection-editor-popup">' +
-            '<span contentEditable="true" data-placeholder="Tag..."></span>' +
+            '<span class="input" contentEditable="true" data-placeholder="Tag..."></span>' +
           '</div>').appendTo(containerEl),
 
         inputEl = element.find('span'),
 
         init = function() {
+              // TODO autocomplete matcher
+          var matcher = function(query, responseFn) {
+                responseFn([]);
+              };
+
           element.css({ top: position[1] - 15, left: position[0] });
-          setTimeout(function() { inputEl.focus(); }, 1);
+
           inputEl.keydown(onKeydown);
+          inputEl.typeahead({ hint:false },{ source: matcher });
+
+          setTimeout(function() { inputEl.focus(); }, 1);
         },
 
         onKeydown = function(e) {
