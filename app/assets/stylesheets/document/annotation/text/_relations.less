@@ -39,13 +39,21 @@ svg {
   position:absolute;
   background-color:#fff;
   padding: 1px 6px;
-  .rounded-corners(3px);
-  font-size: 15px;
-  color: #9f9f9f;
-  min-width: 80px;
-  border: 1px solid lighten(@standard-type, 7%);;
+  .rounded-corners(2px);
   .box-shadow(1px, 1px, 14px, rgba(0, 0, 0, 0.2));
   transform:translate(-50%, 0);
+
+  input {
+    border:none;
+    font-size:15px;
+    width:80px;
+  }
+
+  input:focus {
+    border:none;
+    box-shadow:none;
+  }
+
 }
 
 #main.noselect #content {
