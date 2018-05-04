@@ -1,4 +1,7 @@
-define(['common/hasEvents'], function(HasEvents) {
+define([
+  'common/hasEvents',
+  'document/annotation/text/relations/tagVocabulary'
+], function(HasEvents, Vocabulary) {
 
   // https://github.com/twitter/typeahead.js/issues/235
   var original = jQuery.fn.val;
@@ -19,9 +22,15 @@ define(['common/hasEvents'], function(HasEvents) {
         inputEl = element.find('span'),
 
         init = function() {
-              // TODO autocomplete matcher
           var matcher = function(query, responseFn) {
-                responseFn([]);
+                var matches = [];
+
+                Vocabulary.tags.forEach(function(tag) {
+                  if (tag.toLowerCase().indexOf(query.toLowerCase()) === 0)
+                    matches.push(tag);
+                });
+
+                responseFn(matches);
               };
 
           element.css({ top: position[1] - 15, left: position[0] });
@@ -34,8 +43,12 @@ define(['common/hasEvents'], function(HasEvents) {
 
         onKeydown = function(e) {
           if (e.keyCode == 13) {
-            that.fireEvent('submit');
+            var tag = inputEl.val();
+
+            Vocabulary.add(tag);
+            that.fireEvent('submit', tag);
             element.remove();
+
             return false;
           }
         };
