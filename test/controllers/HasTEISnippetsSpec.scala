@@ -15,14 +15,14 @@ class TestHasTEISnippets extends HasTEISnippets
 class HasTEISnippetsSpec extends Specification {
   
   val TEST_FILE = new File("test/resources/transform/tei/odyssey.tei.xml")
- 
+
   "Anchor parsing" should {
     
     "return the correct values" in {
       val anchor = 
         "from=/tei/text/body/div/p[2]::64;" +
         "to=/tei/text/body/div/p[2]::89"
-      
+
       val parsed = new TestHasTEISnippets().parseAnchor(anchor)
       
       parsed.startPath must equalTo("/TEI/text/body/div/p[2]")
@@ -78,7 +78,7 @@ class HasTEISnippetsSpec extends Specification {
   }
   
   "Snippet extraction" should {
-    
+
     "work for snippet inside a single text node" in {
       val anchor =
         "from=/tei/text/body/div/p::35;" +
