@@ -11,16 +11,16 @@ define([
 
     var self = this,
 
-        getDOMPosition = function(path) {
+        getDOMPosition = function(path, shadowDom) {
           var offsetIdx = path.indexOf('::'),
 
               // CETEIcean-specific: prefix all path elements with 'tei-'!
               normalized = path.substring(0, offsetIdx).replace(/\//g, '/tei-'),
 
               parentNode = document.evaluate(normalized.substring(1),
-                rootNode, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
+                shadowDom, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
 
-              node = parentNode.firstChild,
+              node = shadowDom.firstChild,
 
               offset = parseInt(path.substring(offsetIdx + 2)),
 
@@ -47,6 +47,12 @@ define([
 
         /** Only called from outside, so we can override directly in here **/
         initPage = function(annotations) {
+          var shadowDom = (function() {
+                var fragment = document.createDocumentFragment();
+                fragment.appendChild(rootNode.cloneNode(true)); // deep clone
+                return fragment.firstChild; // content Element
+              })();
+
           annotations.forEach(function(annotation) {
             var quote = AnnotationUtils.getQuote(annotation),
 
@@ -60,8 +66,8 @@ define([
                   return p.indexOf('to=') === 0;
                 }).substring(3),
 
-                fromPosition = getDOMPosition(fromPath),
-                toPosition = getDOMPosition(toPath),
+                fromPosition = getDOMPosition(fromPath, shadowDom),
+                toPosition = getDOMPosition(toPath, shadowDom),
 
                 range = rangy.createRange(), spans;
 
@@ -71,6 +77,11 @@ define([
             spans = self.wrapRange(range);
             self.updateStyles(annotation, spans);
             self.bindToElements(annotation, spans);
+          });
+
+          rootNode.innerHTML = '';
+          shadowDom.childNodes.forEach(function(n) {
+            rootNode.appendChild(n);
           });
         };
 
