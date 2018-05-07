@@ -6,6 +6,7 @@ import org.joox.JOOX._
 import org.w3c.dom.{Document, Element, Node}
 import org.w3c.dom.ranges.{DocumentRange, Range}
 import org.xml.sax.InputSource
+import scala.annotation.tailrec
 
 trait HasTEISnippets extends HasTextSnippets {
   
@@ -49,27 +50,15 @@ trait HasTEISnippets extends HasTextSnippets {
     * 
     * (a, b, c, d, e, f, g, h, i)
     */
-  private[controllers] def flattenDOM(node: Node, flattened: Seq[Node] = Seq.empty[Node]): Seq[Node] = {    
-    (Option(node.getFirstChild), Option(node.getNextSibling)) match {
-      
-      case (Some(child), Some(sibling)) =>
-        // Walk child level and then continue with sibling
-        val nodes = flattenDOM(child, flattened :+ node)
-        flattenDOM(sibling, nodes)      
-        
-      case (Some(child), None) =>
-        // Append and continue with child
-        flattenDOM(child, flattened :+ node)
-        
-      case (None, Some(sibling)) =>
-        // Append and continue with sibling
-        flattenDOM(sibling, flattened :+ node)
-        
-      case (None, None) =>
-        // Just append this node and we're done
-        flattened :+ node
-        
+  private[controllers] def flattenDOM(node: Node, flattened: Seq[Node] = Seq.empty[Node]): Seq[Node] = {
+    
+    def flattenRecursive(node: Node, flattened: Seq[Node] = Seq.empty[Node]): Seq[Node] = {
+      val children = node.getChildNodes()
+      val childrenAsSeq = Seq.tabulate(children.getLength)(n => children.item(n))
+      (flattened :+ node) ++ childrenAsSeq.flatMap(child => flattenRecursive(child, flattened))
     }
+    
+    flattenRecursive(node)
   }
   
   private def parseXML(source: InputSource) = {
@@ -86,7 +75,7 @@ trait HasTEISnippets extends HasTextSnippets {
   
   protected def toRange(anchor: String, doc: Document): Range = {
     
-    def findPosition(parent: Element, offset: Int): (Node, Int) = {
+    def findPosition(parent: Element, offset: Int): (Node, Int) = {      
       val firstChild = parent.getFirstChild
       val len = Option(firstChild.getNodeValue).map(_.size).getOrElse(0)
       
@@ -95,6 +84,7 @@ trait HasTEISnippets extends HasTextSnippets {
         (firstChild, offset)
       } else {
         // Offset exceeds first child boundaries - step through DOM
+        @tailrec
         def findRecursive(remainingNodes: Seq[Node], remainingOffset: Int): (Node, Int) = {
           val h = remainingNodes.head
           val t = remainingNodes.tail
@@ -105,7 +95,7 @@ trait HasTEISnippets extends HasTextSnippets {
             findRecursive(t, remainingOffset - len)
         }
         
-        findRecursive(flattenDOM(firstChild), offset)
+        findRecursive(flattenDOM(parent), offset)
       }        
     }
     
