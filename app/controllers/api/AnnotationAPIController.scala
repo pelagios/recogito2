@@ -5,13 +5,6 @@ import controllers._
 import java.io.File
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import services.{ContentType, HasDate}
-import services.annotation._
-import services.contribution._
-import services.document.{DocumentService, DocumentInfo}
-import services.user.UserService
-import services.image.ImageService
-import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime
 import play.api.{Configuration, Logger}
 import play.api.http.FileMimeTypes
@@ -21,6 +14,14 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ExecutionContext, Future}
+import services.{ContentType, HasDate}
+import services.annotation._
+import services.annotation.relation.Relation
+import services.contribution._
+import services.document.{DocumentService, DocumentInfo}
+import services.user.UserService
+import services.image.ImageService
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import storage.uploads.Uploads
 
 /** Encapsulates those parts of an annotation that are submitted from the client **/
@@ -152,7 +153,8 @@ class AnnotationAPIController @Inject() (
           AnnotationStatus(
             s.value,
             Some(s.setBy.getOrElse(user)),
-            s.setAt.getOrElse(now))))))
+            s.setAt.getOrElse(now))))),
+      Seq.empty[Relation])
   }
 
   /** Common boilerplate code for all API methods carrying JSON config payload **/

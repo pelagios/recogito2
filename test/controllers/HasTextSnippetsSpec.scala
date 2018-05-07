@@ -1,14 +1,15 @@
 package controllers
 
 import java.util.UUID
-import services.ContentType
-import services.annotation._
 import org.joda.time.DateTime
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
+import services.ContentType
+import services.annotation._
+import services.annotation.relation.Relation
 
 class TestHasTextSnippets extends HasTextSnippets
 
@@ -56,7 +57,8 @@ class HasTextSnippetsSpec extends Specification {
         Some(text.substring(start, end)),
         None,
         None,
-        None)))
+        None)),
+      Seq.empty[Relation])
         
   "The snippet for the first annotation" should {
     

@@ -2,7 +2,8 @@ package transform.tei
 
 import java.util.UUID
 import services.ContentType
-import services.annotation.{ Annotation, AnnotationBody, AnnotationStatus, AnnotatedObject }
+import services.annotation.{Annotation, AnnotationBody, AnnotationStatus, AnnotatedObject}
+import services.annotation.relation.Relation
 import services.generated.tables.records.DocumentFilepartRecord
 import org.joda.time.DateTime
 import org.joox.JOOX._
@@ -61,7 +62,8 @@ object TEITag {
       anchor,
       None, // lastModifiedBy
       lastModifiedAt,
-      bodies)
+      bodies,
+      Seq.empty[Relation])
   
   private def getAnchor(el: Element, ranges: DocumentRange) = {
     val rangeBefore = ranges.createRange()

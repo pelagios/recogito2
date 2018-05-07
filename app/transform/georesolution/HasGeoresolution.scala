@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate
 import java.util.UUID
 import services.ContentType
 import services.annotation._
+import services.annotation.relation.Relation
 import services.entity.EntityType
 import services.entity.builtin.EntityService
 import services.task.TaskService
@@ -129,7 +130,8 @@ trait HasGeoresolution {
           None, // note
           Some(AnnotationStatus(AnnotationStatus.UNVERIFIED, None,now))
         )
-      )
+      ),
+      Seq.empty[Relation]
     )
   }
   

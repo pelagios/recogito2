@@ -1,16 +1,17 @@
 package services.annotation
 
 import java.util.UUID
-import services.ContentType
-import org.joda.time.{ DateTime, DateTimeZone }
+import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.DateTimeFormat
 import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test._
 import play.api.test.Helpers._
-import scala.io.Source
 import play.api.libs.json.Json
+import scala.io.Source
+import services.ContentType
+import services.annotation.relation.Relation
 
 @RunWith(classOf[JUnitRunner])
 class AnnotationSpec extends Specification {
@@ -91,7 +92,8 @@ class AnnotationSpec extends Specification {
           "char-offset:25",
           None,
           now,
-          bodies)
+          bodies,
+          Seq.empty[Relation])
           
       // Convert to JSON
       val serialized = Json.prettyPrint(Json.toJson(source))

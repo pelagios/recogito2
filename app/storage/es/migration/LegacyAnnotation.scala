@@ -3,6 +3,7 @@ package storage.es.migration
 import java.util.UUID
 import services.{ContentType, HasContentTypeList, HasDate}
 import services.annotation.{Annotation, AnnotatedObject}
+import services.annotation.relation.Relation
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -26,8 +27,8 @@ case class LegacyAnnotation(
     anchor,
     lastModifiedBy,
     lastModifiedAt,
-    bodies.map(_.toNewAPI)
-  )
+    bodies.map(_.toNewAPI),
+    Seq.empty[Relation])
 
 }
 

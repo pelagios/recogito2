@@ -3,20 +3,21 @@ package controllers.document
 import akka.actor.ActorSystem
 import collection.JavaConverters._
 import controllers.HasConfig
-import java.io.{ File, InputStream }
+import java.io.{File, InputStream}
 import java.sql.Timestamp
 import java.util.UUID
 import java.util.zip.ZipFile
-import services.{ ContentType, HasDate, HasContentTypeList }
-import services.annotation._
-import services.document.DocumentService
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
+import services.{ContentType, HasDate, HasContentTypeList, HasNullableSeq}
+import services.annotation._
+import services.annotation.relation.Relation
+import services.document.DocumentService
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import transform.tiling.TilingService
 
 trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
@@ -179,7 +180,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
 
 }
 
-object BackupReader extends HasDate with HasContentTypeList {
+object BackupReader extends HasDate with HasContentTypeList with HasNullableSeq {
 
   case class AnnotatedObjectStub(
     documentId: Option[String],
@@ -261,7 +262,8 @@ object BackupReader extends HasDate with HasContentTypeList {
     anchor: String,
     lastModifiedBy: Option[String],
     lastModifiedAt: Option[DateTime],
-    bodies: Seq[AnnotationBodyStub]
+    bodies: Seq[AnnotationBodyStub],
+    relations: Seq[Relation]
   ) {
 
     def toAnnotation(docId: String, fileparts: Seq[DocumentFilepartRecord]) = Annotation(
@@ -272,7 +274,8 @@ object BackupReader extends HasDate with HasContentTypeList {
       anchor,
       lastModifiedBy,
       lastModifiedAt.getOrElse(new DateTime()),
-      bodies.map(_.toAnnotationBody)
+      bodies.map(_.toAnnotationBody),
+      relations
     )
 
   }
@@ -285,7 +288,8 @@ object BackupReader extends HasDate with HasContentTypeList {
     (JsPath \ "anchor").read[String] and
     (JsPath \ "last_modified_by").readNullable[String] and
     (JsPath \ "last_modified_at").readNullable[DateTime] and
-    (JsPath \ "bodies").read[Seq[AnnotationBodyStub]]
+    (JsPath \ "bodies").read[Seq[AnnotationBodyStub]] and
+    (JsPath \ "relations").readNullable[Seq[Relation]].map(fromOptSeq)
   )(AnnotationStub.apply _)
 
 }

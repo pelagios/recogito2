@@ -7,6 +7,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import services.HasNullableSeq
+import services.annotation.relation.Relation
 
 case class AnnotationHistoryRecord (
     
@@ -26,6 +27,8 @@ case class AnnotationHistoryRecord (
   
   bodies: Seq[AnnotationBody],
   
+  relations: Seq[Relation],
+  
   deleted: Boolean
       
 ) {
@@ -39,7 +42,8 @@ case class AnnotationHistoryRecord (
     anchor,
     lastModifiedBy,
     lastModifiedAt,
-    bodies)
+    bodies,
+    relations)
   
 }
 
@@ -65,6 +69,8 @@ object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
     (JsPath \ "last_modified_at").format[DateTime] and
     (JsPath \ "bodies").formatNullable[Seq[AnnotationBody]]
       .inmap(fromOptSeq[AnnotationBody], toOptSeq[AnnotationBody]) and
+    (JsPath \ "relations").formatNullable[Seq[Relation]]
+      .inmap(fromOptSeq[Relation], toOptSeq[Relation]) and
     (JsPath \ "deleted").formatNullable[Boolean]
       .inmap[Boolean](fromOptBoolean, toOptBoolean) 
   )(AnnotationHistoryRecord.apply, unlift(AnnotationHistoryRecord.unapply))
@@ -78,6 +84,7 @@ object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
     a.lastModifiedBy,
     a.lastModifiedAt,
     a.bodies,
+    a.relations,
     false)
     
   def forDelete(a: Annotation, deletedBy: String, deletedAt: DateTime) = AnnotationHistoryRecord(
@@ -89,6 +96,7 @@ object AnnotationHistoryRecord extends HasDate with HasNullableSeq {
     Some(deletedBy),
     deletedAt, 
     a.bodies,
+    a.relations,
     true)
   
 }

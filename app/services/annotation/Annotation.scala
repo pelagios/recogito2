@@ -6,6 +6,8 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import services.HasNullableSeq
+import services.annotation.relation.Relation
 import services.generated.tables.records.DocumentFilepartRecord
 
 case class Annotation(
@@ -16,7 +18,8 @@ case class Annotation(
   anchor: String,
   lastModifiedBy: Option[String],
   lastModifiedAt: DateTime,
-  bodies: Seq[AnnotationBody]) {
+  bodies: Seq[AnnotationBody],
+  relations: Seq[Relation]) {
   
   def withBody(body: AnnotationBody) = 
     this.copy(bodies = this.bodies :+ body.copy(lastModifiedAt = this.lastModifiedAt))
@@ -35,7 +38,7 @@ object AnnotatedObject extends HasContentTypeList {
 
 }
 
-object BackendAnnotation extends HasDate {
+object BackendAnnotation extends HasDate with HasNullableSeq {
   
   // Backend body serialization
   import services.annotation.BackendAnnotationBody._
@@ -48,12 +51,14 @@ object BackendAnnotation extends HasDate {
     (JsPath \ "anchor").format[String] and
     (JsPath \ "last_modified_by").formatNullable[String] and
     (JsPath \ "last_modified_at").format[DateTime] and
-    (JsPath \ "bodies").format[Seq[AnnotationBody]]
+    (JsPath \ "bodies").format[Seq[AnnotationBody]] and
+    (JsPath \ "relations").formatNullable[Seq[Relation]]
+      .inmap[Seq[Relation]](fromOptSeq, toOptSeq)
   )(Annotation.apply, unlift(Annotation.unapply))
 
 }
 
-object FrontendAnnotation extends HasDate {
+object FrontendAnnotation extends HasDate with HasNullableSeq {
 
   // Frontend body serialization
   import services.annotation.FrontendAnnotationBody._
@@ -66,7 +71,9 @@ object FrontendAnnotation extends HasDate {
     (JsPath \ "anchor").write[String] and
     (JsPath \ "last_modified_by").writeNullable[String] and
     (JsPath \ "last_modified_at").write[DateTime] and
-    (JsPath \ "bodies").write[Seq[AnnotationBody]]
+    (JsPath \ "bodies").write[Seq[AnnotationBody]] and
+    (JsPath \ "relations").writeNullable[Seq[Relation]]
+      .contramap[Seq[Relation]](toOptSeq)
   )(unlift(Annotation.unapply))
   
 }
@@ -83,6 +90,7 @@ object Annotation {
       anchor,
       None, // lastModifiedBy
       new DateTime(),
-      Seq.empty[AnnotationBody])
+      Seq.empty[AnnotationBody],
+      Seq.empty[Relation])
 
 }
