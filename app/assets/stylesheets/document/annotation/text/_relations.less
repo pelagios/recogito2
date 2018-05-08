@@ -14,9 +14,22 @@ svg {
     fill:@standard-type;
   }
 
-  circle.mid {
-    stroke-width:1.6;
-    fill:#fff;
+  .mid {
+
+    rect {
+      stroke-width:1.4;
+      stroke:lighten(@standard-type, 10%);
+      fill:#fff;
+      pointer-events:auto;
+      cursor:pointer;
+    }
+
+    text {
+      font-family:FontAwesome;
+      font-size:9px;
+      fill:@blueish-white;
+    }
+
   }
 
   rect {

@@ -2,6 +2,44 @@ define([
   'document/annotation/text/relations/shapes'
 ], function(Shapes) {
 
+  var MidHandle = function() {
+    var g = document.createElementNS(Shapes.SVG_NAMESPACE, 'g'),
+        rect = document.createElementNS(Shapes.SVG_NAMESPACE, 'rect'),
+        text = document.createElementNS(Shapes.SVG_NAMESPACE, 'text'),
+
+        init = function() {
+          g.setAttribute('class', 'mid');
+
+          rect.setAttribute('rx', 2);
+          rect.setAttribute('ry', 2);
+          rect.setAttribute('width', 18);
+          rect.setAttribute('height', 9);
+
+          text.setAttribute('dx', -4);
+          text.setAttribute('dy', 4);
+          text.innerHTML = '&#xf02b;';
+        },
+
+        setX = function(x) {
+          rect.setAttribute('x', x - 9.5);
+          text.setAttribute('x', x);
+        },
+
+        setY = function(y) {
+          rect.setAttribute('y', y - 4.5);
+          text.setAttribute('y', y - 0.6);
+        };
+
+    init();
+
+    g.appendChild(rect);
+    // g.appendChild(text);
+
+    this.g = g;
+    this.setX = setX;
+    this.setY = setY;
+  };
+
   var Relation = function(svgEl, fromNode, opt_toNode) {
 
     var that = this,
@@ -21,8 +59,9 @@ define([
         // SVG elements
         path        = document.createElementNS(Shapes.SVG_NAMESPACE, 'path'),
         startHandle = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
-        midHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
         endHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
+
+        midHandle   = new MidHandle(),
 
         // [x,y] array or node object
         currentEnd = opt_toNode,
@@ -45,7 +84,7 @@ define([
         attach = function() {
           if (currentEnd.elements) {
             attached = true;
-            svgEl.appendChild(midHandle);
+            // svgEl.appendChild(midHandle);
           }
         },
 
@@ -132,10 +171,8 @@ define([
 
             currentMidXY = [ midX, midY ];
 
-            midHandle.setAttribute('cx', midX);
-            midHandle.setAttribute('cy', midY);
-            midHandle.setAttribute('r', 4);
-            midHandle.setAttribute('class', 'mid');
+            midHandle.setX(midX);
+            midHandle.setY(midY);
           }
         },
 
@@ -164,6 +201,7 @@ define([
 
     svgEl.appendChild(path);
     svgEl.appendChild(startHandle);
+    svgEl.appendChild(midHandle.g);
     svgEl.appendChild(endHandle);
 
     this.dragTo = dragTo;
