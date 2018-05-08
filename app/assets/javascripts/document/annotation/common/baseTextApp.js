@@ -144,7 +144,9 @@ define([
     initPage();
 
     API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-       .done(this.onAnnotationsLoaded.bind(this)).then(loadIndicator.destroy)
+       .done(this.onAnnotationsLoaded.bind(this))
+       .then(relationsLayer.init) // TODO just a hack for testing!
+       .then(loadIndicator.destroy)
        .fail(this.onAnnotationsLoadError.bind(this)).then(loadIndicator.destroy);
   };
   App.prototype = Object.create(BaseApp.prototype);

@@ -35,6 +35,9 @@ define([
         scrollIntoView(preselected.bounds);
       }
     }
+
+    // In order to support chaining
+    return annotations;
   };
 
   BaseApp.prototype.onAnnotationsLoadError = function(annotations) {

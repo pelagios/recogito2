@@ -9,7 +9,9 @@ define([
         svg = jQuery(svgEl), // shorthand
 
         // { annotation: ..., elements: ... }
-        toNode = opt_toNode, toBounds,
+        toNode = opt_toNode,
+
+        toBounds = (opt_toNode) ? Shapes.toOffsetBounds(Shapes.getUnionBounds(opt_toNode.elements), svg) : undefined,
 
         // Note that the selection bounds are useless after scrolling or resize. They
         // represent viewport bounds at the time of selection, so we store document
@@ -23,7 +25,7 @@ define([
         endHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
 
         // [x,y] array or node object
-        currentEnd,
+        currentEnd = opt_toNode,
 
         // [x,y]
         currentMidXY,

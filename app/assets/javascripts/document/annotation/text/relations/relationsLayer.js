@@ -3,8 +3,9 @@ define([
   'common/hasEvents',
   'document/annotation/text/relations/hoverEmphasis',
   'document/annotation/text/relations/relation',
+  'document/annotation/text/relations/relationsViewer',
   'document/annotation/text/relations/tagEditor'
-], function(Config, HasEvents, HoverEmphasis, Relation, TagEditor) {
+], function(Config, HasEvents, HoverEmphasis, Relation, Viewer, TagEditor) {
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
@@ -45,6 +46,9 @@ define([
 
         // The connection currently being drawn, if any
         currentRelation = false,
+
+        // View layer for existing relations
+        viewer = new Viewer(content, svg),
 
         attachHandlers = function() {
           // Note that the SVG element is transparent to mouse events
@@ -187,6 +191,7 @@ define([
 
     this.show = show;
     this.hide = hide;
+    this.init = viewer.init;
 
     HasEvents.apply(this);
   };
