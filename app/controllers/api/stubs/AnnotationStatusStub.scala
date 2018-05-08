@@ -9,7 +9,12 @@ import services.annotation.AnnotationStatus
 case class AnnotationStatusStub(
   value: AnnotationStatus.Value,
   setBy: Option[String],
-  setAt: Option[DateTime])
+  setAt: Option[DateTime]) {
+  
+  def toAnnotationStatus(user: String, now: DateTime) =
+    AnnotationStatus(value, Some(user), now)
+
+}
 
 object AnnotationStatusStub extends HasDate {
 

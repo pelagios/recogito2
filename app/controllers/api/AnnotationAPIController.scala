@@ -74,39 +74,6 @@ class AnnotationAPIController @Inject() (
     }
   }
 
-  private def stubToAnnotation(stub: AnnotationStub, user: String) = {
-    val now = DateTime.now()       
-    Annotation(
-      stub.annotationId.getOrElse(UUID.randomUUID),
-      UUID.randomUUID,
-      stub.annotates,
-      (stub.bodies.flatMap(_.lastModifiedBy) :+ user).distinct,
-      stub.anchor,
-      Some(user),
-      now,
-      stub.bodies.map(b => AnnotationBody(
-        b.hasType,
-        Some(b.lastModifiedBy.getOrElse(user)),
-        b.lastModifiedAt.getOrElse(now),
-        b.value,
-        b.uri,
-        b.note,
-        b.status.map(s =>
-          AnnotationStatus(
-            s.value,
-            Some(s.setBy.getOrElse(user)),
-            s.setAt.getOrElse(now))))),
-      stub.relations.map(s => Relation(
-        s.relatesTo,
-        s.relatesVia,
-        s.bodies.map(b => RelationBody(
-          b.hasType,
-          Some(user),
-          now,
-          b.value))
-      )))
-  }
-
   /** Common boilerplate code for all API methods carrying JSON config payload **/
   private def jsonOp[T](op: T => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]) = {
     request.body.asJson match {
@@ -130,7 +97,7 @@ class AnnotationAPIController @Inject() (
     documents.getDocumentRecord(annotationStub.annotates.documentId, Some(username)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel.canWrite) {
-          val annotation = stubToAnnotation(annotationStub, username)
+          val annotation = annotationStub.toAnnotation(username)
           val f = for {
             (annotationStored, previousVersion) <- annotationService.upsertAnnotation(annotation)
             success <- if (annotationStored)
@@ -164,7 +131,7 @@ class AnnotationAPIController @Inject() (
           if (accesslevel.canWrite) {
             doc.fileparts.find(_.getId == partIds.head) match {
               case Some(filepart) =>
-                val annotations = annotationStubs.map(stub => stubToAnnotation(stub, username))
+                val annotations = annotationStubs.map(_.toAnnotation(username))
                 annotationService.upsertAnnotations(annotations).map { failed =>
                   if (failed.size == 0)
                     // TODO add username and timestamp

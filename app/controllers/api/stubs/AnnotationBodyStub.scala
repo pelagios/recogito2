@@ -13,7 +13,19 @@ case class AnnotationBodyStub(
   value         : Option[String],
   uri           : Option[String],
   note          : Option[String],
-  status        : Option[AnnotationStatusStub])
+  status        : Option[AnnotationStatusStub]) {
+  
+  def toAnnotationBody(user: String, now: DateTime) =
+    AnnotationBody(
+      hasType,
+      Some(user),
+      now,
+      value,
+      uri,
+      note,
+      status.map(_.toAnnotationStatus(user, now)))
+  
+}
 
 object AnnotationBodyStub extends HasDate {
 

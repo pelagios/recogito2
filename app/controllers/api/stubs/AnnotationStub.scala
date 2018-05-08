@@ -4,14 +4,31 @@ import java.util.UUID
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.HasNullableSeq
-import services.annotation.AnnotatedObject
+import services.annotation.{Annotation, AnnotatedObject}
+import org.joda.time.DateTime
 
 case class AnnotationStub(
   annotationId: Option[UUID],
   annotates   : AnnotatedObject,
   anchor      : String,
   bodies      : Seq[AnnotationBodyStub],
-  relations   : Seq[RelationStub])
+  relations   : Seq[RelationStub]) {
+  
+  def toAnnotation(user: String) = {
+    val now = DateTime.now()
+    Annotation(
+      annotationId.getOrElse(UUID.randomUUID),
+      UUID.randomUUID,
+      annotates,
+      (bodies.flatMap(_.lastModifiedBy) :+ user).distinct,
+      anchor,
+      Some(user),
+      now,
+      bodies.map(_.toAnnotationBody(user, now)),
+      relations.map(_.toRelation(user, now)))
+  }
+  
+}
 
 object AnnotationStub extends HasNullableSeq {
 
