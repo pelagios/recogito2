@@ -151,6 +151,13 @@ define([
           return currentMidXY;
         },
 
+        recompute = function() {
+          fromBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(fromNode.elements), svg);
+          if (currentEnd && currentEnd.elements)
+            toBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(opt_toNode.elements), svg);
+          redraw();
+        },
+
         destroy = function() {
 
         };
@@ -162,6 +169,7 @@ define([
     this.dragTo = dragTo;
     this.attach = attach;
     this.isAttached = isAttached;
+    this.recompute = recompute;
     this.destroy = destroy;
     this.redraw = redraw;
     this.getStartNode = getStartNode;

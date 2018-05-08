@@ -44,16 +44,11 @@ define([
         onKeydown = function(e) {
           if (e.keyCode == 13) {
             var tag = inputEl.val();
-
+            
+            // Won't work with element.remove() due to Typeahead
             jQuery('.connection-editor-popup').remove();
-
             Vocabulary.add(tag);
-
             that.fireEvent('submit', tag);
-
-            console.log('removing');
-            console.log(element[0]);
-
             return false;
           }
         };

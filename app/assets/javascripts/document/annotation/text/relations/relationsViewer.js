@@ -2,7 +2,9 @@ define(['document/annotation/text/relations/relation'], function(Connection) {
 
   var RelationsViewer = function(content, svg) {
 
-    var getNode = function(annotationId) {
+    var connections = [],
+
+        getNode = function(annotationId) {
           var elements = jQuery('*[data-id="' + annotationId + '"]'),
               annotation;
 
@@ -14,7 +16,7 @@ define(['document/annotation/text/relations/relation'], function(Connection) {
         },
 
         init = function(annotations) {
-          var relations = annotations.reduce(function(arr, annotation) {
+          connections = annotations.reduce(function(arr, annotation) {
             if (annotation.relations && annotation.relations.length > 0) {
 
               var connections = annotation.relations.map(function(r) {
@@ -24,14 +26,20 @@ define(['document/annotation/text/relations/relation'], function(Connection) {
               });
 
               connections.forEach(function(c) { c.redraw(); });
-
-              return arr.concat(annotation.relations);
+              return arr.concat(connections);
             } else {
               return arr;
             }
           }, []);
+        },
+
+        redrawAll = function() {
+          connections.forEach(function(connection) {
+            connection.recompute();
+          });
         };
 
+    jQuery(window).on('resize', redrawAll);
 
     this.init = init;
   };
