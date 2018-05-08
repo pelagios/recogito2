@@ -45,9 +45,14 @@ define([
           if (e.keyCode == 13) {
             var tag = inputEl.val();
 
+            jQuery('.connection-editor-popup').remove();
+
             Vocabulary.add(tag);
+
             that.fireEvent('submit', tag);
-            element.remove();
+
+            console.log('removing');
+            console.log(element[0]);
 
             return false;
           }

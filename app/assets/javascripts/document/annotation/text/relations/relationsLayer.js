@@ -121,7 +121,9 @@ define([
               },
 
               onSubmit = function(tag) {
-                var sourceAnnotation = currentRelation.getStartNode().annotation,
+                var editor,
+
+                    sourceAnnotation = currentRelation.getStartNode().annotation,
 
                     relation = {
                       relates_to: currentRelation.getEndNode().annotation.annotation_id,
@@ -134,14 +136,15 @@ define([
 
                 addOrReplaceRelation(sourceAnnotation, relation);
                 that.fireEvent('updateRelations', sourceAnnotation);
-              },
 
-              editor;
+                currentRelation = undefined;
+              };
 
           currentRelation.attach();
 
           editor = new TagEditor(contentEl, currentRelation.getMidXY());
           editor.on('submit', onSubmit);
+
           jQuery(document.body).css('cursor', 'auto');
         },
 

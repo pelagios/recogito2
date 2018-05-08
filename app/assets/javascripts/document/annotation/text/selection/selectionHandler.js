@@ -92,6 +92,7 @@ define([
 
           // Not a selection, but a click outside editor/annotation - deselect
           if (selection.isCollapsed && annotationSpan.length === 0) {
+            clearSelection();
             self.fireEvent('select');
             return;
           }
