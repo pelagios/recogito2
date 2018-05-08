@@ -120,6 +120,11 @@ define([
                   annotation.relations.push(relation);
               },
 
+              onCancel = function() {
+                currentRelation.destroy();
+                currentRelation = undefined;                
+              },
+
               onSubmit = function(tag) {
                 var editor,
 
@@ -143,6 +148,7 @@ define([
           currentRelation.attach();
 
           editor = new TagEditor(contentEl, currentRelation.getMidXY());
+          editor.on('cancel', onCancel);
           editor.on('submit', onSubmit);
 
           jQuery(document.body).css('cursor', 'auto');

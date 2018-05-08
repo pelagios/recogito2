@@ -197,6 +197,8 @@ define([
 
         destroy = function() {
 
+          // TODO implement
+
         };
 
     svgEl.appendChild(path);

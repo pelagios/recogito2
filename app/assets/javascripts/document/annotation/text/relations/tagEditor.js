@@ -42,12 +42,18 @@ define([
         },
 
         onKeydown = function(e) {
-          if (e.keyCode == 13) {
+          // Won't work with element due to Typeahead
+          var el = jQuery('.connection-editor-popup');
+
+          if (e.which === 27) { // Escape
+            el.remove();
+            that.fireEvent('cancel');
+          } else if (e.which == 13) { // Enter
             var tag = inputEl.val();
-            
-            // Won't work with element.remove() due to Typeahead
-            jQuery('.connection-editor-popup').remove();
+            el.remove();
+
             Vocabulary.add(tag);
+            
             that.fireEvent('submit', tag);
             return false;
           }
