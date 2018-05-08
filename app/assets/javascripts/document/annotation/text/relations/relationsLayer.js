@@ -1,8 +1,10 @@
 define([
-  'document/annotation/text/relations/connection',
+  'common/config',
+  'common/hasEvents',
   'document/annotation/text/relations/hoverEmphasis',
+  'document/annotation/text/relations/relation',
   'document/annotation/text/relations/tagEditor'
-], function(Connection, HoverEmphasis, TagEditor) {
+], function(Config, HasEvents, HoverEmphasis, Relation, TagEditor) {
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
@@ -34,13 +36,15 @@ define([
 
   var RelationsLayer = function(content, svg) {
 
-    var contentEl = jQuery(content),
+    var that = this,
+
+        contentEl = jQuery(content),
 
         // Current hover emphasis (regardless of whether we're currently drawing a connection)
         currentHover = false,
 
         // The connection currently being drawn, if any
-        currentConnection = false,
+        currentRelation = false,
 
         attachHandlers = function() {
           // Note that the SVG element is transparent to mouse events
@@ -70,7 +74,7 @@ define([
 
         /** Clear current connection, all shapes, detach mouse handlers and hide the SVG plate **/
         hide = function() {
-          currentConnection = false;
+          currentRelation = false;
 
           while (svg.firstChild)
             svg.removeChild(svg.firstChild);
@@ -82,18 +86,59 @@ define([
         /** Drawing code for 'hover emphasis' **/
         hover = function(elements) {
           if (elements) {
-            currentHover = new HoverEmphasis(svg, elements, { showHandle: !currentConnection });
+            currentHover = new HoverEmphasis(svg, elements);
           } else { // Clear hover
             if (currentHover) currentHover.destroy();
             currentHover = undefined;
           }
         },
 
-        /** Start drawing a new connection **/
+        /** Start drawing a new connection line **/
         startNewConnection = function(fromNode) {
-          currentConnection = new Connection(svg, fromNode);
+          currentRelation = new Relation(svg, fromNode);
           jQuery(document.body).css('cursor', 'none');
           render();
+        },
+
+        /** Complete drawing of a new relation **/
+        completeConnection = function() {
+              // Adds a relation, or replaces an existing one if any exists with the same end node
+          var addOrReplaceRelation = function(annotation, relation) {
+                if (!annotation.relations) annotation.relations = [];
+
+                var existing = annotation.relations.filter(function(r) {
+                  return r.relates_to === relation.relates_to;
+                });
+
+                if (existing.length > 0)
+                  annotation.relations[annotation.relations.indexOf(existing)] = relation;
+                else
+                  annotation.relations.push(relation);
+              },
+
+              onSubmit = function(tag) {
+                var sourceAnnotation = currentRelation.getStartNode().annotation,
+
+                    relation = {
+                      relates_to: currentRelation.getEndNode().annotation.annotation_id,
+                      bodies: [{
+                        type: 'TAG',
+                        last_modified_by: Config.me,
+                        value: tag
+                      }]
+                    };
+
+                addOrReplaceRelation(sourceAnnotation, relation);
+                that.fireEvent('updateRelations', sourceAnnotation);
+              },
+
+              editor;
+
+          currentRelation.attach();
+
+          editor = new TagEditor(contentEl, currentRelation.getMidXY());
+          editor.on('submit', onSubmit);
+          jQuery(document.body).css('cursor', 'auto');
         },
 
         /** Emphasise hovered annotation **/
@@ -107,26 +152,19 @@ define([
           hover();
         },
 
-        /** Starts a new connection **/
+        /** Starts or creates a new relation **/
         onMousedown = function(e) {
-          if (currentConnection) {
-            console.log('closing connection');
-            // TODO
-            currentConnection.attach();
-            new TagEditor(contentEl, currentConnection.getMiddot());
-            currentConnection = undefined;
-            jQuery(document.body).css('cursor', 'auto');
-          } else {
-            var node = toNode(e);
-            if (node) startNewConnection(node);
-          }
+          var node = toNode(e);
+
+          if (node)
+            if (currentRelation) completeConnection(node);
+            else startNewConnection(node);
         },
 
         onMousemove = function(e) {
-          if (currentConnection) {
-            if (currentHover) currentConnection.dragTo(currentHover.node);
-            else currentConnection.dragTo([ e.offsetX, e.offsetY ]);
-          }
+          if (currentRelation && !currentRelation.isAttached())
+            if (currentHover) currentRelation.dragTo(currentHover.node);
+            else currentRelation.dragTo([ e.offsetX, e.offsetY ]);
         },
 
         /**
@@ -134,29 +172,25 @@ define([
          * end; or click and hold at the start, drag to end and release.
          */
         onMouseup = function(e) {
-          if (currentHover && currentConnection) {
-            // If this is a different node than the start node, close the connection
-            if (currentHover.annotation !== currentConnection.getStartNode().annotation) {
-              console.log('closing connection');
-            }
-          }
-          /*
-          if (currentConnection.isComplete())
-          else
-            currentConnection.updateConnection(selection)
-          */
+          if (currentHover && currentRelation)
+            // If this is a different node than the start node, complete the connection
+            if (currentHover.annotation !== currentRelation.getStartNode().annotation)
+              completeConnection(currentHover.node);
         },
 
         render = function() {
-          if (currentConnection) {
-            currentConnection.redraw();
+          if (currentRelation) {
+            currentRelation.redraw();
             requestAnimationFrame(render);
           }
         };
 
     this.show = show;
     this.hide = hide;
+
+    HasEvents.apply(this);
   };
+  RelationsLayer.prototype = Object.create(HasEvents.prototype);
 
   return RelationsLayer;
 

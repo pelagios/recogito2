@@ -1,9 +1,8 @@
 define([
-  'common/hasEvents',
   'document/annotation/text/relations/shapes'
-], function(HasEvents, Shapes) {
+], function(Shapes) {
 
-  var Connection = function(svgEl, fromNode, opt_toNode) {
+  var Relation = function(svgEl, fromNode, opt_toNode) {
 
     var that = this,
 
@@ -27,7 +26,10 @@ define([
         currentEnd,
 
         // [x,y]
-        currentMiddot,
+        currentMidXY,
+
+        // Flag indicating whether the relation is completed (or still drawing)
+        attached = false,
 
         dragTo = function(xyOrNode) {
           currentEnd = xyOrNode;
@@ -39,8 +41,14 @@ define([
         },
 
         attach = function() {
-          svgEl.appendChild(midHandle);
-          that.fireEvent('create', that);
+          if (currentEnd.elements) {
+            attached = true;
+            svgEl.appendChild(midHandle);
+          }
+        },
+
+        isAttached = function() {
+          return attached;
         },
 
         getEnd = function() {
@@ -120,7 +128,7 @@ define([
             if (startsAtTop) path.setAttribute('d', compileTopPath());
             else path.setAttribute('d', compileBottomPath());
 
-            currentMiddot = [ midX, midY ];
+            currentMidXY = [ midX, midY ];
 
             midHandle.setAttribute('cx', midX);
             midHandle.setAttribute('cy', midY);
@@ -137,8 +145,8 @@ define([
           return toNode;
         },
 
-        getMiddot = function() {
-          return currentMiddot;
+        getMidXY = function() {
+          return currentMidXY;
         },
 
         destroy = function() {
@@ -147,21 +155,18 @@ define([
 
     svgEl.appendChild(path);
     svgEl.appendChild(startHandle);
-    // svgEl.appendChild(midHandle);
     svgEl.appendChild(endHandle);
 
     this.dragTo = dragTo;
     this.attach = attach;
+    this.isAttached = isAttached;
     this.destroy = destroy;
     this.redraw = redraw;
     this.getStartNode = getStartNode;
     this.getEndNode = getEndNode;
-    this.getMiddot = getMiddot;
-
-    HasEvents.apply(this);
+    this.getMidXY = getMidXY;
   };
-  Connection.prototype = Object.create(HasEvents.prototype);
 
-  return Connection;
+  return Relation;
 
 });

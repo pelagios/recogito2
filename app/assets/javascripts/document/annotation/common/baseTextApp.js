@@ -110,6 +110,10 @@ define([
           promptReapply();
         },
 
+        onUpdateRelations = function(annotation) {
+          self.upsertAnnotation(annotation);
+        },
+
         onAnnotationModeChanged = function(m) {
           if (m.mode === 'RELATIONS') {
             selector.setEnabled(false);
@@ -128,6 +132,8 @@ define([
     BaseApp.apply(this, [ annotations, highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
+
+    relationsLayer.on('updateRelations', onUpdateRelations);
 
     editor.on('createAnnotation', onCreateAnnotation);
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));

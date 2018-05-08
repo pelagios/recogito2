@@ -2,6 +2,7 @@ package controllers.api
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers._
+import controllers.api.stubs._
 import java.io.File
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
@@ -11,76 +12,17 @@ import play.api.http.FileMimeTypes
 import play.api.mvc.{AnyContent, ControllerComponents, Request, Result}
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ExecutionContext, Future}
 import services.{ContentType, HasDate}
 import services.annotation._
-import services.annotation.relation.Relation
+import services.annotation.relation._
 import services.contribution._
 import services.document.{DocumentService, DocumentInfo}
 import services.user.UserService
 import services.image.ImageService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import storage.uploads.Uploads
-
-/** Encapsulates those parts of an annotation that are submitted from the client **/
-case class AnnotationStub(
-  annotationId: Option[UUID],
-  annotates   : AnnotatedObject,
-  anchor      : String,
-  bodies      : Seq[AnnotationBodyStub])
-
-object AnnotationStub {
-
-  implicit val annotationStubReads: Reads[AnnotationStub] = (
-    (JsPath \ "annotation_id").readNullable[UUID] and
-    (JsPath \ "annotates").read[AnnotatedObject] and
-    (JsPath \ "anchor").read[String] and
-    (JsPath \ "bodies").read[Seq[AnnotationBodyStub]]
-  )(AnnotationStub.apply _)
-
-}
-
-/** Partial annotation body **/
-case class AnnotationBodyStub(
-  hasType       : AnnotationBody.Type,
-  lastModifiedBy: Option[String],
-  lastModifiedAt: Option[DateTime],
-  value         : Option[String],
-  uri           : Option[String],
-  note          : Option[String],
-  status        : Option[AnnotationStatusStub])
-
-object AnnotationBodyStub extends HasDate {
-
-  implicit val annotationBodyStubReads: Reads[AnnotationBodyStub] = (
-    (JsPath \ "type").read[AnnotationBody.Value] and
-    (JsPath \ "last_modified_by").readNullable[String] and
-    (JsPath \ "last_modified_at").readNullable[DateTime] and
-    (JsPath \ "value").readNullable[String] and
-    (JsPath \ "uri").readNullable[String] and
-    (JsPath \ "note").readNullable[String] and
-    (JsPath \ "status").readNullable[AnnotationStatusStub]
-  )(AnnotationBodyStub.apply _)
-
-}
-
-/** Partial annotation status **/
-case class AnnotationStatusStub(
-  value: AnnotationStatus.Value,
-  setBy: Option[String],
-  setAt: Option[DateTime])
-
-object AnnotationStatusStub extends HasDate {
-
-  implicit val annotationStatusStubReads: Reads[AnnotationStatusStub] = (
-    (JsPath \ "value").read[AnnotationStatus.Value] and
-    (JsPath \ "set_by").readNullable[String] and
-    (JsPath \ "set_at").readNullable[DateTime]
-  )(AnnotationStatusStub.apply _)
-
-}
 
 @Singleton
 class AnnotationAPIController @Inject() (
@@ -154,7 +96,15 @@ class AnnotationAPIController @Inject() (
             s.value,
             Some(s.setBy.getOrElse(user)),
             s.setAt.getOrElse(now))))),
-      Seq.empty[Relation])
+      stub.relations.map(s => Relation(
+        s.relatesTo,
+        s.relatesVia,
+        s.bodies.map(b => RelationBody(
+          b.hasType,
+          Some(user),
+          now,
+          b.value))
+      )))
   }
 
   /** Common boilerplate code for all API methods carrying JSON config payload **/
