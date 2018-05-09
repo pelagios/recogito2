@@ -63,7 +63,8 @@ svg {
     min-width:80px;
     outline:none;
     .rounded-corners-left(3px);
-    background-color:#fff;
+    // background-color:#fff;
+    background-color:@blueish-white;
     border-style:solid;
     border-color:#5c6a77;
     border-width:1px 0 1px 1px;
@@ -86,15 +87,16 @@ svg {
     }
 
     .delete {
-      background-color:#e2e2e2;
+      // background-color:#e2e2e2;
+      background-color:#fff;
       color:@grey-type;
       border-style:solid;
-      border-color:#5c6a77 #d6d6d6;
+      border-color:#5c6a77 @lightgrey-border-darker; // #d6d6d6;
       border-width:1px 0 1px 1px;
     }
 
     .delete:hover {
-      background-color:#efefef;
+      background-color:#f6f6f6;
     }
 
     .ok {
