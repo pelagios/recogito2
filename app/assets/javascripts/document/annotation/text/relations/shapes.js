@@ -67,7 +67,7 @@ define([], function() {
     getTopHandleXY : function(bounds) {
       return [
         bounds.left + bounds.width / 2 + 0.5,
-        bounds.top - 0.5
+        bounds.top
       ];
     },
 
@@ -75,7 +75,7 @@ define([], function() {
     getBottomHandleXY : function(bounds) {
       return [
         bounds.left + bounds.width / 2 - 0.5,
-        bounds.bottom - 0.5
+        bounds.bottom
       ];
     }
 

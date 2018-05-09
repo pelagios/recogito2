@@ -16,10 +16,14 @@ define([
 
         element = jQuery(
           '<div class="connection-editor-popup">' +
-            '<span class="input" contentEditable="true" data-placeholder="Tag..."></span>' +
+            '<div class="input" contentEditable="true" data-placeholder="Tag..."></div>' +
+            '<div class="buttons">' +
+              '<span class="icon delete">&#xf014;</span>' +
+              '<span class="icon ok">&#xf00c;</span>' +
+            '</div>' +
           '</div>').appendTo(containerEl),
 
-        inputEl = element.find('span'),
+        inputEl = element.find('.input'),
 
         init = function() {
           var matcher = function(query, responseFn) {
@@ -53,7 +57,7 @@ define([
             el.remove();
 
             Vocabulary.add(tag);
-            
+
             that.fireEvent('submit', tag);
             return false;
           }

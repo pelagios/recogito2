@@ -158,12 +158,12 @@ define([
 
             startHandle.setAttribute('cx', start[0]);
             startHandle.setAttribute('cy', start[1]);
-            startHandle.setAttribute('r', 3);
+            startHandle.setAttribute('r', 2);
             startHandle.setAttribute('class', 'start');
 
             endHandle.setAttribute('cx', end[0]);
             endHandle.setAttribute('cy', end[1]);
-            endHandle.setAttribute('r', 3);
+            endHandle.setAttribute('r', 2);
             endHandle.setAttribute('class', 'end');
 
             if (startsAtTop) path.setAttribute('d', compileTopPath());
