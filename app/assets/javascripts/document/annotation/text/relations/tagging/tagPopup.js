@@ -11,7 +11,7 @@ define([
     return original.apply(this, arguments);
   };
 
-  var TagEditor = function(containerEl, position) {
+  var TagPopup = function(containerEl, position) {
     var that = this,
 
         element = jQuery(
@@ -66,8 +66,8 @@ define([
     init();
     HasEvents.apply(this);
   };
-  TagEditor.prototype = Object.create(HasEvents.prototype);
+  TagPopup.prototype = Object.create(HasEvents.prototype);
 
-  return TagEditor;
+  return TagPopup;
 
 });

@@ -6,7 +6,9 @@ define([
 
   var RelationsViewer = function(content, svg) {
 
-    var editor = new RelationEditor(content, svg),
+    var that = this,
+
+        editor = new RelationEditor(content, svg),
 
         connections = [],
 
@@ -72,6 +74,8 @@ define([
         };
 
     jQuery(window).on('resize', redrawAll);
+
+    editor.on('updateRelations', that.forwardEvent('updateRelations'));
 
     this.show = show;
     this.hide = hide;

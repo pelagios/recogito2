@@ -1,53 +1,28 @@
 /** A connection is an on-screen representation of a relation **/
-define(['document/annotation/text/relations/bounds'], function(Bounds) {
+define([
+  'document/annotation/text/relations/bounds',
+  'document/annotation/text/relations/tagging/tagHandle'
+], function(Bounds, TagHandle) {
 
-  var MidHandle = function(label) {
+  var SVG_NAMESPACE = 'http://www.w3.org/2000/svg',
 
-    var g = document.createElementNS(Bounds.SVG_NAMESPACE, 'g'),
-        rect = document.createElementNS(Bounds.SVG_NAMESPACE, 'rect'),
-        text = document.createElementNS(Bounds.SVG_NAMESPACE, 'text'),
+      // Rounded corner arc radius
+      BORDER_RADIUS = 3,
 
-        init = function() {
-          var bbox;
+      // Horizontal distance between connection line and annotation highlight
+      LINE_DISTANCE = 6.5,
 
-          g.setAttribute('class', 'mid');
+      // Possible rounded corner SVG arc configurations: clock position + clockwise/counterclockwise
+      ARC_0CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + BORDER_RADIUS + ',' + BORDER_RADIUS,
+      ARC_0CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 -' + BORDER_RADIUS + ',' + BORDER_RADIUS,
+      ARC_3CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 -' + BORDER_RADIUS + ',' + BORDER_RADIUS,
+      ARC_3CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 -' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
+      ARC_6CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 -' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
+      ARC_6CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 ' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
+      ARC_9CW = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 1 ' + BORDER_RADIUS + ',-' + BORDER_RADIUS,
+      ARC_9CC = 'a' + BORDER_RADIUS + ',' + BORDER_RADIUS + ' 0 0 0 ' + BORDER_RADIUS + ',' + BORDER_RADIUS;
 
-          text.setAttribute('dy', 3.5);
-          text.innerHTML = label;
-          bbox = text.getBBox();
-
-          rect.setAttribute('rx', 2);
-          rect.setAttribute('ry', 2);
-          rect.setAttribute('width', Math.round(bbox.width) + 4);
-          rect.setAttribute('height',  Math.round(bbox.height) - 3);
-        },
-
-        setX = function(x) {
-          var xr = Math.round(x) - 0.5;
-          rect.setAttribute('x', xr - 3);
-          text.setAttribute('x', xr);
-        },
-
-        setY = function(y) {
-          rect.setAttribute('y', y - 6);
-          text.setAttribute('y', y);
-        },
-
-        appendTo = function(svg) {
-          svg.appendChild(g);
-          init();
-        };
-
-    g.appendChild(rect);
-    g.appendChild(text);
-
-    this.g = g;
-    this.setX = setX;
-    this.setY = setY;
-    this.appendTo = appendTo;
-  };
-
-  var Relation = function(svgEl, fromNode, opt_toNode) {
+  var Connection = function(svgEl, fromNode, opt_toNode) {
 
     var that = this,
 
@@ -64,11 +39,11 @@ define(['document/annotation/text/relations/bounds'], function(Bounds) {
         fromBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(fromNode.elements), svg),
 
         // SVG elements
-        path        = document.createElementNS(Bounds.SVG_NAMESPACE, 'path'),
-        startHandle = document.createElementNS(Bounds.SVG_NAMESPACE, 'circle'),
-        endHandle   = document.createElementNS(Bounds.SVG_NAMESPACE, 'circle'),
+        path        = document.createElementNS(SVG_NAMESPACE, 'path'),
+        startHandle = document.createElementNS(SVG_NAMESPACE, 'circle'),
+        endHandle   = document.createElementNS(SVG_NAMESPACE, 'circle'),
 
-        midHandle, //    = new MidHandle(),
+        midHandle,
 
         // [x,y] array or node object
         currentEnd = opt_toNode,
@@ -123,42 +98,42 @@ define(['document/annotation/text/relations/bounds'], function(Bounds) {
                 midX = (half > Math.abs(deltaX)) ? start[0] + deltaX : start[0] + half * Math.sign(deltaX),
                 midY, // computed later
 
-                d = Bounds.LINE_DISTANCE - Bounds.BORDER_RADIUS, // Shorthand: vertical straight line length
+                d = LINE_DISTANCE - BORDER_RADIUS, // Shorthand: vertical straight line length
 
                 // Path that starts at the top edge of the annotation highlight
                 compileBottomPath = function() {
-                  var arc1 = (deltaX > 0) ? Bounds.ARC_9CC : Bounds.ARC_3CW,
-                      arc2 = (deltaX > 0) ? Bounds.ARC_0CW : Bounds.ARC_0CC;
+                  var arc1 = (deltaX > 0) ? ARC_9CC : ARC_3CW,
+                      arc2 = (deltaX > 0) ? ARC_0CW : ARC_0CC;
 
                   midY = (half > Math.abs(deltaX)) ?
-                    start[1] + half - Math.abs(deltaX) + Bounds.LINE_DISTANCE :
-                    start[1] + Bounds.LINE_DISTANCE;
+                    start[1] + half - Math.abs(deltaX) + LINE_DISTANCE :
+                    start[1] + LINE_DISTANCE;
 
                   return 'M' + start[0] +
                          ' ' + start[1] +
                          'v' + d +
                          arc1 +
-                         'h' + (deltaX - 2 * Math.sign(deltaX) * Bounds.BORDER_RADIUS) +
+                         'h' + (deltaX - 2 * Math.sign(deltaX) * BORDER_RADIUS) +
                          arc2 +
                          'V' + end[1];
                 },
 
                 // Path that starts at the bottom edge of the annotation highlight
                 compileTopPath = function() {
-                  var arc1 = (deltaX > 0) ? Bounds.ARC_9CW : Bounds.ARC_3CC,
+                  var arc1 = (deltaX > 0) ? ARC_9CW : ARC_3CC,
                       arc2 = (deltaX > 0) ?
-                        (deltaY >= 0) ? Bounds.ARC_0CW : Bounds.ARC_6CC :
-                        (deltaY >= 0) ? Bounds.ARC_0CC : Bounds.ARC_6CW;
+                        (deltaY >= 0) ? ARC_0CW : ARC_6CC :
+                        (deltaY >= 0) ? ARC_0CC : ARC_6CW;
 
                   midY = (half > Math.abs(deltaX)) ?
-                    start[1] - (half - Math.abs(deltaX)) - Bounds.LINE_DISTANCE :
-                    start[1] - Bounds.LINE_DISTANCE;
+                    start[1] - (half - Math.abs(deltaX)) - LINE_DISTANCE :
+                    start[1] - LINE_DISTANCE;
 
                   return 'M' + start[0] +
                          ' ' + start[1] +
-                         'v-' + (Bounds.LINE_DISTANCE - Bounds.BORDER_RADIUS) +
+                         'v-' + (LINE_DISTANCE - BORDER_RADIUS) +
                          arc1 +
-                         'h' + (deltaX - 2 * Math.sign(deltaX) * Bounds.BORDER_RADIUS) +
+                         'h' + (deltaX - 2 * Math.sign(deltaX) * BORDER_RADIUS) +
                          arc2 +
                          'V' + end[1];
                 };
@@ -205,7 +180,7 @@ define(['document/annotation/text/relations/bounds'], function(Bounds) {
         },
 
         setLabel = function(label) {
-          midHandle = new MidHandle(label);
+          midHandle = new TagHandle(label);
           midHandle.appendTo(svgEl);
         },
 
@@ -231,6 +206,19 @@ define(['document/annotation/text/relations/bounds'], function(Bounds) {
     this.getMidXY = getMidXY;
   };
 
-  return Relation;
+  // Make static vars visible to outside
+  Connection.BORDER_RADIUS = BORDER_RADIUS;
+  Connection.LINE_DISTANCE = LINE_DISTANCE;
+
+  Connection.ARC_0CW = ARC_0CW;
+  Connection.ARC_0CC = ARC_0CC;
+  Connection.ARC_3CW = ARC_3CW;
+  Connection.ARC_3CC = ARC_3CC;
+  Connection.ARC_6CW = ARC_6CW;
+  Connection.ARC_6CC = ARC_6CC;
+  Connection.ARC_9CW = ARC_9CW;
+  Connection.ARC_9CC = ARC_9CC;
+
+  return Connection;
 
 });
