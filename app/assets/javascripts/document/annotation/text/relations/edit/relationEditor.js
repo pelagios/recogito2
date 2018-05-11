@@ -34,7 +34,7 @@ define([
 
       };
 
-  var RelationsLayer = function(content, svg) {
+  var RelationsEditor = function(content, svg) {
 
     var that = this,
 
@@ -191,8 +191,8 @@ define([
 
     HasEvents.apply(this);
   };
-  RelationsLayer.prototype = Object.create(HasEvents.prototype);
+  RelationsEditor.prototype = Object.create(HasEvents.prototype);
 
-  return RelationsLayer;
+  return RelationsEditor;
 
 });

@@ -4,7 +4,7 @@ define([
   'document/annotation/text/relations/connection'
 ], function(HasEvents, RelationEditor, Connection) {
 
-  var RelationsViewer = function(content, svg) {
+  var RelationsLayer = function(content, svg) {
 
     var that = this,
 
@@ -83,8 +83,8 @@ define([
 
     HasEvents.apply(this);
   };
-  RelationsViewer.prototype = Object.create(HasEvents.prototype);
+  RelationsLayer.prototype = Object.create(HasEvents.prototype);
 
-  return RelationsViewer;
+  return RelationsLayer;
 
 });
