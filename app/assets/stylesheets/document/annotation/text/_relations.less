@@ -45,13 +45,13 @@ svg {
 
 .connection-editor-popup {
   position:absolute;
-  .box-shadow(0, 1px, 14px, rgba(0, 0, 0, 0.35));
+  .box-shadow(0, 1px, 14px, rgba(0, 0, 0, 0.4));
   transform:translate(-50%, 0);
   .rounded-corners(3px);
 
   * {
     height:34px;
-    line-height:29px;
+    line-height:31px;
     box-sizing:border-box;
   }
 
@@ -63,11 +63,7 @@ svg {
     min-width:80px;
     outline:none;
     .rounded-corners-left(3px);
-    // background-color:#fff;
     background-color:@blueish-white;
-    border-style:solid;
-    border-color:#5c6a77;
-    border-width:1px 0 1px 1px;
     cursor:text;
   }
 
@@ -87,12 +83,9 @@ svg {
     }
 
     .delete {
-      // background-color:#e2e2e2;
       background-color:#fff;
       color:@grey-type;
-      border-style:solid;
-      border-color:#5c6a77 @lightgrey-border-darker; // #d6d6d6;
-      border-width:1px 0 1px 1px;
+      border-left:1px solid @lightgrey-border;
     }
 
     .delete:hover {
@@ -103,9 +96,6 @@ svg {
       background-color:@ocean;
       color:#fff;
       .rounded-corners-right(3px);
-      border-style:solid;
-      border-color:#3d556d;
-      border-width:1px 1px 1px 0;
     }
 
     .ok:hover {
