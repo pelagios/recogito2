@@ -1,43 +1,50 @@
-define([
-  'document/annotation/text/relations/shapes'
-], function(Shapes) {
+/** A connection is an on-screen representation of a relation **/
+define(['document/annotation/text/relations/bounds'], function(Bounds) {
 
-  var MidHandle = function() {
-    var g = document.createElementNS(Shapes.SVG_NAMESPACE, 'g'),
-        rect = document.createElementNS(Shapes.SVG_NAMESPACE, 'rect'),
-        text = document.createElementNS(Shapes.SVG_NAMESPACE, 'text'),
+  var MidHandle = function(label) {
+
+    var g = document.createElementNS(Bounds.SVG_NAMESPACE, 'g'),
+        rect = document.createElementNS(Bounds.SVG_NAMESPACE, 'rect'),
+        text = document.createElementNS(Bounds.SVG_NAMESPACE, 'text'),
 
         init = function() {
+          var bbox;
+
           g.setAttribute('class', 'mid');
+
+          text.setAttribute('dy', 3.5);
+          text.innerHTML = label;
+          bbox = text.getBBox();
 
           rect.setAttribute('rx', 2);
           rect.setAttribute('ry', 2);
-          rect.setAttribute('width', 18);
-          rect.setAttribute('height', 9);
-
-          text.setAttribute('dx', -4);
-          text.setAttribute('dy', 4);
-          text.innerHTML = '&#xf02b;';
+          rect.setAttribute('width', Math.round(bbox.width) + 4);
+          rect.setAttribute('height',  Math.round(bbox.height) - 3);
         },
 
         setX = function(x) {
-          rect.setAttribute('x', x - 9.5);
-          text.setAttribute('x', x);
+          var xr = Math.round(x) - 0.5;
+          rect.setAttribute('x', xr - 3);
+          text.setAttribute('x', xr);
         },
 
         setY = function(y) {
-          rect.setAttribute('y', y - 4.5);
-          text.setAttribute('y', y - 0.6);
+          rect.setAttribute('y', y - 6);
+          text.setAttribute('y', y);
+        },
+
+        appendTo = function(svg) {
+          svg.appendChild(g);
+          init();
         };
 
-    init();
-
     g.appendChild(rect);
-    // g.appendChild(text);
+    g.appendChild(text);
 
     this.g = g;
     this.setX = setX;
     this.setY = setY;
+    this.appendTo = appendTo;
   };
 
   var Relation = function(svgEl, fromNode, opt_toNode) {
@@ -49,19 +56,19 @@ define([
         // { annotation: ..., elements: ... }
         toNode = opt_toNode,
 
-        toBounds = (opt_toNode) ? Shapes.toOffsetBounds(Shapes.getUnionBounds(opt_toNode.elements), svg) : undefined,
+        toBounds = (opt_toNode) ? Bounds.toOffsetBounds(Bounds.getUnionBounds(opt_toNode.elements), svg) : undefined,
 
         // Note that the selection bounds are useless after scrolling or resize. They
         // represent viewport bounds at the time of selection, so we store document
         // offsets instead
-        fromBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(fromNode.elements), svg),
+        fromBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(fromNode.elements), svg),
 
         // SVG elements
-        path        = document.createElementNS(Shapes.SVG_NAMESPACE, 'path'),
-        startHandle = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
-        endHandle   = document.createElementNS(Shapes.SVG_NAMESPACE, 'circle'),
+        path        = document.createElementNS(Bounds.SVG_NAMESPACE, 'path'),
+        startHandle = document.createElementNS(Bounds.SVG_NAMESPACE, 'circle'),
+        endHandle   = document.createElementNS(Bounds.SVG_NAMESPACE, 'circle'),
 
-        midHandle   = new MidHandle(),
+        midHandle, //    = new MidHandle(),
 
         // [x,y] array or node object
         currentEnd = opt_toNode,
@@ -77,7 +84,7 @@ define([
 
           if (xyOrNode.elements) {
             toNode = xyOrNode;
-            toBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(xyOrNode.elements), svg);
+            toBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(xyOrNode.elements), svg);
           }
         },
 
@@ -97,7 +104,7 @@ define([
             return currentEnd;
           else
             return (fromBounds.top > toBounds.top) ?
-              Shapes.getBottomHandleXY(toBounds) : Shapes.getTopHandleXY(toBounds);
+              Bounds.getBottomHandleXY(toBounds) : Bounds.getTopHandleXY(toBounds);
         },
 
         redraw = function() {
@@ -107,7 +114,7 @@ define([
                 startsAtTop = end[1] <= (fromBounds.top + fromBounds.height / 2),
 
                 start = (startsAtTop) ?
-                  Shapes.getTopHandleXY(fromBounds) : Shapes.getBottomHandleXY(fromBounds),
+                  Bounds.getTopHandleXY(fromBounds) : Bounds.getBottomHandleXY(fromBounds),
 
                 deltaX = end[0] - start[0],
                 deltaY = end[1] - start[1],
@@ -116,42 +123,42 @@ define([
                 midX = (half > Math.abs(deltaX)) ? start[0] + deltaX : start[0] + half * Math.sign(deltaX),
                 midY, // computed later
 
-                d = Shapes.LINE_DISTANCE - Shapes.BORDER_RADIUS, // Shorthand: vertical straight line length
+                d = Bounds.LINE_DISTANCE - Bounds.BORDER_RADIUS, // Shorthand: vertical straight line length
 
                 // Path that starts at the top edge of the annotation highlight
                 compileBottomPath = function() {
-                  var arc1 = (deltaX > 0) ? Shapes.ARC_9CC : Shapes.ARC_3CW,
-                      arc2 = (deltaX > 0) ? Shapes.ARC_0CW : Shapes.ARC_0CC;
+                  var arc1 = (deltaX > 0) ? Bounds.ARC_9CC : Bounds.ARC_3CW,
+                      arc2 = (deltaX > 0) ? Bounds.ARC_0CW : Bounds.ARC_0CC;
 
                   midY = (half > Math.abs(deltaX)) ?
-                    start[1] + half - Math.abs(deltaX) + Shapes.LINE_DISTANCE :
-                    start[1] + Shapes.LINE_DISTANCE;
+                    start[1] + half - Math.abs(deltaX) + Bounds.LINE_DISTANCE :
+                    start[1] + Bounds.LINE_DISTANCE;
 
                   return 'M' + start[0] +
                          ' ' + start[1] +
                          'v' + d +
                          arc1 +
-                         'h' + (deltaX - 2 * Math.sign(deltaX) * Shapes.BORDER_RADIUS) +
+                         'h' + (deltaX - 2 * Math.sign(deltaX) * Bounds.BORDER_RADIUS) +
                          arc2 +
                          'V' + end[1];
                 },
 
                 // Path that starts at the bottom edge of the annotation highlight
                 compileTopPath = function() {
-                  var arc1 = (deltaX > 0) ? Shapes.ARC_9CW : Shapes.ARC_3CC,
+                  var arc1 = (deltaX > 0) ? Bounds.ARC_9CW : Bounds.ARC_3CC,
                       arc2 = (deltaX > 0) ?
-                        (deltaY >= 0) ? Shapes.ARC_0CW : Shapes.ARC_6CC :
-                        (deltaY >= 0) ? Shapes.ARC_0CC : Shapes.ARC_6CW;
+                        (deltaY >= 0) ? Bounds.ARC_0CW : Bounds.ARC_6CC :
+                        (deltaY >= 0) ? Bounds.ARC_0CC : Bounds.ARC_6CW;
 
                   midY = (half > Math.abs(deltaX)) ?
-                    start[1] - (half - Math.abs(deltaX)) - Shapes.LINE_DISTANCE :
-                    start[1] - Shapes.LINE_DISTANCE;
+                    start[1] - (half - Math.abs(deltaX)) - Bounds.LINE_DISTANCE :
+                    start[1] - Bounds.LINE_DISTANCE;
 
                   return 'M' + start[0] +
                          ' ' + start[1] +
-                         'v-' + (Shapes.LINE_DISTANCE - Shapes.BORDER_RADIUS) +
+                         'v-' + (Bounds.LINE_DISTANCE - Bounds.BORDER_RADIUS) +
                          arc1 +
-                         'h' + (deltaX - 2 * Math.sign(deltaX) * Shapes.BORDER_RADIUS) +
+                         'h' + (deltaX - 2 * Math.sign(deltaX) * Bounds.BORDER_RADIUS) +
                          arc2 +
                          'V' + end[1];
                 };
@@ -171,8 +178,10 @@ define([
 
             currentMidXY = [ midX, midY ];
 
-            midHandle.setX(midX);
-            midHandle.setY(midY);
+            if (midHandle) {
+              midHandle.setX(midX);
+              midHandle.setY(midY);
+            }
           }
         },
 
@@ -189,10 +198,15 @@ define([
         },
 
         recompute = function() {
-          fromBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(fromNode.elements), svg);
+          fromBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(fromNode.elements), svg);
           if (currentEnd && currentEnd.elements)
-            toBounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(opt_toNode.elements), svg);
+            toBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(opt_toNode.elements), svg);
           redraw();
+        },
+
+        setLabel = function(label) {
+          midHandle = new MidHandle(label);
+          midHandle.appendTo(svgEl);
         },
 
         destroy = function() {
@@ -203,7 +217,6 @@ define([
 
     svgEl.appendChild(path);
     svgEl.appendChild(startHandle);
-    svgEl.appendChild(midHandle.g);
     svgEl.appendChild(endHandle);
 
     this.dragTo = dragTo;
@@ -212,6 +225,7 @@ define([
     this.recompute = recompute;
     this.destroy = destroy;
     this.redraw = redraw;
+    this.setLabel = setLabel;
     this.getStartNode = getStartNode;
     this.getEndNode = getEndNode;
     this.getMidXY = getMidXY;

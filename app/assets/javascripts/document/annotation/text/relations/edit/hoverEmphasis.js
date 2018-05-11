@@ -1,10 +1,10 @@
-define(['document/annotation/text/relations/shapes'], function(Shapes) {
+define(['document/annotation/text/relations/bounds'], function(Bounds) {
 
   var HoverEmphasis = function(container, elements) {
 
-    var bounds = Shapes.toOffsetBounds(Shapes.getUnionBounds(elements), jQuery(container)),
+    var bounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(elements), jQuery(container)),
 
-        outline = document.createElementNS(Shapes.SVG_NAMESPACE, 'rect'),
+        outline = document.createElementNS(Bounds.SVG_NAMESPACE, 'rect'),
 
         init = function() {
           outline.setAttribute('x', bounds.left - 0.5);

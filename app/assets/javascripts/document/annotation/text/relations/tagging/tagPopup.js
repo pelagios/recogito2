@@ -1,6 +1,6 @@
 define([
   'common/hasEvents',
-  'document/annotation/text/relations/tagVocabulary'
+  'document/annotation/text/relations/tagging/tagVocabulary'
 ], function(HasEvents, Vocabulary) {
 
   // https://github.com/twitter/typeahead.js/issues/235
