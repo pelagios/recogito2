@@ -194,6 +194,8 @@ define([
     svgEl.appendChild(startHandle);
     svgEl.appendChild(endHandle);
 
+    redraw();
+
     this.dragTo = dragTo;
     this.attach = attach;
     this.isAttached = isAttached;

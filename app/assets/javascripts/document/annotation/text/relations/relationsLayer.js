@@ -8,14 +8,13 @@ define([
 
     var that = this,
 
-        editor = new RelationEditor(content, svg),
-
         connections = [],
 
-        getNode = function(annotationId) {
-          var elements = jQuery('*[data-id="' + annotationId + '"]'),
-              annotation;
+        editor = new RelationEditor(content, svg),
 
+        /** Returns a 'graph node' object { annotation: ..., elements: ... } for the given ID **/
+        getNode = function(annotationId) {
+          var elements = jQuery('*[data-id="' + annotationId + '"]');
           if (elements.length > 0)
             return {
               annotation: elements[0].annotation,
@@ -23,15 +22,22 @@ define([
             };
         },
 
+        /**
+         * Initializes the layer with a list of annotations.
+         *
+         * Loops through the annotations, disregarding all that don't have relations, and
+         * builds connections for the others. (Reminder: a 'connection' is the visual rendition
+         * of a relation).
+         */
         init = function(annotations) {
           connections = annotations.reduce(function(arr, annotation) {
             if (annotation.relations && annotation.relations.length > 0) {
-
+              // For each annotation that has relations, build the connections
               var connections = annotation.relations.map(function(r) {
                 var fromNode = getNode(annotation.annotation_id),
                     toNode = getNode(r.relates_to),
 
-                    // Will work as long as we allow exactly one TAG body
+                    // TODO will only work as long as we allow exactly one TAG body
                     label = r.bodies[0].value,
 
                     connection = new Connection(svg, fromNode, toNode);
@@ -40,7 +46,7 @@ define([
                 return connection;
               });
 
-              connections.forEach(function(c) { c.redraw(); });
+              // Attach the relations from this annotations to the global list
               return arr.concat(connections);
             } else {
               return arr;
@@ -48,38 +54,33 @@ define([
           }, []);
         },
 
-        /** Fire up the mouse handlers and show the SVG foreground plate **/
+        /** Show the relations layer **/
         show = function() {
-          // TODO make dependent on write access rights
-          editor.setEnabled(true);
+          editor.setEnabled(true); // TODO make dependent on write access rights
           svg.style.display = 'initial';
         },
 
-        /** Clear current connection, all shapes, detach mouse handlers and hide the SVG plate **/
+        /** Hide the relations layer **/
         hide = function() {
-          currentRelation = false;
-
-          while (svg.firstChild)
-            svg.removeChild(svg.firstChild);
-
-          // TODO make dependent on write access rights
-          editor.setEnabled(false);
+          editor.setEnabled(false); // TODO make dependent on write access rights
           svg.style.display = 'none';
         },
 
-        redrawAll = function() {
+        /** Recomputes (and redraws) all connections - called on window resize **/
+        recomputeAll = function() {
           connections.forEach(function(connection) {
             connection.recompute();
           });
         };
 
-    jQuery(window).on('resize', redrawAll);
+    jQuery(window).on('resize', recomputeAll);
 
+    // Forward editor events to app
     editor.on('updateRelations', that.forwardEvent('updateRelations'));
 
+    this.init = init;
     this.show = show;
     this.hide = hide;
-    this.init = init;
 
     HasEvents.apply(this);
   };
