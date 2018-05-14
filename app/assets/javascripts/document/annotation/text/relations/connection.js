@@ -185,10 +185,11 @@ define([
           redraw();
         },
 
-        destroy = function() {
-
-          // TODO implement
-
+        destroy = function() {          
+          svgEl.removeChild(path);
+          svgEl.removeChild(startHandle);
+          svgEl.removeChild(endHandle);
+          if (midHandle) midHandle.destroy();
         };
 
     svgEl.appendChild(path);

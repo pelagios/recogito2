@@ -125,7 +125,7 @@ define([
          * end; or click and hold at the start, drag to end and release.
          */
         onMouseup = function(e) {
-          if (currentHover && currentConnection) {
+          if (currentHover && currentConnection && !currentConnection.isFixed()) {
             // If this is a different node than the start node, complete the connection
             if (currentHover.annotation !== currentConnection.getStartNode().annotation)
               completeConnection(currentHover.node);
@@ -158,11 +158,6 @@ define([
                   annotation.relations.push(relation);
               },
 
-              onCancel = function() {
-                currentConnection.destroy();
-                currentConnection = undefined;
-              },
-
               onSubmit = function(tag) {
                 var sourceAnnotation = currentConnection.getStartNode().annotation,
 
@@ -181,12 +176,17 @@ define([
                 that.fireEvent('updateRelations', sourceAnnotation);
 
                 currentConnection = undefined;
+              },
+              
+              onDelete = function() {
+                currentConnection.destroy();
+                currentConnection = undefined;
               };
 
           currentConnection.fix();
 
-          editor.on('cancel', onCancel);
           editor.on('submit', onSubmit);
+          editor.on('delete', onDelete);
 
           jQuery(document.body).css('cursor', 'auto');
         },
