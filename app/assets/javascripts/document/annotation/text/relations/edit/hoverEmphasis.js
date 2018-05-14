@@ -1,10 +1,12 @@
 define(['document/annotation/text/relations/bounds'], function(Bounds) {
 
-  var HoverEmphasis = function(container, elements) {
+  var SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-    var bounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(elements), jQuery(container)),
+  var HoverEmphasis = function(svg, elements) {
 
-        outline = document.createElementNS(Bounds.SVG_NAMESPACE, 'rect'),
+    var bounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(elements), jQuery(svg)),
+
+        outline = document.createElementNS(SVG_NAMESPACE, 'rect'),
 
         init = function() {
           outline.setAttribute('x', bounds.left - 0.5);
@@ -12,11 +14,11 @@ define(['document/annotation/text/relations/bounds'], function(Bounds) {
           outline.setAttribute('width', bounds.width + 1);
           outline.setAttribute('height', bounds.height);
           outline.setAttribute('class', 'hover');
-          container.appendChild(outline);
+          svg.appendChild(outline);
         },
 
         destroy = function() {
-          container.removeChild(outline);
+          svg.removeChild(outline);
         };
 
     init();
