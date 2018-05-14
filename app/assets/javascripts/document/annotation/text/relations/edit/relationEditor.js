@@ -4,7 +4,7 @@ define([
   'document/annotation/text/relations/edit/hoverEmphasis',
   'document/annotation/text/relations/connection',
   'document/annotation/text/relations/tagging/tagPopup'
-], function(Config, HasEvents, HoverEmphasis, Connection, TagEditor) {
+], function(Config, HasEvents, HoverEmphasis, Connection, TagPopup) {
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
@@ -142,7 +142,7 @@ define([
         /** Complete drawing of a new connection **/
         completeConnection = function() {
 
-          var editor = new TagEditor(contentEl, currentConnection.getMidXY()),
+          var editor = new TagPopup(contentEl, currentConnection.getMidXY()),
 
               // Adds a relation, or replaces an existing one if any exists with the same end node
               addOrReplaceRelation = function(annotation, relation) {

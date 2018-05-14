@@ -3,7 +3,12 @@ define([
   'document/annotation/text/relations/tagging/tagVocabulary'
 ], function(HasEvents, Vocabulary) {
 
-  // https://github.com/twitter/typeahead.js/issues/235
+  /**
+   * A hack that patches jQuery, so that contentEditable elements work with typeahead like
+   * normal inputs.
+   *
+   * https://github.com/twitter/typeahead.js/issues/235
+   */
   var original = jQuery.fn.val;
   jQuery.fn.val = function() {
     if ($(this).is('*[contenteditable=true]'))
@@ -12,6 +17,7 @@ define([
   };
 
   var TagPopup = function(containerEl, position) {
+
     var that = this,
 
         element = jQuery(
@@ -25,7 +31,12 @@ define([
 
         inputEl = element.find('.input'),
 
+        btnDelete = element.find('.delete'),
+        btnOk = element.find('.ok'),
+
         init = function() {
+
+          // Trivial prefix-based autocomplete matcher
           var matcher = function(query, responseFn) {
                 var matches = [];
 
@@ -42,28 +53,35 @@ define([
           inputEl.keydown(onKeydown);
           inputEl.typeahead({ hint:false },{ source: matcher });
 
+          btnDelete.click(onDelete);
+          btnOk.click(onSubmit);
+
           setTimeout(function() { inputEl.focus(); }, 1);
         },
 
+        onSubmit = function() {
+          var tag = inputEl.val();
+          Vocabulary.add(tag);
+          element.remove();
+          that.fireEvent('submit', tag);
+          return false;
+        },
+
+        onDelete = function() {
+          element.remove();
+          that.fireEvent('delete');
+          return false;
+        },
+
         onKeydown = function(e) {
-          // Won't work with element due to Typeahead
-          var el = jQuery('.connection-editor-popup');
-
-          if (e.which === 27) { // Escape
-            el.remove();
-            that.fireEvent('cancel');
-          } else if (e.which == 13) { // Enter
-            var tag = inputEl.val();
-            el.remove();
-
-            Vocabulary.add(tag);
-
-            that.fireEvent('submit', tag);
-            return false;
-          }
+          if (e.which === 27) // Escape
+            cancel();
+          else if (e.which == 13) // Enter
+            submit();
         };
 
     init();
+
     HasEvents.apply(this);
   };
   TagPopup.prototype = Object.create(HasEvents.prototype);
