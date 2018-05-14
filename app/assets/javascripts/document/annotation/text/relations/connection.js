@@ -206,7 +206,7 @@ define([
         recompute = function() {
           fromBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(fromNode.elements), svg);
           if (currentEnd && currentEnd.elements)
-            toBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(opt_toNode.elements), svg);
+            toBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(currentEnd.elements), svg);
           redraw();
         },
 

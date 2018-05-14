@@ -7,6 +7,8 @@ define([
 
     var that = this,
 
+        svg,
+
         g = document.createElementNS(Draw.SVG_NAMESPACE, 'g'),
         rect = document.createElementNS(Draw.SVG_NAMESPACE, 'rect'),
         text = document.createElementNS(Draw.SVG_NAMESPACE, 'text'),
@@ -46,9 +48,14 @@ define([
           return label;
         },
 
-        appendTo = function(svg) {
+        appendTo = function(svgEl) {
+          svg = svgEl;
           svg.appendChild(g);
           init();
+        },
+
+        destroy = function() {
+          if (svg) svg.removeChild(g);
         };
 
     g.appendChild(rect);
@@ -57,6 +64,7 @@ define([
     this.setXY = setXY;
     this.getLabel = getLabel;
     this.appendTo = appendTo;
+    this.destroy = destroy;
 
     HasEvents.apply(this);
   };
