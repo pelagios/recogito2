@@ -52,7 +52,7 @@ define([
         currentMidXY,
 
         // Flag indicating whether the relation is completed (or still drawing)
-        attached = false,
+        fixed = false,
 
         dragTo = function(xyOrNode) {
           currentEnd = xyOrNode;
@@ -63,15 +63,15 @@ define([
           }
         },
 
-        attach = function() {
+        fix = function() {
           if (currentEnd.elements) {
-            attached = true;
+            fixed = true;
             // svgEl.appendChild(midHandle);
           }
         },
 
-        isAttached = function() {
-          return attached;
+        isFixed = function() {
+          return fixed;
         },
 
         getEnd = function() {
@@ -182,6 +182,7 @@ define([
         setLabel = function(label) {
           midHandle = new TagHandle(label);
           midHandle.appendTo(svgEl);
+          redraw();
         },
 
         destroy = function() {
@@ -197,8 +198,8 @@ define([
     redraw();
 
     this.dragTo = dragTo;
-    this.attach = attach;
-    this.isAttached = isAttached;
+    this.fix = fix;
+    this.isFixed = isFixed;
     this.recompute = recompute;
     this.destroy = destroy;
     this.redraw = redraw;

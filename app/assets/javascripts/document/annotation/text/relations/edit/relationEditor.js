@@ -4,10 +4,21 @@ define([
   'document/annotation/text/relations/edit/hoverEmphasis',
   'document/annotation/text/relations/connection',
   'document/annotation/text/relations/tagging/tagPopup'
-], function(Config, HasEvents, HoverEmphasis, Relation, TagEditor) {
+], function(Config, HasEvents, HoverEmphasis, Connection, TagEditor) {
 
   var SVG_NS = "http://www.w3.org/2000/svg",
 
+      /**
+       * Helper: gets all stacked annotation SPANS for an element.
+       *
+       * Reminder - annotations can be nested. This helper retrieves the whole stack.
+       *
+       * <span class="annotation" data-id="annotation-01">
+       *   <span class="annotation" data-id="annotation-02">
+       *     <span class="annotation" data-id="annotation-03">foo</span>
+       *   </span>
+       * </span>
+       */
       getAnnotationSpansRecursive = function(element, a) {
         var spans = (a) ? a : [ ],
             parent = element.parentNode;
@@ -20,34 +31,41 @@ define([
           return spans;
       },
 
+      /**
+       * Returns a 'graph node' object { annotation: ..., elements: ... } for the
+       * given mouse event. (Used for mouse over emphasis effect.)
+       */
       toNode = function(e) {
         var t = jQuery(e.target).closest('.annotation'),
             sourceSpan = (t.length > 0) ? t[0] : undefined,
             annotationSpans, annotation, elements;
 
         if (sourceSpan) {
+          // All stacked annotation spans
           annotationSpans = getAnnotationSpansRecursive(sourceSpan);
+
+          // Annotation ID from the top-most span in the stack
           annotation = annotationSpans[annotationSpans.length - 1].annotation;
+
+          // ALL spans for this annotation (not just the hovered one)
           elements = jQuery('.annotation[data-id="' + annotation.annotation_id + '"]');
+
           return { annotation: annotation, elements: elements };
         }
 
       };
 
-  var RelationsEditor = function(content, svg) {
+  var RelationEditor = function(content, svg) {
 
     var that = this,
 
         contentEl = jQuery(content),
 
-        // Current hover emphasis (regardless of whether we're currently drawing a connection)
         currentHover = false,
 
-        // The connection currently being drawn, if any
-        currentRelation = false,
+        currentConnection = false,
 
         attachHandlers = function() {
-          // Note that the SVG element is transparent to mouse events
           contentEl.addClass('noselect');
           contentEl.on('mousedown', onMousedown);
           contentEl.on('mousemove', onMousemove);
@@ -57,7 +75,6 @@ define([
         },
 
         detachHandlers = function() {
-          // Note that the SVG element is transparent to mouse events
           contentEl.removeClass('noselect');
           contentEl.off('mousedown', onMousedown);
           contentEl.off('mousemove', onMousemove);
@@ -76,66 +93,6 @@ define([
           }
         },
 
-        /** Start drawing a new connection line **/
-        startNewConnection = function(fromNode) {
-          currentRelation = new Relation(svg, fromNode);
-          jQuery(document.body).css('cursor', 'none');
-          render();
-        },
-
-        /** Complete drawing of a new relation **/
-        completeConnection = function() {
-              // Adds a relation, or replaces an existing one if any exists with the same end node
-          var addOrReplaceRelation = function(annotation, relation) {
-                if (!annotation.relations) annotation.relations = [];
-
-                var existing = annotation.relations.filter(function(r) {
-                  return r.relates_to === relation.relates_to;
-                });
-
-                if (existing.length > 0)
-                  annotation.relations[annotation.relations.indexOf(existing)] = relation;
-                else
-                  annotation.relations.push(relation);
-              },
-
-              onCancel = function() {
-                currentRelation.destroy();
-                currentRelation = undefined;
-              },
-
-              onSubmit = function(tag) {
-                var editor,
-
-                    sourceAnnotation = currentRelation.getStartNode().annotation,
-
-                    relation = {
-                      relates_to: currentRelation.getEndNode().annotation.annotation_id,
-                      bodies: [{
-                        type: 'TAG',
-                        last_modified_by: Config.me,
-                        value: tag
-                      }]
-                    };
-
-                currentRelation.setLabel(tag);
-                currentRelation.redraw();
-
-                addOrReplaceRelation(sourceAnnotation, relation);
-                that.fireEvent('updateRelations', sourceAnnotation);
-
-                currentRelation = undefined;
-              };
-
-          currentRelation.attach();
-
-          editor = new TagEditor(contentEl, currentRelation.getMidXY());
-          editor.on('cancel', onCancel);
-          editor.on('submit', onSubmit);
-
-          jQuery(document.body).css('cursor', 'auto');
-        },
-
         /** Emphasise hovered annotation **/
         onEnterAnnotation = function(e) {
           if (currentHover) hover();
@@ -150,16 +107,17 @@ define([
         /** Starts or creates a new relation **/
         onMousedown = function(e) {
           var node = toNode(e);
-
-          if (node)
-            if (currentRelation) completeConnection(node);
+          if (node) {
+            if (currentConnection) completeConnection(node);
             else startNewConnection(node);
+          }
         },
 
         onMousemove = function(e) {
-          if (currentRelation && !currentRelation.isAttached())
-            if (currentHover) currentRelation.dragTo(currentHover.node);
-            else currentRelation.dragTo([ e.offsetX, e.offsetY ]);
+          if (currentConnection && !currentConnection.isFixed()) {
+            if (currentHover) currentConnection.dragTo(currentHover.node);
+            else currentConnection.dragTo([ e.offsetX, e.offsetY ]);
+          }
         },
 
         /**
@@ -167,32 +125,90 @@ define([
          * end; or click and hold at the start, drag to end and release.
          */
         onMouseup = function(e) {
-          if (currentHover && currentRelation)
+          if (currentHover && currentConnection) {
             // If this is a different node than the start node, complete the connection
-            if (currentHover.annotation !== currentRelation.getStartNode().annotation)
+            if (currentHover.annotation !== currentConnection.getStartNode().annotation)
               completeConnection(currentHover.node);
+          }
+        },
+
+        /** Start drawing a new connection line **/
+        startNewConnection = function(fromNode) {
+          currentConnection = new Connection(svg, fromNode);
+          jQuery(document.body).css('cursor', 'none');
+          render();
+        },
+
+        /** Complete drawing of a new connection **/
+        completeConnection = function() {
+
+          var editor = new TagEditor(contentEl, currentConnection.getMidXY()),
+
+              // Adds a relation, or replaces an existing one if any exists with the same end node
+              addOrReplaceRelation = function(annotation, relation) {
+                if (!annotation.relations) annotation.relations = [];
+
+                var existing = annotation.relations.filter(function(r) {
+                  return r.relates_to === relation.relates_to;
+                });
+
+                if (existing.length > 0)
+                  annotation.relations[annotation.relations.indexOf(existing)] = relation;
+                else
+                  annotation.relations.push(relation);
+              },
+
+              onCancel = function() {
+                currentConnection.destroy();
+                currentConnection = undefined;
+              },
+
+              onSubmit = function(tag) {
+                var sourceAnnotation = currentConnection.getStartNode().annotation,
+
+                    relation = {
+                      relates_to: currentConnection.getEndNode().annotation.annotation_id,
+                      bodies: [{
+                        type: 'TAG',
+                        last_modified_by: Config.me,
+                        value: tag
+                      }]
+                    };
+
+                currentConnection.setLabel(tag);
+
+                addOrReplaceRelation(sourceAnnotation, relation);
+                that.fireEvent('updateRelations', sourceAnnotation);
+
+                currentConnection = undefined;
+              };
+
+          currentConnection.fix();
+
+          editor.on('cancel', onCancel);
+          editor.on('submit', onSubmit);
+
+          jQuery(document.body).css('cursor', 'auto');
         },
 
         render = function() {
-          if (currentRelation) {
-            currentRelation.redraw();
+          if (currentConnection) {
+            currentConnection.redraw();
             requestAnimationFrame(render);
           }
         },
 
         setEnabled = function(enabled) {
-          if (enabled)
-            attachHandlers();
-          else
-            detachHandlers();
+          if (enabled) attachHandlers();
+          else detachHandlers();
         };
 
     this.setEnabled = setEnabled;
 
     HasEvents.apply(this);
   };
-  RelationsEditor.prototype = Object.create(HasEvents.prototype);
+  RelationEditor.prototype = Object.create(HasEvents.prototype);
 
-  return RelationsEditor;
+  return RelationEditor;
 
 });
