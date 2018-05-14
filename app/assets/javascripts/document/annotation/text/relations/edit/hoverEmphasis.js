@@ -1,12 +1,13 @@
-define(['document/annotation/text/relations/bounds'], function(Bounds) {
-
-  var SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+define([
+  'document/annotation/text/relations/bounds',
+  'document/annotation/text/relations/drawing'
+], function(Bounds, Draw) {
 
   var HoverEmphasis = function(svg, elements) {
 
     var bounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(elements), jQuery(svg)),
 
-        outline = document.createElementNS(SVG_NAMESPACE, 'rect'),
+        outline = document.createElementNS(Draw.SVG_NAMESPACE, 'rect'),
 
         init = function() {
           outline.setAttribute('x', bounds.left - 0.5);

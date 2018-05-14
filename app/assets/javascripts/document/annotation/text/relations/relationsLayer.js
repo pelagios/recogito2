@@ -12,16 +12,6 @@ define([
 
         editor = new RelationEditor(content, svg),
 
-        /** Returns a 'graph node' object { annotation: ..., elements: ... } for the given ID **/
-        getNode = function(annotationId) {
-          var elements = jQuery('*[data-id="' + annotationId + '"]');
-          if (elements.length > 0)
-            return {
-              annotation: elements[0].annotation,
-              elements: elements
-            };
-        },
-
         /**
          * Initializes the layer with a list of annotations.
          *
@@ -32,19 +22,9 @@ define([
         init = function(annotations) {
           connections = annotations.reduce(function(arr, annotation) {
             if (annotation.relations && annotation.relations.length > 0) {
-              // For each annotation that has relations, build the connections
+              // For each annotation that has relations, build the corresponding connections...
               var connections = annotation.relations.map(function(r) {
-                var fromNode = getNode(annotation.annotation_id),
-                    toNode = getNode(r.relates_to),
-
-                    // TODO will only work as long as we allow exactly one TAG body
-                    label = r.bodies[0].value,
-
-                    connection = new Connection(svg, fromNode, toNode);
-
-                connection.setLabel(label);
-                connection.on('click', onConnectionClicked);
-                return connection;
+                return new Connection(content, svg, annotation, r);
               });
 
               // Attach the relations from this annotations to the global list
@@ -53,10 +33,6 @@ define([
               return arr;
             }
           }, []);
-        },
-
-        onConnectionClicked = function(connection) {
-          console.log('click', connection);
         },
 
         /** Show the relations layer **/
@@ -83,7 +59,7 @@ define([
             optNewConnection.on('click', onConnectionClicked);
             connections.push(optNewConnection);
           }
-          
+
           that.fireEvent('updateRelations', annotation);
         };
 

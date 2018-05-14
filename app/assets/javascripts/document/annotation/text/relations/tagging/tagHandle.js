@@ -1,14 +1,15 @@
-define(['common/hasEvents'], function(HasEvents) {
-
-  var SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+define([
+  'common/hasEvents',
+  'document/annotation/text/relations/drawing'
+], function(HasEvents, Draw) {
 
   var TagHandle = function(label) {
 
     var that = this,
 
-        g = document.createElementNS(SVG_NAMESPACE, 'g'),
-        rect = document.createElementNS(SVG_NAMESPACE, 'rect'),
-        text = document.createElementNS(SVG_NAMESPACE, 'text'),
+        g = document.createElementNS(Draw.SVG_NAMESPACE, 'g'),
+        rect = document.createElementNS(Draw.SVG_NAMESPACE, 'rect'),
+        text = document.createElementNS(Draw.SVG_NAMESPACE, 'text'),
 
         init = function() {
           var bbox;
@@ -30,15 +31,19 @@ define(['common/hasEvents'], function(HasEvents) {
           });
         },
 
-        setX = function(x) {
-          var xr = Math.round(x) - 0.5;
-          rect.setAttribute('x', xr - 3);
-          text.setAttribute('x', xr);
+        setXY = function(xy) {
+          var x = Math.round(xy[0]) - 0.5,
+              y = Math.round(xy[1]);
+
+          rect.setAttribute('x', x - 3);
+          rect.setAttribute('y', y - 6);
+
+          text.setAttribute('x', x);
+          text.setAttribute('y', y);
         },
 
-        setY = function(y) {
-          rect.setAttribute('y', y - 6);
-          text.setAttribute('y', y);
+        getLabel = function() {
+          return label;
         },
 
         appendTo = function(svg) {
@@ -49,9 +54,8 @@ define(['common/hasEvents'], function(HasEvents) {
     g.appendChild(rect);
     g.appendChild(text);
 
-    this.g = g;
-    this.setX = setX;
-    this.setY = setY;
+    this.setXY = setXY;
+    this.getLabel = getLabel;
     this.appendTo = appendTo;
 
     HasEvents.apply(this);

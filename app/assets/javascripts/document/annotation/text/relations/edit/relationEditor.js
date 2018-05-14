@@ -2,11 +2,8 @@ define([
   'common/config',
   'common/hasEvents',
   'document/annotation/text/relations/edit/hoverEmphasis',
-  'document/annotation/text/relations/connection',
-  'document/annotation/text/relations/tagging/tagPopup'
-], function(Config, HasEvents, HoverEmphasis, Connection, TagPopup) {
-
-  var SVG_NS = "http://www.w3.org/2000/svg",
+  'document/annotation/text/relations/connection'
+], function(Config, HasEvents, HoverEmphasis, Connection) {
 
       /**
        * Helper: gets all stacked annotation SPANS for an element.
@@ -19,7 +16,7 @@ define([
        *   </span>
        * </span>
        */
-      getAnnotationSpansRecursive = function(element, a) {
+  var getAnnotationSpansRecursive = function(element, a) {
         var spans = (a) ? a : [ ],
             parent = element.parentNode;
 
@@ -114,7 +111,7 @@ define([
         },
 
         onMousemove = function(e) {
-          if (currentConnection && !currentConnection.isFixed()) {
+          if (currentConnection && currentConnection.isFloating()) {
             if (currentHover) currentConnection.dragTo(currentHover.node);
             else currentConnection.dragTo([ e.offsetX, e.offsetY ]);
           }
@@ -125,16 +122,16 @@ define([
          * end; or click and hold at the start, drag to end and release.
          */
         onMouseup = function(e) {
-          if (currentHover && currentConnection && !currentConnection.isFixed()) {
+          if (currentHover && currentConnection && currentConnection.isFloating()) {
             // If this is a different node than the start node, complete the connection
-            if (currentHover.annotation !== currentConnection.getStartNode().annotation)
+            if (currentHover.annotation !== currentConnection.getStartAnnotation())
               completeConnection(currentHover.node);
           }
         },
 
         /** Start drawing a new connection line **/
         startNewConnection = function(fromNode) {
-          currentConnection = new Connection(svg, fromNode);
+          currentConnection = new Connection(content, svg, fromNode);
           jQuery(document.body).css('cursor', 'none');
           render();
         },
@@ -142,10 +139,8 @@ define([
         /** Complete drawing of a new connection **/
         completeConnection = function() {
 
-          var editor = new TagPopup(contentEl, currentConnection.getMidXY()),
-
               // Adds a relation, or replaces an existing one if any exists with the same end node
-              addOrReplaceRelation = function(annotation, relation) {
+          var addOrReplaceRelation = function(annotation, relation) {
                 if (!annotation.relations) annotation.relations = [];
 
                 var existing = annotation.relations.filter(function(r) {
@@ -158,35 +153,20 @@ define([
                   annotation.relations.push(relation);
               },
 
-              onSubmit = function(tag) {
-                var sourceAnnotation = currentConnection.getStartNode().annotation,
-
-                    relation = {
-                      relates_to: currentConnection.getEndNode().annotation.annotation_id,
-                      bodies: [{
-                        type: 'TAG',
-                        last_modified_by: Config.me,
-                        value: tag
-                      }]
-                    };
-
-                currentConnection.setLabel(tag);
-
-                addOrReplaceRelation(sourceAnnotation, relation);
-                that.fireEvent('updateRelations', sourceAnnotation, currentConnection);
-
+              onUpdate = function(annotation, connection) {
+                that.fireEvent('updateRelations', annotation);
                 currentConnection = undefined;
               },
 
-              onDelete = function() {
-                currentConnection.destroy();
+              onDelete = function(connection) {
                 currentConnection = undefined;
+                that.fireEvent('delete', connection);
               };
 
           currentConnection.fix();
-
-          editor.on('submit', onSubmit);
-          editor.on('delete', onDelete);
+          currentConnection.on('update', onUpdate);
+          currentConnection.on('delete', onDelete);
+          currentConnection.editRelation();
 
           jQuery(document.body).css('cursor', 'auto');
         },
