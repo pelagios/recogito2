@@ -60,11 +60,17 @@ define([
         },
 
         onSubmit = function() {
-          var tag = inputEl.val();
-          Vocabulary.add(tag);
-          element.remove();
-          that.fireEvent('submit', tag);
-          return false;
+          var tag = inputEl.val(),
+              isEmpty = (tag) ? tag.trim() === '' : true;
+
+          if (isEmpty) {
+            onDelete();
+          } else {
+            Vocabulary.add(tag);
+            element.remove();
+            that.fireEvent('submit', tag);
+            return false;
+          }
         },
 
         onDelete = function() {
