@@ -1,8 +1,9 @@
 /** A connection is an on-screen representation of a relation **/
 define([
+  'common/hasEvents',
   'document/annotation/text/relations/bounds',
   'document/annotation/text/relations/tagging/tagHandle'
-], function(Bounds, TagHandle) {
+], function(HasEvents, Bounds, TagHandle) {
 
   var SVG_NAMESPACE = 'http://www.w3.org/2000/svg',
 
@@ -64,10 +65,8 @@ define([
         },
 
         fix = function() {
-          if (currentEnd.elements) {
+          if (currentEnd.elements)
             fixed = true;
-            // svgEl.appendChild(midHandle);
-          }
         },
 
         isFixed = function() {
@@ -181,11 +180,12 @@ define([
 
         setLabel = function(label) {
           midHandle = new TagHandle(label);
+          midHandle.on('click', function() { that.fireEvent('click', that); });
           midHandle.appendTo(svgEl);
           redraw();
         },
 
-        destroy = function() {          
+        destroy = function() {
           svgEl.removeChild(path);
           svgEl.removeChild(startHandle);
           svgEl.removeChild(endHandle);
@@ -208,7 +208,10 @@ define([
     this.getStartNode = getStartNode;
     this.getEndNode = getEndNode;
     this.getMidXY = getMidXY;
+
+    HasEvents.apply(this);
   };
+  Connection.prototype = Object.create(HasEvents.prototype);
 
   // Make static vars visible to outside
   Connection.BORDER_RADIUS = BORDER_RADIUS;

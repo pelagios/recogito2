@@ -1,10 +1,12 @@
-define([], function() {
+define(['common/hasEvents'], function(HasEvents) {
 
   var SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
   var TagHandle = function(label) {
 
-    var g = document.createElementNS(SVG_NAMESPACE, 'g'),
+    var that = this,
+
+        g = document.createElementNS(SVG_NAMESPACE, 'g'),
         rect = document.createElementNS(SVG_NAMESPACE, 'rect'),
         text = document.createElementNS(SVG_NAMESPACE, 'text'),
 
@@ -15,12 +17,17 @@ define([], function() {
 
           text.setAttribute('dy', 3.5);
           text.innerHTML = label;
+
           bbox = text.getBBox();
 
           rect.setAttribute('rx', 2);
           rect.setAttribute('ry', 2);
           rect.setAttribute('width', Math.round(bbox.width) + 4);
           rect.setAttribute('height',  Math.round(bbox.height) - 3);
+
+          rect.addEventListener('click', function() {
+            that.fireEvent('click');
+          });
         },
 
         setX = function(x) {
@@ -46,7 +53,10 @@ define([], function() {
     this.setX = setX;
     this.setY = setY;
     this.appendTo = appendTo;
+
+    HasEvents.apply(this);
   };
+  TagHandle.prototype = Object.create(HasEvents.prototype);
 
   return TagHandle;
 

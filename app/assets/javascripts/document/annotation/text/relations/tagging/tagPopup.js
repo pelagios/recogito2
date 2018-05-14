@@ -81,9 +81,9 @@ define([
 
         onKeydown = function(e) {
           if (e.which === 27) // Escape
-            cancel();
+            onDelete();
           else if (e.which == 13) // Enter
-            submit();
+            onSubmit();
         };
 
     init();

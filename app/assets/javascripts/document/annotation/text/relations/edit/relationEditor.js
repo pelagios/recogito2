@@ -173,11 +173,11 @@ define([
                 currentConnection.setLabel(tag);
 
                 addOrReplaceRelation(sourceAnnotation, relation);
-                that.fireEvent('updateRelations', sourceAnnotation);
+                that.fireEvent('updateRelations', sourceAnnotation, currentConnection);
 
                 currentConnection = undefined;
               },
-              
+
               onDelete = function() {
                 currentConnection.destroy();
                 currentConnection = undefined;

@@ -43,6 +43,7 @@ define([
                     connection = new Connection(svg, fromNode, toNode);
 
                 connection.setLabel(label);
+                connection.on('click', onConnectionClicked);
                 return connection;
               });
 
@@ -52,6 +53,10 @@ define([
               return arr;
             }
           }, []);
+        },
+
+        onConnectionClicked = function(connection) {
+          console.log('click', connection);
         },
 
         /** Show the relations layer **/
@@ -71,12 +76,20 @@ define([
           connections.forEach(function(connection) {
             connection.recompute();
           });
+        },
+
+        onUpdateRelations = function(annotation, optNewConnection) {
+          if (optNewConnection) {
+            optNewConnection.on('click', onConnectionClicked);
+            connections.push(optNewConnection);
+          }
+          
+          that.fireEvent('updateRelations', annotation);
         };
 
     jQuery(window).on('resize', recomputeAll);
 
-    // Forward editor events to app
-    editor.on('updateRelations', that.forwardEvent('updateRelations'));
+    editor.on('updateRelations', onUpdateRelations);
 
     this.init = init;
     this.show = show;
