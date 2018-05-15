@@ -12,11 +12,11 @@ define([
   var addOrReplaceRelation = function(annotation, relation) {
         if (!annotation.relations) annotation.relations = [];
 
-        var existing = annotation.relations.filter(function(r) {
+        var existing = annotation.relations.find(function(r) {
           return r.relates_to === relation.relates_to;
         });
 
-        if (existing.length > 0)
+        if (existing)
           annotation.relations[annotation.relations.indexOf(existing)] = relation;
         else
           annotation.relations.push(relation);
@@ -71,6 +71,7 @@ define([
         currentEnd,
 
         initHandle = function(label) {
+          if (handle) handle.destroy();
           handle = new TagHandle(label);
           handle.on('click', editRelation); // TODO make dependent on access permissions
           handle.appendTo(svgEl);
