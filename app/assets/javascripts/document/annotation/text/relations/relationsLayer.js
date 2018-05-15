@@ -56,6 +56,19 @@ define([
           });
         },
 
+        /**
+         * Deletes all relations pointing to the given annotation ID (i.e. in case a user
+         * deletes the annotation in the UI).
+         */
+        deleteRelationsTo = function(annotationId) {
+          // Sort of side-effect-ugly but well...
+          connections = connections.filter(function(conn) {
+            var isAffected = conn.getEndAnnotation().annotation_id === annotationId;
+            if (isAffected) conn.destroy();
+            return !isAffected;
+          });
+        },
+
         onUpdateRelations = function(annotation, optNewConnection) {
           if (optNewConnection) {
             optNewConnection.on('click', onConnectionClicked);
@@ -72,6 +85,7 @@ define([
     this.init = init;
     this.show = show;
     this.hide = hide;
+    this.deleteRelationsTo = deleteRelationsTo;
 
     HasEvents.apply(this);
   };

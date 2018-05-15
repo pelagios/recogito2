@@ -272,6 +272,10 @@ define([
           return fromNode.annotation;
         },
 
+        getEndAnnotation = function() {
+          if (toNode) return toNode.annotation;
+        },
+
         destroy = function() {
           svgEl.removeChild(path);
           svgEl.removeChild(startDot);
@@ -298,6 +302,7 @@ define([
 
     this.editRelation = editRelation;
     this.getStartAnnotation = getStartAnnotation;
+    this.getEndAnnotation = getEndAnnotation;
 
     this.destroy = destroy;
 

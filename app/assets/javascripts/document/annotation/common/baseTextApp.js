@@ -110,6 +110,11 @@ define([
           promptReapply();
         },
 
+        onDeleteAnnotation = function(annotation) {
+          relationsLayer.deleteRelationsTo(annotation.annotation_id);
+          self.onDeleteAnnotation(annotation);
+        },
+
         onUpdateRelations = function(annotation) {
           self.upsertAnnotation(annotation);
         },
@@ -136,8 +141,8 @@ define([
     relationsLayer.on('updateRelations', onUpdateRelations);
 
     editor.on('createAnnotation', onCreateAnnotation);
+    editor.on('deleteAnnotation', onDeleteAnnotation);
     editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
-    editor.on('deleteAnnotation', this.onDeleteAnnotation.bind(this));
 
     rangy.init();
 
