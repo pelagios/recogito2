@@ -98,14 +98,15 @@ class AnnotationService @Inject() (
     }
 
   /** Deletes the annotation with the given ID **/
-  def deleteAnnotation(annotationId: UUID, deletedBy: String, deletedAt: DateTime): Future[Option[Annotation]] =
+  def deleteAnnotation(annotationId: UUID, deletedBy: String, deletedAt: DateTime): Future[Option[Annotation]] = {
     findById(annotationId).flatMap(_ match {
       case Some((annotation, _)) =>
         val f = for {
+          relationsUpdated <- removeRelationsTo(annotation.annotationId)
           markerInserted <- insertDeleteMarker(annotation, deletedBy, deletedAt)
           if (markerInserted)
             deleted <- deleteById(annotationId.toString)
-        } yield deleted
+        } yield relationsUpdated && deleted
 
         f.map { success =>
           if (!success) throw new Exception("Error deleting annotation")
@@ -116,7 +117,8 @@ class AnnotationService @Inject() (
         }
 
       case None => Future.successful(None)
-    })
+    }) 
+  }
 
   def countTotal(): Future[Long] =
     es.client execute {
@@ -186,6 +188,25 @@ class AnnotationService @Inject() (
           )
       } limit ES.MAX_SIZE
     } map { _.to[(Annotation, Long)].toSeq.map(_._1) }
+    
+  /** Retrieves annotations carrying relations to the given ID and removes those relations **/
+  def removeRelationsTo(relatedTo: UUID): Future[Boolean] = {
+    // Fetches all annotations carrying relations to the given ID
+    val fAffectedAnnotations = es.client execute {
+      search(ES.RECOGITO / ES.ANNOTATION) query { 
+        termQuery("relations.relates_to" -> relatedTo.toString)
+      } limit ES.MAX_SIZE // Should be safe to assume no more than 10k annotations point here
+    } map { _.to[(Annotation, Long)] }
+
+    // Filters out relations that point to the given ID
+    def removeRelations(annotations: Seq[Annotation]): Seq[Annotation] =
+      annotations.map(removeRelationsTo(_, relatedTo))
+    
+    for {
+      affected <- fAffectedAnnotations
+      failed <- upsertAnnotations(removeRelations(affected.map(_._1)))      
+    } yield (failed.size == 0)
+  }
 
   /** Rolls back the document to the state at the given timestamp **/
   def rollbackToTimestamp(documentId: String, timestamp: DateTime): Future[Boolean] = {

@@ -43,5 +43,8 @@ trait HasAnnotationIndexing {
       }
     })
   }
+  
+  def removeRelationsTo(annotation: Annotation, to: UUID) =
+    annotation.copy(relations = annotation.relations.filter(_.relatesTo != to))
 
 }
