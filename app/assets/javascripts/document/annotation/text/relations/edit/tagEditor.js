@@ -81,7 +81,12 @@ define([
 
         onDelete = function() {
           element.remove();
-          that.fireEvent('delete');
+
+          if (opt_tag)
+            that.fireEvent('delete');
+          else // Delete, but no existing tag = cancel
+            that.fireEvent('cancel');
+
           return false;
         },
 

@@ -244,10 +244,16 @@ define([
                 destroy();
                 removeRelation(sourceAnnotation, toNode.annotation.annotation_id);
                 that.fireEvent('update', sourceAnnotation);
+              },
+
+              onCancel = function() {
+                if (!handle) // New relation - delete connection on cancel
+                  destroy();
               };
 
           editor.on('submit', onSubmit);
           editor.on('delete', onDelete);
+          editor.on('cancel', onCancel);
         },
 
         getRelation = function() {
