@@ -22,6 +22,22 @@ define([
           annotation.relations.push(relation);
       },
 
+      removeRelation = function(annotation, relatesToId) {
+        if (annotation.relations) {
+          var toRemove = annotation.relations.find(function(r) {
+                return r.relates_to === relatesToId;
+              }),
+
+              idxToRemove = (toRemove) ? annotation.relations.indexOf(toRemove) : -1;
+
+          if (idxToRemove > -1)
+            annotation.relations.splice(idxToRemove, 1);
+
+          if (annotation.relations.length === 0)
+            delete annotation.relations;
+        }
+      },
+
       /** Returns a 'graph node' object { annotation: ..., elements: ... } for the given ID **/
       getNode = function(annotationId) {
         var elements = jQuery('*[data-id="' + annotationId + '"]');
@@ -212,20 +228,22 @@ define([
 
         /** Opens the tag editor **/
         editRelation = function() {
-          var editor = new TagEditor(contentEl, currentMidXY),
+          var label = (handle) ? handle.getLabel : undefined,
+
+              editor = new TagEditor(contentEl, currentMidXY, label),
+
+              sourceAnnotation = fromNode.annotation, // shorthand
 
               onSubmit = function(tag) {
-                var sourceAnnotation = fromNode.annotation;
-
                 initHandle(tag);
-
                 addOrReplaceRelation(sourceAnnotation, getRelation());
-                that.fireEvent('update', sourceAnnotation, that);
+                that.fireEvent('update', sourceAnnotation);
               },
 
               onDelete = function() {
                 destroy();
-                that.fireEvent('delete', that);
+                removeRelation(sourceAnnotation, toNode.annotation.annotation_id);
+                that.fireEvent('update', sourceAnnotation);
               };
 
           editor.on('submit', onSubmit);

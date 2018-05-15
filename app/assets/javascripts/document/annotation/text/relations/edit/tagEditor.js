@@ -1,7 +1,8 @@
 define([
   'common/hasEvents',
+  'common/ui/behavior',
   'document/annotation/text/relations/tagging/tagVocabulary'
-], function(HasEvents, Vocabulary) {
+], function(HasEvents, Behavior, Vocabulary) {
 
   /**
    * A hack that patches jQuery, so that contentEditable elements work with typeahead like
@@ -16,7 +17,7 @@ define([
     return original.apply(this, arguments);
   };
 
-  var TagPopup = function(containerEl, position) {
+  var TagPopup = function(containerEl, position, opt_tag) {
 
     var that = this,
 
@@ -50,13 +51,18 @@ define([
 
           element.css({ top: position[1] - 15, left: position[0] });
 
+          if (opt_tag) inputEl.html(opt_tag);
+
           inputEl.keydown(onKeydown);
           inputEl.typeahead({ hint:false },{ source: matcher });
 
           btnDelete.click(onDelete);
           btnOk.click(onSubmit);
 
-          setTimeout(function() { inputEl.focus(); }, 1);
+          setTimeout(function() {
+            if (opt_tag) Behavior.placeCaretAtEnd(inputEl[0]);
+            else inputEl.focus();
+          }, 1);
         },
 
         onSubmit = function() {
@@ -79,11 +85,19 @@ define([
           return false;
         },
 
+        onCancel = function() {
+          element.remove();
+          that.fireEvent('cancel');
+          return false;
+        },
+
         onKeydown = function(e) {
-          if (e.which === 27) // Escape
-            onDelete();
-          else if (e.which == 13) // Enter
+          if (e.which === 13) // Enter = Submit
             onSubmit();
+          else if (e.which === 27 && opt_tag) // Escape on existing tag = Cancel
+            onCancel();
+          else if (e.which == 27) // Escape on new tag = Delete
+            onDelete();
         };
 
     init();

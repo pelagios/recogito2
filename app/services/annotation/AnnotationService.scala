@@ -34,7 +34,7 @@ class AnnotationService @Inject() (
     
     def upsertAnnotation(a: Annotation): Future[Boolean] =
       es.client execute {
-        update(a.annotationId.toString) in ES.RECOGITO / ES.ANNOTATION docAsUpsert a
+        indexInto(ES.RECOGITO / ES.ANNOTATION).doc(a).id(a.annotationId.toString)
       } map { _ => true
       } recover { case t: Throwable =>
         Logger.error(s"Error indexing annotation ${annotation.annotationId}: ${t.getMessage}")

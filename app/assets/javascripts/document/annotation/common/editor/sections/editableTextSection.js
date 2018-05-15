@@ -4,8 +4,9 @@
 define([
   'i18n!common/i18n/document/annotation/nls/editor',
   'common/config',
+  'common/ui/behavior',
   'document/annotation/common/editor/sections/section'
-], function(I18N, Config, Section) {
+], function(I18N, Config, Behavior, Section) {
 
   var EditableTextSection = function(element, annotationBody, opt_menuitems) {
     var self = this,
@@ -94,24 +95,12 @@ define([
     return jQuery('<div/>').text(text).html();
   };
 
-  // Cf. http://stackoverflow.com/questions/13513329/set-cursor-to-the-end-of-contenteditable-div
-  EditableTextSection.prototype.placeCaretAtEnd = function(element) {
-    var range = document.createRange(),
-        selection = window.getSelection();
-
-    range.setStart(element, 1);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-    element.focus();
-  };
-
   EditableTextSection.prototype.makeEditable = function() {
     var self = this;
 
     this.element.addClass('editing');
     this.textEntryDiv.prop('contenteditable', true);
-    this.placeCaretAtEnd(this.textEntryDiv[0]);
+    Behavior.placeCaretAtEnd(this.textEntryDiv[0]);
     this.lastModified.remove();
 
     this.textEntryDiv.keyup(function(e) {

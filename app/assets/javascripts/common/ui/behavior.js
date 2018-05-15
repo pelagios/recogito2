@@ -30,6 +30,17 @@ define(['common/config'], function(Config) {
 
         return false;
       });
+    },
+
+    placeCaretAtEnd : function(element) {
+      var range = document.createRange(),
+          selection = window.getSelection();
+
+      range.setStart(element, 1);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      element.focus();
     }
 
   };

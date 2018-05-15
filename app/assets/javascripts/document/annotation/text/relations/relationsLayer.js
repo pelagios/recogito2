@@ -24,7 +24,9 @@ define([
             if (annotation.relations && annotation.relations.length > 0) {
               // For each annotation that has relations, build the corresponding connections...
               var connections = annotation.relations.map(function(r) {
-                return new Connection(content, svg, annotation, r);
+                var c = new Connection(content, svg, annotation, r);
+                c.on('update', that.forwardEvent('updateRelations'));
+                return c;
               });
 
               // Attach the relations from this annotations to the global list
