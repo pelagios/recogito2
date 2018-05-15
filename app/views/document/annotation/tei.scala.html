@@ -63,17 +63,30 @@
         <li class="group annotation-mode">
           <h3>ANNOTATION MODE:</h3>
           <ul>
-            <li data-mode="NORMAL" class="active"><span class="label">NORMAL</span></li>
+            <li data-mode="NORMAL" class="active">
+              <span class="label">@messages("document.annotation.text.toolbar.mode.normal")</span>
+            </li>
             <li class="quick has-submenu">
-              <span class="label">QUICK</span>
+              <span class="label">@messages("document.annotation.text.toolbar.mode.quick")</span>
               <div class="submenu" style="display:none;">
                 <ul>
-                  <li data-mode="QUICK" data-type="PLACE"><span class="icon">&#xf041;</span> Places</li>
-                  <li data-mode="QUICK" data-type="PERSON"><span class="icon">&#xf007;</span> Persons</li>
-                  <li data-mode="QUICK" data-type="TAGS" class="disabled"><span class="icon">&#xf02c;</span> Tags</li>
+                  <li data-mode="QUICK" data-type="PLACE">
+                    <span class="icon">&#xf041;</span> @messages("document.annotation.text.toolbar.mode.quick.places")
+                  </li>
+                  <li data-mode="QUICK" data-type="PERSON">
+                    <span class="icon">&#xf007;</span> @messages("document.annotation.text.toolbar.mode.quick.persons")
+                  </li>
+                  <li data-mode="QUICK" data-type="TAGS" class="disabled">
+                    <span class="icon">&#xf02c;</span> @messages("document.annotation.text.toolbar.mode.quick.tags")
+                  </li>
                 </ul>
               </div>
             </li>
+            @if(currentUser.isDefined && currentUser.get.featureToggles.contains("relations")) {
+              <li data-mode="RELATIONS">
+                <span class="label">@messages("document.annotation.text.toolbar.mode.relations")
+              </li>
+            }
           </ul>
         </li>
 
@@ -108,7 +121,10 @@
       </ul>
     </div> <!-- .sidebar -->
 
-    <div id="main"><div id="content"></div></div>
+    <div id="main">
+      <div id="content"></div>
+      <svg id="relations"></svg>
+    </div>
 
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
