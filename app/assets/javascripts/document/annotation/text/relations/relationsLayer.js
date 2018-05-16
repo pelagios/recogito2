@@ -22,7 +22,7 @@ define([
          */
         init = function(annotations) {
           if (!Config.writeAccess) jQuery(svg).addClass('readonly');
-          
+
           connections = annotations.reduce(function(arr, annotation) {
             if (annotation.relations && annotation.relations.length > 0) {
               // For each annotation that has relations, build the corresponding connections...
@@ -73,10 +73,8 @@ define([
         },
 
         onUpdateRelations = function(annotation, optNewConnection) {
-          if (optNewConnection) {
-            optNewConnection.on('click', onConnectionClicked);
+          if (optNewConnection)
             connections.push(optNewConnection);
-          }
 
           that.fireEvent('updateRelations', annotation);
         };

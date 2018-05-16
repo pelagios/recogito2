@@ -157,8 +157,8 @@ define([
                   annotation.relations.push(relation);
               },
 
-              onUpdate = function(annotation, connection) {
-                that.fireEvent('updateRelations', annotation);
+              onUpdate = function(annotation) {
+                that.fireEvent('updateRelations', annotation, currentConnection);
                 currentConnection = undefined;
               },
 
@@ -190,7 +190,13 @@ define([
         setEnabled = function(enabled) {
           if (enabled) attachHandlers();
           else detachHandlers();
+        },
+
+        recomputeConnection = function() {
+          if (currentConnection) currentConnection.recompute();
         };
+
+    jQuery(window).on('resize', recomputeConnection);
 
     this.setEnabled = setEnabled;
 
