@@ -21,12 +21,20 @@ svg {
   }
 
   path {
-    stroke:fade(@standard-type, 80%);
-    stroke-width:1.6;
+    stroke:lighten(@standard-type, 10%);
     stroke-linecap:round;
     stroke-linejoin:round;
-    stroke-dasharray:2,3;
     fill:transparent;
+  }
+
+  path.connection {
+    stroke-width:1.6;
+    stroke-dasharray:2,3;
+  }
+
+  path.arrow {
+    stroke-width:1.8;
+    fill:lighten(@standard-type, 25%);
   }
 
   .mid {

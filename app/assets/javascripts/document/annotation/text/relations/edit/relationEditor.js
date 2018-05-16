@@ -161,11 +161,16 @@ define([
               onDelete = function(connection) {
                 currentConnection = undefined;
                 that.fireEvent('delete', connection);
+              },
+
+              onCancel = function() {
+                currentConnection = undefined;
               };
 
           currentConnection.fix();
           currentConnection.on('update', onUpdate);
           currentConnection.on('delete', onDelete);
+          currentConnection.on('cancel', onCancel);
           currentConnection.editRelation();
 
           jQuery(document.body).css('cursor', 'auto');

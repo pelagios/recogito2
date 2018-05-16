@@ -3,67 +3,84 @@ define([
   'document/annotation/text/relations/drawing'
 ], function(HasEvents, Draw) {
 
-  var TagHandle = function(label) {
+  var TagHandle = function(label, svg) {
 
     var that = this,
 
-        svg,
-
         g = document.createElementNS(Draw.SVG_NAMESPACE, 'g'),
-        rect = document.createElementNS(Draw.SVG_NAMESPACE, 'rect'),
-        text = document.createElementNS(Draw.SVG_NAMESPACE, 'text'),
+
+        rect  = document.createElementNS(Draw.SVG_NAMESPACE, 'rect'),
+        text  = document.createElementNS(Draw.SVG_NAMESPACE, 'text'),
+        arrow = document.createElementNS(Draw.SVG_NAMESPACE, 'path'),
+
+        bounds,
 
         init = function() {
-          var bbox;
-
           g.setAttribute('class', 'mid');
 
-          text.setAttribute('dy', 3.5);
           text.innerHTML = label;
+          bounds = text.getBBox();
 
-          bbox = text.getBBox();
+          text.setAttribute('dy', 3.5);
+          text.setAttribute('dx', - Math.round(bounds.width / 2));
 
-          rect.setAttribute('rx', 2);
+          rect.setAttribute('rx', 2); // Rounded corners
           rect.setAttribute('ry', 2);
-          rect.setAttribute('width', Math.round(bbox.width) + 4);
-          rect.setAttribute('height',  Math.round(bbox.height) - 3);
+
+          rect.setAttribute('width', Math.round(bounds.width) + 5);
+          rect.setAttribute('height',  Math.round(bounds.height) - 2);
+
+          arrow.setAttribute('class', 'arrow');
 
           rect.addEventListener('click', function() {
             that.fireEvent('click');
           });
         },
 
-        setXY = function(xy) {
+        setPosition = function(xy, orientation) {
           var x = Math.round(xy[0]) - 0.5,
-              y = Math.round(xy[1]);
+              y = Math.round(xy[1]),
 
-          rect.setAttribute('x', x - 3);
-          rect.setAttribute('y', y - 6);
+              dx = Math.round(bounds.width / 2),
+
+              createArrow = function() {
+                if (orientation === 'left')
+                  return 'M' + (xy[0] - dx - 8) + ',' + (xy[1] - 4) + 'l-7,4l7,4';
+                else if (orientation === 'right')
+                  return 'M' + (xy[0] + dx + 8) + ',' + (xy[1] - 4) + 'l7,4l-7,4';
+                else if (orientation === 'down')
+                  return 'M' + (xy[0] - 4) + ',' + (xy[1] + 12) + 'l4,7l4,-7';
+                else
+                  return 'M' + (xy[0] - 4) + ',' + (xy[1] - 12) + 'l4,-7l4,7';
+              };
+
+          rect.setAttribute('x', x - 3 - dx);
+          rect.setAttribute('y', y - 6.5);
 
           text.setAttribute('x', x);
           text.setAttribute('y', y);
+
+          arrow.setAttribute('d', createArrow());
         },
 
         getLabel = function() {
           return label;
         },
 
-        appendTo = function(svgEl) {
-          svg = svgEl;
-          svg.appendChild(g);
-          init();
-        },
-
         destroy = function() {
-          if (svg) svg.removeChild(g);
+          svg.removeChild(g);
         };
 
+    // Append first and init afterwards, so we can query text width/height
     g.appendChild(rect);
     g.appendChild(text);
+    g.appendChild(arrow);
+    svg.appendChild(g);
 
-    this.setXY = setXY;
+    init();
+
     this.getLabel = getLabel;
-    this.appendTo = appendTo;
+    this.setPosition = setPosition;
     this.destroy = destroy;
 
     HasEvents.apply(this);

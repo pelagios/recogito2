@@ -65,16 +65,15 @@ define([
         // Flag indicating whether the relation is still drawing (floating) or not
         floating,
 
-        handle,
+        handle, arrow,
 
         // [x,y] array or node object
         currentEnd,
 
         initHandle = function(label) {
           if (handle) handle.destroy();
-          handle = new TagHandle(label);
+          handle = new TagHandle(label, svgEl);
           handle.on('click', editRelation); // TODO make dependent on access permissions
-          handle.appendTo(svgEl);
           redraw();
         },
 
@@ -155,6 +154,10 @@ define([
                 midX = (half > Math.abs(deltaX)) ? start[0] + deltaX : start[0] + half * Math.sign(deltaX),
                 midY, // computed later
 
+                orientation = (half > Math.abs(deltaX)) ?
+                  (deltaY > 0) ? 'down' : 'up' :
+                  (deltaX > 0) ? 'right' : 'left',
+
                 d = Draw.LINE_DISTANCE - Draw.BORDER_RADIUS, // Shorthand: vertical straight line length
 
                 // Path that starts at the top edge of the annotation highlight
@@ -207,11 +210,12 @@ define([
 
             if (startsAtTop) path.setAttribute('d', compileTopPath());
             else path.setAttribute('d', compileBottomPath());
+            path.setAttribute('class', 'connection');
 
             currentMidXY = [ midX, midY ];
 
             if (handle)
-              handle.setXY(currentMidXY);
+              handle.setPosition(currentMidXY, orientation);
           }
         },
 
@@ -250,6 +254,7 @@ define([
               onCancel = function() {
                 if (!handle) // New relation - delete connection on cancel
                   destroy();
+                that.fireEvent('cancel');
               };
 
           editor.on('submit', onSubmit);
