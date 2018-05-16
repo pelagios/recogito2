@@ -1,6 +1,41 @@
 define([], function() {
 
-  var toUnionBoundingRects = function(elements) {
+      /** Helper to merge two bounds that have the same height + are exactly consecutive **/
+  var mergeBounds = function(clientBounds) {
+        if (clientBounds.length == 1) return clientBounds; // shortcut
+
+        return clientBounds.reduce(function(merged, bbox) {
+          var previous = (merged.length > 0) ? merged[merged.length - 1] : undefined,
+
+              isConsecutive = function(a, b) {
+                if (a.height === b.height)
+                  return (a.x + a.width === b.x || b.x + b.width === a.x);
+                else
+                  return false;
+              },
+
+              extend = function(a, b) {
+                a.x = Math.min(a.x, b.x);
+                a.left = Math.min(a.left, b.left);
+                a.width = a.width + b.width;
+                a.right = Math.max(a.right + b.right);
+              };
+
+          if (previous) {
+            if (isConsecutive(previous, bbox))
+              extend(previous, bbox);
+            else
+              merged.push(bbox);
+          } else {
+            merged.push(bbox);
+          }
+
+          return merged;
+        }, []);
+      },
+
+      /** Returns a clean list of (merged) DOMRect bounds for the given elements **/
+      toUnionBoundingRects = function(elements) {
         var allRects = elements.toArray().reduce(function(arr, el) {
               var rectList = el.getClientRects(), // Note array-like, but *not* an array (sigh)
                   len = rectList.length, i;
@@ -12,11 +47,10 @@ define([], function() {
               return arr;
             }, []);
 
-        // TODO merge
-
-        return allRects;
+        return mergeBounds(allRects);
       },
 
+      /** Translates DOMRect client bounds to offset bounds within the given container **/
       toOffsetBounds = function(clientBounds, offsetContainer) {
         var offset = offsetContainer.offset(),
             left = Math.round(clientBounds.left - offset.left),
