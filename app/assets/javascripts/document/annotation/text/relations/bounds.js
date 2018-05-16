@@ -68,9 +68,29 @@ define([], function() {
 
   var Bounds = function(elements, offsetContainer) {
 
-    var offsetBounds = toUnionBoundingRects(elements).map(function(clientBounds) {
-          return toOffsetBounds(clientBounds, offsetContainer);
-        }),
+    var offsetBounds,
+
+        recompute = function() {
+          offsetBounds = toUnionBoundingRects(elements).map(function(clientBounds) {
+            return toOffsetBounds(clientBounds, offsetContainer);
+          });
+        },
+
+        getRects = function() {
+          return offsetBounds;
+        },
+
+        getTop = function() {
+          return offsetBounds[0].top;
+        },
+
+        getBottom = function() {
+          return offsetBounds[offsetBounds.length - 1].bottom;
+        },
+
+        getHeight = function() {
+          return getBottom() - getTop();
+        },
 
         getTopHandleXY = function() {
           return [
@@ -87,10 +107,13 @@ define([], function() {
           ];
         };
 
-    this.rects = offsetBounds;
-    this.top = offsetBounds[0].top;
-    this.bottom = offsetBounds[offsetBounds.length - 1].bottom;
-    this.height = this.bottom - this.top;
+    recompute();
+
+    this.recompute = recompute;
+    this.getRects = offsetBounds;
+    this.getTop = getTop;
+    this.getBottom = getBottom;
+    this.getHeight = getHeight;
     this.getTopHandleXY = getTopHandleXY;
     this.getBottomHandleXY = getBottomHandleXY;
   };

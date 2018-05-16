@@ -133,7 +133,7 @@ define([
           if (currentEnd instanceof Array)
             return currentEnd;
           else
-            return (fromBounds.top > toBounds.top) ?
+            return (fromBounds.getTop() > toBounds.getTop()) ?
               toBounds.getBottomHandleXY() : toBounds.getTopHandleXY();
         },
 
@@ -142,7 +142,7 @@ define([
           if (currentEnd) {
             var end = getEndXY(),
 
-                startsAtTop = end[1] <= (fromBounds.top + fromBounds.height / 2),
+                startsAtTop = end[1] <= (fromBounds.getTop() + fromBounds.getHeight() / 2),
 
                 start = (startsAtTop) ?
                   fromBounds.getTopHandleXY() : fromBounds.getBottomHandleXY(),
@@ -225,9 +225,9 @@ define([
          * annotation highlights has changed after a window resize.
          */
         recompute = function() {
-          fromBounds = new Bounds(fromNode.elements, svg);
+          fromBounds.recompute();
           if (currentEnd && currentEnd.elements)
-            toBounds = new Bounds(currentEnd.elements, svg);
+            toBounds.recompute();
           redraw();
         },
 
