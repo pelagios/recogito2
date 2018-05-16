@@ -112,8 +112,12 @@ define([
 
         onMousemove = function(e) {
           if (currentConnection && currentConnection.isFloating()) {
-            if (currentHover) currentConnection.dragTo(currentHover.node);
-            else currentConnection.dragTo([ e.offsetX, e.offsetY ]);
+            if (currentHover)  {
+              currentConnection.dragTo(currentHover.node);
+            } else {
+              var offset = contentEl.offset();
+              currentConnection.dragTo([ e.pageX - offset.left, e.pageY - offset.top ]);
+            }
           }
         },
 
@@ -132,7 +136,7 @@ define([
         /** Start drawing a new connection line **/
         startNewConnection = function(fromNode) {
           currentConnection = new Connection(content, svg, fromNode);
-          jQuery(document.body).css('cursor', 'none');
+          // jQuery(document.body).css('cursor', 'none');
           render();
         },
 

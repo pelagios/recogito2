@@ -11,7 +11,7 @@ define([
         init = function() {
           var bounds = new Bounds(elements, jQuery(svg)),
 
-              svgRects = bounds.rects.map(function(r) {
+              svgRects = bounds.getRects().map(function(r) {
                 var svgRect = document.createElementNS(Draw.SVG_NAMESPACE, 'rect');
                 svgRect.setAttribute('x', r.left - 0.5);
                 svgRect.setAttribute('y', r.top - 0.5);

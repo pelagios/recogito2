@@ -110,7 +110,7 @@ define([], function() {
     recompute();
 
     this.recompute = recompute;
-    this.getRects = offsetBounds;
+    this.getRects = getRects;
     this.getTop = getTop;
     this.getBottom = getBottom;
     this.getHeight = getHeight;
