@@ -81,17 +81,17 @@ define([
         /** Initializes a floating connection from a start node **/
         initFromStartNode = function() {
           fromNode = nodeOrAnnotation;
-          fromBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(fromNode.elements), svg);
+          fromBounds = new Bounds(fromNode.elements, svg);
           floating = true;
         },
 
         /** Initializes a fixed connection from a relation **/
         initFromRelation = function() {
           fromNode = getNode(nodeOrAnnotation.annotation_id);
-          fromBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(fromNode.elements), svg);
+          fromBounds = new Bounds(fromNode.elements, svg);
 
           toNode = getNode(opt_relation.relates_to);
-          toBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(toNode.elements), svg);
+          toBounds = new Bounds(toNode.elements, svg);
 
           currentEnd = toNode;
 
@@ -115,7 +115,7 @@ define([
             currentEnd = xyOrNode;
             if (xyOrNode.elements) {
               toNode = xyOrNode;
-              toBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(xyOrNode.elements), svg);
+              toBounds = new Bounds(xyOrNode.elements, svg);
             }
           }
         },
@@ -135,7 +135,7 @@ define([
             return currentEnd;
           else
             return (fromBounds.top > toBounds.top) ?
-              Bounds.getBottomHandleXY(toBounds) : Bounds.getTopHandleXY(toBounds);
+              toBounds.getBottomHandleXY() : toBounds.getTopHandleXY();
         },
 
         /** Redraws the connection **/
@@ -146,7 +146,7 @@ define([
                 startsAtTop = end[1] <= (fromBounds.top + fromBounds.height / 2),
 
                 start = (startsAtTop) ?
-                  Bounds.getTopHandleXY(fromBounds) : Bounds.getBottomHandleXY(fromBounds),
+                  fromBounds.getTopHandleXY() : fromBounds.getBottomHandleXY(),
 
                 deltaX = end[0] - start[0],
                 deltaY = end[1] - start[1],
@@ -221,9 +221,9 @@ define([
          * annotation highlights has changed after a window resize.
          */
         recompute = function() {
-          fromBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(fromNode.elements), svg);
+          fromBounds = new Bounds(fromNode.elements, svg);
           if (currentEnd && currentEnd.elements)
-            toBounds = Bounds.toOffsetBounds(Bounds.getUnionBounds(currentEnd.elements), svg);
+            toBounds = new Bounds(currentEnd.elements, svg);
           redraw();
         },
 

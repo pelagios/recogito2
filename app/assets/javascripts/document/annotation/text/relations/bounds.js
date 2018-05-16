@@ -1,64 +1,66 @@
 define([], function() {
 
-  return {
+  var toUnionBoundingRects = function(elements) {
+        var allRects = elements.toArray().reduce(function(arr, el) {
+              var rectList = el.getClientRects(), // Note array-like, but *not* an array (sigh)
+                  len = rectList.length, i;
 
-    getUnionBounds : function(elements) {
-      var bounds = elements.toArray().map(function(el) {
-            return el.getBoundingClientRect();
-          }),
+              for (i = 0; i < len; i++) {
+                arr.push(rectList[i]);
+              }
 
-          top = bounds.map(function(b) { return b.top; }),
-          right = bounds.map(function(b) { return b.right; }),
-          bottom = bounds.map(function(b) { return b.bottom; }),
-          left = bounds.map(function(b) { return b.left; }),
+              return arr;
+            }, []);
 
-          minTop = Math.min.apply(null, top),
-          maxRight = Math.max.apply(null, right),
-          maxBottom = Math.min.apply(null, bottom),
-          minLeft = Math.min.apply(null, left);
+        // TODO merge
 
-      return {
-        top   : minTop,
-        right : maxRight,
-        bottom: maxBottom,
-        left  : minLeft,
-        width : maxRight - minLeft,
-        height: maxBottom - minTop
+        return allRects;
+      },
+
+      toOffsetBounds = function(clientBounds, offsetContainer) {
+        var offset = offsetContainer.offset(),
+            left = Math.round(clientBounds.left - offset.left),
+            top = Math.round(clientBounds.top - offset.top + jQuery(window).scrollTop());
+
+        return {
+          left  : left,
+          top   : top,
+          right : Math.round(left + clientBounds.width),
+          bottom: Math.round(top + clientBounds.height),
+          width : Math.round(clientBounds.width),
+          height: Math.round(clientBounds.height)
+        };
       };
-    },
 
-    // Helper to convert client (viewport) bounds to offset bounds
-    toOffsetBounds : function(clientBounds, offsetContainer) {
-      var offset = offsetContainer.offset(),
-          left = Math.round(clientBounds.left - offset.left),
-          top = Math.round(clientBounds.top - offset.top + jQuery(window).scrollTop());
+  var Bounds = function(elements, offsetContainer) {
 
-      return {
-        left  : left,
-        top   : top,
-        right : Math.round(left + clientBounds.width),
-        bottom: Math.round(top + clientBounds.height),
-        width : Math.round(clientBounds.width),
-        height: Math.round(clientBounds.height)
-      };
-    },
+    var offsetBounds = toUnionBoundingRects(elements).map(function(clientBounds) {
+          return toOffsetBounds(clientBounds, offsetContainer);
+        }),
 
-    // Shorthand for getting top handle position on bounds
-    getTopHandleXY : function(bounds) {
-      return [
-        bounds.left + bounds.width / 2 + 0.5,
-        bounds.top
-      ];
-    },
+        getTopHandleXY = function() {
+          return [
+            offsetBounds[0].left + offsetBounds[0].width / 2 + 0.5,
+            offsetBounds[0].top
+          ];
+        },
 
-    // Shorthand for getting bottom handle position on bounds
-    getBottomHandleXY : function(bounds) {
-      return [
-        bounds.left + bounds.width / 2 - 0.5,
-        bounds.bottom
-      ];
-    }
+        getBottomHandleXY = function() {
+          var i = offsetBounds.length - 1;
+          return [
+            offsetBounds[i].left + offsetBounds[i].width / 2 - 0.5,
+            offsetBounds[i].bottom
+          ];
+        };
 
+    this.rects = offsetBounds;
+    this.top = offsetBounds[0].top;
+    this.bottom = offsetBounds[offsetBounds.length - 1].bottom;
+    this.height = this.bottom - this.top;
+    this.getTopHandleXY = getTopHandleXY;
+    this.getBottomHandleXY = getBottomHandleXY;
   };
+
+  return Bounds;
 
 });
