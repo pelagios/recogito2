@@ -1,8 +1,9 @@
 define([
+  'common/config',
   'common/hasEvents',
   'document/annotation/text/relations/edit/relationEditor',
   'document/annotation/text/relations/connection'
-], function(HasEvents, RelationEditor, Connection) {
+], function(Config, HasEvents, RelationEditor, Connection) {
 
   var RelationsLayer = function(content, svg) {
 
@@ -10,7 +11,7 @@ define([
 
         connections = [],
 
-        editor = new RelationEditor(content, svg),
+        editor = (Config.writeAccess) ? new RelationEditor(content, svg) : undefined,
 
         /**
          * Initializes the layer with a list of annotations.
@@ -20,12 +21,14 @@ define([
          * of a relation).
          */
         init = function(annotations) {
+          if (!Config.writeAccess) jQuery(svg).addClass('readonly');
+          
           connections = annotations.reduce(function(arr, annotation) {
             if (annotation.relations && annotation.relations.length > 0) {
               // For each annotation that has relations, build the corresponding connections...
               var connections = annotation.relations.map(function(r) {
                 var c = new Connection(content, svg, annotation, r);
-                c.on('update', that.forwardEvent('updateRelations'));
+                if (Config.writeAccess) c.on('update', that.forwardEvent('updateRelations'));
                 return c;
               });
 
@@ -39,13 +42,13 @@ define([
 
         /** Show the relations layer **/
         show = function() {
-          editor.setEnabled(true); // TODO make dependent on write access rights
+          if (editor) editor.setEnabled(true);
           svg.style.display = 'initial';
         },
 
         /** Hide the relations layer **/
         hide = function() {
-          editor.setEnabled(false); // TODO make dependent on write access rights
+          if (editor) editor.setEnabled(false);
           svg.style.display = 'none';
         },
 
@@ -80,7 +83,7 @@ define([
 
     jQuery(window).on('resize', recomputeAll);
 
-    editor.on('updateRelations', onUpdateRelations);
+    if (editor) editor.on('updateRelations', onUpdateRelations);
 
     this.init = init;
     this.show = show;

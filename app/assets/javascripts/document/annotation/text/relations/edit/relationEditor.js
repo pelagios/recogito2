@@ -136,7 +136,7 @@ define([
         /** Start drawing a new connection line **/
         startNewConnection = function(fromNode) {
           currentConnection = new Connection(content, svg, fromNode);
-          // jQuery(document.body).css('cursor', 'none');
+          jQuery(document.body).css('cursor', 'none');
           render();
         },
 

@@ -1,5 +1,9 @@
 @import "../_autocomplete.less";
 
+svg.readonly .mid rect {
+  pointer-events:none; // Override in case of read-only access
+}
+
 svg {
   position:absolute;
   top:0;

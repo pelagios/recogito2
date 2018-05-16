@@ -73,7 +73,7 @@ define([
         initHandle = function(label) {
           if (handle) handle.destroy();
           handle = new TagHandle(label, svgEl);
-          handle.on('click', editRelation); // TODO make dependent on access permissions
+          if (Config.writeAccess) handle.on('click', editRelation);
           redraw();
         },
 
