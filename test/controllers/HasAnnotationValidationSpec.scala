@@ -13,6 +13,7 @@ import play.api.test.Helpers._
 import scala.io.Source
 import play.api.libs.json.Json
 import services.generated.tables.records.DocumentRecord
+import services.contribution.ContributionAction
 
 class TestAnnotationValidator extends HasAnnotationValidation
 
@@ -112,6 +113,20 @@ class HasAnnotationValidationSpec extends Specification {
       addedComment.affectsItem.itemType must equalTo(COMMENT_BODY)
     }
 
+  }
+  
+  "The fifth test annotation" should {
+    
+    "produce one contribution (add relation)" in {
+      val annotationWithRelation = loadAnnotation("annotation-with-relation.json")
+      val contributions = validator.validateUpdate(annotationWithRelation, Some(annotationBefore), document)
+            
+      contributions.size must equalTo(2)
+      
+      val relationContributions = contributions.filter(_.action == ContributionAction.CREATE_RELATION_BODY)
+      relationContributions.size must equalTo(1)
+    }
+    
   }
 
 }

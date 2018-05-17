@@ -66,6 +66,10 @@ object ItemType extends Enumeration {
   val EVENT_BODY = Value("EVENT_BODY")
   
   val TAG_BODY = Value("TAG_BODY")
+  
+  val RELATION = Value("RELATION")
+  
+  val RELATION_TAG = Value("RELATION_TAG")
 
   def fromBodyType(bodyType: AnnotationBody.Value) = bodyType match {
 
@@ -84,7 +88,7 @@ object ItemType extends Enumeration {
     case AnnotationBody.TAG => TAG_BODY
     
   }
-    
+      
   /** JSON conversion **/
   implicit val itemTypeFormat: Format[ItemType.Value] =
     Format(

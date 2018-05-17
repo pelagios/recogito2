@@ -18,6 +18,10 @@ object ContributionAction extends Enumeration {
   val CONFIRM_BODY           = Value("CONFIRM_BODY")
   val FLAG_BODY              = Value("FLAG_BODY")
   val DELETE_BODY            = Value("DELETE_BODY")
+  
+  val CREATE_RELATION_BODY   = Value("CREATE_RELATION_BODY")
+  val EDIT_RELATION          = Value("EDIT_RELATION_BODY")  
+  val DELETE_RELATION        = Value("DELETE_RELATION")
 
   /** JSON conversion **/
   implicit val contributionActionFormat: Format[ContributionAction.Value] =

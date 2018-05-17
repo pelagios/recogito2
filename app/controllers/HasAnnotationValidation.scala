@@ -1,7 +1,8 @@
 package controllers
 
 import services.ContentType
-import services.annotation.{ Annotation, AnnotationBody, AnnotationStatus }
+import services.annotation.{Annotation, AnnotationBody, AnnotationStatus}
+import services.annotation.relation.Relation
 import services.contribution._
 import services.generated.tables.records.DocumentRecord
 
@@ -100,6 +101,68 @@ trait HasAnnotationValidation {
   /** At the moment, just checks for equal types, but may become more sophisticated in the future **/
   private def isPredecessorTo(before: AnnotationBody, after: AnnotationBody): Boolean =
     after.hasType == before.hasType
+    
+  /** TODO extend to relation-body granularity later **/
+  private def createRelationContribution(annotationAfter: Annotation, createdRelation: Relation, document: DocumentRecord) =
+    Contribution(
+      ContributionAction.CREATE_RELATION_BODY,
+      annotationAfter.lastModifiedBy.get,
+      annotationAfter.lastModifiedAt,
+      Item(
+        ItemType.RELATION_TAG,
+        annotationAfter.annotates.documentId,
+        document.getOwner,
+        Some(annotationAfter.annotates.filepartId),
+        Some(annotationAfter.annotates.contentType),
+        Some(annotationAfter.annotationId),
+        Some(annotationAfter.versionId),
+        None, // valueBefore
+        Some(createdRelation.bodies.map(_.value).mkString)
+      ),
+      Seq.empty[String],
+      getContext(annotationAfter)
+    )
+    
+  private def changeRelationContribution(annotationBefore: Annotation, annotationAfter: Annotation, relationBefore: Relation, relationAfter: Relation, document: DocumentRecord) =
+    Contribution(
+      ContributionAction.EDIT_RELATION,
+      annotationAfter.lastModifiedBy.get,
+      annotationAfter.lastModifiedAt,
+      Item(
+        ItemType.RELATION,
+        annotationAfter.annotates.documentId,
+        document.getOwner,
+        Some(annotationAfter.annotates.filepartId),
+        Some(annotationAfter.annotates.contentType),
+        Some(annotationAfter.annotationId),
+        Some(annotationAfter.versionId),
+        Some(relationBefore.bodies.map(_.value).mkString),
+        Some(relationAfter.bodies.map(_.value).mkString)
+      ),
+      Seq.empty[String],
+      getContext(annotationAfter)
+    )
+    
+  private def deleteRelationContribution(annotationBefore: Annotation, annotationAfter: Annotation, deletedRelation: Relation, document: DocumentRecord) =
+    Contribution(
+      ContributionAction.DELETE_RELATION,
+      annotationAfter.lastModifiedBy.get,
+      annotationAfter.lastModifiedAt,
+      Item(
+        ItemType.RELATION,
+        annotationAfter.annotates.documentId,
+        document.getOwner,
+        Some(annotationAfter.annotates.filepartId),
+        Some(annotationAfter.annotates.contentType),
+        Some(annotationAfter.annotationId),
+        Some(annotationAfter.versionId),
+        // At least currently, bodies have either value or URI - never both
+        Some(deletedRelation.bodies.map(_.value).mkString),
+        None
+      ),
+      Seq.empty[String],
+      getContext(annotationAfter)
+    )
 
   def validateUpdate(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord): Seq[Contribution] = {
 
@@ -113,10 +176,14 @@ trait HasAnnotationValidation {
 
     computeContributions(annotation, previousVersion, document)
   }
-
+  
   /** Performs a 'diff' on the annotations, returning the corresponding Contributions **/
-  def computeContributions(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord) = previousVersion match {
-    case Some(before) => {
+  def computeContributions(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord) =
+    computeBodyContributions(annotation, previousVersion, document) ++
+    computeRelationContributions(annotation, previousVersion, document)
+    
+  def computeBodyContributions(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord) = previousVersion match {
+    case Some(before) =>
       // Body order never changes - so we compare before & after step by step
       annotation.bodies.foldLeft((Seq.empty[Contribution], before.bodies)) { case ((contributions, referenceBodies), nextBodyAfter) =>
         // Leading bodies that are not predecessors to bodies in the new annotation are DELETIONS
@@ -140,16 +207,36 @@ trait HasAnnotationValidation {
             remainingReferenceBodies.tail)
         }
       }._1 // We're not interested in the empty list of 'remaining reference bodies'
-    }
 
-    case None => {
+    case None =>
       if (annotation.lastModifiedBy.isEmpty)
         // We don't count 'contributions' made automatic processes
         // TODO new annotation with no previous version - generate contributions
         Seq.empty[Contribution]
       else
         annotation.bodies.map(body => createBodyContribution(annotation, body, document))
-    }
+  }
+    
+  def computeRelationContributions(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord) = previousVersion match {
+    case Some(before) =>
+      // We'll keep this simple, with just delete/create
+      val deleted = before.relations diff annotation.relations
+      val created = annotation.relations diff before.relations
+      
+      // If adds >= deletes, well treat those as edits
+      val edited = deleted.take(created.size).zip(created)
+      
+      val deleteContribs = deleted.drop(created.size).map(deleteRelationContribution(before, annotation, _, document))
+      val createContribs = created.drop(deleted.size).map(createRelationContribution(annotation, _, document))
+      val editContribs = edited.map { case (relationBefore, relationAfter) => 
+        changeRelationContribution(before, annotation, relationBefore, relationAfter, document)
+      }
+      
+      deleteContribs ++ editContribs ++ createContribs      
+      
+    case None =>
+      // At the moment, this doesn't ever happen. Relations can only be added to existing annotations. But let's keep it, to be sure.
+      annotation.relations.map(createRelationContribution(annotation, _, document))
   }
 
 }
