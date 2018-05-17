@@ -51,6 +51,12 @@ define(['common/utils/placeUtils'], function(PlaceUtils) {
         return user + 'changed ' + itemTypeLabel + ' from ' + uriToLink(valBefore) + ' to ' + uriToLink(valAfter);
       } else if (action === 'DELETE_ANNOTATION') {
         return user + 'deleted annotation <em>&raquo;' + contribution.context + '&laquo;</em>';
+      } else if (action === 'CREATE_RELATION_BODY') {
+        return user + 'created relation <em>&raquo;' + valAfter + '&laquo;</em>';
+      } else if (action === 'EDIT_RELATION_BODY') {
+        return user + 'changed relation from <em>&raquo;' + valBefore + '&laquo;</em> to <em>&raquo;' + valAfter + '&laquo;</em>';
+      } else if (action === 'DELETE_RELATION') {
+        return user + 'deleted relation <em>&raquo;' + valBefore + '&laquo;</em>';
       } else {
         return 'An unknown change happend';
       }
