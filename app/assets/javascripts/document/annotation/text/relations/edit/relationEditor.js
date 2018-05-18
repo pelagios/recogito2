@@ -69,6 +69,7 @@ define([
           contentEl.on('mouseup', onMouseup);
           contentEl.on('mouseover', '.annotation', onEnterAnnotation);
           contentEl.on('mouseleave', '.annotation', onLeaveAnnotation);
+          jQuery(document).on('keydown', onKeydown);
         },
 
         detachHandlers = function() {
@@ -78,6 +79,7 @@ define([
           contentEl.off('mouseup', onMouseup);
           contentEl.off('mouseover', '.annotation', onEnterAnnotation);
           contentEl.off('mouseleave', '.annotation', onLeaveAnnotation);
+          jQuery(document).off('keydown', onKeydown);
         },
 
         /** Drawing code for 'hover emphasis' **/
@@ -130,6 +132,14 @@ define([
             // If this is a different node than the start node, complete the connection
             if (currentHover.annotation !== currentConnection.getStartAnnotation())
               completeConnection(currentHover.node);
+          }
+        },
+
+        onKeydown = function(e) {
+          if (currentConnection && e.which === 27) { // Escape
+            currentConnection.destroy();
+            currentConnection = undefined;
+            jQuery(document.body).css('cursor', 'auto');
           }
         },
 
