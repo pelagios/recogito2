@@ -128,5 +128,33 @@ class HasAnnotationValidationSpec extends Specification {
     }
     
   }
+  
+  "Adding a second relation" should {
+        
+    "produce the correct contribution" in {
+      val withOneRelation = loadAnnotation("annotation-with-relation.json")
+      val withTwoRelations = loadAnnotation("annotation-with-two-relations.json")
+
+      val contributions = validator.validateUpdate(withTwoRelations, Some(withOneRelation), document)
+      
+      contributions.size must equalTo(1)
+      contributions.head.action must equalTo(ContributionAction.CREATE_RELATION_BODY)      
+    }
+    
+  }
+  
+  "Removing the second relation" should {
+    
+    "produce the correct contribution" in {
+      val withOneRelation = loadAnnotation("annotation-with-relation.json")
+      val withTwoRelations = loadAnnotation("annotation-with-two-relations.json")
+      
+      val contributions = validator.validateUpdate(withOneRelation, Some(withTwoRelations), document)
+      
+      contributions.size must equalTo(1)
+      contributions.head.action must equalTo(ContributionAction.DELETE_RELATION)      
+    }
+    
+  }
 
 }

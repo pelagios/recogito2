@@ -18,8 +18,8 @@ case class AnnotationBodyStub(
   def toAnnotationBody(user: String, now: DateTime) =
     AnnotationBody(
       hasType,
-      Some(user),
-      now,
+      Some(lastModifiedBy.getOrElse(user)),
+      lastModifiedAt.getOrElse(now),
       value,
       uri,
       note,

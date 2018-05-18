@@ -12,7 +12,10 @@ case class AnnotationStatusStub(
   setAt: Option[DateTime]) {
   
   def toAnnotationStatus(user: String, now: DateTime) =
-    AnnotationStatus(value, Some(user), now)
+    AnnotationStatus(
+      value,
+      Some(setBy.getOrElse(user)),
+      setAt.getOrElse(now))
 
 }
 

@@ -1,0 +1,47 @@
+{
+  "annotation_id": "7cfa1504-26de-45ef-a590-8b60ea8a60e8",
+  "version_id": "d286c474-5353-43bd-a701-0a00b1e70c4e",
+  "annotates": {
+    "document_id": "98muze1cl3saib",
+    "filepart_id": "f903b736-cae8-4fe3-9bda-01583783548b",
+    "content_type": [ "TEXT", "TEXT_PLAIN" ]
+  },
+  "contributors": [ "rainer" ],
+  "anchor": "char-offset:231",
+  "last_modified_by": "rainer",
+  "last_modified_at": "2016-02-23T18:24:00Z",
+  "bodies": [
+    {
+      "type": "QUOTE",
+      "last_modified_by": "rainer",
+      "last_modified_at": "2016-02-23T18:10:00Z",
+      "value": "London Stansted"
+    },{
+      "type": "PLACE",
+      "last_modified_by": "rainer",
+      "last_modified_at": "2016-02-23T18:24:00Z",
+      "reference": {
+        "uri": "https://www.wikidata.org/wiki/Q8709"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "relates_to": "e99a9f32-3602-4c58-8b92-b2a26eae5ff9",
+      "bodies": [{
+        "type": "TAG",
+        "last_modified_by": "rainer",
+        "last_modified_at": "2018-05-18T09:43:00Z",
+        "value": "anotherRelation"
+      }]
+    }, {
+      "relates_to": "a00566be-c51a-4831-a270-c700f06bc205",
+      "bodies": [{
+        "type": "TAG",
+        "last_modified_by": "rainer",
+        "last_modified_at": "2018-05-07T15:31:00Z",
+        "value": "flyingTo"
+      }]
+    }
+  ]
+}
