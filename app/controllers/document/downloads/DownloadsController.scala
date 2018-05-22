@@ -187,8 +187,14 @@ class DownloadsController @Inject() (
      })     
   }
   
-  def downloadGephiCSV(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
-    relationsToGephiCSV(documentId).map { file =>
+  def downloadGephiNodes(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
+    relationsToGephiNodes(documentId).map { file =>
+      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })    
+    }
+  }
+  
+  def downloadGephiEdges(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
+    relationsToGephiEdges(documentId).map { file =>
       Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })    
     }
   }

@@ -93,17 +93,18 @@
           <h2>Relations</h2>
           <div class="inner">
             <ul>
-              <li>
+              <li class="two-buttons">
                 <div class="description">
-                  <h3>Gephi CSV Edge List</h3>
+                  <h3>Gephi CSV Node/Edge Lists</h3>
                   <p>
-                    The relationships annotated in this document, as a CSV file compatible with
-                    the Edge List format of the <a href="http://gephi.org/" target="_blank">Gephi</a>
+                    The relationships annotated in this document, as CSV files compatible with
+                    the Node and Edge List format of the <a href="http://gephi.org/" target="_blank">Gephi</a>
                     graph visualization platform.
                   </p>
                 </div>
                 <div class="button-container">
-                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadGephiCSV(doc.id)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadGephiNodes(doc.id)" class="btn small"><span class="icon">&#xf019;</span> Nodes</a>
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadGephiEdges(doc.id)" class="btn small"><span class="icon">&#xf019;</span> Edges</a>
                 </div>
               </li>
             </ul>
