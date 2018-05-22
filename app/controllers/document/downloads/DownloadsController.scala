@@ -189,13 +189,13 @@ class DownloadsController @Inject() (
   
   def downloadGephiNodes(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     relationsToGephiNodes(documentId).map { file =>
-      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })    
+      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + "_nodes.csv" })    
     }
   }
   
   def downloadGephiEdges(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     relationsToGephiEdges(documentId).map { file =>
-      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })    
+      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + "_edges.csv" })    
     }
   }
   
