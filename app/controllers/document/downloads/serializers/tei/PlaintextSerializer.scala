@@ -59,15 +59,15 @@ trait PlaintextSerializer extends BaseTEISerializer {
       val baseTag = entityType.map { body =>
         body.hasType match {        
           case PLACE => body.uri match {
-            case Some(uri) => <placeName ref={uri} n={id}>{quote}</placeName>
-            case None => <placeName n={id}>{quote}</placeName>
+            case Some(uri) => <placeName ref={uri} id={id}>{quote}</placeName>
+            case None => <placeName id={id}>{quote}</placeName>
           }
             
           case PERSON =>
-            <persName n={id}>{quote}</persName>
+            <persName id={id}>{quote}</persName>
             
           case EVENT =>
-            <rs n={id} type="event">{quote}</rs>
+            <rs id={id} type="event">{quote}</rs>
         }
       }.getOrElse(<span>{quote}</span>)
       
@@ -98,15 +98,18 @@ trait PlaintextSerializer extends BaseTEISerializer {
       val textsAndParts = maybeTextsAndParts.flatten
       val fAnnotations = annotationService.findByDocId(doc.id)
       
-      fAnnotations.map { t =>
+      fAnnotations.map { t =>        
         val annotationsByPart = t.map(_._1).groupBy(_.annotates.filepartId)
-        textsAndParts.map { case (text, part) =>
+        val divs = textsAndParts.map { case (text, part) =>
           <div><p>{ textpartToTEI(text, annotationsByPart.get(part.getId).getOrElse(Seq.empty[Annotation])) }</p></div>
         }
+        
+        val relations = relationsToList(t.map(_._1))
+        (divs, relations)
       }
     }
-    
-    fDivs.map { divs =>
+        
+    fDivs.map { case (divs, relations) =>
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
           <fileDesc>
@@ -128,7 +131,8 @@ trait PlaintextSerializer extends BaseTEISerializer {
               }              
             </publicationStmt>
             <sourceDesc>
-              <p><link target={ controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL } /></p> 
+              <p><link target={ controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL } /></p>
+              { if (relations.isDefined) relations.get } 
             </sourceDesc>
           </fileDesc>
           <encodingDesc>
