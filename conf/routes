@@ -74,13 +74,14 @@ GET     /document/:id/stats/tags.json                controllers.document.stats.
 GET     /document/:id/stats/tags.csv                 controllers.document.stats.StatsController.getTagsAsCSV(id: String)
 
 GET     /document/:id/downloads                      controllers.document.downloads.DownloadsController.showDownloadOptions(id: String)
-GET     /document/:id/downloads/csv                  controllers.document.downloads.DownloadsController.downloadCSV(id: String, export_tables: Boolean ?= false)
-GET     /document/:id/downloads/ttl                  controllers.document.downloads.DownloadsController.downloadTTL(id: String)
-GET     /document/:id/downloads/rdf                  controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
-GET     /document/:id/downloads/jsonld               controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)
-GET     /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
-POST    /document/:id/downloads/geojson              controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
-GET     /document/:id/downloads/tei                  controllers.document.downloads.DownloadsController.downloadTEI(id: String)
+GET     /document/:id/downloads/annotations/csv      controllers.document.downloads.DownloadsController.downloadCSV(id: String, export_tables: Boolean ?= false)
+GET     /document/:id/downloads/annotations/ttl      controllers.document.downloads.DownloadsController.downloadTTL(id: String)
+GET     /document/:id/downloads/annotations/rdf      controllers.document.downloads.DownloadsController.downloadRDFXML(id: String)
+GET     /document/:id/downloads/annotations/jsonld   controllers.document.downloads.DownloadsController.downloadJSONLD(id: String)
+GET     /document/:id/downloads/places/geojson       controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+POST    /document/:id/downloads/places/geojson       controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+GET     /document/:id/downloads/relations/gephi      controllers.document.downloads.DownloadsController.downloadGephiCSV(id: String)
+GET     /document/:id/downloads/merged/tei           controllers.document.downloads.DownloadsController.downloadTEI(id: String)
 
 GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
 

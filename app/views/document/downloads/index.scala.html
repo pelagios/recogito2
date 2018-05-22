@@ -88,6 +88,29 @@
         </div>
       </div>
 
+      @if(currentUser.isDefined && currentUser.get.featureToggles.contains("relations")) {
+        <div class="panel">
+          <h2>Relations</h2>
+          <div class="inner">
+            <ul>
+              <li>
+                <div class="description">
+                  <h3>Gephi CSV Edge List</h3>
+                  <p>
+                    The relationships annotated in this document, as a CSV file compatible with
+                    the Edge List format of the <a href="http://gephi.org/" target="_blank">Gephi</a>
+                    graph visualization platform.
+                  </p>
+                </div>
+                <div class="button-container">
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadGephiCSV(doc.id)" class="btn small"><span class="icon">&#xf019;</span> CSV</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      }
+
       <div class="panel">
         <h2>Annotated Document</h2>
         <div class="inner">

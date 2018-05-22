@@ -74,6 +74,7 @@ class DownloadsController @Inject() (
     with CSVSerializer
     with GeoJSONSerializer
     with RDFSerializer
+    with RelationsSerializer
     with webannotation.WebAnnotationSerializer
     with tei.PlaintextSerializer
     with tei.TEISerializer 
@@ -184,6 +185,12 @@ class DownloadsController @Inject() (
          else
            Future.successful(Forbidden)
      })     
+  }
+  
+  def downloadGephiCSV(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
+    relationsToGephiCSV(documentId).map { file =>
+      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })    
+    }
   }
   
   def downloadTEI(documentId: String) = silhouette.UserAwareAction.async { implicit request =>

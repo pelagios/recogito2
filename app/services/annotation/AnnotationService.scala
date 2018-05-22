@@ -132,12 +132,27 @@ class AnnotationService @Inject() (
       } limit 0
     } map { _.totalHits }
 
+  /** All annotations on the given document **/
   def findByDocId(id: String, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.document_id" -> id)
       } start offset limit limit
     } map(_.to[(Annotation, Long)].toSeq)
+    
+  
+  /** Only annotations that have relations **/
+  def findWithRelationByDocId(id: String, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[Annotation]] =
+    es.client execute {
+      search(ES.RECOGITO / ES.ANNOTATION) query {
+        boolQuery
+          must (
+            termQuery("annotates.document_id" -> id),
+            existsQuery("relations.relates_to")
+          )
+      }
+    } map { _.to[(Annotation, Long)].toSeq.map(_._1) }
+    
 
   /** Deletes all annotations & version history on a given document **/
   def deleteByDocId(docId: String): Future[Boolean] = {
