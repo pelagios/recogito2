@@ -101,7 +101,8 @@ libraryDependencies ++= Seq(
   "org.webjars.npm" % "chartist" % "0.9.8",
 
   specs2 % Test,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
+  "xmlunit" % "xmlunit" % "1.6" % Test
 )
 
 // Play provides two styles of routers, one expects its actions to be injected, the

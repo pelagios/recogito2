@@ -4,7 +4,9 @@ import controllers.HasTEISnippets
 import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import services.document.{ DocumentInfo, DocumentService }
 import services.generated.tables.records.DocumentFilepartRecord
+import org.joox.Match
 import org.joox.JOOX._
+import org.w3c.dom.Document
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.xml.Elem
 import storage.uploads.Uploads
@@ -22,10 +24,30 @@ trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
     val startOffset = a.substring(a.indexOf("::") + 2, a.indexOf(";")).toInt
     -startOffset
   }
+  
+  /** Returns the sourceDesc element of the TEI document, creating it in place if it doesn't exist already **/
+  private[tei] def getOrCreateSourceDesc(document: Document) = {
+    
+    def getOrCreate(parent: Match, childName: String, prepend: Boolean): Match = {
+      val maybeChild = parent.find(childName)
+      if (maybeChild.isEmpty) {
+        if (prepend) parent.prepend($(s"<${childName}/>"))
+        else parent.append($(s"<${childName}/>"))
+        parent.find(childName)
+      } else {
+        maybeChild
+      }
+    }
+        
+    val doc = $(document)
+    val teiHeader = getOrCreate(doc, "teiHeader", true) // prepend
+    val fileDesc = getOrCreate(teiHeader, "fileDesc", false) // append
+    getOrCreate(fileDesc, "sourceDesc", false) // append
+  }
 
   def partToTEI(part: DocumentFilepartRecord, xml: String, annotations: Seq[Annotation]) = {
     val doc = parseXMLString(xml)
-
+   
     def toTag(annotation: Annotation) = {
       val quote = annotation.bodies.find(_.hasType == AnnotationBody.QUOTE).get.value.get
       val entityBody = annotation.bodies.find(b => ENTITY_TYPES.contains(b.hasType))
@@ -44,7 +66,7 @@ trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
         case _ => doc.createElement("span")
       }
       
-      el.setAttribute("n", annotation.annotationId.toString)
+      el.setAttribute("id", annotation.annotationId.toString)
       if (entityURI.isDefined) el.setAttribute("ref", entityURI.get)
       
       getAttributes(annotation).foreach { case(key, values) =>
@@ -65,6 +87,10 @@ trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
         range.surroundContents(tag)
       }
     }
+    
+    val relations = relationsToList(annotations)
+    if (relations.isDefined)
+      getOrCreateSourceDesc(doc).append($(relations.get.toString))
 
     $(doc).toString
   }
