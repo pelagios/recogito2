@@ -52,6 +52,9 @@ define([
         /** Hide the relations layer **/
         hide = function() {
           if (editor) editor.setEnabled(false);
+          connections.forEach(function(conn) {
+            conn.stopEditing();
+          });
           svg.style.display = 'none';
         },
 

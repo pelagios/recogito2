@@ -70,6 +70,9 @@ define([
         // [x,y] array or node object
         currentEnd,
 
+        // The opened editor (if we're currently editing)
+        editor,
+
         initHandle = function(label) {
           if (handle) handle.destroy();
           handle = new TagHandle(label, svgEl);
@@ -235,31 +238,41 @@ define([
         editRelation = function() {
           var label = (handle) ? handle.getLabel : undefined,
 
-              editor = new TagEditor(contentEl, currentMidXY, label),
-
               sourceAnnotation = fromNode.annotation, // shorthand
 
               onSubmit = function(tag) {
                 initHandle(tag);
                 addOrReplaceRelation(sourceAnnotation, getRelation());
                 that.fireEvent('update', sourceAnnotation);
+                editor = undefined;
               },
 
               onDelete = function() {
                 destroy();
                 removeRelation(sourceAnnotation, toNode.annotation.annotation_id);
                 that.fireEvent('update', sourceAnnotation);
+                editor = undefined;
               },
 
               onCancel = function() {
                 if (!handle) // New relation - delete connection on cancel
                   destroy();
                 that.fireEvent('cancel');
+                editor = undefined;
               };
+
+          editor = new TagEditor(contentEl, currentMidXY, label);
 
           editor.on('submit', onSubmit);
           editor.on('delete', onDelete);
           editor.on('cancel', onCancel);
+        },
+
+        stopEditing = function() {
+          if (editor) {
+            editor.destroy();
+            editor = undefined;
+          }
         },
 
         getRelation = function() {
@@ -286,6 +299,7 @@ define([
           svgEl.removeChild(startDot);
           svgEl.removeChild(endDot);
           if (handle) handle.destroy();
+          if (editor) editor.destroy();
         };
 
     svgEl.appendChild(path);
@@ -306,6 +320,8 @@ define([
     this.recompute = recompute;
 
     this.editRelation = editRelation;
+    this.stopEditing = stopEditing;
+
     this.getStartAnnotation = getStartAnnotation;
     this.getEndAnnotation = getEndAnnotation;
 

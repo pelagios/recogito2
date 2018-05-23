@@ -198,8 +198,15 @@ define([
         },
 
         setEnabled = function(enabled) {
-          if (enabled) attachHandlers();
-          else detachHandlers();
+          if (enabled) {
+            attachHandlers();
+          } else {
+            detachHandlers();
+            if (currentConnection) {
+              currentConnection.destroy();
+              currentConnection = undefined;
+            }
+          }
         },
 
         recomputeConnection = function() {

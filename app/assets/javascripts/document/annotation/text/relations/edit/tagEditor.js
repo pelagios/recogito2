@@ -103,9 +103,15 @@ define([
             onCancel();
           else if (e.which == 27) // Escape on new tag = Delete
             onDelete();
+        },
+
+        destroy = function() {
+          element.remove();
         };
 
     init();
+
+    this.destroy = destroy;
 
     HasEvents.apply(this);
   };
