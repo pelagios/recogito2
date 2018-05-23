@@ -121,6 +121,7 @@ define([
 
         onAnnotationModeChanged = function(m) {
           if (m.mode === 'RELATIONS') {
+            editor.close();
             selector.setEnabled(false);
             relationsLayer.show();
           } else {
