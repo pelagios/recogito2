@@ -2,8 +2,9 @@ define([
   'common/config',
   'common/hasEvents',
   'document/annotation/text/relations/edit/relationEditor',
+  'document/annotation/text/relations/tagging/tagVocabulary',
   'document/annotation/text/relations/connection'
-], function(Config, HasEvents, RelationEditor, Connection) {
+], function(Config, HasEvents, RelationEditor, Vocabulary, Connection) {
 
   var RelationsLayer = function(content, svg) {
 
@@ -38,6 +39,8 @@ define([
               return arr;
             }
           }, []);
+
+          Vocabulary.init(annotations);
         },
 
         /** Show the relations layer **/
