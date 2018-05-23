@@ -4,6 +4,10 @@ define([
   'document/annotation/text/relations/tagging/tagVocabulary'
 ], function(HasEvents, Behavior, Vocabulary) {
 
+  var escapeHtml = function(text) {
+    return jQuery('<div/>').text(text).html();
+  };
+
   /**
    * A hack that patches jQuery, so that contentEditable elements work with typeahead like
    * normal inputs.
@@ -13,7 +17,7 @@ define([
   var original = jQuery.fn.val;
   jQuery.fn.val = function() {
     if ($(this).is('*[contenteditable=true]'))
-      return jQuery.fn.html.apply(this, arguments);
+      return jQuery.fn.text.apply(this, arguments);
     return original.apply(this, arguments);
   };
 
@@ -51,7 +55,7 @@ define([
 
           element.css({ top: position[1] - 15, left: position[0] });
 
-          if (opt_tag) inputEl.html(opt_tag);
+          if (opt_tag) inputEl.html(escapeHtml(opt_tag));
 
           inputEl.keydown(onKeydown);
           inputEl.typeahead({ hint:false },{ source: matcher });

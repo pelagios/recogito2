@@ -3,6 +3,10 @@ define([
   'document/annotation/text/relations/drawing'
 ], function(HasEvents, Draw) {
 
+  var escapeHtml = function(text) {
+        return jQuery('<div/>').text(text).html();
+      };
+
   var TagHandle = function(label, svg) {
 
     var that = this,
@@ -17,8 +21,7 @@ define([
 
         init = function() {
           g.setAttribute('class', 'mid');
-
-          text.innerHTML = label;
+          text.innerHTML = escapeHtml(label);
           bounds = text.getBBox();
 
           text.setAttribute('dy', 3.5);
