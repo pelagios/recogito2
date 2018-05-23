@@ -202,6 +202,7 @@ define([
             attachHandlers();
           } else {
             detachHandlers();
+            jQuery(document.body).css('cursor', 'auto');
             if (currentConnection) {
               currentConnection.destroy();
               currentConnection = undefined;
