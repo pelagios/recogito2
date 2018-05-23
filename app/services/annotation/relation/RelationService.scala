@@ -47,4 +47,15 @@ trait RelationService { self: AnnotationService =>
     } yield (sourceAnnotations ++ additionalDestinations)
   }
   
+  def hasRelations(id: String): Future[Boolean] =
+    es.client execute {
+      search(ES.RECOGITO / ES.ANNOTATION) query {
+        boolQuery
+          must (
+            termQuery("annotates.document_id" -> id),
+            existsQuery("relations.relates_to")
+          )
+      } limit 0
+    } map { _.totalHits > 0 }
+  
 }

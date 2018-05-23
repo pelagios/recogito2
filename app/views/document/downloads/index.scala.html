@@ -2,7 +2,8 @@
   doc: services.document.DocumentInfo,
   currentUser: Option[services.user.User],
   accessLevel: services.document.RuntimeAccessLevel,
-  annotationCount: Long
+  annotationCount: Long,
+  hasRelations: Boolean
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
@@ -88,7 +89,7 @@
         </div>
       </div>
 
-      @if(currentUser.isDefined && currentUser.get.featureToggles.contains("relations")) {
+      @if(hasRelations) {
         <div class="panel">
           <h2>Relations</h2>
           <div class="inner">
