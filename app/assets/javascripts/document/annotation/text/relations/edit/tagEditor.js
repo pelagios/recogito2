@@ -70,8 +70,8 @@ define([
         },
 
         onSubmit = function() {
-          var tag = inputEl.val(),
-              isEmpty = (tag) ? tag.trim() === '' : true;
+          var tag = inputEl.val().trim(),
+              isEmpty = (tag) ? tag === '' : true;
 
           if (isEmpty) {
             onDelete();
