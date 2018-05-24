@@ -128,6 +128,11 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
     val rows = sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
     rows == 1
   }
+  
+  /** Deletes all fileparts for the given upload Id **/
+  def deleteFilePartsByUploadId(uploadId: Int) = db.withTransaction { sql =>
+    sql.deleteFrom(UPLOAD_FILEPART).where(UPLOAD_FILEPART.UPLOAD_ID.equal(uploadId)).execute()
+  }
 
   /** Deletes a filepart - record is removed from the DB, file from the data directory **/
   def deleteFilepartByTitleAndOwner(title: String, owner: String) = db.withTransaction { sql =>

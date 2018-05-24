@@ -149,9 +149,12 @@ class UploadController @Inject() (
         case Some(url) =>
           // Identify type of IIIF URL - image or item manifest? 
           IIIFParser.identify(url).flatMap {  
-            case Success(IIIF.IMAGE_INFO) =>            
-              uploads.insertRemoteFilepart(pendingUpload.getId, username, ContentType.IMAGE_IIIF, url).map(success =>
-              if (success) Ok else InternalServerError)
+            case Success(IIIF.IMAGE_INFO) =>     
+              uploads.deleteFilePartsByUploadId(pendingUpload.getId).flatMap { _ =>
+                uploads.insertRemoteFilepart(pendingUpload.getId, username, ContentType.IMAGE_IIIF, url)
+              }.map { success =>
+                if (success) Ok else InternalServerError
+              }
             
             case Success(IIIF.MANIFEST) =>
               IIIFParser.fetchManifest(url).flatMap { 

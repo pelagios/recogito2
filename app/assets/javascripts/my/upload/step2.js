@@ -137,6 +137,8 @@ require(['common/config'], function(Config) {
               url = iiifInput.val(),
 
               registerSource = function() {
+                indicator.removeClass('ok');
+                indicator.removeClass('failed');
                 indicator.addClass('pending');
                 jsRoutes.controllers.my.UploadController.storeFilepart(Config.owner).ajax({
                   data: { iiif_source: url },
