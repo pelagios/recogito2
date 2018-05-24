@@ -1,0 +1,295 @@
+@()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+@_layout("Recogito in 10 Minutes", "A quick tutorial of Recogito's most important features. Learn how to create annotations, map places and share your work with others.", "en", "tutorial.css") {
+  <h1>10 Minute Tutorial</h1>
+  <span class="sub-title"><span class="icon">&#xf017;</span> A Quick Introduction to Recogito</span>
+} {
+  <div class="toc-wrapper" dir="rtl">
+    <div class="toc">
+      <ul class="internal">
+        <li><a href="#what">ریکوگیتو چیست؟</a></li>
+        <li><a href="#upload">کلیک سند جدید </a></li>
+        <li><a href="#annotations">حاشیه‌نویسی</a></li>
+        <li><a href="#map">Identify and Map Places</a></li>
+        <li><a href="#export">Export Your Data</a></li>
+        <li><a href="#invite">Invite Other Users</a></li>
+      </ul>
+
+      <div class="localized-versions">
+        <h3>This tutorial in</h3>
+        <ul>
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("de")">
+              <img src="@routes.Assets.versioned("images/flags/de.png")"> Deutsch
+            </a>
+          </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("es")">
+              <img src="@routes.Assets.versioned("images/flags/es.png")"> Espa&ntilde;ol
+            </a>
+          </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("fa")">
+              <img src="@routes.Assets.versioned("images/flags/ir.png")"> فارسی
+            </a>
+          </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("it")">
+              <img src="@routes.Assets.versioned("images/flags/it.png")"> Italiano
+            </a>
+          </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("nl")">
+              <img src="@routes.Assets.versioned("images/flags/nl.png")"> Nederlands
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="article" dir="rtl">
+    <div class="inner">
+      <p>
+        این آموزش کوتاه خلاصه‌ای از مهمترین قابلیت‌های ریکوگیتو را در اختیار شما می‌گذارد. یاد خواهید گرفت که چگونه:
+      </p>
+      <ul>
+        <li>متن و عکس بارگذاری کنید.</li>
+        <li>حاشیه‌نویسی کنید.</li>
+        <li>نام مکان‌ها را در متن خود شناسایی و روی نقشه مشخص کنید.</li>
+        <li>برای استفادهٔ دوباره از داده‌های خود در محیطی خارج از ریکوگیتو آنها را دریافت (export) کنید.</li>
+        <li>کاربران دیگر را برای مشارکت دعوت کنید.</li>
+      </ul>
+
+      <h2 id="what">ریکوگیتو چیست؟</h2>
+
+      <p>
+        ریکوگیتو سکویی آنلاین برای حاشیه‌نویسی مشارکتی متن و اسناد است که توسط <a href="http://commons.pelagios.org" target="_blank">Pelagios Commons</a> نگهداری و مدیریت می‌شود. در ریکوگیتو برای کاربران محیط کاری شخصی ایجاد می‌شود که آنان را قادر به جمع آوری و سازماندهی منابع خود—متن، عکس و داده‌هایی در قالب جدول—و مشارکت در حاشیه‌نویسی و تفسیر منابع می‌کند. ریکوگیتو به شما کمک می‌کند تا به‌ راحتی کارهای خود را در وب در معرض دید عموم قرار دهید و نتایج تحقیقات خود را به‌ عنوان داده‌باز (Open Data) ارائه کنید.
+      </p>
+
+      <p>
+        این آموزش مهمترین نکات لازم دربارۀ کار با ریکوگیتو را در اختیار شما قرار می‌دهد. برای تکمیل این آموزش نیاز به ایجاد حساب کاربری و همچنین دو سند نمونه دارید: یک فایل متنی در قالب txtو یک تصویر.
+      </p>
+
+      <p>
+        نکته: این متن آموزشی را در پنجره جداگانه‌ای در مرورگر خود باز کنید تا در زمان پیشرفت کار قادر به دیدن و دنبال‌کردن مراحل آن باشید.
+      </p>
+
+      <p class="tip rtl">
+        در ریکوگیتو اسناد برای سازماندهی منابع شما بکار می‌روند. هر سند می‌تواند شامل چندین فایل باشد. در این قسمت از آموزش ما سندی را با تنها یک فایل متنی بارگذاری می‌کنیم.
+      </p>
+
+      <h2 id="upload">کلیک سند جدید </h2>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/new-document.png")">
+      </p>
+
+      <p>
+        کلیک سند جدید
+      </p>
+
+      <h3>برای بارگذاری سند جدید</h3>
+      <ol>
+        <li>عنوانی برای سند خود وارد کرده و دکمه «بعدی» را کلیک کنید.</li>
+        <li>فایل متنی خود را بارگذاری کنید. می‌توانید این کار را از طریق «انتخاب فایل» و «پیوست» متن و یا با کشیدن و رها‌کردن فایل توسط موس در محدوده بارگذاری انجام دهید.</li>
+        <li>می‌توانید شناسایی موجودیت‌های نامدار (Named Entity Recognition) را بر روی متن اجرا کنید. در این صورت خواهید توانست مکان‌ها و افراد را به صورت خودکار در متن شناسایی کنید و حاشیه‌نویسی اولیه‌ای را انجام دهید. برای اینکار گزینه «حاشیه‌نویسی خودکار» را انتخاب کرده و «بعدی» را کلیک کنید.</li>
+      </ol>
+
+      <p>
+        این مرحله زمانی متناسب با طول متن شما نیاز خواهد داشت. پس از پایان اجرا، «پایان» را کلیک کنید. تبریک می‌گوییم! شما اولین سند خود را وارد محیط کاری خود کرده‌اید.
+      </p>
+
+      <h3>بارگذاری تصویر جدید</h3>
+      <p>
+        برای ایجاد سند جدیدی از تصویر مورد نظر خود مراحل بالا را طی کنید. در مرحله پایانی، تبدیل تصویر بارگذاری شده به تصویری با قابلیت بزرگنمایی زمان کوتاهی به طول می‌انجامد. در این مورد توضیحات بیشتری در ادامه ارائه می‌شود.
+      </p>
+
+      <h2 id="annotations">مرحله ۲. حاشیه‌نویسی</h2>
+      <p>
+        Open your text document by double-clicking it in the list. This will take you to the
+        <strong>annotation view</strong>.
+      </p>
+
+      <h3>To create a text annotation</h3>
+      <p>
+        Select text like you would in any word processing tool: either by clicking and
+        dragging with your mouse, or by double clicking a word. You can add text
+        comments and tags, as well as identify the selected text as a
+        <strong>Place</strong>, <strong>Person</strong> or <strong>Event</strong>. (We will learn
+        more about how to deal with places in a minute.)
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/annotation-view.png")">
+      </p>
+
+      <p>
+        Try experimenting with the annotation editor. You can change or delete each part of an
+        annotation seperately, after you have created it. (To delete a tag, click on it first
+        to get a delete button.) Deleting all parts of an annotation will also remove the highlight
+        from the text.
+      </p>
+
+      <h3>To create an image annotation</h3>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/image-controls.png")" class="inline right">
+        Open your image document. Recogito has a <strong>zoomable view</strong> so you can
+        navigate even highest-resolution images easily. Zoom using your mousewheel or
+        the <span class="key">+</span> <span class="key">-</span> buttons in the upper right
+        corner. On touch devices you can also use a &quot;pinch&quot; gesture. Pan by dragging and
+        releasing the image.
+      </p>
+
+      <p>
+        You can <strong>rotate</strong> the image at arbitrary angles. On a desktop computer,
+        hold <span class="key">SHIFT</span> + <span class="key">Alt</span> while dragging with your
+        mouse. On touch devices, use a pinch gesture. Use the button with the single arrow
+        <span class="key icon">&#xf176;</span> to quickly rotate the image back to its
+        original orientation.
+      </p>
+
+      <p>
+        Let's create our first image annotation. In the toolbar, there is a drop-down menu where you
+        can switch between Recogito's different selection modes: Point, Rectangle and Tilted Box.
+        Select <strong>Point</strong> and create an annotation by clicking somewhere in your image.
+        Switch back to <strong>Move</strong> to resume standard image navigation.
+      </p>
+
+      <p>
+        Now try annotating an area: pick the <strong>Rectangle</strong> tool. Click once to
+        select the starting corner of the area. Then click again for the opposite corner.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/tilted-box.gif")">
+      </p>
+
+      <p id="tilted-box">
+        The <strong>Tilted Box</strong> tool may take a bit more practice: select it from the menu.
+        Click the mouse button once to start drawing the baseline of the box. Click again to set the
+        end of the baseline. Move the mouse to define the height of the box, and click when you are
+        happy with the height.
+      </p>
+
+      <p class="tip">
+        Tip: the Tilted Box tool is especially useful for annotating labels in maps. Because
+        there is an explicit <strong>baseline</strong>, the data you generate
+        will also retain information about the <strong>orientation</strong> of the label.
+      </p>
+
+      <p id="linked-box">
+        <img src="@routes.Assets.versioned("images/help/linked-box.jpg")" class="inline right">
+        The <strong>Linked Box</strong><span class="linked-box"></span> is a modified version of
+        the Tilted Box, designed specifically for maps containing symbols and labels.
+      </p>
+
+      <p>
+        Click once to mark the symbol, then continue to annotate the label as you would with the
+        Tilted Box: click to start the baseline, click again to end it, click once more to set the
+        height. You can modify all points afterwards, by clicking and dragging them.
+      </p>
+
+      <h2 id="map">Step 3. Identify and Map Places</h2>
+
+      <p>
+        You already know how to annotate a word or phrase in a document, and identify it as a
+        reference to a place. Now let's assign this reference to a
+        <a href="@controllers.help.routes.HelpController.showFAQ()#what-is-a-gazetteer">gazetteer</a>,
+        so that Recogito can plot it on the map.
+      </p>
+
+      <p>
+        Click <strong>Place</strong> in the annotation editor. Recogito will attempt to
+        provide an automatic suggestion from
+        <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">its
+        supported gazetteers</a>. You can either <strong>confirm</strong> this suggestion, or
+        try to find a better match in the gazetteer search. If you can't find a suitable match,
+        you also have the option to <strong>flag</strong> this reference, as an indication that
+        no suitable match was available.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/create-text-annotation.gif")">
+      </p>
+
+      <p>
+        To speed up your work, Recogito will automatically search the text for identical phrases
+        and give you the option to <strong>re-apply</strong> the gazetteer assignment to all
+        other matches.
+      </p>
+
+      <h2 id="export">Step 4. Export Your Data</h2>
+
+      <p>
+        Select the <span class="outline-icon">&#xe875;</span> icon in the main navigation bar.
+        This will take you to the available <strong>export options</strong> for your document. In
+        addition to the options listed on this page, you can also download a <strong>backup
+        package</strong> of your work from the <span class="outline-icon">&#xe8c9;</span> document
+        settings page. We recommend to download backups for archiving and as an added security measure.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/export.png")">
+      </p>
+
+      <h2 id="invite">Step 5. Invite Other Users</h2>
+
+      <p>
+        In this final step we are going to learn how you can share your documents with other
+        users on Recogito, so that you can work as a team. Select the
+        <span class="outline-icon">&#xe8c9;</span> icon in the main navigation bar. This will
+        take you to the <strong>Document Settings</strong> page. In the left sidebar,
+        select <strong>Sharing</strong>.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/share.gif")">
+      </p>
+
+      <p>
+        Use the search field at the bottom of the <strong>Collaborators</strong> box to grant a user
+        access to your document. You can choose between different levels of access:
+      </p>
+
+      <ul>
+        <li><strong>Read</strong> allows users to view document and annotations, but not add
+          annotations and comments themselves.</li>
+
+        <li><strong>Write</strong> allows users to view and annotate the document.</li>
+
+        <li><strong>Admin</strong> provides write access, and additionally allows users to
+          edit document metadata, invite other collaborators, and perform administrative
+          actions like downloading backups.</li>
+      </ul>
+
+      <h2>Congratulations!</h2>
+
+      <p>
+        You have successfully made your way through Recogito's most important features.
+        By completing this tutorial, you have learned to:
+      </p>
+
+      <ul>
+        <li>upload documents</li>
+        <li>create annotations on texts and images</li>
+        <li>map place references to gazetteers</li>
+        <li>export your data to different formats</li>
+        <li>invite other users to work with you</li>
+      </ul>
+
+      <p>
+        If you want to learn more and get in touch with our user community, please visit the
+        <a href="http://commons.pelagios.org/groups/recogito-users/" target="_blank">Recogito Users
+        Forum</a>.
+      </p>
+    </div>
+  </div>
+
+  @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/help/tutorial.js")))
+}

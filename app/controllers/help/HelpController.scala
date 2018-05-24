@@ -32,6 +32,7 @@ class HelpController @Inject() (
     lang.toUpperCase match {
       case "DE" => result(views.html.help.tutorial_de())
       case "ES" => result(views.html.help.tutorial_es())
+      case "FA" => result(views.html.help.tutorial_fa())
       case "FR" => result(views.html.help.tutorial_fr())
       case "IT" => result(views.html.help.tutorial_it())
       case "NL" => result(views.html.help.tutorial_nl())
@@ -44,10 +45,10 @@ class HelpController @Inject() (
   def showAbout = Action { implicit request =>
     val imprint = Try(Source.fromFile(env.getFile("conf/imprint"))).toOption
       .map { _.getLines.mkString("\n") }
-    
+
     val adminEmail = config.get[String]("admin.email")
-      
-    result(views.html.help.about(imprint, adminEmail)) 
+
+    result(views.html.help.about(imprint, adminEmail))
   }
 
 }
