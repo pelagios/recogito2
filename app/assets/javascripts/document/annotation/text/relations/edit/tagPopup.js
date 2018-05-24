@@ -33,7 +33,7 @@ define([
               '<span class="icon delete">&#xf014;</span>' +
               '<span class="icon ok">&#xf00c;</span>' +
             '</div>' +
-          '</div>').appendTo(containerEl),
+          '</div>').appendTo(containerEl).hide(),
 
         inputEl = element.find('.input'),
 
@@ -63,6 +63,8 @@ define([
         },
 
         open = function(position, conn) {
+          if (isOpen()) onCancel();
+
           connection = conn;
 
           element.css({ top: position[1] - 15, left: position[0] });
@@ -108,17 +110,24 @@ define([
 
         onCancel = function() {
           element.hide();
-          that.fireEvent('cancel', connection);
+
+          if (connection.isStored())
+            that.fireEvent('cancel', connection);
+          else // Cancel on new connection = Delete
+            onDelete();
+
           return false;
         },
 
         onKeydown = function(e) {
           if (e.which === 13) // Enter = Submit
             onSubmit();
-          else if (e.which === 27 && connection.isStored()) // Escape on stored connection = Cancel
+          else if (e.which === 27)
             onCancel();
-          else if (e.which === 27) // Escape on new connection = Delete
-            onDelete();
+        },
+
+        isOpen = function() {
+          return element.is(':visible');
         },
 
         close = function() {
