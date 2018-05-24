@@ -16,11 +16,23 @@ object IIIFParser {
     case url if url.endsWith("info.json") =>
       Future.successful(Success(IIIF.IMAGE_INFO))
       
-    case url if url.endsWith("manifest") || url.endsWith("manifest.json") =>
+    case url if url.endsWith("manifest") || url.endsWith("manifest.json") => // Assuming presentation manifest as default
       Future.successful(Success(IIIF.MANIFEST))
       
-    // TODO fetch and determine by inspection
-    // case url =>
+    // Fetch and determine by inspection
+    case url if url.endsWith("json") =>
+      ws.url(url).withFollowRedirects(true).get().map { response =>
+        (response.json \ "@type").asOpt[String] match {
+          case Some(_) => Success(IIIF.MANIFEST) 
+          case None => 
+            if ((response.json \ "protocol").as[String].endsWith("api/image"))
+              Success(IIIF.IMAGE_INFO)
+            else
+              Failure(new RuntimeException("Could not identify resource type"))
+        }
+      } recover { case t: Throwable =>
+        Failure(t)
+      }
       
     case _ =>
       Future.successful(Failure(new RuntimeException("Could not identify resource type")))
