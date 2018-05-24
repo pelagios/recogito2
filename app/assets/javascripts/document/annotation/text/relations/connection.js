@@ -1,45 +1,13 @@
 /** A connection is an on-screen representation of a relation **/
 define([
   'common/config',
-  'common/hasEvents',
   'document/annotation/text/relations/bounds',
   'document/annotation/text/relations/drawing',
-  'document/annotation/text/relations/edit/tagEditor',
   'document/annotation/text/relations/tagging/tagHandle'
-], function(Config, HasEvents, Bounds, Draw, TagEditor, TagHandle) {
+], function(Config, Bounds, Draw, TagHandle) {
 
-      /** Helper to add or replace a relation within an annotation **/
-  var addOrReplaceRelation = function(annotation, relation) {
-        if (!annotation.relations) annotation.relations = [];
-
-        var existing = annotation.relations.find(function(r) {
-          return r.relates_to === relation.relates_to;
-        });
-
-        if (existing)
-          annotation.relations[annotation.relations.indexOf(existing)] = relation;
-        else
-          annotation.relations.push(relation);
-      },
-
-      removeRelation = function(annotation, relatesToId) {
-        if (annotation.relations) {
-          var toRemove = annotation.relations.find(function(r) {
-                return r.relates_to === relatesToId;
-              }),
-
-              idxToRemove = (toRemove) ? annotation.relations.indexOf(toRemove) : -1;
-
-          if (idxToRemove > -1)
-            annotation.relations.splice(idxToRemove, 1);
-
-          if (annotation.relations.length === 0)
-            delete annotation.relations;
-        }
-      },
-
-      /** Returns a 'graph node' object { annotation: ..., elements: ... } for the given ID **/
-      getNode = function(annotationId) {
+  /** Returns a 'graph node' object { annotation: ..., elements: ... } for the given ID **/
+  var getNode = function(annotationId) {
         var elements = jQuery('*[data-id="' + annotationId + '"]');
         if (elements.length > 0)
           return {
@@ -48,7 +16,7 @@ define([
           };
       };
 
-  var Connection = function(contentEl, svgEl, nodeOrAnnotation, opt_relation) {
+  var Connection = function(contentEl, svgEl, nodeOrAnnotation, tagPopup, opt_relation) {
 
     var that = this,
 
@@ -65,26 +33,20 @@ define([
         // Flag indicating whether the relation is still drawing (floating) or not
         floating,
 
+        // true if this is a stored connection, false if it was newly drawn
+        stored,
+
         handle, arrow,
 
         // [x,y] array or node object
         currentEnd,
-
-        // The opened editor (if we're currently editing)
-        editor,
-
-        initHandle = function(label) {
-          if (handle) handle.destroy();
-          handle = new TagHandle(label, svgEl);
-          if (Config.writeAccess) handle.on('click', editRelation);
-          redraw();
-        },
 
         /** Initializes a floating connection from a start node **/
         initFromStartNode = function() {
           fromNode = nodeOrAnnotation;
           fromBounds = new Bounds(fromNode.elements, svg);
           floating = true;
+          stored = false;
         },
 
         /** Initializes a fixed connection from a relation **/
@@ -98,9 +60,10 @@ define([
           currentEnd = toNode;
 
           // TODO will only work as long as we allow exactly one TAG body
-          initHandle(opt_relation.bodies[0].value);
+          setLabel(opt_relation.bodies[0].value);
 
           floating = false;
+          stored = true;
         },
 
         // SVG elements
@@ -129,6 +92,14 @@ define([
 
         isFloating = function() {
           return floating;
+        },
+
+        isStored = function() {
+          return stored;
+        },
+
+        setStored = function() {
+          stored = true;
         },
 
         /** Returns the current end [x,y] coords **/
@@ -236,43 +207,11 @@ define([
 
         /** Opens the tag editor **/
         editRelation = function() {
-          var label = (handle) ? handle.getLabel : undefined,
-
-              sourceAnnotation = fromNode.annotation, // shorthand
-
-              onSubmit = function(tag) {
-                initHandle(tag);
-                addOrReplaceRelation(sourceAnnotation, getRelation());
-                that.fireEvent('update', sourceAnnotation);
-                editor = undefined;
-              },
-
-              onDelete = function() {
-                destroy();
-                removeRelation(sourceAnnotation, toNode.annotation.annotation_id);
-                that.fireEvent('update', sourceAnnotation);
-                editor = undefined;
-              },
-
-              onCancel = function() {
-                if (!handle) // New relation - delete connection on cancel
-                  destroy();
-                that.fireEvent('cancel');
-                editor = undefined;
-              };
-
-          editor = new TagEditor(contentEl, currentMidXY, label);
-
-          editor.on('submit', onSubmit);
-          editor.on('delete', onDelete);
-          editor.on('cancel', onCancel);
+          tagPopup.open(currentMidXY, that);
         },
 
         stopEditing = function() {
-          if (editor) {
-            editor.destroy();
-            editor = undefined;
-          }
+          tagPopup.close();
         },
 
         getRelation = function() {
@@ -284,6 +223,17 @@ define([
               value: handle.getLabel()
             }]
           };
+        },
+
+        getLabel = function() {
+          if (handle) return handle.getLabel();
+        },
+
+        setLabel = function(label) {
+          if (handle) handle.destroy();
+          handle = new TagHandle(label, svgEl);
+          if (Config.writeAccess) handle.on('click', editRelation);
+          redraw();
         },
 
         getStartAnnotation = function() {
@@ -299,7 +249,7 @@ define([
           svgEl.removeChild(startDot);
           svgEl.removeChild(endDot);
           if (handle) handle.destroy();
-          if (editor) editor.destroy();
+          tagPopup.close();
         };
 
     svgEl.appendChild(path);
@@ -324,12 +274,15 @@ define([
 
     this.getStartAnnotation = getStartAnnotation;
     this.getEndAnnotation = getEndAnnotation;
+    this.getRelation = getRelation;
+    this.getLabel = getLabel;
+    this.setLabel = setLabel;
+
+    this.isStored = isStored;
+    this.setStored = setStored;
 
     this.destroy = destroy;
-
-    HasEvents.apply(this);
   };
-  Connection.prototype = Object.create(HasEvents.prototype);
 
   return Connection;
 

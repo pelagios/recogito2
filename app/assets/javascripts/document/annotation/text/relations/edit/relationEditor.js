@@ -1,9 +1,8 @@
 define([
   'common/config',
-  'common/hasEvents',
   'document/annotation/text/relations/edit/hoverEmphasis',
   'document/annotation/text/relations/connection'
-], function(Config, HasEvents, HoverEmphasis, Connection) {
+], function(Config, HoverEmphasis, Connection) {
 
       /**
        * Helper: gets all stacked annotation SPANS for an element.
@@ -52,7 +51,7 @@ define([
 
       };
 
-  var RelationEditor = function(content, svg) {
+  var RelationEditor = function(content, svg, tagEditor) {
 
     var that = this,
 
@@ -145,48 +144,16 @@ define([
 
         /** Start drawing a new connection line **/
         startNewConnection = function(fromNode) {
-          currentConnection = new Connection(content, svg, fromNode);
+          currentConnection = new Connection(content, svg, fromNode, tagEditor);
           jQuery(document.body).css('cursor', 'none');
           render();
         },
 
         /** Complete drawing of a new connection **/
         completeConnection = function() {
-
-              // Adds a relation, or replaces an existing one if any exists with the same end node
-          var addOrReplaceRelation = function(annotation, relation) {
-                if (!annotation.relations) annotation.relations = [];
-
-                var existing = annotation.relations.filter(function(r) {
-                  return r.relates_to === relation.relates_to;
-                });
-
-                if (existing.length > 0)
-                  annotation.relations[annotation.relations.indexOf(existing)] = relation;
-                else
-                  annotation.relations.push(relation);
-              },
-
-              onUpdate = function(annotation) {
-                that.fireEvent('updateRelations', annotation, currentConnection);
-                currentConnection = undefined;
-              },
-
-              onDelete = function(connection) {
-                currentConnection = undefined;
-                that.fireEvent('delete', connection);
-              },
-
-              onCancel = function() {
-                currentConnection = undefined;
-              };
-
           currentConnection.fix();
-          currentConnection.on('update', onUpdate);
-          currentConnection.on('delete', onDelete);
-          currentConnection.on('cancel', onCancel);
           currentConnection.editRelation();
-
+          currentConnection = undefined;
           jQuery(document.body).css('cursor', 'auto');
         },
 
@@ -217,10 +184,7 @@ define([
     jQuery(window).on('resize', recomputeConnection);
 
     this.setEnabled = setEnabled;
-
-    HasEvents.apply(this);
   };
-  RelationEditor.prototype = Object.create(HasEvents.prototype);
 
   return RelationEditor;
 

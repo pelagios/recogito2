@@ -123,10 +123,10 @@ define([
           if (m.mode === 'RELATIONS') {
             editor.close();
             selector.setEnabled(false);
-            relationsLayer.show();
+            relationsLayer.setDrawingEnabled(true);
           } else {
             selector.setEnabled(true);
-            relationsLayer.hide();
+            relationsLayer.setDrawingEnabled(false);
             editor.setAnnotationMode(m);
           }
         };

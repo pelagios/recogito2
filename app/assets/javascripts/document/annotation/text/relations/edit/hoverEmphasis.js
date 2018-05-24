@@ -3,7 +3,6 @@ define([
   'document/annotation/text/relations/drawing'
 ], function(Bounds, Draw) {
 
-
   var HoverEmphasis = function(svg, elements) {
 
     var outlines = document.createElementNS(Draw.SVG_NAMESPACE, 'g'),

@@ -4,24 +4,25 @@ define([
   'document/annotation/text/relations/tagging/tagVocabulary'
 ], function(HasEvents, Behavior, Vocabulary) {
 
-  var escapeHtml = function(text) {
-    return jQuery('<div/>').text(text).html();
-  };
+      /**
+       * A hack that patches jQuery, so that contentEditable elements work with typeahead like
+       * normal inputs.
+       *
+       * https://github.com/twitter/typeahead.js/issues/235
+       */
+  var original = jQuery.fn.val,
 
-  /**
-   * A hack that patches jQuery, so that contentEditable elements work with typeahead like
-   * normal inputs.
-   *
-   * https://github.com/twitter/typeahead.js/issues/235
-   */
-  var original = jQuery.fn.val;
+      escapeHtml = function(text) {
+        return jQuery('<div/>').text(text).html();
+      };
+
   jQuery.fn.val = function() {
     if ($(this).is('*[contenteditable=true]'))
       return jQuery.fn.text.apply(this, arguments);
     return original.apply(this, arguments);
   };
 
-  var TagPopup = function(containerEl, position, opt_tag) {
+  var TagPopup = function(containerEl) { //, position, opt_tag) {
 
     var that = this,
 
@@ -39,8 +40,9 @@ define([
         btnDelete = element.find('.delete'),
         btnOk = element.find('.ok'),
 
-        init = function() {
+        connection,
 
+        init = function() {
           // Trivial prefix-based autocomplete matcher
           var matcher = function(query, responseFn) {
                 var matches = [];
@@ -53,20 +55,27 @@ define([
                 responseFn(matches);
               };
 
-          element.css({ top: position[1] - 15, left: position[0] });
-
-          if (opt_tag) inputEl.html(escapeHtml(opt_tag));
-
           inputEl.keydown(onKeydown);
           inputEl.typeahead({ hint:false },{ source: matcher });
 
           btnDelete.click(onDelete);
           btnOk.click(onSubmit);
+        },
 
-          setTimeout(function() {
-            if (opt_tag) Behavior.placeCaretAtEnd(inputEl[0]);
-            else inputEl.focus();
-          }, 1);
+        open = function(position, conn) {
+          connection = conn;
+
+          element.css({ top: position[1] - 15, left: position[0] });
+          element.show();
+
+          inputEl.empty();
+
+          if (conn.isStored()) {
+            inputEl.html(escapeHtml(conn.getLabel()));
+            inputEl.focus();
+          } else {
+            setTimeout(function() { inputEl.focus(); }, 1);
+          }
         },
 
         onSubmit = function() {
@@ -76,46 +85,50 @@ define([
           if (isEmpty) {
             onDelete();
           } else {
+            connection.setLabel(tag);
             Vocabulary.add(tag);
-            element.remove();
-            that.fireEvent('submit', tag);
+            element.hide();
+            that.fireEvent('submit', connection);
             return false;
           }
         },
 
         onDelete = function() {
-          element.remove();
+          element.hide();
 
-          if (opt_tag)
-            that.fireEvent('delete');
-          else // Delete, but no existing tag = cancel
-            that.fireEvent('cancel');
+          if (connection.isStored())
+            that.fireEvent('delete', connection);
+          else // Delete on a new connection = cancel
+            that.fireEvent('cancel', connection);
+
+          connection.destroy();
 
           return false;
         },
 
         onCancel = function() {
-          element.remove();
-          that.fireEvent('cancel');
+          element.hide();
+          that.fireEvent('cancel', connection);
           return false;
         },
 
         onKeydown = function(e) {
           if (e.which === 13) // Enter = Submit
             onSubmit();
-          else if (e.which === 27 && opt_tag) // Escape on existing tag = Cancel
+          else if (e.which === 27 && connection.isStored()) // Escape on stored connection = Cancel
             onCancel();
-          else if (e.which == 27) // Escape on new tag = Delete
+          else if (e.which === 27) // Escape on new connection = Delete
             onDelete();
         },
 
-        destroy = function() {
-          element.remove();
+        close = function() {
+          element.hide();
         };
 
     init();
 
-    this.destroy = destroy;
+    this.open = open;
+    this.close = close;
 
     HasEvents.apply(this);
   };
