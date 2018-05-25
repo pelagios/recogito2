@@ -59,8 +59,8 @@ landing.index.news.text=Thanks to the efforts of our fantastic community, Recogi
   <strong>Italian</strong>? Much of Recogito will now come in proper translation. \
   <strong>Farsi</strong>, <strong>Hebrew</strong> and <strong>Turkish</strong> are in the works, \
   too. And you can help! <a href="mailto:commons@pelagios.org">Drop us a note</a>. Visit our \
-  <a href="https://docs.google.com/spreadsheets/d/1HkpZsVgn_3dQbht9sIXB7hTL4OSrzwxhWlmskVChc7g/edit#gid=0" target="_blank">translation \
-  sheet</a>. Fill some blanks in your language, or add a new one.
+  <a href="https://github.com/pelagios/recogito2/wiki/User-Interface-Translation:-Contributors''-Guide" target="_blank">contributors' \
+  guide</a>. Fill some blanks in your language, or add a new one.
 
 # Tiles
 landing.index.tiles.1.title=Shared Collections
