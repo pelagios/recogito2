@@ -48,6 +48,15 @@ Documentation on how to import gazetteers is [on the Wiki](https://github.com/pe
 * Last but not least: another reminder to remove the default 'recogito' admin user - or at least
   change its password!
 
+## Contributing to development
+
+If you want to contribute to the development of Recogito, do get in touch with us with your ideas
+via [commons@pelagios.org](mailto:commons@pelagios.org). Or want to contribute and don't know where
+to start? The easiest way to get started is by helping out with the translation of the user interface
+and help resources. Check the
+[Wiki](https://github.com/pelagios/recogito2/wiki/User-Interface-Translation:-Contributors'-Guide)
+for more information.
+
 ## License
 
 Recogito is licensed under the terms of the
