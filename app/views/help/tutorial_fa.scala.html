@@ -9,9 +9,9 @@
         <li><a href="#what">ریکوگیتو چیست؟</a></li>
         <li><a href="#upload">کلیک سند جدید </a></li>
         <li><a href="#annotations">حاشیه‌نویسی</a></li>
-        <li><a href="#map">Identify and Map Places</a></li>
-        <li><a href="#export">Export Your Data</a></li>
-        <li><a href="#invite">Invite Other Users</a></li>
+        <li><a href="#map">شناسایی و نگاشت مکان‌ها</a></li>
+        <li><a href="#export">دریافت داده‌ها</a></li>
+        <li><a href="#invite">دعوت از کاربران</a></li>
       </ul>
 
       <div class="localized-versions">
@@ -134,23 +134,15 @@
       </p>
 
       <p>
-        You can <strong>rotate</strong> the image at arbitrary angles. On a desktop computer,
-        hold <span class="key">SHIFT</span> + <span class="key">Alt</span> while dragging with your
-        mouse. On touch devices, use a pinch gesture. Use the button with the single arrow
-        <span class="key icon">&#xf176;</span> to quickly rotate the image back to its
-        original orientation.
+        می‌توانید تصویر را در درجات دلخواه بچرخانید. در کامپیوترهای رومیزی کلید SHIFT + Alt را همزمان با کشیدن موس نگه دارید. در دستگاه‌های لمسی می‌توانید از حرکت "نیشگون" استفاده کنید. با بکاربردن دکمه‌ای که حاوی یک فلش است به سرعت تصویر را به حالت اولیه باز گردانید.
       </p>
 
       <p>
-        Let's create our first image annotation. In the toolbar, there is a drop-down menu where you
-        can switch between Recogito's different selection modes: Point, Rectangle and Tilted Box.
-        Select <strong>Point</strong> and create an annotation by clicking somewhere in your image.
-        Switch back to <strong>Move</strong> to resume standard image navigation.
+        در اینجا اولین حاشیه‌نویسی برای تصویر را ایجاد می‌کنیم. در منوی ابزار یک منوی کرکر‌ه‌ای وجود دارد که با استفاده از آن می‌توانید حالت‌های مختلف انتخاب بخشی از تصویر در ریکوگیتو را تغییر دهید: نقطه، مستطیل و جعبه عنوان گذاری شده. نقط‌ه‌ای را انتخاب کرده و سپس با کلیک بر روی تصویر یادداشتی را ایجاد کنید.  با بازگشت به گزینه حرکت (Move) می‌توانید ناوش اولیه تصویر را بازیابی کنید.
       </p>
 
       <p>
-        Now try annotating an area: pick the <strong>Rectangle</strong> tool. Click once to
-        select the starting corner of the area. Then click again for the opposite corner.
+        حالا ناحیه‌ای از تصویر را حاشیه‌نویسی کنید: ابزار مستطیل را انتخاب کنید. برای انتخاب نقطه شروع ناحیه انتخابی یک بار کلیک کنید و سپس در نقطه پایانی دوباره کلیک کنید.
       </p>
 
       <p>
@@ -158,16 +150,11 @@
       </p>
 
       <p id="tilted-box">
-        The <strong>Tilted Box</strong> tool may take a bit more practice: select it from the menu.
-        Click the mouse button once to start drawing the baseline of the box. Click again to set the
-        end of the baseline. Move the mouse to define the height of the box, and click when you are
-        happy with the height.
+        جعبه عنوان گذاری شده ممکن است تمرین بیشتری نیاز داشته باشد: از منو آن را انتخاب کنید. دکمه موس را کلیک کرده و نگه دارید تا خطوط اصلی جعبه را بکشید. سپس موس را رها کنید. برای تعیین ارتفاع جعبه، موس را حرکت دهید و زمانی که به ارتفاع دلخواه رسیدید کلیک کنید.
       </p>
 
       <p class="tip">
-        Tip: the Tilted Box tool is especially useful for annotating labels in maps. Because
-        there is an explicit <strong>baseline</strong>, the data you generate
-        will also retain information about the <strong>orientation</strong> of the label.
+        نکته: جعبه عنوان گذاری شده بطور خاص برای حاشیه‌نویسی برچسب‌ها در نقشه پرکاربرد است. از آنجا که خطوط اصلی مشخصی وجود دارد، داده‌هایی که تولید می‌کنید اطلاعاتی درمورد جهت قرارگیری برچسب را نیز شامل می‌شود.
       </p>
 
       <p id="linked-box">
@@ -182,23 +169,14 @@
         height. You can modify all points afterwards, by clicking and dragging them.
       </p>
 
-      <h2 id="map">Step 3. Identify and Map Places</h2>
+      <h2 id="map">مرحله ۳: شناسایی و نگاشت مکان‌ها</h2>
 
       <p>
-        You already know how to annotate a word or phrase in a document, and identify it as a
-        reference to a place. Now let's assign this reference to a
-        <a href="@controllers.help.routes.HelpController.showFAQ()#what-is-a-gazetteer">gazetteer</a>,
-        so that Recogito can plot it on the map.
+        تا این مرحله چگونگی حاشیه‌نویسی یک کلمه یا عبارت در یک سند و شناسایی آن بعنوان مرجعی به یک مکان را آموخته‌اید اکنون می‌خواهیم این مرجع را به یک فرهنگ جغرافیایی (gazetteer) ارجاع دهیم بطوریکه ریکوگیتو قادر یه کشیدن و نشان دادن آن مکان بر روی نقشه باشد.
       </p>
 
       <p>
-        Click <strong>Place</strong> in the annotation editor. Recogito will attempt to
-        provide an automatic suggestion from
-        <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">its
-        supported gazetteers</a>. You can either <strong>confirm</strong> this suggestion, or
-        try to find a better match in the gazetteer search. If you can't find a suitable match,
-        you also have the option to <strong>flag</strong> this reference, as an indication that
-        no suitable match was available.
+        مکانی را در ویرایشگر حاشیه‌نویسی کلیک کنید. ریکوگیتو تلاش خواهد کرد تا بطور خودکار پیشنهاداتی را فرهنگ‌های جغرافیایی (gazetteers) مورد پشتیبان خود ارائه کند. شما می‌توانید این پیشنهادها را تائید کنید یا گزینه مناسب تری را در جستجو کنید. در صورتی که مورد مناسبی برای انطباق پیدا نکردید، می‌توانید این مرجع را—بعنوان نشانه‌ای که با هیچ مکانی مطابقت ندارد—با پرچمی‌ علامت گذاری کنید.
       </p>
 
       <p>
@@ -206,33 +184,23 @@
       </p>
 
       <p>
-        To speed up your work, Recogito will automatically search the text for identical phrases
-        and give you the option to <strong>re-apply</strong> the gazetteer assignment to all
-        other matches.
+        برای تسریع کار، ریکوگیتو متن موردنظر را برای عبارات یکسان جستجو کرده و امکان ارجاع دوباره این عبارت به فرهنگ جغرافیایی را برای موارد دیگر فراهم می‌کند.
       </p>
 
-      <h2 id="export">Step 4. Export Your Data</h2>
+      <h2 id="export">مرحله ۴: دریافت داده‌ها</h2>
 
       <p>
-        Select the <span class="outline-icon">&#xe875;</span> icon in the main navigation bar.
-        This will take you to the available <strong>export options</strong> for your document. In
-        addition to the options listed on this page, you can also download a <strong>backup
-        package</strong> of your work from the <span class="outline-icon">&#xe8c9;</span> document
-        settings page. We recommend to download backups for archiving and as an added security measure.
+        شکلک … را در نوار راهبری انتخاب کنید تا گزینه‌های موجود برای دریافت سند را مشاهده کنید. علاوه بر گزینه‌های لیست شده در این صفحه، می‌توایند بسته پشتیبان کار خود را از صفحه تنظیمات سند بارگیری کنید. توصیه می‌کنیم نسخه‌های پشتیبان را جهت بایگانی و بعنوان یک اقدام امنیتی بارگیری کنید.
       </p>
 
       <p>
         <img src="@routes.Assets.versioned("images/help/export.png")">
       </p>
 
-      <h2 id="invite">Step 5. Invite Other Users</h2>
+      <h2 id="invite">مرحله ۵: دعوت از کاربران</h2>
 
       <p>
-        In this final step we are going to learn how you can share your documents with other
-        users on Recogito, so that you can work as a team. Select the
-        <span class="outline-icon">&#xe8c9;</span> icon in the main navigation bar. This will
-        take you to the <strong>Document Settings</strong> page. In the left sidebar,
-        select <strong>Sharing</strong>.
+        در این مرحله پایانی، چگونگی به اشتراک گذاشتن اسناد با سایر کاربران ریکوگیتو را خواهیم آموخت، بطوریکه بتوان در قالب یک تیم همکاری کرد. با اتخاب شکلک … در نوار راهبری اصلی به صفحه تنظیمات سند هدایت می‌شوید. در نوار کناری سمت چپ گزینه «اشتراک گذاری» را انتخاب کنید.
       </p>
 
       <p>
@@ -240,40 +208,33 @@
       </p>
 
       <p>
-        Use the search field at the bottom of the <strong>Collaborators</strong> box to grant a user
-        access to your document. You can choose between different levels of access:
+        برای اختصاص دسترسی اسناد خود به یک کاربر از ابزار جستجو در پایین جعبه «مشارکت کنندگان» استفاده کنید. می‌تواند سطوح مختلف دسترسی را انتخاب کنید:
       </p>
 
       <ul>
-        <li><strong>Read</strong> allows users to view document and annotations, but not add
-          annotations and comments themselves.</li>
+        <li>«خواندن» اجازه مشاهده سند و حاشیه‌نویسی‌ها مربوطه را صادر می‌کند ولی اجازه اضافه کردن حاشیه‌نویسی‌ها و نظرات را به آنها نمی‌دهد.</li>
 
-        <li><strong>Write</strong> allows users to view and annotate the document.</li>
+        <li>«نوشتن» اجازه مشاهده و همچنین حاشیه‌نویسی سند را به کاربران می‌دهد.</li>
 
-        <li><strong>Admin</strong> provides write access, and additionally allows users to
-          edit document metadata, invite other collaborators, and perform administrative
-          actions like downloading backups.</li>
+        <li>«مدیریت» اجازه نوشتن را بهمراه ویرایش فراداده، دعوت از سایر مشارکت‌کنندگان و انجام اعمال مدیریتی مانند بارگیری نسخه‌های پشتیبان را صادر می‌کند. </li>
       </ul>
 
-      <h2>Congratulations!</h2>
+      <h2>تبریک می‌گوییم!</h2>
 
       <p>
-        You have successfully made your way through Recogito's most important features.
-        By completing this tutorial, you have learned to:
+        شما مراحل آموزش مهمترین قابلیت‌های ریکوگیتو را با موفقیت پشت سر گذاشتید. با به پایان رساندن این دوره آموزشی شما آموختید که:
       </p>
 
       <ul>
-        <li>upload documents</li>
-        <li>create annotations on texts and images</li>
-        <li>map place references to gazetteers</li>
-        <li>export your data to different formats</li>
-        <li>invite other users to work with you</li>
+        <li>سندی را بارگذاری کنید</li>
+        <li>حاشیه‌نویسی روی متون و تصاویر را انجام دهید</li>
+        <li>مکان‌ها را به فرهنگ‌های جغرافیایی ارجاع دهید</li>
+        <li>داده‌های خود را در قالب‌های متفاوت دریافت و بارگیری کنید</li>
+        <li>از کاربران دیگر برای همکاری دعوت بعمل آورید</li>
       </ul>
 
       <p>
-        If you want to learn more and get in touch with our user community, please visit the
-        <a href="http://commons.pelagios.org/groups/recogito-users/" target="_blank">Recogito Users
-        Forum</a>.
+        درصورتیکه تمایل به یادگیری بیشتر و تماس با انجمن کاربران، خواهشمند است از انجمن کاربران ریکوگیتو دیدن فرمایید.
       </p>
     </div>
   </div>
