@@ -1,5 +1,5 @@
 define([
-  'i18n!common/i18n/document/annotation/nls/editor',
+  'i18n!common/i18n/document/nls/annotation',
   'common/config',
   'document/annotation/common/editor/sections/section',
   'document/annotation/common/editor/sections/tag/tagAutocomplete'
@@ -14,7 +14,7 @@ define([
     var element = (Config.writeAccess) ? jQuery(
           '<div class="section tags">' +
             '<ul></ul>' +
-            '<input type="text" class="add-tag" placeholder="' + I18N.placeholder_add_tag + '"></input>' +
+            '<input type="text" class="add-tag" placeholder="' + I18N.editor_placeholder_add_tag + '"></input>' +
           '</div>') : jQuery('<div class="section tags readonly"><ul></ul></div>'),
 
         taglist = element.find('ul'),

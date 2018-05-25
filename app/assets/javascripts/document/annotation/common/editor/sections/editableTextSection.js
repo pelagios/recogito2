@@ -2,7 +2,7 @@
  * A base class that encapsulates the common features of comment and transcription sections.
  */
 define([
-  'i18n!common/i18n/document/annotation/nls/editor',
+  'i18n!common/i18n/document/nls/annotation',
   'common/config',
   'common/ui/behavior',
   'document/annotation/common/editor/sections/section'
@@ -18,8 +18,8 @@ define([
 
         dropdownMenu = jQuery(
           '<ul class="edit-dropdown">' +
-            '<li data-fn="edit">' + I18N.dropdown_edit + '</li>' +
-            '<li data-fn="delete">' + I18N.dropdown_delete + '</li>' +
+            '<li data-fn="edit">' + I18N.editor_dropdown_edit + '</li>' +
+            '<li data-fn="delete">' + I18N.editor_dropdown_delete + '</li>' +
           '</ul>'),
 
         toggleEditDropdown = function(e) {

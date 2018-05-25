@@ -5,7 +5,7 @@
  *
  */
 define([
-  'i18n!common/i18n/document/annotation/nls/editor',
+  'i18n!common/i18n/document/nls/annotation',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
@@ -26,17 +26,17 @@ define([
                     '<div class="category-buttons">' +
                       '<div class="category-container">' +
                         '<div class="category place">' +
-                          '<span class="icon">&#xf041;</span> ' + I18N.label_place +
+                          '<span class="icon">&#xf041;</span> ' + I18N.editor_label_place +
                         '</div>' +
                       '</div>' +
                       '<div class="category-container">' +
                         '<div class="category person">' +
-                          '<span class="icon">&#xf007;</span> ' + I18N.label_person +
+                          '<span class="icon">&#xf007;</span> ' + I18N.editor_label_person +
                         '</div>' +
                       '</div>' +
                       '<div class="category-container">' +
                         '<div class="category event">' +
-                          '<span class="icon">&#xf005;</span> ' + I18N.label_event +
+                          '<span class="icon">&#xf005;</span> ' + I18N.editor_label_event +
                         '</div>' +
                       '</div>' +
                     '</div>' +
@@ -44,9 +44,9 @@ define([
                     '<div class="reply-section"></div>' +
                     '<div class="tag-section"></div>' +
                     '<div class="footer">' +
-                      '<button class="btn small outline cancel">Cancel</button>' +
-                      '<button class="btn small outline ok-next">OK &amp Next</button>' +
-                      '<button class="btn small ok">OK</button>' +
+                      '<button class="btn small outline cancel">' + I18N.btn_cancel + '</button>' +
+                      '<button class="btn small outline ok-next">' + I18N.btn_ok_and_next + '</button>' +
+                      '<button class="btn small ok">' + I18N.btn_ok + '</button>' +
                     '</div>' +
                   '</div>' +
                 '</div>');
@@ -65,7 +65,7 @@ define([
         btnOk = element.find('button.ok'),
 
         replyField = new TextEntryField(element.find('.reply-section'), {
-          placeholder : I18N.placeholder_add_comment,
+          placeholder : I18N.editor_placeholder_add_comment,
           cssClass    : 'reply',
           bodyType    : 'COMMENT'
         }),
