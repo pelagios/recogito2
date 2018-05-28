@@ -29,14 +29,18 @@ trait BaseTEISerializer extends BaseSerializer {
       case sourceAnnotations =>
         val relationElements = sourceAnnotations.flatMap { source =>
           source.relations.map { relation =>
-            val name = relation.bodies.map(_.value).mkString
+            val name = relation.bodies.map(_.value.replaceAll(" ", "_")).mkString
             val active = source.annotationId.toString
             val passive = relation.relatesTo.toString
             <relation name={name} active={active} passive={passive} />
           }
         }
         
-        Some(<listRelation>{relationElements}</listRelation>)
+        Some(<ab>
+          <listRelation>
+            {relationElements}
+          </listRelation>
+        </ab>)
     }
   
 }
