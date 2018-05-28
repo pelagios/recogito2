@@ -1,8 +1,10 @@
 package transform.ner
 
+import java.io.File
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
+import org.joox.JOOX._
 import org.pelagios.recogito.sdk.ner.EntityType
 import play.api.test._
 import play.api.test.Helpers._
@@ -14,10 +16,13 @@ class NERServiceSpec extends Specification {
 
   val TEST_TEXT =
     Source.fromFile("test/resources/transform/ner/text-for-ner-01.txt").getLines().mkString("\n")
+    
+  val TEST_TEI = 
+    new File("test/resources/transform/ner/tei-for-ner.tei.xml")
 
-  "The NER parse function" should {
+  "The NER text parse function" should {
 
-    val entities =  NERService.parse(TEST_TEXT)
+    val entities =  NERService.parseText(TEST_TEXT)
     
     "detect 8 Named Entites in the test text" in {
       entities.size must equalTo (8)
@@ -50,6 +55,20 @@ class NERServiceSpec extends Specification {
       })
     }
 
+  }
+  
+  "The NER TEI parse function" should {
+    
+    val enriched = $(NERService.enrichTEI(TEST_TEI))
+    
+    "insert 11 placeName tags" in {
+      enriched.find("placeName").size must equalTo(11) 
+    }
+    
+    "insert 24 persName tags" in {
+      enriched.find("persName").size must equalTo(24)       
+    }
+    
   }
 
 }

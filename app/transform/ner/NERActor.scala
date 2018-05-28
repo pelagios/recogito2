@@ -59,17 +59,29 @@ class NERActor(
     }
     
   /** Select appropriate parser for part content type **/
-  private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) =
+  private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) = {
+    
+    def readFile(): String =
+      Source.fromFile(new File(dir, part.getFile)).getLines.mkString("\n")
+    
     part.getContentType match {
       case t if t == ContentType.TEXT_PLAIN.toString =>
-        val file =  new File(dir, part.getFile)
-        val text = Source.fromFile(file).getLines.mkString("\n")
-        NERService.parse(text)
+        NERService.parseText(readFile())
+        
+      case t if t == ContentType.TEXT_TEIXML =>
+        // For simplicity, NER results are inlined into the TEI document. They
+        // will be extracted (together with all pre-existing tags) in a separate
+        // step, anyway.
+        
+        // NERService.enrichTEI(readFile())
+        
+        Seq.empty[Entity]
 
       case t =>
         Logger.info(s"Skipping NER for file of unsupported type ${t}: ${dir.getName}${File.separator}${part.getFile}")
         Seq.empty[Entity]
     }
+  }
   
   override def getAnchor(resolvable: EntityGeoresolvable, index: Int) =
     "char-offset:" + resolvable.entity.charOffset
