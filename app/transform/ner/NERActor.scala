@@ -61,20 +61,16 @@ class NERActor(
   /** Select appropriate parser for part content type **/
   private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) = {
     
-    def readFile(): String =
-      Source.fromFile(new File(dir, part.getFile)).getLines.mkString("\n")
-    
     part.getContentType match {
       case t if t == ContentType.TEXT_PLAIN.toString =>
-        NERService.parseText(readFile())
+        val text = Source.fromFile(new File(dir, part.getFile)).getLines.mkString("\n")
+        NERService.parseText(text)
         
       case t if t == ContentType.TEXT_TEIXML =>
         // For simplicity, NER results are inlined into the TEI document. They
         // will be extracted (together with all pre-existing tags) in a separate
         // step, anyway.
-        
-        // NERService.enrichTEI(readFile())
-        
+        NERService.enrichTEI(new File(dir, part.getFile))
         Seq.empty[Entity]
 
       case t =>

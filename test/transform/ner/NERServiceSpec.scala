@@ -10,6 +10,9 @@ import play.api.test._
 import play.api.test.Helpers._
 import scala.concurrent.duration._
 import scala.io.Source
+import org.codehaus.plexus.util.StringInputStream
+import java.io.StringWriter
+import java.io.BufferedWriter
 
 @RunWith(classOf[JUnitRunner])
 class NERServiceSpec extends Specification {
@@ -59,7 +62,11 @@ class NERServiceSpec extends Specification {
   
   "The NER TEI parse function" should {
     
-    val enriched = $(NERService.enrichTEI(TEST_TEI))
+    val writer = new StringWriter()
+    NERService.enrichTEI(TEST_TEI, Some(new BufferedWriter(writer)))
+    val enriched = $(writer.toString)
+    
+    println(enriched.toString)
     
     "insert 11 placeName tags" in {
       enriched.find("placeName").size must equalTo(11) 

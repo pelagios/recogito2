@@ -2,7 +2,7 @@ package transform.ner
 
 import akka.actor.ActorSystem
 import akka.routing.RoundRobinPool
-import java.io.File
+import java.io.{File, FileOutputStream, Writer, PrintWriter}
 import javax.inject.{Inject, Singleton}
 import org.joox.JOOX._
 import org.pelagios.recogito.sdk.ner.{Entity, EntityType}
@@ -44,8 +44,8 @@ object NERService {
     * If an outfile is provided, the results will be written there. Otherwise the original XML file
     * is replaced with the enriched one.
     */
-  private[ner] def enrichTEI(file: File, outfile: Option[File] = None): String = {
-    
+  private[ner] def enrichTEI(file: File, writer: Option[Writer] = None) = {
+        
     def flattenTextNodes(node: Node, flattened: Seq[Node] = Seq.empty[Node]): Seq[Node] = {
       if (node.getNodeType == Node.TEXT_NODE) {
         if (node.getNodeValue.trim.isEmpty)
@@ -108,7 +108,13 @@ object NERService {
       parentNode.removeChild(node)
     }
     
-    doc.toString
+    val w = writer match {
+      case Some(w) => w        
+      case None => new PrintWriter(new FileOutputStream(file, false))
+    }
+    
+    w.write(doc.toString)
+    w.close()
   }
     
 }
