@@ -77,7 +77,7 @@ object TEITag {
     val xpathNormalized = xpath.substring(0, xpath.lastIndexOf('/')).toLowerCase
       .replaceAll("\\[1\\]", "") // Selecting first is redundant (and browser clients don't do it)
       
-    "from=" + xpathNormalized + "::" + offset + ";to=" + xpathNormalized + "::" + (offset + quote.size)
+    s"from=${xpathNormalized}::${offset};to=${xpathNormalized}::${offset + quote.size}"
   }
   
   def convert(part: DocumentFilepartRecord, el: Element, ranges: DocumentRange) = {

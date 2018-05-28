@@ -60,13 +60,22 @@ class NERServiceSpec extends Specification {
 
   }
   
-  "The NER TEI parse function" should {
+  "THE NER TEI parsing function" should {
+
+    val entities = NERService.parseTEI(TEST_TEI)
+
+    "work" in {
+      
+      success
+    }
+    
+  }
+  
+  "The NER TEI enrichment function" should {
     
     val writer = new StringWriter()
     NERService.enrichTEI(TEST_TEI, Some(new BufferedWriter(writer)))
     val enriched = $(writer.toString)
-    
-    println(enriched.toString)
     
     "insert 11 placeName tags" in {
       enriched.find("placeName").size must equalTo(11) 
