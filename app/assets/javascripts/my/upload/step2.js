@@ -49,8 +49,7 @@ require(['common/config'], function(Config) {
           var uploadsInList = jQuery('.dz-preview'),
               textUploads = jQuery.grep(uploadsInList, function(el) {
                 var contentType = jQuery(el).data('type');
-                // Note: we don't currently support NER for TEI text
-                return contentType && contentType.indexOf('TEXT_PLAIN') === 0;
+                return contentType && contentType.indexOf('TEXT_') === 0;
               });
 
           return textUploads.length > 0;
