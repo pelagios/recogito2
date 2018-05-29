@@ -1,3 +1,5 @@
+@import "_anim.less";
+
 #dropzone {
   box-sizing:border-box;
   margin:20px 0.4% 20px 2px;
@@ -187,6 +189,41 @@
     display:none;
     margin-left:165px;
     line-height:42px;
+
+    // Temporary
+    position:relative;
+    .new-tei-ner {
+      position:absolute;
+      text-align:center;
+      top:-48px;
+      left:-10px;
+      width:150px;
+      display:none;
+
+      .inner {
+        width:100%;
+        padding:5px;
+        background-color:yellow;
+        font-size:15px;
+        .rounded-corners(4px);
+        .box-shadow(2px, 2px, 24px, rgba(0, 0, 0, 0.25));
+
+        * { vertical-align:bottom; }
+      }
+
+      .inner::after {
+        content:'';
+        position:absolute;
+        bottom:-10px;
+        left:65px;
+        width:0;
+        height:0;
+        border-left:10px solid transparent;
+        border-right:10px solid transparent;
+        border-top:10px solid yellow;
+      }
+
+    }
 
     .whats-this {
       color:@lightgrey-type;

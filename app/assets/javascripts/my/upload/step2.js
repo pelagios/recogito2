@@ -55,6 +55,17 @@ require(['common/config'], function(Config) {
           return textUploads.length > 0;
         },
 
+        /** Temporary **/
+        doUploadsIncludeTEI = function() {
+          var uploadsInList = jQuery('.dz-preview'),
+              textUploads = jQuery.grep(uploadsInList, function(el) {
+                var contentType = jQuery(el).data('type');
+                return contentType && contentType.indexOf('TEXT_TEIXML') === 0;
+              });
+
+          return textUploads.length > 0;
+        },
+
         /** Returns true if there are un-uploaded files in the list **/
         areUploadsPending = function() {
           // Note: we're setting 'data-type' after upload - querying this seems
@@ -90,7 +101,6 @@ require(['common/config'], function(Config) {
             jQuery('input.next').prop('disabled', true);
 
           // NER panel is visible only if >0 text uploads in list
-
           if (!isNerPanelVisible && uploadsIncludeTexts) {
             // Hidden but needs to be visible: restore checkbox state and show
             nerCheckbox.prop('checked', nerCheckboxState);
@@ -101,6 +111,10 @@ require(['common/config'], function(Config) {
             nerPanel.hide();
             nerCheckbox.prop('checked', false);
           }
+
+          // Temporary
+          if (doUploadsIncludeTEI() && !nerPanel.find('.new-tei-ner').is(':visible'))
+            nerPanel.find('.new-tei-ner').show();
         },
 
         /** Handles clicks on the trashcan icon next to each upload **/
