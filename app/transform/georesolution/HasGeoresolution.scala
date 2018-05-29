@@ -18,16 +18,18 @@ trait Georesolvable {
   
   val toponym: String
   
+  val anchor: String
+  
   val coord: Option[Coordinate]
   
 }
 
 object Georesolvable {
   
-  private[Georesolvable] class DefaultGeoresolvable(val toponym: String, val coord: Option[Coordinate]) extends Georesolvable
+  private[Georesolvable] class DefaultGeoresolvable(val toponym: String, val anchor: String, val coord: Option[Coordinate]) extends Georesolvable
  
-  def apply(toponym: String, coord: Option[Coordinate]) =
-    new DefaultGeoresolvable(toponym, coord)
+  def apply(toponym: String, anchor: String, coord: Option[Coordinate]) =
+    new DefaultGeoresolvable(toponym, anchor, coord)
   
 }
 
@@ -37,7 +39,7 @@ trait HasGeoresolution {
   
   type T <: Georesolvable
   
-  def getAnchor(resolvable: T, index: Int): String
+  // def getAnchor(resolvable: T, index: Int): String
     
   protected def resolve(
       document: DocumentRecord,
@@ -108,7 +110,7 @@ trait HasGeoresolution {
       UUID.randomUUID,
       AnnotatedObject(documentId, partId, contentType),
       Seq.empty[String], // no contributors
-      getAnchor(resolvable, index),
+      resolvable.anchor,
       None, // no last modifying user
       now,
       Seq(

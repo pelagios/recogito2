@@ -16,7 +16,7 @@ import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord
 import transform.georesolution.{Georesolvable, HasGeoresolution}
 import transform.WorkerActor
 
-case class EntityGeoresolvable(entity: Entity) extends Georesolvable {
+case class EntityResolvable(entity: Entity, val anchor: String) extends Georesolvable {
   val toponym = entity.chars
   val coord = None
 }
@@ -27,7 +27,7 @@ class NERActor(
   implicit val entityService: EntityService
 ) extends WorkerActor(NERService.TASK_TYPE, taskService) with HasGeoresolution {
   
-  type T = EntityGeoresolvable
+  type T = EntityResolvable
   
   private implicit val ctx = context.dispatcher
   
@@ -39,15 +39,15 @@ class NERActor(
       Logger.info(s"NER completed on ${part.getId}")
       taskService.updateProgress(taskId, 50)
       
-      val places = phrases.filter(_.entityType == EntityType.LOCATION).map(e => Some(EntityGeoresolvable(e)))
-      val persons = phrases.filter(_.entityType == EntityType.PERSON)     
+      val places = phrases.filter(_.entity.entityType == EntityType.LOCATION).map(Some(_))
+      val persons = phrases.filter(_.entity.entityType == EntityType.PERSON)     
       
       resolve(doc, part, places, places.size, taskId, (50, 80))
       
-      val fInsertPeople = annotationService.upsertAnnotations(persons.map { entity => 
+      val fInsertPeople = annotationService.upsertAnnotations(persons.map { r => 
         Annotation
-          .on(part, "char-offset:" + entity.charOffset)
-          .withBody(AnnotationBody.quoteBody(entity.chars))
+          .on(part, r.anchor)
+          .withBody(AnnotationBody.quoteBody(r.entity.chars))
           .withBody(AnnotationBody.personBody())
       })
       Await.result(fInsertPeople, 20.minutes)
@@ -63,22 +63,22 @@ class NERActor(
     ContentType.withName(part.getContentType) match {
       case Some(t) if t == ContentType.TEXT_PLAIN =>
         val text = Source.fromFile(new File(dir, part.getFile)).getLines.mkString("\n")
-        NERService.parseText(text)
+        val entities = NERService.parseText(text)
+        entities.map(e => EntityResolvable(e, s"char-offset:${e.charOffset}"))
         
       case Some(t) if t == ContentType.TEXT_TEIXML =>
         // For simplicity, NER results are inlined into the TEI document. They
         // will be extracted (together with all pre-existing tags) in a separate
         // step, anyway.
-        NERService.enrichTEI(new File(dir, part.getFile))
-        Seq.empty[Entity]
+        val entitiesAndAnchors = NERService.parseTEI(new File(dir, part.getFile))
+        entitiesAndAnchors.map { case (e, anchor) => 
+          EntityResolvable(e, anchor)
+        }
 
       case _ =>
         Logger.info(s"Skipping NER for file of unsupported type ${part.getContentType}: ${dir.getName}${File.separator}${part.getFile}")
-        Seq.empty[Entity]
+        Seq.empty[EntityResolvable]
     }
-  
-  override def getAnchor(resolvable: EntityGeoresolvable, index: Int) =
-    "char-offset:" + resolvable.entity.charOffset
   
 }
 

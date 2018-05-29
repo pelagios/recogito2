@@ -4,6 +4,7 @@ import java.io.{File, FileOutputStream, Writer, PrintWriter}
 import org.joox.JOOX._
 import org.pelagios.recogito.sdk.ner.{Entity, EntityType}
 import org.w3c.dom.Node
+import org.w3c.dom.ranges.DocumentRange
 
 trait HasTEIParsing {
   
@@ -22,29 +23,35 @@ trait HasTEIParsing {
   }
 
   /** NER-parses TEI **/
-  private[ner] def parseTEI(file: File): Seq[Entity] = {
-    val textElem = $(file).find("text")
-    val textNodes = flattenTextNodes(textElem.get(0))
+  private[ner] def parseTEI(file: File): Seq[(Entity, String)] = {    
+    val tei = $(file)
+    val textElement = tei.find("text").get(0)
+    val textNodes = flattenTextNodes(textElement)
+
+    val ranges = tei.document().asInstanceOf[DocumentRange]
     
-    textNodes.foldLeft(Seq.empty[Entity]) { case (allEntities, textNode) =>
-      val xpath = $(textNode.getParentNode).xpath()
-      val normalized = xpath
-        .substring(0, xpath.lastIndexOf('/')).toLowerCase
-        .replaceAll("\\[1\\]", "")
+    textNodes.foldLeft(Seq.empty[(Entity, String)]) { case (allEntities, textNode) =>
+      val parentNode = textNode.getParentNode
+      val xpath = $(parentNode).xpath()
+      val normalized = xpath.toLowerCase.replaceAll("\\[1\\]", "")
         
       val entities = NERService.parseText(textNode.getNodeValue)
-      
-      val anchors = entities.map { e =>
-        s"from=${normalized}::${e.charOffset};to=${normalized}::${e.charOffset + e.chars.size}"
+            
+      allEntities ++ entities.map { e => 
+        val rangeBefore = ranges.createRange()
+        rangeBefore.setStart(parentNode, 0)
+        rangeBefore.setEnd(textNode, e.charOffset)
+        
+        val offset = rangeBefore.toString.size
+        
+        val anchor = s"from=${normalized}::${offset};to=${normalized}::${offset + e.chars.size}"
+        (e, anchor)
       }
-      
-      println(anchors)
-      
-      allEntities ++ entities
+    } filter { case (e, anchor) =>
+      // Bit of a hack, but we need to filter all annotations inside existing place/persNames, since these will
+      // be removed in the import stage
+      !(anchor.contains("placename") || anchor.contains("persname")) 
     }
-    
-    
-    Seq.empty[Entity]
   }
   
   /** Parses the TEI, enriching the original XML with the result <placeName> and <persName> tags.  

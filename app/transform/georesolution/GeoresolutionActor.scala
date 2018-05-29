@@ -45,6 +45,7 @@ class GeoresolutionActor(
     val lonColumn = args.get("lon_column").map(_.toInt)
     val hasCoordHint = latColumn.isDefined && lonColumn.isDefined
     
+    var counter = -1
     new File(dir, part.getFile).asCsvReader[List[String]](config).map {
       case Success(line) =>
         val toponym = line(toponymColumn).trim()        
@@ -61,7 +62,8 @@ class GeoresolutionActor(
               None
             }
           
-          Some(Georesolvable(toponym, coord))
+          counter += 1
+          Some(Georesolvable(toponym, s"row:{counter}", coord))
         } else {
           None
         }
@@ -69,8 +71,6 @@ class GeoresolutionActor(
       case _ => None
     }
   }
-  
-  override def getAnchor(resolvable: Georesolvable, index: Int) = "row:" + index
   
 }
 
