@@ -23,7 +23,7 @@ class NERService @Inject() (
   NERActor.props(taskService, annotationService, entityService), 10  
 )
 
-object NERService extends HasTEIParsing {
+object NERService extends HasTeiNER {
 
   val TASK_TYPE = TaskType("NER")
   

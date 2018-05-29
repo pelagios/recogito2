@@ -236,7 +236,7 @@ class UploadController @Inject() (
             // TODO this bit should be cleaned up
 
             // Apply NER if requested
-            val applyNER = true // checkParamValue("apply-ner", "on")
+            val applyNER = checkParamValue("apply-ner", "on")
             if (applyNER) {
               nerService.spawnTask(doc, docParts)
               runningTasks.append(NERService.TASK_TYPE)

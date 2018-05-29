@@ -60,17 +60,6 @@ class NERServiceSpec extends Specification {
 
   }
   
-  "THE NER TEI parsing function" should {
-
-    val entities = NERService.parseTEI(TEST_TEI)
-
-    "work" in {
-      
-      success
-    }
-    
-  }
-  
   "The NER TEI enrichment function" should {
     
     val writer = new StringWriter()
