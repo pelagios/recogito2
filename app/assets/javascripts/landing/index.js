@@ -48,8 +48,8 @@ require([], function() {
             },
             position: 'bottom-left',
             content: {
-              message: 'Recogito uses a cookie to remember your login state. The cookie is cleared from your browser when you log out.',
-              href: '/help/about#cookies'
+              message: 'Recogito uses a cookie to keep you logged in. The cookie is cleared from your browser when you log out.',
+              href: '/help/privacy'
             }
           });
         };
