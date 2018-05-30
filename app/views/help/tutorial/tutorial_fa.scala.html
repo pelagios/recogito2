@@ -1,5 +1,5 @@
 @()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
-@_layout("Recogito in 10 Minutes", "A quick tutorial of Recogito's most important features. Learn how to create annotations, map places and share your work with others.", "en", "tutorial.css") {
+@views.html.help._layout("Recogito in 10 Minutes", "A quick tutorial of Recogito's most important features. Learn how to create annotations, map places and share your work with others.", "en", "tutorial.css") {
   <h1>10 Minute Tutorial</h1>
   <span class="sub-title"><span class="icon">&#xf017;</span> A Quick Introduction to Recogito</span>
 } {
@@ -18,31 +18,31 @@
         <h3>This tutorial in</h3>
         <ul>
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("de")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("de")">
               <img src="@routes.Assets.versioned("images/flags/de.png")"> Deutsch
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showTutorial()">
+            <a href="@controllers.help.routes.HelpController.tutorial()">
               <img src="@routes.Assets.versioned("images/flags/en_uk.png")"> English
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("es")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("es")">
               <img src="@routes.Assets.versioned("images/flags/es.png")"> Espa&ntilde;ol
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("it")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("it")">
               <img src="@routes.Assets.versioned("images/flags/it.png")"> Italiano
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("nl")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("nl")">
               <img src="@routes.Assets.versioned("images/flags/nl.png")"> Nederlands
             </a>
           </li>
@@ -51,7 +51,7 @@
     </div>
   </div>
 
-  <div class="article" dir="rtl">
+  <div class="article has-sidebar" dir="rtl">
     <div class="inner">
       <p>
         این آموزش کوتاه خلاصه‌ای از مهمترین قابلیت‌های ریکوگیتو را در اختیار شما می‌گذارد. یاد خواهید گرفت که چگونه:

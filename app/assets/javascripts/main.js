@@ -21,6 +21,7 @@ require.config({
     { name : 'document/settings/sharing' },
     { name : 'document/stats/tags' },
     { name : 'help/tutorial'},
+    { name : 'help/articles'},
     { name : 'landing/index' },
     { name : 'my/settings/account' },
     { name : 'my/upload/step1' },

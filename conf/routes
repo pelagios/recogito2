@@ -24,10 +24,12 @@ GET     /status                                      controllers.landing.StatusC
 # Help area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /help/about                                  controllers.help.HelpController.showAbout
-GET     /help/faq                                    controllers.help.HelpController.showFAQ
-GET     /help/tutorial                               controllers.help.HelpController.showTutorial
-GET     /help/:lang/tutorial                         controllers.help.HelpController.showLocalizedTutorial(lang: String)
+GET     /help/about                                  controllers.help.HelpController.about
+GET     /help/faq                                    controllers.help.HelpController.faq
+GET     /help/privacy                                controllers.help.HelpController.privacy
+GET     /help/terms                                  controllers.help.HelpController.terms
+GET     /help/tutorial                               controllers.help.HelpController.tutorial
+GET     /help/:lang/tutorial                         controllers.help.HelpController.localizedTutorial(lang: String)
 GET     /help                                        controllers.help.HelpController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

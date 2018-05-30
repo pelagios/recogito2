@@ -1,9 +1,13 @@
-@import "../_globals.less";
-
 html, body {
   font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size:17px;
   line-height:150%;
+  height:100%;
+}
+
+.container {
+  min-height:100%;
+  position:relative;
 }
 
 .inner {
@@ -11,7 +15,7 @@ html, body {
   margin:0 auto;
 }
 
-.page-header {
+.help-header {
   height:95px;
 
   .logo {
@@ -112,7 +116,7 @@ html, body {
 
   ul {
     margin:0;
-    padding:0 0 20px 0;
+    padding:0 0 30px 0;
     list-style:none;
   }
 
@@ -128,8 +132,8 @@ html, body {
   }
 
   li:hover::before {
-    padding-left:3px;
-    padding-right:2px;
+    padding-left:2px;
+    padding-right:3px;
   }
 
   a {
@@ -140,7 +144,7 @@ html, body {
 }
 
 .article {
-  padding:20px 0 120px 0;
+  padding:30px 0 170px 0;
 
   h2, h3 {
     font-family:PTSansNarrow;
@@ -182,6 +186,27 @@ html, body {
     .rounded-corners(2px);
   }
 
+  .anchor-link {
+    position:relative;
+    bottom:3px;
+    text-decoration:none;
+    font-size:19px;
+    width:22px;
+    height:20px;
+    padding-left:5px;
+    margin-left:-27px;
+    display:none;
+    color:lighten(@lightgrey-type, 20%);
+  }
+
+  .anchor-link:hover {
+    color:lighten(@lightgrey-type, 20%);
+  }
+
+  h2:hover .anchor-link {
+    display:inline-block;
+  }
+
 }
 
 .footer {
@@ -204,6 +229,7 @@ html, body {
     top:35px;
     padding:0;
     margin:0;
+    z-index:1;
   }
 
   .info {
@@ -215,6 +241,7 @@ html, body {
     left:0;
     font-size:20px;
     text-align:center;
+    z-index:0;
   }
 
   .nav {

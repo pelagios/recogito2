@@ -1,9 +1,14 @@
-@()(implicit request: RequestHeader)
-@_layout("FAQ | Recogito", "Frequently Asked Questions", "en", "help.css") {
+@()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+@_layout(
+  "FAQ",
+  "Recogito FAQ",
+  "Frequently Asked Questions",
+  "en"
+) {
   <h1>Frequently Asked Questions</h1>
 } {
   <div class="article">
-    <div class="inner">
+    <div class="inner clickable-anchors">
       <h2 id="supported-formats">What kind of documents can I upload?</h2>
       <p>Presently, Recogito supports:</p>
       <ul>
@@ -143,4 +148,7 @@
       }
     </div>
   </div>
+
+  @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/help/articles.js")))
 }

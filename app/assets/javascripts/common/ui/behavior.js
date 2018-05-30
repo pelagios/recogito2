@@ -41,6 +41,12 @@ define(['common/config'], function(Config) {
       selection.removeAllRanges();
       selection.addRange(range);
       element.focus();
+    },
+
+    makeAnchorsClickable : function() {
+      jQuery('.clickable-anchors *[id]').each(function() {
+        jQuery(this).prepend(jQuery('<a href="#' + this.id + '" class="icon anchor-link">&#xf0c1;</a>'));
+      });
     }
 
   };

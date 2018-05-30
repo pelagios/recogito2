@@ -1,5 +1,5 @@
 @()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
-@_layout("Recogito in 10 Minutes", "A quick tutorial of Recogito's most important features. Learn how to create annotations, map places and share your work with others.", "en", "tutorial.css") {
+@views.html.help._layout("Recogito in 10 Minutes", "A quick tutorial of Recogito's most important features. Learn how to create annotations, map places and share your work with others.", "en", "tutorial.css") {
   <h1>10 Minute Tutorial</h1>
   <span class="sub-title"><span class="icon">&#xf017;</span> A Quick Introduction to Recogito</span>
 } {
@@ -18,31 +18,31 @@
         <h3>This tutorial in</h3>
         <ul>
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("de")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("de")">
               <img src="@routes.Assets.versioned("images/flags/de.png")"> Deutsch
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("es")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("es")">
               <img src="@routes.Assets.versioned("images/flags/es.png")"> Espa&ntilde;ol
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("fa")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("fa")">
               <img src="@routes.Assets.versioned("images/flags/ir.png")"> فارسی
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("it")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("it")">
               <img src="@routes.Assets.versioned("images/flags/it.png")"> Italiano
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("nl")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("nl")">
               <img src="@routes.Assets.versioned("images/flags/nl.png")"> Nederlands
             </a>
           </li>
@@ -51,7 +51,7 @@
     </div>
   </div>
 
-  <div class="article">
+  <div class="article has-sidebar">
     <div class="inner">
       <p>
         This quick tutorial will give you an overview of Recogito's most important features.
@@ -225,14 +225,14 @@
       <p>
         You already know how to annotate a word or phrase in a document, and identify it as a
         reference to a place. Now let's assign this reference to a
-        <a href="@controllers.help.routes.HelpController.showFAQ()#what-is-a-gazetteer">gazetteer</a>,
+        <a href="@controllers.help.routes.HelpController.faq()#what-is-a-gazetteer">gazetteer</a>,
         so that Recogito can plot it on the map.
       </p>
 
       <p>
         Click <strong>Place</strong> in the annotation editor. Recogito will attempt to
         provide an automatic suggestion from
-        <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">its
+        <a href="@controllers.help.routes.HelpController.faq()#available-gazetteers">its
         supported gazetteers</a>. You can either <strong>confirm</strong> this suggestion, or
         try to find a better match in the gazetteer search. If you can't find a suitable match,
         you also have the option to <strong>flag</strong> this reference, as an indication that

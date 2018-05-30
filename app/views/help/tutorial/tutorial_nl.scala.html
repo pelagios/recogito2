@@ -1,5 +1,5 @@
 @()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
-@_layout("Een korte introductie tot Recogito", "Deze korte tutorial geeft een overzicht van de belangrijkste features van Recogito.", "nl", "tutorial.css") {
+@views.html.help._layout("Een korte introductie tot Recogito", "Deze korte tutorial geeft een overzicht van de belangrijkste features van Recogito.", "nl", "tutorial.css") {
   <h1>10 Minute Tutorial</h1>
   <span class="sub-title"><span class="icon">&#xf017;</span> Een korte introductie tot Recogito</span>
 } {
@@ -18,31 +18,31 @@
         <h3>This tutorial in</h3>
         <ul>
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("de")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("de")">
               <img src="@routes.Assets.versioned("images/flags/de.png")"> Deutsch
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showTutorial()">
+            <a href="@controllers.help.routes.HelpController.tutorial()">
               <img src="@routes.Assets.versioned("images/flags/en_uk.png")"> English
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("es")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("es")">
               <img src="@routes.Assets.versioned("images/flags/es.png")"> Espa&ntilde;ol
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("fa")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("fa")">
               <img src="@routes.Assets.versioned("images/flags/ir.png")"> فارسی
             </a>
           </li>
 
           <li>
-            <a href="@controllers.help.routes.HelpController.showLocalizedTutorial("it")">
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("it")">
               <img src="@routes.Assets.versioned("images/flags/it.png")"> Italiano
             </a>
           </li>
@@ -51,7 +51,7 @@
     </div>
   </div>
 
-  <div class="article">
+  <div class="article has-sidebar">
     <div class="inner">
       <p>
         Deze korte tutorial geeft een overzicht van de belangrijkste features van Recogito.
@@ -216,14 +216,14 @@
       <p>
         In Stap 1 is behandeld hoe woorden of woordgroepen in een document geannoteerd en als
         plaats gemarkeerd kunnen worden. In deze stap leren we hoe deze referentie aan een
-        <a href="@controllers.help.routes.HelpController.showFAQ()#what-is-a-gazetteer">gazetteer</a>
+        <a href="@controllers.help.routes.HelpController.faq()#what-is-a-gazetteer">gazetteer</a>
         te koppelen zodat Recogito deze op een kaart kan laten zien.
       </p>
 
       <p>
         Klik op <strong>Plaats</strong> in de annotatie-editor. Recogito zal proberen een
         automatische suggestie te geven uit de
-        <a href="@controllers.help.routes.HelpController.showFAQ()#available-gazetteers">ondersteunde
+        <a href="@controllers.help.routes.HelpController.faq()#available-gazetteers">ondersteunde
         gazetteers</a>. Deze suggestie kan <strong>bevestigd</strong> worden, of een betere
         suggestie kan gevonden worden in de gazetteer zoekfunctie. Als er geen geschikte match
         beschikbaar is, geeft Recogito de mogelijkheid om te markeren dat er geen geschikte

@@ -141,34 +141,58 @@ h3 {
 
 .footer {
   width:100%;
-  height:120px;
   background-color:@nightsky-type;
   color:#fff;
-  -webkit-font-smoothing: antialiased;
-  font-size:16px;
+  font-size:17px;
 
   .inner {
     padding:20px 0;
+    height:80px;
+  }
+
+  .info, .social, .nav {
+    display:block;
+    position:absolute;
+    top:35px;
+    padding:0;
+    margin:0;
+    z-index:1;
+  }
+
+  .info {
+    left:0;
+    width:320px;
+  }
+
+  .social, .nav {
+    right:0;
+    top:45px;
+
+    a {
+      color:#fff;
+      padding:0 10px;
+    }
+
+  }
+
+  .social {
+    left:0;
+    font-size:20px;
+    text-align:center;
+    z-index:0;
+  }
+
+  ul {
+    list-style:none;
+  }
+
+  li {
+    display:inline;
   }
 
   a {
     color:desaturate(lighten(@nightsky, 30%), 20%);
-  }
-
-  .developed-by {
-    width:580px;
-  }
-
-  .logo {
-    position:absolute;
-    top:22px;
-    right:5px;
-
-    img {
-      width:177px;
-      height:70px;
-    }
-
+    text-decoration:none;
   }
 
 }

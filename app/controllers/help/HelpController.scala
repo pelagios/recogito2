@@ -19,38 +19,33 @@ class HelpController @Inject() (
     implicit val webjars: WebJarsUtil
   ) extends AbstractController(components) with HasVisitLogging {
 
+  private val adminEmail = config.get[String]("admin.email")
+  private val imprint =
+    Try(Source.fromFile(env.getFile("conf/imprint"))).toOption.map { _.getLines.mkString("\n") }
+
   private def result(template: HtmlFormat.Appendable)(implicit request: RequestHeader) = {
     logPageView()
     Ok(template)
   }
 
-  def index = Action { implicit request =>
-    result(views.html.help.index())
-  }
-
-  def showTutorial  = Action { implicit request => result(views.html.help.tutorial()) }
-
-  def showLocalizedTutorial(lang: String) = Action { implicit request =>
+  def localizedTutorial(lang: String) = Action { implicit request =>
     lang.toUpperCase match {
-      case "DE" => result(views.html.help.tutorial_de())
-      case "ES" => result(views.html.help.tutorial_es())
-      case "FA" => result(views.html.help.tutorial_fa())
-      case "FR" => result(views.html.help.tutorial_fr())
-      case "IT" => result(views.html.help.tutorial_it())
-      case "NL" => result(views.html.help.tutorial_nl())
+      case "DE" => result(views.html.help.tutorial.tutorial_de())
+      case "ES" => result(views.html.help.tutorial.tutorial_es())
+      case "FA" => result(views.html.help.tutorial.tutorial_fa())
+      case "FR" => result(views.html.help.tutorial.tutorial_fr())
+      case "IT" => result(views.html.help.tutorial.tutorial_it())
+      case "NL" => result(views.html.help.tutorial.tutorial_nl())
       case _ => NotFound(views.html.error404())
     }
   }
 
-  def showFAQ = Action { implicit request => result(views.html.help.faq()) }
+  def index    = Action { implicit request => result(views.html.help.index()) }
 
-  def showAbout = Action { implicit request =>
-    val imprint = Try(Source.fromFile(env.getFile("conf/imprint"))).toOption
-      .map { _.getLines.mkString("\n") }
-
-    val adminEmail = config.get[String]("admin.email")
-
-    result(views.html.help.about(imprint, adminEmail))
-  }
+  def about    = Action { implicit request => result(views.html.help.general.about(imprint, adminEmail)) }
+  def faq      = Action { implicit request => result(views.html.help.faq()) }
+  def privacy  = Action { implicit request => result(views.html.help.general.privacy(adminEmail)) }
+  def terms    = Action { implicit request => result(views.html.help.general.terms()) }
+  def tutorial = Action { implicit request => result(views.html.help.tutorial.tutorial()) }
 
 }

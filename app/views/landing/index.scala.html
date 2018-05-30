@@ -41,11 +41,11 @@
         </span>
 
         <span class="links">
-          <a href="@controllers.help.routes.HelpController.showTutorial()">
+          <a href="@controllers.help.routes.HelpController.tutorial()">
             @messages("landing.index.header.link.tutorial")
           </a>
 
-          <a href="@controllers.help.routes.HelpController.showAbout()">
+          <a href="@controllers.help.routes.HelpController.about()">
             @messages("landing.index.header.link.about")
           </a>
 
@@ -66,7 +66,7 @@
           <p>
             @messages("landing.index.jumbotron.blurb")
           </p>
-          <a href="@controllers.help.routes.HelpController.showTutorial()">
+          <a href="@controllers.help.routes.HelpController.tutorial()">
             @messages("landing.index.jumbotron.learn_more")
           </a>
         </div> <!-- jumbotron-left -->
@@ -269,27 +269,30 @@
 
     <div class="footer">
       <div class="inner">
-        <div class="developed-by">
-          @Html(messages("landing.index.about",
-            "http://www.ait.ac.at",
-            "http://www.exeter.ac.uk",
-            "http://www.hiig.de",
-            "http://www.open.ac.uk",
-            "http://london.ac.uk",
-            "http://mellon.org/"))
-
-          @Html(messages("landing.index.visit_us",
-            "&#xf09b",
-            "http://github.com/pelagios/recogito2",
-            "&#xf099;",
-            "http://twitter.com/pelagiosproject"))
+        <div class="info">
+          Open Source Software by <a href="http://commmons.pelagios.org" target="_blank">Pelagios
+          Commons</a>. Funded by the <a href="http://mellon.org/" target="_blank">Andrew W.
+          Mellon Foundation</a>.
         </div>
 
-        <div class="logo">
-          <a href="http://commons.pelagios.org" target="_blank">
-            <img src="@routes.Assets.versioned("images/logo-commons-white.png")">
-          </a>
-        </div>
+        <ul class="social">
+          <li class="icon">
+            <a href="http://github.com/pelagios/recogito2" target="_blank">&#xf09b;</a>
+          </li>
+          <li>
+            <a href="mailto:commons@@pelagios.org" target="_blank">&#xf0e0;</a>
+          </li>
+          <li>
+            <a href="http://twitter.com/pelagiosproject" target="_blank">&#xf099;</a>
+          </li>
+        </ul>
+
+        <ul class="nav">
+          <li><a href="@controllers.help.routes.HelpController.terms()">Terms</a></li>
+          <li><a href="@controllers.help.routes.HelpController.privacy()">Privacy</a></li>
+          <li><a href="@controllers.help.routes.HelpController.index()">Help</a></li>
+          <li><a href="@controllers.help.routes.HelpController.about()">About</a></li>
+        </ul>
       </div>
     </div>
     @helper.javascriptRouter("jsRoutes")(

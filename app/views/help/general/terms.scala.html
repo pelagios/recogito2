@@ -1,0 +1,71 @@
+@()(implicit request: RequestHeader)
+@views.html.help._layout(
+  "Terms and Conditions of Use",
+  "Recogito Terms and Conditions of Use",
+  "By registering with Recogito, you confirm that you accept our Terms and Conditions of Use, and that you agree to comply with them.",
+  "en"
+) {
+  <h1>Terms and Conditions of Use</h1>
+} {
+  <div class="article">
+    <div class="inner">
+      <p>
+        By registering with Recogito, you confirm that you accept the following Terms and
+        Conditions of Use, and that you agree to comply with them:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Storage of personal information.</strong> You consent that Recogito stores
+          your username, personal name (optional), your E-Mail address, the documents that
+          you upload, annotation data that is added to them, and statistics derived from
+          these annotations. Recogito will not store any more data than it needs to provide
+          a functional annotation services, as described in our
+          <a href="@controllers.help.routes.HelpController.tutorial()">tutorial</a>.</li>
+
+        <li>Storage of your E-Mail address is for the purpose of sending instructions for
+          resetting your password in case you forget it. We will not share this address with
+          anyone, nor use it to send out information on a regular basis (newsletters, etc.) We may,
+          however, use it to get in touch with specific important or urgent information, should
+          the need ever arise.</li>
+
+        <li>You may upload any documents that you wish to your own private
+          workspace. You may also invite other Recogito users to collaborate. However,
+          you and your collaborators must not make any copyrighted materials open to
+          the public.</li>
+
+        <li>Documents are, by default, not open to the public. They will only be made
+          publicly available if the owner (or someone who has been granted 'admin' rights by
+          the owner) checks the 'public view' tickbox. This box should be ticked if, and only
+          if, the document is not under copyright, or if you are the copyright holder.</li>
+
+        <li>If you are invited to work on a document in Recogito you are prohibited by
+          UK copyright law from copying the contents and re-posting elsewhere.</li>
+
+        <li>Recogito and the Pelagios team assume no responsibility for misuse of this
+          service to open copyrighted materials to the public, and reserves the right to
+          immediately remove materials suspected of violating copyright laws and suspend
+          access during any account review. In the case of disputed materials, we will
+          follow UK copyright laws unless otherwise noted.</li>
+
+        <li>You consent to have all your annotations released immediately into the public under
+          the <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank">Creative
+          Commons CC0 ('CC Zero') 1.0 Universal</a> license.</li>
+      </ul>
+
+      <p>
+        By not complying with any of these terms and conditions, you forfeit your right to use
+        Recogito. The final judgement on any disputes will be made by the Pelagios Commons
+        Committee.
+      </p>
+
+      <p>
+        Pelagios Commons provides free access to Recogito in the spirit of open data and as
+        an act of collegiality. We make no guarantees about access to this service at any time
+        or about contents held in the system, nor do we accept any liability whatsoever in case
+        of loss of data. Users are encouraged to download and maintain a private record
+        of annotations produced.
+      </p>
+    </div>
+  </div>
+}
