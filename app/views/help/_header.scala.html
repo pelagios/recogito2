@@ -1,0 +1,59 @@
+@(title: String, synopsis: String, lang: String, stylesheet: String)(articleHeading: Html)(content: Html)(implicit request: RequestHeader)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>@title</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/help/" + stylesheet)"/>
+    <meta http-equiv="content-language" content="@lang">
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@@pelagiosproject" />
+    <meta property="og:title" content="@title" />
+    <meta name="twitter:title" content="@title" />
+    <meta property="og:description" content="@synopsis" />
+    <meta name="twitter:description" content="@synopsis" />
+    <meta property="og:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+    <meta property="og:image:width" content="240" />
+    <meta property="og:image:height" content="240" />
+    <meta name="twitter:image" content="@routes.Assets.versioned("images/logo_sq_240px.png").absoluteURL" />
+    <meta property="og:url" content="@controllers.landing.routes.LandingController.index.absoluteURL" />
+    <link rel="apple-touch-icon" sizes="57x57" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
+    <link rel="apple-touch-icon" sizes="114x114" href="@routes.Assets.versioned("images/touch-icon-iphone-114.png")" />
+    <link rel="apple-touch-icon" sizes="72x72" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
+    <link rel="apple-touch-icon" sizes="144x144" href="@routes.Assets.versioned("images/touch-icon-ipad-144.png")" />
+  </head>
+  
+  <body>
+    <div class="page-header">
+      <div class="inner">
+        <div class="logo">
+          <a href="@controllers.landing.routes.LandingController.index()"><!--
+          --><img src="@routes.Assets.versioned("images/logo-recogito-small.png")"><!--
+          --></a><span class="page-title">Help</span>
+        </div>
+
+        <div class="links">
+          @if(title == "Recogito in 10 Minutes") { <a href="#" onclick="javascript:return false;" class="current">Tutorial</a>
+            } else { <a href="@controllers.help.routes.HelpController.showTutorial()">Tutorial</a> }
+
+          @if(title == "FAQ | Recogito") { <a href="#" onclick="javascript:return false;" class="current">FAQ</a>
+            } else { <a href="@controllers.help.routes.HelpController.showFAQ()">FAQ</a> }
+
+          @if(title == "About | Recogito") { <a href="#" onclick="javascript:return false;" class="current">About</a>
+            } else { <a href="@controllers.help.routes.HelpController.showAbout()">About</a> }
+
+          <a target="_blank" href="http://commons.pelagios.org/groups/recogito-users/">Forum</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-heading">
+      <div class="inner">
+        <div class="wrapper">@articleHeading</div>
+      </div>
+    </div>
+
+    @content
+
+  </body>
+</html>

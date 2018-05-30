@@ -24,7 +24,9 @@ class HelpController @Inject() (
     Ok(template)
   }
 
-  def index = Action { Redirect(routes.HelpController.showTutorial()) }
+  def index = Action { implicit request =>
+    result(views.html.help.index())
+  }
 
   def showTutorial  = Action { implicit request => result(views.html.help.tutorial()) }
 

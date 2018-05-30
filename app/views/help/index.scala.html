@@ -1,0 +1,81 @@
+@()(implicit request: RequestHeader)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Help</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/help/help.css")"/>
+  </head>
+
+  <body>
+    <div class="page-header">
+      <div class="inner">
+        <div class="logo">
+          <a href="@controllers.help.routes.HelpController.index()"><!--
+          --><img src="@routes.Assets.versioned("images/logo-recogito-small.png")"><!--
+          -->Help
+          </a>
+        </div>
+
+        <div class="links">
+          <a target="_blank" href="http://commons.pelagios.org/groups/recogito-users/">Forum</a>
+          <a target="_blank" href="mailto:commons@@pelagios.org">Contact Us</a>
+          <a href="@controllers.landing.routes.LandingController.index()">Return to Recogito</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="article-heading">
+      <div class="inner">
+        <div class="wrapper">
+          <h1>Help Topics</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-index">
+      <div class="inner">
+        <h2>First Steps</h2>
+        <ul>
+          <li><a href="#">10 Minute Tutorial</a></li>
+          <li><a href="#">Frequently Asked Questions</a></li>
+        </ul>
+
+        <h2>General Information and Site Policy</h2>
+        <ul>
+          <li><a href="#">About Recogito</a></li>
+          <li><a href="#">Imprint</a></li>
+          <li><a href="#">Privacy Policy &amp; Cookie Use</a></li>
+          <li><a href="#">Recogito Terms of Use</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="inner">
+        <div class="info">
+          An initative of <a href="http://commons.pelagios.org" target="_blank">Pelagios Commons</a>
+        </div>
+
+        <ul class="social">
+          <li class="icon">
+            <a href="http://github.com/pelagios/recogito2" target="_blank">&#xf09b;</a>
+          </li>
+
+          <li>
+            <a href="mailto:commons@@pelagios.org" target="_blank">&#xf0e0;</a>
+          </li>
+
+          <li>
+            <a href="http://twitter.com/pelagiosproject" target="_blank">&#xf099;</a>
+          </li>
+        </ul>
+
+        <ul class="nav">
+          <li><a href="#">Terms of Use</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">About</a></li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
