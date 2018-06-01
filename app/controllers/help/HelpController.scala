@@ -40,12 +40,13 @@ class HelpController @Inject() (
     }
   }
 
-  def index    = Action { implicit request => result(views.html.help.index()) }
+  def index     = Action { implicit request => result(views.html.help.index()) }
 
-  def about    = Action { implicit request => result(views.html.help.general.about(imprint, adminEmail)) }
-  def faq      = Action { implicit request => result(views.html.help.faq()) }
-  def privacy  = Action { implicit request => result(views.html.help.general.privacy(adminEmail)) }
-  def terms    = Action { implicit request => result(views.html.help.general.terms()) }
-  def tutorial = Action { implicit request => result(views.html.help.tutorial.tutorial()) }
+  def about     = Action { implicit request => result(views.html.help.general.about(imprint, adminEmail)) }
+  def faq       = Action { implicit request => result(views.html.help.faq()) }
+  def privacy   = Action { implicit request => result(views.html.help.general.privacy(adminEmail)) }
+  def relations = Action { implicit request => result(views.html.help.relations()) }
+  def terms     = Action { implicit request => result(views.html.help.general.terms()) }
+  def tutorial  = Action { implicit request => result(views.html.help.tutorial.tutorial()) }
 
 }

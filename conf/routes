@@ -27,6 +27,7 @@ GET     /status                                      controllers.landing.StatusC
 GET     /help/about                                  controllers.help.HelpController.about
 GET     /help/faq                                    controllers.help.HelpController.faq
 GET     /help/privacy                                controllers.help.HelpController.privacy
+GET     /help/relations                              controllers.help.HelpController.relations
 GET     /help/terms                                  controllers.help.HelpController.terms
 GET     /help/tutorial                               controllers.help.HelpController.tutorial
 GET     /help/:lang/tutorial                         controllers.help.HelpController.localizedTutorial(lang: String)
