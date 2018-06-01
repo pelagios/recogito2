@@ -140,33 +140,24 @@ h3 {
 }
 
 .footer {
-  width:100%;
   background-color:@nightsky-type;
   color:#fff;
   font-size:17px;
 
   .inner {
     padding:20px 0;
-    height:80px;
   }
 
-  .info, .social, .nav {
-    display:block;
-    position:absolute;
-    top:35px;
-    padding:0;
-    margin:0;
-    z-index:1;
-  }
-
-  .info {
+  .developed-by {
     left:0;
-    width:320px;
+    width:500px;
+    a .icon { color:#fff; }
   }
 
-  .social, .nav {
+  .nav {
+    position:absolute;
     right:0;
-    top:45px;
+    top:20px;
 
     a {
       color:#fff;
@@ -175,15 +166,10 @@ h3 {
 
   }
 
-  .social {
-    left:0;
-    font-size:20px;
-    text-align:center;
-    z-index:0;
-  }
-
   ul {
     list-style:none;
+    margin:0;
+    padding:0;
   }
 
   li {
