@@ -13,11 +13,21 @@ require([], function() {
         usersEl = widget.find('.users h3'),
 
         format = function(num) {
-          if (num > 10000) {
+          var t, h, m, trunc;
+
+          if (num > 999999) {
+            trunc = Math.round(num / 10000);
+            m = Math.floor(trunc / 100);
+            t = trunc % 100;
+            if (t > 9)
+              return m + ',' + t + 'M';
+            else
+              return m + ',0' + t + 'M';
+          } else if (num > 10000) {
             return Math.round(num / 1000) + 'K';
           } else if (num > 1000) {
-            var t = Math.floor(num / 1000);
-            var h = num % 1000;
+            t = Math.floor(num / 1000);
+            h = num % 1000;
             if (h > 99)
               return t + ',' + h;
             else if (h > 9)
