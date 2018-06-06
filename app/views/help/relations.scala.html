@@ -9,7 +9,58 @@
 } {
   <div class="article has-sidebar">
     <div class="inner">
-      Coming soon...
+      <p>
+        The <strong>Relations</strong> tool enables you to draw connections between annotations
+        in a text, and tag the connection in order to make a statement about its type.
+        <img src="@routes.Assets.versioned("images/help/relations-toolbar.png")">
+      </p>
+
+      <h2>How to Use the Relations Tool</h2>
+      <p>
+        Switch to <strong>Relations</strong> annotation mode in the toolbar. To start a
+        connection, click on an annotation once (or click and hold if your prefer). Move the
+        mouse to the target annotation and click again (or release the mouse, if you started
+        by click-and-hold).
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/relations-drawing.gif")">
+
+      <p>
+        Type a tag into the editor box that pops up and hit <strong>Enter</strong> to confirm and
+        create the connection. Alternatively, click the <span class="icon 14px">&#xf00c;</span>
+        checkmark icon. If you want to cancel and delete the connection instead, hit
+        <strong>Escape</strong> or click the <span class="icon 14px">&#xf014;</span>
+        trashcan icon.
+      </p>
+
+      <h2>Exporting Relations Data</h2>
+      <p>
+        Recogito can export relation data to multiple formats. Go to the downloads
+        page <span class="outline-icon">&#xe875;</span>
+      </p>
+
+      <h3>Network Exports</h3>
+      <p>
+        If relations exist in your document, the downloads page includes an additional box
+        with network-specific download options. Currently, there is only one option: CSV node and
+        edge lists compatible with the <a href="http://gephi.org/" target="_blank">Gephi</a>
+        graph visualization platform.
+      </p>
+
+      <p class="tip">
+        Note that each network node corresponds to one <strong>annotation</strong>. If you annotate
+        multiple occurences of the same place in the text, then each will be a node in the graph. We
+        may offer aggregated exports later, where occurrences are grouped, so that each
+        <strong>place</strong> is represented as one node, even if annotated multiple times.
+      </p>
+
+      <h3>Embedded Exports</h3>
+      <p>
+        In addition, relations are also embedded into the TEI export, represented as
+        <code>&lt;relation&gt;</code> elements in the document header.
+      </p>
+
+
     </div>
   </div>
 }
