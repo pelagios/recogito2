@@ -1,5 +1,25 @@
 @import "../_autocomplete.less";
 
+// TEMPORARY
+ul.menu {
+
+  a.new {
+    width:auto;
+    display:inline;
+    margin-left:2px;
+    padding:1px 4px;
+    background-color:darken(@orange-type, 7%);
+    color:#fff;
+    .rounded-corners(2px);
+    font-size:12px;
+  }
+
+  li.group.annotation-mode {
+    padding-right:0;
+  }
+
+}
+
 svg.readonly .mid rect {
   pointer-events:none; // Override in case of read-only access
 }

@@ -43,6 +43,10 @@ define([
 
         attachClickHandlers = function() {
           annotationModes.on('click', 'li', function(e) {
+
+            // Temporary
+            if (e.target.nodeName === 'A') return true;
+
             var menuItemQuick = annotationModes.find('.quick'),
                 t = jQuery(e.target).closest('li'),
                 mode = t.data('mode'),

@@ -82,11 +82,10 @@
                 </ul>
               </div>
             </li>
-            @if(currentUser.isDefined && currentUser.get.featureToggles.contains("relations")) {
-              <li data-mode="RELATIONS">
-                <span class="label">@messages("document.annotation.text.toolbar.mode.relations")
-              </li>
-            }
+            <li data-mode="RELATIONS">
+              <span class="label">@messages("document.annotation.text.toolbar.mode.relations")</span>
+              <a class="new" target="_blank" href="@controllers.help.routes.HelpController.relations()">What's this?</a>
+            </li>
           </ul>
         </li>
 
