@@ -15,7 +15,7 @@ require([], function() {
         format = function(num) {
           var t, h, m, trunc;
 
-          if (num > 999999) {
+          if (num > 999499) {
             trunc = Math.round(num / 10000);
             m = Math.floor(trunc / 100);
             t = trunc % 100;
