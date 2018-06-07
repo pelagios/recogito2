@@ -20,9 +20,9 @@ require([], function() {
             m = Math.floor(trunc / 100);
             t = trunc % 100;
             if (t > 9)
-              return m + ',' + t + 'M';
+              return m + '.' + t + 'M';
             else
-              return m + ',0' + t + 'M';
+              return m + '.0' + t + 'M';
           } else if (num > 10000) {
             return Math.round(num / 1000) + 'K';
           } else if (num > 1000) {
