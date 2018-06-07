@@ -44,22 +44,13 @@ landing.index.registration_form.placeholder.register=リコギトへ登録して
 landing.index.registration_form.disclaimer.text=<a href="{0}">利用規約</a> \とあなたのパスワードを保存することに同意してください。
 
 # News
-landing.index.news.title=ニュース:
-landing.index.news.subtitle=あなたの言語でリコギト <br/>\
-  <img class="flag" src="assets/images/flags/en_uk.png"> \
-  <img class="flag" src="assets/images/flags/nl.png"> \
-  <img class="flag" src="assets/images/flags/fr.png"> \
-  <img class="flag" src="assets/images/flags/de.png"> \
-  <img class="flag" src="assets/images/flags/gr.png"> \
-  <img class="flag" src="assets/images/flags/it.png">
-landing.index.news.text=私たちの素晴らしいコミュニティの動力のおかげでリコギトは他の言語で利用可能です。あなたのブラウザはこの言語にセットされていますか？ <strong>Dutch</strong>, \
-  <strong>French</strong>, <strong>German</strong>, <strong>Greek</strong> or \
-  <strong>Italian</strong>? リコギトの大部分を適度な翻訳で見れます。 \
-  <strong>Farsi</strong>, <strong>Hebrew</strong> and <strong>Turkish</strong> での翻訳は進行中です。 \
-  あなたも共同出来ます！ <a href="mailto:commons@pelagios.org">へメッセージを送ってください</a>。 このページをご覧ください。 \
-  <a href="https://docs.google.com/spreadsheets/d/1HkpZsVgn_3dQbht9sIXB7hTL4OSrzwxhWlmskVChc7g/edit#gid=0" target="_blank">translation \
-  sheet</a>. あなたの言語や新言語を入れてください。
-
+landing.index.news.title=News:
+landing.index.news.subtitle=Annotating Relations
+landing.index.news.text=We are excited to announce the general availability of our new \
+  <strong>Relations</strong> feature. Build networks from text by drawing connections between \
+  people, places, things, events. Make statements about how they relate using your own vocabulary. \
+  Get data out easily for further analysis and visualization. <a href="/help/relations">Here''s how</a>.
+  
 # Tiles
 landing.index.tiles.1.title=共有コレクション
 landing.index.tiles.1.text=テキストとイメージをアプロードし、自分のコレクションを作ってください。他の人を共有するために招待してください。
