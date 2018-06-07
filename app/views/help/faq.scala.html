@@ -12,20 +12,19 @@
       <h2 id="supported-formats">What kind of documents can I upload?</h2>
       <p>Presently, Recogito supports:</p>
       <ul>
-        <li>Plaintext .txt files (with UTF-8 character encoding)</li>
+        <li>Plaintext files (.txt extension)</li>
+        <li><span class="beta">BETA</span> TEI/XML encoded text (.xml extension)
         <li>Images in JPEG, TIFF and PNG format</li>
-        <li>Images served via <a href="http://iiif.io" target="_blank">IIIF</a> (currently,
-          single images only but no collection manifests)</li>
+        <li><span class="beta">BETA</span> Images served via <a href="http://iiif.io" target="_blank">IIIF</a>
+          (single images or collection manifests)</li>
         <li><span class="beta">BETA</span> Spreadsheet data in
           <a href="https://en.wikipedia.org/wiki/Comma-separated_values" target="_blank">CSV</a>
-          format (using comma, semicolon, tab or | as delimiting character, and UTF-8 character
-          encoding)</li>
-        <li><span class="beta">BETA</span> TEI/XML encoded text. Note that we are still testing
-          this feature. It may be unstable for very complex and/or long TEI documents. At the
-          moment, files need to have a <strong>.tei.xml</strong> extension in order for Recogito
-          to recognize them! <a href="mailto:commons@@pelagios.org">Do let us know</a> if you
-          experience any problems.
+          format (using comma, semicolon, tab or | as delimiting character)</li>
       </ul>
+      <p>
+         Note that all text-based formats (txt, xml, csv) must be UTF-8 character
+         encoded files.
+      </p>
 
       <h2 id="user-quota">Can I upload unlimited documents?</h2>
       <p>
@@ -120,7 +119,7 @@
         relevant places in other gazetteers in Recogito.
       </p>
 
-      <h2>What Named Entity Recognition are you using?</h2>
+      <h2 id="which-ner">What Named Entity Recognition are you using?</h2>
       <p>
         Presently, our hosted service at <a href="http://recogito.pelagios.org">recogito.pelagios.org</a>
         integrates the <a href="http://stanfordnlp.github.io/CoreNLP/" target="_blank">Stanford
