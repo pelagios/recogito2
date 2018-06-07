@@ -3,6 +3,7 @@ package transform.tei
 import java.io.File
 import java.util.UUID
 import services.ContentType
+import services.annotation.AnnotationBody
 import services.generated.tables.records.DocumentFilepartRecord
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -10,7 +11,6 @@ import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 import scala.io.Source
-import services.annotation.AnnotationBody
 
 @RunWith(classOf[JUnitRunner])
 class TEIParserServiceSpec extends Specification {
@@ -57,6 +57,21 @@ class TEIParserServiceSpec extends Specification {
         val quote = a.bodies.find(_.hasType == AnnotationBody.QUOTE).get.value.get
         EXPECTED_ENTITIES must contain((anchor, quote))
       }
+    }
+    
+    "properly pick up prefixed attributes" in {
+      val personAnnotations = annotations.filter { annotation => 
+        val personBodies = annotation.bodies.filter(_.hasType == AnnotationBody.PERSON)
+        !personBodies.isEmpty
+      }
+      
+      val hyperion = personAnnotations.head
+      val tags = hyperion.bodies
+        .filter(_.hasType == AnnotationBody.TAG)
+        .flatMap(_.value)
+      
+      tags.size must equalTo(2)
+      tags.toSet must equalTo(Set("@xml:id:identifier", "@category:Deity")) 
     }
     
   }

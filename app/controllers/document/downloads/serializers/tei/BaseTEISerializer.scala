@@ -4,7 +4,19 @@ import controllers.document.downloads.serializers.BaseSerializer
 import services.annotation.{ Annotation, AnnotationBody }
 
 trait BaseTEISerializer extends BaseSerializer {
-
+  
+  def getAttribute(tag: String) = {
+    val sepIdx =
+      if (tag.count(_ == ':') == 1)
+        tag.indexOf(':')
+      else 
+        tag.indexOf(':', tag.indexOf(':') + 1)
+      
+    val key = tag.substring(1, sepIdx)
+    val value = tag.substring(sepIdx + 1)
+    (key, value)
+  }
+      
   /** By convention, use all tags starting with @ as XML attributes **/
   def getAttributes(annotation: Annotation) =
     annotation.bodies.filter { body =>
@@ -14,13 +26,9 @@ trait BaseTEISerializer extends BaseSerializer {
         value.contains(':')
       }.getOrElse(false)
     }.map { body => 
-      val tag = body.value.get
-      val key = tag.substring(1, tag.indexOf(':'))
-      val value = tag.substring(tag.indexOf(':') + 1)
-      (key, value)
+      getAttribute(body.value.get)
     }.groupBy { _._1 }.mapValues { _.map(_._2) }.toSeq
     
-  
   /** Generates a <listRelation> element for relations, if any are contained in the annotations **/
   def relationsToList(annotations: Seq[Annotation]) = 
     annotations.filter(_.relations.size > 0) match {

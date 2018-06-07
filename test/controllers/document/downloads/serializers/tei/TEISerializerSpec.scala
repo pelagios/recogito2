@@ -27,6 +27,32 @@ class TEISerializerSpec extends XMLTestCase with SpecificationLike with HasTEISn
       <text></text>
     </TEI>
   
+  "getAttribute" should {
+    
+    "properly split a simple attribute" in {
+      val tag = "@id:foo"
+      val (key, value) = serializer.getAttribute(tag)
+      
+      key must equalTo("id")
+      value must equalTo("foo")
+    }
+    
+    "properly split prefixed attributes" in {
+      val tag1 = "@xml:id:foo"
+      val tag2 = "@xml:id:foo:bar"
+      
+      val (key1, value1) = serializer.getAttribute(tag1)
+      val (key2, value2) = serializer.getAttribute(tag2)
+      
+      key1 must equalTo("xml:id")
+      value1 must equalTo("foo")
+      
+      key2 must equalTo("xml:id")
+      value2 must equalTo("foo:bar")
+    }
+    
+  }
+  
   "getOrCreateSourceDesc" should {
     
     "work for TEI without teiHeader" in {  
@@ -99,5 +125,5 @@ class TEISerializerSpec extends XMLTestCase with SpecificationLike with HasTEISn
     }
     
   }
-  
+    
 }
