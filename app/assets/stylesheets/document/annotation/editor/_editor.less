@@ -119,19 +119,20 @@
         float:left;
         margin:0 0 0 8px;
         padding:0;
-        line-height:30px;
-        width:30px;
-        height:30px;
+        line-height:33px;
+        width:29px;
+        height:29px;
+        .rounded-corners(100%);
         outline:none;
         border:none;
-        font-size:16px;
-        color:darken(@lightgrey-border-darker, 15%);
+        font-size:14px;
+        color:@ocean;
         background-color:transparent;
         cursor:pointer;
       }
 
-      button.share:hover {
-        color:@ocean;
+      button.share::-moz-focus-inner {
+        border:0; // https://stackoverflow.com/questions/71074/how-to-remove-firefoxs-dotted-outline-on-buttons-as-well-as-links
       }
 
       button:last-child {
