@@ -9,9 +9,6 @@ trait BaseTEISerializer extends BaseSerializer {
   /** Creates an "ID" that conforms to TEI restrictions **/
   def toTeiId(uuid: UUID): String = s"recogito-${uuid}"
   
-  /** Reverse **/
-  def fromTeiId(str: String): UUID = UUID.fromString(str.substring(9))
-  
   def getAttribute(tag: String) = {
     val sepIdx =
       if (tag.count(_ == ':') == 1)

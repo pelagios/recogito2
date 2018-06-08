@@ -59,17 +59,17 @@ trait PlaintextSerializer extends BaseTEISerializer {
       val baseTag = entityType.map { body =>
         body.hasType match {        
           case PLACE => body.uri match {
-            case Some(uri) => <placeName ref={uri} id={id}>{quote}</placeName>
-            case None => <placeName id={id}>{quote}</placeName>
+            case Some(uri) => <placeName ref={uri} xml:id={id}>{quote}</placeName>
+            case None => <placeName xml:id={id}>{quote}</placeName>
           }
             
           case PERSON =>
-            <persName id={id}>{quote}</persName>
+            <persName xml:id={id}>{quote}</persName>
             
           case EVENT =>
-            <rs id={id} type="event">{quote}</rs>
+            <rs xml:id={id} type="event">{quote}</rs>
         }
-      }.getOrElse(<span id={id}>{quote}</span>)
+      }.getOrElse(<span xml:id={id}>{quote}</span>)
       
       val teiTag = attributes.foldLeft(baseTag) { case (el, (name, values)) =>
         el % new UnprefixedAttribute(name, Text(values.mkString), Null)

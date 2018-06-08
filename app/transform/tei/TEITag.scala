@@ -11,7 +11,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.ranges.DocumentRange
 import scala.collection.JavaConversions._
 
-object TEITag {
+object TEITag extends {
   
   private def toQuoteBody(lastModifiedAt: DateTime, quote: String) =
     AnnotationBody(
@@ -50,7 +50,7 @@ object TEITag {
       )
     }
   
-  private def toAnnotation(lastModifiedAt: DateTime, part: DocumentFilepartRecord, anchor: String, bodies: Seq[AnnotationBody]) =
+  private def toAnnotation(lastModifiedAt: DateTime, part: DocumentFilepartRecord, anchor: String, bodies: Seq[AnnotationBody]) =    
     Annotation(
       UUID.randomUUID,
       UUID.randomUUID,
@@ -103,7 +103,7 @@ object TEITag {
     // 'ref' is treated separately, 'n' is discarded altogether
     val attributesToConvert = attributes.filter { attr =>
       val key = attr._1.toLowerCase
-      key != "n" && key != "ref" }
+      key != "xml:id" && key != "ref" }
       
     val ref = getAttribute("ref")  
     val t   = getAttribute("type")
