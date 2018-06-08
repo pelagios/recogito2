@@ -44,6 +44,7 @@ define([
                     '<div class="reply-section"></div>' +
                     '<div class="tag-section"></div>' +
                     '<div class="footer">' +
+                      '<button class="share icon">&#xf0c1;</button>' +
                       '<button class="btn small outline cancel">' + I18N.btn_cancel + '</button>' +
                       '<button class="btn small outline ok-next">' + I18N.btn_ok_and_next + '</button>' +
                       '<button class="btn small ok">' + I18N.btn_ok + '</button>' +
