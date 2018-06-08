@@ -66,7 +66,7 @@ trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
         case _ => doc.createElement("span")
       }
       
-      el.setAttribute("id", annotation.annotationId.toString)
+      el.setAttribute("id", toTeiId(annotation.annotationId))
       if (entityURI.isDefined) el.setAttribute("ref", entityURI.get)
       
       getAttributes(annotation).foreach { case(key, values) =>

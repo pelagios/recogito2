@@ -1,9 +1,16 @@
 package controllers.document.downloads.serializers.tei
 
 import controllers.document.downloads.serializers.BaseSerializer
+import java.util.UUID
 import services.annotation.{ Annotation, AnnotationBody }
 
 trait BaseTEISerializer extends BaseSerializer {
+  
+  /** Creates an "ID" that conforms to TEI restrictions **/
+  def toTeiId(uuid: UUID): String = s"recogito-${uuid}"
+  
+  /** Reverse **/
+  def fromTeiId(str: String): UUID = UUID.fromString(str.substring(9))
   
   def getAttribute(tag: String) = {
     val sepIdx =
@@ -38,8 +45,8 @@ trait BaseTEISerializer extends BaseSerializer {
         val relationElements = sourceAnnotations.flatMap { source =>
           source.relations.map { relation =>
             val name = relation.bodies.map(_.value.replaceAll(" ", "_")).mkString
-            val active = source.annotationId.toString
-            val passive = relation.relatesTo.toString
+            val active = toTeiId(source.annotationId)
+            val passive = toTeiId(relation.relatesTo)
             <relation name={name} active={active} passive={passive} />
           }
         }

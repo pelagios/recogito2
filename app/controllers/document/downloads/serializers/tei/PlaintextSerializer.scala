@@ -50,7 +50,7 @@ trait PlaintextSerializer extends BaseTEISerializer {
     }
     
     val ranges = nonOverlappingAnnotations.foldLeft((Seq.empty[Node], 0)) { case ((nodes, beginIndex), annotation) =>
-      val id = annotation.annotationId.toString
+      val id = toTeiId(annotation.annotationId)
       val quote = escape(getQuote(annotation))
       val offset = getCharOffset(annotation)
       val entityType = getEntityType(annotation)      
@@ -69,7 +69,7 @@ trait PlaintextSerializer extends BaseTEISerializer {
           case EVENT =>
             <rs id={id} type="event">{quote}</rs>
         }
-      }.getOrElse(<span>{quote}</span>)
+      }.getOrElse(<span id={id}>{quote}</span>)
       
       val teiTag = attributes.foldLeft(baseTag) { case (el, (name, values)) =>
         el % new UnprefixedAttribute(name, Text(values.mkString), Null)
