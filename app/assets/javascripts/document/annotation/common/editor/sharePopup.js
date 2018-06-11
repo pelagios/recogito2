@@ -1,6 +1,6 @@
 define(['common/config'], function(Config) {
 
-  var l = window.location,
+  var l = window.location, // Shorthand
 
       BASE_URL = l.protocol + '//' +
         l.host + '/document/' +
@@ -11,26 +11,40 @@ define(['common/config'], function(Config) {
     var element = jQuery(
           '<div class="share-popup">' +
             '<div class="arrow"></div>' +
-            '<span class="label">Copy URL to share</span>' +
+            '<span class="label"><span class="icon">&#xf0c1;</span> Link to share ' +
+              '<span class="notifier">Copied to Clipboard</span>' +
+            '</span>' +
             '<input type="text" class="annotation-link" />' +
           '</div>').hide().appendTo(parent),
+
+        notifierEl = element.find('.notifier').hide(),
 
         inputEl = element.find('input'),
 
         close = function() {
+          notifierEl.hide();
           element.hide();
         },
 
         toggle = function() {
           if (element.is(':visible'))
-            element.hide();
+            close();
           else
             element.show();
         },
 
         setAnnotation = function(annotation) {
           inputEl.val(BASE_URL + annotation.annotation_id);
+        },
+
+        onFocus = function() {
+          jQuery(this).select();
+          document.execCommand('copy');
+          notifierEl.fadeIn(100);
+          setTimeout(function() { notifierEl.fadeOut(300); }, 2000);
         };
+
+    inputEl.focus(onFocus);
 
     this.close = close;
     this.setAnnotation = setAnnotation;
