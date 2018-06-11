@@ -36,6 +36,7 @@ class HelpController @Inject() (
       case "FR" => result(views.html.help.tutorial.tutorial_fr())
       case "IT" => result(views.html.help.tutorial.tutorial_it())
       case "NL" => result(views.html.help.tutorial.tutorial_nl())
+      case "TR" => result(views.html.help.tutorial.tutorial_tr())
       case _ => NotFound(views.html.error404())
     }
   }
