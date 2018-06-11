@@ -26,6 +26,10 @@ define(['common/config'], function(Config) {
           element.hide();
         },
 
+        isOpen = function() {
+          return element.is(':visible');
+        },
+
         toggle = function() {
           if (element.is(':visible'))
             close();
@@ -47,6 +51,7 @@ define(['common/config'], function(Config) {
     inputEl.focus(onFocus);
 
     this.close = close;
+    this.isOpen = isOpen;
     this.setAnnotation = setAnnotation;
     this.toggle = toggle;
   };

@@ -140,8 +140,13 @@ define([
 
         /** 'Cancel' clears the selection and closes the editor **/
         onCancel = function() {
-          selectionHandler.clearSelection();
-          self.close();
+          if (sharePopup.isOpen()) {
+            // Close the popup
+            sharePopup.close();
+          } else {
+            selectionHandler.clearSelection();
+            self.close();
+          }
         },
 
         /** 'OK' updates the annotation & highlight spans and closes the editor **/
