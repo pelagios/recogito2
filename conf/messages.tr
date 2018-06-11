@@ -1,20 +1,33 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations=Annotations
-common.users=Users
+common.annotations=Açıklamalar
+common.users=Kullanıcılar
 common.logged_in_as=Hesap sahibi
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common document-related labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.document.title=Başlık
+common.document.author=Yazar
+common.document.date=Tarih
+common.document.description=Tanım
+common.document.language=Dil
+common.document.source=Kaynak
+common.document.edition=Yayın
+common.document.license=İzin
+common.document.attribution=Özellik
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common button labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.buttons.save_changes=Save Changes
+common.buttons.save_changes=Değişiklikleri kaydet
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 landing.index.page_title=Recogito'ya hoşgeldiniz
-landing.index.header.link.tutorial=Tutorial
+landing.index.header.link.tutorial=Deneyerek öğren
 landing.index.header.link.about=About
 landing.index.header.link.login=Giriş
 
@@ -44,18 +57,15 @@ landing.index.tiles.1.title=Paylaşılan Koleksiyonlar
 landing.index.tiles.1.text=Metin ya da resim yükleyin. Kendi koleksiyonlarınızı oluşturun. \
   Çalışmanıza katılmasını istediklerinizi davet edin.
 landing.index.tiles.2.title=Ortak Açıklama ve Notlar
-landing.index.tiles.2.text=Create notes. Tag. Discuss. Recogito tracks provenance and maintains \
-  version history.
-landing.index.tiles.3.title=Semantics Included
-landing.index.tiles.3.text=Tag places and persons with controlled vocabularies easily with \
-  built-in support features.
-landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Show the results of your work on the Web. Publish your data as Linked \
-  Open Data.
+landing.index.tiles.2.text=Not oluşturun. Etiketleyin. Tartışın. Recogito kaynağın aslını takip eder ve geçmiş versiyonları devam ettirir.
+landing.index.tiles.3.title=Anlamı içeren
+landing.index.tiles.3.text=İçinde var olan destek özellikleri sayesinde, kontrol edilmiş kelime dağarcığı ile yerleri ve kişileri kolayca etiketleyin.
+landing.index.tiles.4.title=Açık Veri
+landing.index.tiles.4.text=İşinizin sonuçlarını internet ortamında gösterin. Verinizi Bağlantılı Açık Veri olarak yayınlayın.
 
 # Recogito Right Now
-landing.index.right_now=Recogito Right Now
-landing.index.edits_last_24hrs=Edits last 24hrs
+landing.index.right_now=Şu anda Recogito
+landing.index.edits_last_24hrs=Son 24 saat içinde yapılan düzenlemeler
 
 # About
 landing.index.about=Open Source Software by the <a href="{0}" target="_blank">Austrian Institute \
@@ -71,120 +81,111 @@ landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=Joined on
-my.header.account_settings=Account Settings
-my.header.space_used=Used
-my.header.logout=Logout
+my.header.joined_on=Katıldı
+my.header.account_settings=Hesap Bilgileri
+my.header.space_used=Kullanılan
+my.header.logout=Çıkış
 
-my.tabs.my_documents=My Documents
-my.tabs.shared_with_me=Shared with me
+my.tabs.my_documents=Belgelerim
+my.tabs.shared_with_me=Benimle Paylaşılanlar
 
-my.tools.search=Search
-my.tools.new_document=New Document
+my.tools.search=Ara
+my.tools.new_document=Yeni Belge
 
-my.table.header.uploaded=Uploaded
-my.table.header.last_edit=Last edit
-my.table.header.by=By
-my.table.header.public=Public
-my.table.header.owner=Owner
-my.table.header.shared_by=Shared by
-my.table.header.access_level=Access
+my.table.header.uploaded=Yüklendi
+my.table.header.last_edit=En son düzenleme
+my.table.header.by=Tarafından
+my.table.header.public=Ortak
+my.table.header.owner=Sahibi
+my.table.header.shared_by=Tarafından Paylaşıldı
+my.table.header.access_level=Erişim
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-account_settings.sidebar.account=Account
-account_settings.sidebar.password=Password
-account_settings.sidebar.restore=Restore from Backup
+account_settings.sidebar.account=Hesap
+account_settings.sidebar.password=Şifre
+account_settings.sidebar.restore=Son yedeklemeden yükle
 
-account_settings.account.account_settings=Account Settings
-account_settings.account.email=E-Mail
-account_settings.account.name=Name
-account_settings.account.about_you=About You
-account_settings.account.website=Your Website
-account_settings.account.optional=Optional
-account_settings.account.delete.title=Delete Account
-account_settings.account.delete.warning=Warning: deleting your account will also delete all your \
-  documents and annotations. Make sure have created backups of all documents you want to keep. \
-  Deleting your account is irreversible.
-account_settings.account.delete.button=Delete my account
+account_settings.account.account_settings=Hesap Bilgileri
+account_settings.account.email=Elektronik posta
+account_settings.account.name=İsim
+account_settings.account.about_you=Sizinle İlgili
+account_settings.account.website=Sizin İnternet siteniz
+account_settings.account.optional=İsteğe Bağlı
+account_settings.account.delete.title=Hesabı sil
+account_settings.account.delete.warning=Uyarı: hesabınızı silmek aynı zamanda bütün belge ve açıklamalarınızı silmeye yol açar. Saklamak istediğiniz bütün belgeleri yedeklediğinizden emin olun. Hesabınızı silmenin geri dönüşü yoktur.
+account_settings.account.delete.button=Hesabımı sil
 
-account_settings.password.change_password=Change Password
-account_settings.password.current=Current Password
-account_settings.password.new=New Password
-account_settings.password.verify=Verify Password
+account_settings.password.change_password=Şifre Değiştir
+account_settings.password.current=Şu anki şifre
+account_settings.password.new=Yeni şifre
+account_settings.password.verify=Şifreyi doğrula
 
-account_settings.restore.instructions=You can restore a document from a ZIP package downloaded \
-  earlier through Recogito's Backup function.
-account_settings.restore.button=Upload ZIP Backup Package
+account_settings.restore.instructions=Recogito'nun Yedekleme özelliğini kullanarak indirdiğiniz ZIP paketini tekrardan yükleyebilirsiniz.
+account_settings.restore.button=ZIP Yedekleme Paket yükle
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.annotation.text.toolbar.annotation_mode=ANNOTATION MODE:
+document.annotation.text.toolbar.annotation_mode=AÇIKLAMA MODU
 document.annotation.text.toolbar.mode.normal=NORMAL
-document.annotation.text.toolbar.mode.quick=QUICK
-document.annotation.text.toolbar.mode.quick.places=Places
-document.annotation.text.toolbar.mode.quick.persons=Persons
-document.annotation.text.toolbar.mode.quick.tags=Tags
+document.annotation.text.toolbar.mode.quick=HIZLI
+document.annotation.text.toolbar.mode.quick.places=Yerler
+document.annotation.text.toolbar.mode.quick.persons=Kişiler
+document.annotation.text.toolbar.mode.quick.tags=Etiketler
 document.annotation.text.toolbar.mode.relations=RELATIONS
-document.annotation.text.toolbar.color=COLOR:
-document.annotation.text.toolbar.color.by_type=BY ENTITY TYPE
-document.annotation.text.toolbar.color.by_status=BY VERIFICATION STATUS
-document.annotation.text.toolbar.color.by_tag=BY FIRST TAG
+document.annotation.text.toolbar.color=RENK
+document.annotation.text.toolbar.color.by_type=OLUŞUM TIPI ILE
+document.annotation.text.toolbar.color.by_status=ONAY DURUMU ILE
+document.annotation.text.toolbar.color.by_tag=ETIKET ILE
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Image annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.annotation.image.toolbar.tools=TOOLS
-document.annotation.image.toolbar.tools.move=MOVE
-document.annotation.image.toolbar.tools.point=POINT
-document.annotation.image.toolbar.tools.rectangle=RECTANGLE
-document.annotation.image.toolbar.tools.tilted_box=TILTED BOX
+document.annotation.image.toolbar.tools=ARAÇLAR
+document.annotation.image.toolbar.tools.move=TAŞI
+document.annotation.image.toolbar.tools.point=NOKTA
+document.annotation.image.toolbar.tools.rectangle=DIKDÖRTGEN
+document.annotation.image.toolbar.tools.tilted_box=PARALEL KENAR
 
-document.annotation.image.toolbar.image=IMAGE
-document.annotation.image.toolbar.layers=LAYERS
-document.annotation.image.toolbar.help=HELP
+document.annotation.image.toolbar.image=GÖRÜNTÜ
+document.annotation.image.toolbar.layers=KATMANLAR
+document.annotation.image.toolbar.help=YARDIM
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.downloads.annotations.csv.text=Download annotations as a data table for importing into spreadsheet software or a GIS.
-document.downloads.annotations.rdf.text=Download annotations and document metadata as RDF, encoded using Open Annotation and Dublin Core.
-document.downloads.annotations.geojson.text=Confirmed geo-located places in the document as a GeoJSON FeatureCollection.
-document.downloads.annotations.kml.text=Confirmed geo-located places as KML file, for viewing in Google Earth.
-document.downloads.annotations.tei.text=Annotated text in a basic TEI/XML serialization. Note: only \
-  place name annotations are included at the moment. Also, overlapping annotations are filtered \
-  out as TEI does not support them.
+document.downloads.annotations.csv.text=Notları tablolama yazılımı veya GIS'e aktarmak için veri tablosu halinde indir.
+document.downloads.annotations.rdf.text=Düzenlemeleri ve belgenin metaverisi, Open Annotation ve Dublin Core kullanılarak hazırlanmış olan RDF dosyası olarak indir.
+document.downloads.annotations.geojson.text=GeoJSON FeatureCollection olarak belgede onaylanmış coğrafi konumlar.
+document.downloads.annotations.kml.text=Google Earth'de görüntülenmek üzere KML dosyası olarak onaylanmış coğrafi konumlar.
+document.downloads.annotations.tei.text=Basit TEI/xml kodlamasında bulunan açıklamalı metin. Not: şu anda sadece yer ismi açıklamaları dahil edilmiştir. Ayrıca, çakışan açıklamalar TEI tarafından desteklenmediği için filtrelendi.
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.settings.sidebar.metadata=Metadata
-document.settings.sidebar.sharing=Sharing
-document.settings.sidebar.edit_history=Edit History
-document.settings.sidebar.backup=Backup
-document.settings.sidebar.delete=Delete
+document.settings.sidebar.metadata=Metaveri
+document.settings.sidebar.sharing=Paylaşım
+document.settings.sidebar.edit_history=Geçmiş bilgileri düzenle
+document.settings.sidebar.backup=Yedekle
+document.settings.sidebar.delete=Sil
 
 # Metadata
-document.settings.metadata.document_metadata=Document Metadata
-document.settings.metadata.document_parts=Document Parts
-document.settings.metadata.edit_part=Edit Part Metadata
-document.settings.metadata.drag_to_change=Drag to change order
+document.settings.metadata.document_metadata=Belge Metaverisi
+document.settings.metadata.document_parts=Belge Parçaları
+document.settings.metadata.edit_part=Metaveri parçası düzenle
+document.settings.metadata.drag_to_change=Düzeni değiştirmek için sürükle
 
 # Sharing
-document.settings.sharing.public_access=Public Access
-document.settings.sharing.visible_to_all=Visible to all
+document.settings.sharing.public_access=Genel Erişim
+document.settings.sharing.visible_to_all=Herkes görebilir
 
-document.settings.sharing.collaborators=Collaborators
-document.settings.sharing.collaborators.none=This document doesn''t have any collaborators yet. \
-  Use the form below to add a collaborator.
-document.settings.sharing.collaborators.enter_username=Enter username
+document.settings.sharing.collaborators=Katılımcılar
+document.settings.sharing.collaborators.none=Bu belgenin henüz hiç katılımcısı yok. Yeni katılımcı eklemek için aşağıdaki formu kullanın.
+document.settings.sharing.collaborators.enter_username=Kullanıcı adı gir
 
 # Backup
-document.settings.backup.backup=Backup
-document.settings.backup.description=The backup package includes document metadata, files, and \
-  annotations. You can use it to restore your work to Recogito at a later date. Back up your work \
-  regularly as an added safety measure. Please note that the <u>edit history is currently not \
-  included</u> in the backup package.
-document.settings.backup.button=Download ZIP Backup Package
+document.settings.backup.backup=Yedek
+document.settings.backup.description=Yedekleme paketi notlar, dosyalar ve belge metaverisinden oluşur. İleri bir tarihte Recogito'da işini düzenlemek için kullanabilirsiniz. Tedbir olarak işinizi düzenli olarak yedekleyin. Lütfen geçmiş düzenlemelerin yedekleme paketini içermediğini unutmayın.
+document.settings.backup.button=ZIP Yedekleme Paketi İndir
