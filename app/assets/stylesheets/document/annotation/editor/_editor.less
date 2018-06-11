@@ -6,6 +6,7 @@
 @import "sections/_placesection.less";
 @import "sections/_tagsection.less";
 @import "sections/_transcriptionsection.less";
+@import "_sharepopup.less";
 @import "_textentryfield.less";
 
 .annotation-editor-popup {
@@ -117,7 +118,7 @@
 
       button.share {
         float:left;
-        margin:0 0 0 8px;
+        margin:0 0 0 4px;
         padding:0;
         line-height:33px;
         width:29px;
@@ -126,9 +127,13 @@
         outline:none;
         border:none;
         font-size:14px;
-        color:@ocean;
+        color:fade(@ocean, 30%);
         background-color:transparent;
         cursor:pointer;
+      }
+
+      button.share:hover {
+        color:@ocean;
       }
 
       button.share::-moz-focus-inner {

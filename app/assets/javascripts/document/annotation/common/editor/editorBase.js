@@ -94,7 +94,6 @@ define([
 
   EditorBase.prototype.open = function(selection) {
     if (selection) {
-      console.log(selection.annotation);
       this.clear();
       this.currentSelection = selection;
       this.sectionList.setAnnotation(selection.annotation);

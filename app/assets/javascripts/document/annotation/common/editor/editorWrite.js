@@ -1,18 +1,13 @@
-/**
- *
- * TODO there is now a hardcoded dependency between the editor and text selection functionality.
- * We'll need to break this dependency up in order to re-use the editor in image annotation mode.
- *
- */
 define([
   'i18n!common/i18n/document/nls/annotation',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
   'document/annotation/common/editor/editorBase',
+  'document/annotation/common/editor/sharePopup',
   'document/annotation/common/editor/textEntryField',
   'document/annotation/common/georesolution/georesolutionPanel'
-], function(I18N, AnnotationUtils, PlaceUtils, API, EditorBase, TextEntryField, GeoresolutionPanel) {
+], function(I18N, AnnotationUtils, PlaceUtils, API, EditorBase, SharePopup, TextEntryField, GeoresolutionPanel) {
 
   var WriteEditor = function(container, annotations, selectionHandler, options) {
     var self = this,
@@ -44,7 +39,7 @@ define([
                     '<div class="reply-section"></div>' +
                     '<div class="tag-section"></div>' +
                     '<div class="footer">' +
-                      '<button class="share icon">&#xf0c1;</button>' +
+                      '<button class="share icon">&#xf064;</button>' +
                       '<button class="btn small outline cancel">' + I18N.btn_cancel + '</button>' +
                       '<button class="btn small outline ok-next">' + I18N.btn_ok_and_next + '</button>' +
                       '<button class="btn small ok">' + I18N.btn_ok + '</button>' +
@@ -61,6 +56,8 @@ define([
         btnPerson = element.find('.category.person'),
         btnEvent = element.find('.category.event'),
 
+        btnShare = element.find('button.share'),
+
         btnCancel = element.find('button.cancel'),
         btnOkAndNext = element.find('button.ok-next'),
         btnOk = element.find('button.ok'),
@@ -71,6 +68,8 @@ define([
           bodyType    : 'COMMENT'
         }),
 
+        sharePopup = new SharePopup(element.find('.annotation-editor-popup-inner')),
+
         georesolutionPanel = new GeoresolutionPanel(),
 
         annotationMode = { mode: 'NORMAL' },
@@ -80,6 +79,8 @@ define([
         },
 
         openSelection = function(selection) {
+          sharePopup.close(); // Always close the share popup
+
           // In case of selection === undefined, close the editor
           if (!selection) {
             self.close();
@@ -117,6 +118,7 @@ define([
             self.open(selection);
           }
 
+          sharePopup.setAnnotation(selection.annotation);
           return false;
         },
 
@@ -208,6 +210,8 @@ define([
     btnPlace.click(onAddPlace);
     btnPerson.click(onAddPerson);
     btnEvent.click(onAddEvent);
+
+    btnShare.click(sharePopup.toggle);
 
     btnCancel.click(onCancel);
     btnOk.click(onOK);
