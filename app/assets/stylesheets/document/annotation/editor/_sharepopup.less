@@ -1,7 +1,7 @@
 .share-popup {
   position:absolute;
   width:360px;
-  padding:6px 10px 8px 10px;
+  padding:6px 8px 8px 10px;
   margin:-2px 0 0 -10px;
   background-color:@blueish-white-hi;
   border:1px solid darken(@lightgrey-border-darker, 7%);
@@ -14,8 +14,6 @@
     display:block;
 
     .icon {
-      position:relative;
-      top:1px;
       padding-right:2px;
       font-size:14px;
     }
@@ -53,17 +51,55 @@
     border:1px solid darken(@lightgrey-border-darker, 4%);
   }
 
-  input {
-    font-size:12px;
-    font-family:Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    margin:1px 0 4px 0;
-    padding:5px 6px 3px 6px;
-    background-color:#fff;
+  .url {
+    position:relative;
+    display:inline-block;
     width:100%;
-    .rounded-corners(2px);
-    border:1px solid darken(@lightgrey-border-darker, 4%);
-    box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.075);
-    letter-spacing:normal;
+    margin:1px 0 4px 0;
+
+    input {
+      font-size:12px;
+      font-family:Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      padding:5px 36px 3px 6px;
+      background-color:#fff;
+      width:100%;
+      height:26px;
+      .rounded-corners(2px);
+      border:1px solid darken(@lightgrey-border-darker, 4%);
+      box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.075);
+      letter-spacing:normal;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    button.to-clipboard {
+      font-family:FontAwesome;
+      text-align:center;
+      line-height:18px;
+      font-size:14px;
+      display:block;
+      position:absolute;
+      height:26px;
+      right:0;
+      bottom:0;
+      color:darken(@lightgrey-border-darker, 20%);
+      width:30px;
+      .rounded-corners-right(2px);
+      border:1px solid darken(@lightgrey-border-darker, 4%);
+      background-color:@blueish-white;
+      outline:none;
+      cursor:pointer;
+    }
+
+    button.to-clipboard:hover {
+      background-color:@blueish-white-hi;
+    }
+
+    button.to-clipboard::-moz-focus-inner {
+      border:0; // https://stackoverflow.com/questions/71074/how-to-remove-firefoxs-dotted-outline-on-buttons-as-well-as-links
+    }
+
   }
 
 }

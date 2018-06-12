@@ -33,12 +33,18 @@ define(['common/config'], function(Config) {
               '<span class="label"><span class="icon">&#xf0c1;</span> Link to share annotation' +
                 '<span class="notifier" data-for="share-annotation">Copied to Clipboard</span>' +
               '</span>' +
-              '<input type="text" id="share-annotation" class="share-link annotation-url" />' +
+              '<div class="url">' +
+                '<input type="text" id="share-annotation" class="share-link annotation-url" />' +
+                '<button class="to-clipboard" data-for="share-annotation">&#xf0ea;</button>' +
+              '</div>' +
 
               '<span class="label"><span class="icon">&#xf03e;</span> Link to share image snippet' +
                 '<span class="notifier" data-for="share-image">Copied to Clipboard</span>' +
               '</span>' +
-              '<input type="text" id="share-image" class="share-link image-url" />' +
+              '<div class="url">' +
+                '<input type="text" id="share-image" class="share-link image-url" />' +
+                '<button class="to-clipboard" data-for="share-image">&#xf0ea;</button>' +
+              '</div>' +
 
               SHARE_WARNING +
 
@@ -51,7 +57,10 @@ define(['common/config'], function(Config) {
               '<span class="label"><span class="icon">&#xf0c1;</span> Link to share ' +
                 '<span class="notifier" data-for="share-annotation">Copied to Clipboard</span>' +
               '</span>' +
-              '<input type="text" id="share-annotation" class="share-link annotation-url" />' +
+              '<div class="url">' +
+                '<input type="text" id="share-annotation" class="share-link annotation-url" />' +
+                '<button class="to-clipboard" data-for="share-annotation">&#xf0ea;</button>' +
+              '</div>' +
 
               SHARE_WARNING +
 
