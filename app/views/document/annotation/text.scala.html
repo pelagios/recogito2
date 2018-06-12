@@ -5,14 +5,14 @@
   accessLevel: services.document.RuntimeAccessLevel,
   annotationCount: Long,
   content: String,
-  sharedVia: Option[services.annotation.Annotation]
+  sharedVia: Option[controllers.document.annotation.AnnotationSummary]
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
-    @views.html.document.standardMeta(doc, annotationCount, Some(currentPart), Some(content))
+    @views.html.document.annotation._meta(doc, annotationCount, Some(currentPart), Some(content), sharedVia)
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/text/index.css")"/>
     <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     @Html(webJarsUtil.css("leaflet.css"))

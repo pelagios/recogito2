@@ -1,0 +1,13 @@
+@(
+  doc: services.document.DocumentInfo,
+  annotationCount: Long,
+  currentPart: Option[services.generated.tables.records.DocumentFilepartRecord] = None,
+  content: Option[String],
+  sharedVia: Option[controllers.document.annotation.AnnotationSummary]
+)(implicit request: RequestHeader)
+
+@if(sharedVia.isDefined) {
+  
+} else {
+  @views.html.document.standardMeta(doc, annotationCount, currentPart, content)
+}

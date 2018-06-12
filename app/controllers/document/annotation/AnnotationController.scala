@@ -69,7 +69,7 @@ class AnnotationController @Inject() (
     
     def fResponse(via: Option[Annotation]) = documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
       if (accesslevel.canReadData)
-        renderResponse(doc, currentPart, loggedIn, accesslevel, via)
+        renderResponse(doc, currentPart, loggedIn, accesslevel, via.map(AnnotationSummary.from))
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
         Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))
       else
@@ -87,7 +87,7 @@ class AnnotationController @Inject() (
     currentPart: DocumentFilepartRecord,
     loggedInUser: Option[User],
     accesslevel: RuntimeAccessLevel,
-    redirectedVia: Option[Annotation]
+    redirectedVia: Option[AnnotationSummary]
   )(implicit request: RequestHeader) = {
 
     logDocumentView(doc.document, Some(currentPart), accesslevel)
