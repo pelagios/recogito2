@@ -28,7 +28,7 @@ define(['common/utils/placeUtils'], function(PlaceUtils) {
           valAfter = contribution.affects_item.value_after,
           valAfterShort = (valAfter && valAfter.length > 256) ? valAfter.substring(0, 256) + '...' : valAfter,
           annotationUri = jsRoutes.controllers.document.annotation.AnnotationController
-            .resolveAnnotationView(contribution.affects_item.document_id, contribution.affects_item.filepart_id, contribution.affects_item.annotation_id).url;
+            .resolveFromAnnotation(contribution.affects_item.annotation_id).url;
           context = (contribution.context) ? '<em>&raquo;<a href="' + annotationUri +'">' + contribution.context + '&laquo;</a></em>' : false;
 
       if (action === 'CREATE_BODY' && itemType === 'QUOTE_BODY') {

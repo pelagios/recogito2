@@ -4,7 +4,8 @@
   currentUser: Option[services.user.User],
   accessLevel: services.document.RuntimeAccessLevel,
   preview: String,
-  annotationCount: Long
+  annotationCount: Long,
+  sharedVia: Option[services.annotation.Annotation]
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>

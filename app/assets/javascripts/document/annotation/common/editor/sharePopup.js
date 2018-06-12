@@ -3,9 +3,7 @@ define(['common/config'], function(Config) {
   var l = window.location, // Shorthand
 
       ANNOTATION_BASE = l.protocol + '//' +
-        l.host + '/document/' +
-        Config.documentId + '/part/' +
-        Config.partSequenceNo + '/edit#',
+        l.host + '/annotation/',
 
       IMAGE_BASE = l.protocol + '//' +
         l.host + '/api/annotation/',

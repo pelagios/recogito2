@@ -83,7 +83,7 @@ require([
                 })[0],
 
                 documentUrl = jsRoutes.controllers.document.annotation.AnnotationController
-                  .resolveAnnotationView(contribution.affects_item.document_id, contribution.affects_item.filepart_id, contribution.affects_item.annotation_id).url,
+                  .resolveFromAnnotation(contribution.affects_item.annotation_id).url,
 
                 documentLabel = (document.author) ?
                   document.author + ': ' + document.title :

@@ -31,47 +31,30 @@ class AnnotationController @Inject() (
   implicit val ctx: ExecutionContext
 ) extends BaseOptAuthController(components, config, documents, users)
     with HasTEISnippets
-    with HasVisitLogging 
+    with HasVisitLogging
     with I18nSupport {
-
-  /** For convenience: redirects to proper annotation view, given various ID combinations  **/
-  def resolveAnnotationView(
-    documentId: String,
-    maybePartId: Option[java.util.UUID],
-    maybeAnnotationId: Option[java.util.UUID]) = Action.async { implicit request =>
-
-    // Shorthand re-used below
-    def partResponse(partId: UUID, okResponse: DocumentFilepartRecord => Result) =
-      documents.findPartById(partId).map {
-        case Some(part) => okResponse(part)
-        case None =>  NotFoundPage
-      }
-
-    (maybePartId, maybeAnnotationId) match {
-
-      case (Some(partId), Some(annotationId)) => partResponse(partId, { part =>
-        // Redirect to part, with annotation ID appended as fragment
-        Redirect(routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo)
-          .withFragment(annotationId.toString).toString) })
-
-      case (Some(partId), None) => partResponse(partId, { part =>
-        // Redirect to part
-        Redirect(routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo)) })
-
-      case (None, Some(annotationId)) =>
-        // No part ID? Fetch from annotation
-        annotations.findById(annotationId).flatMap {
-          case Some((annotation, _)) => partResponse(annotation.annotates.filepartId, { part =>
+  
+  def resolveFromAnnotation(uuid: UUID) = Action.async { implicit request =>
+    annotations.findById(uuid).flatMap {
+      case Some((annotation, _)) =>
+        documents.findPartById(annotation.annotates.filepartId).map {
+          case Some(part) =>
             Redirect(routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo)
-              .withFragment(annotationId.toString).toString)
-          })
-
-          case None => Future.successful(NotFound)
+              .withFragment(annotation.annotationId.toString).toString)
+            
+          case None => InternalServerError // Annotation points to non-existing part? Should never happen
         }
-
-      case (None, None) =>
-        // No part specified - redirect to first part in sequence
-        Future.successful(Redirect(routes.AnnotationController.showAnnotationView(documentId, 1)))
+        
+      case None => Future.successful(NotFoundPage)
+    }
+  }
+  
+  def resolveFromPart(uuid: UUID) = Action.async { implicit request =>
+    documents.findPartById(uuid).map {
+      case Some(part) =>
+        Redirect(routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo))
+        
+      case None =>  NotFoundPage
     }
   }
 
@@ -96,13 +79,13 @@ class AnnotationController @Inject() (
   )(implicit request: RequestHeader) = {
 
     logDocumentView(doc.document, Some(currentPart), accesslevel)
-    
+
     // Needed in any case - start now (val)
     val fCountAnnotations = annotations.countByDocId(doc.id)
 
     // Needed only for Text and TEI - start on demand (def)
     def fReadTextfile() = uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile)
-    
+
     // Generic conditional: is the user authorized to see the content? Render 'forbidden' page if not.
     def ifAuthorized(result: Result, annotationCount: Long) =
       if (accesslevel.canReadAll) result else Ok(views.html.document.annotation.forbidden(doc, currentPart, loggedInUser, annotationCount))
@@ -110,15 +93,15 @@ class AnnotationController @Inject() (
     ContentType.withName(currentPart.getContentType) match {
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
-        fCountAnnotations.map { c => 
-          ifAuthorized(Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c)), c)
+        fCountAnnotations.map { c =>
+          ifAuthorized(Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c, None)), c)
         }
 
       case Some(ContentType.TEXT_PLAIN) =>
         fReadTextfile() flatMap {
           case Some(content) =>
-            fCountAnnotations.map { c => 
-              ifAuthorized(Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, c, content)), c)
+            fCountAnnotations.map { c =>
+              ifAuthorized(Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, c, content, None)), c)
             }
 
           case None =>
@@ -132,7 +115,7 @@ class AnnotationController @Inject() (
           case Some(content) =>
             fCountAnnotations.map { c =>
               val preview = previewFromTEI(content)
-              ifAuthorized(Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c)), c)
+              ifAuthorized(Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c, None)), c)
             }
 
           case None =>

@@ -82,7 +82,7 @@ define([
 
         getContentLink = function(annotation) {
           return jsRoutes.controllers.document.annotation.AnnotationController
-            .resolveAnnotationView(Config.documentId, annotation.annotates.filepart_id, annotation.annotation_id).url;
+            .resolveFromAnnotation(annotation.annotation_id).url;
         },
 
         showCard = function(annotation, slideDirection) {
