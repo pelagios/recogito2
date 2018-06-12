@@ -89,6 +89,13 @@ define(['common/config'], function(Config) {
           imageInput.val(IMAGE_BASE + id + '.jpg');
         },
 
+        onClick = function() {
+          var el = jQuery(this),
+              inputId = el.data('for');
+
+          jQuery('#' + inputId).focus();
+        },
+
         onFocus = function() {
           var el = jQuery(this),
               id = el.attr('id'),
@@ -100,8 +107,8 @@ define(['common/config'], function(Config) {
           setTimeout(function() { notifier.fadeOut(300); }, 2000);
         };
 
-    annotationInput.focus(onFocus);
-    imageInput.focus(onFocus);
+    element.find('input').focus(onFocus);
+    element.find('button').click(onClick);
 
     this.close = close;
     this.isOpen = isOpen;
