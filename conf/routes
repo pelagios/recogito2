@@ -28,6 +28,7 @@ GET     /help/about                                  controllers.help.HelpContro
 GET     /help/faq                                    controllers.help.HelpController.faq
 GET     /help/privacy                                controllers.help.HelpController.privacy
 GET     /help/relations                              controllers.help.HelpController.relations
+GET     /help/sharing-links                          controllers.help.HelpController.sharingLinks
 GET     /help/terms                                  controllers.help.HelpController.terms
 GET     /help/tutorial                               controllers.help.HelpController.tutorial
 GET     /help/:lang/tutorial                         controllers.help.HelpController.localizedTutorial(lang: String)

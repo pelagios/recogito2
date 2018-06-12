@@ -32,6 +32,7 @@
         partId: '@currentPart.getId',
         partSequenceNo: @currentPart.getSequenceNo,
         contentType: '@currentPart.getContentType',
+        isPublic: @doc.isOpenToPublic,
         writeAccess: @accessLevel.canWrite,
         isAdmin: @accessLevel.isAdmin
       }

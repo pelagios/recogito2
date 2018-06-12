@@ -8,7 +8,21 @@ define(['common/config'], function(Config) {
         Config.partSequenceNo + '/edit#',
 
       IMAGE_BASE = l.protocol + '//' +
-        l.host + '/api/annotation/';
+        l.host + '/api/annotation/',
+
+      SHARE_WARNING = (Config.isPublic) ? "" /* No warning */ :
+        (Config.isAdmin) ?
+          // Admin access -> link to sharing settings
+          '<span class="private-document">' +
+            '<span class="icon">&#xf071;</span> This document is not public ' +
+            '(<a href="/document/' + Config.documentId + '/settings?tab=sharing" target="_blank">edit sharing settings</a>)' +
+          '</span>' :
+
+          // No admin? Link to help for more info
+          '<span class="private-document">' +
+            '<span class="icon">&#xf071;</span> This document is not public ' +
+            '(<a href="/help/sharing-links" target="_blank">learn more</a>)' +
+          '</span>';
 
   var SharePopup = function(parent) {
 
@@ -28,6 +42,8 @@ define(['common/config'], function(Config) {
               '</span>' +
               '<input type="text" id="share-image" class="share-link image-url" />' +
 
+              SHARE_WARNING +
+
             '</div>').hide().appendTo(parent) :
 
           jQuery(
@@ -38,6 +54,8 @@ define(['common/config'], function(Config) {
                 '<span class="notifier" data-for="share-annotation">Copied to Clipboard</span>' +
               '</span>' +
               '<input type="text" id="share-annotation" class="share-link annotation-url" />' +
+
+              SHARE_WARNING +
 
             '</div>').hide().appendTo(parent),
 
