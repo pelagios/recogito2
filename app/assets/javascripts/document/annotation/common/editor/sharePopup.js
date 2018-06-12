@@ -91,9 +91,11 @@ define(['common/config'], function(Config) {
 
         onClick = function() {
           var el = jQuery(this),
-              inputId = el.data('for');
+              inputId = el.data('for'),
+              inputEl = jQuery('#' + inputId);
 
-          jQuery('#' + inputId).focus();
+          inputEl.focus();
+          inputEl.blur();
         },
 
         onFocus = function() {

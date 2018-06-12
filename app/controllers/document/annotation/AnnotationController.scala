@@ -5,7 +5,7 @@ import controllers.{BaseOptAuthController, HasVisitLogging, HasTEISnippets, Secu
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import services.ContentType
-import services.annotation.AnnotationService
+import services.annotation.{Annotation, AnnotationService}
 import services.document.{RuntimeAccessLevel, DocumentInfo, DocumentService}
 import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord, UserRecord}
 import services.user.{User, UserService}
@@ -40,7 +40,7 @@ class AnnotationController @Inject() (
         documents.findPartById(annotation.annotates.filepartId).map {
           case Some(part) =>
             Redirect(routes.AnnotationController.showAnnotationView(part.getDocumentId, part.getSequenceNo)
-              .withFragment(annotation.annotationId.toString).toString)
+              .withFragment(annotation.annotationId.toString).toString).flashing("annotation" -> annotation.annotationId.toString)
             
           case None => InternalServerError // Annotation points to non-existing part? Should never happen
         }
@@ -61,21 +61,33 @@ class AnnotationController @Inject() (
   /** Shows the annotation view for a specific document part **/
   def showAnnotationView(documentId: String, seqNo: Int) = silhouette.UserAwareAction.async { implicit request =>
     val loggedIn = request.identity
-    documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
+    
+    val fRedirectedVia = request.flash.get("annotation") match {
+      case Some(annotationId) => annotations.findById(UUID.fromString(annotationId)).map { _.map(_._1) }
+      case None => Future.successful(None)
+    }
+    
+    def fResponse(via: Option[Annotation]) = documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
       if (accesslevel.canReadData)
-        renderResponse(doc, currentPart, loggedIn, accesslevel)
+        renderResponse(doc, currentPart, loggedIn, accesslevel, via)
       else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
         Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))
       else
         Future.successful(ForbiddenPage)
     })
+    
+    for {
+      redirectedVia <- fRedirectedVia
+      response <- fResponse(redirectedVia)
+    } yield response
   }
 
   private def renderResponse(
     doc: DocumentInfo,
     currentPart: DocumentFilepartRecord,
     loggedInUser: Option[User],
-    accesslevel: RuntimeAccessLevel
+    accesslevel: RuntimeAccessLevel,
+    redirectedVia: Option[Annotation]
   )(implicit request: RequestHeader) = {
 
     logDocumentView(doc.document, Some(currentPart), accesslevel)
@@ -94,14 +106,14 @@ class AnnotationController @Inject() (
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
         fCountAnnotations.map { c =>
-          ifAuthorized(Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c, None)), c)
+          ifAuthorized(Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c, redirectedVia)), c)
         }
 
       case Some(ContentType.TEXT_PLAIN) =>
         fReadTextfile() flatMap {
           case Some(content) =>
             fCountAnnotations.map { c =>
-              ifAuthorized(Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, c, content, None)), c)
+              ifAuthorized(Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, c, content, redirectedVia)), c)
             }
 
           case None =>
@@ -115,7 +127,7 @@ class AnnotationController @Inject() (
           case Some(content) =>
             fCountAnnotations.map { c =>
               val preview = previewFromTEI(content)
-              ifAuthorized(Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c, None)), c)
+              ifAuthorized(Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c, redirectedVia)), c)
             }
 
           case None =>
