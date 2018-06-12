@@ -2,27 +2,50 @@ define(['common/config'], function(Config) {
 
   var l = window.location, // Shorthand
 
-      BASE_URL = l.protocol + '//' +
+      ANNOTATION_BASE = l.protocol + '//' +
         l.host + '/document/' +
         Config.documentId + '/part/' +
-        Config.partSequenceNo + '/edit#';
+        Config.partSequenceNo + '/edit#',
+
+      IMAGE_BASE = l.protocol + '//' +
+        l.host + '/api/annotation/';
 
   var SharePopup = function(parent) {
-    var element = jQuery(
-          '<div class="share-popup">' +
-            '<div class="arrow"></div>' +
-            '<span class="label"><span class="icon">&#xf0c1;</span> Link to share ' +
-              '<span class="notifier">Copied to Clipboard</span>' +
-            '</span>' +
-            '<input type="text" class="annotation-link" />' +
-          '</div>').hide().appendTo(parent),
 
-        notifierEl = element.find('.notifier').hide(),
+        // Design differs for text vs. image (images have a JPG share URL as well)
+    var element = (Config.contentType.indexOf('IMAGE') === 0) ?
+          jQuery(
+            '<div class="share-popup">' +
+              '<div class="arrow"></div>' +
 
-        inputEl = element.find('input'),
+              '<span class="label"><span class="icon">&#xf0c1;</span> Link to share annotation' +
+                '<span class="notifier" data-for="share-annotation">Copied to Clipboard</span>' +
+              '</span>' +
+              '<input type="text" id="share-annotation" class="share-link annotation-url" />' +
+
+              '<span class="label"><span class="icon">&#xf03e;</span> Link to image snippet' +
+                '<span class="notifier" data-for="share-image">Copied to Clipboard</span>' +
+              '</span>' +
+              '<input type="text" id="share-image" class="share-link image-url" />' +
+
+            '</div>').hide().appendTo(parent) :
+
+          jQuery(
+            '<div class="share-popup">' +
+              '<div class="arrow"></div>' +
+
+              '<span class="label"><span class="icon">&#xf0c1;</span> Link to share ' +
+                '<span class="notifier" data-for="share-annotation">Copied to Clipboard</span>' +
+              '</span>' +
+              '<input type="text" id="share-annotation" class="share-link annotation-url" />' +
+
+            '</div>').hide().appendTo(parent),
+
+        annotationInput = element.find('input.annotation-url'),
+        imageInput = element.find('input.image-url'),
 
         close = function() {
-          notifierEl.hide();
+          jQuery('.notifier').hide();
           element.hide();
         },
 
@@ -31,24 +54,29 @@ define(['common/config'], function(Config) {
         },
 
         toggle = function() {
-          if (element.is(':visible'))
-            close();
-          else
-            element.show();
+          if (element.is(':visible')) close();
+          else element.show();
         },
 
         setAnnotation = function(annotation) {
-          inputEl.val(BASE_URL + annotation.annotation_id);
+          var id = annotation.annotation_id;
+          annotationInput.val(ANNOTATION_BASE + id);
+          imageInput.val(IMAGE_BASE + id + '.jpg');
         },
 
         onFocus = function() {
-          jQuery(this).select();
+          var el = jQuery(this),
+              id = el.attr('id'),
+              notifier = jQuery('.notifier[data-for="' + id + '"]');
+
+          el.select();
           document.execCommand('copy');
-          notifierEl.fadeIn(100);
-          setTimeout(function() { notifierEl.fadeOut(300); }, 2000);
+          notifier.fadeIn(100);
+          setTimeout(function() { notifier.fadeOut(300); }, 2000);
         };
 
-    inputEl.focus(onFocus);
+    annotationInput.focus(onFocus);
+    imageInput.focus(onFocus);
 
     this.close = close;
     this.isOpen = isOpen;
