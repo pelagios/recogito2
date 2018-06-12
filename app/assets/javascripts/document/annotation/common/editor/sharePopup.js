@@ -37,7 +37,7 @@ define(['common/config'], function(Config) {
               '</span>' +
               '<input type="text" id="share-annotation" class="share-link annotation-url" />' +
 
-              '<span class="label"><span class="icon">&#xf03e;</span> Link to image snippet' +
+              '<span class="label"><span class="icon">&#xf03e;</span> Link to share image snippet' +
                 '<span class="notifier" data-for="share-image">Copied to Clipboard</span>' +
               '</span>' +
               '<input type="text" id="share-image" class="share-link image-url" />' +
