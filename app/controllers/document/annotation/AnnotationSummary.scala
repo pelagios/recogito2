@@ -6,6 +6,7 @@ case class AnnotationSummary(title: String, description: String)
 
 object AnnotationSummary {
   
-  def from(a: Annotation): AnnotationSummary = AnnotationSummary("foo", "bar baz")
+  // TODO
+  def from(a: Annotation): AnnotationSummary = AnnotationSummary("", "")
   
 }
