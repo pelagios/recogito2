@@ -171,27 +171,26 @@
         çözünürlükte bile rahatça gezinebilirsiniz. Yakınlaşmak için fare tekerleğini
         veya sağ üstteki  <span class="key">+</span> <span class="key">-</span> tuşlarını kullanın.
         Dokunmatik ekranlarda ayrıca <strong>kaydırma hareketini</strong> kullanabilirsiniz.
-        Görüntüyü taşımak veya bırakmak için <strong>yatay kaydırmayı</strong> kullanabilirsiniz.        
+        Görüntüyü taşımak veya bırakmak için <strong>yatay kaydırmayı</strong> kullanabilirsiniz.
       </p>
 
       <p>
-        You can <strong>rotate</strong> the image at arbitrary angles. On a desktop computer,
-        hold <span class="key">SHIFT</span> + <span class="key">Alt</span> while dragging with your
-        mouse. On touch devices, use a pinch gesture. Use the button with the single arrow
-        <span class="key icon">&#xf176;</span> to quickly rotate the image back to its
-        original orientation.
+        Görüntüyü istediğiniz açıda döndürebilirsiniz.Masaüstü bilgisayarında fare ile taşıma
+        yaparken <span class="key">SHIFT</span> + <span class="key">Alt</span> tuşlarına basılı
+        tutunuz. Dokunmatik cihazlarda, kaydırma hareketini kullanınız. Görüntüyü orijinal yönüne
+        geri getirmek için tek oklu tuşu kullanabilirsiniz.
       </p>
 
       <p>
-        Let's create our first image annotation. In the toolbar, there is a drop-down menu where you
-        can switch between Recogito's different selection modes: Point, Rectangle and Tilted Box.
-        Select <strong>Point</strong> and create an annotation by clicking somewhere in your image.
-        Switch back to <strong>Move</strong> to resume standard image navigation.
+        İlk görüntü açıklamamızı oluşturalım. Araç menüsünde Recogito’nun farklı mod seçeneklerine
+        geçiş yapabileceğiniz, aşağıya doğru açılan bir menü bulunuyor: Nokta, Dikdörtgen ve
+        Paralel kenar. Nokta’yı seçin ve bir açıklama oluşturmak için  görüntünüzün üzerinde
+        bir yere tıklayın. Standart görüntü navigasyonuna devam etmek için Taşı’ya geri dönün.
       </p>
 
       <p>
-        Now try annotating an area: pick the <strong>Rectangle</strong> tool. Click once to
-        select the starting corner of the area. Then click again for the opposite corner.
+        Şimdi bir bölgeyi açıklamayı deneyin: Dikdörtgen aracı seçin. Başlangıç bölgesi için
+        seçtiğiniz noktaya tıklayın. Sonra ters köşe için tekrar tıklayın.
       </p>
 
       <p>
@@ -199,16 +198,15 @@
       </p>
 
       <p id="tilted-box">
-        The <strong>Tilted Box</strong> tool may take a bit more practice: select it from the menu.
-        Click the mouse button once to start drawing the baseline of the box. Click again to set the
-        end of the baseline. Move the mouse to define the height of the box, and click when you are
-        happy with the height.
+        Paralel kenar aracı biraz daha fazla çalışma gerektirebilir: Menüden modu seçin. Fare
+        düğmesine basılı tutarak kutunun taban çizgisini belirleyin. Fare düğmesini bırakın.
+        Fareyi kutunun yüksekliğine karar vermek için oynatın ve uygun bulduğunuz yerde tıklayın.
       </p>
 
       <p class="tip">
-        Tip: the Tilted Box tool is especially useful for annotating labels in maps. Because
-        there is an explicit <strong>baseline</strong>, the data you generate
-        will also retain information about the <strong>orientation</strong> of the label.
+        Tavsiye: Paralel kenar aracı özellikle haritalardaki notları açıklamak için yararlıdır.
+        Belirgin bir taban çizgisi olması sayesinde ürettiğiniz veri, notun önceki yönü hakkında
+        da bilgi verir.
       </p>
 
       <p id="linked-box">
@@ -223,23 +221,21 @@
         height. You can modify all points afterwards, by clicking and dragging them.
       </p>
 
-      <h2 id="map">Step 3. Identify and Map Places</h2>
+      <h2 id="map">3. Adım. Yerleri Tanımlayın ve Haritalayın</h2>
 
       <p>
-        You already know how to annotate a word or phrase in a document, and identify it as a
-        reference to a place. Now let's assign this reference to a
-        <a href="@controllers.help.routes.HelpController.faq()#what-is-a-gazetteer">gazetteer</a>,
-        so that Recogito can plot it on the map.
+        Şu anda bir belgedeki kelimeyi veya kelime grubunu nasıl açıklayacağınızı ve bir yere
+        referans vermek için nasıl tanımlayacağınızı biliyorsunuz. Şimdi Recogito’nun haritada
+        yerleştirmesi için bu referansı bir yer adları kataloğuna atayın.
       </p>
 
       <p>
-        Click <strong>Place</strong> in the annotation editor. Recogito will attempt to
-        provide an automatic suggestion from
-        <a href="@controllers.help.routes.HelpController.faq()#available-gazetteers">its
-        supported gazetteers</a>. You can either <strong>confirm</strong> this suggestion, or
-        try to find a better match in the gazetteer search. If you can't find a suitable match,
-        you also have the option to <strong>flag</strong> this reference, as an indication that
-        no suitable match was available.
+        Açıklama düzenleyicisinde Yer tıklayınız. Recogito size desteklenen
+        <a href="@controllers.help.routes.HelpController.faq()#available-gazetteers">yer adları
+        kataloğu</a> içinden otomatik olarak öneri getirecektir. Bu öneriyi onaylayabilir veya
+        yer adları kataloğu içinden arama yaparak daha iyi bir eşleşmeyi bulabilirsiniz. Eğer
+        uygun bir eşleşme bulamazsanız, Uygun eşlemesi yoktur olarak işaretleme opsiyonunuzda
+        bulunmaktadır.
       </p>
 
       <p>
@@ -247,33 +243,30 @@
       </p>
 
       <p>
-        To speed up your work, Recogito will automatically search the text for identical phrases
-        and give you the option to <strong>re-apply</strong> the gazetteer assignment to all
-        other matches.
+        İşinizi hızlandırmak için, Recogito otomatik olarak metni benzer ifadeler için
+        arayacak ve size yer adları kataloğu içindeki tüm diğer eşleşmeler atanacak bir
+        opsiyonu sunacaktır.
       </p>
 
-      <h2 id="export">Step 4. Export Your Data</h2>
+      <h2 id="export">4. Adım: Verinizi Aktarın</h2>
 
       <p>
-        Select the <span class="outline-icon">&#xe875;</span> icon in the main navigation bar.
-        This will take you to the available <strong>export options</strong> for your document. In
-        addition to the options listed on this page, you can also download a <strong>backup
-        package</strong> of your work from the <span class="outline-icon">&#xe8c9;</span> document
-        settings page. We recommend to download backups for archiving and as an added security measure.
+        Simge yi ana gezinme çubuğunda tıklayınız. Bu size dokümanınız için mevcut olan aktarma
+        opsiyonlarını gösterecektir. Bu sayfada listelenen opsiyon listesine ek olarak,
+        doküman ayarları sayfasından işinizin yedek paketini de indirebilirsiniz. Arşivleme
+        ve güvenlik unsuru olarak yedeklemeleri ayrı bir dizine indirmenizi tavsiye ederiz.
       </p>
 
       <p>
         <img src="@routes.Assets.versioned("images/help/export.png")">
       </p>
 
-      <h2 id="invite">Step 5. Invite Other Users</h2>
+      <h2 id="invite">5. Adım: Diğer Kullanıcıları Davet Edin</h2>
 
       <p>
-        In this final step we are going to learn how you can share your documents with other
-        users on Recogito, so that you can work as a team. Select the
-        <span class="outline-icon">&#xe8c9;</span> icon in the main navigation bar. This will
-        take you to the <strong>Document Settings</strong> page. In the left sidebar,
-        select <strong>Sharing</strong>.
+        Bu son adımda takım olarak çalışabilmeniz için belgelerinizi diğer kullanıcılarla nasıl
+        paylaşacağımızı öğreneceğiz. Ana gezinti menüsünden simgeyi seçin. Bu sizi Belge
+        Düzenlemeleri sayfasına götürecektir. Soldaki menüden Paylaşım’ı seçin.
       </p>
 
       <p>
@@ -281,40 +274,42 @@
       </p>
 
       <p>
-        Use the search field at the bottom of the <strong>Collaborators</strong> box to grant a user
-        access to your document. You can choose between different levels of access:
+        Bir kullanıcının sizin belgenize ulaşması için Katılımcılar kutusunun altındaki arama
+        alanını kullanın. Farklı seviyelerde ulaşım izni belirleyebilirsiniz:
       </p>
 
       <ul>
-        <li><strong>Read</strong> allows users to view document and annotations, but not add
-          annotations and comments themselves.</li>
+        <li>Oku, kullanıcıların belgeyi ve açıklamaları görmelerine izin verir ancak kullanıcılar
+          açıklama ve yorum ekleyemezler.</li>
 
-        <li><strong>Write</strong> allows users to view and annotate the document.</li>
+        <li>Yaz, kullanıcıların belgeyi görmelerine ve açıklama eklemelerine izin verir.</li>
 
-        <li><strong>Admin</strong> provides write access, and additionally allows users to
-          edit document metadata, invite other collaborators, and perform administrative
-          actions like downloading backups.</li>
+        <li>Yönetici yazma erişimi sağlar, ve ek olarak kullanıcıların belge metaverisini
+          düzenlemesine izin verir, diğer katılımcıları davet eder, ve yedekleri indirme gibi
+          yönetici aksiyonlarını uygular.</li>
       </ul>
 
-      <h2>Congratulations!</h2>
+      <h2>Tebrikler!</h2>
 
       <p>
-        You have successfully made your way through Recogito's most important features.
-        By completing this tutorial, you have learned to:
+        Recogito’nun en önemli özelliklerini kullanmayı başarıyla öğrendiniz. Bu çalışmayı
+        tamamlayarak
       </p>
 
       <ul>
-        <li>upload documents</li>
-        <li>create annotations on texts and images</li>
-        <li>map place references to gazetteers</li>
-        <li>export your data to different formats</li>
-        <li>invite other users to work with you</li>
+        <li>belge yüklemeyi</li>
+        <li>Metin ve görüntüler üzerinde açıklamalar oluşturmayı</li>
+        <li>Yer referanslarını yer isimleri kataloglarına eklemeyi</li>
+        <li>Verilerinizi farklı formatlarda dışa aktarmayı</li>
+        <li>Başkalarını birlikte çalışmak üzere davet etmeyi</li>
       </ul>
 
+      <p>öğrendiniz.</p>
+
       <p>
-        If you want to learn more and get in touch with our user community, please visit the
-        <a href="http://commons.pelagios.org/groups/recogito-users/" target="_blank">Recogito Users
-        Forum</a>.
+        Eğer daha fazla bilgi almak ve kullanıcı topluluğu ile temasa geçmek isterseniz lütfen
+        <a href="http://commons.pelagios.org/groups/recogito-users/" target="_blank">Recogito
+        Kullanıcı Forumu (Recogito Users Forum)</a>‘nu lütfen ziyaret edin.
       </p>
     </div>
   </div>
