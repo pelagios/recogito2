@@ -12,7 +12,7 @@
   <head>
     <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
-    @views.html.document.annotation._meta(doc, annotationCount, Some(currentPart), None, sharedVia)
+    @views.html.document.annotation._meta(doc, annotationCount, Some(currentPart), Some(preview), sharedVia)
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/tei/index.css")"/>
     <link rel="stylesheet" id="colorscheme" href="@routes.Assets.versioned("stylesheets/document/annotation/text/colorByType.css")"/>
     @Html(webJarsUtil.css("leaflet.css"))

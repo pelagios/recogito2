@@ -6,8 +6,4 @@
   sharedVia: Option[controllers.document.annotation.AnnotationSummary]
 )(implicit request: RequestHeader)
 
-@if(sharedVia.isDefined) {
-  
-} else {
-  @views.html.document.standardMeta(doc, annotationCount, currentPart, content)
-}
+@views.html.document.standardMeta(doc, annotationCount, currentPart, content)

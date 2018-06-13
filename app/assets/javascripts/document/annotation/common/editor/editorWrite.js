@@ -79,11 +79,10 @@ define([
         },
 
         openSelection = function(selection) {
-          sharePopup.close(); // Always close the share popup
-
-          // In case of selection === undefined, close the editor
+          // In case of selection === undefined, close the editor (unless sharePopup open - close first)
           if (!selection) {
-            self.close();
+            if (sharePopup.isOpen()) sharePopup.close();
+            else self.close();
             return;
           }
 
@@ -140,13 +139,16 @@ define([
 
         /** 'Cancel' clears the selection and closes the editor **/
         onCancel = function() {
-          if (sharePopup.isOpen()) {
-            // Close the popup
+          selectionHandler.clearSelection();
+          self.close();
+        },
+
+        onEscape = function() {
+          // Escape key should close the share popup first
+          if (sharePopup.isOpen())
             sharePopup.close();
-          } else {
-            selectionHandler.clearSelection();
-            self.close();
-          }
+          else
+            onCancel();
         },
 
         /** 'OK' updates the annotation & highlight spans and closes the editor **/
@@ -234,7 +236,7 @@ define([
     this.sectionList.on('change', onChangeGeoresolution);
 
     // ESC key doubles as 'Cancel'
-    this.on('escape', onCancel);
+    this.on('escape', onEscape);
 
     // TODO handle click on background document -> cancel
   };

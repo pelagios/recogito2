@@ -69,9 +69,24 @@ define(['common/config'], function(Config) {
         annotationInput = element.find('input.annotation-url'),
         imageInput = element.find('input.image-url'),
 
+        onClick = function(e) {
+          var destination = jQuery(e.target).closest('.share-popup');
+          if (destination.length === 0) close(); // Click outside
+        },
+
         close = function() {
-          jQuery('.notifier').hide();
+          parent.off('click', onClick);
           element.hide();
+        },
+
+        open = function() {
+          jQuery('.notifier').hide();
+          element.show();
+          setTimeout(function() {
+            // We need to delay, otherwise the opening click is already registered as an
+            // outside click, instantly closing the popup again
+            parent.on('click', onClick);
+          }, 1);
         },
 
         isOpen = function() {
@@ -80,7 +95,7 @@ define(['common/config'], function(Config) {
 
         toggle = function() {
           if (element.is(':visible')) close();
-          else element.show();
+          else open();
         },
 
         setAnnotation = function(annotation) {
@@ -89,28 +104,21 @@ define(['common/config'], function(Config) {
           imageInput.val(IMAGE_BASE + id + '.jpg');
         },
 
-        onClick = function() {
-          var el = jQuery(this),
-              inputId = el.data('for'),
-              inputEl = jQuery('#' + inputId);
+        onCopy = function() {
+          var button = jQuery(this),
+              inputId = button.data('for'),
+              inputEl = jQuery('#' + inputId),
+              notifier = jQuery('.notifier[data-for="' + inputId + '"]');
 
-          inputEl.focus();
-          inputEl.blur();
-        },
-
-        onFocus = function() {
-          var el = jQuery(this),
-              id = el.attr('id'),
-              notifier = jQuery('.notifier[data-for="' + id + '"]');
-
-          el.select();
+          inputEl.select();
           document.execCommand('copy');
+          inputEl.blur();
+
           notifier.fadeIn(100);
           setTimeout(function() { notifier.fadeOut(300); }, 2000);
         };
 
-    element.find('input').focus(onFocus);
-    element.find('button').click(onClick);
+    element.find('button').click(onCopy);
 
     this.close = close;
     this.isOpen = isOpen;
