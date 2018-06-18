@@ -1,6 +1,7 @@
 package transform.georesolution
 
 import com.vividsolutions.jts.geom.Coordinate
+import java.net.URI
 import java.util.UUID
 import services.ContentType
 import services.annotation._
@@ -8,9 +9,9 @@ import services.annotation.relation.Relation
 import services.entity.EntityType
 import services.entity.builtin.EntityService
 import services.task.TaskService
-import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord }
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime
-import scala.concurrent.{ Await, ExecutionContext }
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import storage.es.ES
 
@@ -22,14 +23,16 @@ trait Georesolvable {
   
   val coord: Option[Coordinate]
   
+  val uri: Option[URI]
+  
 }
 
 object Georesolvable {
   
-  private[Georesolvable] class DefaultGeoresolvable(val toponym: String, val anchor: String, val coord: Option[Coordinate]) extends Georesolvable
+  private[Georesolvable] class DefaultGeoresolvable(val toponym: String, val anchor: String, val coord: Option[Coordinate], val uri: Option[URI]) extends Georesolvable
  
   def apply(toponym: String, anchor: String, coord: Option[Coordinate]) =
-    new DefaultGeoresolvable(toponym, anchor, coord)
+    new DefaultGeoresolvable(toponym, anchor, coord, None)
   
 }
 
@@ -54,20 +57,26 @@ trait HasGeoresolution {
     val partId = part.getId
     val contentType = ContentType.withName(part.getContentType).get
     
-    def resolveOne(resolvable: T, index: Int) = {
-      entityService.searchEntities(ES.sanitize(resolvable.toponym), Some(EntityType.PLACE), 0, 1, resolvable.coord).map { topHits =>
-        if (topHits.total > 0)
-          // TODO be smarter about choosing the right URI from the place
-          toAnnotation(docId, partId, contentType, resolvable, Some(topHits.items(0).entity.uris.head), index)         
-        else
-          // No gazetteer match found
-          toAnnotation(docId, partId, contentType, resolvable, None, index)
-      }.recover { case t: Throwable =>
-        t.printStackTrace()
-        toAnnotation(docId, partId, contentType, resolvable, None, index)
+    def resolveOne(resolvable: T): Future[Annotation] =
+      resolvable.uri match {
+        case Some(uri) =>
+          // Just keep the URI provided with the entity
+          Future.successful(toAnnotation(docId, partId, contentType, resolvable, Some(uri.toString)))
+          
+        case None =>
+          // Try to resolve toponym against the index
+          entityService.searchEntities(ES.sanitize(resolvable.toponym), Some(EntityType.PLACE), 0, 1, resolvable.coord).map { topHits =>
+            if (topHits.total > 0)
+              // TODO be smarter about choosing the right URI from the place
+              toAnnotation(docId, partId, contentType, resolvable, Some(topHits.items(0).entity.uris.head))         
+            else
+              // No gazetteer match found
+              toAnnotation(docId, partId, contentType, resolvable, None)
+          }.recover { case t: Throwable =>
+            t.printStackTrace()
+            toAnnotation(docId, partId, contentType, resolvable, None)
+          }
       }
-    }
-    
     var counter = 0
     var progress = progressRange._1
     
@@ -76,7 +85,7 @@ trait HasGeoresolution {
       maybeResolvable match {
         case Some(resolvable) =>
           val f = for {
-            annotation <- resolveOne(resolvable, counter)
+            annotation <- resolveOne(resolvable)
             (success, _) <- annotationService.upsertAnnotation(annotation)
           } yield (success)
           
@@ -100,8 +109,8 @@ trait HasGeoresolution {
       partId: UUID,
       contentType: ContentType,
       resolvable: T,
-      uri: Option[String],
-      index: Int
+      uri: Option[String]
+      // index: Int
     ): Annotation = {
     
     val now = new DateTime()

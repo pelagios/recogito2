@@ -2,6 +2,7 @@ package transform.ner
 
 import akka.actor.Props
 import java.io.File
+import java.net.URI
 import java.util.UUID
 import org.pelagios.recogito.sdk.ner._
 import play.api.Logger
@@ -16,7 +17,7 @@ import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord
 import transform.georesolution.{Georesolvable, HasGeoresolution}
 import transform.WorkerActor
 
-case class EntityResolvable(entity: Entity, val anchor: String) extends Georesolvable {
+case class EntityResolvable(entity: Entity, val anchor: String, val uri: Option[URI]) extends Georesolvable {
   val toponym = entity.chars
   val coord = None
 }
@@ -64,7 +65,7 @@ class NERActor(
       case Some(t) if t == ContentType.TEXT_PLAIN =>
         val text = Source.fromFile(new File(dir, part.getFile)).getLines.mkString("\n")
         val entities = NERService.parseText(text)
-        entities.map(e => EntityResolvable(e, s"char-offset:${e.charOffset}"))
+        entities.map(e => EntityResolvable(e, s"char-offset:${e.charOffset}", Option(e.uri)))
         
       case Some(t) if t == ContentType.TEXT_TEIXML =>
         // For simplicity, NER results are inlined into the TEI document. They
@@ -72,7 +73,7 @@ class NERActor(
         // step, anyway.
         val entitiesAndAnchors = NERService.parseTEI(new File(dir, part.getFile))
         entitiesAndAnchors.map { case (e, anchor) => 
-          EntityResolvable(e, anchor)
+          EntityResolvable(e, anchor, Option(e.uri))
         }
 
       case _ =>
