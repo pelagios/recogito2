@@ -46,6 +46,12 @@
               <img src="@routes.Assets.versioned("images/flags/nl.png")"> Nederlands
             </a>
           </li>
+
+          <li>
+            <a href="@controllers.help.routes.HelpController.localizedTutorial("tr")">
+              <img src="@routes.Assets.versioned("images/flags/tr.png")"> T&uuml;rkçe
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -78,7 +84,7 @@
         نکته: این متن آموزشی را در پنجرهٔ جداگانه‌ای در مرورگر خود باز کنید تا در زمان پیشرفت کار قادر به دیدن و دنبال کردنِ مراحل آن باشید.
       </p>
       <h2 id="upload">مرحلهٔ ۱. بارگذاری سند</h2>
-      <p>  
+      <p>
         در ریکوگیتو اسناد برای سازماندهی منابع شما به کار می‌روند. هر سند می‌تواند شامل چندین فایل باشد. در این قسمت از آموزش, ما سندی را با تنها یک فایل متنی بارگذاری می‌کنیم.
       </p>
 
@@ -241,5 +247,3 @@
   @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
   @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/help/tutorial.js")))
 }
-
-
