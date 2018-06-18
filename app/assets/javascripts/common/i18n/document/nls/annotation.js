@@ -14,9 +14,13 @@ define({
     'btn_cancel': 'Cancel',
     'btn_ok_and_next': 'OK &amp; Next',
     'btn_ok': 'OK'
-   },
+  },
   'de': true,
+  'el': true,
+  'es': true,
   'fa': true,
   'fr': true,
-  'it': true
+  'it': true,
+  'nl': true,
+  'tr': true
 });
