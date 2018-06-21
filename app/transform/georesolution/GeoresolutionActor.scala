@@ -63,7 +63,7 @@ class GeoresolutionActor(
             }
           
           counter += 1
-          Some(Georesolvable(toponym, s"row:{counter}", coord))
+          Some(Georesolvable(toponym, s"row:${counter}", coord))
         } else {
           None
         }
