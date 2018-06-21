@@ -25,8 +25,13 @@ object TEITag extends {
     )
     
   private def toEntityBody(lastModifiedAt: DateTime, entityType: AnnotationBody.Type, ref: Option[String]) = {
-    val status = ref.map(_ => // Set to verified only if there is a reference
-      AnnotationStatus(AnnotationStatus.VERIFIED, None, lastModifiedAt))
+    val status = ref match {
+      case Some(uri) =>
+        AnnotationStatus(AnnotationStatus.VERIFIED, None, lastModifiedAt)
+
+      case None =>
+        AnnotationStatus(AnnotationStatus.UNVERIFIED, None, lastModifiedAt)
+    }
       
     AnnotationBody(
       entityType,
@@ -35,7 +40,7 @@ object TEITag extends {
       None, // value
       ref,
       None, // note
-      status)
+      Some(status))
   }
     
   private def toTagBodies(lastModifiedAt: DateTime, attributes: Seq[(String, Seq[String])]) =

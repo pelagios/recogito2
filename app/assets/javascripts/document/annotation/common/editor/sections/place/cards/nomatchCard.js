@@ -41,7 +41,7 @@ define([
         render = function() {
           containerEl.html(element);
 
-          if (verificationStatus.value === 'NOT_IDENTIFIABLE')
+          if (verificationStatus && verificationStatus.value === 'NOT_IDENTIFIABLE')
             setFlagged();
           else
             labelEl.html(labelNoAutoMatch);
