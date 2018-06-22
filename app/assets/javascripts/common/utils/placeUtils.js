@@ -198,6 +198,18 @@ define(['common/ui/countries'], function(Countries) {
       return bestMatch;
     },
 
+    getBBoxSize: function(place) {
+      if (!place.representative_geometry)
+        return 0;
+
+      if (place.representative_geometry.type === 'Point')
+        return 0;
+
+      var bbox = place.bbox.coordinates;
+      return Math.abs(bbox[1][0] - bbox[0][0]) *
+        Math.abs(bbox[1][1] - bbox[0][1]);
+    },
+
     /**
      * Parses a gazetteer URI and determines the appropriate gazetteer
      * shortcode, ID, and signature color.

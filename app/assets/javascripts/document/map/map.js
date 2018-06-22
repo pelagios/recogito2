@@ -62,11 +62,20 @@ define([
         },
 
         setPlaces = function(places) {
-          places.forEach(function(place) {
+          var withGeometry = places.filter(function(place) {
+                return place.representative_point || place.representative_geometry;
+              }).sort(function(a, b) {
+                // TODO is sorting by bbox size enough?
+                var bboxSizeA = PlaceUtils.getBBoxSize(a),
+                    bboxSizeB = PlaceUtils.getBBoxSize(b);
+                return bboxSizeB - bboxSizeA;
+              });
+
+          withGeometry.forEach(function(place) {
             var annotations = getAnnotationsForPlace(place),
                 marker;
 
-            if ((place.representative_point || place.representative_geometry) && annotations.length > 0) {
+            if (annotations.length > 0) {
               marker = (place.representative_geometry && place.representative_geometry.type !== 'Point') ?
                 shapeLayer.addShape(place) : pointLayer.addMarker(place);
 
@@ -117,7 +126,9 @@ define([
               markers = pointLayer.getLayers().concat(shapeLayer.getLayers());
 
           markers.forEach(function (marker) {
-            var markerLatLng = marker.getLatLng(), // .getBounds().getCenter(),
+            var markerLatLng = (marker.getLatLng) ?
+                  marker.getLatLng() : // Points
+                  marker.getBounds().getCenter(), // GeoJSON
                 distSq =
                   Math.pow(latlng.lat - markerLatLng.lat, 2) +
                   Math.pow(latlng.lng - markerLatLng.lng, 2);
