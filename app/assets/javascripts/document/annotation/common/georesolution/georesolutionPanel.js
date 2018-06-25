@@ -43,9 +43,15 @@ define([
                       '<div class="georesolution-sidebar">' +
                         '<div class="result-header">'+
                           '<div class="result-total">' +
-                            '<span class="icon">&#xf03a;</span> <span class="label"></span>' +
+                            '<span class="icon">&#xf03a;</span> ' +
+                            '<span class="label"></span> ' +
+                            '<span class="result-took"></span>' +
                           '</div>' +
-                          '<div class="result-took"></div>' +
+                          '<div class="result-filter-button">' +
+                            '<span class="label">Settings</span> <span class="icon">&#xf013;</span>' +
+                          '</div>' +
+                        '</div>' +
+                        '<div class="filter-settings">' +
                         '</div>' +
                         '<div class="result-list">' +
                           '<ul></ul>' +
@@ -249,7 +255,7 @@ define([
             currentSearchResultsTotal = response.total;
 
             resultTotal.html(response.total + ' Total');
-            resultTook.html('Took ' + response.took + 'ms');
+            resultTook.html('(took ' + response.took + 'ms)');
 
             jQuery.each(response.items, function(idx, place) {
               var result = new ResultCard(resultList, place),
