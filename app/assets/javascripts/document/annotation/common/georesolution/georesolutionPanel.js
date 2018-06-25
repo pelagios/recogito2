@@ -48,10 +48,10 @@ define([
                             '<span class="result-took"></span>' +
                           '</div>' +
                           '<div class="result-filter-button">' +
-                            '<span class="label">Settings</span> <span class="icon">&#xf013;</span>' +
+                            '<span class="label">Options</span> <span class="icon">&#xf013;</span>' +
                           '</div>' +
                         '</div>' +
-                        '<div class="filter-settings">' +
+                        '<div class="filter-options">' +
                         '</div>' +
                         '<div class="result-list">' +
                           '<ul></ul>' +
@@ -82,19 +82,22 @@ define([
             return el;
           })(),
 
-          searchInput     = element.find('.search'),
+          searchInput      = element.find('.search'),
 
-          btnFlag         = element.find('.flag'),
-          btnCancel       = element.find('.cancel'),
+          btnFlag          = element.find('.flag'),
+          btnCancel        = element.find('.cancel'),
 
-          resultTotal     = element.find('.result-total .label'),
-          resultTook      = element.find('.result-took'),
+          resultTotal      = element.find('.result-total .label'),
+          resultTook       = element.find('.result-took'),
+          btnFilterOptions = element.find('.result-filter-button'),
 
-          resultContainer = element.find('.result-list'),
-          resultList      = element.find('.result-list ul'),
-          waitForNext     = element.find('.wait-for-next'),
+          filterOptions    = element.find('.filter-options'),
 
-          mapContainer    = element.find('.map-container'),
+          resultContainer  = element.find('.result-list'),
+          resultList       = element.find('.result-list ul'),
+          waitForNext      = element.find('.wait-for-next'),
+
+          mapContainer     = element.find('.map-container'),
 
           placeBody = false,
 
@@ -301,6 +304,12 @@ define([
               API.searchPlaces(currentSearch, offset).done(onResponse);
           },
 
+          toggleFilterOptions = function() {
+            var isVisible = filterOptions.is(':visible');
+                op = (isVisible) ? 'slideUp' : 'slideDown';
+            filterOptions.velocity(op, { duration: 250 });
+          },
+
           clear = function() {
             markerLayer.clearLayers();
             resultList.empty();
@@ -365,6 +374,8 @@ define([
         search();
       }
     });
+
+    btnFilterOptions.click(toggleFilterOptions);
 
     blockMouseWheelBubbling();
 
