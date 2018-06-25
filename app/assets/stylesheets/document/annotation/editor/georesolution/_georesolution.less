@@ -82,30 +82,17 @@
 
         .icon { font-size:14px;  }
 
-        .result-filter-button {
+        .result-total {
+          position:relative;
+          width:100%;
+        }
+
+        .result-took {
           position:absolute;
+          top:0;
           right:12px;
-          cursor:pointer;
-          .noselect();
-
-          .label {
-            padding-right:2px;
-          }
-
         }
 
-        .result-filter-button:hover .label {
-          text-decoration:underline;
-        }
-
-      }
-
-      .filter-options {
-        width:100%;
-        height:200px;
-        display:none;
-        background-color:#fff;
-        border-bottom:1px solid @lightgrey-border;
       }
 
       .result-list {
