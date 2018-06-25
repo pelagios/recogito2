@@ -312,6 +312,7 @@ define([
 
           clear = function() {
             markerLayer.clearLayers();
+            shapeLayer.clearLayers();
             resultList.empty();
             resultTotal.empty();
             resultTook.empty();

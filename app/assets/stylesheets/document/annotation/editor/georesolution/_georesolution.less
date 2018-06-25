@@ -115,6 +115,10 @@
         margin:0;
         padding:0;
         list-style-type:none;
+        background-color:#fff;
+        -webkit-box-shadow:inset 1px 4px 12px -6px rgba(0, 0, 0, 0.25);
+           -moz-box-shadow:inset 1px 4px 12px -6px rgba(0, 0, 0, 0.25);
+                box-shadow:inset 1px 4px 12px -6px rgba(0, 0, 0, 0.25);
 
         ul {
           padding:0;
@@ -123,14 +127,13 @@
         }
 
         li {
-          background-color:#fff;
           border-bottom:1px solid @lightgrey-border;
           padding:10px;
           cursor:pointer;
         }
 
         li:hover {
-          background-color:@blueish-white-hi;
+          background-color:rgba(0, 0, 0, 0.015);
         }
 
         .unlocated { padding-top:3px; }
