@@ -6,7 +6,7 @@ define([], function() {
 
         addShape = function(place) {
           var style = mapStyle.getShapeStyle(place, map.getAnnotationsForPlace(place));
-          return L.geoJson(place.representative_geometry, style).addTo(shapeLayer);
+          return L.geoJSON(place.representative_geometry, style).addTo(shapeLayer);
         },
 
         redraw = function() {

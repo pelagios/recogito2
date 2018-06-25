@@ -8,6 +8,14 @@ define([
   'common/hasEvents'
 ], function(ResultCard, BaseMap, Countries, Formatting, PlaceUtils, API, HasEvents) {
 
+  var SHAPE_STYLE = {
+        color:'#146593',
+        fillColor:'#5397b0',
+        opacity:1,
+        weight:1.5,
+        fillOpacity:0.7
+      };
+
   var GeoresolutionPanel = function() {
 
     var self = this,
@@ -98,7 +106,9 @@ define([
 
           map = new BaseMap(element.find('.map')),
 
-          markerLayer = L.layerGroup(),
+          markerLayer = L.featureGroup(),
+
+          shapeLayer = L.featureGroup(),
 
           closeUnlocatedPopup = function() {
             if (unlocatedPopup) {
@@ -215,8 +225,19 @@ define([
           },
 
           onNextPage = function(response) {
-            var moreAvailable =
-              response.total > currentSearchResults.length + response.items.length;
+            var sortBySize = function(places) {
+
+                },
+
+                createMarker = function(place) {
+                  if (place.representative_geometry && place.representative_geometry.type !== 'Point')
+                    return L.geoJSON(place.representative_geometry, SHAPE_STYLE).addTo(shapeLayer);
+                  else if (place.representative_point)
+                    return L.marker([place.representative_point[1], place.representative_point[0]]).addTo(markerLayer);
+                },
+
+                moreAvailable =
+                  response.total > currentSearchResults.length + response.items.length;
 
             // Switch wait icon on/off
             if (moreAvailable)
@@ -231,11 +252,8 @@ define([
             resultTook.html('Took ' + response.took + 'ms');
 
             jQuery.each(response.items, function(idx, place) {
-              var coord = (place.representative_point) ?
-                    [ place.representative_point[1], place.representative_point[0] ] : false,
-
-                  result = new ResultCard(resultList, place),
-                  marker = (coord) ? L.marker(coord).addTo(markerLayer) : false;
+              var result = new ResultCard(resultList, place),
+                  marker = createMarker(place);
 
               // Click on the list item opens popup (on marker, if any)
               result.on('click', function() { openPopup(place, marker); });
@@ -326,6 +344,7 @@ define([
           };
 
     map.add(markerLayer);
+    map.add(shapeLayer);
 
     resultContainer.scroll(onScroll);
 

@@ -38,7 +38,7 @@ define(['common/map/layerswitcher'], function(LayerSwitcher) {
           center: DEFAULT_CENTER,
           zoom: DEFAULT_ZOOM,
           zoomControl: false,
-          layers: [ currentBaseLayer ]
+          layers: [currentBaseLayer]
         }),
 
         layerSwitcher = new LayerSwitcher(),
