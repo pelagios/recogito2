@@ -10,11 +10,13 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalacOptions ++= Seq("-feature")
 
+updateOptions := updateOptions.value.withGigahorse(false)
+
 resolvers ++= Seq(
   "Typesafe" at "http://repo.typesafe.com/typesafe/releases/",
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-  "Open Source Geospatial Foundation Repository" at "http://download.osgeo.org/webdav/geotools/",
-  "Geotoolkit" at "http://maven.geotoolkit.org/",
+  "GeoTools" at "http://download.osgeo.org/webdav/geotools/",
+  "Boundless" at "http://repo.boundlessgeo.com/main/",
   "Atlassian Releases" at "https://maven.atlassian.com/public/"
 )
 
