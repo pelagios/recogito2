@@ -14,6 +14,7 @@ import org.jooq.Sequence
 import org.jooq.Table
 import org.jooq.impl.SchemaImpl
 
+import services.generated.tables.AuthorityFile
 import services.generated.tables.Document
 import services.generated.tables.DocumentFilepart
 import services.generated.tables.FeatureToggle
@@ -71,6 +72,7 @@ class Public extends SchemaImpl("public") {
 
 	private def getTables0() : List[Table[_]] = {
 		return Arrays.asList[Table[_]](
+			AuthorityFile.AUTHORITY_FILE,
 			Document.DOCUMENT,
 			DocumentFilepart.DOCUMENT_FILEPART,
 			FeatureToggle.FEATURE_TOGGLE,

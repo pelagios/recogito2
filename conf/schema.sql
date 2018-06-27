@@ -116,6 +116,15 @@ CREATE TABLE sharing_policy (
 CREATE INDEX idx_sharing_policy_document_id ON sharing_policy(document_id);
 CREATE INDEX idx_sharing_policy_shared_with ON sharing_policy(shared_with);
 
+-- metadata for known authority files
+CREATE TABLE authority_file (
+  id TEXT NOT NULL PRIMARY KEY,
+  screen_name TEXT NOT NULL,
+  shortcode TEXT NOT NULL,
+  color TEXT NOT NULL,
+  url_patterns TEXT NOT NULL
+);
+
 CREATE TABLE task (
   id UUID PRIMARY KEY,
   task_type TEXT NOT NULL,
