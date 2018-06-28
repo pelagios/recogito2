@@ -3,7 +3,7 @@ import scala.sys.process.Process
 lazy val webpack = taskKey[Unit]("Run webpack when packaging the application")
 
 def runWebpack(file: File) = {
-  scala.sys.process.Process("npm run build", file) !
+  scala.sys.process.Process("webpack", file) !
 }
 
 webpack := {
