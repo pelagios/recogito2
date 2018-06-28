@@ -1,0 +1,20 @@
+@()(content: Html)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito | Admin</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/admin/index.css")"/>
+  </head>
+  <body>
+    <div class="sidebar">
+      <ul>
+        <li><a href="@controllers.admin.gazetteers.routes.GazetteerAdminController.index">Gazetteers</a></li>
+        <li><a href="@controllers.admin.users.routes.UserAdminController.index">Users</a></li>
+        <li><a href="@controllers.admin.backup.routes.BackupAdminController.index">Backup &amp; Restore</a></li>
+      </ul>
+    </div>
+    <div class="content">
+      @content
+    </div>
+  </body>
+</html>

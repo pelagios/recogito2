@@ -1,61 +1,30 @@
 @(gazetteers: Seq[String])(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Recogito Administration - Gazetteers</title>
-    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
-    <script>
-      jQuery(document).ready(function() {
-        jQuery('.gazetteer-list').on('click', 'li', function(e) {
-          var gazetteer = jQuery(e.target).closest('li').data('gazetteer');
+@views.html.admin._layout() {
+  <div id="app">React should be here</div>
+  
+  <div class="gazetteer-list">
+    <ul>
+      @for(gazetteer <- gazetteers) {
+        <li data-gazetteer="@gazetteer">@gazetteer <a href="#">Delete</a></li>
+      }
+    </ul>
+  </div>
 
-          jsRoutes.controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(gazetteer)
-            .ajax().done(function() {
-              console.log('deleted.');
-            });
+  <div class="gazetteer-search">
+    <form method="GET">
+      <input type="text" />
+    </form>
+  </div>
 
-          return false;
-        });
-      });
-    </script>
-  </head>
-  <body>
-    <div id="app">React should be here</div>
+  <div class="upload-datadump">
+    @helper.form(action = controllers.admin.gazetteers.routes.GazetteerAdminController.importGazetteer(), 'enctype -> "multipart/form-data") {
+      <input type="file" id="gazetteer-file" name="gazetteer-file">
+      <input type="submit">
+    }
+  </div>
 
-    <div class="side-navbar">
-      <ul>
-        <li><a href="#">Users</a></li>
-        <li><a href="#">Gazetteers</a></li>
-        <li><a href="#">Backup &amp; Restore</a></li>
-      </ul>
-    </div>
-
-    <div class="content">
-      <div class="gazetteer-list">
-        <ul>
-          @for(gazetteer <- gazetteers) {
-            <li data-gazetteer="@gazetteer">@gazetteer <a href="#">Delete</a></li>
-          }
-        </ul>
-      </div>
-
-      <div class="gazetteer-search">
-        <form method="GET">
-          <input type="text" />
-        </form>
-      </div>
-
-      <div class="upload-datadump">
-        @helper.form(action = controllers.admin.gazetteers.routes.GazetteerAdminController.importGazetteer(), 'enctype -> "multipart/form-data") {
-          <input type="file" id="gazetteer-file" name="gazetteer-file">
-          <input type="submit">
-        }
-      </div>
-    </div>
-    @helper.javascriptRouter("jsRoutes")(
-      controllers.admin.gazetteers.routes.javascript.GazetteerAdminController.deleteGazetteer
-    )
-
-    <script type="text/javascript" src="@routes.Assets.versioned("build/gazetteers.js")"></script>
-  </body>
-</html>
+  @helper.javascriptRouter("jsRoutes")(
+    controllers.admin.gazetteers.routes.javascript.GazetteerAdminController.deleteGazetteer
+  )
+  <script type="text/javascript" src="@routes.Assets.versioned("build/gazetteers.js")"></script>
+}

@@ -1,0 +1,168 @@
+@import "../_globals.less";
+@import "../_meter.less";
+@import "_grid.less";
+
+html, body {
+  background-color:@blueish-white;
+}
+
+.content {
+  max-width:1150px;
+  min-width:920px;
+  margin:0 auto;
+  padding:30px 0;
+}
+
+.content:after {
+  content:'';
+  display:block;
+  clear:both;
+}
+
+.metric {
+  margin:0;
+  position:relative;
+  box-sizing:border-box;
+  color:@standard-type;
+  background-color:#fff;
+  border:1px solid @standard-type;
+  text-align:center;
+  .rounded-corners(3px);
+  padding:5px 0 8px;
+  height:100%;
+
+   .number, .caption {
+     display:block;
+     line-height:170%;
+   }
+
+   .number {
+     padding:3% 0;
+     font-size:28px;
+   }
+
+   .caption {
+     position:absolute;
+     bottom:0;
+     width:100%;
+     background-color:@standard-type;
+     color:#fff;
+     font-size:14px;
+   }
+
+}
+
+.h2>.metric .number {
+  padding:17% 0;
+  font-size:36px;
+}
+
+.top-contributors {
+
+  table {
+    padding:10px 15px;
+    box-sizing:border-box;
+    width:100%;
+    text-align:left;
+
+    td {
+      padding:0 5px;
+      vertical-align:middle;
+      font-size:14px;
+      line-height:21px;
+    }
+
+    td:first-child {
+      width:1%;
+
+      a {
+        color:@standard-type;
+        text-decoration:none;
+      }
+
+    }
+
+    td:last-child {
+      width:1%;
+      white-space:nowrap;
+      text-align:right;
+    }
+
+    .meter {
+      height:10px;
+      margin-top:2px;
+    }
+
+    .bar {
+      background-color:@ocean;
+    }
+
+  }
+
+}
+
+.activity-history {
+  position:relative;
+  width:100%;
+  height:100%;
+  padding:15px 0 25px 0;
+
+  #activity-history-chart {
+    padding:0 20px 0 5px;
+    box-sizing:border-box;
+    width:100%;
+    height:100%;
+  }
+
+  .ct-series-a .ct-bar {
+    stroke:@ocean;
+    stroke-width:10.5px;
+  }
+
+  .ct-label {
+    white-space:nowrap;
+  }
+
+}
+
+.right-now {
+  position:relative;
+  padding:0;
+
+  .container {
+    border-bottom:23px solid transparent;
+    height:100%;
+    overflow:hidden !important;
+    box-sizing:border-box;
+    text-align:left;
+  }
+
+  table {
+    width:100%;
+    border-collapse:collapse;
+
+    tr.even td {
+      background-color:@blueish-white-hi;
+    }
+
+    td {
+      padding:2px 8px;
+      font-size:15px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:0;
+
+      a { color:@lightblue-type; }
+      em { font-style:normal; }
+
+    }
+
+    td.made-at {
+      width:120px;
+      text-align:right;
+    }
+
+  }
+
+}
