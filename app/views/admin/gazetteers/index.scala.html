@@ -1,27 +1,15 @@
 @(gazetteers: Seq[String])(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 @views.html.admin._layout() {
-  <div id="app">React should be here</div>
-  
-  <div class="gazetteer-list">
-    <ul>
-      @for(gazetteer <- gazetteers) {
-        <li data-gazetteer="@gazetteer">@gazetteer <a href="#">Delete</a></li>
-      }
-    </ul>
-  </div>
-
-  <div class="gazetteer-search">
-    <form method="GET">
-      <input type="text" />
-    </form>
-  </div>
-
   <div class="upload-datadump">
     @helper.form(action = controllers.admin.gazetteers.routes.GazetteerAdminController.importGazetteer(), 'enctype -> "multipart/form-data") {
-      <input type="file" id="gazetteer-file" name="gazetteer-file">
-      <input type="submit">
+      <input type="file" id="dumpfile" name="dumpfile">
+      <label class="btn" for="dumpfile">
+        <span class="icon">&#xf055;</span> Upload Dump        
+      </label>
     }
   </div>
+
+  <div id="app"></div>
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.admin.gazetteers.routes.javascript.GazetteerAdminController.deleteGazetteer
