@@ -124,7 +124,7 @@ watchSources ~= { (ws: Seq[File]) =>
 }
 */
 
-pipelineStages := Seq(/* rjs, */ digest, gzip)
+pipelineStages := Seq(rjs, digest, gzip)
 
 unmanagedJars in Runtime ++= Attributed.blankSeq((file("plugins/") ** "*.jar").get)
 
