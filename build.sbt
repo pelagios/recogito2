@@ -107,15 +107,24 @@ libraryDependencies ++= Seq(
   "xmlunit" % "xmlunit" % "1.6" % Test
 )
 
-// Play provides two styles of routers, one expects its actions to be injected, the
-// other, legacy style, accesses its actions statically.
-routesGenerator := InjectedRoutesGenerator
+PlayKeys.playRunHooks += Webpack(baseDirectory.value)
 
-pipelineStages := Seq(rjs, digest, gzip)
+routesGenerator := InjectedRoutesGenerator
 
 includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
+excludeFilter in (Assets, JshintKeys.jshint) := "*.js"
+
+/*
+watchSources ~= { (ws: Seq[File]) =>
+  ws filterNot { path =>
+    path.getName.endsWith(".js") || path.getName == ("build")
+  }
+}
+*/
+
+pipelineStages := Seq(/* rjs, */ digest, gzip)
 
 unmanagedJars in Runtime ++= Attributed.blankSeq((file("plugins/") ** "*.jar").get)
 

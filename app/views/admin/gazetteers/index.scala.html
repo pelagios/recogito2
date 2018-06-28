@@ -20,6 +20,8 @@
     </script>
   </head>
   <body>
+    <div id="app">React should be here</div>
+
     <div class="side-navbar">
       <ul>
         <li><a href="#">Users</a></li>
@@ -53,5 +55,7 @@
     @helper.javascriptRouter("jsRoutes")(
       controllers.admin.gazetteers.routes.javascript.GazetteerAdminController.deleteGazetteer
     )
+
+    <script type="text/javascript" src="@routes.Assets.versioned("build/gazetteers.js")"></script>
   </body>
 </html>
