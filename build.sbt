@@ -114,15 +114,8 @@ routesGenerator := InjectedRoutesGenerator
 includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
-excludeFilter in (Assets, JshintKeys.jshint) := "*.js"
 
-/*
-watchSources ~= { (ws: Seq[File]) =>
-  ws filterNot { path =>
-    path.getName.endsWith(".js") || path.getName == ("build")
-  }
-}
-*/
+excludeFilter in (Assets, JshintKeys.jshint) := "*.js"
 
 pipelineStages := Seq(rjs, digest, gzip)
 
