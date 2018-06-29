@@ -69,8 +69,13 @@ trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
       el.setAttribute("id", toTeiId(annotation.annotationId))
       if (entityURI.isDefined) el.setAttribute("ref", entityURI.get)
       
-      getAttributes(annotation).foreach { case(key, values) =>
-        el.setAttribute(key, values.mkString) }
+      getAttributeTags(annotation).foreach { case(key, values) =>
+        el.setAttribute(key, values.mkString) 
+      }
+      
+      val tags = getNonAttributeTags(annotation)
+      if (tags.size > 0)
+        el.setAttribute("ana", tags.mkString(","))
       
       el.appendChild(doc.createTextNode(quote))
 

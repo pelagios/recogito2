@@ -53,23 +53,29 @@ trait PlaintextSerializer extends BaseTEISerializer {
       val id = toTeiId(annotation.annotationId)
       val quote = escape(getQuote(annotation))
       val offset = getCharOffset(annotation)
-      val entityType = getEntityType(annotation)      
-      val attributes = getAttributes(annotation)
+      val entityType = getEntityType(annotation)    
       
-      val baseTag = entityType.map { body =>
+      // Tags of form @key:value - to be used as XML attributes
+      val attributes = getAttributeTags(annotation)
+      
+      // All other tags, rolled into one 'ana' attribute
+      val tags = getNonAttributeTags(annotation)
+      val ana =  { if (tags.isEmpty) None else Some(tags.mkString(",")) }.map { xml.Text(_) }
+      
+       val baseTag = entityType.map { body =>
         body.hasType match {        
           case PLACE => body.uri match {
-            case Some(uri) => <placeName ref={uri} xml:id={id}>{quote}</placeName>
-            case None => <placeName xml:id={id}>{quote}</placeName>
+            case Some(uri) => <placeName ref={uri} xml:id={id} ana={ana}>{quote}</placeName>
+            case None => <placeName xml:id={id} ana={ana}>{quote}</placeName>
           }
             
           case PERSON =>
-            <persName xml:id={id}>{quote}</persName>
+            <persName xml:id={id} ana={ana}>{quote}</persName>
             
           case EVENT =>
-            <rs xml:id={id} type="event">{quote}</rs>
+            <rs xml:id={id} type="event" ana={ana}>{quote}</rs>
         }
-      }.getOrElse(<span xml:id={id}>{quote}</span>)
+      }.getOrElse(<span xml:id={id} ana={ana}>{quote}</span>)
       
       val teiTag = attributes.foldLeft(baseTag) { case (el, (name, values)) =>
         el % new UnprefixedAttribute(name, Text(values.mkString), Null)

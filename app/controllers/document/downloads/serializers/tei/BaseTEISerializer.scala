@@ -20,18 +20,31 @@ trait BaseTEISerializer extends BaseSerializer {
     val value = tag.substring(sepIdx + 1)
     (key, value)
   }
+  
+  /** Checks if this tag should be treated as XML attribute.
+    * 
+    * By convention, tags of the form '@key:value' are serialized
+    * as xml attribute, e.g. <span key="value">.
+    */
+  def isAttributeTag(body: AnnotationBody) =
+    body.value.map { value =>
+      value.startsWith("@") &&
+      value.contains(':')
+    }.getOrElse(false)
       
   /** By convention, use all tags starting with @ as XML attributes **/
-  def getAttributes(annotation: Annotation) =
+  def getAttributeTags(annotation: Annotation) =
     annotation.bodies.filter { body =>
-      body.hasType == AnnotationBody.TAG && 
-      body.value.map { value => 
-        value.startsWith("@") && 
-        value.contains(':')
-      }.getOrElse(false)
+      body.hasType == AnnotationBody.TAG && isAttributeTag(body)
     }.map { body => 
       getAttribute(body.value.get)
     }.groupBy { _._1 }.mapValues { _.map(_._2) }.toSeq
+    
+  /** All tags that don't fall into the 'attribute tag' convetion above **/
+  def getNonAttributeTags(annotation: Annotation) = 
+    annotation.bodies.filter { body =>
+      body.hasType == AnnotationBody.TAG && !isAttributeTag(body)
+    }.map { _.value.get }
     
   /** Generates a <listRelation> element for relations, if any are contained in the annotations **/
   def relationsToList(annotations: Seq[Annotation]) = 
