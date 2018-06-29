@@ -40,7 +40,7 @@ class GazetteerAdminController @Inject() (
   }
   
   def importGazetteer = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
-    request.body.asMultipartFormData.flatMap(_.file("gazetteer-file")) match {
+    request.body.asMultipartFormData.flatMap(_.file("file")) match {
       case Some(formData) => {
         
         Logger.info("Importing gazetteer from " + formData.filename)
