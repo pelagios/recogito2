@@ -1,0 +1,36 @@
+.content .pane {
+  position:relative;
+  border:1px solid @lightgrey-border;
+  .rounded-corners(3px);
+  .box-shadow(2px, 2px, 28px, rgba(0, 0, 0, 0.2));
+
+  .left {
+    width:40%;
+  }
+
+  .right {
+    position:absolute;
+    top:0;
+    right:0;
+    height:100%;
+    width:60%;
+    background-color:@blueish-white;
+    -webkit-box-shadow:inset 7px 0 14px -10px rgba(0,0,0,0.35);
+       -moz-box-shadow:inset 7px 0 14px -10px rgba(0,0,0,0.35);
+            box-shadow:inset 7px 0 14px -10px rgba(0,0,0,0.35);
+  }
+
+  .authority-list {
+    height:320px; // DUMMY
+  }
+
+  .authority-details {
+    margin:20px;
+    .box-shadow(2px, 2px, 28px, rgba(0, 0, 0, 0.2));
+  }
+
+  .upload {
+    padding:10px;
+  }
+
+}

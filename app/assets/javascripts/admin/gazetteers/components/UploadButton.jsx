@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-export default class UploadForm extends Component {
+export default class UploadButton extends Component {
 
   submit(e) {
     const input = e.target;
@@ -10,13 +10,13 @@ export default class UploadForm extends Component {
 
     axios.post('/admin/gazetteers', data)
       .then(response => {
-        console.log(response);
+        // Discard (for now)
       });
   }
 
   render() {
     return (
-      <form>
+      <form className="upload">
         <input
           id="dumpfile"
           type="file"
@@ -29,4 +29,5 @@ export default class UploadForm extends Component {
       </form>
     );
   }
+
 }
