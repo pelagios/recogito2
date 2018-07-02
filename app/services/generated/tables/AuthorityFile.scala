@@ -55,24 +55,29 @@ class AuthorityFile(alias : String, aliased : Table[AuthorityFileRecord], parame
 	val ID : TableField[AuthorityFileRecord, String] = createField("id", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
-	 * The column <code>public.authority_file.screen_name</code>.
+	 * The column <code>public.authority_file.shortname</code>.
 	 */
-	val SCREEN_NAME : TableField[AuthorityFileRecord, String] = createField("screen_name", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+	val SHORTNAME : TableField[AuthorityFileRecord, String] = createField("shortname", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+
+	/**
+	 * The column <code>public.authority_file.fullname</code>.
+	 */
+	val FULLNAME : TableField[AuthorityFileRecord, String] = createField("fullname", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>public.authority_file.shortcode</code>.
 	 */
-	val SHORTCODE : TableField[AuthorityFileRecord, String] = createField("shortcode", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+	val SHORTCODE : TableField[AuthorityFileRecord, String] = createField("shortcode", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>public.authority_file.color</code>.
 	 */
-	val COLOR : TableField[AuthorityFileRecord, String] = createField("color", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+	val COLOR : TableField[AuthorityFileRecord, String] = createField("color", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * The column <code>public.authority_file.url_patterns</code>.
 	 */
-	val URL_PATTERNS : TableField[AuthorityFileRecord, String] = createField("url_patterns", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+	val URL_PATTERNS : TableField[AuthorityFileRecord, String] = createField("url_patterns", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
 	 * Create a <code>public.authority_file</code> table reference

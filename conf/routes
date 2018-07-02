@@ -39,7 +39,7 @@ GET     /help                                        controllers.help.HelpContro
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
-POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.importGazetteer
+POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.upsertAuthority
 DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 
 GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)

@@ -19,14 +19,11 @@ object PelagiosRDFCrosswalk {
       new DateTime(endDate).withZone(DateTimeZone.UTC))
   }
 
-  def fromRDF(filename: String): InputStream => Seq[EntityRecord] = {
-
-    val source = filename.substring(0, filename.indexOf('.'))
-
+  def fromRDF(filename: String, identifier: String): InputStream => Seq[EntityRecord] = {
     def convertPlace(place: org.pelagios.api.gazetteer.Place) =
       EntityRecord(
         EntityRecord.normalizeURI(place.uri),
-        source,
+        identifier,
         DateTime.now().withZone(DateTimeZone.UTC),
         None,
         place.label,
@@ -48,7 +45,7 @@ object PelagiosRDFCrosswalk {
       Scalagios.readPlaces(stream, filename).map(convertPlace).toSeq }
   }
 
-  def readFile(file: File): Seq[EntityRecord] =
-    fromRDF(file.getName)(new FileInputStream(file))
+  def readFile(file: File, identifier: String): Seq[EntityRecord] =
+    fromRDF(file.getName, identifier)(new FileInputStream(file))
 
 }

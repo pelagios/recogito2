@@ -9,8 +9,11 @@ export default class AuthorityDetails extends Component {
     this.state = {}; // TODO initial values?
   }
 
-  closeError() {
-    this.setState({ error: null });
+  closeMessage() {
+    this.setState({
+      success: null,
+      error: null
+    });
   }
 
   onAttachFile(evt) {
@@ -49,19 +52,33 @@ export default class AuthorityDetails extends Component {
     if (isValid) {
       const data = new FormData();
 
+      // Fields we need to pull from the state
+      const stateFields = [
+        'identifier',
+        'shortname',
+        'fullname',
+        'shortcode',
+        'color',
+        'urlpatterns'
+      ];
+
+      stateFields.forEach(key => {
+        const val = this.state[key]
+        if (val) data.append(key, val);
+      });
+
+      // Append file, if any
       if (this.file) data.append('file', this.file);
 
-      data.append('identifier', this.state.identifier);
-      data.append('screenname', this.state.screenname);
-      data.append('shortcode', this.state.shortcode);
-      data.append('urlpatterns', this.state.urlpatterns);
-
-      /* TODO POST to server
       axios.post('/admin/gazetteers', data)
         .then(response => {
-          // Discard (for now)
-        });
-      */
+          this.setState({ success: response.data });
+        })
+        .catch(error => {
+          this.setState({
+            error: `Something went wrong: ${error.response.data}`
+          });
+        })
     }
   }
 
@@ -72,8 +89,17 @@ export default class AuthorityDetails extends Component {
           <div className="error flash-message">
             <span
               className="icon"
-              onClick={this.closeError.bind(this)}>&#xf00d;
+              onClick={this.closeMessage.bind(this)}>&#xf00d;
             </span> {this.state.error}
+          </div>
+        }
+
+        {this.state.success &&
+          <div className="success flash-message">
+            <span
+              className="icon"
+              onClick={this.closeMessage.bind(this)}>&#xf00c;
+            </span> {this.state.success}
           </div>
         }
 
