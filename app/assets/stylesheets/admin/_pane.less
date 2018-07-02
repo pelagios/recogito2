@@ -6,6 +6,7 @@
 
   .left {
     width:40%;
+    min-height:420px;
   }
 
   .right {
@@ -21,12 +22,39 @@
   }
 
   .authority-list {
-    height:320px; // DUMMY
+    height:100%;
   }
 
   .authority-details {
-    margin:20px;
+    background-color:#fff;
+    margin:10px;
+    .rounded-corners(3px);
     .box-shadow(2px, 2px, 28px, rgba(0, 0, 0, 0.2));
+
+    form{
+      padding:20px 10px;
+    }
+
+    .fileupload {
+
+      #filename {
+        width:270px;
+      }
+
+      #file {
+
+
+      }
+
+      .btn.add-file {
+        display:inline-block;
+        width:40px;
+        margin:0;
+        padding:2px 8px 2px 12px;
+      }
+
+    }
+
   }
 
   .upload {

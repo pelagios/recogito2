@@ -119,10 +119,11 @@ CREATE INDEX idx_sharing_policy_shared_with ON sharing_policy(shared_with);
 -- metadata for known authority files
 CREATE TABLE authority_file (
   id TEXT NOT NULL PRIMARY KEY,
-  screen_name TEXT NOT NULL,
-  shortcode TEXT NOT NULL,
-  color TEXT NOT NULL,
-  url_patterns TEXT NOT NULL
+  shortname TEXT NOT NULL,
+  fullname TEXT,
+  shortcode TEXT,
+  color TEXT,
+  url_patterns TEXT
 );
 
 CREATE TABLE task (
