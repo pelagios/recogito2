@@ -10,11 +10,11 @@ images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our 
 
 * Java 8 JDK
 * [SBT](http://www.scala-sbt.org/) (version 1.0.x)
-* __New:__ as we are moving some of the UI components to [React](https://reactjs.org/),
-  [node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) must be installed from now on as well (e.g. see
-  [here](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04) for Ubuntu instructions). We are currently using:
-  - Node.js version 4.2.6
-  - npm version 6.1.0
+* __NEW:__ as we are introducing [React](https://reactjs.org/) in some UI areas,
+  the following additional dependencies must be installed:
+  - [node.js](https://nodejs.org/en/) (version 4.2.6)
+  - [npm](https://www.npmjs.com/) (version 6.1.0)
+  - `webpack` and `webpack-cli` packages (via npm)
 * PostgreSQL DB (tested with version 9.5)
 * __Important: as of version 2.2, Recogito requires an installation of
   [ElasticSearch v5.6.5](https://www.elastic.co/downloads/past-releases/elasticsearch-5-6-5).
