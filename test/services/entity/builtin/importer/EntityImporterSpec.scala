@@ -104,7 +104,7 @@ class EntityImporterSpec extends Specification {
 
   "After importing the DARE sample, the PlaceService" should {
 
-    val dareRecords = PelagiosRDFCrosswalk.readFile(DARE_RDF)
+    val dareRecords = PelagiosRDFCrosswalk.readFile(DARE_RDF, "http://dare.ht.lu.se")
 
     "contain 4 places" in {
       // This mostly tests the mock impl - but probably doesn't hurt & is consistent the integration spec
@@ -165,7 +165,7 @@ class EntityImporterSpec extends Specification {
 
   "After importing the Pleiades sample, the PlaceService" should {
 
-    val pleiadesRecords = PelagiosRDFCrosswalk.readFile(PLEIADES_RDF)
+    val pleiadesRecords = PelagiosRDFCrosswalk.readFile(PLEIADES_RDF, "http://pleiades.stoa.org")
 
     "contain 5 places" in {
       val failedRecords = importRecords(pleiadesRecords)

@@ -55,6 +55,11 @@ class AuthorityFile(alias : String, aliased : Table[AuthorityFileRecord], parame
 	val ID : TableField[AuthorityFileRecord, String] = createField("id", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
+	 * The column <code>public.authority_file.authority_type</code>.
+	 */
+	val AUTHORITY_TYPE : TableField[AuthorityFileRecord, String] = createField("authority_type", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
+
+	/**
 	 * The column <code>public.authority_file.shortname</code>.
 	 */
 	val SHORTNAME : TableField[AuthorityFileRecord, String] = createField("shortname", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")

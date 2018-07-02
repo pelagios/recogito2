@@ -16,7 +16,7 @@ class PelagiosRDFCrosswalkSpec extends Specification {
 
   "The Pelagios Gazetter RDF crosswalk" should {
 
-    val records = PelagiosRDFCrosswalk.readFile(GAZETTEER_RDF)
+    val records = PelagiosRDFCrosswalk.readFile(GAZETTEER_RDF, "http://pleiades.stoa.org")
 
     "properly load all gazetteer records from RDF" in {
       records.size must equalTo(5)

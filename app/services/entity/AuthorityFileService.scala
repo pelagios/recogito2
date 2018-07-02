@@ -2,15 +2,15 @@ package services.entity
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
-import services.generated.Tables.AUTHORITY_FILE
-import storage.db.DB
 import services.BaseService
+import services.generated.Tables.AUTHORITY_FILE
 import services.generated.tables.records.AuthorityFileRecord
+import storage.db.DB
 
 @Singleton
 class AuthorityFileService @Inject() (val db: DB, implicit val ctx: ExecutionContext) extends BaseService {
   
-  def listAll() = db.query { sql =>
+  def listAll(eType: Option[EntityType] = None) = db.query { sql =>
     sql.selectFrom(AUTHORITY_FILE).fetchArray().toSeq
   }
   
@@ -20,6 +20,7 @@ class AuthorityFileService @Inject() (val db: DB, implicit val ctx: ExecutionCon
   
   def upsert(
     identifier: String,
+    entityType: EntityType,
     shortname: String,
     fullname: Option[String],
     shortcode: Option[String],
@@ -28,6 +29,7 @@ class AuthorityFileService @Inject() (val db: DB, implicit val ctx: ExecutionCon
   ) = db.query { sql =>
     val authorityFile = new AuthorityFileRecord(
       identifier, 
+      entityType.toString,
       shortname,
       optString(fullname),
       optString(shortcode),

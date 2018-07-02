@@ -59,6 +59,22 @@ class GazetteerAdminController @Inject() (
     Ok(views.html.admin.gazetteers.index())
   }
   
+  def listGazetteers = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
+    val fMetadata = authorities.listAll(Some(EntityType.PLACE))
+    val fRecordCounts = entities.countByAuthority(Some(EntityType.PLACE))
+    
+    val f = for {
+      metadata <- fMetadata
+      counts <- fRecordCounts
+    } yield (metadata, counts)
+    
+    f.map { case (metadata, counts) =>
+      
+    }
+    
+    Ok // TODO roll meta + counts into a single datastructure and serialize to JSON
+  }
+  
   def upsertAuthority = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     authorityMetadataForm.bindFromRequest.fold(
       formWithErrors =>
@@ -80,6 +96,7 @@ class GazetteerAdminController @Inject() (
           
         authorities.upsert(
           authorityMeta.identifier,
+          EntityType.PLACE, // TODO temporary only
           authorityMeta.shortname,
           authorityMeta.fullname,
           authorityMeta.shortcode,

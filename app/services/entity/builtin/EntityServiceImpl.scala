@@ -56,7 +56,7 @@ class EntityServiceImpl @Inject()(
       } map { _.totalHits }
   }
 
-  override def listAuthorities(eType: Option[EntityType] = None): Future[Seq[(String, Long)]] = {
+  override def countByAuthority(eType: Option[EntityType] = None): Future[Seq[(String, Long)]] = {
     val base = eType match {
       case Some(t) =>
           search(ES.RECOGITO / ES.ENTITY) query termQuery("entity_type" -> t.toString)
