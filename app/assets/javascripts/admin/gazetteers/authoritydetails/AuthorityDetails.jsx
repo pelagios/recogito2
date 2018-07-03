@@ -57,6 +57,12 @@ export default class AuthorityDetails extends Component {
     this.setState({ value: updatedValue });
   }
 
+  onChangeColor(hex) {
+    const updatedValue =
+      Object.assign({}, this.state.value, { color: hex });
+    this.setState({ value: updatedValue });
+  }
+
   /** Identifier and shortname are required properties **/
   validate() {
     const hasIdentifier = this.state.value.identifier;
@@ -173,7 +179,11 @@ export default class AuthorityDetails extends Component {
             value={this.state.value.urlpatterns}
             onChange={this.onChange.bind(this)} />
 
-          <ColorField />
+          <ColorField
+            name="color"
+            label="Color"
+            value={this.state.value.color}
+            onChange={this.onChangeColor.bind(this)} />
 
           <FileField
             name="file"

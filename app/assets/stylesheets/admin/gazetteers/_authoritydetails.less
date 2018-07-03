@@ -4,17 +4,35 @@
     cursor:pointer;
   }
 
-  .fileupload {
+  #file_name, #color { width:220px; }
 
-    #file_name { width:220px; }
+  .color {
 
-    .btn.add-file {
+    dd { position:relative; }
+
+    .color-sample {
+      position:absolute;
+      top:9px;
+      right:-33px;
       display:inline-block;
-      width:40px;
-      margin:0;
-      padding:2px 8px 2px 12px;
+      width:27px;
+      height:27px;
+      background-color:@form-grey-border;
+      .rounded-corners(4px);
+      cursor:pointer;
     }
 
+    .swatches-picker {
+      position:absolute;
+    }
+
+  }
+
+  .fileupload .btn.add-file {
+    display:inline-block;
+    width:40px;
+    margin:0;
+    padding:2px 8px 2px 12px;
   }
 
 }
