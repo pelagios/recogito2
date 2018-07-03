@@ -103,7 +103,7 @@ export default class AuthorityDetails extends Component {
         })
         .catch(error => {
           this.setState({
-            errorMessage: `Something went wrong: ${error.response.data}`
+            errorMessage: `Something went wrong: ${error.response}`
           });
         })
     }
