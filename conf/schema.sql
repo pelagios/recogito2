@@ -122,6 +122,7 @@ CREATE TABLE authority_file (
   authority_type TEXT NOT NULL,
   shortname TEXT NOT NULL,
   fullname TEXT,
+  homepage TEXT,
   shortcode TEXT,
   color TEXT,
   url_patterns TEXT

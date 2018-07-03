@@ -10,6 +10,7 @@ const EMPTY = {
   identifier : '',
   shortname  : '',
   fullname   : '',
+  homepage   : '',
   shortcode  : '',
   urlpatterns: '',
   color      : ''
@@ -84,6 +85,7 @@ export default class AuthorityDetails extends Component {
         'identifier',
         'shortname',
         'fullname',
+        'homepage',
         'shortcode',
         'color',
         'urlpatterns'
@@ -151,6 +153,12 @@ export default class AuthorityDetails extends Component {
             name="fullname"
             label="Full name"
             value={this.state.value.fullname}
+            onChange={this.onChange.bind(this)} />
+
+          <StringField
+            name="homepage"
+            label="Homepage"
+            value={this.state.value.homepage}
             onChange={this.onChange.bind(this)} />
 
           <StringField

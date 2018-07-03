@@ -70,6 +70,11 @@ class AuthorityFile(alias : String, aliased : Table[AuthorityFileRecord], parame
 	val FULLNAME : TableField[AuthorityFileRecord, String] = createField("fullname", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
+	 * The column <code>public.authority_file.homepage</code>.
+	 */
+	val HOMEPAGE : TableField[AuthorityFileRecord, String] = createField("homepage", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * The column <code>public.authority_file.shortcode</code>.
 	 */
 	val SHORTCODE : TableField[AuthorityFileRecord, String] = createField("shortcode", org.jooq.impl.SQLDataType.CLOB, "")

@@ -28,6 +28,7 @@ case class AuthorityMetadata(
   identifier  : String,
   shortname   : String,
   fullname    : Option[String],
+  homepage    : Option[String],
   shortcode   : Option[String],
   urlPatterns : Option[String],
   color       : Option[String])
@@ -54,6 +55,7 @@ class GazetteerAdminController @Inject() (
       "identifier" -> nonEmptyText,
       "shortname" -> nonEmptyText,
       "fullname" -> optional(text),
+      "homepage" -> optional(text),
       "shortcode" -> optional(text),
       "urlpatterns" -> optional(text),
       "color" -> optional(text)
@@ -105,10 +107,7 @@ class GazetteerAdminController @Inject() (
       formWithErrors =>
         Future.successful(BadRequest), // Can never happen from the UI
         
-      authorityMeta => {
-        
-        play.api.Logger.info("Updating...")
-        
+      authorityMeta => {        
         val urlPatterns = authorityMeta.urlPatterns.map { urls =>
           urls.split(",").map(_.trim).toSeq
         }.getOrElse(Seq.empty[String])
@@ -124,6 +123,7 @@ class GazetteerAdminController @Inject() (
           EntityType.PLACE, // TODO hard-wired temporarily only
           authorityMeta.shortname,
           authorityMeta.fullname,
+          authorityMeta.homepage,
           authorityMeta.shortcode,
           authorityMeta.color,
           urlPatterns).map { _ => maybeImport match {

@@ -25,6 +25,7 @@ class AuthorityFileService @Inject() (val db: DB, implicit val ctx: ExecutionCon
     entityType: EntityType,
     shortname: String,
     fullname: Option[String],
+    homepage: Option[String],
     shortcode: Option[String],
     color: Option[String],
     urlPatterns: Seq[String]
@@ -34,6 +35,7 @@ class AuthorityFileService @Inject() (val db: DB, implicit val ctx: ExecutionCon
       entityType.toString,
       shortname,
       optString(fullname),
+      optString(homepage),
       optString(shortcode),
       optString(color),
       { if (urlPatterns.size > 0) urlPatterns.mkString(",")
@@ -56,6 +58,7 @@ object AuthorityFileService {
     (JsPath \ "authority_type").write[String] and
     (JsPath \ "shortname").write[String] and
     (JsPath \ "fullname").writeNullable[String] and
+    (JsPath \ "homepage").writeNullable[String] and
     (JsPath \ "shortcode").writeNullable[String] and
     (JsPath \ "color").writeNullable[String] and
     (JsPath \ "url_patterns").writeNullable[Seq[String]]
@@ -64,6 +67,7 @@ object AuthorityFileService {
       a.getAuthorityType,
       a.getShortname,
       Option(a.getFullname),
+      Option(a.getHomepage),
       Option(a.getShortcode),
       Option(a.getColor),
       Option(a.getUrlPatterns).map(_.split(","))
