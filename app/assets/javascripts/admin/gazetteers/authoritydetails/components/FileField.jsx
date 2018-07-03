@@ -21,7 +21,7 @@ export default class FileField extends Component {
             style={{display:'none'}}
             onChange={this.props.onChange} />
 
-          <label className={this.props.buttonClass}>
+          <label className={this.props.buttonClass} for={this.props.name}>
             <span class="icon">&#xf055;</span>
           </label>
         </dd>

@@ -9,13 +9,23 @@ export default class AuthorityDetails extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {}; // TODO initial values?
+
+    this.state = {
+      errorMessage  : null, // UI state: displayed error message
+      successMessage: null, // UI state: displayed success message
+      filename      : null, // Filename displayed in file input
+      value         : props.value
+    };
   }
 
-  closeMessage() {
+  componentWillReceiveProps(nextProps) {
+    this.setState({ value: nextProps.value });
+  }
+
+  closeMessages() {
     this.setState({
-      success: null,
-      error: null
+      errorMessage  : null,
+      successMessage: null
     });
   }
 
@@ -25,10 +35,20 @@ export default class AuthorityDetails extends Component {
     this.setState({ filename: file.name });
   }
 
+  onChange(evt) {
+    const input = evt.target;
+
+    const diff = {};
+    diff[input.name] = input.value;
+
+    const updatedValue = Object.assign({}, this.state.value, diff);
+    this.setState({ value: updatedValue });
+  }
+
   /** Identifier and shortname are required properties **/
   validate() {
-    const hasIdentifier = this.state.identifier;
-    const hasShortname = this.state.shortname;
+    const hasIdentifier = this.state.value.identifier;
+    const hasShortname = this.state.value.shortname;
 
     if (!hasIdentifier && !hasShortname)
       this.setState({ error: 'Identifier and shortname are required properties' })
@@ -40,13 +60,6 @@ export default class AuthorityDetails extends Component {
       this.setState({ error: null });
 
     return hasIdentifier && hasShortname;
-  }
-
-  onChange(evt) {
-    const input = evt.target;
-    const state = {};
-    state[input.name] = input.value;
-    this.setState(state);
   }
 
   onSubmit() {
@@ -66,7 +79,7 @@ export default class AuthorityDetails extends Component {
       ];
 
       stateFields.forEach(key => {
-        const val = this.state[key]
+        const val = this.state.value[key]
         if (val) data.append(key, val);
       });
 
@@ -75,11 +88,11 @@ export default class AuthorityDetails extends Component {
 
       axios.post('/admin/gazetteers', data)
         .then(response => {
-          this.setState({ success: response.data });
+          this.setState({ successMessage: response.data });
         })
         .catch(error => {
           this.setState({
-            error: `Something went wrong: ${error.response.data}`
+            errorMessage: `Something went wrong: ${error.response.data}`
           });
         })
     }
@@ -88,21 +101,21 @@ export default class AuthorityDetails extends Component {
   render() {
     return (
       <div className="authority-details">
-        {this.state.error &&
+        {this.state.errorMessage &&
           <div className="error flash-message">
             <span
               className="icon"
-              onClick={this.closeMessage.bind(this)}>&#xf00d;
-            </span> {this.state.error}
+              onClick={this.closeMessages.bind(this)}>&#xf00d;
+            </span> {this.state.errorMessage}
           </div>
         }
 
-        {this.state.success &&
+        {this.state.successMessage &&
           <div className="success flash-message">
             <span
               className="icon"
-              onClick={this.closeMessage.bind(this)}>&#xf00c;
-            </span> {this.state.success}
+              onClick={this.closeMessages.bind(this)}>&#xf00c;
+            </span> {this.state.successMessage}
           </div>
         }
 
@@ -110,26 +123,31 @@ export default class AuthorityDetails extends Component {
           <StringField
             name="identifier"
             label="Identifier"
+            value={this.state.value.identifier}
             onChange={this.onChange.bind(this)} />
 
           <StringField
             name="shortname"
             label="Short name"
+            value={this.state.value.shortname}
             onChange={this.onChange.bind(this)} />
 
           <StringField
             name="fullname"
             label="Full name"
+            value={this.state.value.fullname}
             onChange={this.onChange.bind(this)} />
 
           <StringField
             name="shortcode"
             label="Shortcode"
+            value={this.state.value.shortcode}
             onChange={this.onChange.bind(this)} />
 
           <StringField
             name="urlpatterns"
             label="URL Patterns"
+            value={this.state.value.urlpatterns}
             onChange={this.onChange.bind(this)} />
 
           <ColorField />

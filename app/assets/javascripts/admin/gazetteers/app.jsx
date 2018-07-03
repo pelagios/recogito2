@@ -28,6 +28,7 @@ export default class App extends Component {
       <div className="pane gazetteers">
         <div className="left">
           <AuthorityList onSelect={this.onSelect.bind(this)} />
+
           <button className="btn" onClick={this.addNew.bind(this)}>
             <span class="icon">&#xf055;</span> Add New
           </button>
@@ -35,7 +36,7 @@ export default class App extends Component {
 
         <div className="right">
           {this.state.details &&
-            <AuthorityDetails detailsFor={this.state.details} />
+            <AuthorityDetails value={this.state.details} />
           }
         </div>
       </div>

@@ -12,7 +12,7 @@ export default class StringField extends Component {
             id={this.props.name}
             name={this.props.name}
             autocomplete="false"
-            value={this.props.value}
+            defaultValue={this.props.value}
             onChange={this.props.onChange} />
         </dd>
       </dl>
