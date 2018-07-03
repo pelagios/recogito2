@@ -108,6 +108,7 @@ export default class AuthorityDetails extends Component {
       axios.post('/admin/gazetteers', data)
         .then(response => {
           this.setState({ successMessage: response.data });
+          this.props.onSaved(this.state.value);
         })
         .catch(error => {
           this.setState({

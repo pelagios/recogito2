@@ -9,7 +9,10 @@ export default class AuthorityList extends Component {
     super(props);
 
     this.state = { authorities: [] };
+    this.refresh();
+  }
 
+  refresh() {
     axios.get('/admin/gazetteers.json?counts=true')
       .then(response => {
         this.setState({ authorities: response.data });
