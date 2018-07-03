@@ -1,6 +1,8 @@
 package services.entity
 
 import javax.inject.{Inject, Singleton}
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import services.BaseService
 import services.generated.Tables.AUTHORITY_FILE
@@ -44,5 +46,27 @@ class AuthorityFileService @Inject() (val db: DB, implicit val ctx: ExecutionCon
       .set(authorityFile)
       .execute()
   }
+  
+}
+
+object AuthorityFileService {
+  
+  implicit val authorityFileRecordWrites: Writes[AuthorityFileRecord] = (
+    (JsPath \ "identifier").write[String] and
+    (JsPath \ "authority_type").write[String] and
+    (JsPath \ "shortname").write[String] and
+    (JsPath \ "fullname").writeNullable[String] and
+    (JsPath \ "shortcode").writeNullable[String] and
+    (JsPath \ "color").writeNullable[String] and
+    (JsPath \ "url_patterns").writeNullable[Seq[String]]
+  )(a => (
+      a.getId,
+      a.getAuthorityType,
+      a.getShortname,
+      Option(a.getFullname),
+      Option(a.getShortcode),
+      Option(a.getColor),
+      Option(a.getUrlPatterns).map(_.split(","))
+    ))
   
 }

@@ -39,6 +39,7 @@ GET     /help                                        controllers.help.HelpContro
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
+GET     /admin/gazetteers.json                       controllers.admin.gazetteers.GazetteerAdminController.listGazetteers
 POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.upsertAuthority
 DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 

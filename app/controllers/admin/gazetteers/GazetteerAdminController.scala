@@ -8,6 +8,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.libs.json.{Json, JsObject}
 import play.api.mvc.ControllerComponents
 import services.document.DocumentService
 import services.entity.{AuthorityFileService, EntityType}
@@ -15,11 +16,13 @@ import services.entity.builtin.EntityService
 import services.entity.builtin.importer.crosswalks.geojson._
 import services.entity.builtin.importer.crosswalks.rdf._
 import services.entity.builtin.importer.EntityImporterFactory
+import services.generated.tables.records.AuthorityFileRecord
 import services.user.UserService
 import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import scala.concurrent.{ExecutionContext, Future}
 import storage.es.ES
+import controllers.HasPrettyPrintJSON
 
 case class AuthorityMetadata(
   identifier  : String,
@@ -42,7 +45,9 @@ class GazetteerAdminController @Inject() (
   implicit val materializer: Materializer,
   implicit val ctx: ExecutionContext,
   implicit val webJarsUtil: WebJarsUtil
-) extends BaseAuthController(components, config, documents, users) {
+) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
+  
+
  
   val authorityMetadataForm = Form(
     mapping(
@@ -59,7 +64,7 @@ class GazetteerAdminController @Inject() (
     Ok(views.html.admin.gazetteers.index())
   }
   
-  def listGazetteers = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
+  def listGazetteers = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     val fMetadata = authorities.listAll(Some(EntityType.PLACE))
     val fRecordCounts = entities.countByAuthority(Some(EntityType.PLACE))
     
@@ -68,11 +73,31 @@ class GazetteerAdminController @Inject() (
       counts <- fRecordCounts
     } yield (metadata, counts)
     
-    f.map { case (metadata, counts) =>
+    f.map { case (listedGazetteers, counts) =>
+      import AuthorityFileService._ // Import implicit JSON serialization
       
+      // In order to see possible inconsistencies between DB and index,
+      // we separately handle: i) gazetteers described in the DB, ii) gazetteer
+      // IDs recorded in the index, but without a metadata record in the DB.
+      // Normally, the list below should be empty.
+      val unlistedGazetteers = counts.filterNot { case (id, count) => 
+        listedGazetteers.map(_.getId).contains(id) 
+      }
+      
+      val json = listedGazetteers.map {  m =>
+          val count = counts.find(_._1 == m.getId).map(_._2).getOrElse(0l)
+          Json.toJson(m).as[JsObject] ++ Json.obj("count" -> count)
+        } ++ unlistedGazetteers.map { case (id, count) =>
+          Json.obj(
+            "identifier" -> id,
+            "authority_type" -> "PLACE",
+            "shortname" -> id,
+            "count" -> count,
+            "conflicted" -> true)
+        }
+      
+      jsonOk(Json.toJson(json))
     }
-    
-    Ok // TODO roll meta + counts into a single datastructure and serialize to JSON
   }
   
   def upsertAuthority = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
@@ -96,7 +121,7 @@ class GazetteerAdminController @Inject() (
           
         authorities.upsert(
           authorityMeta.identifier,
-          EntityType.PLACE, // TODO temporary only
+          EntityType.PLACE, // TODO hard-wired temporarily only
           authorityMeta.shortname,
           authorityMeta.fullname,
           authorityMeta.shortcode,

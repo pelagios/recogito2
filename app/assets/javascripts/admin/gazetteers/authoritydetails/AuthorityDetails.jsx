@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import { SwatchesPicker } from 'react-color';
 import axios from 'axios';
+
+import ColorField from './components/ColorField.jsx';
+import FileField from './components/FileField.jsx';
+import StringField from './components/StringField.jsx';
 
 export default class AuthorityDetails extends Component {
 
@@ -104,100 +107,39 @@ export default class AuthorityDetails extends Component {
         }
 
         <form className="crud">
-          <dl>
-            <dt><label for="identifier">Identifier</label></dt>
-            <dd>
-              <input
-                type="text"
-                id="identifier"
-                name="identifier"
-                autocomplete="false"
-                value={this.state.identifier}
-                onChange={this.onChange.bind(this)} />
-            </dd>
-          </dl>
+          <StringField
+            name="identifier"
+            label="Identifier"
+            onChange={this.onChange.bind(this)} />
 
-          <dl>
-            <dt><label for="fullname">Short name</label></dt>
-            <dd>
-              <input
-                type="text"
-                id="shortname"
-                name="shortname"
-                autocomplete="false"
-                value={this.state.screenname}
-                onChange={this.onChange.bind(this)} />
-            </dd>
-          </dl>
+          <StringField
+            name="shortname"
+            label="Short name"
+            onChange={this.onChange.bind(this)} />
 
-          <dl>
-            <dt><label for="fullname">Full name</label></dt>
-            <dd>
-              <input
-                type="text"
-                id="fullname"
-                name="fullname"
-                autocomplete="false"
-                value={this.state.screenname}
-                onChange={this.onChange.bind(this)} />
-            </dd>
-          </dl>
+          <StringField
+            name="fullname"
+            label="Full name"
+            onChange={this.onChange.bind(this)} />
 
-          <dl>
-            <dt><label for="shortcode">Shortcode</label></dt>
-            <dd>
-              <input
-                type="text"
-                id="shortcode"
-                name="shortcode"
-                autocomplete="false"
-                value={this.state.shortcode}
-                onChange={this.onChange.bind(this)} />
-            </dd>
-          </dl>
+          <StringField
+            name="shortcode"
+            label="Shortcode"
+            onChange={this.onChange.bind(this)} />
 
-          <dl>
-            <dt><label for="urlpatterns">URL Patterns</label></dt>
-            <dd>
-              <input
-                type="text"
-                id="urlpatterns"
-                name="urlpatterns"
-                autocomplete="false"
-                value={this.state.urlpatterns}
-                onChange={this.onChange.bind(this)} />
-            </dd>
-          </dl>
+          <StringField
+            name="urlpatterns"
+            label="URL Patterns"
+            onChange={this.onChange.bind(this)} />
 
-          <dl>
-            <dt><label for="color">Color</label></dt>
-            <dd>
-              {/* <SwatchesPicker /> */}
-            </dd>
-          </dl>
+          <ColorField />
 
-          <dl className="fileupload">
-            <dt><label for="filename">Upload File</label></dt>
-            <dd>
-              <input
-                type="text"
-                id="filename"
-                name="filename"
-                disabled="true"
-                value={this.state.filename} />
-
-              <input
-                type="file"
-                id="file"
-                name="file"
-                style={{display:'none'}}
-                onChange={this.onAttachFile.bind(this)}/>
-
-              <label className="btn add-file" for="file">
-                <span class="icon">&#xf055;</span>
-              </label>
-            </dd>
-          </dl>
+          <FileField
+            name="file"
+            label="Upload File"
+            value={this.state.filename}
+            buttonClass="btn add-file"
+            onChange={this.onAttachFile.bind(this)}/>
 
           <dl>
             <dt/>

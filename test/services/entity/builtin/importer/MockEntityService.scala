@@ -77,7 +77,7 @@ class MockEntityService(implicit ctx: ExecutionContext) extends EntityService {
     }
 
   /** Unimplemented methods **/
-  override def listAuthorities(eType: Option[EntityType] = None): Future[Seq[(String, Long)]] = ???
+  override def countByAuthority(eType: Option[EntityType] = None): Future[Seq[(String, Long)]] = ???
 
   override def listEntitiesInDocument(docId  : String,
     eType  : Option[EntityType] = None,
