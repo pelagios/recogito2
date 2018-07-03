@@ -29,7 +29,7 @@ export default class AuthorityList extends Component {
               <th></th>
               <th>Identifier</th>
               <th>Name</th>
-              <th>Records</th>
+              <th className="align-right">Records</th>
             </tr>
           </thead>
           <tbody>
