@@ -13,6 +13,14 @@ export default class App extends Component {
     };
   }
 
+  componentDidMount(){
+    const onKeydown = e => {
+      if (e.which === 27) this.setState({ details: null });
+    }
+
+    document.addEventListener('keydown', onKeydown.bind(this), false);
+  }
+
   addNew() {
     this.setState({
       details: {} // Set empty details
@@ -25,7 +33,7 @@ export default class App extends Component {
 
   render() {
     return (
-      <div className="pane gazetteers">
+      <div className="pane two">
         <div className="left">
           <AuthorityList onSelect={this.onSelect.bind(this)} />
 
@@ -34,11 +42,11 @@ export default class App extends Component {
           </button>
         </div>
 
-        <div className="right">
-          {this.state.details &&
+        {this.state.details &&
+          <div className="right">
             <AuthorityDetails value={this.state.details} />
-          }
-        </div>
+          </div>
+        }
       </div>
     );
   }

@@ -1,9 +1,9 @@
-@()(content: Html)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+@(stylesheet: String)(content: Html)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>Recogito | Admin</title>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/admin/index.css")"/>
+    <link rel="stylesheet" href="@routes.Assets.versioned(stylesheet)"/>
   </head>
   <body>
     <div class="sidebar">

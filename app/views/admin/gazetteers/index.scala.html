@@ -1,5 +1,5 @@
 @()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
-@views.html.admin._layout() {
+@views.html.admin._layout("stylesheets/admin/gazetteers/index.css") {
   <div id="app"></div>
   @helper.javascriptRouter("jsRoutes")(
     controllers.admin.gazetteers.routes.javascript.GazetteerAdminController.deleteGazetteer

@@ -3,7 +3,17 @@ import axios from 'axios';
 
 import ColorField from './components/ColorField.jsx';
 import FileField from './components/FileField.jsx';
+import Footer from './components/Footer.jsx';
 import StringField from './components/StringField.jsx';
+
+const EMPTY = {
+  identifier : '',
+  shortname  : '',
+  fullname   : '',
+  shortcode  : '',
+  urlpatterns: '',
+  color      : ''
+};
 
 export default class AuthorityDetails extends Component {
 
@@ -19,7 +29,8 @@ export default class AuthorityDetails extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ value: nextProps.value });
+    const nextValue = Object.assign({}, EMPTY, nextProps.value);
+    this.setState({ value: nextValue });
   }
 
   closeMessages() {
@@ -51,13 +62,13 @@ export default class AuthorityDetails extends Component {
     const hasShortname = this.state.value.shortname;
 
     if (!hasIdentifier && !hasShortname)
-      this.setState({ error: 'Identifier and shortname are required properties' })
+      this.setState({ errorMessage: 'Identifier and shortname are required properties' })
     else if (!hasIdentifier)
-      this.setState({ error: 'Identifier is required' })
+      this.setState({ errorMessage: 'Identifier is required' })
     else if (!hasShortname)
-      this.setState({ error: 'Shortname is required' })
+      this.setState({ errorMessage: 'Shortname is required' })
     else
-      this.setState({ error: null });
+      this.setState({ errorMessage: null });
 
     return hasIdentifier && hasShortname;
   }
@@ -96,6 +107,10 @@ export default class AuthorityDetails extends Component {
           });
         })
     }
+  }
+
+  onDelete() {
+    console.log('delete');
   }
 
   render() {
@@ -158,17 +173,11 @@ export default class AuthorityDetails extends Component {
             value={this.state.filename}
             buttonClass="btn add-file"
             onChange={this.onAttachFile.bind(this)}/>
-
-          <dl>
-            <dt/>
-            <dd>
-              <button
-                type="button"
-                className="btn"
-                onClick={this.onSubmit.bind(this)}>Save</button>
-            </dd>
-          </dl>
         </form>
+
+        <Footer
+          onSubmit={this.onSubmit.bind(this)}
+          onDelete={this.onDelete.bind(this)} />
       </div>
     );
   }

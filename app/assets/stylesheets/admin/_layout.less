@@ -1,5 +1,4 @@
 @import "../_globals.less";
-@import "_pane.less";
 
 html, body {
   margin:0;
@@ -53,4 +52,57 @@ html, body {
 .content {
   margin-left:220px;
   padding:20px;
+
+  button {
+    padding:8px;
+    width:120px;
+    margin-left:5px;
+
+    .icon {
+      font-size:17px;
+      padding-right:2px;
+    }
+
+  }
+}
+
+.content .pane.two {
+  min-width:900px;
+  position:relative;
+  min-height:200px;
+
+  .left, .right {
+    width:49%;
+    background-color:#fff;
+    border:1px solid @lightgrey-border;
+    .rounded-corners(3px);
+    .box-shadow(2px, 2px, 28px, rgba(0, 0, 0, 0.2));
+  }
+
+  .left {
+    float:left;
+  }
+
+  .right {
+    float:right;
+  }
+
+  form {
+    width:460px;
+    margin:0 auto;
+    padding:30px 0;
+
+    input, button {
+      width:270px;
+    }
+
+  }
+
+  .footer {
+    background-color:@blueish-white-hi;
+    text-align:right;
+    border-top:1px solid @lightgrey-border;
+    padding:10px;
+  }
+
 }
