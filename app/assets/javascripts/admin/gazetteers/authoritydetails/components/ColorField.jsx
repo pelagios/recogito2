@@ -9,7 +9,7 @@ export default class ColorField extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log(nextProps);
+    this.setState({ color: nextProps.value });
   }
 
   toggleColorPicker() {
