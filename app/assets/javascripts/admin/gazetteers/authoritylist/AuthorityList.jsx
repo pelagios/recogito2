@@ -23,11 +23,27 @@ export default class AuthorityList extends Component {
   render() {
     return (
       <div className="authority-list">
-        <ul>
-          {this.state.authorities.map(authority =>
-            <AuthorityRow value={authority} onClick={this.onSelect.bind(this)}/>
-          )}
-        </ul>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Identifier</th>
+              <th>Name</th>
+              <th>Records</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.authorities.map(authority =>
+              <AuthorityRow value={authority} onClick={this.onSelect.bind(this)}/>
+            )}
+          </tbody>
+        </table>
+
+        <div className="footer">
+          <button className="btn" onClick={this.props.onAddNew}>
+            <span class="icon">&#xf055;</span> Add New
+          </button>
+        </div>
       </div>
     );
   }

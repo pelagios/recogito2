@@ -8,9 +8,7 @@ export default class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      details : null
-    };
+    this.state = { details : null };
   }
 
   componentDidMount(){
@@ -22,24 +20,20 @@ export default class App extends Component {
   }
 
   addNew() {
-    this.setState({
-      details: {} // Set empty details
-    });
+    this.setState({ details: {} });
   }
 
   onSelect(authority) {
-    this.setState({details: authority});
+    this.setState({ details: authority });
   }
 
   render() {
     return (
       <div className="pane two">
         <div className="left">
-          <AuthorityList onSelect={this.onSelect.bind(this)} />
-
-          <button className="btn" onClick={this.addNew.bind(this)}>
-            <span class="icon">&#xf055;</span> Add New
-          </button>
+          <AuthorityList
+            onSelect={this.onSelect.bind(this)}
+            onAddNew={this.addNew.bind(this)}/>
         </div>
 
         {this.state.details &&

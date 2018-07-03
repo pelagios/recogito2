@@ -1,0 +1,43 @@
+.content .authority-list {
+  position:relative;
+
+  table {
+    width:100%;
+    border-collapse:collapse;
+    border-spacing:0;
+  }
+
+  th, td {
+    padding:8px;
+  }
+
+  thead th {
+    text-align:left;
+    font-weight:normal;
+    border-bottom:1px solid @lightgrey-border;
+  }
+
+  tbody {
+    -webkit-box-shadow:inset 1px 4px 12px -6px rgba(0, 0, 0, 0.2);
+       -moz-box-shadow:inset 1px 4px 12px -6px rgba(0, 0, 0, 0.2);
+            box-shadow:inset 1px 4px 12px -6px rgba(0, 0, 0, 0.2);
+
+    tr {
+      cursor:pointer;
+    }
+
+    tr td {
+      border-bottom:1px solid lighten(@lightgrey-border, 3%);
+    }
+
+    tr:last-child td {
+      border-bottom:none;
+    }
+
+    tr:hover td {
+      background-color:rgba(0, 0, 0, 0.025);
+    }
+
+  }
+
+}
