@@ -7,13 +7,13 @@ import Footer from './components/Footer.jsx';
 import StringField from './components/StringField.jsx';
 
 const EMPTY = {
-  identifier : '',
-  shortname  : '',
-  fullname   : '',
-  homepage   : '',
-  shortcode  : '',
-  urlpatterns: '',
-  color      : ''
+  identifier  : '',
+  shortname   : '',
+  fullname    : '',
+  homepage    : '',
+  shortcode   : '',
+  url_patterns: '',
+  color       : ''
 };
 
 export default class AuthorityDetails extends Component {
@@ -177,7 +177,7 @@ export default class AuthorityDetails extends Component {
           <StringField
             name="urlpatterns"
             label="URL Patterns"
-            value={this.state.value.urlpatterns}
+            value={this.state.value.url_patterns}
             onChange={this.onChange.bind(this)} />
 
           <ColorField
