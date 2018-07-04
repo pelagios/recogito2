@@ -3,13 +3,13 @@ require.config({
   fileExclusionRegExp: /^lib$/,
   paths: {
     marked: '/webjars/marked/0.3.6/marked.min',
-    i18n: '../vendor/i18n',
-    text: '../vendor/rjs-text'
+    i18n: '../vendor/i18n'
   }
 });
 
 require([
   'common/ui/alert',
+  'common/utils/placeUtils',
   'common/annotationView',
   'common/api',
   'common/config',
@@ -25,6 +25,7 @@ require([
   'document/annotation/image/selection/selectionHandler'
 ], function(
   Alert,
+  PlaceUtils,
   AnnotationView,
   API,
   Config,
@@ -132,9 +133,11 @@ require([
 
       olMap.on('postrender', onMapMove);
 
-      API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-         .done(this.onAnnotationsLoaded.bind(this)).then(loadIndicator.destroy)
-         .fail(this.onAnnotationsLoadError.bind(this)).then(loadIndicator.destroy);
+      PlaceUtils.initGazetteers().done(function() {
+        API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
+           .done(self.onAnnotationsLoaded.bind(self)).then(loadIndicator.destroy)
+           .fail(self.onAnnotationsLoadError.bind(self)).then(loadIndicator.destroy);
+       });
     };
     App.prototype = Object.create(BaseApp.prototype);
 

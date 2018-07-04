@@ -1,17 +1,15 @@
 require.config({
   baseUrl: "/assets/javascripts/",
-  fileExclusionRegExp: /^lib$/,
-  paths: {
-    text: '../vendor/rjs-text'
-  }
+  fileExclusionRegExp: /^lib$/
 });
 
 require([
+  'common/utils/placeUtils',
   'common/annotationView',
   'common/api',
   'common/config',
   'document/map/map'
-], function(AnnotationView, API, Config, Map) {
+], function(PlaceUtils, AnnotationView, API, Config, Map) {
 
   jQuery(document).ready(function() {
 
@@ -33,10 +31,12 @@ require([
           // TODO implement
         };
 
-    API.listAnnotationsInDocument(Config.documentId)
-       .then(onAnnotationsLoaded)
-       .done(onPlacesLoaded)
-       .fail(onLoadError);
+    PlaceUtils.initGazetteers().done(function() {
+      API.listAnnotationsInDocument(Config.documentId)
+         .then(onAnnotationsLoaded)
+         .done(onPlacesLoaded)
+         .fail(onLoadError);
+    });
   });
 
 });

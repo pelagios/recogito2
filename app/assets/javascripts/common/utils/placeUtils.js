@@ -1,15 +1,14 @@
 define([
-  'common/ui/countries',
-  'text!/api/authorities/gazetteers'
-], function(Countries, Gazetteers) {
+  'common/ui/countries'
+], function(Countries) {
 
   // TODO fetch this information from the server, so we can feed it from the DB
   var TOKEN = '{{id}}',
 
-      KNOWN_GAZETTEERS = JSON.parse(Gazetteers),
+      KNOWN_GAZETTEERS = undefined,
 
       /** Keeping previous hard-coded version for color/URL pattern reference **/
-            
+
       // KNOWN_GAZETTEERS = [
       //   { shortcode: 'chgis',    url_patterns: [ 'http://maps.cga.harvard.edu/tgaz/placename/hvd_' ], color: '#9467bd' },
       //   { shortcode: 'dare',     url_patterns: [ 'http://dare.ht.lu.se/places/' ], color: '#ff7f0e' },
@@ -107,6 +106,13 @@ define([
       };
 
   return {
+
+    initGazetteers: function() {
+      return jsRoutes.controllers.api.AuthoritiesAPIController.listGazetteers()
+        .ajax().then(function(gazetteers) {
+          KNOWN_GAZETTEERS = gazetteers;
+        });
+    },
 
     /**
      * Given a placename, returns the 'best matching record'.

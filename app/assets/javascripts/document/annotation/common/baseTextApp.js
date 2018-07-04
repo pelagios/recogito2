@@ -2,6 +2,7 @@ define([
   'common/ui/alert',
   'common/ui/formatting',
   'common/utils/annotationUtils',
+  'common/utils/placeUtils',
   'common/annotationView',
   'common/api',
   'common/config',
@@ -15,6 +16,7 @@ define([
   Alert,
   Formatting,
   AnnotationUtils,
+  PlaceUtils,
   AnnotationView,
   API,
   Config,
@@ -149,11 +151,13 @@ define([
 
     initPage();
 
-    API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-       .done(this.onAnnotationsLoaded.bind(this))
-       .then(relationsLayer.init) // TODO just a hack for testing!
-       .then(loadIndicator.destroy)
-       .fail(this.onAnnotationsLoadError.bind(this)).then(loadIndicator.destroy);
+    PlaceUtils.initGazetteers().done(function() {
+      API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
+         .done(self.onAnnotationsLoaded.bind(self))
+         .then(relationsLayer.init)
+         .then(loadIndicator.destroy)
+         .fail(self.onAnnotationsLoadError.bind(self)).then(loadIndicator.destroy);
+    });
   };
   App.prototype = Object.create(BaseApp.prototype);
 

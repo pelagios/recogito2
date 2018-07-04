@@ -3,8 +3,7 @@ require.config({
   fileExclusionRegExp: /^lib$/,
   paths: {
     marked: '/webjars/marked/0.3.6/marked.min',
-    i18n: '../vendor/i18n',
-    text: '../vendor/rjs-text'
+    i18n: '../vendor/i18n'
   }
 });
 
