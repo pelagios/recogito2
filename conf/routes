@@ -39,7 +39,6 @@ GET     /help                                        controllers.help.HelpContro
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.index
-GET     /admin/gazetteers.json                       controllers.admin.gazetteers.GazetteerAdminController.listGazetteers
 POST    /admin/gazetteers                            controllers.admin.gazetteers.GazetteerAdminController.upsertAuthority
 DELETE  /admin/gazetteers/:name                      controllers.admin.gazetteers.GazetteerAdminController.deleteGazetteer(name: String)
 
@@ -146,6 +145,8 @@ GET     /api/document/:id/places                     controllers.api.PlaceAPICon
 
 GET     /api/place/search                            controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None)
 GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
+
+GET     /api/authorities/gazetteers                  controllers.api.AuthoritiesAPIController.listGazetteers
 
 POST    /api/task                                    controllers.api.TaskAPIController.spawnTask
 GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)

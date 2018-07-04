@@ -13,7 +13,7 @@ export default class AuthorityList extends Component {
   }
 
   refresh() {
-    axios.get('/admin/gazetteers.json?counts=true')
+    axios.get('/api/authorities/gazetteers')
       .then(response => {
         this.setState({ authorities: response.data });
       });

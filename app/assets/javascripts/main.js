@@ -3,7 +3,8 @@ require.config({
   fileExclusionRegExp : /^lib$/,
   paths: {
     marked: '../../../web-modules/main/webjars/lib/marked/marked.min',
-    i18n: '../../../../../public/vendor/i18n'
+    i18n: '../../../../../public/vendor/i18n',
+    json: '../../../../../public/vendor/rjs-text'
   },
   modules : [
     { name : 'admin/dashboard' },

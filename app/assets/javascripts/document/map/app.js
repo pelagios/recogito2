@@ -1,6 +1,9 @@
 require.config({
   baseUrl: "/assets/javascripts/",
-  fileExclusionRegExp: /^lib$/
+  fileExclusionRegExp: /^lib$/,
+  paths: {
+    text: '../vendor/rjs-text'
+  }
 });
 
 require([

@@ -94,7 +94,7 @@ export default class AuthorityDetails extends Component {
         'homepage',
         'shortcode',
         'color',
-        'urlpatterns'
+        'url_patterns'
       ];
 
       stateFields.forEach(key => {
@@ -175,7 +175,7 @@ export default class AuthorityDetails extends Component {
             onChange={this.onChange.bind(this)} />
 
           <StringField
-            name="urlpatterns"
+            name="url_patterns"
             label="URL Patterns"
             value={this.state.value.url_patterns}
             onChange={this.onChange.bind(this)} />
