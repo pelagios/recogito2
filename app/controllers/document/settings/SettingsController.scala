@@ -46,10 +46,13 @@ class SettingsController @Inject() (
   def showDocumentSettings(documentId: String, tab: Option[String]) = silhouette.SecuredAction.async { implicit request =>
     documentAdminAction(documentId, request.identity.username, { doc =>
       tab.map(_.toLowerCase) match {
-        case Some(t) if t == "sharing" => {
+        case Some(t) if t == "preferences" =>
+          Future.successful(Ok(views.html.document.settings.preferences(doc, request.identity)))
+
+        case Some(t) if t == "sharing" =>
           val f = for {
-            collaborators <- documents.listDocumentCollaborators(documentId)
-          } yield collaborators
+            sharingPolicies <- documents.listDocumentCollaborators(documentId)
+          } yield sharingPolicies
 
           f.map(sharingPolicies =>
             // Make sure this page isn't cached, since stuff gets added via AJAX
@@ -58,7 +61,6 @@ class SettingsController @Inject() (
                 CACHE_CONTROL -> "no-cache, no-store, must-revalidate",
                 PRAGMA -> "no-cache",
                 EXPIRES -> "0"))
-        }
 
         case Some(t) if t == "history" =>
           Future.successful(Ok(views.html.document.settings.history(doc, request.identity)))

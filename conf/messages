@@ -173,6 +173,7 @@ document.downloads.annotations.tei.text=Annotated text in a basic TEI/XML serial
 # Document settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 document.settings.sidebar.metadata=Metadata
+document.settings.sidebar.preferences=Annotation Preferences
 document.settings.sidebar.sharing=Sharing
 document.settings.sidebar.edit_history=Edit History
 document.settings.sidebar.backup=Backup

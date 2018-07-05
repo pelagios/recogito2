@@ -1,0 +1,13 @@
+@(
+  doc: services.document.DocumentInfo,
+  currentUser: services.user.User
+ )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
+
+@_layout("Settings | Annotation Preferences", doc, currentUser, Some("preferences")) {
+  <div class="panel centered">
+    <h2>Gazetteers</h2>
+    <div class="inner">
+
+    </div>
+  </div>
+}
