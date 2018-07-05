@@ -17,6 +17,7 @@ import org.jooq.impl.SchemaImpl
 import services.generated.tables.AuthorityFile
 import services.generated.tables.Document
 import services.generated.tables.DocumentFilepart
+import services.generated.tables.DocumentPreferences
 import services.generated.tables.FeatureToggle
 import services.generated.tables.Folder
 import services.generated.tables.FolderAssociation
@@ -57,6 +58,7 @@ class Public extends SchemaImpl("public") {
 
 	private def getSequences0() : List[Sequence[_]] = {
 		return Arrays.asList[Sequence[_]](
+			Sequences.DOCUMENT_PREFERENCES_ID_SEQ,
 			Sequences.FEATURE_TOGGLE_ID_SEQ,
 			Sequences.FOLDER_ID_SEQ,
 			Sequences.SHARING_POLICY_ID_SEQ,
@@ -75,6 +77,7 @@ class Public extends SchemaImpl("public") {
 			AuthorityFile.AUTHORITY_FILE,
 			Document.DOCUMENT,
 			DocumentFilepart.DOCUMENT_FILEPART,
+			DocumentPreferences.DOCUMENT_PREFERENCES,
 			FeatureToggle.FEATURE_TOGGLE,
 			Folder.FOLDER,
 			FolderAssociation.FOLDER_ASSOCIATION,

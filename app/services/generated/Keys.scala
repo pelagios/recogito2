@@ -16,6 +16,7 @@ import org.jooq.impl.AbstractKeys
 import services.generated.tables.AuthorityFile
 import services.generated.tables.Document
 import services.generated.tables.DocumentFilepart
+import services.generated.tables.DocumentPreferences
 import services.generated.tables.FeatureToggle
 import services.generated.tables.Folder
 import services.generated.tables.FolderAssociation
@@ -28,6 +29,7 @@ import services.generated.tables.User
 import services.generated.tables.UserRole
 import services.generated.tables.records.AuthorityFileRecord
 import services.generated.tables.records.DocumentFilepartRecord
+import services.generated.tables.records.DocumentPreferencesRecord
 import services.generated.tables.records.DocumentRecord
 import services.generated.tables.records.FeatureToggleRecord
 import services.generated.tables.records.FolderAssociationRecord
@@ -58,6 +60,7 @@ object Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
+	val IDENTITY_DOCUMENT_PREFERENCES = Identities0.IDENTITY_DOCUMENT_PREFERENCES
 	val IDENTITY_FEATURE_TOGGLE = Identities0.IDENTITY_FEATURE_TOGGLE
 	val IDENTITY_FOLDER = Identities0.IDENTITY_FOLDER
 	val IDENTITY_SHARING_POLICY = Identities0.IDENTITY_SHARING_POLICY
@@ -71,6 +74,7 @@ object Keys {
 	val AUTHORITY_FILE_PKEY = UniqueKeys0.AUTHORITY_FILE_PKEY
 	val DOCUMENT_PKEY = UniqueKeys0.DOCUMENT_PKEY
 	val DOCUMENT_FILEPART_PKEY = UniqueKeys0.DOCUMENT_FILEPART_PKEY
+	val DOCUMENT_PREFERENCES_PKEY = UniqueKeys0.DOCUMENT_PREFERENCES_PKEY
 	val FEATURE_TOGGLE_PKEY = UniqueKeys0.FEATURE_TOGGLE_PKEY
 	val FOLDER_PKEY = UniqueKeys0.FOLDER_PKEY
 	val SERVICE_ANNOUNCEMENT_PKEY = UniqueKeys0.SERVICE_ANNOUNCEMENT_PKEY
@@ -89,6 +93,7 @@ object Keys {
 
 	val DOCUMENT__DOCUMENT_OWNER_FKEY = ForeignKeys0.DOCUMENT__DOCUMENT_OWNER_FKEY
 	val DOCUMENT_FILEPART__DOCUMENT_FILEPART_DOCUMENT_ID_FKEY = ForeignKeys0.DOCUMENT_FILEPART__DOCUMENT_FILEPART_DOCUMENT_ID_FKEY
+	val DOCUMENT_PREFERENCES__DOCUMENT_PREFERENCES_DOCUMENT_ID_FKEY = ForeignKeys0.DOCUMENT_PREFERENCES__DOCUMENT_PREFERENCES_DOCUMENT_ID_FKEY
 	val FEATURE_TOGGLE__FEATURE_TOGGLE_USERNAME_FKEY = ForeignKeys0.FEATURE_TOGGLE__FEATURE_TOGGLE_USERNAME_FKEY
 	val FOLDER__FOLDER_OWNER_FKEY = ForeignKeys0.FOLDER__FOLDER_OWNER_FKEY
 	val FOLDER__FOLDER_PARENT_FKEY = ForeignKeys0.FOLDER__FOLDER_PARENT_FKEY
@@ -107,6 +112,7 @@ object Keys {
 	// -------------------------------------------------------------------------
 
 	private object Identities0 extends AbstractKeys {
+		val IDENTITY_DOCUMENT_PREFERENCES : Identity[DocumentPreferencesRecord, Integer] = AbstractKeys.createIdentity(DocumentPreferences.DOCUMENT_PREFERENCES, DocumentPreferences.DOCUMENT_PREFERENCES.ID)
 		val IDENTITY_FEATURE_TOGGLE : Identity[FeatureToggleRecord, Integer] = AbstractKeys.createIdentity(FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.ID)
 		val IDENTITY_FOLDER : Identity[FolderRecord, Integer] = AbstractKeys.createIdentity(Folder.FOLDER, Folder.FOLDER.ID)
 		val IDENTITY_SHARING_POLICY : Identity[SharingPolicyRecord, Integer] = AbstractKeys.createIdentity(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
@@ -118,6 +124,7 @@ object Keys {
 		val AUTHORITY_FILE_PKEY : UniqueKey[AuthorityFileRecord] = AbstractKeys.createUniqueKey(AuthorityFile.AUTHORITY_FILE, AuthorityFile.AUTHORITY_FILE.ID)
 		val DOCUMENT_PKEY : UniqueKey[DocumentRecord] = AbstractKeys.createUniqueKey(Document.DOCUMENT, Document.DOCUMENT.ID)
 		val DOCUMENT_FILEPART_PKEY : UniqueKey[DocumentFilepartRecord] = AbstractKeys.createUniqueKey(DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.ID)
+		val DOCUMENT_PREFERENCES_PKEY : UniqueKey[DocumentPreferencesRecord] = AbstractKeys.createUniqueKey(DocumentPreferences.DOCUMENT_PREFERENCES, DocumentPreferences.DOCUMENT_PREFERENCES.ID)
 		val FEATURE_TOGGLE_PKEY : UniqueKey[FeatureToggleRecord] = AbstractKeys.createUniqueKey(FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.ID)
 		val FOLDER_PKEY : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
 		val SERVICE_ANNOUNCEMENT_PKEY : UniqueKey[ServiceAnnouncementRecord] = AbstractKeys.createUniqueKey(ServiceAnnouncement.SERVICE_ANNOUNCEMENT, ServiceAnnouncement.SERVICE_ANNOUNCEMENT.ID)
@@ -134,6 +141,7 @@ object Keys {
 	private object ForeignKeys0 extends AbstractKeys {
 		val DOCUMENT__DOCUMENT_OWNER_FKEY : ForeignKey[DocumentRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, Document.DOCUMENT, Document.DOCUMENT.OWNER)
 		val DOCUMENT_FILEPART__DOCUMENT_FILEPART_DOCUMENT_ID_FKEY : ForeignKey[DocumentFilepartRecord, DocumentRecord] = AbstractKeys.createForeignKey(services.generated.Keys.DOCUMENT_PKEY, DocumentFilepart.DOCUMENT_FILEPART, DocumentFilepart.DOCUMENT_FILEPART.DOCUMENT_ID)
+		val DOCUMENT_PREFERENCES__DOCUMENT_PREFERENCES_DOCUMENT_ID_FKEY : ForeignKey[DocumentPreferencesRecord, DocumentRecord] = AbstractKeys.createForeignKey(services.generated.Keys.DOCUMENT_PKEY, DocumentPreferences.DOCUMENT_PREFERENCES, DocumentPreferences.DOCUMENT_PREFERENCES.DOCUMENT_ID)
 		val FEATURE_TOGGLE__FEATURE_TOGGLE_USERNAME_FKEY : ForeignKey[FeatureToggleRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.USERNAME)
 		val FOLDER__FOLDER_OWNER_FKEY : ForeignKey[FolderRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, Folder.FOLDER, Folder.FOLDER.OWNER)
 		val FOLDER__FOLDER_PARENT_FKEY : ForeignKey[FolderRecord, FolderRecord] = AbstractKeys.createForeignKey(services.generated.Keys.FOLDER_PKEY, Folder.FOLDER, Folder.FOLDER.PARENT)

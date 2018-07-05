@@ -9,6 +9,7 @@ import javax.annotation.Generated
 import services.generated.tables.AuthorityFile
 import services.generated.tables.Document
 import services.generated.tables.DocumentFilepart
+import services.generated.tables.DocumentPreferences
 import services.generated.tables.FeatureToggle
 import services.generated.tables.Folder
 import services.generated.tables.FolderAssociation
@@ -47,6 +48,11 @@ object Tables {
 	 * The table public.document_filepart
 	 */
 	val DOCUMENT_FILEPART = services.generated.tables.DocumentFilepart.DOCUMENT_FILEPART
+
+	/**
+	 * The table public.document_preferences
+	 */
+	val DOCUMENT_PREFERENCES = services.generated.tables.DocumentPreferences.DOCUMENT_PREFERENCES
 
 	/**
 	 * The table public.feature_toggle
