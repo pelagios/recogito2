@@ -7,6 +7,7 @@ import javax.inject.{Inject, Singleton}
 import services.annotation.AnnotationService
 import services.contribution.ContributionService
 import services.document.{DocumentService, DocumentInfo, RuntimeAccessLevel}
+import services.entity.{AuthorityFileService, EntityType}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.user.UserService
 import services.user.Roles._
@@ -22,6 +23,7 @@ import storage.uploads.Uploads
 
 @Singleton
 class SettingsController @Inject() (
+  val authorities: AuthorityFileService,
   val components: ControllerComponents,
   val config: Configuration,
   val users: UserService,
@@ -47,7 +49,9 @@ class SettingsController @Inject() (
     documentAdminAction(documentId, request.identity.username, { doc =>
       tab.map(_.toLowerCase) match {
         case Some(t) if t == "preferences" =>
-          Future.successful(Ok(views.html.document.settings.preferences(doc, request.identity)))
+          authorities.listAll(Some(EntityType.PLACE)).map { gazetteers =>
+            Ok(views.html.document.settings.preferences(doc, request.identity, gazetteers))
+          }
 
         case Some(t) if t == "sharing" =>
           val f = for {

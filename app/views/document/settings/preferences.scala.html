@@ -1,22 +1,44 @@
 @(
   doc: services.document.DocumentInfo,
-  currentUser: services.user.User
+  currentUser: services.user.User,
+  gazetteers: Seq[services.generated.tables.records.AuthorityFileRecord]
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Settings | Annotation Preferences", doc, currentUser, Some("preferences")) {
   <div class="panel centered">
     <h2>Gazetteers</h2>
     <div class="inner">
-      <form>
+      <form id="gazetteer-preferences">
         <input type="checkbox" id="use-all" name="use-all" />
         <label for="use-all">
           Use all gazetteers when searching for places
         </label>
 
-        <div class="gazetteer-list">
-          
+        <div id="gazetteer-list">
+          <table>
+            <tbody>
+              @for(gazetteer <- gazetteers) {
+                <tr data-id="@gazetteer.getId">
+                  <td>
+                    <input class="included" type="checkbox" id="@gazetteer.getId" name="@gazetteer.getId" />
+                    <label for="@gazetteer.getId"></label>
+                  </td>
+                  <td>
+                    @if(Option(gazetteer.getHomepage).isDefined) {
+                      <a href="@gazetteer.getHomepage" target="_blank">@gazetteer.getShortname</a>
+                    } else {
+                      @gazetteer.getShortname</td>
+                    }
+                  </td>
+                  <td>@gazetteer.getFullname</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
       </form>
     </div>
   </div>
+
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/settings/preferences.js")))
 }

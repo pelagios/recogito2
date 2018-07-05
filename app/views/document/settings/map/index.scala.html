@@ -1,0 +1,61 @@
+@(
+  doc: services.document.DocumentInfo,
+  currentUser: Option[services.user.User],
+  accessLevel: services.document.RuntimeAccessLevel,
+  annotationCount: Long
+ )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Map | @doc.author.map(_ + ": ")@doc.title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    @views.html.document.standardMeta(doc, annotationCount)
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/map/index.css")"/>
+    @Html(webJarsUtil.css("leaflet.css"))
+    @Html(webJarsUtil.script("leaflet.js"))
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    @Html(webJarsUtil.script("velocity.min.js"))
+    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/map/app.js")))
+    <script>
+      window.config = {
+        @if(currentUser.isDefined) { me: '@currentUser.get.username', }
+        documentId: '@doc.id',
+        documentOwner: '@doc.ownerName',
+        parts: [
+          @Html(doc.fileparts.map { part =>
+            Html(s"{ title: '${part.getTitle}', id: '${part.getId}' }")
+          }.mkString(",\n"))
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "map")
+    @views.html.sidebarHeader(doc.owner)
+
+    <div class="map-container">
+      <div class="map"></div>
+
+      <div class="toggle-legend">
+        <span class="icon">&#xf013;</span> <span class="label"></span>
+      </div>
+
+      <div class="map-controls">
+        <div class="layers control icon" title="Change base layer">&#xf0c9;</div>
+        <div class="zoom">
+          <div class="zoom-in control" title="Zoom in">+</div>
+          <div class="zoom-out control" title="Zoom out">&ndash;</div>
+        </div>
+      </div>
+    </div>
+
+    @helper.javascriptRouter("jsRoutes")(
+      controllers.api.routes.javascript.AnnotationAPIController.getAnnotation,
+      controllers.api.routes.javascript.AnnotationAPIController.getImage,
+      controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInDocument,
+      controllers.api.routes.javascript.AuthoritiesAPIController.listGazetteers,
+      controllers.api.routes.javascript.PlaceAPIController.listPlacesInDocument,
+      controllers.document.annotation.routes.javascript.AnnotationController.resolveFromAnnotation
+    )
+  </body>
+</html>
