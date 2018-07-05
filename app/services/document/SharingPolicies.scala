@@ -3,9 +3,10 @@ package services.document
 import collection.JavaConversions._
 import java.sql.Timestamp
 import java.util.Date
-import services.{ Page, SortOrder }
+import play.api.Logger
+import services.{Page, SortOrder}
 import services.generated.Tables._
-import services.generated.tables.records.{ DocumentRecord, SharingPolicyRecord }
+import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import storage.db.DB
 
 trait SharingPolicies { self: DocumentService =>
@@ -100,6 +101,52 @@ trait SharingPolicies { self: DocumentService =>
       .where(SHARING_POLICY.SHARED_WITH.equal(username)
         .or(SHARING_POLICY.SHARED_BY.equal(username)))
       .execute()
+  }
+  
+  protected def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): RuntimeAccessLevel = {
+    
+    // Shorthand
+    val isVisibleToPublic = 
+      document.getPublicVisibility == PublicAccess.PUBLIC.toString ||
+      document.getPublicVisibility == PublicAccess.WITH_LINK.toString
+      
+    // The accesslevel determined purely from the document's public access settings
+    def getPublicAccessLevel(): RuntimeAccessLevel = PublicAccess.AccessLevel.withName(document.getPublicAccessLevel) match {
+      case Some(PublicAccess.READ_DATA) => RuntimeAccessLevel.READ_DATA
+      case Some(PublicAccess.READ_ALL) => RuntimeAccessLevel.READ_ALL
+      case Some(PublicAccess.WRITE) =>
+        forUser match {
+          case Some(_) => // Write access to any logged-in user
+            RuntimeAccessLevel.WRITE
+          case None => // READ_ALL access to anonymous visitors
+            RuntimeAccessLevel.READ_ALL
+        }
+      case None =>
+        Logger.warn(s"Document ${document.getId} visible to public, but no access level set")
+        RuntimeAccessLevel.FORBIDDEN      
+    }
+    
+    forUser match {      
+      // Trivial case: the user is the owner of the document
+      case Some(user) if (document.getOwner == user) =>
+        RuntimeAccessLevel.OWNER
+      
+      case Some(user) =>
+        sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => SharingLevel.withName(p.getAccessLevel)) match {
+          // There's a sharing policy for this user
+          case Some(policy) => RuntimeAccessLevel.fromSharingLevel(policy)
+          
+          // No sharing policy, but document might still be public
+          case None => 
+            if (isVisibleToPublic) getPublicAccessLevel()
+            else RuntimeAccessLevel.FORBIDDEN
+        }
+
+      // Anonymous access - the user is not logged in
+      case None =>
+        if (isVisibleToPublic) getPublicAccessLevel() 
+        else RuntimeAccessLevel.FORBIDDEN
+    }
   }
   
 }

@@ -10,113 +10,21 @@ import services.generated.Tables._
 import services.generated.tables.records._
 import org.joda.time.DateTime
 import org.apache.commons.io.FileUtils
-import org.apache.commons.lang3.RandomStringUtils
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import storage.db.DB
 import storage.uploads.Uploads
 
 case class PartOrdering(partId: UUID, seqNo: Int)
 
 @Singleton
-class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends BaseService with SharingPolicies {
-  
-  // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
-  private val ID_LENGTH = 14
-  
-  // Utility function to check if an ID exists in the DB
-  def existsId(id: String) = {
-    def checkExists() = db.query { sql =>
-      val count = sql.select(DOCUMENT.ID)
-         .from(DOCUMENT)
-         .where(DOCUMENT.ID.equal(id))
-         .fetchArray()
-         .length
-      
-      count > 0
-    }
-    
-    Await.result(checkExists(), 10.seconds)    
-  }
-  
-  def generateRandomID(retriesLeft: Int = 10): String = {
-    
-    // Takes a set of strings and returns those that already exist in the DB as doc IDs
-    def findIds(ids: Set[String])(implicit db: DB) = db.query { sql =>
-      sql.select(DOCUMENT.ID)
-         .from(DOCUMENT)
-         .where(DOCUMENT.ID.in(ids))
-         .fetchArray()
-         .map(_.value1).toSet    
-    }
-    
-    // Generate 10 random IDs
-    val randomIds = 
-      (1 to 10).map(_ => RandomStringUtils.randomAlphanumeric(ID_LENGTH).toLowerCase).toSet
-
-    // Match them all against the database and remove those that already exist
-    val idsAlreadyInDB = Await.result(findIds(randomIds), 10.seconds)    
-    val uniqueIds = randomIds.filter(id => !idsAlreadyInDB.contains(id))
-    
-    if (uniqueIds.size > 0) {
-      uniqueIds.head
-    } else if (retriesLeft > 0) {
-      Logger.warn("Failed to generate unique random document ID")
-      generateRandomID(retriesLeft - 1)
-    } else {
-      throw new RuntimeException("Failed to create unique document ID")
-    }
-  }
-  
-  private def determineAccessLevel(document: DocumentRecord, sharingPolicies: Seq[SharingPolicyRecord], forUser: Option[String]): RuntimeAccessLevel = {
-    
-    // Shorthand
-    val isVisibleToPublic = 
-      document.getPublicVisibility == PublicAccess.PUBLIC.toString ||
-      document.getPublicVisibility == PublicAccess.WITH_LINK.toString
-      
-    // The accesslevel determined purely from the document's public access settings
-    def getPublicAccessLevel(): RuntimeAccessLevel = PublicAccess.AccessLevel.withName(document.getPublicAccessLevel) match {
-      case Some(PublicAccess.READ_DATA) => RuntimeAccessLevel.READ_DATA
-      case Some(PublicAccess.READ_ALL) => RuntimeAccessLevel.READ_ALL
-      case Some(PublicAccess.WRITE) =>
-        forUser match {
-          case Some(_) => // Write access to any logged-in user
-            RuntimeAccessLevel.WRITE
-          case None => // READ_ALL access to anonymous visitors
-            RuntimeAccessLevel.READ_ALL
-        }
-      case None =>
-        Logger.warn(s"Document ${document.getId} visible to public, but no access level set")
-        RuntimeAccessLevel.FORBIDDEN      
-    }
-    
-    forUser match {      
-      // Trivial case: the user is the owner of the document
-      case Some(user) if (document.getOwner == user) =>
-        RuntimeAccessLevel.OWNER
-      
-      case Some(user) =>
-        sharingPolicies.filter(_.getSharedWith == user).headOption.flatMap(p => SharingLevel.withName(p.getAccessLevel)) match {
-          // There's a sharing policy for this user
-          case Some(policy) => RuntimeAccessLevel.fromSharingLevel(policy)
-          
-          // No sharing policy, but document might still be public
-          case None => 
-            if (isVisibleToPublic) getPublicAccessLevel()
-            else RuntimeAccessLevel.FORBIDDEN
-        }
-
-      // Anonymous access - the user is not logged in
-      case None =>
-        if (isVisibleToPublic) getPublicAccessLevel() 
-        else RuntimeAccessLevel.FORBIDDEN
-    }
-  }
+class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) 
+  extends BaseService 
+  with DocumentIdFactory 
+  with SharingPolicies {
   
   /** Creates a new DocumentRecord from an UploadRecord **/
   private[services] def createDocumentFromUpload(upload: UploadRecord) =
@@ -294,6 +202,11 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) extends 
         Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne()).map(document =>
           (document, determineAccessLevel(document, Seq.empty[SharingPolicyRecord], loggedInUser)))
     }
+  }
+  
+  /** Retrieves the preferences for the given document **/
+  def getPreferences(id: String) = db.query { sql =>
+    sql.selectFrom(DOCUMENT_PREFERENCES).where(DOCUMENT_PREFERENCES.DOCUMENT_ID.equal(id)).fetchArray.toSeq
   }
 
   /** Retrieves the document record, filepart metadata and owner information, along with access permissions **/
