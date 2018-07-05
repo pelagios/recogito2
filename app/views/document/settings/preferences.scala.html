@@ -5,7 +5,7 @@
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Settings | Annotation Preferences", doc, currentUser, Some("preferences")) {
-  <div class="panel centered">
+  <div class="panel">
     <h2>Gazetteers</h2>
     <div class="inner">
       <form id="gazetteer-preferences">
@@ -13,6 +13,7 @@
         <label for="use-all">
           Use all gazetteers when searching for places
         </label>
+        <span class="save-notifier" />
 
         <div id="gazetteer-list">
           <table>
@@ -31,6 +32,7 @@
                     }
                   </td>
                   <td>@gazetteer.getFullname</td>
+                  <td class="save-notifier"></td>
                 </tr>
               }
             </tbody>
