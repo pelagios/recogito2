@@ -112,21 +112,25 @@ class DocumentController @Inject() (
   def getRaw(docId: String, partNo: Int, lines: Option[Int]) = silhouette.UserAwareAction.async { implicit request =>
     documentPartResponse(docId, partNo, request.identity, { case (document, currentPart, accesslevel) =>
       Future {
-        scala.concurrent.blocking {
-          val documentDir = uploads.getDocumentDir(document.owner.getUsername, document.id).get
-          val file = new File(documentDir, currentPart.getFile)
-          if (file.exists)
-            lines match {
-              case Some(limit) =>
-                Ok(Source.fromFile(file).getLines().take(limit).mkString("\n"))
-                  .as("text/csv")
-                  .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + currentPart.getId + "." + limit + ".csv" })
-
-              case None =>
-                Ok.sendFile(file)
-            }
-          else
-            NotFound
+        if (accesslevel.canReadAll) {
+          scala.concurrent.blocking {
+            val documentDir = uploads.getDocumentDir(document.owner.getUsername, document.id).get
+            val file = new File(documentDir, currentPart.getFile)
+            if (file.exists)
+              lines match {
+                case Some(limit) =>
+                  Ok(Source.fromFile(file).getLines().take(limit).mkString("\n"))
+                    .as("text/csv")
+                    .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + currentPart.getId + "." + limit + ".csv" })
+  
+                case None =>
+                  Ok.sendFile(file)
+              }
+            else
+              NotFound
+          }
+        } else {
+          Forbidden
         }
       }
     })
