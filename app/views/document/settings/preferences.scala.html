@@ -13,7 +13,7 @@
         <label for="use-all">
           Use all gazetteers when searching for places
         </label>
-        <span class="save-notifier"></span>
+        <span class="save-notifier" data-for="use-all">Saved</span>
 
         <div id="gazetteer-list">
           <table>
@@ -31,8 +31,10 @@
                       @gazetteer.getShortname</td>
                     }
                   </td>
-                  <td>@gazetteer.getFullname</td>
-                  <td class="save-notifier"></td>
+                  <td>
+                    @gazetteer.getFullname
+                    <span class="save-notifier" data-for="@gazetteer.getId">Saved</span>
+                  </td>
                 </tr>
               }
             </tbody>

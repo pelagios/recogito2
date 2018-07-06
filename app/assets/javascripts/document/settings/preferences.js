@@ -52,7 +52,7 @@ require(['common/config'], function(Config) {
           }
         },
 
-        onToggleUseAll = function() {
+        onToggleUseAll = function(evt) {
           var isChecked = useAll.is(':checked');
           if (isChecked) {
             table.addClass('disabled');
@@ -61,18 +61,20 @@ require(['common/config'], function(Config) {
             table.removeClass('disabled');
           }
 
-          onChange();
+          onChange(evt);
         },
 
-        onChange = function() {
+        onChange = function(evt) {
+          var forId = jQuery(evt.target).attr('id'),
+              notifier = jQuery('*[data-for="' + forId + '"]');
+
           jsRoutes.controllers.document.settings.SettingsController.setGazetteerPreferences(Config.documentId).ajax({
             data: JSON.stringify(toSetting(getState())),
             contentType: 'application/json'
           }).success(function() {
-            // TODO
-            console.log('success');
+            notifier.show();
+            setTimeout(function() { notifier.fadeOut(200); }, 1000);
           }).fail(function(error) {
-            // TODO
             console.log('error');
           });
         };
