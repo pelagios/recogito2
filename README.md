@@ -1,6 +1,6 @@
 # Recogito
 
-__Current version: [v3.0](https://github.com/pelagios/recogito2/releases/tag/v3.0)__
+__Current version: [v3.1](https://github.com/pelagios/recogito2/releases/tag/v3.1)__
 
 Home of [Recogito](http://recogito.pelagios.org) - a Semantic Annotation tool for texts and
 images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our progress on
@@ -11,7 +11,8 @@ images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our 
 * Java 8 JDK
 * [SBT](http://www.scala-sbt.org/) (version 1.0.x)
 * __NEW:__ as we are introducing [React](https://reactjs.org/) in some UI areas,
-  the following additional dependencies must be installed:
+  a number of additional dependencies must be installed. __Note that this is not
+  needed for v3.1 yet, only if you build from the current master!__
   - [node.js](https://nodejs.org/en/) (version 4.2.6)
   - [npm](https://www.npmjs.com/) (version 6.1.0)
   - `webpack` and `webpack-cli` packages (via npm)
