@@ -1,201 +1,186 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.annotations=Annotations
-common.users=Users
-common.logged_in_as=Logged in as
+common.annotations=টীকা
+common.users= ব্যবহারকারী
+common.logged_in_as= লগ ইন করে আছেন
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common document-related labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.document.title=Title
-common.document.author=Author
-common.document.date=Date
-common.document.description=Description
-common.document.language=Language
-common.document.source=Source
-common.document.edition=Edition
-common.document.license=License
-common.document.attribution=Attribution
+common.document.title=শিরনাম
+common.document.author=রচয়িতা
+common.document.date=তারিখ
+common.document.description=বর্ণনা
+common.document.language=ভাষা
+common.document.source=উৎস
+common.document.edition=সংস্করণ
+common.document.license=লাইসেন্স
+common.document.attribution=আরোপণ
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Common button labels
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-common.buttons.save_changes=Save Changes
+common.buttons.save_changes=পরিবর্তনগুলো সংরক্ষণ করুন
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Landing page
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-landing.index.page_title=Welcome to Recogito
-landing.index.header.link.tutorial=Tutorial
-landing.index.header.link.about=About
-landing.index.header.link.login=Log In
+landing.index.page_title=Recogitoতে স্বাগতম
+landing.index.header.link.tutorial=প্রশিক্ষণ
+landing.index.header.link.about=Recogito সম্বন্ধে
+landing.index.header.link.login=লগ ইন
 
 # Jumbotron
-landing.index.jumbotron.tagline.1=Semantic Annotation
-landing.index.jumbotron.tagline.2=without the pointy brackets
-landing.index.jumbotron.blurb=Work on texts and images. Identify and mark named entities. Use your data in other tools or connect to other data on the Web. Without the need to learn code.
-landing.index.jumbotron.learn_more=Learn More
+landing.index.jumbotron.tagline.1=শব্দার্থিক টীকা
+landing.index.jumbotron.tagline.2=বন্ধনী ব্যাতিত
+landing.index.jumbotron.blurb=বাক্য এবং ছবিতে বিভিন্ন বস্তু সনাক্ত এবং চিহ্নিত করুন। অন্যান্য টুল এবং ওয়েবের অন্যান্য ডেটার সাথে আপনার ডেটা সংযুক্ত করুন। কোড জানার প্রয়োজন নেই।
+landing.index.jumbotron.learn_more=আরও জানুন
 
-landing.index.registration_form.placeholder.username=Pick a username
-landing.index.registration_form.placeholder.email=Your email address
-landing.index.registration_form.placeholder.password=Create a password
-landing.index.registration_form.placeholder.register=Register for Recogito
-landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms and Conditions of Use</a> \
-  and the storage of your E-Mail address.
+landing.index.registration_form.placeholder.username=ব্যাবহারকারীর নাম নির্বাচন করুন
+landing.index.registration_form.placeholder.email=আপনার ই-মেইল 
+landing.index.registration_form.placeholder.password=পাসওয়ার্ড তৈরি করুন
+landing.index.registration_form.placeholder.register=Recogitoতে রেজিস্টার করুন
+landing.index.registration_form.disclaimer.text=আমাদের <a href="{0}">ব্যাবহারের শর্তাবলি</a> এবং আপনার ই-মেইল সংরক্ষনের ব্যাপারে সম্মতি জানান।
 
 # News
-landing.index.news.title=News:
-landing.index.news.subtitle=Annotating Relations
-landing.index.news.text=We are excited to announce the general availability of our new \
-  <strong>Relations</strong> feature. Build networks from text by drawing connections between \
-  people, places, things, events. Make statements about how they relate using your own vocabulary. \
-  Get data out easily for further analysis and visualization. <a href="/help/relations">Here''s how</a>.
+landing.index.news.title=সংবাদঃ
+landing.index.news.subtitle=সম্পর্ক চিহ্নিত করুন
+landing.index.news.text=আমরা অতিশয় আনন্দের সাথে জানাচ্ছি যে আমাদের নতুন \
+  <strong>সম্পর্ক</strong> টুলটি এখন সবার ব্যাবহারের জন্য উপযুক্ত. আপনার বাক্য অথবা রচনার সাথে জনসাধারণ, বাসস্থান, বস্তু এবং ঘটনার মধ্যকার সম্পর্ক চিহ্নিত করে নেটওয়ার্ক তৈরি করুন। এরা কিভাবে সম্পর্কিত তা আপনার নিজের ভাষায় ব্যাখ্যা করুন। আরো বিশ্লেষণ এবং দৃশ্যযোগ্য করার জন্য সহজে আপনার তথ্য স্থানান্তর করুন। <a href="/help/relations">এখান থেকে জানুন কিভাবে</a>.
+
 
 # Tiles
-landing.index.tiles.1.title=Shared Collections
-landing.index.tiles.1.text=Upload texts and images. Build your own collections. Invite \
-  others to collaborate.
-landing.index.tiles.2.title=Collaborative Annotation
-landing.index.tiles.2.text=Create notes. Tag. Discuss. Recogito tracks provenance and maintains \
-  version history.
-landing.index.tiles.3.title=Semantics Included
-landing.index.tiles.3.text=Tag places, people and events and reveal the relations between them.
-landing.index.tiles.4.title=Open Data
-landing.index.tiles.4.text=Export your data into other tools. Make the results of your work more \
-  open, visible and re-usable.
+landing.index.tiles.1.title=শেয়ারকৃত সংগ্রহ
+landing.index.tiles.1.text=আপনার টেক্সট এবং ছবি আপলোড করুন। আপনার নিজস্ব সংগ্রহ তৈরি করুন। অন্যদের একত্রে কাজ করার জন্য আমন্ত্রণ জানান।
+landing.index.tiles.2.title=সহযোগিতামূলক টীকাযুক্তি
+landing.index.tiles.2.text=নোট তৈরি করুন। ট্যাগ করুন। আলোচনা করুন। Recogito উৎপত্তি চিহ্নিত করে সংস্করণ ইতিহাস সংরক্ষণ করে।
+landing.index.tiles.3.title=শব্দার্থযুক্ত
+landing.index.tiles.3.text=স্থান, জনসাধারণ এবং ঘটনা ট্যাগ করে তাদের মধ্যকার সম্পর্ক উদ্ঘাটন করুন।
+landing.index.tiles.4.title=উন্মুক্ত তথ্য
+landing.index.tiles.4.text=আপনার তথ্য অন্যান্য টুলে এক্সপোর্ট করুন। আপনার কাজ আরও উন্মুক্ত, দৃশ্যমান এবং পুনরায় ব্যাবহারের উপযুক্ত করুন।
 
 # Recogito Right Now
-landing.index.right_now=Recogito Right Now
-landing.index.edits_last_24hrs=Edits last 24hrs
+landing.index.right_now=বর্তমানে Recogito
+landing.index.edits_last_24hrs=গত ২৪ঘণ্টার সম্পাদনা
 
 # About
 landing.index.about=Open Source Software by the <a href="{0}" target="_blank">Austrian Institute \
   of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
   <a href="{2}" target="_blank">Humboldt Institute for Internet and Society</a>, \
   <a href="{3}" target="_blank">The Open University</a> and \
-  <a href="{4}" target="_blank">University of London</a>. Funded by the \
-  <a href="{5}" target="_blank">Andrew W. Mellon Foundation</a>.
-landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
-  <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Follow us on \
-  <a href="{3}" target="_blank">Twitter</a>
+  <a href="{4}" target="_blank">University of London</a> দ্বারা তৈরিকৃত ওপেন সোর্স সফ্টওয়্যার। Funded by the \
+  <a href="{5}" target="_blank">Andrew W. Mellon Foundation</a>এর আর্থিক সহায়তায়।
+landing.index.visit_us=<span class="icon">{0}</span> আমাদের \
+  <a href="{1}" target="_blank">Github</a> পেজ দেখুন। <span class="icon">{2}</span> আমাদের \
+  <a href="{3}" target="_blank">Twitter</a> ফলো করুন।
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=Joined on
-my.header.account_settings=Account Settings
-my.header.space_used=Used
-my.header.logout=Logout
+my.header.joined_on=যোগদান করার তারিখ
+my.header.account_settings=অ্যাকাউন্ট সেটিংস
+my.header.space_used=ব্যাবহারকৃত
+my.header.logout=লগআউট
 
-my.tabs.my_documents=My Documents
-my.tabs.shared_with_me=Shared with me
+my.tabs.my_documents=আমার ডকুমেন্ট
+my.tabs.shared_with_me=আমার সাথে শেয়ার করা
 
-my.tools.search=Search
-my.tools.new_document=New Document
+my.tools.search=অনুসন্ধান
+my.tools.new_document=নতুন ডকুমেন্ট
 
-my.table.header.uploaded=Uploaded
-my.table.header.last_edit=Last edit
-my.table.header.by=By
-my.table.header.public=Public
-my.table.header.owner=Owner
-my.table.header.shared_by=Shared by
-my.table.header.access_level=Access
+my.table.header.uploaded=আপলোডকৃত
+my.table.header.last_edit=সর্বশেষ সম্পাদনা
+my.table.header.by=দ্বারা
+my.table.header.public=সর্বসাধারণের
+my.table.header.owner=স্বত্বাধিকারী
+my.table.header.shared_by=শেয়ার করেছেন
+my.table.header.access_level=প্রবেশ
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-account_settings.sidebar.account=Account
-account_settings.sidebar.password=Password
-account_settings.sidebar.restore=Restore from Backup
+account_settings.sidebar.account=অ্যাকাউন্ট
+account_settings.sidebar.password=পাসওয়ার্ড
+account_settings.sidebar.restore=ব্যাকআপ থেকে পুনরূদ্ধার করুন
 
-account_settings.account.account_settings=Account Settings
-account_settings.account.email=E-Mail
-account_settings.account.name=Name
-account_settings.account.about_you=About You
-account_settings.account.website=Your Website
-account_settings.account.optional=Optional
-account_settings.account.delete.title=Delete Account
-account_settings.account.delete.warning=Warning: deleting your account will also delete all your \
-  documents and annotations. Make sure have created backups of all documents you want to keep. \
-  Deleting your account is irreversible.
-account_settings.account.delete.button=Delete my account
+account_settings.account.account_settings=অ্যাকাউন্ট সেটিংস
+account_settings.account.email=ই-মেইল
+account_settings.account.name=নাম
+account_settings.account.about_you=আপনার সম্বন্ধে
+account_settings.account.website=আপনার ওয়েবসাইট
+account_settings.account.optional=ঐচ্ছিক
+account_settings.account.delete.title=অ্যাকাউন্ট মুছে ফেলুন
+account_settings.account.delete.warning=সতর্কীকরণঃ অ্যাকাউন্ট মুছে ফেলার সাথে আপনার যাবতীয় ডকুমেন্ট এবং টীকাও মুছে যাবে। আপনি সংরক্ষণ করতে চান এমন সব ডকুমেন্ট অবশ্যই ব্যাকআপ করুন। আপনার অ্যাকাউন্ট মুছে ফেলা অপরিবর্তনীয়। 
+account_settings.account.delete.button=আমার অ্যাকাউন্ট মুছে দিন
 
-account_settings.password.change_password=Change Password
-account_settings.password.current=Current Password
-account_settings.password.new=New Password
-account_settings.password.verify=Verify Password
-
-account_settings.restore.instructions=You can restore a document from a ZIP package downloaded \
-  earlier through Recogito's Backup function.
-account_settings.restore.button=Upload ZIP Backup Package
+account_settings.password.change_password=পাসওয়ার্ড পরিবর্তন করুন
+account_settings.password.current=বর্তমান পাসওয়ার্ড
+account_settings.password.new=New নতুন পাসওয়ার্ড
+account_settings.password.verify=পাসওয়ার্ডের সঠিক কিনা যাচাই করুন
+account_settings.restore.instructions=Recogito-এর ব্যাকআপ ফাংশন ব্যাবহার করে ডাউনলোড করা জিপ প্যাকেজ থেকে আপনার ডকুমেন্ট পুনরুদ্ধার করতে পারেন।
+account_settings.restore.button=জিপ ব্যাকআপ প্যাকেজ আপলোড করুন
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Text annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.annotation.text.toolbar.annotation_mode=ANNOTATION MODE:
-document.annotation.text.toolbar.mode.normal=NORMAL
-document.annotation.text.toolbar.mode.quick=QUICK
-document.annotation.text.toolbar.mode.quick.places=Places
-document.annotation.text.toolbar.mode.quick.persons=Persons
-document.annotation.text.toolbar.mode.quick.tags=Tags
-document.annotation.text.toolbar.color=COLOR:
-document.annotation.text.toolbar.color.by_type=BY ENTITY TYPE
-document.annotation.text.toolbar.color.by_status=BY VERIFICATION STATUS
-document.annotation.text.toolbar.color.by_tag=BY FIRST TAG
+document.annotation.text.toolbar.annotation_mode=টীকাযুক্তি মোডঃ
+document.annotation.text.toolbar.mode.normal=সাধারণ
+document.annotation.text.toolbar.mode.quick=দ্রুত
+document.annotation.text.toolbar.mode.quick.places=স্থান
+document.annotation.text.toolbar.mode.quick.persons=ব্যক্তি
+document.annotation.text.toolbar.mode.quick.tags=ট্যাগ
+document.annotation.text.toolbar.color=রং:
+document.annotation.text.toolbar.color.by_type=বস্তুর ধরণ দ্বারা
+document.annotation.text.toolbar.color.by_status=যাচাইকরণের অবস্থা দ্বারা
+document.annotation.text.toolbar.color.by_tag=প্রথম ট্যাগ দ্বারা
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Image annotation
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.annotation.image.toolbar.tools=TOOLS
-document.annotation.image.toolbar.tools.move=MOVE
-document.annotation.image.toolbar.tools.point=POINT
-document.annotation.image.toolbar.tools.rectangle=RECTANGLE
-document.annotation.image.toolbar.tools.tilted_box=TILTED BOX
+document.annotation.image.toolbar.tools=সরঞ্জাম
+document.annotation.image.toolbar.tools.move=স্থানান্তর করুন
+document.annotation.image.toolbar.tools.point=বিন্দু
+document.annotation.image.toolbar.tools.rectangle=আয়তক্ষেত্র
+document.annotation.image.toolbar.tools.tilted_box=হেলানো বক্স
 
-document.annotation.image.toolbar.image=IMAGE
-document.annotation.image.toolbar.layers=LAYERS
-document.annotation.image.toolbar.help=HELP
+document.annotation.image.toolbar.image=ছবি
+document.annotation.image.toolbar.layers=স্তর
+document.annotation.image.toolbar.help=সাহায্য
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Downloads
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.downloads.annotations.csv.text=Download annotations as a data table for importing into spreadsheet software or a GIS.
-document.downloads.annotations.rdf.text=Download annotations and document metadata as RDF, encoded using Open Annotation and Dublin Core.
-document.downloads.annotations.geojson.text=Confirmed geo-located places in the document as a GeoJSON FeatureCollection.
-document.downloads.annotations.kml.text=Confirmed geo-located places as KML file, for viewing in Google Earth.
-document.downloads.annotations.tei.text=Annotated text in a basic TEI/XML serialization. Note: only \
-  place name annotations are included at the moment. Also, overlapping annotations are filtered \
-  out as TEI does not support them.
+document.downloads.annotations.csv.text= স্প্রেডশীট সফ্টওয়্যার অথবা জিআইএস-এ অন্তর্ভুক্তির জন্য ডাটা টেবিলের আকারে টীকাগুলো ডাউনলোড করুন।
+document.downloads.annotations.rdf.text=Open Annotation এবং Dublin Core ব্যাবহার করে এনকোডকৃত RDFএর আকারে টীকা এবং ডকুমেন্ট মেটাডাটা ডাউনলোড করুন।
+document.downloads.annotations.geojson.text=ডকুমেন্টে GeoJSON FeatureCollection হিসেবে নিশ্চিত করা ভূ-অবস্থিত স্থান।
+document.downloads.annotations.kml.text=Google Earth-এ দর্শনের জন্য KML file হিসেবে নিশ্চিত করা ভূ-অবস্থিত স্থান।
+document.downloads.annotations.tei.text=সাধারণ TEI/XML সিরিয়ালাইযেশনে টীকাযুক্ত বাক্য। বিঃদ্রঃ বর্তমানে শুধুমাত্র বাসস্থানের নামের টীকা অন্তর্ভুক্ত। এক স্থানের জন্য একের অধিক টীকা TEI দ্বারা সমর্থিত নয় বলে এগুলো অন্তর্ভুক্ত নয়। 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Document settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-document.settings.sidebar.metadata=Metadata
-document.settings.sidebar.sharing=Sharing
-document.settings.sidebar.edit_history=Edit History
-document.settings.sidebar.backup=Backup
-document.settings.sidebar.delete=Delete
+document.settings.sidebar.metadata=মেটাডাটা
+document.settings.sidebar.sharing=শেয়ার করা
+document.settings.sidebar.edit_history=সম্পাদনার ইতিহাস
+document.settings.sidebar.backup=ব্যাকআপ
+document.settings.sidebar.delete=মুছে ফেলুন
 
 # Metadata
-document.settings.metadata.document_metadata=Document Metadata
-document.settings.metadata.document_parts=Document Parts
-document.settings.metadata.edit_part=Edit Part Metadata
-document.settings.metadata.drag_to_change=Drag to change order
+document.settings.metadata.document_metadata=ডকুমেন্ট মেটাডাটা
+document.settings.metadata.document_parts=ডকুমেন্ট অংশ
+document.settings.metadata.edit_part=আংশিক মেটাডাটা সম্পাদনা করুন
+document.settings.metadata.drag_to_change=বিন্যাস পরিবর্তন করার জন্য টানুন
 
 # Sharing
-document.settings.sharing.public_access=Public Access
-document.settings.sharing.visible_to_all=Visible to all
+document.settings.sharing.public_access=সর্বসাধারণের প্রবেশ
+document.settings.sharing.visible_to_all=সর্বসাধারণের কাছে দৃশ্যমান
 
-document.settings.sharing.collaborators=Collaborators
-document.settings.sharing.collaborators.none=This document doesn''t have any collaborators yet. \
-  Use the form below to add a collaborator.
-document.settings.sharing.collaborators.enter_username=Enter username
+document.settings.sharing.collaborators=সহযোগী
+document.settings.sharing.collaborators.none=এই ডকুমেন্টে বর্তমানে কোন সহযোগী নেই। সহযোগী যোগ করতে নিচের ফর্মটি ব্যাবহার করুন।
+document.settings.sharing.collaborators.enter_username=ব্যাবহারকারীর নাম প্রবেশ করুন
 
 # Backup
-document.settings.backup.backup=Backup
-document.settings.backup.description=The backup package includes document metadata, files, and \
-  annotations. You can use it to restore your work to Recogito at a later date. Back up your work \
-  regularly as an added safety measure. Please note that the <u>edit history is currently not \
-  included</u> in the backup package.
-document.settings.backup.button=Download ZIP Backup Package
+document.settings.backup.backup=ব্যাকআপ
+document.settings.backup.description=ব্যাকআপ প্যাকেজটিতে ডকুমেন্ট মেটাডাটা, ফাইল এবং টীকা অন্তর্ভুক্ত। এটি ব্যাবহার করে পরবর্তীতে আপনার কাজ Recogitoতে পুনরুদ্ধার করতে পারবেন। নিরাপত্তার জন্য আপনার কাজ নিয়মিত ব্যাকআপ করুন। দয়া করে মনে রাখবেন <u>সম্পাদনার ইতিহাস বর্তমানে ব্যাকআপ প্যাকেজে অন্তর্ভুক্ত নয়</u>। 
+document.settings.backup.button=জিপ ব্যাকআপ প্যাকেজ ডাউনলোড করুন
