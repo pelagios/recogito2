@@ -22,7 +22,7 @@ trait PreferencesActions { self: SettingsController =>
   def setGazetteerPreferences(docId: String) = self.silhouette.SecuredAction.async { implicit request =>
     // JSON is parsed to case class and instantly re-serialized as a security/sanitization measure!
     jsonDocumentAdminAction[GazetteerPreferences](docId, request.identity.username, { case (document, prefs) =>      
-      self.documents.upsertPreferences(docId, "GAZETTEERS", Json.stringify(Json.toJson(prefs))).map { success =>
+      self.documents.upsertPreferences(docId, "authorities.gazetteers", Json.stringify(Json.toJson(prefs))).map { success =>
         if (success) Ok
         else InternalServerError
       }

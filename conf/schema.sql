@@ -88,12 +88,11 @@ CREATE TABLE document_filepart (
 CREATE INDEX idx_document_filepart_document_id ON document_filepart(document_id);
 
 CREATE TABLE document_preferences (
-  id SERIAL PRIMARY KEY,
   document_id TEXT NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   preference_name TEXT NOT NULL,
-  preference_value TEXT NOT NULL
+  preference_value TEXT NOT NULL,
+  PRIMARY KEY (document_id, preference_name)
 );
-CREATE INDEX idx_document_preferences_document_id ON document_preferences(document_id);
 
 -- users can organize documents into folders
 CREATE TABLE folder (

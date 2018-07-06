@@ -61,7 +61,7 @@ require(['common/config'], function(Config) {
             table.removeClass('disabled');
           }
 
-          // onChange();
+          onChange();
         },
 
         onChange = function() {

@@ -5,7 +5,6 @@ package services.generated.tables
 
 
 import java.lang.Class
-import java.lang.Integer
 import java.lang.String
 import java.util.Arrays
 import java.util.List
@@ -14,7 +13,6 @@ import javax.annotation.Generated
 
 import org.jooq.Field
 import org.jooq.ForeignKey
-import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -53,11 +51,6 @@ class DocumentPreferences(alias : String, aliased : Table[DocumentPreferencesRec
 	}
 
 	/**
-	 * The column <code>public.document_preferences.id</code>.
-	 */
-	val ID : TableField[DocumentPreferencesRecord, Integer] = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
-
-	/**
 	 * The column <code>public.document_preferences.document_id</code>.
 	 */
 	val DOCUMENT_ID : TableField[DocumentPreferencesRecord, String] = createField("document_id", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
@@ -88,10 +81,6 @@ class DocumentPreferences(alias : String, aliased : Table[DocumentPreferencesRec
 
 	private def this(alias : String, aliased : Table[DocumentPreferencesRecord]) = {
 		this(alias, aliased, null)
-	}
-
-	override def getIdentity : Identity[DocumentPreferencesRecord, Integer] = {
-		Keys.IDENTITY_DOCUMENT_PREFERENCES
 	}
 
 	override def getPrimaryKey : UniqueKey[DocumentPreferencesRecord] = {

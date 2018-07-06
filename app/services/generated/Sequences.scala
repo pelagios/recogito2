@@ -25,11 +25,6 @@ import org.jooq.impl.SequenceImpl
 object Sequences {
 
 	/**
-	 * The sequence <code>public.document_preferences_id_seq</code>
-	 */
-	val DOCUMENT_PREFERENCES_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("document_preferences_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))
-
-	/**
 	 * The sequence <code>public.feature_toggle_id_seq</code>
 	 */
 	val FEATURE_TOGGLE_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("feature_toggle_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))

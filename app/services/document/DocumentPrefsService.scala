@@ -2,6 +2,7 @@ package services.document
 
 import scala.concurrent.Future
 import services.generated.Tables.DOCUMENT_PREFERENCES
+import services.generated.tables.records.DocumentPreferencesRecord
 
 trait DocumentPrefsService { self: DocumentService =>
   
@@ -10,15 +11,13 @@ trait DocumentPrefsService { self: DocumentService =>
   }
   
   def upsertPreferences(docId: String, name: String, prefs: String): Future[Boolean] = db.query { sql =>
-    /*
+    val prefRecord = new DocumentPreferencesRecord(docId, name, prefs)
     sql
       .insertInto(DOCUMENT_PREFERENCES)
-      .set(authorityFile)
+      .set(prefRecord)
       .onDuplicateKeyUpdate()
-      .set(authorityFile)
-      .execute()
-     */
-    ???
+      .set(prefRecord)
+      .execute() == 1
   }
   
 }
