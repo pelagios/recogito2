@@ -93,6 +93,7 @@ PUT     /document/:id/settings/sortorder             controllers.document.settin
 GET     /document/:id/settings                       controllers.document.settings.SettingsController.showDocumentSettings(id: String, tab: Option[String])
 POST    /document/:id/settings/metadata              controllers.document.settings.SettingsController.updateDocumentMetadata(id: String)
 POST    /document/:id/settings/metadata/part/:ptId   controllers.document.settings.SettingsController.updateFilepartMetadata(id: String, ptId: java.util.UUID)
+POST    /document/:id/settings/prefs/gazetteers      controllers.document.settings.SettingsController.setGazetteerPreferences(id: String)
 PUT     /document/:id/settings/visibility            controllers.document.settings.SettingsController.setPublicVisibility(id: String, visibility: String)
 PUT     /document/:id/settings/accesslevel           controllers.document.settings.SettingsController.setPublicAccessLevel(id: String, accessLevel: String)
 PUT     /document/:id/settings/collaborator          controllers.document.settings.SettingsController.addCollaborator(id: String)

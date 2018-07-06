@@ -38,6 +38,7 @@ class SettingsController @Inject() (
   implicit val webjars: WebJarsUtil
 ) extends BaseAuthController(components, config, documents, users)
     with MetadataActions
+    with PreferencesActions
     with SharingActions
     with HistoryActions
     with BackupActions

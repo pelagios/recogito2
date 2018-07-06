@@ -24,6 +24,7 @@ case class PartOrdering(partId: UUID, seqNo: Int)
 class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) 
   extends BaseService 
   with DocumentIdFactory 
+  with DocumentPrefsService
   with SharingPolicies {
   
   /** Creates a new DocumentRecord from an UploadRecord **/
@@ -202,11 +203,6 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
         Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne()).map(document =>
           (document, determineAccessLevel(document, Seq.empty[SharingPolicyRecord], loggedInUser)))
     }
-  }
-  
-  /** Retrieves the preferences for the given document **/
-  def getPreferences(id: String) = db.query { sql =>
-    sql.selectFrom(DOCUMENT_PREFERENCES).where(DOCUMENT_PREFERENCES.DOCUMENT_ID.equal(id)).fetchArray.toSeq
   }
 
   /** Retrieves the document record, filepart metadata and owner information, along with access permissions **/

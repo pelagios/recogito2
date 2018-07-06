@@ -1,5 +1,13 @@
 #gazetteer-preferences {
 
+  label::before {
+    font-size:14px;
+  }
+
+}
+
+#gazetteer-preferences > label {
+  margin-left:13px;
 }
 
 #gazetteer-list {
@@ -12,9 +20,11 @@
     width:100%;
     border-collapse:collapse;
 
+    tr:first-child td { padding-top:8px; }
+    tr:last-child td { padding-bottom:8px; }
+
     td {
-      padding:8px 5px;
-      border-bottom:1px solid @lightgrey-border;
+      padding:2px;
 
       a {
         padding: 0;
@@ -31,10 +41,6 @@
       width:90%;
     }
 
-  }
-
-  tr:last-child td {
-    border-bottom:none;
   }
 
   table.disabled * {

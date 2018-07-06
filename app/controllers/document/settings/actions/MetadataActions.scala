@@ -8,7 +8,6 @@ import services.generated.tables.records.DocumentRecord
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import scala.concurrent.Future
 

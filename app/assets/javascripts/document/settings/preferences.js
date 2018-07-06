@@ -3,11 +3,18 @@ require.config({
   fileExclusionRegExp: /^lib$/
 });
 
-require([], function() {
+require(['common/config'], function(Config) {
 
   jQuery(document).ready(function() {
+
+    var useAll = jQuery('#use-all'),
+
+        table = jQuery('#gazetteer-list table'),
+
+        gazetteers = jQuery('#gazetteer-list input'),
+
         /** Returns the state of a single input DOM node **/
-    var getInputState = function(node) {
+        getInputState = function(node) {
           var input = jQuery(node),
               checked = input.is(':checked'),
               id = input.closest('tr').data('id'),
@@ -45,14 +52,33 @@ require([], function() {
           }
         },
 
-        onChange = function() {
-          var setting = toSetting(getState());
+        onToggleUseAll = function() {
+          var isChecked = useAll.is(':checked');
+          if (isChecked) {
+            table.addClass('disabled');
+            gazetteers.prop('checked', true);
+          } else {
+            table.removeClass('disabled');
+          }
 
-          // TODO store via API
-          console.log(setting);
+          // onChange();
+        },
+
+        onChange = function() {
+          jsRoutes.controllers.document.settings.SettingsController.setGazetteerPreferences(Config.documentId).ajax({
+            data: JSON.stringify(toSetting(getState())),
+            contentType: 'application/json'
+          }).success(function() {
+            // TODO
+            console.log('success');
+          }).fail(function(error) {
+            // TODO
+            console.log('error');
+          });
         };
 
-    jQuery('#gazetteer-preferences input').change(onChange);
+    useAll.change(onToggleUseAll);
+    gazetteers.change(onChange);
   });
 
 });

@@ -13,7 +13,7 @@
         <label for="use-all">
           Use all gazetteers when searching for places
         </label>
-        <span class="save-notifier" />
+        <span class="save-notifier"></span>
 
         <div id="gazetteer-list">
           <table>
@@ -42,5 +42,15 @@
     </div>
   </div>
 
+  <script>
+  window.config = {
+    documentId: "@doc.id"
+  }
+  </script>
+
   @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/settings/preferences.js")))
+
+  @helper.javascriptRouter("jsRoutes")(
+    controllers.document.settings.routes.javascript.SettingsController.setGazetteerPreferences
+  )
 }
