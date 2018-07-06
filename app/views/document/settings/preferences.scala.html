@@ -24,12 +24,14 @@
                     <input class="included" type="checkbox" id="@gazetteer.getId" name="@gazetteer.getId" />
                     <label for="@gazetteer.getId"></label>
                   </td>
-                  <td>
-                    @if(Option(gazetteer.getHomepage).isDefined) {
-                      <a href="@gazetteer.getHomepage" target="_blank">@gazetteer.getShortname</a>
-                    } else {
-                      @gazetteer.getShortname</td>
-                    }
+                  <td class="shortname">
+                    <div @if(Option(gazetteer.getColor).isDefined) {style="background-color:@gazetteer.getColor"}>
+                      @if(Option(gazetteer.getHomepage).isDefined) {
+                        <a href="@gazetteer.getHomepage" target="_blank">@gazetteer.getShortname</a>
+                      } else {
+                        @gazetteer.getShortname
+                      }
+                    </div>
                   </td>
                   <td>
                     @gazetteer.getFullname

@@ -36,8 +36,9 @@
       padding:2px;
 
       a {
-        padding: 0;
-        color:@ocean;
+        padding:0;
+        color:#fff;
+        text-decoration:none;
       }
 
     }
@@ -50,11 +51,24 @@
       width:90%;
     }
 
+    td.shortname div {
+      padding:0 2px;
+      text-align:center;
+      background-color:#c2c2c2;
+      .rounded-corners(2px);
+      margin-right:3px;
+      color:#fff;
+    }
+
   }
 
   table.disabled * {
     color:lighten(@lightgrey-type, 15%) !important;
     pointer-events:none;
+    td.shortname div, td.shortname div a {
+      color:#efefef !important;
+      background-color:#c2c2c2 !important;
+    }
   }
 
 }
