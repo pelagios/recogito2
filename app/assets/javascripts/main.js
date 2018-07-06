@@ -17,6 +17,7 @@ require.config({
     { name : 'document/map/app' },
     { name : 'document/settings/delete' },
     { name : 'document/settings/metadata' },
+    { name : 'document/settings/preferences' },
     { name : 'document/settings/history' },
     { name : 'document/settings/sharing' },
     { name : 'document/stats/tags' },
