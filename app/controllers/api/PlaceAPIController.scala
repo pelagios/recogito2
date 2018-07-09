@@ -35,7 +35,14 @@ class PlaceAPIController @Inject() (
   }
 
   /** Search by query string - available to logged in users only **/
-  def searchPlaces(query: String, offset: Int, size: Int, latlng: Option[String]) = silhouette.SecuredAction.async { implicit request =>
+  def searchPlaces(
+    query: String, 
+    offset: Int, 
+    size: Int, 
+    latlng: Option[String],
+    gazetteers:Option[String]
+  ) = silhouette.SecuredAction.async { implicit request =>
+    // Parse (optional) center coordinate from query string
     val sortFrom = latlng.flatMap { l =>
       val arg = l.split(",")
       Try(new Coordinate(arg(1).toDouble, arg(0).toDouble)) match {
@@ -43,8 +50,11 @@ class PlaceAPIController @Inject() (
         case Failure(e) => None
       }
     }
+    
+    // Parse (optional) gazetteer filter from query string
+    val allowedGazetteers = gazetteers.map(_.split(",").map(_.trim).toSeq)
 
-    entities.searchEntities(query, Some(EntityType.PLACE), offset, size, sortFrom).map { results =>
+    entities.searchEntities(query, Some(EntityType.PLACE), offset, size, sortFrom, allowedGazetteers).map { results =>
       jsonOk(Json.toJson(results.map(_.entity)))
     }
   }

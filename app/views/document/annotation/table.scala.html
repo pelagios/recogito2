@@ -3,6 +3,7 @@
   currentPart: services.generated.tables.records.DocumentFilepartRecord,
   currentUser: Option[services.user.User],
   accessLevel: services.document.RuntimeAccessLevel,
+  prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord],
   annotationCount: Long
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
@@ -38,7 +39,8 @@
         partSequenceNo: @currentPart.getSequenceNo,
         contentType: '@currentPart.getContentType',
         writeAccess: @accessLevel.canWrite,
-        isAdmin: @accessLevel.isAdmin
+        isAdmin: @accessLevel.isAdmin,
+        @views.html.document.annotation._prefs(prefs)
       }
     </script>
   </head>

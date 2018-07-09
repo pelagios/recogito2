@@ -22,11 +22,12 @@ trait EntityService {
   def findConnected(uris: Seq[String]): Future[Seq[IndexedEntity]]
 
   def searchEntities(
-    query    : String,
-    eType    : Option[EntityType] = None,
-    offset   : Int = 0,
-    limit    : Int = ES.MAX_SIZE,
-    sortFrom : Option[Coordinate] = None
+    query       : String,
+    eType       : Option[EntityType] = None,
+    offset      : Int = 0,
+    limit       : Int = ES.MAX_SIZE,
+    sortFrom    : Option[Coordinate] = None,
+    authorities : Option[Seq[String]] = None
   ): Future[Page[IndexedEntity]]
 
   def listEntitiesInDocument(

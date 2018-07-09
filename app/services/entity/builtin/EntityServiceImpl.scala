@@ -136,29 +136,40 @@ class EntityServiceImpl @Inject()(
     eType: Option[EntityType] = None,
     offset: Int = 0,
     limit: Int = ES.MAX_SIZE,
-    sortFrom: Option[Coordinate] = None
+    sortFrom: Option[Coordinate] = None,
+    authorities : Option[Seq[String]] = None
   ): Future[Page[IndexedEntity]] = {
+    
+    val baseQuery = boolQuery.should(
+      // Treat as standard query string query first...
+      queryStringQuery(q).defaultOperator("AND"),
+
+      // ...and then look for exact matches in specific fields
+      boolQuery.should(
+        // Search inside record titles...
+        matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
+        matchPhraseQuery("is_conflation_of.title", q),
+
+        // ...names...
+        matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0),
+        matchPhraseQuery("is_conflation_of.names.name", q),
+
+        // ...and descriptions (with lower boost)
+        matchQuery("is_conflation_of.descriptions.description", q).operator("AND").boost(0.2)
+      )
+    )
 
     val query =
       search(ES.RECOGITO / ES.ENTITY) query {
-        boolQuery.should(
-          // Treat as standard query string query first...
-          queryStringQuery(q).defaultOperator("AND"),
-
-          // ...and then look for exact matches in specific fields
-          boolQuery.should(
-            // Search inside record titles...
-            matchPhraseQuery("is_conflation_of.title.raw", q).boost(5.0),
-            matchPhraseQuery("is_conflation_of.title", q),
-
-            // ...names...
-            matchPhraseQuery("is_conflation_of.names.name.raw", q).boost(5.0),
-            matchPhraseQuery("is_conflation_of.names.name", q),
-
-            // ...and descriptions (with lower boost)
-            matchQuery("is_conflation_of.descriptions.description", q).operator("AND").boost(0.2)
-          )
-        )
+        authorities match {
+          case Some(allowed) =>
+            boolQuery.must(
+              boolQuery.should(allowed.map(id => matchQuery("is_conflation_of.source_authority", id))),
+              baseQuery
+            )
+          case None =>
+            baseQuery
+        }
     } start offset limit limit
 
     es.client execute {

@@ -1,0 +1,4 @@
+@(prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord])
+authorities: {
+  gazetteers: @prefs.find(_.getPreferenceName == "authorities.gazetteers").map { pref => @Html(pref.getPreferenceValue) }.getOrElse("{}")
+}

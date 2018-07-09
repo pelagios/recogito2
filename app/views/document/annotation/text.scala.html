@@ -3,6 +3,7 @@
   currentPart: services.generated.tables.records.DocumentFilepartRecord,
   currentUser: Option[services.user.User],
   accessLevel: services.document.RuntimeAccessLevel,
+  prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord],
   annotationCount: Long,
   content: String,
   sharedVia: Option[controllers.document.annotation.AnnotationSummary]
@@ -35,7 +36,8 @@
         contentType: '@currentPart.getContentType',
         isPublic: @doc.isOpenToPublic,
         writeAccess: @accessLevel.canWrite,
-        isAdmin: @accessLevel.isAdmin
+        isAdmin: @accessLevel.isAdmin,
+        @views.html.document.annotation._prefs(prefs)
       }
     </script>
   </head>

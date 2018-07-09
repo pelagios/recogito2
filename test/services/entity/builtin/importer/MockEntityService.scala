@@ -60,11 +60,12 @@ class MockEntityService(implicit ctx: ExecutionContext) extends EntityService {
     }
 
   override def searchEntities(
-    query    : String,
-    eType    : Option[EntityType] = None,
-    offset   : Int = 0,
-    limit    : Int = ES.MAX_SIZE,
-    sortFrom : Option[Coordinate] = None): Future[Page[IndexedEntity]] =
+    query      : String,
+    eType      : Option[EntityType] = None,
+    offset     : Int = 0,
+    limit      : Int = ES.MAX_SIZE,
+    sortFrom   : Option[Coordinate] = None,
+    authorities: Option[Seq[String]] = None): Future[Page[IndexedEntity]] =
 
     Future {
       val results = mockIndex.asScala.values.toSeq

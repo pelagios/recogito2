@@ -1,4 +1,4 @@
-define([], function() {
+define(['common/config'], function(Config) {
 
   return {
 
@@ -60,9 +60,19 @@ define([], function() {
 
     searchPlaces : function(query, offset, size) {
       var o = (offset) ? offset : 0,
-          s = (size) ? size : 20;
+          s = (size) ? size : 20,
+          searchAllGazetteers =
+            (Config.authorities.gazetteers.hasOwnProperty('use_all')) ?
+              Config.authorities.gazetteers.use_all : true;
 
-      return jsRoutes.controllers.api.PlaceAPIController.searchPlaces(query, o, s).ajax();
+      console.log('search all', searchAllGazetteers);
+      console.log(Config.authorities.gazetteers);
+
+      if (searchAllGazetteers)
+        return jsRoutes.controllers.api.PlaceAPIController.searchPlaces(query, o, s).ajax();
+      else
+        return jsRoutes.controllers.api.PlaceAPIController.searchPlaces(query, o, s, null,
+          Config.authorities.gazetteers.includes).ajax();
     }
 
   };

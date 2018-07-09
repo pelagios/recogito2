@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import services.ContentType
 import services.annotation.{Annotation, AnnotationService}
 import services.document.{RuntimeAccessLevel, DocumentInfo, DocumentService}
-import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord, UserRecord}
+import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord, DocumentPreferencesRecord, UserRecord}
 import services.user.{User, UserService}
 import services.visit.VisitService
 import org.webjars.play.WebJarsUtil
@@ -62,23 +62,27 @@ class AnnotationController @Inject() (
   def showAnnotationView(documentId: String, seqNo: Int) = silhouette.UserAwareAction.async { implicit request =>
     val loggedIn = request.identity
     
+    val fPreferences = documents.getPreferences(documentId)
+    
     val fRedirectedVia = request.flash.get("annotation") match {
       case Some(annotationId) => annotations.findById(UUID.fromString(annotationId)).map { _.map(_._1) }
       case None => Future.successful(None)
     }
     
-    def fResponse(via: Option[Annotation]) = documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
-      if (accesslevel.canReadData)
-        renderResponse(doc, currentPart, loggedIn, accesslevel, via.map(AnnotationSummary.from))
-      else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
-        Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))
-      else
-        Future.successful(ForbiddenPage)
-    })
+    def fResponse(prefs: Seq[DocumentPreferencesRecord], via: Option[Annotation]) = 
+      documentPartResponse(documentId, seqNo, loggedIn, { case (doc, currentPart, accesslevel) =>
+        if (accesslevel.canReadData)
+          renderResponse(doc, currentPart, loggedIn, accesslevel, prefs, via.map(AnnotationSummary.from))
+        else if (loggedIn.isEmpty) // No read rights - but user is not logged in yet
+          Future.successful(Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None)))
+        else
+          Future.successful(ForbiddenPage)
+      })
     
     for {
+      preferences <- fPreferences
       redirectedVia <- fRedirectedVia
-      response <- fResponse(redirectedVia)
+      response <- fResponse(preferences, redirectedVia)
     } yield response
   }
 
@@ -87,6 +91,7 @@ class AnnotationController @Inject() (
     currentPart: DocumentFilepartRecord,
     loggedInUser: Option[User],
     accesslevel: RuntimeAccessLevel,
+    prefs: Seq[DocumentPreferencesRecord],
     redirectedVia: Option[AnnotationSummary]
   )(implicit request: RequestHeader) = {
 
@@ -106,14 +111,14 @@ class AnnotationController @Inject() (
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
         fCountAnnotations.map { c =>
-          ifAuthorized(Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, c, redirectedVia)), c)
+          ifAuthorized(Ok(views.html.document.annotation.image(doc, currentPart, loggedInUser, accesslevel, prefs, c, redirectedVia)), c)
         }
 
       case Some(ContentType.TEXT_PLAIN) =>
         fReadTextfile() flatMap {
           case Some(content) =>
             fCountAnnotations.map { c =>
-              ifAuthorized(Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, c, content, redirectedVia)), c)
+              ifAuthorized(Ok(views.html.document.annotation.text(doc, currentPart, loggedInUser, accesslevel, prefs, c, content, redirectedVia)), c)
             }
 
           case None =>
@@ -127,7 +132,7 @@ class AnnotationController @Inject() (
           case Some(content) =>
             fCountAnnotations.map { c =>
               val preview = previewFromTEI(content)
-              ifAuthorized(Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, preview, c, redirectedVia)), c)
+              ifAuthorized(Ok(views.html.document.annotation.tei(doc, currentPart, loggedInUser, accesslevel, prefs, preview, c, redirectedVia)), c)
             }
 
           case None =>
@@ -138,7 +143,7 @@ class AnnotationController @Inject() (
 
       case Some(ContentType.DATA_CSV) =>
         fCountAnnotations.map { c =>
-          ifAuthorized(Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, c)), c)
+          ifAuthorized(Ok(views.html.document.annotation.table(doc, currentPart, loggedInUser, accesslevel, prefs, c)), c)
         }
 
       case _ =>
