@@ -1,7 +1,8 @@
 @(
   doc: services.document.DocumentInfo,
   currentUser: services.user.User,
-  gazetteers: Seq[services.generated.tables.records.AuthorityFileRecord]
+  gazetteers: Seq[services.generated.tables.records.AuthorityFileRecord],
+  gazetteerPrefs: controllers.document.settings.actions.GazetteerPreferences
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Settings | Annotation Preferences", doc, currentUser, Some("preferences")) {
@@ -9,19 +10,28 @@
     <h2>Gazetteers</h2>
     <div class="inner">
       <form id="gazetteer-preferences">
-        <input type="checkbox" id="use-all" name="use-all" />
+        <input
+          type="checkbox"
+          id="use-all"
+          name="use-all"
+          @if(gazetteerPrefs.useAll) { checked="true" }"/>
         <label for="use-all">
           Use all gazetteers when searching for places
         </label>
         <span class="save-notifier" data-for="use-all">Saved</span>
 
         <div id="gazetteer-list">
-          <table>
+          <table@if(gazetteerPrefs.useAll){ class="disabled"}>
             <tbody>
               @for(gazetteer <- gazetteers) {
                 <tr data-id="@gazetteer.getId">
                   <td>
-                    <input class="included" type="checkbox" id="@gazetteer.getId" name="@gazetteer.getId" />
+                    <input
+                      class="included"
+                      type="checkbox"
+                      id="@gazetteer.getId"
+                      name="@gazetteer.getId"
+                      @if(gazetteerPrefs.useAll || gazetteerPrefs.includes.contains(gazetteer.getId)) { checked="true" }"/>
                     <label for="@gazetteer.getId"></label>
                   </td>
                   <td class="shortname">

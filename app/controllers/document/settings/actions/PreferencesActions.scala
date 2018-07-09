@@ -3,7 +3,11 @@ package controllers.document.settings.actions
 import controllers.document.settings.SettingsController
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.mvc.RequestHeader
 import services.HasNullableSeq
+import services.document.DocumentInfo
+import services.entity.EntityType
+import services.user.User
 
 case class GazetteerPreferences(useAll: Boolean, includes: Seq[String])
 
@@ -14,10 +18,31 @@ object GazetteerPreferences extends HasNullableSeq {
     (JsPath \ "includes").formatNullable[Seq[String]]
       .inmap(fromOptSeq[String], toOptSeq[String])
   )(GazetteerPreferences.apply, unlift(GazetteerPreferences.unapply))
+  
+  val DEFAULTS = GazetteerPreferences(true, Seq.empty[String])
 
 }
 
 trait PreferencesActions { self: SettingsController =>
+  
+  def showAnnotationPreferences(doc: DocumentInfo, user: User)(implicit request: RequestHeader) = {
+    val fGazetteers= self.authorities.listAll(Some(EntityType.PLACE))
+    val fCurrentPrefs = self.documents.getPreferences(doc.id)
+    
+    val f = for {
+      gazetteers <- fGazetteers
+      currentPrefs <- fCurrentPrefs
+    } yield (gazetteers, currentPrefs)
+    
+    f.map { case (gazetteers, allPrefs) =>
+      val gazetteerPrefs = allPrefs
+        .find(_.getPreferenceName == "authorities.gazetteers")
+        .flatMap(str => Json.fromJson[GazetteerPreferences](Json.parse(str.getPreferenceValue)).asOpt)
+        .getOrElse(GazetteerPreferences.DEFAULTS)
+        
+      Ok(views.html.document.settings.preferences(doc, user, gazetteers, gazetteerPrefs))
+    }
+  }
     
   def setGazetteerPreferences(docId: String) = self.silhouette.SecuredAction.async { implicit request =>
     // JSON is parsed to case class and instantly re-serialized as a security/sanitization measure!

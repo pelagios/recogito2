@@ -50,9 +50,7 @@ class SettingsController @Inject() (
     documentAdminAction(documentId, request.identity.username, { doc =>
       tab.map(_.toLowerCase) match {
         case Some(t) if t == "preferences" =>
-          authorities.listAll(Some(EntityType.PLACE)).map { gazetteers =>
-            Ok(views.html.document.settings.preferences(doc, request.identity, gazetteers))
-          }
+          showAnnotationPreferences(doc, request.identity)
 
         case Some(t) if t == "sharing" =>
           val f = for {
