@@ -1,4 +1,4 @@
--- note: 'user' is a keyword in posgres, so we need those quotes
+-- note: 'user' is a keyword in postgres, so we need those quotes
 CREATE TABLE "user" (
   username TEXT NOT NULL PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
@@ -87,6 +87,7 @@ CREATE TABLE document_filepart (
 );
 CREATE INDEX idx_document_filepart_document_id ON document_filepart(document_id);
 
+-- prefs are key/value pairs, where the value is a JSON structure
 CREATE TABLE document_preferences (
   document_id TEXT NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   preference_name TEXT NOT NULL,
@@ -94,7 +95,7 @@ CREATE TABLE document_preferences (
   PRIMARY KEY (document_id, preference_name)
 );
 
--- users can organize documents into folders
+-- users can organize documents into folders (for future use)
 CREATE TABLE folder (
   id SERIAL PRIMARY KEY,
   owner TEXT NOT NULL REFERENCES "user"(username),
@@ -135,6 +136,7 @@ CREATE TABLE authority_file (
   url_patterns TEXT
 );
 
+-- stores status info on long-running background tasks (NER etc.)
 CREATE TABLE task (
   id UUID PRIMARY KEY,
   task_type TEXT NOT NULL,
@@ -151,6 +153,7 @@ CREATE TABLE task (
   progress INTEGER NOT NULL
 );
 
+-- annoucement info to be shown to a user right after login
 CREATE TABLE service_announcement (
   id UUID PRIMARY KEY,
   for_user TEXT NOT NULL REFERENCES "user"(username),
