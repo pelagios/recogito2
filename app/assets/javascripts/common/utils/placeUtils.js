@@ -115,6 +115,25 @@ define([
     },
 
     /**
+     * Given a list of place union records, and a list of allowed
+     * authority IDs, this method strips unwanted records. I.e. places
+     * containing both a Pleiades and a DARE record are reduced to a
+     * Pleiades record, if DARE is not in the allowed authorities.
+     */
+    filterRecords: function(places, allowedAuthorities) {
+      var filterOne = function(place) {
+            var allowedRecords = place.is_conflation_of.filter(function(record) {
+                  return allowedAuthorities.indexOf(record.source_authority) > -1;
+                });
+
+            place.is_conflation_of = allowedRecords; // Mutating in place...
+            return place;
+          };
+
+      return places.map(filterOne);
+    },
+
+    /**
      * Given a placename, returns the 'best matching record'.
      *
      * The method will simply look for an exact match in all names of all records

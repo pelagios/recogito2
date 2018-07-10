@@ -1,4 +1,7 @@
-define(['common/config'], function(Config) {
+define([
+  'common/utils/placeUtils',
+  'common/config'
+], function(PlaceUtils, Config) {
 
   return {
 
@@ -63,13 +66,23 @@ define(['common/config'], function(Config) {
           s = (size) ? size : 20,
           searchAllGazetteers =
             (Config.authorities.gazetteers.hasOwnProperty('use_all')) ?
-              Config.authorities.gazetteers.use_all : true;
+              Config.authorities.gazetteers.use_all : true,
+          includes = (searchAllGazetteers) ? false :
+            Config.authorities.gazetteers.includes;
 
       if (searchAllGazetteers)
-        return jsRoutes.controllers.api.PlaceAPIController.searchPlaces(query, o, s).ajax();
+        return jsRoutes.controllers.api.PlaceAPIController
+          .searchPlaces(query, o, s)
+          .ajax();
       else
-        return jsRoutes.controllers.api.PlaceAPIController.searchPlaces(query, o, s, null,
-          Config.authorities.gazetteers.includes).ajax();
+        return jsRoutes.controllers.api.PlaceAPIController
+          .searchPlaces(query, o, s, null, includes)
+          .ajax()
+          .then(function(results) {
+            // Modify in place - not ideal...
+            results.items = PlaceUtils.filterRecords(results.items, includes);
+            return results;
+          });
     }
 
   };

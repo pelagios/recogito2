@@ -226,11 +226,7 @@ define([
           },
 
           onNextPage = function(response) {
-            var sortBySize = function(places) {
-
-                },
-
-                createMarker = function(place) {
+            var createMarker = function(place) {
                   if (place.representative_geometry && place.representative_geometry.type !== 'Point')
                     return L.geoJSON(place.representative_geometry, SHAPE_STYLE).addTo(shapeLayer);
                   else if (place.representative_point)
