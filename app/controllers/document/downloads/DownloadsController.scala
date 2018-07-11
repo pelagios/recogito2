@@ -70,6 +70,7 @@ class DownloadsController @Inject() (
     with annotations.oa.AnnotationsToOA
     with annotations.webannotation.AnotationsToWebAnno
     with document.csv.DatatableToCSV
+    with document.geojson.DatatableToGazetteer
     with document.tei.PlaintextToTEI
     with document.tei.TEIToTEI
     with places.GeoJSONSerializer
