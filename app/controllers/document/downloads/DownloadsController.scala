@@ -27,11 +27,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import storage.uploads.Uploads
 
 case class FieldMapping(
-  
-  // TODO normalize URL
-    
-  // TODO how to deal with geometry? Support WKT + lat/lon in separate columns?
-  
   BASE_URL          : Option[String],
   FIELD_ID          : Int,
   FIELD_TITLE       : Int,
@@ -71,13 +66,15 @@ class DownloadsController @Inject() (
   implicit val webjars: WebJarsUtil,
   implicit val ctx: ExecutionContext
 ) extends BaseOptAuthController(components, config, documents, users)
-    with CSVSerializer
-    with GeoJSONSerializer
-    with RDFSerializer
-    with RelationsSerializer
-    with webannotation.WebAnnotationSerializer
-    with tei.PlaintextSerializer
-    with tei.TEISerializer 
+    with annotations.csv.AnnotationsToCSV
+    with annotations.oa.AnnotationsToOA
+    with annotations.webannotation.AnotationsToWebAnno
+    with document.csv.DatatableToCSV
+    with document.geojson.DatatableToGazetteer
+    with document.tei.PlaintextToTEI
+    with document.tei.TEIToTEI
+    with places.GeoJSONSerializer
+    with relations.RelationsToGephi
     with I18nSupport {
   
   private def download(

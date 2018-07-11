@@ -1,4 +1,4 @@
-package controllers.document.downloads.serializers.webannotation
+package controllers.document.downloads.serializers.annotations.webannotation
 
 import controllers.document.downloads.serializers.BaseSerializer
 import services.annotation.AnnotationService
@@ -7,7 +7,7 @@ import play.api.mvc.{ AnyContent, Request }
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
 
-trait WebAnnotationSerializer extends BaseSerializer {
+trait AnotationsToWebAnno extends BaseSerializer {
 
   def documentToWebAnnotation(doc: DocumentInfo)(implicit documentService: DocumentService,
       annotationService: AnnotationService, request: Request[AnyContent], ctx: ExecutionContext) = {

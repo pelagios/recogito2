@@ -1,4 +1,4 @@
-package controllers.document.downloads.serializers.tei
+package controllers.document.downloads.serializers.document.tei
 
 import controllers.document.downloads.serializers.BaseSerializer
 import java.util.UUID

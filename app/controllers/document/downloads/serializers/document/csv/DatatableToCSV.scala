@@ -1,7 +1,8 @@
-package controllers.document.downloads.serializers
+package controllers.document.downloads.serializers.document.csv
 
 import controllers.HasCSVParsing
-import java.io.{BufferedInputStream, File, FileInputStream, FileOutputStream}
+import controllers.document.downloads.serializers.BaseSerializer
+import java.io.{BufferedInputStream, File, FileInputStream}
 import java.nio.file.Paths
 import java.util.UUID
 import java.util.zip.{ZipEntry, ZipOutputStream}
@@ -11,98 +12,34 @@ import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import services.ContentType
-import services.annotation.{Annotation, AnnotationBody, AnnotationService}
+import services.annotation.{AnnotationService, AnnotationBody}
 import services.document.DocumentInfo
-import services.entity.{Entity, EntityType}
+import services.entity.Entity
 import services.entity.builtin.EntityService
 import services.generated.tables.records.DocumentFilepartRecord
-import storage.uploads.Uploads
 import storage.TempDir
+import storage.uploads.Uploads
 
-trait CSVSerializer extends BaseSerializer with HasCSVParsing { 
-
-  private val EMPTY     = ""
+trait DatatableToCSV extends BaseSerializer with HasCSVParsing {
   
   private def findPlace(body: AnnotationBody, places: Seq[Entity]): Option[Entity] =
     body.uri.flatMap { uri =>
       places.find(_.uris.contains(uri))
     }
-
-  /** Exports the annotations for the document to the standard Recogito CSV output format **/ 
-  def annotationsToCSV(documentId: String)(
-    implicit annotationService: AnnotationService,
-             entityService: EntityService, 
-             tmpFile: TemporaryFileCreator,
-             conf: Configuration,
-             ctx: ExecutionContext
-  ) = {
-
-    def serializeOne(a: Annotation, places: Seq[Entity]): Seq[String] = {
-      val firstEntity = getFirstEntityBody(a)
-      val maybePlace = firstEntity.flatMap(body => findPlace(body, places))
-      
-      val quoteOrTranscription =
-        if (a.annotates.contentType.isText)
-          getFirstQuote(a)
-        else if (a.annotates.contentType.isImage)
-          getFirstTranscription(a)
-        else None
-        
-      val placeTypes = maybePlace.map(_.subjects.map(_._1).mkString(","))
-
-      Seq(a.annotationId.toString,
-          quoteOrTranscription.getOrElse(EMPTY),
-          a.anchor,
-          firstEntity.map(_.hasType.toString).getOrElse(EMPTY),
-          firstEntity.flatMap(_.uri).getOrElse(EMPTY),
-          maybePlace.map(_.titles.mkString("|")).getOrElse(EMPTY),
-          maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(EMPTY),
-          maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY),
-          maybePlace.map(_.subjects.map(_._1).mkString(",")).getOrElse(EMPTY),
-          firstEntity.flatMap(_.status.map(_.value.toString)).getOrElse(EMPTY),
-          getTagBodies(a).flatMap(_.value).mkString("|"),
-          getCommentBodies(a).flatMap(_.value).mkString("|"))
-    }
-
-    val annotationQuery = annotationService.findByDocId(documentId)
-    val placeQuery = entityService.listEntitiesInDocument(documentId, Some(EntityType.PLACE))
-
-    val f = for {
-      annotations <- annotationQuery
-      places <- placeQuery
-    } yield (annotations, places.items.map(_._1.entity))
-
-    f.map { case (annotations, places) =>
-      scala.concurrent.blocking {
-        val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
-        
-        val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
-        val underlying = tmp.path.toFile
-        val config = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(header))
-        val writer = underlying.asCsvWriter[Seq[String]](config)
-        
-        val tupled = sort(annotations.map(_._1)).map(a => serializeOne(a, places))
-        tupled.foreach(t => writer.write(t))
-        writer.close()
-        
-        underlying
-      }
-    }
-  }
   
   /** Exports a ZIP of user-uploaded tables, with annotation info merged into the original CSVs **/ 
   def exportMergedTables(
     doc: DocumentInfo
-  )(
-    implicit annotationService: AnnotationService, 
-             entityService: EntityService,
-             uploads: Uploads,
-             tmpFile: TemporaryFileCreator,
-             conf: Configuration,
-             ctx: ExecutionContext
+  )(implicit
+      annotationService: AnnotationService, 
+      entityService: EntityService,
+      uploads: Uploads,
+      tmpFile: TemporaryFileCreator,
+      conf: Configuration,
+      ctx: ExecutionContext
   ): Future[(File, String)] = {
     
     def createZip(parts: Seq[(DocumentFilepartRecord, File)]): File = {
@@ -143,10 +80,10 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
         val maybePlace = maybeFirstEntity.flatMap(body => findPlace(body, places))
         
         row ++ Seq(
-          maybeFirstEntity.map(_.hasType.toString).getOrElse(EMPTY),
-          maybeFirstEntity.flatMap(_.uri).getOrElse(EMPTY),
-          maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(EMPTY),
-          maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY)
+          maybeFirstEntity.map(_.hasType.toString).getOrElse(""),
+          maybeFirstEntity.flatMap(_.uri).getOrElse(""),
+          maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(""),
+          maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse("")
         )
       }
             
@@ -195,6 +132,6 @@ trait CSVSerializer extends BaseSerializer with HasCSVParsing {
         // Multiple tables - package into a Zip
         (createZip(outputFiles), doc.id + ".zip")
     })
-  }
-
+  }  
+  
 }

@@ -1,6 +1,6 @@
-package controllers.document.downloads.serializers
+package controllers.document.downloads.serializers.annotations.oa
 
-import java.io.{File, FileOutputStream}
+import controllers.document.downloads.serializers.BaseSerializer
 import java.nio.file.Paths
 import java.util.UUID
 import services.HasDate
@@ -13,7 +13,6 @@ import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.ExecutionContext
-import scala.concurrent.{ExecutionContext, Future}
 import storage.TempDir
 
 sealed class BaseVocab(val getURI: String) {
@@ -47,7 +46,7 @@ object Pelagios extends BaseVocab("http://pelagios.github.io/vocab/terms#") {
 }
 
 
-trait RDFSerializer extends BaseSerializer with HasDate {
+trait AnnotationsToOA extends BaseSerializer with HasDate {
     
   private def createDocumentResource(docInfo: DocumentInfo, baseUri: String, model: Model) = {
     val resource = model.createResource(baseUri)
