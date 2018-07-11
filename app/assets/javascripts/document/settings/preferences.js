@@ -13,6 +13,8 @@ require(['common/config'], function(Config) {
 
         gazetteers = jQuery('#gazetteer-list input'),
 
+        plausibilityWarning = jQuery('.plausibility-warning'),
+
         /** Returns the state of a single input DOM node **/
         getInputState = function(node) {
           var input = jQuery(node),
@@ -64,12 +66,22 @@ require(['common/config'], function(Config) {
           onChange(evt);
         },
 
+        setWarning = function(setting) {
+          if (setting.use_all || setting.includes.length > 0)
+            plausibilityWarning.fadeOut(200);
+          else
+            plausibilityWarning.show();
+        },
+
         onChange = function(evt) {
           var forId = jQuery(evt.target).attr('id'),
-              notifier = jQuery('*[data-for="' + forId + '"]');
+              notifier = jQuery('*[data-for="' + forId + '"]'),
+              setting = toSetting(getState());
+
+          setWarning(setting);
 
           jsRoutes.controllers.document.settings.SettingsController.setGazetteerPreferences(Config.documentId).ajax({
-            data: JSON.stringify(toSetting(getState())),
+            data: JSON.stringify(setting),
             contentType: 'application/json'
           }).success(function() {
             notifier.show();
@@ -81,6 +93,8 @@ require(['common/config'], function(Config) {
 
     useAll.change(onToggleUseAll);
     gazetteers.change(onChange);
+
+    setWarning(toSetting(getState()));
   });
 
 });
