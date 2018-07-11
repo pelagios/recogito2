@@ -1,4 +1,4 @@
-package controllers.document.downloads.serializers.tei
+package controllers.document.downloads.serializers.document.tei
 
 import controllers.HasTEISnippets
 import org.joox.JOOX._
@@ -10,7 +10,7 @@ import play.api.test.Helpers._
 import org.custommonkey.xmlunit.XMLTestCase
 import org.custommonkey.xmlunit.XMLUnit
 
-class TestSerializer extends TEISerializer
+class TestSerializer extends TEIToTEI
 
 @RunWith(classOf[JUnitRunner])
 class TEISerializerSpec extends XMLTestCase with SpecificationLike with HasTEISnippets {

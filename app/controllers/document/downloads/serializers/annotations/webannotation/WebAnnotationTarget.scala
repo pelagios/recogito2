@@ -1,4 +1,4 @@
-package controllers.document.downloads.serializers.webannotation
+package controllers.document.downloads.serializers.annotations.webannotation
 
 import services.annotation.Annotation
 import play.api.libs.json._

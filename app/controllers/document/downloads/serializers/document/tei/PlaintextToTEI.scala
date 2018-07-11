@@ -1,4 +1,4 @@
-package controllers.document.downloads.serializers.tei
+package controllers.document.downloads.serializers.document.tei
 
 import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
 import services.document.{ DocumentInfo, DocumentService }
@@ -7,7 +7,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 import scala.xml.{ UnprefixedAttribute, Node, Null, Text }
 import storage.uploads.Uploads
 
-trait PlaintextSerializer extends BaseTEISerializer {
+trait PlaintextToTEI extends BaseTEISerializer {
   
   /** Simplistic, but should be all we need. If we need more, we can switch to Apache Commons StringEscapeUtils **/
   private def escape(str: String) =

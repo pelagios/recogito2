@@ -1,4 +1,4 @@
-package controllers.document.downloads.serializers.tei
+package controllers.document.downloads.serializers.document.tei
 
 import controllers.HasTEISnippets
 import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
@@ -11,7 +11,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.xml.Elem
 import storage.uploads.Uploads
 
-trait TEISerializer extends BaseTEISerializer with HasTEISnippets {
+trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
 
   private val ENTITY_TYPES = Set(AnnotationBody.PLACE, AnnotationBody.PERSON, AnnotationBody.EVENT)
 

@@ -1,4 +1,4 @@
-package controllers.document.downloads.serializers.webannotation
+package controllers.document.downloads.serializers.annotations.webannotation
 
 import services.image._
 import services.annotation.{ Annotation, AnnotationBody }

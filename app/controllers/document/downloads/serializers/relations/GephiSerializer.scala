@@ -1,5 +1,6 @@
-package controllers.document.downloads.serializers
+package controllers.document.downloads.serializers.relations
 
+import controllers.document.downloads.serializers.BaseSerializer
 import java.nio.file.Paths
 import java.util.UUID
 import kantan.csv.CsvConfiguration
@@ -12,7 +13,7 @@ import services.annotation.AnnotationService
 import storage.TempDir
 import storage.es.ES
 
-trait RelationsSerializer extends BaseSerializer {
+trait GephiSerializer extends BaseSerializer {
   
   def relationsToGephiNodes(documentId: String)(
     implicit annotationService: AnnotationService, tmpFile: TemporaryFileCreator, conf: Configuration, ctx: ExecutionContext
