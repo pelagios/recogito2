@@ -13,7 +13,7 @@ import services.annotation.AnnotationService
 import storage.TempDir
 import storage.es.ES
 
-trait GephiSerializer extends BaseSerializer {
+trait RelationsToGephi extends BaseSerializer {
   
   def relationsToGephiNodes(documentId: String)(
     implicit annotationService: AnnotationService, tmpFile: TemporaryFileCreator, conf: Configuration, ctx: ExecutionContext

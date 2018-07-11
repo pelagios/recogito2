@@ -73,7 +73,7 @@ class DownloadsController @Inject() (
     with document.tei.PlaintextToTEI
     with document.tei.TEIToTEI
     with places.GeoJSONSerializer
-    with relations.GephiSerializer
+    with relations.RelationsToGephi
     with I18nSupport {
   
   private def download(
