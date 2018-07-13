@@ -18,7 +18,7 @@ import services.entity.builtin.EntityService
 import storage.es.ES 
 import storage.uploads.Uploads
 
-trait GeoJSONSerializer extends BaseSerializer with HasCSVParsing {
+trait PlacesToGeoJSON extends BaseSerializer with HasCSVParsing {
   
   def placesToGeoJSON(documentId: String)(implicit entityService: EntityService, annotationService: AnnotationService, ctx: ExecutionContext) = {
     val fAnnotations = annotationService.findByDocId(documentId, 0, ES.MAX_SIZE)

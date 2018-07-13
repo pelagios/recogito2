@@ -73,14 +73,14 @@ class DownloadsController @Inject() (
     with document.geojson.DatatableToGazetteer
     with document.tei.PlaintextToTEI
     with document.tei.TEIToTEI
-    with places.GeoJSONSerializer
+    with places.PlacesToGeoJSON
     with relations.RelationsToGephi
     with I18nSupport {
   
   private def download(
-      documentId: String, 
-      requiredAccessLevel: RuntimeAccessLevel, 
-      export: DocumentInfo => Future[Result]
+    documentId: String, 
+    requiredAccessLevel: RuntimeAccessLevel, 
+    export: DocumentInfo => Future[Result]
   )(implicit request: UserAwareRequest[Security.Env, AnyContent]) = 
     documentReadResponse(documentId, request.identity, { case (docInfo, userAccessLevel) =>
       if (userAccessLevel >= requiredAccessLevel)
