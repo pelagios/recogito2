@@ -121,7 +121,9 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
 
         onKeyDown = function(e) {
           var key = e.which,
-              isEventFromEditor = jQuery(e.target).closest('.annotation-editor-popup').length > 0;
+              isEventFromEditor =
+                jQuery(e.target).closest('.annotation-editor-popup').length > 0 ||
+                jQuery(e.target).closest('.georesolution-panel').length > 0;
 
           // We ignore keypresses while the user is typing on the editor
           if (!isEventFromEditor) {
