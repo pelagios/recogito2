@@ -63,8 +63,21 @@ define([
           }
         },
 
-        getFiltered = function(filter) {
-          return annotation.filter(filter);
+        /** Filters annotations by any filter function **/
+        filter = function(filter) {
+          return annotations.filter(filter);
+        },
+
+        forEach = function(fn) {
+          annotations.forEach(fn);
+        },
+
+        /** Filters annotations to those that have the specified body type **/
+        filterByBodyType = function(bodyType) {
+          return annotations.filter(function(a) {
+            var bodiesOfType = Utils.getBodiesOfType(a, bodyType);
+            return bodiesOfType.length > 0;
+          });
         },
 
         listContributors = function() {
@@ -91,7 +104,9 @@ define([
     // write access. But returning new copies every time seems too costly.
     this.readOnly = function() {
       return {
-        getFiltered      : getFiltered,
+        filter           : filter,
+        forEach          : forEach,
+        filterByBodyType : filterByBodyType,
         listContributors : listContributors,
         listUniqueTags   : listUniqueTags,
         listAnnotations  : listAnnotations

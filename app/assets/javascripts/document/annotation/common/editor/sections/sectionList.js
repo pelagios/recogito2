@@ -150,7 +150,7 @@ define([
         },
 
         initPlaceSection = function(placeBody, opt_toponym) {
-          var placeSection = new PlaceSection(centerSectionEl, placeBody, opt_toponym);
+          var placeSection = new PlaceSection(centerSectionEl, placeBody, opt_toponym, allAnnotations);
           forwardEvent(placeSection, 'change'); // Georesolution change needs to be handled by editor
           handleDelete(placeSection);
           sections.push(placeSection);

@@ -5,12 +5,24 @@ define([
   'document/annotation/common/editor/sections/place/minimap',
   'document/annotation/common/editor/sections/section',
   'common/ui/formatting',
+  'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'common/api',
   'common/config'
-], function(ErrorCard, NoMatchCard, StandardCard, MiniMap, Section, Formatting, PlaceUtils, API, Config) {
+], function(
+  ErrorCard,
+  NoMatchCard,
+  StandardCard,
+  MiniMap,
+  Section,
+  Formatting,
+  AnnotationUtils,
+  PlaceUtils,
+  API,
+  Config
+) {
 
-  var PlaceSection = function(parent, placeBody, opt_toponym) {
+  var PlaceSection = function(parent, placeBody, opt_toponym, allAnnotations) {
     var self = this,
 
         element = (function() {
@@ -84,18 +96,50 @@ define([
 
         /** Fills the place card based on a search on the provided toponym string **/
         fillFromToponym = function(toponym, verificationStatus, lastModified) {
-          API.searchPlaces(toponym).done(function(response) {
-            if (response.total > 0) {
-              var topPlace = response.items[0],
-                  bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
-                  coord = topPlace.representative_point;
 
-              placeBody.uri = bestRecord.uri;
-              fillTemplate(bestRecord, verificationStatus, lastModified, coord);
-            } else {
-              fillTemplate(false, verificationStatus, lastModified);
-            }
-          });
+          // Checks existing annotations for verfied matches on the same
+          // toponym and returns the URI that was associated with it most
+          // recently
+          var mostRecentPreviousMatch = (function() {
+                // PLACE bodies for previous matches on this toponym
+                var previousMatches = [];
+
+                allAnnotations.forEach(function(a) {
+                  var quote = AnnotationUtils.getQuote(a),
+                      placeBodies = AnnotationUtils.getBodiesOfType(a, 'PLACE'),
+                      verifiedPlaceBodies = placeBodies.filter(function(b) {
+                        return b.status && b.status.value === 'VERIFIED';
+                      });
+
+                  if (quote.toLowerCase() === toponym.toLowerCase() && verifiedPlaceBodies.length > 0)
+                    previousMatches = previousMatches.concat(verifiedPlaceBodies);
+                });
+
+                previousMatches.sort(function(a, b) {
+                  if (a.last_modified_at < b.last_modified_at) return 1;
+                  if (a.last_modified_at > b.last_modified_at) return -1;
+                  return 0;
+                });
+
+                if (previousMatches.length > 0)
+                  return previousMatches[0].uri;
+              })();
+
+          if (mostRecentPreviousMatch)
+            fillFromURI(mostRecentPreviousMatch, verificationStatus, lastModified);
+          else
+            API.searchPlaces(toponym).done(function(response) {
+              if (response.total > 0) {
+                var topPlace = response.items[0],
+                    bestRecord = PlaceUtils.getBestMatchingRecord(topPlace),
+                    coord = topPlace.representative_point;
+
+                placeBody.uri = bestRecord.uri;
+                fillTemplate(bestRecord, verificationStatus, lastModified, coord);
+              } else {
+                fillTemplate(false, verificationStatus, lastModified);
+              }
+            });
         },
 
         /** Updates the section with a change performed by the user **/

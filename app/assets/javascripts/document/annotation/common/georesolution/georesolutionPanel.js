@@ -328,7 +328,6 @@ define([
            * search result list is reached.
            */
           blockMouseWheelBubbling = function() {
-
             element.bind('mousewheel', function(e) {
               if (e.originalEvent.wheelDelta) {
                 var scrollTop = resultContainer.scrollTop(),
