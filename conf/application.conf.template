@@ -17,7 +17,11 @@ play.i18n.langs = [ "en", "bn", "de", "el", "es", "fa", "fr", "he", "it", "ja", 
 
 # Maximum size for file uploads
 # ~~~~~
-play.http.parser.maxDiskBuffer=200MB
+play.http.parser.maxDiskBuffer=500MB
+
+# Server request timeout value (default = 20s)
+# ~~~~~
+# play.server.akka.requestTimeout=180s
 
 # Set to true if running Recogito over HTTPS
 auth.cookie.secure=false
