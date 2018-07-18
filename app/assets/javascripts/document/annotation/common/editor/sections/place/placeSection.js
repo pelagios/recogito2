@@ -111,7 +111,9 @@ define([
                         return b.status && b.status.value === 'VERIFIED';
                       });
 
-                  if (quote.toLowerCase() === toponym.toLowerCase() && verifiedPlaceBodies.length > 0)
+                  // TODO images
+
+                  if (quote && quote.toLowerCase() === toponym.toLowerCase() && verifiedPlaceBodies.length > 0)
                     previousMatches = previousMatches.concat(verifiedPlaceBodies);
                 });
 
