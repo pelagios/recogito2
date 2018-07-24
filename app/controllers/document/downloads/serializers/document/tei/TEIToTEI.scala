@@ -66,7 +66,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
         case _ => doc.createElement("span")
       }
       
-      el.setAttribute("id", toTeiId(annotation.annotationId))
+      el.setAttribute("xml:id", toTeiId(annotation.annotationId))
       if (entityURI.isDefined) el.setAttribute("ref", entityURI.get)
       
       getAttributeTags(annotation).foreach { case(key, values) =>
