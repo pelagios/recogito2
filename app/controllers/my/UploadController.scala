@@ -3,6 +3,7 @@ package controllers.my
 import akka.actor.ActorSystem
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import services.{ContentType, UnsupportedContentTypeException, UnsupportedTextEncodingException}
 import services.document.DocumentService
@@ -29,7 +30,7 @@ import transform.tei.TEIParserService
 import transform.tiling.TilingService
 import transform.iiif.{IIIF, IIIFParser}
 
-case class UploadSuccess(contentType: String)
+case class UploadSuccess(partId: UUID, contentType: String)
 
 case class NewDocumentData(title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String)
 
@@ -51,8 +52,10 @@ class UploadController @Inject() (
     implicit val system: ActorSystem
   ) extends BaseAuthController(components, config, documents, users) with I18nSupport with HasPrettyPrintJSON {
   
-  implicit val uploadSuccessWrites: Writes[UploadSuccess] =
-    (JsPath \ "content_type").write[String].contramap(_.contentType)
+  implicit val uploadSuccessWrites: Writes[UploadSuccess] = (
+    (JsPath \ "uuid").write[UUID] and
+    (JsPath \ "content_type").write[String]
+  )(unlift(UploadSuccess.unapply))
 
   private val MSG_ERROR = "There was an error processing your data"
 
@@ -118,7 +121,7 @@ class UploadController @Inject() (
         uploads.insertUploadFilepart(pendingUpload.getId, request.identity, f).map(_ match {
           case Right(filepart) =>
             // Upload was properly identified and stored
-            Ok(Json.toJson(UploadSuccess(filepart.getContentType)))
+            Ok(Json.toJson(UploadSuccess(filepart.getId, filepart.getContentType)))
 
           case Left(e: UnsupportedContentTypeException) =>
             BadRequest("Unknown or unsupported file format")
@@ -214,8 +217,8 @@ class UploadController @Inject() (
   }
 
   /** Deletes a filepart during step 2 **/
-  def deleteFilepart(usernameInPath: String, filename: String) = silhouette.SecuredAction.async { implicit request =>
-    uploads.deleteFilepartByTitleAndOwner(filename, request.identity.username).map(success => {
+  def deleteFilepart(usernameInPath: String, uuid: UUID) = silhouette.SecuredAction.async { implicit request =>
+    uploads.deleteFilepartByUUIDAndOwner(uuid, request.identity.username).map(success => {
       if (success) Ok else NotFoundPage
     })
   }

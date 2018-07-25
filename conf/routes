@@ -172,7 +172,7 @@ POST    /:username/upload/step-1                     controllers.my.UploadContro
 GET     /:username/upload/step-1                     controllers.my.UploadController.showStep1(username: String)
 GET     /:username/upload/step-2                     controllers.my.UploadController.showStep2(username: String)
 POST    /:username/upload/step-2                     controllers.my.UploadController.storeFilepart(username: String)
-DELETE  /:username/upload/step-2/:filename           controllers.my.UploadController.deleteFilepart(username: String, filename: String)
+DELETE  /:username/upload/step-2/:partId             controllers.my.UploadController.deleteFilepart(username: String, partId: java.util.UUID)
 GET     /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
 POST    /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
 GET     /:username/upload/cancel                     controllers.my.UploadController.cancelUploadWizard(username: String)

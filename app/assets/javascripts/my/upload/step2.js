@@ -120,9 +120,9 @@ require(['common/config'], function(Config) {
         /** Handles clicks on the trashcan icon next to each upload **/
         onDelete = function(e) {
           var uploadDiv = jQuery(e.target).closest('.dz-preview'),
-              filename = (e.name) ? e.name : uploadDiv.find('.dz-filename').text();
+              uuid = (e.previewElement) ? e.previewElement.dataset.id : uploadDiv.data('id');
 
-          jsRoutes.controllers.my.UploadController.deleteFilepart(Config.owner, filename).ajax({
+          jsRoutes.controllers.my.UploadController.deleteFilepart(Config.owner, uuid).ajax({
             success: function(result) {
               uploadDiv.remove();
               refresh();
@@ -133,8 +133,10 @@ require(['common/config'], function(Config) {
         },
 
         onUploadSuccess = function(e, response) {
+          var dataset = e.previewElement.dataset;
           // Set content type returned by server to DOM element data-type attribute
-          e.previewElement.dataset.type = response.content_type;
+          dataset.type = response.content_type;
+          dataset.id = response.uuid;
           jQuery(e.previewElement).addClass('upload-complete');
           refresh();
         },

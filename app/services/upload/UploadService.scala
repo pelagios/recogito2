@@ -135,9 +135,10 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
   }
 
   /** Deletes a filepart - record is removed from the DB, file from the data directory **/
-  def deleteFilepartByTitleAndOwner(title: String, owner: String) = db.withTransaction { sql =>
+  def deleteFilepartByUUIDAndOwner(id: UUID, owner: String) = db.withTransaction { sql =>
+    // Note: the ID is unique, we're just using the owner as an additional verification measure
     Option(sql.selectFrom(UPLOAD_FILEPART)
-              .where(UPLOAD_FILEPART.TITLE.equal(title))
+              .where(UPLOAD_FILEPART.ID.equal(id))
               .and(UPLOAD_FILEPART.OWNER.equal(owner))
               .fetchOne()) match {
 
@@ -187,7 +188,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
     sql.deleteFrom(UPLOAD).execute()
   }
 
-  /** Retrieves the pending uplotad for a user (if any) along with the filepart metadata records **/
+  /** Retrieves the pending upload for a user (if any) along with the filepart metadata records **/
   def findPendingUploadWithFileparts(username: String) = db.query { sql =>
     val result =
       sql.selectFrom(UPLOAD

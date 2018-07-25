@@ -52,8 +52,7 @@ CREATE TABLE upload_filepart (
   file TEXT NOT NULL,
   filesize_kb DOUBLE PRECISION,
   source text,
-  sequence_no INTEGER,
-  UNIQUE (owner, title)
+  sequence_no INTEGER
 );
 
 -- users own (and can share) documents
