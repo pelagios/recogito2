@@ -18,7 +18,7 @@ class AnnotationService @Inject() (
 ) extends HasAnnotationIndexing with AnnotationHistoryService with RelationService {
 
   /** Upserts an annotation.
-    *  
+    *
     * Automatically deals with version history.
     *
     * @return a boolean flag indicating successful completion, the internal ElasticSearch
@@ -32,7 +32,7 @@ class AnnotationService @Inject() (
         resolved <- fResolved
       } yield resolved.flatten
     }
-    
+
     def upsertAnnotation(a: Annotation): Future[Boolean] =
       es.client execute {
         indexInto(ES.RECOGITO / ES.ANNOTATION).doc(a).id(a.annotationId.toString)
@@ -42,10 +42,10 @@ class AnnotationService @Inject() (
         t.printStackTrace
         false
       }
-      
+
     for {
       resolvedEntities <- fResolveEntityReferences
-      maybePrevious <- if (versioned) findById(annotation.annotationId) 
+      maybePrevious <- if (versioned) findById(annotation.annotationId)
                        else Future.successful(None)
       stored <- upsertAnnotation(addUnionIds(annotation, resolvedEntities))
       success <- if (stored) {
@@ -69,7 +69,7 @@ class AnnotationService @Inject() (
         Logger.warn(failed.size + " annotations failed to import - retrying")
         upsertAnnotations(failed, versioned, retries - 1)
       } else {
-        Logger.info("Successfully imported " + (annotations.size - failed.size) + " annotations")
+        Logger.info("Successfully upserted " + (annotations.size - failed.size) + " annotations")
         if (failed.size > 0)
           Logger.error(failed.size + " annotations failed without recovery")
         else
@@ -87,7 +87,7 @@ class AnnotationService @Inject() (
       else
         None
     }
-    
+
   private def deleteById(annotationId: String): Future[Boolean] =
     es.client execute {
       delete(annotationId.toString) from ES.RECOGITO / ES.ANNOTATION
@@ -114,11 +114,11 @@ class AnnotationService @Inject() (
           Some(annotation)
         } recover { case t: Throwable =>
           t.printStackTrace()
-          None 
+          None
         }
 
       case None => Future.successful(None)
-    }) 
+    })
   }
 
   def countTotal(): Future[Long] =
@@ -140,7 +140,7 @@ class AnnotationService @Inject() (
         termQuery("annotates.document_id" -> id)
       } start offset limit limit
     } map(_.to[(Annotation, Long)].toSeq)
-    
+
   /** Deletes all annotations & version history on a given document **/
   def deleteByDocId(docId: String): Future[Boolean] = {
     val deleteAnnotations = findByDocId(docId).flatMap { annotationsAndVersions =>
@@ -190,12 +190,12 @@ class AnnotationService @Inject() (
           )
       } limit ES.MAX_SIZE
     } map { _.to[(Annotation, Long)].toSeq.map(_._1) }
-    
+
   /** Retrieves annotations carrying relations to the given ID and removes those relations **/
   def removeRelationsTo(relatedTo: UUID): Future[Boolean] = {
     // Fetches all annotations carrying relations to the given ID
     val fAffectedAnnotations = es.client execute {
-      search(ES.RECOGITO / ES.ANNOTATION) query { 
+      search(ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("relations.relates_to" -> relatedTo.toString)
       } limit ES.MAX_SIZE // Should be safe to assume no more than 10k annotations point here
     } map { _.to[(Annotation, Long)] }
@@ -203,10 +203,11 @@ class AnnotationService @Inject() (
     // Filters out relations that point to the given ID
     def removeRelations(annotations: Seq[Annotation]): Seq[Annotation] =
       annotations.map(removeRelationsTo(_, relatedTo))
-    
+
     for {
       affected <- fAffectedAnnotations
-      failed <- upsertAnnotations(removeRelations(affected.map(_._1)))      
+      failed <- if (affected.isEmpty) Future.successful(Seq.empty[Annotation]) 
+                else upsertAnnotations(removeRelations(affected.map(_._1)))
     } yield (failed.size == 0)
   }
 
