@@ -78,6 +78,8 @@ object TEITag extends {
     
     val offset = rangeBefore.toString.size
     val quote = el.getTextContent
+
+    play.api.Logger.info($(el).toString)
     
     val xpath = $(el).xpath
     val xpathNormalized = xpath.substring(0, xpath.lastIndexOf('/')).toLowerCase

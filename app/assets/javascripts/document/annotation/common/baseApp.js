@@ -50,7 +50,7 @@ define([
     self.header.showStatusSaving();
     API.storeAnnotation(annotationStub)
        .done(function(annotation) {
-         self.annotations.add(annotation);
+         self.annotations.addOrReplace(annotation);
          self.header.incrementAnnotationCount();
          self.header.updateContributorInfo(Config.me);
          self.header.showStatusSaved();
@@ -85,7 +85,7 @@ define([
 
          annotations.forEach(function(annotation) {
            // Note: it *should* be safe to assume that the annotations come in the same
-           // order as the original stubs, but we'll be a little definsive here, just in case
+           // order as the original stubs, but we'll be a little defensive here, just in case
            var stub = findStub(annotation);
            jQuery.extend(stub, annotation);
            self.highlighter.refreshAnnotation(stub);

@@ -39,7 +39,7 @@ object TEIParserService {
     val places = $(teiXML).find("placeName").get
     val people = $(teiXML).find("persName").get
     val spans  = $(teiXML).find("span").get
-        
+
     val annotations = (places ++ people ++ spans).map(TEITag.convert(part, _, ranges))
 
     if (replaceOriginalFile)

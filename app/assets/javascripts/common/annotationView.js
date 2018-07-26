@@ -54,6 +54,21 @@ define([
           resetDerivedSets();
         },
 
+        addOrReplace = function(annotation) {
+          var existing = annotations.find(function(a) {
+                return a.annotation_id === annotation.annotation_id;
+              }),
+
+              idx = (existing) ? annotations.indexOf(existing) : -1;
+
+          if (idx === -1)
+            annotations.push(annotation);
+          else
+            annotations[idx] = annotation;
+
+          resetDerivedSets();
+        },
+
         /** Removes an annotatoin or array of annotations to the view **/
         remove = function(a) {
           var idx = annotations.indexOf(a);
@@ -80,6 +95,15 @@ define([
           });
         },
 
+        /** Filters annotations to those with a specific quote body value **/
+        filterByQuote = function(quote) {
+          return annotations.filter(function(a) {
+            var quoteBodies = Utils.getBodiesOfType(a, 'QUOTE');
+            // Safe to assume annotations have only a single quote body
+            return quoteBodies.length > 0 && quoteBodies[0].value === quote;
+          });
+        },
+
         listContributors = function() {
           var getContributors = function(a) { return a.contributors; };
           collectIntoIfEmpty(getContributors, contributors);
@@ -97,6 +121,7 @@ define([
         };
 
     this.add = add;
+    this.addOrReplace = addOrReplace;
     this.remove = remove;
 
     // This way we can hand out a 'read-only' reference to other UI components.
@@ -107,6 +132,7 @@ define([
         filter           : filter,
         forEach          : forEach,
         filterByBodyType : filterByBodyType,
+        filterByQuote    : filterByQuote,
         listContributors : listContributors,
         listUniqueTags   : listUniqueTags,
         listAnnotations  : listAnnotations

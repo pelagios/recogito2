@@ -27,11 +27,47 @@ define([
   Toolbar,
   RelationsLayer) {
 
+  /** DUMMY ONLY **/
+  var REAPPLY_TEXT = function(annotated, unannotated, quote) {
+    if (annotated + unannotated != 0) {
+      var text, buttons = [ 'No'];
+
+      if (annotated == 0) {
+        if (unannotated == 1)
+          text = 'There is 1 more unmarked occurrence of <em>';
+        else
+          text = 'There are ' + unannotated + ' more unmarked occurrences of <em>';
+
+        buttons.push('Yes');
+      } else if (unannotated == 0) {
+        if (unannotated == 1)
+          text = 'There is 1 other annotated occurrence of <em>';
+        else
+          text = 'There are ' + annotated + ' other annotated occurrences of <em>';
+
+        buttons.push('Yes, replace existing annotations');
+        buttons.push('Yes, merge with existing annotations');
+      } else {
+        text = 'There are ' + unannotated + ' more unmarked and ' + annotated + ' annotated occurrences of <em>';
+        buttons.push('Yes, replace existing annotations');
+        buttons.push('Yes, merge with existing annotations');
+      }
+
+      text += quote + '</em> in the text.<br/>Do you want to re-apply this annotation?';
+
+      console.log(buttons);
+
+      return text;
+    }
+  };
+
   var App = function(contentNode, highlighter, selector, phraseAnnotator) {
 
     var self = this,
 
-        annotations = new AnnotationView(),
+        annotationView = new AnnotationView(),
+
+        annotations = annotationView.readOnly(),
 
         loadIndicator = new LoadIndicator(),
 
@@ -40,8 +76,8 @@ define([
         toolbar = new Toolbar(jQuery('.header-toolbar')),
 
         editor = (Config.writeAccess) ?
-          new WriteEditor(containerNode, annotations.readOnly(), selector) :
-          new ReadEditor(containerNode, annotations.readOnly()),
+          new WriteEditor(containerNode, annotations, selector) :
+          new ReadEditor(containerNode, annotations),
 
         colorschemeStylesheet = jQuery('#colorscheme'),
 
@@ -83,6 +119,16 @@ define([
           localStorage.setItem('r2.document.edit.colorscheme', mode);
         },
 
+        /** DUMMY ONLY **/
+        promptReapply2 = function(annotation) {
+          var quote = AnnotationUtils.getQuote(annotation),
+              unannotatedOccurrenceCount = phraseAnnotator.countOccurrences(quote),
+              annotatedOccurrences = annotations.filterByQuote(quote),
+              totalCount = unannotatedOccurrenceCount + annotatedOccurrences.length;
+
+          console.log(REAPPLY_TEXT( annotatedOccurrences.length, unannotatedOccurrenceCount, quote));
+        },
+
         onCreateAnnotation = function(selection) {
           var reapply = function() {
                 var selections = phraseAnnotator.createSelections(selection.annotation);
@@ -97,6 +143,9 @@ define([
                       'There are ' + occurrenceCount + ' more occurrences of <em>' :
                       'There is 1 more occurrence of <em>';
 
+                // TODO handle exising annotations for identical quotes?
+                // console.log(annotations.filterByQuote(quote));
+
                 if (occurrenceCount > 0) {
                   promptMessage +=
                     quote + '</em> in the text.<br/>Do you want to re-apply this annotation?';
@@ -108,8 +157,19 @@ define([
           // Store the annotation first
           self.onCreateAnnotation(selection);
 
+          /** DUMMY ONLY **/
+          promptReapply2(selection.annotation);
+
           // Then prompt the user if they want to re-apply across the doc
           promptReapply();
+        },
+
+        onUpdateAnnotation = function(annotationStub) {
+
+          /** DUMMY ONLY **/
+          promptReapply2(annotationStub);
+
+          self.onUpdateAnnotation(annotationStub);
         },
 
         onDeleteAnnotation = function(annotation) {
@@ -137,15 +197,15 @@ define([
     toolbar.on('annotationModeChanged', onAnnotationModeChanged);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
 
-    BaseApp.apply(this, [ annotations, highlighter, selector ]);
+    BaseApp.apply(this, [ annotationView, highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
 
     relationsLayer.on('updateRelations', onUpdateRelations);
 
     editor.on('createAnnotation', onCreateAnnotation);
+    editor.on('updateAnnotation', onUpdateAnnotation);
     editor.on('deleteAnnotation', onDeleteAnnotation);
-    editor.on('updateAnnotation', this.onUpdateAnnotation.bind(this));
 
     rangy.init();
 
