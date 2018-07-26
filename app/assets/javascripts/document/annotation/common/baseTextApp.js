@@ -47,6 +47,8 @@ define([
           new WriteEditor(containerNode, annotations, selector) :
           new ReadEditor(containerNode, annotations),
 
+        reapply = new Reapply(phraseAnnotator, annotations),
+
         colorschemeStylesheet = jQuery('#colorscheme'),
 
         relationsLayer = new RelationsLayer(containerNode, document.getElementById('relations')),
@@ -119,7 +121,7 @@ define([
           self.onCreateAnnotation(selection);
 
           // Then prompt the user if they want to re-apply across the doc
-          Reapply.reapplyIfNeeded(phraseAnnotator, annotations, selection.annotation);
+          reapply.reapplyIfNeeded(selection.annotation);
         },
 
         onUpdateAnnotation = function(annotationStub) {
@@ -154,6 +156,10 @@ define([
     BaseApp.apply(this, [ annotationView, highlighter, selector ]);
 
     selector.on('select', editor.openSelection);
+
+    reapply.on('create', self.onCreateAnnotationBatch.bind(self));
+    // TODO reapply.on('update', ...)
+    // TODO reapply.on('delete', ...)
 
     relationsLayer.on('updateRelations', onUpdateRelations);
 
