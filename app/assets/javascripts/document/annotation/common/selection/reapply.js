@@ -12,14 +12,14 @@ define([
           if (unannotated + annotated != 0) {
             if (annotated == 0) {
               if (unannotated == 1)
-                message = 'There is 1 more <em>un-annotated</em> occurrence';
+                message = 'There is 1 more un-annotated occurrence';
               else
-                message = 'There are ' + unannotated + ' more <em>un-annotated</em> occurrences';
+                message = 'There are ' + unannotated + ' more un-annotated occurrences';
             } else if (unannotated == 0) {
               if (unannotated == 1)
-                message = 'There is 1 other <em>annotated</em> occurrence';
+                message = 'There is 1 other annotated occurrence';
               else
-                message = 'There are ' + annotated + ' other <em>annotated</em> occurrences';
+                message = 'There are ' + annotated + ' other annotated occurrences';
             } else {
               if (annotated == 1 && unannotated == 1)
                 message = 'There is 1 more <em>un-annotated</em> and 1 <em>annotated</em> occurrence';
