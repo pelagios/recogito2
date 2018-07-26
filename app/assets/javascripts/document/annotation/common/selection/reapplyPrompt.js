@@ -19,19 +19,22 @@ define([
           if (unannotated + annotated != 0) {
             if (annotated == 0) {
               if (unannotated == 1)
-                message = 'There is 1 more un-annotated occurrence of <em>';
+                message = 'There is 1 more <em>un-annotated</em> occurrence';
               else
-                message = 'There are ' + unannotated + ' more un-annotated occurrences of <em>';
+                message = 'There are ' + unannotated + ' more <em>un-annotated</em> occurrences';
             } else if (unannotated == 0) {
               if (unannotated == 1)
-                message = 'There is 1 other annotated occurrence of <em>';
+                message = 'There is 1 other <em>annotated</em> occurrence';
               else
-                message = 'There are ' + annotated + ' other annotated occurrences of <em>';
+                message = 'There are ' + annotated + ' other <em>annotated</em> occurrences';
             } else {
-              message = 'There are ' + unannotated + ' more un-annotated and ' + annotated + ' annotated occurrences of <em>';
+              if (annotated == 1 && unannotated == 1)
+                message = 'There is 1 more <em>un-annotated</em> and 1 <em>annotated</em> occurrence';
+              else
+                message = 'There are ' + unannotated + ' more <em>un-annotated</em> and ' + annotated + ' <em>annotated</em> occurrences';
             }
 
-            message += quote + '</em> in the text. Do you want to re-apply this annotation?';
+            message += ' of <span class="quote">' + quote + '</span> in the text. Do you want to re-apply this annotation?';
           }
 
           return message;
