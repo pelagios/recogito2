@@ -36,9 +36,9 @@ define([
         getButtons = function(annotated) {
           if (annotated > 0)
             return '<span class="stacked">' +
-              '<button class="btn" data-action="REPLACE">YES &mdash; replace existing annotations</button>' +
-              '<button class="btn" data-action="MERGE">YES &mdash; merge with existing annotations</button>' +
-              '<button class="btn outline" data-action="CANCEL">NO &mdash; don\'t re-apply</button>' +
+              '<button class="btn" data-action="REPLACE">YES, replace existing annotations</button>' +
+              '<button class="btn disabled" data-action="REPLACE">YES, merge with existing annotations</button>' +
+              '<button class="btn outline" data-action="CANCEL">NO, don\'t re-apply</button>' +
             '</span>';
           else
             return '<span>' +
@@ -50,9 +50,18 @@ define([
         onReplace = function(annotation, toReplace) {
           // Creates new annotations for un-annotated occurrences
           var selections = phraseAnnotator.createSelections(annotation);
-          if (actionHandlers.create) actionHandlers.create(selections);
+          if (selections.length > 0 && actionHandlers.create)
+            actionHandlers.create(selections);
 
-          // TODO update existing annotations (in toReplace array)
+          // For each annotation to replace, copy bodies from source annotation
+          toReplace.forEach(function(replaced) {
+            replaced.bodies = annotation.bodies.map(function(body) {
+              return jQuery.extend({}, body);
+            });
+          });
+
+          if (toReplace.length > 0 && actionHandlers.update)
+            actionHandlers.update(toReplace);
         },
 
         onMerge = function(annotation, toReplace) {
@@ -64,7 +73,10 @@ define([
           var quote = AnnotationUtils.getQuote(annotation),
 
               unannotatedCount = phraseAnnotator.countOccurrences(quote),
-              annotated = annotations.filterByQuote(quote),
+              annotated = annotations.filterByQuote(quote).filter(function(a) {
+                // Don't doublecount (or re-update) the current annotation
+                return a.annotation_id != annotation.annotation_id;
+              }),
 
               prompt = function() {
                 var message = getMessage(unannotatedCount, annotated.length, quote),

@@ -99,6 +99,7 @@ define([
 
         onUpdateAnnotation = function(annotationStub) {
           self.onUpdateAnnotation(annotationStub);
+          reapply.reapplyIfNeeded(annotationStub);
         },
 
         onDeleteAnnotation = function(annotation) {
@@ -131,7 +132,7 @@ define([
     selector.on('select', editor.openSelection);
 
     reapply.on('create', self.onCreateAnnotationBatch.bind(self));
-    // TODO reapply.on('update', ...)
+    reapply.on('update', self.upsertAnnotationBatch.bind(self));
     // TODO reapply.on('delete', ...)
 
     relationsLayer.on('updateRelations', onUpdateRelations);
