@@ -9,7 +9,7 @@ define([
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/page/loadIndicator',
-  'document/annotation/common/selection/reapplyPrompt',
+  'document/annotation/common/selection/reapply',
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/relations/relationsLayer'
@@ -24,7 +24,7 @@ define([
   ReadEditor,
   WriteEditor,
   LoadIndicator,
-  ReapplyPrompt,
+  Reapply,
   BaseApp,
   Toolbar,
   RelationsLayer) {
@@ -114,15 +114,12 @@ define([
               };
           */
 
-          var prompt = new ReapplyPrompt(phraseAnnotator, annotations);
 
           // Store the annotation first
           self.onCreateAnnotation(selection);
 
           // Then prompt the user if they want to re-apply across the doc
-          // promptReapply();
-          prompt.open(selection.annotation);
-
+          Reapply.reapplyIfNeeded(phraseAnnotator, annotations, selection.annotation);
         },
 
         onUpdateAnnotation = function(annotationStub) {
