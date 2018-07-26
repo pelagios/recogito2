@@ -9,6 +9,7 @@ define([
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/page/loadIndicator',
+  'document/annotation/common/selection/reapplyPrompt',
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/relations/relationsLayer'
@@ -23,43 +24,10 @@ define([
   ReadEditor,
   WriteEditor,
   LoadIndicator,
+  ReapplyPrompt,
   BaseApp,
   Toolbar,
   RelationsLayer) {
-
-  /** DUMMY ONLY **/
-  var REAPPLY_TEXT = function(annotated, unannotated, quote) {
-    if (annotated + unannotated != 0) {
-      var text, buttons = [ 'No'];
-
-      if (annotated == 0) {
-        if (unannotated == 1)
-          text = 'There is 1 more unmarked occurrence of <em>';
-        else
-          text = 'There are ' + unannotated + ' more unmarked occurrences of <em>';
-
-        buttons.push('Yes');
-      } else if (unannotated == 0) {
-        if (unannotated == 1)
-          text = 'There is 1 other annotated occurrence of <em>';
-        else
-          text = 'There are ' + annotated + ' other annotated occurrences of <em>';
-
-        buttons.push('Yes, replace existing annotations');
-        buttons.push('Yes, merge with existing annotations');
-      } else {
-        text = 'There are ' + unannotated + ' more unmarked and ' + annotated + ' annotated occurrences of <em>';
-        buttons.push('Yes, replace existing annotations');
-        buttons.push('Yes, merge with existing annotations');
-      }
-
-      text += quote + '</em> in the text.<br/>Do you want to re-apply this annotation?';
-
-      console.log(buttons);
-
-      return text;
-    }
-  };
 
   var App = function(contentNode, highlighter, selector, phraseAnnotator) {
 
@@ -119,17 +87,8 @@ define([
           localStorage.setItem('r2.document.edit.colorscheme', mode);
         },
 
-        /** DUMMY ONLY **/
-        promptReapply2 = function(annotation) {
-          var quote = AnnotationUtils.getQuote(annotation),
-              unannotatedOccurrenceCount = phraseAnnotator.countOccurrences(quote),
-              annotatedOccurrences = annotations.filterByQuote(quote),
-              totalCount = unannotatedOccurrenceCount + annotatedOccurrences.length;
-
-          console.log(REAPPLY_TEXT( annotatedOccurrences.length, unannotatedOccurrenceCount, quote));
-        },
-
         onCreateAnnotation = function(selection) {
+          /*
           var reapply = function() {
                 var selections = phraseAnnotator.createSelections(selection.annotation);
                 self.onCreateAnnotationBatch(selections);
@@ -153,22 +112,20 @@ define([
                   new Alert(Alert.PROMPT, promptTitle, promptMessage).on('ok', reapply);
                 }
               };
+          */
+
+          var prompt = new ReapplyPrompt(phraseAnnotator, annotations);
 
           // Store the annotation first
           self.onCreateAnnotation(selection);
 
-          /** DUMMY ONLY **/
-          promptReapply2(selection.annotation);
-
           // Then prompt the user if they want to re-apply across the doc
-          promptReapply();
+          // promptReapply();
+          prompt.open(selection.annotation);
+
         },
 
         onUpdateAnnotation = function(annotationStub) {
-
-          /** DUMMY ONLY **/
-          promptReapply2(annotationStub);
-
           self.onUpdateAnnotation(annotationStub);
         },
 
