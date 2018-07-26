@@ -127,9 +127,10 @@ define([
                   return previousMatches[0].uri;
               })();
 
-          if (mostRecentPreviousMatch)
+          if (mostRecentPreviousMatch) {
+            placeBody.uri = mostRecentPreviousMatch;
             fillFromURI(mostRecentPreviousMatch, verificationStatus, lastModified);
-          else
+          } else {
             API.searchPlaces(toponym).done(function(response) {
               if (response.total > 0) {
                 var topPlace = response.items[0],
@@ -142,6 +143,7 @@ define([
                 fillTemplate(false, verificationStatus, lastModified);
               }
             });
+          }
         },
 
         /** Updates the section with a change performed by the user **/
