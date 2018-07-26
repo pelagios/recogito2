@@ -90,33 +90,6 @@ define([
         },
 
         onCreateAnnotation = function(selection) {
-          /*
-          var reapply = function() {
-                var selections = phraseAnnotator.createSelections(selection.annotation);
-                self.onCreateAnnotationBatch(selections);
-              },
-
-              promptReapply = function() {
-                var quote = AnnotationUtils.getQuote(selection.annotation),
-                    occurrenceCount = phraseAnnotator.countOccurrences(quote),
-                    promptTitle = 'Re-Apply',
-                    promptMessage = (occurrenceCount > 1) ?
-                      'There are ' + occurrenceCount + ' more occurrences of <em>' :
-                      'There is 1 more occurrence of <em>';
-
-                // TODO handle exising annotations for identical quotes?
-                // console.log(annotations.filterByQuote(quote));
-
-                if (occurrenceCount > 0) {
-                  promptMessage +=
-                    quote + '</em> in the text.<br/>Do you want to re-apply this annotation?';
-
-                  new Alert(Alert.PROMPT, promptTitle, promptMessage).on('ok', reapply);
-                }
-              };
-          */
-
-
           // Store the annotation first
           self.onCreateAnnotation(selection);
 

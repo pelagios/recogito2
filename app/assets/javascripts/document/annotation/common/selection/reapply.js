@@ -48,16 +48,15 @@ define([
         },
 
         onReplace = function(annotation, toReplace) {
-          var selections = phraseAnnotator.createSelections(annotation);
-
           // Creates new annotations for un-annotated occurrences
+          var selections = phraseAnnotator.createSelections(annotation);
           if (actionHandlers.create) actionHandlers.create(selections);
 
           // TODO update existing annotations (in toReplace array)
-
         },
 
         onMerge = function(annotation, toReplace) {
+          // TODO
           console.log('not yet implemented');
         },
 
