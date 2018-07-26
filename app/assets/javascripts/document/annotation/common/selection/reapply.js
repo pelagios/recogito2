@@ -37,7 +37,7 @@ define([
           if (annotated > 0)
             return '<span class="stacked">' +
               '<button class="btn" data-action="REPLACE">YES, replace existing annotations</button>' +
-              '<button class="btn disabled" data-action="REPLACE">YES, merge with existing annotations</button>' +
+              '<button class="btn" data-action="REPLACE">YES, merge with existing annotations</button>' +
               '<button class="btn outline" data-action="CANCEL">NO, don\'t re-apply</button>' +
             '</span>';
           else
