@@ -27,6 +27,30 @@ define(function() {
       return bodies;
     },
 
+    /**
+     * Returns true if bodies are equal in terms of their value. I.e.
+     * this check considers type, value and URI fields, but ignores
+     * creator and creation timestamp.
+     */
+    bodyValueEquals : function(a, b) {
+      if (a.type != b.type) return false;
+      if (a.value != b.value) return false;
+      if (a.uri != b.uri) return false;
+      return true;
+    },
+
+    /**
+     * Returns true if the annotation contains a body with the same
+     * value as the given body. Equality is checked according to the rules
+     * of bodyValueEquals (above)
+     */
+    containsBodyOfValue : function(annotation, body) {
+      var that = this;
+      return annotation.bodies.find(function(b) {
+        return that.bodyValueEquals(b, body);
+      });
+    },
+
     /** Shorthand **/
     getTags : function(annotation) {
       return this.getBodiesOfType(annotation, 'TAG').map(function(t) {

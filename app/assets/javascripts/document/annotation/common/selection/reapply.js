@@ -37,7 +37,7 @@ define([
           if (annotated > 0)
             return '<span class="stacked">' +
               '<button class="btn" data-action="REPLACE">YES, replace existing annotations</button>' +
-              '<button class="btn" data-action="REPLACE">YES, merge with existing annotations</button>' +
+              '<button class="btn" data-action="MERGE">YES, merge with existing annotations</button>' +
               '<button class="btn outline" data-action="CANCEL">NO, don\'t re-apply</button>' +
             '</span>';
           else
@@ -47,11 +47,15 @@ define([
             '</span>';
         },
 
-        onReplace = function(annotation, toReplace) {
-          // Creates new annotations for un-annotated occurrences
+        /** Re-applies the annotation to the un-annotated text **/
+        reapplyToUnannotated = function(annotation) {
           var selections = phraseAnnotator.createSelections(annotation);
           if (selections.length > 0 && actionHandlers.create)
             actionHandlers.create(selections);
+        }
+
+        onReplace = function(annotation, toReplace) {
+          reapplyToUnannotated(annotation); // Nothing to replace here
 
           // For each annotation to replace, copy bodies from source annotation
           toReplace.forEach(function(replaced) {
@@ -65,8 +69,27 @@ define([
         },
 
         onMerge = function(annotation, toReplace) {
-          // TODO
-          console.log('not yet implemented');
+          // By convention, "merge" replaces the current place bodies,
+          // and appends all other bodies
+          var newPlaceBodies = AnnotationUtils.getBodiesOfType(annotation, 'PLACE'),
+
+              mergeOne = function(original) {
+                var bodiesToKeep = (newPlaceBodies.length > 0) ?
+                      original.bodies.filter(function(b) { return b.type != 'PLACE' }) :
+                      original.bodies,
+
+                    bodiesToAppend = annotation.bodies.filter(function(b) {
+                      return !AnnotationUtils.containsBodyOfValue(original, b);
+                    });
+
+                original.bodies = bodiesToKeep.concat(bodiesToAppend);
+              };
+
+          reapplyToUnannotated(annotation); // Nothing to merge here
+          toReplace.forEach(mergeOne);
+
+          if (toReplace.length > 0 && actionHandlers.update)
+            actionHandlers.update(toReplace);
         },
 
         reapplyIfNeeded = function(annotation) {
