@@ -54,18 +54,23 @@ define([
           resetDerivedSets();
         },
 
-        addOrReplace = function(annotation) {
-          var existing = annotations.find(function(a) {
-                return a.annotation_id === annotation.annotation_id;
-              }),
+        addOrReplace = function(a) {
+          var newAnnotations = (jQuery.isArray(a)) ? a : [ a ],
 
-              idx = (existing) ? annotations.indexOf(existing) : -1;
+              addOrReplaceOne = function(annotation) {
+                var existing = annotations.find(function(a) {
+                      return a.annotation_id === annotation.annotation_id;
+                    }),
 
-          if (idx === -1)
-            annotations.push(annotation);
-          else
-            annotations[idx] = annotation;
+                    idx = (existing) ? annotations.indexOf(existing) : -1;
 
+                if (idx === -1)
+                  annotations.push(annotation);
+                else
+                  annotations[idx] = annotation;
+              };
+
+          newAnnotations.forEach(addOrReplaceOne);
           resetDerivedSets();
         },
 

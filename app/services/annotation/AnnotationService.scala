@@ -69,11 +69,11 @@ class AnnotationService @Inject() (
         Logger.warn(failed.size + " annotations failed to import - retrying")
         upsertAnnotations(failed, versioned, retries - 1)
       } else {
-        Logger.info("Successfully upserted " + (annotations.size - failed.size) + " annotations")
+        // Logger.info("Successfully upserted " + (annotations.size - failed.size) + " annotations")
         if (failed.size > 0)
           Logger.error(failed.size + " annotations failed without recovery")
-        else
-          Logger.info("No failed imports")
+        // else
+        //  Logger.info("No failed imports")
         Future.successful(failed)
       }
     }
