@@ -22,9 +22,9 @@ define([
                 message = 'There are ' + annotated + ' other annotated occurrences';
             } else {
               if (annotated == 1 && unannotated == 1)
-                message = 'There is 1 more <em>un-annotated</em> and 1 <em>annotated</em> occurrence';
+                message = 'There is 1 <em>un-annotated</em> and 1 <em>annotated</em> occurrence';
               else
-                message = 'There are ' + unannotated + ' more <em>un-annotated</em> and ' + annotated + ' <em>annotated</em> occurrences';
+                message = 'There are ' + unannotated + ' <em>un-annotated</em> and ' + annotated + ' <em>annotated</em> occurrences';
             }
 
             message += ' of <span class="quote">' + quote + '</span> in the text. Do you want to re-apply this annotation?';
