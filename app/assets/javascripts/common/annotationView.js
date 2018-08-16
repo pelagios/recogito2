@@ -74,7 +74,7 @@ define([
           resetDerivedSets();
         },
 
-        /** Removes an annotatoin or array of annotations to the view **/
+        /** Removes an annotation or array of annotations to the view **/
         remove = function(a) {
           var idx = annotations.indexOf(a);
           if (idx > -1) {
