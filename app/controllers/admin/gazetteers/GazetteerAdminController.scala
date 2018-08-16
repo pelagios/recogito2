@@ -13,6 +13,7 @@ import services.document.DocumentService
 import services.entity.{AuthorityFileService, EntityType}
 import services.entity.builtin.EntityService
 import services.entity.builtin.importer.crosswalks.geojson._
+import services.entity.builtin.importer.crosswalks.geojson.lpf.LPFCrosswalk
 import services.entity.builtin.importer.crosswalks.rdf._
 import services.entity.builtin.importer.EntityImporterFactory
 import services.generated.tables.records.AuthorityFileRecord
@@ -115,6 +116,12 @@ class GazetteerAdminController @Inject() (
         Logger.info("Using GeoNames crosswalk")
         val loader = new StreamLoader()
         loader.importPlaces(new FileInputStream(file), GeoNamesCrosswalk.fromJson, importer)
+        
+      // Bit of a hack for now...
+      case f if f.endsWith("json") && f.contains("lpf") =>
+        Logger.info("Importing LPF-style GeoJSON")
+        val loader = new DumpLoader()
+        loader.importDump(file, filename, LPFCrosswalk.fromGeoJSON(filename), importer)
         
       case f if f.endsWith("json") =>
         Logger.info("Importing Pelagios GeoJSON FeatureCollection")
