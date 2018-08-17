@@ -118,10 +118,15 @@ class GazetteerAdminController @Inject() (
         loader.importPlaces(new FileInputStream(file), GeoNamesCrosswalk.fromJson, importer)
         
       // Bit of a hack for now...
-      case f if f.endsWith("json") && f.contains("lpf") =>
+      // case f if f.endsWith("json") && f.contains("lpf") =>
+      //   Logger.info("Importing LPF-style GeoJSON")
+      //   val loader = new DumpLoader()
+      //   loader.importDump(file, filename, LPFCrosswalk.fromJson(filename), importer)
+        
+      case f if f.endsWith("jsonl") && f.contains("lpf") =>
         Logger.info("Importing LPF-style GeoJSON")
-        val loader = new DumpLoader()
-        loader.importDump(file, filename, LPFCrosswalk.fromGeoJSON(filename), importer)
+        val loader = new StreamLoader()
+        loader.importPlaces(new FileInputStream(file), LPFCrosswalk.fromJsonLines(filename), importer)
         
       case f if f.endsWith("json") =>
         Logger.info("Importing Pelagios GeoJSON FeatureCollection")
