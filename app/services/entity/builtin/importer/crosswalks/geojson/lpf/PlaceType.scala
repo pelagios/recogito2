@@ -8,7 +8,7 @@ case class PlaceType(id: String, label: String)
 object PlaceType {
   
   implicit val placetypeReads: Reads[PlaceType] = (
-    (JsPath \ "@id").read[String] and
+    (JsPath \ "@id").read[JsValue].map(_.toString) and // Could be numbers...
     (JsPath \ "label").read[String]
   )(PlaceType.apply _)
   
