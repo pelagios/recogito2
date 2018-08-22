@@ -10,71 +10,67 @@ import services.entity._
 import services.entity.builtin.importer.crosswalks.geojson.BaseGeoJSONCrosswalk
 
 object LPFCrosswalk extends BaseGeoJSONCrosswalk {
+  
+  private def toEntityRecord(source: String, f: LPFFeature) = EntityRecord(
+    f.id,
+    source,
+    DateTime.now().withZone(DateTimeZone.UTC),
+    None, // lastChangedAt
+    f.title,
+    f.descriptions.map(_.toDescription),
+    f.namings.map(_.toName),
+    f.geometry,
+    f.geometry.map(_.getCentroid.getCoordinate),
+    None, // country code
+    None, // temporal bounds
+    f.placetypes.map(_.label),
+    None, // priority
+    Seq.empty[Link] // TODO create from matches
+  )
 
   def fromJsonLines(filename: String)(record: String): Option[EntityRecord] = super.fromJson[LPFFeature](record, { f =>
     val source = filename.substring(0, filename.indexOf('.'))
-    EntityRecord(
-      f.id,
-      source,
-      DateTime.now().withZone(DateTimeZone.UTC),
-      None, // lastChangedAt
-      f.namings.headOption.map(_.toponym).getOrElse("[unnamed]"),
-      Seq.empty[Description],
-      Seq.empty[Name], // TODO create from namings
-      f.geometry,
-      f.geometry.map(_.getCentroid.getCoordinate),
-      None, // country code
-      None, // temporal bounds
-      Seq.empty[String], // subjects
-      None, // priority
-      Seq.empty[Link] // TODO create from matches
-    )
+    toEntityRecord(source, f)
   })
   
-  /*
   def fromGeoJSON(filename: String)(in: InputStream): Seq[EntityRecord] = {
     val source = filename.substring(0, filename.indexOf('.'))
     val maybeFc = Json.fromJson[LPFFeatureCollection](Json.parse(in)) // .get
     if (maybeFc.isError) println(maybeFc.toString)
     val fc = maybeFc.get
-    fc.features.map(f => EntityRecord(
-      f.id,
-      source,
-      DateTime.now().withZone(DateTimeZone.UTC),
-      None, // lastChangedAt
-      f.namings.headOption.map(_.toponym).getOrElse("[unnamed]"),
-      Seq.empty[Description],
-      Seq.empty[Name], // TODO create from namings
-      f.geometry,
-      f.geometry.map(_.getCentroid.getCoordinate),
-      None, // country code
-      None, // temporal bounds
-      Seq.empty[String], // subjects
-      None, // priority
-      Seq.empty[Link] // TODO create from matches
-    ))
+    fc.features.map(toEntityRecord(source, _))
   }
-  */
   
 }
 
-// To be extended in the future...
 case class LPFFeature(
   id: String,
+  title: String,
+  countryCode: Option[String],
   namings: Seq[Naming],
   parthood: Seq[Parthood],
-  // placetypes: Seq[PlaceType],
+  placetypes: Seq[PlaceType],
+  descriptions: Seq[LPFDescription],
   exactMatches: Seq[String],
   closeMatches: Seq[String],
-  geometry: Option[Geometry])
+  geometry: Option[Geometry]) {
+  
+  lazy val links = 
+    closeMatches.map(Link(_, LinkType.CLOSE_MATCH))
+    exactMatches.map(Link(_, LinkType.EXACT_MATCH))
+  
+}
 
 object LPFFeature extends HasGeometrySafe {
   
   implicit val lpfReads: Reads[LPFFeature] = (
     (JsPath \ "@id").read[String] and
+    (JsPath \ "properties"\ "title").read[String] and
+    (JsPath \ "properties" \ "ccode").readNullable[String] and
     (JsPath \ "namings").readNullable[Seq[Naming]].map(_.getOrElse(Seq.empty[Naming])) and
     (JsPath \ "parthood").readNullable[Seq[Parthood]].map(_.getOrElse(Seq.empty[Parthood])) and
-    // (JsPath \ "placetypes").readNullable[Seq[PlaceType]].map(_.getOrElse(Seq.empty[PlaceType])) and
+    (JsPath \ "placetypes").readNullable[Seq[PlaceType]].map(_.getOrElse(Seq.empty[PlaceType])) and
+    (JsPath \ "description").readNullable[Seq[LPFDescription]].map(_.getOrElse(Seq.empty[LPFDescription])) and
     (JsPath \ "exactMatch").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String])) and
     (JsPath \ "closeMatch").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String])) and
     (JsPath \ "geometry").readNullable[Geometry]
