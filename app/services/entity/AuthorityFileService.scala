@@ -49,6 +49,13 @@ class AuthorityFileService @Inject() (val db: DB, implicit val ctx: ExecutionCon
       .execute()
   }
   
+  def delete(identifier: String) = db.query { sql =>
+    sql
+      .deleteFrom(AUTHORITY_FILE)
+      .where(AUTHORITY_FILE.ID.equal(identifier))
+      .execute() == 1
+  }
+  
 }
 
 object AuthorityFileService {

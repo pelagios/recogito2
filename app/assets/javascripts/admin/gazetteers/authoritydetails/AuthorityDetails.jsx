@@ -119,7 +119,25 @@ export default class AuthorityDetails extends Component {
   }
 
   onDelete() {
-    console.log('delete');
+    const source = this.state.value.identifier
+
+    if (source) {
+      axios.delete(`/admin/gazetteers/${source}`)
+        .then(response => {
+          this.setState({
+            successMessage: 'Deleted successfully'
+          })
+        })
+        .catch(error => {
+          this.setState({
+            errorMessage: `Something went wrong when deleting ${source}`
+          })
+        });
+    } else {
+      this.setState({
+        errorMessage: 'No gazetteer selected to delete.'
+      });
+    }
   }
 
   render() {
