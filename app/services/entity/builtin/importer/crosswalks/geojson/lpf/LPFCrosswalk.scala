@@ -1,6 +1,6 @@
 package services.entity.builtin.importer.crosswalks.geojson.lpf
 
-import com.vividsolutions.jts.geom.Geometry
+import com.vividsolutions.jts.geom.{Geometry, GeometryCollection}
 import java.io.InputStream
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
@@ -19,8 +19,8 @@ object LPFCrosswalk extends BaseGeoJSONCrosswalk {
     f.title,
     f.descriptions.map(_.toDescription),
     f.namings.map(_.toName),
-    f.geometry,
-    f.geometry.map(_.getCentroid.getCoordinate),
+    f.normalizedGeometry,
+    f.normalizedGeometry.map(_.getCentroid.getCoordinate),
     None, // country code
     None, // temporal bounds
     f.placetypes.map(_.label),
@@ -58,6 +58,14 @@ case class LPFFeature(
   lazy val links = 
     closeMatches.map(Link(_, LinkType.CLOSE_MATCH))
     exactMatches.map(Link(_, LinkType.EXACT_MATCH))
+    
+  /** Simplifies single-geometry GeometryCollections to... single geometries **/
+  lazy val normalizedGeometry = geometry.map { _ match {
+    case geom: GeometryCollection => 
+      if (geom.getNumGeometries == 1) geom.getGeometryN(0)
+      else geom
+    case geom => geom
+  }}
   
 }
 

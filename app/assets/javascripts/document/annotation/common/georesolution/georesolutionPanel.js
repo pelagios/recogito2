@@ -139,13 +139,7 @@ define([
           openMapPopup = function(popup, marker) {
             marker.unbindPopup();
             closeUnlocatedPopup();
-            // TODO this fails for GeoJSON FeatureCollections
-            // marker.bindPopup(popup[0]).openPopup();
-
-            // TODO temporary fix, but not ideal, since it opens the popup at the
-            // tip of the marker pin, rather than at the handle. Figure out a
-            // solution that branches based on the type of marker
-            marker.bindPopup(popup[0]).openPopup(marker.getBounds().getCenter());
+            marker.bindPopup(popup[0]).openPopup();
           },
 
           openPopup = function(place, opt_marker) {
