@@ -1,16 +1,21 @@
 package controllers.document
 
+import com.vividsolutions.jts.geom.Envelope
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
 import services.document.DocumentInfo
+import services.HasGeometry
 
-case class DatasetMeta(doc: DocumentInfo, isCanonical: Boolean = false) {
+case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = None) extends HasGeometry {
 
   lazy val name = Option(doc.owner.getRealName).getOrElse(doc.ownerName) 
   
-  lazy val spatialCoverage = JsNull
-  
-  // TODO add sameAs if not canonical
+  def sameAs()(implicit request: RequestHeader) =
+    if (spatialCoverage.isDefined) // Canonical URL 
+      JsNull
+    else
+      JsString(controllers.document.downloads.routes.DownloadsController.showDownloadOptions(doc.id).absoluteURL)
+
   def asJsonLd()(implicit request: RequestHeader) = Json.prettyPrint(
     JsObject(
       Json.obj(
@@ -19,6 +24,7 @@ case class DatasetMeta(doc: DocumentInfo, isCanonical: Boolean = false) {
         "name" -> doc.title,
         "description" -> doc.description, // TODO this is a mandatory parameter in Google's Dataset spec!
         "url" -> controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, 1).absoluteURL,
+        "sameAs" -> sameAs,
         "creator" -> Json.obj(
           "@type" -> "Person",
           "name" -> name,
@@ -37,7 +43,7 @@ case class DatasetMeta(doc: DocumentInfo, isCanonical: Boolean = false) {
           )
         ),
         "temporalCoverage" -> doc.dateFreeform, // TODO create structured dates if possible
-        "spatialCoverage" -> spatialCoverage
+        "spatialCoverage" -> Json.toJson(spatialCoverage)
       ).fields.filter(_._2 match { // Filter out undefined props
         case JsNull => false
         case _ => true

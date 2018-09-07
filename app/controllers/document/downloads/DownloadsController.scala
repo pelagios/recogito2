@@ -92,15 +92,17 @@ class DownloadsController @Inject() (
   def showDownloadOptions(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     documentReadResponse(documentId, request.identity, { case (doc, accesslevel) =>
       val fAnnotationCount = annotations.countByDocId(documentId)
+      val fAnnotationBounds = entities.getDocumentSpatialExtent(documentId)
       val fHasRelations = annotations.hasRelations(documentId)
       
       val f = for {
         annotationCount <- fAnnotationCount
+        annotationBounds <- fAnnotationBounds
         hasRelations <- fHasRelations
-      } yield (annotationCount, hasRelations)
+      } yield (annotationCount, annotationBounds, hasRelations)
       
-      f.map { case (annotationCount, hasRelations) =>
-        Ok(views.html.document.downloads.index(doc, request.identity, accesslevel, annotationCount, hasRelations))
+      f.map { case (count, bounds, hasRelations) =>
+        Ok(views.html.document.downloads.index(doc, request.identity, accesslevel, count, bounds, hasRelations))
       }
     })
   }

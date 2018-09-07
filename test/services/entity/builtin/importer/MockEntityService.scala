@@ -1,7 +1,7 @@
 package services.entity.builtin.importer
 
 import collection.JavaConverters._
-import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.{Coordinate, Envelope}
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.{ExecutionContext, Future}
@@ -94,6 +94,8 @@ class MockEntityService(implicit ctx: ExecutionContext) extends EntityService {
     limit  : Int = ES.MAX_SIZE
   ): Future[Page[IndexedEntity]] = ???
 
+  def getDocumentSpatialExtent(docId : String): Future[Envelope] = ???
+  
   def deleteBySourceAuthority(authority: String): Future[Boolean] = ???
 
 }

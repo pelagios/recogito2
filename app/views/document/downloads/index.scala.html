@@ -3,6 +3,7 @@
   currentUser: Option[services.user.User],
   accessLevel: services.document.RuntimeAccessLevel,
   annotationCount: Long,
+  annotationBounds: com.vividsolutions.jts.geom.Envelope,
   hasRelations: Boolean
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
@@ -10,7 +11,7 @@
   <head>
     <title>Downloads | @doc.author.map(_ + ": ")@doc.title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
-    @views.html.document.standardMeta(doc, annotationCount)
+    @views.html.document.standardMeta(doc, annotationCount, Some(annotationBounds))
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/downloads/index.css")"/>
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     @if(doc.hasDataParts) {
