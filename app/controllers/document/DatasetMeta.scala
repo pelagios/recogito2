@@ -4,9 +4,8 @@ import com.vividsolutions.jts.geom.Envelope
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
 import services.document.DocumentInfo
-import services.HasGeometry
 
-case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = None) extends HasGeometry {
+case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = None) {
 
   lazy val name = Option(doc.owner.getRealName).getOrElse(doc.ownerName) 
   
@@ -15,7 +14,10 @@ case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = No
       JsNull
     else
       JsString(controllers.document.downloads.routes.DownloadsController.showDownloadOptions(doc.id).absoluteURL)
-
+      
+  def toBox(e: Envelope) =
+    s"${e.getMinY} ${e.getMinX} ${e.getMaxY} ${e.getMaxX}"
+      
   def asJsonLd()(implicit request: RequestHeader) = Json.prettyPrint(
     JsObject(
       Json.obj(
@@ -43,7 +45,13 @@ case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = No
           )
         ),
         "temporalCoverage" -> doc.dateFreeform, // TODO create structured dates if possible
-        "spatialCoverage" -> Json.toJson(spatialCoverage)
+        "spatialCoverage" -> spatialCoverage.map { env => Json.obj(
+          "@type" -> "Place",
+          "geo" -> Json.obj(
+            "@type" -> "GeoShape",
+            "box" -> toBox(env)
+          )
+        )}
       ).fields.filter(_._2 match { // Filter out undefined props
         case JsNull => false
         case _ => true
