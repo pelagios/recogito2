@@ -4,6 +4,7 @@ import akka.stream.Materializer
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, Security}
 import java.io.{File, FileInputStream}
+import java.util.zip.GZIPInputStream
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
 import play.api.data.Form
@@ -98,6 +99,10 @@ class GazetteerAdminController @Inject() (
     )
   }
   
+  private def getStream(file: File, filename: String) =
+    if (filename.endsWith(".gz")) new GZIPInputStream(new FileInputStream(file))
+    else new FileInputStream(file)
+
   /** Temporary hack... **/
   private def importDumpfile(file: File, filename: String, identifier: String) = {
     val importer = importerFactory.createImporter(EntityType.PLACE)
@@ -110,12 +115,12 @@ class GazetteerAdminController @Inject() (
       case f if f.contains("pleiades") =>
         Logger.info("Using Pleiades crosswalk")
         val loader = new StreamLoader()
-        loader.importPlaces(new FileInputStream(file), PleiadesCrosswalk.fromJson, importer)
+        loader.importPlaces(getStream(file, filename), PleiadesCrosswalk.fromJson, importer)
         
       case f if f.contains("geonames") =>
         Logger.info("Using GeoNames crosswalk")
         val loader = new StreamLoader()
-        loader.importPlaces(new FileInputStream(file), GeoNamesCrosswalk.fromJson, importer)
+        loader.importPlaces(getStream(file, filename), GeoNamesCrosswalk.fromJson, importer)
         
       // Bit of a hack for now...
       // case f if f.endsWith("json") && f.contains("lpf") =>
