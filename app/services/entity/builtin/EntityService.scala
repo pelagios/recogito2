@@ -1,6 +1,6 @@
 package services.entity.builtin
 
-import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.{Coordinate, Envelope}
 import java.util.UUID
 import scala.concurrent.Future
 import services.Page
@@ -44,6 +44,8 @@ trait EntityService {
     offset : Int = 0,
     limit  : Int = ES.MAX_SIZE
   ): Future[Page[IndexedEntity]]
+  
+  def getDocumentSpatialExtent(docId : String): Future[Envelope]
 
   def deleteBySourceAuthority(authority: String): Future[Boolean]
 

@@ -91,7 +91,6 @@ class DownloadsController @Inject() (
 
   def showDownloadOptions(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
     documentReadResponse(documentId, request.identity, { case (doc, accesslevel) =>
-      
       val fAnnotationCount = annotations.countByDocId(documentId)
       val fHasRelations = annotations.hasRelations(documentId)
       

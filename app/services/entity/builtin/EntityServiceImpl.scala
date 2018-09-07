@@ -3,12 +3,13 @@ package services.entity.builtin
 import com.sksamuel.elastic4s.{Hit, HitReader, Indexable}
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.searches.RichSearchResponse
-import com.vividsolutions.jts.geom.Coordinate
+import com.vividsolutions.jts.geom.{Coordinate, Envelope}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import org.elasticsearch.common.geo.GeoPoint
 import org.elasticsearch.search.aggregations.bucket.nested.InternalNested
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
+import org.elasticsearch.search.aggregations.metrics.geobounds.GeoBounds
 import org.elasticsearch.search.sort.SortOrder
 import play.api.Logger
 import play.api.libs.json.Json
@@ -180,6 +181,25 @@ class EntityServiceImpl @Inject()(
      }
     } map { toPage(_, offset, limit) }
   }
+  
+  /** Helper that aggregates the entity IDs referenced by the annotations
+    * in a given document.
+    */
+  private def aggregateEntityIds(docId: String): Future[Map[String, Long]] =
+    es.client execute {
+      search (ES.RECOGITO / ES.ANNOTATION) query {
+        termQuery("annotates.document_id" -> docId)
+      } aggregations (
+        nestedAggregation("per_body", "bodies") subaggs (
+          termsAggregation("by_union_id") field("bodies.reference.union_id") size ES.MAX_SIZE
+        )
+      ) size 0
+    } map { response =>
+      val terms = response.aggregations
+        .getAs[InternalNested]("per_body")
+        .getAggregations.get[StringTerms]("by_union_id")
+      parseTermsAggregation(terms)
+    }
 
   /** Lists entities in a document.
     *
@@ -193,22 +213,8 @@ class EntityServiceImpl @Inject()(
     offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Page[(IndexedEntity, Long)]] = {
 
     val startTime = System.currentTimeMillis
-
-    val fAggregateIds: Future[Map[String, Long]] =
-      es.client execute {
-        search (ES.RECOGITO / ES.ANNOTATION) query {
-          termQuery("annotates.document_id" -> docId)
-        } aggregations (
-          nestedAggregation("per_body", "bodies") subaggs (
-            termsAggregation("by_union_id") field("bodies.reference.union_id") size ES.MAX_SIZE
-          )
-        ) size 0
-      } map { response =>
-        val terms = response.aggregations
-          .getAs[InternalNested]("per_body")
-          .getAggregations.get[StringTerms]("by_union_id")
-        parseTermsAggregation(terms)
-      }
+    
+    val fAggregateIds = aggregateEntityIds(docId)
 
     def resolveEntities(unionIds: Seq[String]): Future[Seq[IndexedEntity]] =
       if (unionIds.isEmpty)
@@ -234,6 +240,34 @@ class EntityServiceImpl @Inject()(
 
       Page(took, 0l, 0, ES.MAX_SIZE, zipped)
     }
+  }
+  
+  override def getDocumentSpatialExtent(docId: String): Future[Envelope] = {
+    val fAggregateIds = aggregateEntityIds(docId)
+    
+    def toCoord(pt: GeoPoint) = new Coordinate(pt.getLon, pt.getLat)
+    
+    def aggregateCoverage(unionIds: Seq[String]) =
+      if (unionIds.isEmpty)
+        Future.successful(new Envelope())
+      else
+        es.client execute {
+          search(ES.RECOGITO / ES.ENTITY) query {
+            boolQuery.should (
+              unionIds.map(id => matchQuery("union_id", id))
+            )
+          } aggregations (
+            geoBoundsAggregation("point_bounds") field ("representative_point")
+          ) size 0
+        } map { response =>
+          val bounds = response.aggregations.getAs[GeoBounds]("point_bounds")
+          new Envelope(toCoord(bounds.bottomRight), toCoord(bounds.topLeft))
+        }
+  
+    for {
+      counts <- fAggregateIds
+      envelope <- aggregateCoverage(counts.map(_._1).toSeq)
+    } yield (envelope)
   }
 
   override def searchEntitiesInDocument(query: String, docId: String, eType: Option[EntityType] = None,
