@@ -22,6 +22,8 @@ import services.user.Roles._
 import org.webjars.play.WebJarsUtil
 import scala.concurrent.{ExecutionContext, Future}
 import storage.es.ES
+import better.files.{File => ScalaFile, _}
+import java.io.File
 
 case class AuthorityMetadata(
   identifier  : String,
@@ -76,7 +78,7 @@ class GazetteerAdminController @Inject() (
         val maybeImport = request.body.asMultipartFormData
           .flatMap(_.file("file"))
           .map { formData => 
-            importDumpfile(formData.ref.path.toFile, formData.filename, authorityMeta.identifier)
+            importGazetteerFile(formData.ref.path.toFile, formData.filename, authorityMeta.identifier)
           }
           
         authorities.upsert(
@@ -97,7 +99,20 @@ class GazetteerAdminController @Inject() (
       }
     )
   }
-  
+
+  private def importGazetteerFile(file: File, filename: String, identifier: String) = {
+    if (filename.toLowerCase.endsWith(".gz")) {
+      val filePath = file.getAbsolutePath()
+      val unzippedFilename : String = filename.slice(0, filename.length - 3)
+      val unzippedFilePath : String = filePath.slice(0, filePath.length - 3)
+      ScalaFile(filePath).unGzipTo(ScalaFile(unzippedFilePath))
+      importDumpfile(new File(unzippedFilePath), unzippedFilename, identifier)
+    }
+    else {
+      importDumpfile(file, filename, identifier)
+    }
+  }
+
   /** Temporary hack... **/
   private def importDumpfile(file: File, filename: String, identifier: String) = {
     val importer = importerFactory.createImporter(EntityType.PLACE)
