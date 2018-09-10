@@ -75,12 +75,22 @@ define([
 
               mergeOne = function(original) {
                 var bodiesToKeep = (newPlaceBodies.length > 0) ?
-                      original.bodies.filter(function(b) { return b.type != 'PLACE' }) :
+                      original.bodies.filter(function(b) {
+                        var isPlace = b.type == 'PLACE',
+                            isIdentical = AnnotationUtils.containsBodyOfValue(newPlaceBodies, b),
+
+                            // Remove all place bodies from the original, unless
+                            // they are identical to one in the list of new
+                            // place bodies.
+                            toRemove = isPlace && !isIdentical;
+
+                        return !toRemove; // false means 'remove'
+                      }) :
                       original.bodies,
 
                     bodiesToAppend = annotation.bodies.filter(function(b) {
                       // Don't append bodies which the original already has
-                      return !AnnotationUtils.containsBodyOfValue(bodiesToKeep, b);
+                      return !AnnotationUtils.containsBodyOfValue(original, b);
                     });
 
                 original.bodies = bodiesToKeep.concat(bodiesToAppend);
