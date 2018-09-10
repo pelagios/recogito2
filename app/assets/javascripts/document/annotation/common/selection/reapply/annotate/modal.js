@@ -51,7 +51,7 @@ define([], function() {
               '<div class="alert info reapply">' +
                 '<h1>Re-Apply</h1>' +
                 '<p class="message">' + message + '</p>' +
-                '<p class="buttons">' + buttons + '</div>' +
+                '<p class="buttons">' + buttons + '</p>' +
               '</div>' +
             '</div>').appendTo(document.body);
 
