@@ -9,7 +9,7 @@ define([
   'document/annotation/common/editor/editorRead',
   'document/annotation/common/editor/editorWrite',
   'document/annotation/common/page/loadIndicator',
-  'document/annotation/common/selection/reapply',
+  'document/annotation/common/selection/reapply/reapply',
   'document/annotation/common/baseApp',
   'document/annotation/text/page/toolbar',
   'document/annotation/text/relations/relationsLayer'
@@ -105,6 +105,7 @@ define([
         onDeleteAnnotation = function(annotation) {
           relationsLayer.deleteRelationsTo(annotation.annotation_id);
           self.onDeleteAnnotation(annotation);
+          reapply.reapplyDelete(annotation);
         },
 
         onUpdateRelations = function(annotation) {
