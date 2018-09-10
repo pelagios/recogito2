@@ -79,7 +79,8 @@ define([
                       original.bodies,
 
                     bodiesToAppend = annotation.bodies.filter(function(b) {
-                      return !AnnotationUtils.containsBodyOfValue(original, b);
+                      // Don't append bodies which the original already has
+                      return !AnnotationUtils.containsBodyOfValue(bodiesToKeep, b);
                     });
 
                 original.bodies = bodiesToKeep.concat(bodiesToAppend);

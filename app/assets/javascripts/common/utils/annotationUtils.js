@@ -44,9 +44,12 @@ define(function() {
      * value as the given body. Equality is checked according to the rules
      * of bodyValueEquals (above)
      */
-    containsBodyOfValue : function(annotation, body) {
-      var that = this;
-      return annotation.bodies.find(function(b) {
+    containsBodyOfValue : function(annotationOrListOfBodies, body) {
+      var that = this,
+          bodies = (jQuery.isArray(annotationOrListOfBodies)) ?
+            annotationOrListOfBodies : annotationOrListOfBodies.bodies;
+
+      return bodies.find(function(b) {
         return that.bodyValueEquals(b, body);
       });
     },
