@@ -18,7 +18,7 @@ import services.{ContentType, HasDate}
 import services.annotation._
 import services.annotation.relation._
 import services.contribution._
-import services.document.{DocumentService, DocumentInfo}
+import services.document.{DocumentService, DocumentInfo, RuntimeAccessLevel}
 import services.user.UserService
 import services.image.ImageService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
@@ -321,5 +321,65 @@ class AnnotationAPIController @Inject() (
       case None => Future.successful(NotFoundPage)
     }
   }
+  
+  def bulkDelete() = silhouette.SecuredAction.async { implicit request => jsonOp[Seq[UUID]] { ids =>
+    val username = request.identity.username
+    val now = DateTime.now
+    
+    // Shorthand for readability
+    def getDocumentIds(affectedAnnotations: Seq[Option[(Annotation, Long)]]) =
+      affectedAnnotations.flatten.map(_._1.annotates.documentId)
+      
+    // Deletes one annotation after checking access permissions
+    def deleteOne(annotation: Annotation, docsAndPermissions: Seq[(DocumentInfo, RuntimeAccessLevel)]) = {
+      val hasWritePermissions = docsAndPermissions
+        .find(_._1.id == annotation.annotates.documentId)
+        .map(_._2.canWrite)
+        .getOrElse(false)
+        
+      if (hasWritePermissions) {
+        annotationService
+          .deleteAnnotation(annotation.annotationId, username, now)
+          .map(_ => true) // True if delete is successful
+          .recover { case t: Throwable =>
+            t.printStackTrace()
+            Logger.error(s"Something went wrong while batch-deleting annotation ${annotation.annotationId}")
+            Logger.error(t.toString)
+            false // False in case stuff breaks 
+          } 
+      } else {
+        Logger.warn(s"Prevented malicious batch-delete attempt by user ${username}")
+        Future.successful(false)
+      }
+    }
+    
+    // Fetch affected annotations and documents
+    val f = for {
+      affectedAnnotations <- Future.sequence(ids.map(annotationService.findById))
+      affectedDocuments <- Future.sequence { 
+        getDocumentIds(affectedAnnotations).map { docId => 
+          documents.getExtendedInfo(docId, Some(username))
+        }
+      }
+    } yield (affectedAnnotations.flatten.map(_._1), affectedDocuments.flatten)
+    
+    // Bulk delete loop
+    val fBulkDelete = f.flatMap { case (annotations, docsAndPermissions) =>
+      // Delete annotations one by one, keeping a list of those that failed
+      annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (f, next) =>
+        f.flatMap { failed =>          
+          deleteOne(next, docsAndPermissions).map { success =>
+            if (success) failed else failed :+ next
+          }
+        }
+      }
+    } map { failed =>
+      if (!failed.isEmpty)
+        Logger.error(s"Failed to bulk-delete the following annotations: ${failed.map(_.annotationId).mkString}") 
+      failed.isEmpty
+    }
+    
+    fBulkDelete.map(success => if (success) Ok else InternalServerError)
+  }}
 
 }

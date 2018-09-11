@@ -134,7 +134,7 @@ define([
 
     reapply.on('create', self.onCreateAnnotationBatch.bind(self));
     reapply.on('update', self.upsertAnnotationBatch.bind(self));
-    // TODO reapply.on('delete', ...)
+    reapply.on('delete', self.onDeleteAnnotationBatch.bind(self));
 
     relationsLayer.on('updateRelations', onUpdateRelations);
 

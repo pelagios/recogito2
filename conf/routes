@@ -134,6 +134,7 @@ GET     /part/:id                                    controllers.document.annota
 POST    /api/annotation                              controllers.api.AnnotationAPIController.createAnnotation
 GET     /api/annotation/:id.jpg                      controllers.api.AnnotationAPIController.getImage(id: java.util.UUID)
 GET     /api/annotation/:id                          controllers.api.AnnotationAPIController.getAnnotation(id: java.util.UUID, context: Boolean ?= false)
+DELETE  /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkDelete
 DELETE  /api/annotation/:id                          controllers.api.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
 
 POST    /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkUpsert

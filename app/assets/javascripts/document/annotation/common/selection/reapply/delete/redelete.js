@@ -7,10 +7,8 @@ define([
 
     var actionHandlers = {},
 
-        onDelete = function(annotation, toDelete) {
-          console.log('reapplying delete');
-          console.log(annotation);
-          console.log('deleting ' + toDelete.length);
+        onDelete = function(toDelete) {
+          actionHandlers.delete(toDelete);
         },
 
         reapplyDelete = function(annotation) {
@@ -20,8 +18,8 @@ define([
                 return a.annotation_id != annotation.annotation_id;
               });
 
-          // if (annotated.length > 0)
-          //  Modal.prompt(quote, annotated, onDelete.bind(this, annotation, annotated));
+          if (annotated.length > 0)
+            Modal.prompt(quote, annotated, onDelete.bind(this, annotated));
         },
 
         on = function(evt, handler) {

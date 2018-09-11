@@ -289,6 +289,13 @@ define([
           rootNode.normalize();
         },
 
+        /** Shorthand **/
+        removeAnnotations = function(annotations) {
+          annotations.forEach(function(a) {
+            removeAnnotation(a);
+          });
+        },
+
         refreshAnnotation = function(annotation) {
           var spans = jQuery('[data-id=' + annotation.annotation_id + ']');
           if (spans.length === 0) {
@@ -388,6 +395,7 @@ define([
     this.initPage = initPage;
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
+    this.removeAnnotations = removeAnnotations;
     this.setColorscheme = setColorscheme;
     this.updateStyles = updateStyles;
     this.wrapRange = wrapRange;

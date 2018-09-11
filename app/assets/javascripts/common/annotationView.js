@@ -76,11 +76,16 @@ define([
 
         /** Removes an annotation or array of annotations to the view **/
         remove = function(a) {
-          var idx = annotations.indexOf(a);
-          if (idx > -1) {
-            annotations.splice(idx, 1);
-            resetDerivedSets();
-          }
+          var annotations = (jQuery.isArray(a)) ? a : [ a ],
+
+              removeOne = function(annotation) {
+                var idx = annotations.indexOf(annotation);
+                if (idx > -1)
+                  annotations.splice(idx, 1);
+              };
+
+          annotations.forEach(removeOne);
+          resetDerivedSets();
         },
 
         /** Filters annotations by any filter function **/

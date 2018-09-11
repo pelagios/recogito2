@@ -77,7 +77,7 @@ class AnnotationService @Inject() (
         Future.successful(failed)
       }
     }
-
+    
   def findById(annotationId: UUID): Future[Option[(Annotation, Long)]] =
     es.client execute {
       get(annotationId.toString) from ES.RECOGITO / ES.ANNOTATION

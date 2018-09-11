@@ -48,6 +48,14 @@ define([
       return jsRoutes.controllers.api.AnnotationAPIController.deleteAnnotation(id).ajax();
     },
 
+    deleteAnnotationBatch : function(ids) {
+      return jsRoutes.controllers.api.AnnotationAPIController.bulkDelete().ajax({
+        type: 'DELETE',
+        data: JSON.stringify(ids),
+        contentType: 'application/json'
+      });
+    },
+
     /** Place API **/
 
     getPlace : function(uri) {

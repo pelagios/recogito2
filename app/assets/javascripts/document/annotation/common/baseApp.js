@@ -121,9 +121,7 @@ define([
   BaseApp.prototype.onDeleteAnnotation = function(annotation) {
     var self = this;
 
-    // TODO restore when store fails?
     this.highlighter.removeAnnotation(annotation);
-
     API.deleteAnnotation(annotation.annotation_id)
        .done(function() {
          self.header.incrementAnnotationCount(-1);
@@ -131,6 +129,26 @@ define([
        })
        .fail(function(error) {
          self.header.showSaveError(error);
+       });
+  };
+
+  BaseApp.prototype.onDeleteAnnotationBatch = function(annotations) {
+    var self = this,
+        ids = annotations.map(function(a) {
+          return a.annotation_id;
+        });
+
+    self.header.showStatusSaving();
+    API.deleteAnnotationBatch(ids)
+       .done(function() {
+         self.highlighter.removeAnnotations(annotations);
+         self.annotations.remove(annotations);
+         self.header.incrementAnnotationCount(-annotations.length);
+         self.header.updateContributorInfo(Config.me);
+         self.header.showStatusSaved();
+       })
+       .fail(function(error) {
+         self.header.showSaveError();
        });
   };
 
