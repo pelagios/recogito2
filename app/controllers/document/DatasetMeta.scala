@@ -4,11 +4,27 @@ import com.vividsolutions.jts.geom.Envelope
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
 import services.document.DocumentInfo
+import services.generated.tables.DocumentFilepart
+import services.ContentType
 
 case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = None) {
 
   lazy val name = Option(doc.owner.getRealName).getOrElse(doc.ownerName) 
   
+  def image()(implicit request: RequestHeader) = doc.fileparts
+      .filter(_.getContentType.startsWith("IMAGE_"))
+      .headOption.map { filepart =>
+        ContentType.withName(filepart.getContentType).get match {  
+          case ContentType.IMAGE_UPLOAD =>
+            controllers.document.routes.DocumentController.getImageTile(doc.id, filepart.getSequenceNo, "TileGroup0/2-1-1.jpg").absoluteURL
+            
+          case ContentType.IMAGE_IIIF =>
+            s"${filepart.getFile.substring(0, filepart.getFile.length - 9)}square/256,256/0/default.jpg"
+            
+          case _ => "" // Can never happen
+        }
+      }
+      
   def sameAs()(implicit request: RequestHeader) =
     if (spatialCoverage.isDefined) // Canonical URL 
       JsNull
@@ -26,6 +42,7 @@ case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = No
         "name" -> doc.title,
         "description" -> doc.description, // TODO this is a mandatory parameter in Google's Dataset spec!
         "url" -> controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, 1).absoluteURL,
+        "image" -> image,
         "sameAs" -> sameAs,
         "creator" -> Json.obj(
           "@type" -> "Person",
