@@ -7,10 +7,26 @@ import services.document.DocumentInfo
 import services.generated.tables.DocumentFilepart
 import services.ContentType
 
-case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = None) {
+case class DatasetMeta(doc: DocumentInfo, annotationCount: Long, spatialCoverage: Option[Envelope] = None) {
 
-  lazy val name = Option(doc.owner.getRealName).getOrElse(doc.ownerName) 
+  lazy val name = 
+    if (doc.fileparts.forall(_.getContentType == ContentType.DATA_CSV.toString)) // Tabular data
+      s"""${doc.author.map(_ + ", ").getOrElse("")}${doc.title}"""
+    else
+      s"""Annotations: ${doc.author.map(_ + ", ").getOrElse("")}${doc.title}"""
+      
+  lazy val owner = Option(doc.owner.getRealName).getOrElse(doc.ownerName) 
   
+  lazy val license = doc.license.map { license => license.uri match {
+    case Some(uri) => uri.toString // Pick URI if available...
+    case None => license.name // or label as fallback
+  }}
+  
+  lazy val description = doc.description match {
+    case Some(d) => s"${d} (${annotationCount} annotations)"
+    case None => s"${annotationCount} annotations"
+  }
+    
   def image()(implicit request: RequestHeader) = doc.fileparts
       .filter(_.getContentType.startsWith("IMAGE_"))
       .headOption.map { filepart =>
@@ -39,14 +55,15 @@ case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = No
       Json.obj(
         "@context" -> "http://schema.org",
         "@type" -> "Dataset",
-        "name" -> doc.title,
-        "description" -> doc.description, // TODO this is a mandatory parameter in Google's Dataset spec!
+        "name" -> name,
+        "description" -> description,
         "url" -> controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, 1).absoluteURL,
         "image" -> image,
+        "license" -> license,
         "sameAs" -> sameAs,
         "creator" -> Json.obj(
           "@type" -> "Person",
-          "name" -> name,
+          "name" -> owner,
           "url" -> controllers.my.routes.MyRecogitoController.index(doc.ownerName, None, None, None, None, None).absoluteURL
         ),
         "distribution" -> Json.arr(
@@ -61,7 +78,7 @@ case class DatasetMeta(doc: DocumentInfo, spatialCoverage: Option[Envelope] = No
             "contentUrl" -> controllers.document.downloads.routes.DownloadsController.downloadGeoJSON(doc.id, false).absoluteURL
           )
         ),
-        "temporalCoverage" -> doc.dateFreeform, // TODO create structured dates if possible
+        "temporalCoverage" -> doc.dateFreeform,
         "spatialCoverage" -> spatialCoverage.map { env => Json.obj(
           "@type" -> "Place",
           "geo" -> Json.obj(
