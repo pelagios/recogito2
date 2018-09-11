@@ -73,5 +73,10 @@ class LandingController @Inject() (
       Ok(sitemap).as("text/plain")
     }
   }
+  
+  def robots() = Action { implicit request =>
+    val sitemapURL = routes.LandingController.sitemap().absoluteURL()
+    Ok(s"Sitemap: ${sitemapURL}").as("text/plain")
+  }
 
 }

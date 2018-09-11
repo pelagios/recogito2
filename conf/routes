@@ -184,6 +184,7 @@ GET     /:username/upload/progress/:docId            controllers.my.UploadContro
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /sitemap.txt                                 controllers.landing.LandingController.sitemap
+GET     /robots.txt                                  controllers.landing.LandingController.robots
 GET     /stats.json                                  controllers.landing.LandingController.getStats()
 GET     /                                            controllers.landing.LandingController.index
 
