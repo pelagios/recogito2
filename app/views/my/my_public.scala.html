@@ -9,21 +9,9 @@
     <title>@owner.username | Recogito</title>
     <meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,height=device-height,target-densitydpi=device-dpi,user-scalable=yes" />
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/my/index.css")"/>
-    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
-    <script>
-      jQuery(document).ready(function() {
-        $(".document-list tr").click(function() {
-          var id = jQuery(this).data('id'),
-              url = jsRoutes.controllers.document.annotation.AnnotationController
-                      .showAnnotationView(id, 1).absoluteURL();
-          window.location = url;
-        });
-      });
-    </script>
   </head>
   <body>
     <div class="page-header">
-
       <div class="user-section">
         <div class="user-info">
           <h1>@owner.username</h1>
@@ -63,15 +51,17 @@
           </thead>
           <tbody>
             @for(document <- documents.items) {
-              <tr class="document" data-id="@document.getId">
-                <td></td> <!-- content type icon -->
-                <td>@document.getAuthor</td>
-                <td>@document.getTitle</td>
-                <td>@document.getDateFreeform</td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
-              </tr>
+              @defining(controllers.document.annotation.routes.AnnotationController.showAnnotationView(document.getId, 1).absoluteURL()) { url =>
+                <tr class="document" data-id="@document.getId">
+                  <td></td> <!-- content type icon -->
+                  <td><a href="@url">@document.getAuthor</a></td>
+                  <td><a href="@url">@document.getTitle</a></td>
+                  <td><a href="@url">@document.getDateFreeform</a></td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+              }
             }
           </tbody>
         </table>
