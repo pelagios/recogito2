@@ -59,6 +59,12 @@ case class DatasetMeta(doc: DocumentInfo, annotationCount: Long, spatialCoverage
         "description" -> description,
         "url" -> controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, 1).absoluteURL,
         "image" -> image,
+        "includedInDataCatalog" -> Json.obj(
+          "@id" -> "http://recogito.pelagios.org",
+          "@type" -> "DataCatalog",
+          "description" -> "Recogito: semantic annotation without the pointy brackets. Open Source software by service by Pelagios.",
+          "url" -> "https://recogito.pelagios.org"          
+        ),
         "license" -> license,
         "sameAs" -> sameAs,
         "creator" -> Json.obj(
@@ -66,6 +72,7 @@ case class DatasetMeta(doc: DocumentInfo, annotationCount: Long, spatialCoverage
           "name" -> owner,
           "url" -> controllers.my.routes.MyRecogitoController.index(doc.ownerName, None, None, None, None, None).absoluteURL
         ),
+        "isAccessibleForFree" -> true,
         "distribution" -> Json.arr(
           Json.obj(
             "@type" -> "DataDownload",
