@@ -68,15 +68,15 @@ class LandingController @Inject() (
 
   def sitemap() = Action.async { implicit request =>
     documents.listOwnersWithPublicDocuments().map { users =>
-      val baseURL = routes.LandingController.index().absoluteURL() 
+      val baseURL = routes.LandingController.index().absoluteURL()
       val sitemap = users.map(user => s"${baseURL}${user}").mkString("\n")
       Ok(sitemap).as("text/plain")
     }
   }
-  
+
   def robots() = Action { implicit request =>
     val sitemapURL = routes.LandingController.sitemap().absoluteURL()
-    Ok(s"Sitemap: ${sitemapURL}").as("text/plain")
+    Ok(s"SITEMAP: ${sitemapURL}").as("text/plain")
   }
 
 }
