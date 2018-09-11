@@ -330,6 +330,18 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     
     Page(System.currentTimeMillis - startTime, total, offset, limit, items) 
   }
+  
+  /** Lists users who have at least one document with visibility set to PUBLIC **/
+  def listOwnersWithPublicDocuments(offset: Int = 0, limit: Int = 10000) = db.query { sql =>
+    sql.select(DOCUMENT.OWNER).from(DOCUMENT)
+      .where(DOCUMENT.PUBLIC_VISIBILITY
+        .equal(PublicAccess.PUBLIC.toString))
+      .groupBy(DOCUMENT.OWNER)
+      .limit(limit)
+      .offset(offset)
+      .fetch().into(classOf[String])
+      .toSeq
+  }
     
   /** Deletes a document by its ID, along with filepart records and files **/
   def delete(document: DocumentRecord): Future[Unit] = db.withTransaction { sql =>
