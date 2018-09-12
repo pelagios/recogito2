@@ -19,6 +19,7 @@ import services.annotation.relation.Relation
 import services.document.DocumentService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import transform.tiling.TilingService
+import services.document.PublicAccess
 
 trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
 
@@ -71,7 +72,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
         (json \ "edition").asOpt[String].getOrElse(null),
         (json \ "license").asOpt[String].getOrElse(null),
         (json \ "attribution").asOpt[String].getOrElse(null),
-        (json \ "public_visibility").asOpt[String].getOrElse(null),
+        (json \ "public_visibility").asOpt[String].getOrElse(PublicAccess.PRIVATE.toString),
         (json \ "public_access_level").asOpt[String].getOrElse(null))
     }
 
