@@ -59,7 +59,7 @@ define([], function() {
         var btn = jQuery(evt.target),
             action = btn.data('action');
 
-        actions[action]();
+        if (actions[action]) actions[action]();
 
         element.remove();
       });

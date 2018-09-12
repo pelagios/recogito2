@@ -75,7 +75,7 @@ define([
           if (unannotatedCount + annotated.length > 0)
             Modal.prompt(quote, unannotatedCount, annotated, {
               'MERGE': onMerge.bind(this, annotation, annotated),
-              'REPLACE': onReplace.bind(this, annotation, annotated)
+              'REPLACE': onReplace.bind(this, annotation, annotated),
             });
         };
 
