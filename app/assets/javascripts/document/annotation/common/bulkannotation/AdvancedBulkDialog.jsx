@@ -17,8 +17,8 @@ export default class AdvancedBulkOptions extends Component {
     };
   }
 
-  onOk() {
-    console.log('OK');
+  onOk(settings) {
+    console.log(settings);
   }
 
   render() {

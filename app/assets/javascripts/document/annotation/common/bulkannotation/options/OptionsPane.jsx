@@ -93,7 +93,9 @@ export default class OptionsPane extends Component {
             onChange={this.onChangeMergePolicy.bind(this)} />
         </CSSTransition>
 
-        <Footer onCancel={this.props.onCancel} />
+        <Footer
+          onOk={this.props.onOk.bind(this, this.state)}
+          onCancel={this.props.onCancel} />
       </div>
     )
   }

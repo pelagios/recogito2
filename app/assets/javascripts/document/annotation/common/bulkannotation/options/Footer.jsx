@@ -9,7 +9,9 @@ export default class Footer extends Component {
           className="btn outline"
           onClick={this.props.onCancel}>Cancel</button>
 
-        <button className="btn">Apply Changes</button>
+        <button
+          className="btn"
+          onClick={this.props.onOk}>Apply Changes</button>
       </div>
     )
   }
