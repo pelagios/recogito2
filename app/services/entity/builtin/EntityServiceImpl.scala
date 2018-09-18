@@ -266,7 +266,7 @@ class EntityServiceImpl @Inject()(
   
     for {
       counts <- fAggregateIds
-      envelope <- aggregateCoverage(counts.map(_._1).toSeq)
+      envelope <- aggregateCoverage(counts.map(_._1).toSeq.take(ES.MAX_CLAUSES))
     } yield (envelope)
   }
 

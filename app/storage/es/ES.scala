@@ -33,6 +33,9 @@ object ES extends ESSearchSanitizer {
 
   // Max. number of retries to do in case of failed imports
   val MAX_RETRIES        = 10
+  
+  // Max. number of boolean clauses in ES
+  val MAX_CLAUSES        = 1024
 
   def logFailures(response: RichBulkResponse): Boolean = {
     if (response.hasFailures)

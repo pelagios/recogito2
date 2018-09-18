@@ -114,6 +114,25 @@ define([
           });
         },
 
+        /**
+         * Filters annotations to those with a specific entity URI.
+         * Note that we'll need to adapt this method once we get more
+         * than just PLACE entity types.
+         */
+        filterByEntityURI = function(uri) {
+          return annotations.filter(function(a) {
+            // TODO needs extending once we have more than just places
+            var entityBodies = Utils.getBodiesOfType(a, 'PLACE'),
+                entityURIs = [];
+
+            entityBodies.forEach(function(b) {
+              if (b.uri) entityURIs.push(b);
+            });
+
+            return entityBodies.indexOf(uri) > -1;
+          });
+        },
+
         listContributors = function() {
           var getContributors = function(a) { return a.contributors; };
           collectIntoIfEmpty(getContributors, contributors);
