@@ -44,20 +44,22 @@ export default class MergePolicy extends Component {
           </SelectableOption>
         </ul>
 
-        <CSSTransition
-          classNames="no-admin-wrapper"
-          in={this.props.value == 'REPLACE'}
-          timeout={150}>
+        {!window.config.isAdmin &&
+          <CSSTransition
+            classNames="no-admin-wrapper"
+            in={this.props.value == 'REPLACE'}
+            timeout={150}>
 
-          <div className={(this.props.value == 'REPLACE') ? "no-admin-wrapper" : "no-admin-wrapper no-admin-wrapper-exit-done"}>
-            <div className="no-admin">
-              <span className="icon">{'\uf071'}</span> You do not have
-              administrator privileges for this document. This means you cannot
-              replace annotations that contain comments by other users. Recogito
-              will skip these annotations.
+            <div className={(this.props.value == 'REPLACE') ? "no-admin-wrapper" : "no-admin-wrapper no-admin-wrapper-exit-done"}>
+              <div className="no-admin">
+                <span className="icon">{'\uf071'}</span> You do not have
+                administrator privileges for this document. This means you cannot
+                replace annotations that contain comments by other users. Recogito
+                will skip these annotations.
+              </div>
             </div>
-          </div>
-        </CSSTransition>
+          </CSSTransition>
+        }
       </div>
     )
   }

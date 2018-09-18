@@ -1,0 +1,73 @@
+.options-pane {
+
+  .section.how-to-merge.how-to-merge-exit,
+  .section.how-to-merge.how-to-merge-exit-done {
+    max-height:0;
+    -webkit-transition:max-height 0.15s linear;
+  }
+
+  .section.how-to-merge.how-to-merge-enter,
+  .section.how-to-merge.how-to-merge-enter-done {
+    max-height:260px;
+    -webkit-transition:max-height 0.15s linear;
+  }
+
+  .section.how-to-merge {
+    margin:20px 0 10px 0;
+    overflow:hidden;
+    padding:0 20px;
+    max-height:260px;
+
+    p {
+      padding:5px 0 10px 0;
+      margin:0;
+    }
+
+    input {
+      margin:0;
+    }
+
+    ul strong {
+      font-weight:normal;
+      text-decoration:underline;
+      cursor:pointer;
+    }
+
+    .no-admin-wrapper {
+      max-height:90px;
+      overflow:hidden;
+    }
+
+    .no-admin {
+      display:inline-block;
+      background-color:#f2dede;
+      padding:8px 15px;
+      box-sizing:border-box;
+      border-radius:2px;
+      overflow:hidden;
+      border:1px solid #ebccd1;
+      margin:15px 0 0 0;
+      color:#a94442;
+
+      .icon {
+        font-size: 14px;
+        padding-right:2px;
+      }
+
+    }
+
+    .no-admin-wrapper-enter,
+    .no-admin-wrapper-enter-done {
+      max-height:90px;
+      -webkit-transition:max-height 0.15s linear;
+    }
+
+    .no-admin-wrapper-exit,
+    .no-admin-wrapper-exit-done {
+      max-height:10px;
+      -webkit-transition:max-height 0.15s linear;
+    }
+
+  }
+
+}
