@@ -35,7 +35,7 @@ export default class ApplyIf extends Component {
 
   render() {
     return(
-      <div className="section apply-when">
+      <div className="section apply-if">
         <h2>Apply this annotation if:</h2>
         <ul>
           <SelectableOption

@@ -40,7 +40,6 @@
         @views.html.document.annotation._prefs(prefs)
       }
     </script>
-    <script type="text/javascript" src="@routes.Assets.versioned("build/bulkannotation.js")"></script>
   </head>
   <body>
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit")
@@ -138,6 +137,9 @@
       <svg id="relations"></svg>
     </div>
 
+    <div id="bulk-annotation" />
+
+    <script type="text/javascript" src="@routes.Assets.versioned("build/bulkannotation.js")"></script>
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
       controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
@@ -148,5 +150,11 @@
       controllers.api.routes.javascript.PlaceAPIController.findPlaceByURI,
       controllers.api.routes.javascript.PlaceAPIController.searchPlaces
     )
+    <script>
+      jQuery(document).ready(function() {
+        var app = document.getElementById('bulk-annotation');
+        app.dispatchEvent(new Event('open'));
+      });
+    </script>
   </body>
 </html>

@@ -10,25 +10,22 @@ export default class App extends Component {
 
     this.state = { open : false };
 
-    // Hack for testing only
-    window.config = { isAdmin : false };
-
     const that = this;
-    that.domNode = document.getElementById('app');
-    that.domNode.addEventListener('react-open', function(evt) {
+    that.domNode = document.getElementById('bulk-annotation');
+    that.domNode.addEventListener('open', function(evt) {
       that.setState({ open : true });
     });
+  }
+
+  fireEvent(value) {
+    var evt = new Event('response');
+    evt.value = value;
+    this.domNode.dispatchEvent(evt);
   }
 
   onCancel() {
     this.setState({ open: false });
     this.fireEvent({ action: 'CANCEL' });
-  }
-
-  fireEvent(value) {
-    var evt = new Event('react-response');
-    evt.value = value;
-    this.domNode.dispatchEvent(evt);
   }
 
   render() {
@@ -44,4 +41,4 @@ export default class App extends Component {
 
 }
 
-render(<App />, document.getElementById('app'));
+render(<App />, document.getElementById('bulk-annotation'));

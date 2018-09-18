@@ -1,0 +1,48 @@
+@import "_howtomerge.less";
+
+.options-pane {
+  flex:1;
+  overflow-y:auto;
+  padding:5px 0;
+  font-size:17px;
+
+  .section {
+    padding:10px 20px;
+    box-sizing:border-box;
+
+    h2 {
+      font-weight:normal;
+      font-size:19px;
+      color:#4483c4;
+      padding-bottom:5px;
+    }
+
+  }
+
+  .apply-if {
+
+    em {
+      font-style:normal;
+    }
+
+    em::before {
+      content: '\00ab';
+    }
+
+    em::after {
+      content: '\00bb';
+    }
+
+  }
+
+  .match-stats {
+    background-color:@warning-msg-bg;
+    padding:8px 20px 8px 8px;
+    border-radius:2px;
+    border:1px solid @warning-msg-border;
+    margin:15px 20px 10px 20px;
+    color:@warning-msg-type;
+  }
+
+
+}

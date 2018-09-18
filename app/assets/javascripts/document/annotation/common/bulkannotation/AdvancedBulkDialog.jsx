@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import Draggable from 'react-draggable';
-import axios from 'axios';
 
 import { AnnotationList } from './common/annotationList.js';
-import ChangesStack from './changesStack/ChangesStack.jsx';
+import ChangeList from './changes/ChangeList.jsx';
 import OptionsPane from './options/OptionsPane.jsx';
 
 export default class AdvancedBulkOptions extends Component {
@@ -18,13 +17,6 @@ export default class AdvancedBulkOptions extends Component {
     };
   }
 
-  componentDidMount() {
-    axios.get('test/resources/annotations.json')
-      .then(result => {
-        this.setState({ annotations: new AnnotationList(result.data) });
-      });
-  }
-
   onOk() {
     console.log('OK');
   }
@@ -32,16 +24,16 @@ export default class AdvancedBulkOptions extends Component {
   render() {
     return(
       <div className="clicktrap">
-        <div className="modal-wrapper">
-          <Draggable handle=".modal-header">
-            <div className="modal advanced-bulk-options">
-              <div className="advanced-bulk-options-header modal-header">
+        <div className="bulkannotation-wrapper">
+          <Draggable handle=".bulkannotation-header">
+            <div className="bulkannotation">
+              <div className="bulkannotation-header">
                 <h1 className="title">Bulk Annotation</h1>
                 <button className="cancel nostyle" onClick={this.props.onCancel}>&#xe897;</button>
               </div>
 
-              <div className="advanced-bulk-options-body modal-body">
-                <ChangesStack />
+              <div className="bulkannotation-body">
+                <ChangeList />
 
                 <OptionsPane
                   quote={this.state.quote}

@@ -6,7 +6,7 @@ export default class ChangesOverview extends Component {
 
   render() {
     return(
-      <div className="changes-stack">
+      <div className="changes">
         <ul>
           <Change
             type="PLACE"
