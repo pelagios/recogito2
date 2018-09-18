@@ -8,7 +8,8 @@ var webpack = require('webpack'),
 module.exports = {
   mode: 'production',
   entry: {
-    gazetteers: path.join(srcPath, 'admin/gazetteers/App.jsx')
+    gazetteers: path.join(srcPath, 'admin/gazetteers/App.jsx'),
+    bulkannotation: path.join(srcPath, 'document/annotation/common/bulkannotation/App.jsx')
   },
   output: {
     path:path.resolve(__dirname, jsPath, '../build'),
