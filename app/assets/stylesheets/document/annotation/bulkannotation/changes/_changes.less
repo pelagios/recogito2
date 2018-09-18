@@ -6,33 +6,31 @@
   border-right:1px solid @lightgrey-border-darker;
   box-sizing:border-box;
 
-  .phrase, .change {
+  .delete, .change {
+    margin:5px 8px;
+    font-size:15px;
+    border-radius:3px;
     padding:10px;
+    box-shadow:1px 1px 3px rgba(0, 0, 0, 0.18);
   }
 
-  .phrase {
-    font-size:18px;
-    font-family:"Times New Roman", Times, serif;
-    font-style:italic;
-    text-align:center;
+  .delete {
+    color:#a94442;
+    background-color:#f2dede;
+    border:1px solid lighten(#a94442, 18%);
+  }
 
-    em::before {
-      content: '\00ab';
-    }
-
-    em::after {
-      content: '\00bb';
-    }
+  .delete::before {
+    font-family:FontAwesome;
+    font-size:17px;
+    padding-right:6px;
+    content:'\f00d';
   }
 
   .change {
-    margin:5px 8px;
-    font-size:15px;
     color:@ocean;
     background-color:lighten(@ocean, 42%);
     border:1px solid lighten(@ocean, 10%);
-    box-shadow:1px 1px 3px rgba(0, 0, 0, 0.18);
-    border-radius:3px;
   }
 
   .change::before {
