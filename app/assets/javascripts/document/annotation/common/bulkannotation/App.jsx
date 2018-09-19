@@ -18,6 +18,9 @@ export default class App extends Component {
     that.domNode = document.getElementById('bulk-annotation');
     that.domNode.addEventListener('open', function(evt) {
       const args = evt.args;
+
+      console.log(args);
+
       that.setState({
         open: true,
         mode: args.mode,

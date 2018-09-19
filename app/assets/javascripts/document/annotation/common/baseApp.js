@@ -124,6 +124,7 @@ define([
     this.highlighter.removeAnnotation(annotation);
     API.deleteAnnotation(annotation.annotation_id)
        .done(function() {
+         self.annotations.remove(annotation);
          self.header.incrementAnnotationCount(-1);
          self.header.showStatusSaved();
        })

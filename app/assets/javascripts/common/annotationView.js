@@ -76,15 +76,15 @@ define([
 
         /** Removes an annotation or array of annotations to the view **/
         remove = function(a) {
-          var annotations = (jQuery.isArray(a)) ? a : [ a ],
+          var toRemove = (jQuery.isArray(a)) ? a : [ a ],
 
-              removeOne = function(annotation) {
-                var idx = annotations.indexOf(annotation);
+              removeOne = function(one) {
+                var idx = annotations.indexOf(one);
                 if (idx > -1)
                   annotations.splice(idx, 1);
               };
-
-          annotations.forEach(removeOne);
+              
+          toRemove.forEach(removeOne);
           resetDerivedSets();
         },
 
