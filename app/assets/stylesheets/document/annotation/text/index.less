@@ -107,11 +107,29 @@ body {
   span.quote::before { content:'\00ab'; }
   span.quote::after { content:'\00bb'; }
 
-  .stacked button {
-    display:block;
-    padding:5px 30px;
-    margin:10px auto;
-    width:400px;
+  .stacked {
+    background-color:#fff;
+
+    button {
+      display:block;
+      padding:5px 30px;
+      margin:0 auto 10px auto;
+      width:400px;
+    }
+
+    .open-bulk-options {
+      padding-bottom:22px;
+      display:inline-block;
+      text-decoration:underline;
+      font-size:15px;
+      color:@lightblue-type;
+      cursor:pointer;
+    }
+
+    .open-bulk-options:hover {
+      color:@ocean;
+    }
+
   }
 
 }

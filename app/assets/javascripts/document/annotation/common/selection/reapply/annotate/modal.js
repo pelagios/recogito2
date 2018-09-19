@@ -29,16 +29,16 @@ define([], function() {
 
       getButtons = function(annotated) {
         if (annotated > 0)
-          return '<span class="stacked">' +
-            '<button class="btn" data-action="REPLACE">YES, replace existing annotations</button>' +
-            '<button class="btn" data-action="MERGE">YES, merge with existing annotations</button>' +
-            '<button class="btn outline" data-action="CANCEL">NO, don\'t re-apply</button>' +
-          '</span>';
+          return '<div class="stacked">' +
+            '<button class="btn action" data-action="MERGE">YES &amp; merge existing annotations</button>' +
+            '<button class="btn outline action" data-action="CANCEL">NO, don\'t re-apply</button>' +
+            '<span class="open-bulk-options action" data-action="ADVANCED">Show advanced options...</span>' +
+          '</div>';
         else
-          return '<span>' +
-            '<button class="btn" data-action="REPLACE">YES</button>' +
-            '<button class="btn outline" data-action="CANCEL">NO</button>' +
-          '</span>';
+          return '<div>' +
+            '<button class="btn action" data-action="REPLACE">YES</button>' +
+            '<button class="btn outline action" data-action="CANCEL">NO</button>' +
+          '</div>';
       };
 
   return {
@@ -51,11 +51,11 @@ define([], function() {
               '<div class="alert info reapply">' +
                 '<h1>Re-Apply</h1>' +
                 '<p class="message">' + message + '</p>' +
-                '<p class="buttons">' + buttons + '</p>' +
+                '<div class="buttons">' + buttons + '</div>' +
               '</div>' +
             '</div>').appendTo(document.body);
 
-      element.on('click', 'button', function(evt) {
+      element.on('click', '.action', function(evt) {
         var btn = jQuery(evt.target),
             action = btn.data('action');
 

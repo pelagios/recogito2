@@ -63,6 +63,13 @@ define([
             actionHandlers.update(toReplace);
         },
 
+        onAdvanced = function() {
+          var bulkEl = document.getElementById('bulk-annotation');
+          bulkEl.dispatchEvent(new Event('open'));
+
+          // TODO Append (and remove) response listener
+        },
+
         reapplyIfNeeded = function(annotation) {
           var quote = AnnotationUtils.getQuote(annotation),
 
@@ -75,7 +82,8 @@ define([
           if (unannotatedCount + annotated.length > 0)
             Modal.prompt(quote, unannotatedCount, annotated, {
               'MERGE': onMerge.bind(this, annotation, annotated),
-              'REPLACE': onReplace.bind(this, annotation, annotated)
+              'REPLACE': onReplace.bind(this, annotation, annotated),
+              'ADVANCED': onAdvanced.bind(this)
             });
         };
 
