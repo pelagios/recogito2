@@ -91,7 +91,7 @@ define([
 
               unannotatedCount = phraseAnnotator.countOccurrences(quote),
               annotated = annotations.filterByQuote(quote).filter(function(a) {
-                // Don't doublecount (or re-update) the current annotation
+                // Don't double-count (or re-update) the current annotation
                 return a.annotation_id != annotation.annotation_id;
               });
 
