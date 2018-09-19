@@ -121,7 +121,7 @@ class EntityServiceImpl @Inject()(
       case Seq(e) => Some(e)
       case results  =>
         Logger.warn(s"Search for ${uri} returned ${results.size} results")
-        None
+        Some(results.head)
     }}
 
   override def findConnected(uris: Seq[String]): Future[Seq[IndexedEntity]] =
