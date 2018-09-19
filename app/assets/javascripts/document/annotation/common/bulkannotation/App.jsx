@@ -18,12 +18,10 @@ export default class App extends Component {
     that.domNode = document.getElementById('bulk-annotation');
     that.domNode.addEventListener('open', function(evt) {
       const args = evt.args;
-
-      console.log(args);
-
       that.setState({
         open: true,
         mode: args.mode,
+        unannotatedMatches: args.unannotatedMatches,
         annotations: new AnnotationList(args.annotations),
         quote: AnnotationUtils.getQuote(args.original),
         original: args.original,
@@ -70,7 +68,8 @@ export default class App extends Component {
                     <OptionsPane
                       mode={this.state.mode}
                       quote={this.state.quote}
-                      unannotatedMatches={5}
+                      original={this.state.original}
+                      unannotatedMatches={this.state.unannotatedMatches}
                       annotations={this.state.annotations}
                       onOk={this.onOk.bind(this)}
                       onCancel={this.onCancel.bind(this)} />

@@ -57,4 +57,13 @@ export class AnnotationList {
     return new AnnotationList(filtered);
   }
 
+  /** Removes the annotation with the given annotation ID **/
+  removeById(id) {
+    const filtered = this._annotations.filter(a => {
+      return a.annotation_id != id;
+    });
+
+    return new AnnotationList(filtered);
+  }
+
 }

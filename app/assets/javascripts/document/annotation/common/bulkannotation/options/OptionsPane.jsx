@@ -25,10 +25,13 @@ export default class OptionsPane extends Component {
 
   computeMatches() {
     const computeAnnotated = () => {
-      const filteredByQuote = this.props.annotations.filterByQuote(this.props.quote);
+      const filtered = this.props.annotations
+        .filterByQuote(this.props.quote)
+        .removeById(this.props.original.annotation_id);
+
       return (this.state.applyIfStatus) ?
-        filteredByQuote.filterByVerificationStatus(this.state.applyIfStatus).length :
-        filteredByQuote.length;
+        filtered.filterByVerificationStatus(this.state.applyIfStatus).length :
+        filtered.length;
     }
 
     const annotated = (this.state.applyToAnnotated) ? computeAnnotated() : 0;
