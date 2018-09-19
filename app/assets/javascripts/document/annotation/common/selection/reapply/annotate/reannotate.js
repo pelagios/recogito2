@@ -63,9 +63,18 @@ define([
             actionHandlers.update(toReplace);
         },
 
-        onAdvanced = function() {
-          var bulkEl = document.getElementById('bulk-annotation');
-          bulkEl.dispatchEvent(new Event('open'));
+        onAdvanced = function(annotation, unannotatedCount) {
+          var bulkEl = document.getElementById('bulk-annotation'),
+              evt = new Event('open');
+
+          evt.args = {
+            mode: 'REAPPLY',
+            original: annotation,
+            annotations: annotations.listAnnotations(),
+            unannotatedMatches: unannotatedCount
+          };
+
+          bulkEl.dispatchEvent(evt);
 
           // TODO Append (and remove) response listener
         },
@@ -83,7 +92,7 @@ define([
             Modal.prompt(quote, unannotatedCount, annotated, {
               'MERGE': onMerge.bind(this, annotation, annotated),
               'REPLACE': onReplace.bind(this, annotation, annotated),
-              'ADVANCED': onAdvanced.bind(this)
+              'ADVANCED': onAdvanced.bind(this, annotation, unannotatedCount)
             });
         };
 
