@@ -30,13 +30,14 @@ export default class App extends Component {
     });
   }
 
-  fireEvent(type, value) {
+  fireEvent(type, args) {
     var evt = new Event(type);
-    if (value) evt.value = value;
+    if (args) evt.args = args;
     this.domNode.dispatchEvent(evt);
   }
 
   onOk(settings) {
+    this.setState({ open: false });
     this.fireEvent('ok', settings);
   }
 

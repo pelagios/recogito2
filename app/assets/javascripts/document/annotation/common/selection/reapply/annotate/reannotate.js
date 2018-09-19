@@ -66,7 +66,13 @@ define([
 
         onAdvanced = function(annotation, unannotatedCount) {
           var bulkEl = document.getElementById('bulk-annotation'),
-              evt = new Event('open');
+              evt = new Event('open'),
+
+              okListener = function(evt) {
+                console.log('Received answer:');
+                console.log(evt.args);
+                bulkEl.removeEventListener('ok', okListener, false);
+              }
 
           evt.args = {
             mode: 'REAPPLY',
@@ -77,8 +83,7 @@ define([
           };
 
           bulkEl.dispatchEvent(evt);
-
-          // TODO Append (and remove) response listener
+          bulkEl.addEventListener('ok', okListener);
         },
 
         reapplyIfNeeded = function(annotation) {

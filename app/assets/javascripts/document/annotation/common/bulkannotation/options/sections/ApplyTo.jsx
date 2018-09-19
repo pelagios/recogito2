@@ -28,11 +28,6 @@ export default class ApplyTo extends Component {
             checked={this.props.applyToUnannotated}
             onChange={this.toggle.bind(this, 'applyToUnannotated')}
             disabled={disabled}>unannotated matches</SelectableOption>
-
-          {/* <SelectableOption
-            id="to-below"
-            checked={this.props.applyToBelowOnly}
-            onChange={this.toggle.bind(this, 'applyToBelowOnly')}> matches <u>below</u> this annotation only</SelectableOption> */}
         </ul>
       </div>
     )

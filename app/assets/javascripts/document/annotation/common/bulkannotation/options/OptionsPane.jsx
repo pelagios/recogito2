@@ -18,7 +18,6 @@ export default class OptionsPane extends Component {
       applyIfStatus     : null, // Status value or null
       applyToAnnotated  : true,
       applyToUnannotated: true,
-      applyToBelowOnly  : false,
       mergePolicy       : 'APPEND',
     };
   }
@@ -80,7 +79,6 @@ export default class OptionsPane extends Component {
           <ApplyTo
             applyToAnnotated={this.state.applyToAnnotated}
             applyToUnannotated={this.state.applyToUnannotated}
-            applyToBelowOnly={this.state.applyToBelowOnly}
             onChange={this.onChangeApplyTo.bind(this)} />
         }
 
@@ -103,6 +101,7 @@ export default class OptionsPane extends Component {
 
         <Footer
           mode={this.props.mode}
+          onOk={this.props.onOk.bind(this, this.state)}
           onCancel={this.props.onCancel} />
       </div>
     )
