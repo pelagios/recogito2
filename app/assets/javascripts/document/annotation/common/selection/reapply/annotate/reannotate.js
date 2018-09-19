@@ -1,7 +1,8 @@
 define([
   'common/utils/annotationUtils',
+  'common/utils/placeUtils',
   'document/annotation/common/selection/reapply/annotate/modal'
-], function(AnnotationUtils, Modal) {
+], function(AnnotationUtils, PlaceUtils, Modal) {
 
   var ReAnnotate = function(phraseAnnotator, annotations) {
 
@@ -71,7 +72,8 @@ define([
             mode: 'REAPPLY',
             original: annotation,
             annotations: annotations.listAnnotations(),
-            unannotatedMatches: unannotatedCount
+            unannotatedMatches: unannotatedCount,
+            uriParser:PlaceUtils.parseURI
           };
 
           bulkEl.dispatchEvent(evt);

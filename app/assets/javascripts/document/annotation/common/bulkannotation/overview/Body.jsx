@@ -5,6 +5,7 @@ export default class Body extends Component {
   /** Returns a suitable screen label for the body, based on its type **/
   getLabel(quote, body) {
     const t = body.type; // Shorthand
+    const uri = (body.uri) ? this.props.uriParser(body.uri) : null;
 
     if (t == 'TAG')
       return value;
@@ -13,7 +14,9 @@ export default class Body extends Component {
     else if (t == 'PERSON' || t == 'EVENT')
       return quote;
     else if (t == 'PLACE')
-      return (body.uri) ? body.uri : quote;
+      return (uri) ?
+        ((uri.shortcode) ? `${uri.shortcode}:${uri.id}` : uri): 
+        quote;
     else
       return null;
   }

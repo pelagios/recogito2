@@ -20,7 +20,8 @@ export default class Overview extends Component {
             <Body
               key={index}
               quote={this.props.quote}
-              data={body} />
+              data={body}
+              uriParser={this.props.uriParser} />
           ) : (
             <Delete />
           )

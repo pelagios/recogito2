@@ -23,7 +23,8 @@ export default class App extends Component {
         mode: args.mode,
         annotations: new AnnotationList(args.annotations),
         quote: AnnotationUtils.getQuote(args.original),
-        original: args.original
+        original: args.original,
+        uriParser: args.uriParser
       });
     });
   }
@@ -60,7 +61,8 @@ export default class App extends Component {
                     <Overview
                       mode={this.state.mode}
                       quote={this.state.quote}
-                      original={this.state.original} />
+                      original={this.state.original}
+                      uriParser={this.state.uriParser /* legacy hack... */} />
 
                     <OptionsPane
                       mode={this.state.mode}
