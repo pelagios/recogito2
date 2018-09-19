@@ -35,8 +35,12 @@ export default class ApplyIf extends Component {
 
   render() {
     return(
-      <div className="section apply-if">
-        <h2>Apply this annotation if:</h2>
+      <div className="section apply-when">
+        {(this.props.mode == 'REAPPLY') ? (
+          <h2>Apply this annotation if:</h2>
+        ):(
+          <h2>Delete annotations if:</h2>
+        )}
         <ul>
           <SelectableOption
             id="when-phrase-matches"
@@ -63,5 +67,4 @@ export default class ApplyIf extends Component {
       </div>
     )
   }
-
 }

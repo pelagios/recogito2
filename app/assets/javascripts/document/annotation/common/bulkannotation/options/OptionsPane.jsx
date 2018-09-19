@@ -59,7 +59,6 @@ export default class OptionsPane extends Component {
   }
 
   onChangeMergePolicy(value) {
-    console.log(this.props.annotations);
     this.setState({ mergePolicy: value });
   }
 
@@ -69,32 +68,38 @@ export default class OptionsPane extends Component {
     return(
       <div className="options-pane">
         <ApplyIf
+          mode={this.props.mode}
           quote={this.props.quote}
           status={this.state.applyIfStatus}
           onChange={this.onChangeApplyIf.bind(this)} />
 
-        <ApplyTo
-          applyToAnnotated={this.state.applyToAnnotated}
-          applyToUnannotated={this.state.applyToUnannotated}
-          applyToBelowOnly={this.state.applyToBelowOnly}
-          onChange={this.onChangeApplyTo.bind(this)} />
+        {this.props.mode == 'REAPPLY' &&
+          <ApplyTo
+            applyToAnnotated={this.state.applyToAnnotated}
+            applyToUnannotated={this.state.applyToUnannotated}
+            applyToBelowOnly={this.state.applyToBelowOnly}
+            onChange={this.onChangeApplyTo.bind(this)} />
+        }
 
         <MatchSummary
+          mode={this.props.mode}
           total={stats.total}
           annotated={stats.annotated}
           unannotated={stats.unannotated} />
 
-        <CSSTransition
-          classNames="how-to-merge"
-          in={this.state.applyToAnnotated}
-          timeout={200}>
-          <HowToMerge
-            value={this.state.mergePolicy}
-            onChange={this.onChangeMergePolicy.bind(this)} />
-        </CSSTransition>
+        {this.props.mode == 'REAPPLY' &&
+          <CSSTransition
+            classNames="how-to-merge"
+            in={this.state.applyToAnnotated}
+            timeout={200}>
+            <HowToMerge
+              value={this.state.mergePolicy}
+              onChange={this.onChangeMergePolicy.bind(this)} />
+          </CSSTransition>
+        }
 
         <Footer
-          onOk={this.props.onOk.bind(this, this.state)}
+          mode={this.props.mode}
           onCancel={this.props.onCancel} />
       </div>
     )

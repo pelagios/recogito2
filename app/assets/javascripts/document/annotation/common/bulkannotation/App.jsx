@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 import Draggable from 'react-draggable';
 
-import { AnnotationList } from './common/annotationList.js';
-import ChangeList from './changes/ChangeList.jsx';
+import { AnnotationList } from './common/AnnotationList.js';
+import { AnnotationUtils } from './common/AnnotationUtils.js';
+import Overview from './overview/Overview.jsx';
 import OptionsPane from './options/OptionsPane.jsx';
 
 export default class App extends Component {
@@ -11,19 +12,19 @@ export default class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      open: false,
-      mode: 'REAPPLY',
-      quote: 'Olympus',
-      unannotatedMatches: 5,
-      annotations: new AnnotationList([])
-    };
+    this.state = { open: false };
 
     const that = this;
     that.domNode = document.getElementById('bulk-annotation');
     that.domNode.addEventListener('open', function(evt) {
-      console.log(evt.args);
-      that.setState({ open : true });
+      const args = evt.args;
+      that.setState({
+        open: true,
+        mode: args.mode,
+        annotations: new AnnotationList(args.annotations),
+        quote: AnnotationUtils.getQuote(args.original),
+        original: args.original
+      });
     });
   }
 
@@ -56,9 +57,13 @@ export default class App extends Component {
                   </div>
 
                   <div className="bulkannotation-body">
-                    <ChangeList />
+                    <Overview
+                      mode={this.state.mode}
+                      quote={this.state.quote}
+                      original={this.state.original} />
 
                     <OptionsPane
+                      mode={this.state.mode}
                       quote={this.state.quote}
                       unannotatedMatches={5}
                       annotations={this.state.annotations}

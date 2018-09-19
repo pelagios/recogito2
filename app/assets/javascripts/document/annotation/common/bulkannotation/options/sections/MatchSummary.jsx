@@ -7,8 +7,14 @@ export default class MatchSummary extends Component {
   render() {
     return (
       <div className="section match-stats">
-        Your change will affect{' '}
-        <u className="total">{this.props.total} matches</u>
+        {(this.props.mode == 'REAPPLY') ? (
+          'Your change will affect '
+        ) : (
+          'You are about to delete '
+        )}
+        <u className="total">{this.props.total}
+        {(this.props.mode == 'REAPPLY') ? (' matches') : (' annotations')}
+        </u>
         {(this.props.annotated > 0 && this.props.unannotated > 0) &&
           <React.Fragment>
             {'\u2014 '}

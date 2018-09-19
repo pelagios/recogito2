@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class ChangesOverview extends Component {
+export default class Delete extends Component {
 
   render() {
     return(

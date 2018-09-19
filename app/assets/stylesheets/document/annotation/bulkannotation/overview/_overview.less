@@ -1,4 +1,4 @@
-.changes {
+.overview {
   padding-top:5px;
   box-shadow:inset -5px 6px 3px -5px rgba(0, 0, 0, 0.12);
   background-color:lighten(@blueish-white, 1%);
@@ -6,7 +6,7 @@
   border-right:1px solid @lightgrey-border-darker;
   box-sizing:border-box;
 
-  .delete, .change {
+  .delete, .body {
     margin:5px 8px;
     font-size:15px;
     border-radius:3px;
@@ -27,13 +27,16 @@
     content:'\f00d';
   }
 
-  .change {
+  .body {
     color:@ocean;
     background-color:lighten(@ocean, 42%);
     border:1px solid lighten(@ocean, 10%);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
 
-  .change::before {
+  .body::before {
     font-family:FontAwesome;
     font-size:17px;
     padding-right:8px;
@@ -41,11 +44,11 @@
     top:1px;
   }
 
-  .change.PLACE::before {
+  .body.PLACE::before {
     content:'\f041';
   }
 
-  .change.TAG::before {
+  .body.TAG::before {
     content:'\f02b';
   }
 
