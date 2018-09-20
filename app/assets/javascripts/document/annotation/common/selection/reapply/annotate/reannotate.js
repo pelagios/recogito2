@@ -1,8 +1,9 @@
 define([
+  'common/config',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
   'document/annotation/common/selection/reapply/annotate/modal'
-], function(AnnotationUtils, PlaceUtils, Modal) {
+], function(Config, AnnotationUtils, PlaceUtils, Modal) {
 
   var ReAnnotate = function(phraseAnnotator, annotations) {
 
@@ -59,8 +60,16 @@ define([
          */
         replaceAnnotated = function(annotation, toApply) {
           var isAllowed = function(annotation) {
-                // TODO implement
-                return true;
+                if (Config.isAdmin)
+                  return true;
+
+                var commentsByOthers =
+                       AnnotationUtils.getBodiesOfType(annotation, 'COMMENT')
+                         .filter(function(b) {
+                           return b.last_modified_by != Config.me;
+                       });
+
+                return commentsByOthers.length == 0;
               };
 
           toApply.forEach(function(applied) {
