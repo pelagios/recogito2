@@ -5,6 +5,7 @@ import ApplyIf from './sections/ApplyIf.jsx';
 import ApplyTo from './sections/ApplyTo.jsx';
 import MatchSummary from './sections/MatchSummary.jsx';
 import HowToMerge from './sections/HowToMerge.jsx';
+import NoAdminWarning from './sections/NoAdminWarning.jsx';
 
 import SelectableOption from './SelectableOption.jsx';
 import Footer from './Footer.jsx';
@@ -87,6 +88,10 @@ export default class OptionsPane extends Component {
           total={stats.total}
           annotated={stats.annotated}
           unannotated={stats.unannotated} />
+
+        {this.props.mode == 'DELETE' &&
+          <NoAdminWarning visible={true} />
+        }
 
         {this.props.mode == 'REAPPLY' &&
           <CSSTransition

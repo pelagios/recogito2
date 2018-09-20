@@ -48,6 +48,41 @@
     color:@warning-msg-type;
   }
 
+  .no-admin-wrapper {
+    max-height:90px;
+    overflow:hidden;
+  }
+
+  .no-admin {
+    display:inline-block;
+    background-color:#f2dede;
+    padding:8px 15px;
+    box-sizing:border-box;
+    border-radius:2px;
+    overflow:hidden;
+    border:1px solid #ebccd1;
+    margin:15px 20px 0 20px;
+    color:#a94442;
+
+    .icon {
+      font-size: 14px;
+      padding-right:2px;
+    }
+
+  }
+
+  .no-admin-wrapper-enter,
+  .no-admin-wrapper-enter-done {
+    max-height:90px;
+    -webkit-transition:max-height 0.15s linear;
+  }
+
+  .no-admin-wrapper-exit,
+  .no-admin-wrapper-exit-done {
+    max-height:10px;
+    -webkit-transition:max-height 0.15s linear;
+  }
+
   .footer {
     padding:15px;
     text-align:right;
