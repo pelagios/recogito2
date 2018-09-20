@@ -8,12 +8,109 @@ define([
 
     var actionHandlers = {},
 
-        /** Re-applies the annotation to the un-annotated text **/
+        /**
+         * Helper to check if a list of bodies contains the
+         * given body. NOTE: this method uses
+         * AnnotationUtils.bodyValueEquals(), which checks
+         * for equality based only on type/value/URI, ignoring
+         * creator, timestamp (or object equality).
+         */
+        containsBody = function(list, body) {
+          return list.find(function(b) {
+            return AnnotationUtils.bodyValueEquals(b, body);
+          });
+        },
+
+        /**
+         * Helper function that compares bodiesToFilter with refBodies,
+         * and removes bodies that exist in refBodies from bodiesToFilter.
+         * We're using this to make sure APPEND operations don't repeat
+         * annotation bodies that already exist in the original annotation.
+         */
+        removeBodies = function(refBodies, bodiesToFilter) {
+          return bodiesToFilter.filter(function(b) {
+            return !containsBody(refBodies, b);
+          });
+        },
+
+        /**
+         * Helper function to find bodies that appear in both lists.
+         */
+        intersectBodies = function(bodiesA, bodiesB) {
+          var intersection = [];
+
+          bodiesA.forEach(function(b) {
+            if (containsBody(bodiesB, b))
+              intersection.push(b);
+          });
+          
+          return intersection;
+        },
+
+        /**
+         * Re-applies the annotation to the un-annotated text
+         */
         reapplyToUnannotated = function(annotation) {
           var selections = phraseAnnotator.createSelections(annotation);
           if (selections.length > 0 && actionHandlers.create)
             actionHandlers.create(selections);
-        }
+        },
+
+        /**
+         * Re-applies the annotation to annotated matches, using
+         * REPLACE as a merge strategy. Optionally filters by verification
+         * status.
+         *
+         * Will take into account admin status and potential privilege
+         * conflicts. (They will be re-checked at the server-side anyway. But
+         * by checking on the client, we avoid out-of-sync conflicts upfront.)
+         */
+        replaceAnnotated = function(annotation, toApply, opt_status) {
+
+          var isAllowed = function(annotation) {
+                // TODO implement
+                return true;
+              };
+
+          // TODO filter for status
+
+          toApply.forEach(function(applied) {
+            if (isAllowed(applied)) {
+              var origBodies = applied.bodies,
+                  bodiesToKeep = intersectBodies(origBodies, annotation.bodies);
+                  bodiesToAppend = removeBodies(bodiesToKeep, annotation.bodies);
+                  updatedBodies = bodiesToKeep.concat(bodiesToAppend);
+              applied.bodies = updatedBodies;
+            }
+          });
+        },
+
+        /**
+         * Re-applies the annotation to annotated matches, using
+         * APPEND as a merge strategy. Optionally filters by annotation status.
+         */
+        appendToAnnotated = function(annotation, toApply, opt_status) {
+
+          // TODO filter for status
+
+          toApply.forEach(function(applied) {
+            var origBodies = applied.bodies,
+                bodiesToAppend = removeBodies(origBodies, annotation.bodies);
+                updatedBodies = origBodies.concat(bodiesToAppend);
+            applied.bodies = updatedBodies;
+          });
+        },
+
+        /**
+         * Re-applies the annotation to annotated matches, using
+         * MIXED MERGE as a merge strategy. Optionally filters by annotation
+         * status.
+         */
+        mergeWithAnnotated = function(annotation, toApply, opt_status) {
+
+          // TODO implement
+
+        },
 
         onReplace = function(annotation, toReplace) {
           reapplyToUnannotated(annotation); // Nothing to replace here
