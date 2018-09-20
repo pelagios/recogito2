@@ -43,8 +43,14 @@ define([
             if (containsBody(bodiesB, b))
               intersection.push(b);
           });
-          
+
           return intersection;
+        },
+
+        clone = function(bodies) {
+          return bodies.map(function(body) {
+            return jQuery.extend({}, body);
+          });
         },
 
         /**
@@ -65,20 +71,17 @@ define([
          * conflicts. (They will be re-checked at the server-side anyway. But
          * by checking on the client, we avoid out-of-sync conflicts upfront.)
          */
-        replaceAnnotated = function(annotation, toApply, opt_status) {
-
+        replaceAnnotated = function(annotation, toApply) {
           var isAllowed = function(annotation) {
                 // TODO implement
                 return true;
               };
 
-          // TODO filter for status
-
           toApply.forEach(function(applied) {
             if (isAllowed(applied)) {
               var origBodies = applied.bodies,
                   bodiesToKeep = intersectBodies(origBodies, annotation.bodies);
-                  bodiesToAppend = removeBodies(bodiesToKeep, annotation.bodies);
+                  bodiesToAppend = clone(removeBodies(bodiesToKeep, annotation.bodies));
                   updatedBodies = bodiesToKeep.concat(bodiesToAppend);
               applied.bodies = updatedBodies;
             }
@@ -89,13 +92,10 @@ define([
          * Re-applies the annotation to annotated matches, using
          * APPEND as a merge strategy. Optionally filters by annotation status.
          */
-        appendToAnnotated = function(annotation, toApply, opt_status) {
-
-          // TODO filter for status
-
+        appendToAnnotated = function(annotation, toApply) {
           toApply.forEach(function(applied) {
             var origBodies = applied.bodies,
-                bodiesToAppend = removeBodies(origBodies, annotation.bodies);
+                bodiesToAppend = clone(removeBodies(origBodies, annotation.bodies));
                 updatedBodies = origBodies.concat(bodiesToAppend);
             applied.bodies = updatedBodies;
           });
@@ -106,26 +106,13 @@ define([
          * MIXED MERGE as a merge strategy. Optionally filters by annotation
          * status.
          */
-        mergeWithAnnotated = function(annotation, toApply, opt_status) {
+        mergeWithAnnotated = function(annotation, toApply) {
 
           // TODO implement
 
         },
 
-        onReplace = function(annotation, toReplace) {
-          reapplyToUnannotated(annotation); // Nothing to replace here
-
-          // For each annotation to replace, copy bodies from source annotation
-          toReplace.forEach(function(replaced) {
-            replaced.bodies = annotation.bodies.map(function(body) {
-              return jQuery.extend({}, body);
-            });
-          });
-
-          if (toReplace.length > 0 && actionHandlers.update)
-            actionHandlers.update(toReplace);
-        },
-
+        /*
         onMerge = function(annotation, toReplace) {
           // By convention, "merge" replaces the current place bodies,
           // and appends all other bodies
@@ -160,14 +147,55 @@ define([
           if (toReplace.length > 0 && actionHandlers.update)
             actionHandlers.update(toReplace);
         },
+        */
 
-        onAdvanced = function(annotation, unannotatedCount) {
+        /** Triggered from the first (non-advanced) panel **/
+        onQuickMerge = function(annotation, toReplace) {
+          if (toReplace.length > 0) {
+            reapplyToUnannotated(annotation);
+            mergeWithAnnotated(annotation, toReplace);
+            if (actionHandlers.update)
+              actionHandlers.update(toReplace);
+          }
+        },
+
+        getAnnotationsToModify = function(original, opt_status) {
+          var quote = AnnotationUtils.getQuote(original),
+              filtered = annotations.filterByQuote(quote).filter(function(a) {
+                // Don't double-count (or re-update) the original annotation
+                return a.annotation_id != original.annotation_id;
+              });
+
+          return (opt_status) ? filtered.filter(function(a) {
+            return true; // TODO implement
+          }) : filtered;
+        },
+
+        executeAdvanced = function(annotation, args) {
+          var toApply = (args.applyToAnnotated) ?
+            getAnnotationsToModify(annotation, args.applyIfStatus) : false ;
+
+          if (args.applyToUnannotated)
+            reapplyToUnannotated(annotation);
+
+          if (args.applyToAnnotated) {
+            if (args.mergePolicy == 'APPEND')
+              appendToAnnotated(annotation, toApply);
+
+            else if (args.mergePolicy == 'REPLACE')
+              replaceAnnotated(annotation, toApply);
+
+            else if (args.mergePolicy == 'MIXED') {}
+              mergeWithAnnotated(annotation, toApply);
+          }
+        },
+
+        onGoAdvanced = function(annotation, unannotatedCount) {
           var bulkEl = document.getElementById('bulk-annotation'),
               evt = new Event('open'),
 
               okListener = function(evt) {
-                console.log('Received answer:');
-                console.log(evt.args);
+                executeAdvanced(annotation, evt.args);
                 bulkEl.removeEventListener('ok', okListener, false);
               }
 
@@ -185,18 +213,13 @@ define([
 
         reapplyIfNeeded = function(annotation) {
           var quote = AnnotationUtils.getQuote(annotation),
-
               unannotatedCount = phraseAnnotator.countOccurrences(quote),
-              annotated = annotations.filterByQuote(quote).filter(function(a) {
-                // Don't double-count (or re-update) the current annotation
-                return a.annotation_id != annotation.annotation_id;
-              });
+              annotated = getAnnotationsToModify(annotation);
 
           if (unannotatedCount + annotated.length > 0)
             Modal.prompt(quote, unannotatedCount, annotated, {
-              'MERGE': onMerge.bind(this, annotation, annotated),
-              'REPLACE': onReplace.bind(this, annotation, annotated),
-              'ADVANCED': onAdvanced.bind(this, annotation, unannotatedCount)
+              'MERGE': onQuickMerge.bind(this, annotation, annotated),
+              'ADVANCED': onGoAdvanced.bind(this, annotation, unannotatedCount)
             });
         };
 
