@@ -11,8 +11,20 @@ define([
           actionHandlers.delete(toDelete);
         },
 
-        executeAdvanced = function(args) {
-          console.log(args);
+        executeAdvanced = function(annotation, args) {
+          var quote = AnnotationUtils.getQuote(annotation),
+              status = args.applyIfStatus,
+
+              filtered = annotations.filterByQuote(quote),
+
+              toDelete = (status) ?
+                filtered.filter(function(a) {
+                  var statusValues = AnnotationUtils.getStatus(a);
+                  // Note: we're only evaluating the first status
+                  return (statusValues.length > 0) && statusValues[0] == status;
+                }) : filtered;
+
+          onDelete(toDelete);
         },
 
         onGoAdvanced = function(annotation) {

@@ -9,9 +9,15 @@ export default class Footer extends Component {
           className="btn outline"
           onClick={this.props.onCancel}>Cancel</button>
 
-        <button
-          className="btn"
-          onClick={this.props.onOk}>Apply Changes</button>
+        {(this.props.mode == 'REAPPLY') ? (
+          <button
+            className="btn"
+            onClick={this.props.onOk}>Apply Changes</button>
+        ):(
+          <button
+            className="btn"
+            onClick={this.props.onOk}>Delete</button>
+        )}
       </div>
     )
   }
