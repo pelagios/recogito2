@@ -8,7 +8,7 @@ export default class ApplyIf extends Component {
     super(props);
     this.state = {
       checked: this.props.status != null,
-      status: this.props.status || 'NOT_VERIFIED'
+      status: this.props.status || 'UNVERIFIED'
     };
   }
 
@@ -58,7 +58,7 @@ export default class ApplyIf extends Component {
             <select
               value={this.state.status}
               onChange={this.onChangeStatus.bind(this)}>
-              <option value="NOT_VERIFIED">Not Verified</option>
+              <option value="UNVERIFIED">Not Verified</option>
               <option value="VERIFIED">Verified</option>
               <option value="NOT_IDENTIFIABLE">Flagged</option>
             </select>

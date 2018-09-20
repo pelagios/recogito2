@@ -141,7 +141,9 @@ define([
               });
 
           return (opt_status) ? filtered.filter(function(a) {
-            return true; // TODO implement
+            var statusValues = AnnotationUtils.getStatus(a);
+            // Note: we're only evaluating the first status
+            return (statusValues.length > 0) && statusValues[0] == opt_status;
           }) : filtered;
         },
 
