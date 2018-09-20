@@ -11,8 +11,27 @@ define([
           actionHandlers.delete(toDelete);
         },
 
-        onGoAdvanced = function() {
-          console.log('advanced');
+        executeAdvanced = function(args) {
+          console.log(args);
+        },
+
+        onGoAdvanced = function(annotation) {
+          var bulkEl = document.getElementById('bulk-annotation'),
+              evt = new Event('open'),
+
+              okListener = function(evt) {
+                executeAdvanced(annotation, evt.args);
+                bulkEl.removeEventListener('ok', okListener, false);
+              }
+
+          evt.args = {
+            mode: 'DELETE',
+            annotations: annotations.listAnnotations(),
+            original: annotation
+          };
+
+          bulkEl.dispatchEvent(evt);
+          bulkEl.addEventListener('ok', okListener);
         },
 
         reapplyDelete = function(annotation) {
@@ -25,7 +44,7 @@ define([
           if (annotated.length > 0)
             Modal.prompt(quote, annotated,
               onDelete.bind(this, annotated),
-              onGoAdvanced.bind(this, annotated));
+              onGoAdvanced.bind(this, annotation));
         },
 
         on = function(evt, handler) {
