@@ -21,7 +21,7 @@ export default class App extends Component {
       that.setState({
         open: true,
         mode: args.mode,
-        unannotatedMatches: args.unannotatedMatches,
+        unannotatedMatches: args.unannotatedMatches || 0,
         annotations: new AnnotationList(args.annotations),
         quote: AnnotationUtils.getQuote(args.original),
         original: args.original,

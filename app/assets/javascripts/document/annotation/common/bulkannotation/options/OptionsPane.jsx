@@ -33,7 +33,7 @@ export default class OptionsPane extends Component {
         filtered.length;
     }
 
-    const annotated = (this.state.applyToAnnotated) ? computeAnnotated() : 0;
+    const annotated = (this.props.mode == 'DELETE' || this.state.applyToAnnotated) ? computeAnnotated() : 0;
     const unannotated = (this.state.applyToUnannotated) ? this.props.unannotatedMatches : 0;
     const total = annotated + unannotated;
 
