@@ -11,6 +11,10 @@ define([
           actionHandlers.delete(toDelete);
         },
 
+        onGoAdvanced = function() {
+          console.log('advanced');
+        },
+
         reapplyDelete = function(annotation) {
           var quote = AnnotationUtils.getQuote(annotation),
               annotated = annotations.filterByQuote(quote).filter(function(a) {
@@ -19,7 +23,9 @@ define([
               });
 
           if (annotated.length > 0)
-            Modal.prompt(quote, annotated, onDelete.bind(this, annotated));
+            Modal.prompt(quote, annotated,
+              onDelete.bind(this, annotated),
+              onGoAdvanced.bind(this, annotated));
         },
 
         on = function(evt, handler) {

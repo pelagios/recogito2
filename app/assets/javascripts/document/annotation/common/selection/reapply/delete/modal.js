@@ -1,9 +1,6 @@
 define([], function() {
 
-  var BUTTONS =
-
-
-      getMessage = function(toDelete, quote) {
+  var getMessage = function(toDelete, quote) {
         var message;
 
         if (toDelete == 1)
@@ -23,7 +20,7 @@ define([], function() {
 
   return {
 
-    prompt : function(quote, toDelete, onDelete) {
+    prompt : function(quote, toDelete, onDelete, onGoAdvanced) {
       var message = getMessage(toDelete.length, quote),
           element = jQuery(
             '<div class="clicktrap">' +
@@ -32,18 +29,20 @@ define([], function() {
                 '<p class="message">' + message + '</p>' +
                 '<p class="buttons">' +
                   '<span class="stacked">' +
-                    '<button class="btn" data-action="DELETE">YES, delete</button>' +
-                    '<button class="btn outline" data-action="CANCEL">NO, keep them</button>' +
+                    '<button class="btn action" data-action="DELETE">YES, delete</button>' +
+                    '<button class="btn outline action" data-action="CANCEL">NO, keep them</button>' +
+                    '<span class="open-bulk-options action" data-action="ADVANCED">Show advanced options...</span>' +
                   '</span>' +
                 '</p>' +
               '</div>' +
             '</div>').appendTo(document.body);
 
-      element.on('click', 'button', function(evt) {
+      element.on('click', '.action', function(evt) {
         var btn = jQuery(evt.target),
             action = btn.data('action');
 
         if (action == 'DELETE') onDelete();
+        if (action == 'ADVANCED') onGoAdvanced();
         element.remove();
       });
 
