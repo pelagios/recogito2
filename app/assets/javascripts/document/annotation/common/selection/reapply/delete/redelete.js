@@ -1,14 +1,29 @@
 define([
+  'common/config',
   'common/utils/annotationUtils',
   'document/annotation/common/selection/reapply/delete/modal'
-], function(AnnotationUtils, Modal) {
+], function(Config, AnnotationUtils, Modal) {
 
   var ReDelete = function(annotations) {
 
     var actionHandlers = {},
 
+        isAllowed = function(annotation) {
+          if (Config.isAdmin)
+            return true;
+
+          var commentsByOthers =
+                 AnnotationUtils.getBodiesOfType(annotation, 'COMMENT')
+                   .filter(function(b) {
+                     return b.last_modified_by != Config.me;
+                 });
+
+          return commentsByOthers.length == 0;
+        },
+
         onDelete = function(toDelete) {
-          actionHandlers.delete(toDelete);
+          var allowed = toDelete.filter(isAllowed);
+          actionHandlers.delete(allowed);
         },
 
         executeAdvanced = function(annotation, args) {
