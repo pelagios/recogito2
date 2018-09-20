@@ -9,19 +9,6 @@ define([
     var actionHandlers = {},
 
         /**
-         * Helper to check if a list of bodies contains the
-         * given body. NOTE: this method uses
-         * AnnotationUtils.bodyValueEquals(), which checks
-         * for equality based only on type/value/URI, ignoring
-         * creator, timestamp (or object equality).
-         */
-        containsBody = function(list, body) {
-          return list.find(function(b) {
-            return AnnotationUtils.bodyValueEquals(b, body);
-          });
-        },
-
-        /**
          * Helper function that compares bodiesToFilter with refBodies,
          * and removes bodies that exist in refBodies from bodiesToFilter.
          * We're using this to make sure APPEND operations don't repeat
@@ -29,7 +16,7 @@ define([
          */
         removeBodies = function(refBodies, bodiesToFilter) {
           return bodiesToFilter.filter(function(b) {
-            return !containsBody(refBodies, b);
+            return !AnnotationUtils.containsBodyOfValue(refBodies, b);
           });
         },
 
@@ -40,7 +27,7 @@ define([
           var intersection = [];
 
           bodiesA.forEach(function(b) {
-            if (containsBody(bodiesB, b))
+            if (AnnotationUtils.containsBodyOfValue(bodiesB, b))
               intersection.push(b);
           });
 
@@ -64,8 +51,7 @@ define([
 
         /**
          * Re-applies the annotation to annotated matches, using
-         * REPLACE as a merge strategy. Optionally filters by verification
-         * status.
+         * REPLACE as a merge strategy.
          *
          * Will take into account admin status and potential privilege
          * conflicts. (They will be re-checked at the server-side anyway. But
@@ -90,32 +76,23 @@ define([
 
         /**
          * Re-applies the annotation to annotated matches, using
-         * APPEND as a merge strategy. Optionally filters by annotation status.
+         * APPEND as a merge strategy.
          */
         appendToAnnotated = function(annotation, toApply) {
           toApply.forEach(function(applied) {
             var origBodies = applied.bodies,
-                bodiesToAppend = clone(removeBodies(origBodies, annotation.bodies));
+                bodiesToAppend = removeBodies(origBodies, clone(annotation.bodies));
                 updatedBodies = origBodies.concat(bodiesToAppend);
+
             applied.bodies = updatedBodies;
           });
         },
 
         /**
          * Re-applies the annotation to annotated matches, using
-         * MIXED MERGE as a merge strategy. Optionally filters by annotation
-         * status.
+         * MIXED MERGE as a merge strategy.
          */
         mergeWithAnnotated = function(annotation, toApply) {
-
-          // TODO implement
-
-        },
-
-        /*
-        onMerge = function(annotation, toReplace) {
-          // By convention, "merge" replaces the current place bodies,
-          // and appends all other bodies
           var newPlaceBodies = AnnotationUtils.getBodiesOfType(annotation, 'PLACE'),
 
               mergeOne = function(original) {
@@ -131,28 +108,25 @@ define([
 
                         return !toRemove; // false means 'remove'
                       }) :
+
                       original.bodies,
 
-                    bodiesToAppend = annotation.bodies.filter(function(b) {
+                    bodiesToAppend = clone(annotation.bodies.filter(function(b) {
                       // Don't append bodies which the original already has
                       return !AnnotationUtils.containsBodyOfValue(original, b);
-                    });
+                    }));
 
                 original.bodies = bodiesToKeep.concat(bodiesToAppend);
               };
 
-          reapplyToUnannotated(annotation); // Nothing to merge here
-          toReplace.forEach(mergeOne);
-
-          if (toReplace.length > 0 && actionHandlers.update)
-            actionHandlers.update(toReplace);
+          toApply.forEach(mergeOne);
         },
-        */
 
         /** Triggered from the first (non-advanced) panel **/
         onQuickMerge = function(annotation, toReplace) {
           if (toReplace.length > 0) {
             reapplyToUnannotated(annotation);
+
             mergeWithAnnotated(annotation, toReplace);
             if (actionHandlers.update)
               actionHandlers.update(toReplace);
@@ -181,12 +155,13 @@ define([
           if (args.applyToAnnotated) {
             if (args.mergePolicy == 'APPEND')
               appendToAnnotated(annotation, toApply);
-
             else if (args.mergePolicy == 'REPLACE')
               replaceAnnotated(annotation, toApply);
-
-            else if (args.mergePolicy == 'MIXED') {}
+            else if (args.mergePolicy == 'MIXED')
               mergeWithAnnotated(annotation, toApply);
+
+            if (actionHandlers.update)
+              actionHandlers.update(toApply);
           }
         },
 
@@ -218,6 +193,7 @@ define([
 
           if (unannotatedCount + annotated.length > 0)
             Modal.prompt(quote, unannotatedCount, annotated, {
+              'UNANNOTATED': reapplyToUnannotated.bind(this, annotation),
               'MERGE': onQuickMerge.bind(this, annotation, annotated),
               'ADVANCED': onGoAdvanced.bind(this, annotation, unannotatedCount)
             });

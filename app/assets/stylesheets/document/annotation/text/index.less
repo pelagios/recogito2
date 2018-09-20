@@ -107,8 +107,14 @@ body {
   span.quote::before { content:'\00ab'; }
   span.quote::after { content:'\00bb'; }
 
-  .stacked {
+  .buttons, .stacked {
     background-color:#fff;
+    padding-bottom:22px;
+    margin-top:-1px;
+  }
+
+  .stacked {
+    margin-top:-2px;
 
     button {
       display:block;
@@ -118,7 +124,6 @@ body {
     }
 
     .open-bulk-options {
-      padding-bottom:22px;
       display:inline-block;
       text-decoration:underline;
       font-size:15px;

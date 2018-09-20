@@ -36,7 +36,7 @@ define([], function() {
           '</div>';
         else
           return '<div>' +
-            '<button class="btn action" data-action="REPLACE">YES</button>' +
+            '<button class="btn action" data-action="UNANNOTATED">YES</button>' +
             '<button class="btn outline action" data-action="CANCEL">NO</button>' +
           '</div>';
       };
