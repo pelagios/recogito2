@@ -35,7 +35,9 @@ export default class OptionsPane extends Component {
     }
 
     const annotated = (this.props.mode == 'DELETE' || this.state.applyToAnnotated) ? computeAnnotated() : 0;
-    const unannotated = (this.state.applyToUnannotated) ? this.props.unannotatedMatches : 0;
+    const unannotated = (this.state.applyToUnannotated && !this.state.applyIfStatus) ?
+      this.props.unannotatedMatches : 0;
+
     const total = annotated + unannotated;
 
     return {
@@ -78,6 +80,7 @@ export default class OptionsPane extends Component {
 
         {this.props.mode == 'REAPPLY' &&
           <ApplyTo
+            disableUnannotated={this.props.unannotatedMatches == 0 || this.state.applyIfStatus}
             applyToAnnotated={this.state.applyToAnnotated}
             applyToUnannotated={this.state.applyToUnannotated}
             onChange={this.onChangeApplyTo.bind(this)} />

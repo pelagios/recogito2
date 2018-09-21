@@ -13,7 +13,8 @@ export default class SelectableOption extends Component {
             name={this.props.group}
             checked={this.props.checked}
             onChange={this.props.onChange}
-            readOnly={!this.props.onChange}/>
+            readOnly={!this.props.onChange}
+            disabled={this.props.disabled} />
         ) : (
           <input
             type="checkbox"
@@ -21,7 +22,8 @@ export default class SelectableOption extends Component {
             name={this.props.id}
             checked={this.props.checked}
             onChange={this.props.onChange}
-            readOnly={!this.props.onChange} />
+            readOnly={!this.props.onChange}
+            disabled={this.props.disabled} />
         )}
         <label htmlFor={this.props.id}>
           {this.props.children}

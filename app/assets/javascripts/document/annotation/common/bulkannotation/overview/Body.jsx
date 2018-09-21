@@ -8,14 +8,14 @@ export default class Body extends Component {
     const uri = (body.uri) ? this.props.uriParser(body.uri) : null;
 
     if (t == 'TAG')
-      return value;
+      return body.value;
     else if (t == 'COMMENT')
       return `\u8220${body.value.substr(0, 30)}`;
     else if (t == 'PERSON' || t == 'EVENT')
       return quote;
     else if (t == 'PLACE')
       return (uri) ?
-        ((uri.shortcode) ? `${uri.shortcode}:${uri.id}` : uri): 
+        ((uri.shortcode) ? `${uri.shortcode}:${uri.id}` : uri):
         quote;
     else
       return null;
