@@ -160,7 +160,7 @@ define([
           var toApply = (args.applyToAnnotated) ?
             getAnnotationsToModify(annotation, args.applyIfStatus) : false ;
 
-          if (args.applyToUnannotated && !args.applyStatusIf)
+          if (args.applyToUnannotated && !args.applyIfStatus)
             reapplyToUnannotated(annotation);
 
           if (args.applyToAnnotated) {
