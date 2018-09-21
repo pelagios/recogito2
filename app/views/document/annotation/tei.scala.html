@@ -129,6 +129,9 @@
       <svg id="relations"></svg>
     </div>
 
+    <div id="bulk-annotation" />
+
+    <script type="text/javascript" src="@routes.Assets.versioned("build/bulkannotation.js")"></script>
     @helper.javascriptRouter("jsRoutes")(
       controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
       controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
