@@ -37,8 +37,6 @@ define([
         },
 
         createSelections = function(annotation, requireFullWord) {
-          requireFullWord = true;
-
           var quote = AnnotationUtils.getQuote(annotation),
 
               searchFromOffset = function(text, regex, offset) {
