@@ -190,7 +190,8 @@ define([
             original: annotation,
             annotations: annotations.listAnnotations(),
             unannotatedMatches: unannotatedCount,
-            uriParser:PlaceUtils.parseURI
+            uriParser: PlaceUtils.parseURI,
+            phraseCounter: phraseAnnotator.countOccurrences
           };
 
           bulkEl.dispatchEvent(evt);

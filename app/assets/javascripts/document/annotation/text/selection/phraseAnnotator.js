@@ -81,7 +81,7 @@ define([
 
                       while (nextIdx > -1) {
                         cursor = nextIdx + quote.length;
-                        addRange(textNode, nextIdex, cursor);
+                        addRange(textNode, nextIdx, cursor);
                         nextIdx = text.indexOf(quote, cursor);
                       }
                     };
