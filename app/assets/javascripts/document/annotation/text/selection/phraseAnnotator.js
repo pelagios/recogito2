@@ -36,24 +36,62 @@ define([
           }, 0);
         },
 
-        createSelections = function(annotation) {
+        createSelections = function(annotation, requireFullWord) {
+          requireFullWord = true;
+
           var quote = AnnotationUtils.getQuote(annotation),
+
+              searchFromOffset = function(text, regex, offset) {
+                var substr = text.substring(offset),
+                    idx = substr.search(regex);
+
+                if (idx < 0)
+                  return idx;
+                else
+                  return idx + offset + 1;
+              },
 
               createRangesInTextNode = function(textNode) {
                 var text = textNode.nodeValue,
-                    nextIdx = text.indexOf(quote),
                     ranges = [],
-                    range, cursor;
 
-                while (nextIdx > -1) {
-                  cursor = nextIdx + quote.length;
+                    addRange = function(textNode, from, to) {
+                      var range = rangy.createRange();
+                      range.setStartAndEnd(textNode, from, to);
+                      ranges.push(range);
+                    },
 
-                  range = rangy.createRange();
-                  range.setStartAndEnd(textNode, nextIdx, cursor);
-                  ranges.push(range);
+                    createForFullWordMatch = function() {
+                      var regex = new RegExp('(?:^|\\W)' +
+                            escapeRegExp(quote) + '(?:$|\\W)', 'g'),
 
-                  nextIdx = text.indexOf(quote, cursor);
-                }
+                          result, idx,
+
+                          len = quote.length;
+
+                      while ((result = regex.exec(text))) {
+                        // This index points to the regex match, i.e. the quote
+                        // PLUS WHITESPACE - need to take this into account, too
+                        idx = result.index + result[0].indexOf(quote);
+                        addRange(textNode, idx, idx + len);
+                      }
+                    },
+
+                    createForAnyMatch = function() {
+                      var nextIdx = text.indexOf(quote),
+                          cursor;
+
+                      while (nextIdx > -1) {
+                        cursor = nextIdx + quote.length;
+                        addRange(textNode, nextIdex, cursor);
+                        nextIdx = text.indexOf(quote, cursor);
+                      }
+                    };
+
+                if (requireFullWord)
+                  createForFullWordMatch();
+                else
+                  createForAnyMatch();
 
                 // Sorted bottom-to-top, so we can render them safely (we
                 // know they are not overlapping, by definition!)
