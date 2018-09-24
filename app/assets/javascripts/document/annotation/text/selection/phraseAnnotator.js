@@ -7,7 +7,12 @@ define([
   'common/config'
 ], function(AnnotationUtils, Config) {
 
-  var TEXT = 3; // HTML text node type
+  var TEXT = 3, // HTML text node type
+
+      // From https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript/3561711#3561711
+      escapeRegExp = function(str) {
+        return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); // $& means the whole matched string
+      };
 
   var PhraseAnnotator = function(contentEl, highlighter) {
 
@@ -20,9 +25,13 @@ define([
           });
         },
 
-        countOccurrences = function(phrase) {
+        countOccurrences = function(phrase, requireFullWord) {
+          // Cf. https://superuser.com/questions/903168/how-should-i-write-a-regex-to-match-a-specific-word
+          var splitter = (requireFullWord) ?
+            new RegExp('(?:^|\\W)' + escapeRegExp(phrase) + '(?:$|\\W)', 'g') : phrase;
+
           return getUnannotatedSegments().reduce(function(sum, textNode) {
-            var split = textNode.nodeValue.split(phrase);
+            var split = textNode.nodeValue.split(splitter);
             return sum + split.length - 1;
           }, 0);
         },
