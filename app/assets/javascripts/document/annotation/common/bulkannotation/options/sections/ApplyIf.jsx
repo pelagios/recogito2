@@ -14,7 +14,7 @@ export default class ApplyIf extends Component {
 
   fireStatusEvent() {
     const status = (this.state.checked) ? this.state.status : null;
-    this.props.onChange(status);
+    this.props.onChange({ applyIfStatus: status });
   }
 
   onToggleApplyIfStatus() {
@@ -43,29 +43,31 @@ export default class ApplyIf extends Component {
         )}
         <ul>
           <SelectableOption
-            id="when-phrase-matches"
+            id="if-phrase-matches"
             checked={true}
             readOnly={true}
             disabled={true}> phrase matches <em><u>{this.props.quote}</u></em>
           </SelectableOption>
 
-          <ul>
-            <SelectableOption
-              id="full-word"
-              group="match-type"
-              checked={this.props.matchType == 'FULL_WORD'}
-              onChange={this.props.onChange.bind(this, {applyIfMatchType: 'FULL_WORD'})}
-              type="radio"> require full word match (surrounded by whitespace, comma, etc.)
-            </SelectableOption>
+          {this.mode == 'REAPPLY' &&
+            <ul>
+              <SelectableOption
+                id="full-word"
+                group="match-type"
+                checked={this.props.matchType == 'FULL_WORD'}
+                onChange={this.props.onChange.bind(this, {applyIfMatchType: 'FULL_WORD'})}
+                type="radio"> require full word match (surrounded by whitespace, comma, etc.)
+              </SelectableOption>
 
-            <SelectableOption
-              id="any-match"
-              group="match-type"
-              checked={this.props.matchType == 'ANY_MATCH'}
-              onChange={this.props.onChange.bind(this, {applyIfMatchType: 'ANY_MATCH'})}
-              type="radio"> allow any string match, including inside words
-            </SelectableOption>
-          </ul>
+              <SelectableOption
+                id="any-match"
+                group="match-type"
+                checked={this.props.matchType == 'ANY_MATCH'}
+                onChange={this.props.onChange.bind(this, {applyIfMatchType: 'ANY_MATCH'})}
+                type="radio"> allow any string match, including inside words
+              </SelectableOption>
+            </ul>
+          }
 
           <SelectableOption
             id="if-status-is"

@@ -21,11 +21,10 @@ export default class App extends Component {
       that.setState({
         open: true,
         mode: args.mode,
-        unannotatedMatches: args.unannotatedMatches || 0,
         annotations: new AnnotationList(args.annotations),
         quote: AnnotationUtils.getQuote(args.original),
         original: args.original,
-        
+
         // Hack to get access to legacy util classes
         uriParser: args.uriParser,
         phraseCounter: args.phraseCounter
@@ -73,7 +72,6 @@ export default class App extends Component {
                       mode={this.state.mode}
                       quote={this.state.quote}
                       original={this.state.original}
-                      unannotatedMatches={this.state.unannotatedMatches}
                       annotations={this.state.annotations}
                       onOk={this.onOk.bind(this)}
                       onCancel={this.onCancel.bind(this)}

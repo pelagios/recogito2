@@ -191,7 +191,6 @@ define([
             mode: 'REAPPLY',
             original: annotation,
             annotations: annotations.listAnnotations(),
-            unannotatedMatches: unannotatedCount,
             uriParser: PlaceUtils.parseURI,
             phraseCounter: phraseAnnotator.countOccurrences
           };
