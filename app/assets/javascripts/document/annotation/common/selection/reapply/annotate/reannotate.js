@@ -136,7 +136,7 @@ define([
         /** Triggered from the first (non-advanced) panel **/
         onQuickMerge = function(annotation, toReplace) {
           if (toReplace.length > 0) {
-            reapplyToUnannotated(annotation);
+            reapplyToUnannotated(annotation, 'FULL_WORD');
 
             mergeWithAnnotated(annotation, toReplace);
             if (actionHandlers.update)
@@ -201,12 +201,13 @@ define([
 
         reapplyIfNeeded = function(annotation) {
           var quote = AnnotationUtils.getQuote(annotation),
-              unannotatedCount = phraseAnnotator.countOccurrences(quote),
+              // Require full-word match as default
+              unannotatedCount = phraseAnnotator.countOccurrences(quote, true),
               annotated = getAnnotationsToModify(annotation);
 
           if (unannotatedCount + annotated.length > 0)
             Modal.prompt(quote, unannotatedCount, annotated, {
-              'UNANNOTATED': reapplyToUnannotated.bind(this, annotation),
+              'UNANNOTATED': reapplyToUnannotated.bind(this, annotation, 'FULL_WORD'),
               'MERGE': onQuickMerge.bind(this, annotation, annotated),
               'ADVANCED': onGoAdvanced.bind(this, annotation, unannotatedCount)
             });

@@ -49,7 +49,7 @@ export default class ApplyIf extends Component {
             disabled={true}> phrase matches <em><u>{this.props.quote}</u></em>
           </SelectableOption>
 
-          {this.mode == 'REAPPLY' &&
+          {this.props.mode == 'REAPPLY' &&
             <ul>
               <SelectableOption
                 id="full-word"
