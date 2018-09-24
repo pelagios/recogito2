@@ -17,6 +17,7 @@ export default class OptionsPane extends Component {
 
     this.state = {
       applyIfStatus     : null, // Status value or null
+      applyIfMatchType  : 'FULL_WORD',
       applyToAnnotated  : true,
       applyToUnannotated: true,
       mergePolicy       : 'APPEND',
@@ -36,7 +37,7 @@ export default class OptionsPane extends Component {
 
     const annotated = (this.props.mode == 'DELETE' || this.state.applyToAnnotated) ? computeAnnotated() : 0;
     const unannotated = (this.state.applyToUnannotated && !this.state.applyIfStatus) ?
-      this.props.unannotatedMatches : 0;
+      this.props.phraseCounter(this.props.quote, this.state.applyIfMatchType == 'FULL_WORD') : 0;
 
     const total = annotated + unannotated;
 
@@ -55,11 +56,7 @@ export default class OptionsPane extends Component {
     });
   }
 
-  onChangeApplyIf(status) {
-    this.setState({ applyIfStatus: status });
-  }
-
-  onChangeApplyTo(diff) {
+  onChangeProperty(diff) {
     this.setState(diff);
   }
 
@@ -76,14 +73,15 @@ export default class OptionsPane extends Component {
           mode={this.props.mode}
           quote={this.props.quote}
           status={this.state.applyIfStatus}
-          onChange={this.onChangeApplyIf.bind(this)} />
+          matchType={this.state.applyIfMatchType}
+          onChange={this.onChangeProperty.bind(this)} />
 
         {this.props.mode == 'REAPPLY' &&
           <ApplyTo
             disableUnannotated={this.props.unannotatedMatches == 0 || this.state.applyIfStatus}
             applyToAnnotated={this.state.applyToAnnotated}
             applyToUnannotated={this.state.applyToUnannotated}
-            onChange={this.onChangeApplyTo.bind(this)} />
+            onChange={this.onChangeProperty.bind(this)} />
         }
 
         <MatchSummary

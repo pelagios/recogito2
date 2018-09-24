@@ -44,8 +44,10 @@ define([
         /**
          * Re-applies the annotation to the un-annotated text
          */
-        reapplyToUnannotated = function(annotation) {
-          var selections = phraseAnnotator.createSelections(annotation);
+        reapplyToUnannotated = function(annotation, matchType) {
+          var requireFullWord = matchType == 'FULL_WORD',
+              selections = phraseAnnotator.createSelections(annotation, requireFullWord);
+
           if (selections.length > 0 && actionHandlers.create)
             actionHandlers.create(selections);
         },
@@ -161,7 +163,7 @@ define([
             getAnnotationsToModify(annotation, args.applyIfStatus) : false ;
 
           if (args.applyToUnannotated && !args.applyIfStatus)
-            reapplyToUnannotated(annotation);
+            reapplyToUnannotated(annotation, args.applyIfMatchType);
 
           if (args.applyToAnnotated) {
             if (args.mergePolicy == 'APPEND')

@@ -12,7 +12,7 @@ export default class ApplyIf extends Component {
     };
   }
 
-  fireEvent() {
+  fireStatusEvent() {
     const status = (this.state.checked) ? this.state.status : null;
     this.props.onChange(status);
   }
@@ -21,7 +21,7 @@ export default class ApplyIf extends Component {
     this.setState(previous => (
       { checked: !previous.checked }
     ), () => {
-      this.fireEvent()
+      this.fireStatusEvent()
     });
   }
 
@@ -29,7 +29,7 @@ export default class ApplyIf extends Component {
     const value = e.target.value;
     this.setState({ status: value }, () => {
       // Only forward events if checkbox is checked
-      if (this.state.checked) this.fireEvent();
+      if (this.state.checked) this.fireStatusEvent();
     });
   }
 
@@ -49,8 +49,26 @@ export default class ApplyIf extends Component {
             disabled={true}> phrase matches <em><u>{this.props.quote}</u></em>
           </SelectableOption>
 
+          <ul>
+            <SelectableOption
+              id="full-word"
+              group="match-type"
+              checked={this.props.matchType == 'FULL_WORD'}
+              onChange={this.props.onChange.bind(this, {applyIfMatchType: 'FULL_WORD'})}
+              type="radio"> require full word match (surrounded by whitespace, comma, etc.)
+            </SelectableOption>
+
+            <SelectableOption
+              id="any-match"
+              group="match-type"
+              checked={this.props.matchType == 'ANY_MATCH'}
+              onChange={this.props.onChange.bind(this, {applyIfMatchType: 'ANY_MATCH'})}
+              type="radio"> allow any string match, including inside words
+            </SelectableOption>
+          </ul>
+
           <SelectableOption
-            id="when-status-is"
+            id="if-status-is"
             checked={this.state.checked}
             onChange={this.onToggleApplyIfStatus.bind(this)} >
 
