@@ -71,7 +71,11 @@ define([
           target: 'image-pane',
           layers: [ tileLayer ],
           controls: [],
-          interactions: ol.interaction.defaults({ keyboard: false }),
+          interactions: ol.interaction.defaults().extend([
+            new ol.interaction.DragRotateAndZoom({
+              condition: ol.events.condition.altKeyOnly
+            })
+          ]),
           view: new ol.View({
             projection: projection,
             minResolution: 0.5

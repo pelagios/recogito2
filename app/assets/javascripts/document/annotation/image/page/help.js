@@ -34,7 +34,7 @@ define([
                      '</tr>' +
 
                      '<tr>' +
-                       '<td>Hold <span class="key">SHIFT</span> + <span class="key">Alt</span></td>' +
+                       '<td>Hold <span class="key">ALT</span></td>' +
                        '<td>to rotate the map around the center of the screen</td>' +
                      '</tr>' +
                    '</table>' +
