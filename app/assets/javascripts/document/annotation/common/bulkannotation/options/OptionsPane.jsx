@@ -25,26 +25,40 @@ export default class OptionsPane extends Component {
   }
 
   computeMatches() {
-    const computeAnnotated = () => {
-      const filtered = this.props.annotations
-        .filterByQuote(this.props.quote)
-        .removeById(this.props.original.annotation_id);
+    // Existing annotations "potentially available" for reapply -
+    // we use this to disable the checkbox and 'how to merge' section in
+    // case available = 0
+    const availableAnnotated = this.props.annotations
+      .filterByQuote(this.props.quote)
+      .removeById(this.props.original.annotation_id);
 
+    // Computes no. of annotations actually affected by reapply settings
+    const computeAnnotated = () => {
       return (this.state.applyIfStatus) ?
-        filtered.filterByVerificationStatus(this.state.applyIfStatus).length :
-        filtered.length;
+        availableAnnotated.filterByVerificationStatus(this.state.applyIfStatus).length :
+        availableAnnotated.length;
     }
 
-    const annotated = (this.props.mode == 'DELETE' || this.state.applyToAnnotated) ? computeAnnotated() : 0;
-    const unannotated =
-      (this.state.applyToUnannotated && !this.state.applyIfStatus && this.props.phraseCounter) ?
-        this.props.phraseCounter(this.props.quote, this.state.applyIfMatchType == 'FULL_WORD') : 0;
+    // No. of existing annotations affected by current settings
+    const numAnnotated = (this.props.mode == 'DELETE' || this.state.applyToAnnotated) ? computeAnnotated() : 0;
 
-    const total = annotated + unannotated;
+    // Potentially available unannotated matches
+    const numAvailableUnannotated = (this.props.phraseCounter) ?
+      this.props.phraseCounter(this.props.quote, this.state.applyIfMatchType == 'FULL_WORD') : 0;
+
+    // No. of unannotated match affected by current settings
+    const numUnannotated =
+      (this.state.applyToUnannotated && !this.state.applyIfStatus) ?
+        numAvailableUnannotated : 0;
+
+    // No. of total matches affected by current settings
+    const total = numAnnotated + numUnannotated;
 
     return {
-      annotated: annotated,
-      unannotated: unannotated,
+      hasAvailableAnnotated: availableAnnotated.length > 0,
+      hasAvailableUnannotated: numAvailableUnannotated > 0,
+      numAnnotated: numAnnotated,
+      numUnannotated: numUnannotated,
       total: total
     };
   }
@@ -80,21 +94,24 @@ export default class OptionsPane extends Component {
         {this.props.mode == 'REAPPLY' &&
           <ApplyTo
             applyToAnnotated={this.state.applyToAnnotated}
+            disableAnnotated={!stats.hasAvailableAnnotated}
+
             applyToUnannotated={this.state.applyToUnannotated}
+            disableUnannotated={!stats.hasAvailableUnannotated}
             onChange={this.onChangeProperty.bind(this)} />
         }
 
         <MatchSummary
           mode={this.props.mode}
           total={stats.total}
-          annotated={stats.annotated}
-          unannotated={stats.unannotated} />
+          annotated={stats.numAnnotated}
+          unannotated={stats.numUnannotated} />
 
         {this.props.mode == 'DELETE' &&
           <NoAdminWarning visible={true} />
         }
 
-        {this.props.mode == 'REAPPLY' &&
+        {this.props.mode == 'REAPPLY' && stats.hasAvailableAnnotated &&
           <CSSTransition
             classNames="how-to-merge"
             in={this.state.applyToAnnotated}

@@ -173,7 +173,7 @@ define([
             else if (args.mergePolicy == 'MIXED')
               mergeWithAnnotated(annotation, toApply);
 
-            if (actionHandlers.update)
+            if (actionHandlers.update && toApply.length > 0)
               actionHandlers.update(toApply);
           }
         },
