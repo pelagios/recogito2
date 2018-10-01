@@ -1,0 +1,184 @@
+.documents-pane.grid-pane {
+  background-color:lighten(@lightgrey-border, 5%);
+
+  .virtualized-grid {
+    outline: none;
+    border-left:1px solid @lightgrey-border;
+    padding:0 8px 30px 0;
+  }
+
+  .row {
+    display:flex;
+    flex-flow:row wrap;
+    justify-content:space-around;
+    align-items:center;
+  }
+
+  .cell.dummy {
+    opacity:0;
+  }
+
+  .cell {
+    cursor:pointer;
+    width:190px;
+    height:190px;
+    padding:20px;
+    box-sizing:border-box;
+    display:inline-flex;
+    flex-direction:row;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+
+    .item-wrapper {
+      position:relative;
+      width:100%;
+      height:100%;
+    }
+
+    .item-wrapper.stacked {
+      top:-6px;
+      left:-6px;
+    }
+
+    .document, .stack, .stack::before {
+      background-color:lighten(@lightgrey-border, 8%);
+      border:1px solid @lightgrey-border;
+
+      .rounded-corners(3px);
+      .box-shadow(0, 0, 4px, 0.1);
+    }
+
+    .label {
+      position:absolute;
+      width:100%;
+      box-sizing:border-box;
+      font-size:13px;
+      font-weight:bold;
+      text-align:center;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .document {
+      display:block;
+      position:relative;
+      width:100%;
+      height:100%;
+      text-align:center;
+      overflow:hidden;
+
+      .label {
+        color:#444;
+        bottom:0;
+        padding:12px 8px;
+        border-top:1px solid @lightgrey-border;
+        background-color:#fff;
+      }
+    }
+
+    // Placeholder icon
+    .document::before {
+      position:absolute;
+      top:36px;
+      left:0;
+      bottom:42px;
+      width:100%;
+      font-family:FontAwesome;
+      font-size:42px;
+      color:darken(@lightgrey-border, 3%);
+    }
+
+    .document.TEXT_PLAIN::before   { content:'\f15c' }
+    .document.TEXT_TEI::before     { content:'\f121' }
+    .document.IMAGE_UPLOAD::before { content:'\f1c5' }
+
+    .document.IMAGE_IIIF   {
+      background-image:url("/public/images/iiif-logo.png");
+      background-repeat:no-repeat;
+      background-size:52px 45px;
+      background-position:center 35px;
+    }
+
+    // Colored top border
+    .document::after {
+      content:'';
+      position:absolute;
+      width:100%;
+      top:0;
+      left:0;
+      height:6px;
+    }
+
+    .document.TEXT_PLAIN::after,
+    .document.TEXT_TEI::after {
+      background-color:#5a88de;
+    }
+
+    .document.IMAGE_UPLOAD::after,
+    .document.IMAGE_IIIF::after {
+      background-color:#ff9f59;
+    }
+
+    .document:hover {
+      background-color:#fff;
+    }
+
+    .stack {
+      position:absolute;
+      top:5px;
+      left:5px;
+      width:100%;
+      height:100%;
+    }
+
+    .stack::before {
+      content:'';
+      display:block;
+      width:100%;
+      height:100%;
+      position:absolute;
+      top:4px;
+      left:4px;
+      z-index:-1;
+    }
+
+    .folder {
+      display:block;
+      position:relative;
+      top:0.5px; // Chrome inserts a nasty 1px border otherwise! Argh.
+      width:80%;
+      height:55%;
+      margin:19% 10%;
+      background:linear-gradient(darken(@lightgrey-border, 14%), darken(@lightgrey-border, 20%));
+
+      .rounded-corners(4px);
+      .box-shadow(1px, 1px, 12px, 0.17);
+
+      .label {
+        color:#444;
+        bottom:-26px;
+      }
+    }
+
+    .folder::before {
+      content:'';
+      position:absolute;
+      top:-18px;
+      left:3px;
+      width:50%;
+      height:19px;
+      background-color:darken(@lightgrey-border, 20%);
+      z-index:-1;
+
+      .rounded-corners-top(4px);
+    }
+
+    .folder:hover {
+      background:darken(@lightgrey-border, 14%);
+    }
+
+  }
+
+}

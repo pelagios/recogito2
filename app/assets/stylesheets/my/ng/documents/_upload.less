@@ -1,0 +1,105 @@
+.dropzone-decoration {
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+  background-color:rgba(49, 144, 241, 0.25);
+  border:2px solid #65affb;
+  pointer-events:none;
+}
+
+.upload-progress {
+  position:absolute;
+  bottom:40px;
+  right:40px;
+  width:460px;
+  border:1px solid darken(@ocean, 10%);
+  -webkit-box-shadow:1px 1px 14px rgba(0, 0, 0, 0.5);
+     -moz-box-shadow:1px 1px 14px rgba(0, 0, 0, 0.5);
+          box-shadow:1px 1px 14px rgba(0, 0, 0, 0.5);
+
+  .phase {
+    position:relative;
+    padding:8px 15px;
+    color:#fff;
+    font-weight:bold;
+    background-color:@ocean;
+    border-bottom:1px solid darken(@ocean, 10%);
+
+    button.close {
+      position:absolute;
+      top:11px;
+      right:12px;
+      margin:0;
+      padding:0;
+      color:#fff;
+      font-family:Tonicons;
+      font-weight:bold;
+    }
+
+  }
+
+  .files {
+    list-style-type:none;
+    margin:0;
+    padding:0;
+    background-color:lighten(@lightgrey-border, 4%);
+    font-weight:bold;
+
+    li {
+      position:relative;
+      padding:12px 15px;
+      border-bottom:1px solid @lightgrey-border-darker;
+    }
+
+    .icon.spinner {
+      position:absolute;
+      top:12px;
+      right:20px;
+      display:inline-block;
+      width:14px;
+      height:14px;
+      line-height:20px;
+    }
+
+    .icon.spinner.spin {
+      border:2px solid fade(@ocean, 0.3);
+      border-top:2px solid @ocean;
+      border-radius:50%;
+      -webkit-animation:loadRotation 1s infinite linear;
+              animation:loadRotation 1s infinite linear;
+    }
+
+    .icon.spinner.success::before {
+      content:'\f00c';
+      color:#008000;
+    }
+
+    .icon.spinner.failed::before {
+      content:'\f00d';
+      color:#800000;
+    }
+
+    .icon.spinner.failed::before {
+
+    }
+
+  }
+
+  .progress {
+    padding:22px 15px;
+    background-color:#fff;
+    border-bottom:1px solid @lightgrey-border;
+  }
+
+}
+
+@-webkit-keyframes loadRotation {
+  from { -webkit-transform: rotate(0deg); }
+  to   { -webkit-transform: rotate(359deg); }
+}
+@keyframes loadRotation {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(359deg); }
+}

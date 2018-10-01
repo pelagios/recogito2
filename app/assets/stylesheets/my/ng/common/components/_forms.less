@@ -1,0 +1,58 @@
+input, textarea, select {
+  border:0;
+  outline:none;
+  font-size:17px;
+  font-family:Assistant;
+}
+
+input, textarea {
+  -webkit-appearance:none;
+}
+
+input, textarea, select {
+  box-sizing:border-box;
+  color:@form-type;
+  background-color:#fff;
+  letter-spacing:1px;
+  border:1px solid @form-grey-border;
+
+  .rounded-corners(2px);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color:@form-blue-border;
+  box-shadow:0 0 4px 0 @form-blue-glow;
+}
+
+input[type=checkbox] { display:none; }
+
+input[type=checkbox] + label:before,
+input[type=radio] + label:before {
+  cursor:pointer;
+  font-family:FontAwesome;
+  font-size:14px;
+  display:inline-block;
+  width:20px;
+  text-align:left;
+}
+
+input[type=checkbox] + label:before {
+  content:'\f096';
+}
+
+input[type=radio] + label:before {
+  content:'\f10c';
+}
+
+input[type=checkbox]:checked + label:before {
+  content:'\f046';
+}
+
+input[type=radio]:checked + label:before {
+  content:'\f192';
+}
+
+input[type=checkbox]:disabled + label,
+input[type=checkbox]:disabled + label:before {
+  color:lighten(#9ca4b1, 12%);
+}

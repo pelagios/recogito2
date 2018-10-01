@@ -1,0 +1,134 @@
+@import "_preferences.less";
+
+.documents-table-header {
+  flex:0;
+  margin:0 22px;
+  position:relative;
+
+  .column-labels {
+
+    .label > .inner {
+      white-space:nowrap;
+      cursor:pointer;
+      position:relative;
+    }
+
+    .sort {
+      position:absolute;
+      top:-4px;
+      right:-27px;
+      font-family:Stroke7;
+      font-size:26px;
+      font-weight:bold;
+      display:block;
+      width:25px;
+      height:25px;
+      color:#7f8a9b;
+      .rounded-corners(100%);
+
+      .inner {
+        position:relative;
+        left:-1.5px;
+      }
+
+    }
+
+    .sort:hover {
+      color:#444;
+      background-color:lighten(@lightgrey-border, 3%);
+    }
+
+  }
+
+  .column-options-btn {
+    position:absolute;
+    right:0;
+    top:1px;
+    font-size:14px;
+  }
+
+}
+
+.column-labels, .table-pane .row {
+  border-bottom:1px solid @lightgrey-border;
+  display:inline-grid;
+  font-size:13px;
+  grid-gap:8px;
+}
+
+.column-labels {
+  font-weight:bold;
+  padding:15px 18px 15px 0;
+  width:100%;
+  grid-template-columns:auto 80px 100px 120px 120px;
+}
+
+.documents-pane.table-pane {
+  background-color:lighten(@lightgrey-border, 5%);
+
+  .virtualized-list {
+    outline: none;
+    padding-bottom:30px;
+    overflow-y:scroll !important;
+    border-left:1px solid @lightgrey-border;
+  }
+
+  .row {
+    grid-template-columns:28px auto 80px 100px 120px 120px;
+    box-sizing:border-box;
+    cursor:pointer;
+    padding:14px 0;
+
+    a {
+      color:#444;
+      text-decoration:none;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    a.folder-icon {
+      font-family:FontAwesome;
+      font-size:14px;
+      color:darken(@lightblue-type, 10%);
+      padding:1px 0 0 10px;
+    }
+
+    a.folder-name {
+      grid-column:2 / 7;
+    }
+
+    a.document, a.folder-name {
+      font-weight:bold;
+    }
+
+    .icon {
+      font-size:14px;
+      text-align:center;
+      line-height:14px;
+      padding-left:8px;
+
+      img {
+        width:16px;
+        height:16px;
+        color:#fff;
+
+        .rounded-corners(1px);
+      }
+    }
+
+    .TEXT_PLAIN   .inner { background-color:#5a88de; }
+    .TEXT_TEI     .inner { background-color:#5a88de; }
+    .IMAGE_UPLOAD .inner { background-color:#ff9f59; }
+    .IMAGE_IIIF   .inner { background-color:#ff9f59; }
+  }
+
+  .row:hover {
+    background-color:lighten(@lightgrey-border, 9%);
+  }
+
+  .row:last-child {
+    border-bottom:none;
+  }
+
+}
