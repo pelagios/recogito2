@@ -17,8 +17,8 @@ define(['common/hasEvents'], function(HasEvents) {
                     '<li data-name="AWMC">' +
                       '<div class="thumb-container"><img class="map-thumb" src="http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/7/68/47.png"></div>' +
                       '<h3>Empty Basemap</h3>' +
-                      '<p>Geographically accurate basemap of the ancient world by the <a href="http://awmc.unc.edu/wordpress/tiles/" target="_blank">Ancient World Mapping Centre</a>, ' +
-                      'University of North Caronlina at Chapel Hill.</p>' +
+                      '<p>Geographically accurate basemap of the ancient world by the <a href="http://awmc.unc.edu/wordpress/tiles/" target="_blank">Ancient World Mapping Center</a>, ' +
+                      'University of North Carolina at Chapel Hill.</p>' +
                     '</li>' +
 
                     '<li data-name="DARE">' +
