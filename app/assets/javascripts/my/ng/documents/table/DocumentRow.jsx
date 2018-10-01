@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 const ICONS = {
   TEXT_PLAIN   : 'icon_text.png',
-  TEXT_TEI     : 'icon_tei.png',
+  TEXT_TEIXML  : 'icon_tei.png',
   IMAGE_UPLOAD : 'icon_image.png',
   IMAGE_IIIF   : 'icon_iiif.png'
 };
@@ -10,7 +10,7 @@ const ICONS = {
 export default class DocumentRow extends Component {
 
   render() {
-    // const type = this.props.filetypes[0];
+    const type = this.props.filetypes[0];
     const label = (this.props.author) ?
       `${this.props.author}, ${this.props.title}` : this.props.title;
     const url = `/document/${this.props.id}/part/1/edit`;
@@ -19,8 +19,8 @@ export default class DocumentRow extends Component {
       <div
         style={this.props.style}
         className="row">
-        <a href={url} className={"type icon"/*`type icon/* ${type}`*/}>
-          {/* }<img src={`/public/images/${ICONS[type]}`} /> */}
+        <a href={url} className={`type icon/* ${type}`}>
+          <img src={`/assets/images/${ICONS[type]}`} />
         </a>
         <a href={url} className="document">{label}</a>
         <a href={url} className="language">{this.props.language ? this.props.language.toUpperCase() : ''}</a>

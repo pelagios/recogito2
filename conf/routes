@@ -192,7 +192,7 @@ GET     /                                            controllers.landing.Landing
 # Workspace API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my/documents.json                           controllers.my.ng.WorkspaceAPIController.my
+GET     /my/documents.json                           controllers.my.ng.WorkspaceAPIController.my(offset: Int ?= 0, size: Int ?= 20)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

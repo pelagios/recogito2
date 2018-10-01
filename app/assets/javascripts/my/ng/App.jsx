@@ -24,8 +24,7 @@ export default class App extends Component {
   componentDidMount() {
     axios.get('/my/documents.json')
       .then(result => {
-        console.log(result.data);
-        this.setState({ documents: result.data.items });
+        this.setState({ documents: result.data });
       });
   }
 

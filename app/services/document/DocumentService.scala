@@ -292,6 +292,22 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     Page(System.currentTimeMillis - startTime, total, offset, limit, items)
   }
   
+  def findByOwnerWithPartMetadata(owner: String, offset: Int = 0, limit: Int = 0) = db.query { sql =>
+    val startTime = System.currentTimeMillis
+    
+    val total = sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
+    
+    val records = 
+      sql.selectFrom(DOCUMENT
+           .join(DOCUMENT_FILEPART).on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID)))
+         .where(DOCUMENT.OWNER.equal(owner))
+         .limit(limit)
+         .offset(offset)
+         .fetchArray()
+         
+    groupLeftJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
+  }
+  
   /** Retrieves documents from a given owner, visible to the given logged in user.
     *
     * If there is currently no logged in user, only documents with public_visibility = PUBLIC are returned.  
