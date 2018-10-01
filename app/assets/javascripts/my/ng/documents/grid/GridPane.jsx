@@ -45,6 +45,7 @@ export default class GridPane extends Component {
           return (
             <Document
               key={idx}
+              id={item.id}
               title={item.title}
               filetypes={item.filetypes}
               fileCount={item.file_count} />

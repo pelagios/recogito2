@@ -189,6 +189,12 @@ GET     /stats.json                                  controllers.landing.Landing
 GET     /                                            controllers.landing.LandingController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Workspace API
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /my/documents.json                           controllers.my.ng.WorkspaceAPIController.my
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

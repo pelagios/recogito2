@@ -37,11 +37,12 @@ export default class TablePane extends Component {
             key={args.key}
             style={args.style}
             filetypes={item.filetypes}
+            id={item.id}
             author={item.author}
             title={item.title}
             language={item.language}
             date={item.date}
-            uploaded={item.uploaded}
+            uploaded={item.uploaded_at}
             lastEdit={item.lastedit} />
         )
     })

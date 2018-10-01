@@ -10,28 +10,29 @@ const ICONS = {
 export default class DocumentRow extends Component {
 
   render() {
-    const type = this.props.filetypes[0];
+    // const type = this.props.filetypes[0];
     const label = (this.props.author) ?
       `${this.props.author}, ${this.props.title}` : this.props.title;
+    const url = `/document/${this.props.id}/part/1/edit`;
 
     return (
       <div
         style={this.props.style}
         className="row">
-        <a href="#" className={`type icon ${type}`}>
-          <img src={`/public/images/${ICONS[type]}`} />
+        <a href={url} className={"type icon"/*`type icon/* ${type}`*/}>
+          {/* }<img src={`/public/images/${ICONS[type]}`} /> */}
         </a>
-        <a href="#" className="document">{label}</a>
-        <a href="#" className="language">{this.props.language ? this.props.language.toUpperCase() : ''}</a>
-        <a href="#" className="date">{this.props.date}</a>
-        <a href="#" className="uploaded">
+        <a href={url} className="document">{label}</a>
+        <a href={url} className="language">{this.props.language ? this.props.language.toUpperCase() : ''}</a>
+        <a href={url} className="date">{this.props.date}</a>
+        <a href={url} className="uploaded">
         {new Intl.DateTimeFormat('en-GB', {
           year : 'numeric',
           month: 'short',
           day  : '2-digit'
         }).format(new Date(this.props.uploaded))}
         </a>
-        <a href="#" className="last-edit">
+        <a href={url} className="last-edit">
           {this.props.lastedit && <TimeAgo date={this.props.last_edit} /> }
         </a>
       </div>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
+import axios from 'axios';
 
 import Sidebar from './sidebar/Sidebar.jsx';
 import Header from './header/Header.jsx';
@@ -9,16 +10,23 @@ import GridPane from './documents/grid/GridPane.jsx';
 import UploadProgress from './documents/upload/UploadProgress.jsx';
 import Readme from './documents/Readme.jsx';
 
-import { DUMMY_FOLDERS, DUMMY_DOCUMENTS } from './dummyData.js';
-
 export default class App extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       view: 'MY_DOCUMENTS',
-      presentation: 'TABLE'
+      presentation: 'TABLE',
+      documents: []
     };
+  }
+
+  componentDidMount() {
+    axios.get('/my/documents.json')
+      .then(result => {
+        console.log(result.data);
+        this.setState({ documents: result.data.items });
+      });
   }
 
   changeView(view) {
@@ -52,14 +60,14 @@ export default class App extends Component {
 
           {this.state.presentation == 'TABLE' ?
             <TablePane
-              folders={DUMMY_FOLDERS}
-              documents={DUMMY_DOCUMENTS}>
+              folders={[]}
+              documents={this.state.documents}>
               {/* <Readme>Hello World!</Readme> */}
             </TablePane>
             :
             <GridPane
-              folders={DUMMY_FOLDERS}
-              documents={DUMMY_DOCUMENTS}
+              folders={[]}
+              documents={this.state.documents}
               onDropFile={this.onDropFile.bind(this)}>
               {/* }<Readme>Hello World!</Readme> */}
             </GridPane>
