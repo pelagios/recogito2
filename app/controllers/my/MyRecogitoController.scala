@@ -12,7 +12,7 @@ import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.i18n.I18nSupport
-import play.api.mvc.{ControllerComponents, RequestHeader}
+import play.api.mvc.{ControllerComponents, Cookie, RequestHeader}
 import scala.concurrent.{ExecutionContext, Future}
 import storage.uploads.Uploads
 
@@ -197,10 +197,15 @@ class MyRecogitoController @Inject() (
           tab match {
             case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace, offset, s, o, size)
             case _ =>
-              if (user.featureToggles.contains("new-workspace"))
+              val forceOldWorkspace = request.getQueryString("ng").isDefined || request.cookies.get("ng").isDefined
+              if (user.featureToggles.contains("new-workspace") && !forceOldWorkspace) {
                 Future.successful(Ok(views.html.my.ng()))
-              else
-                renderMyDocuments(user, usedSpace, offset, s, o, size)
+              } else {
+                if (request.getQueryString("ng").isDefined)
+                  Future.successful(Redirect(routes.MyRecogitoController.index(usernameInPath, tab, page, sortBy, order, size)).withCookies(Cookie("ng", "true")).bakeCookies())
+                else 
+                  renderMyDocuments(user, usedSpace, offset, s, o, size)
+              }
           }
           
         case _ =>
