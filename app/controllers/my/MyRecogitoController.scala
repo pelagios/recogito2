@@ -196,7 +196,11 @@ class MyRecogitoController @Inject() (
           val usedSpace = uploads.getUsedDiskspaceKB(user.username)    
           tab match {
             case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace, offset, s, o, size)
-            case _ => renderMyDocuments(user, usedSpace, offset, s, o, size)
+            case _ =>
+              if (user.featureToggles.contains("new-workspace"))
+                Future.successful(Ok(views.html.my.ng()))
+              else
+                renderMyDocuments(user, usedSpace, offset, s, o, size)
           }
           
         case _ =>

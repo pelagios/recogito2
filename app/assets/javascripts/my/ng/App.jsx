@@ -11,8 +11,6 @@ import Readme from './documents/Readme.jsx';
 
 import { DUMMY_FOLDERS, DUMMY_DOCUMENTS } from './dummyData.js';
 
-import '../public/style/style.scss';
-
 export default class App extends Component {
 
   constructor(props) {
