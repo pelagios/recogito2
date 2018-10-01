@@ -18,7 +18,7 @@ define([
         element = jQuery(
           '<div class="map-legend">' +
             '<div class="style-selection">' +
-              '<span>Color by<span>' +
+              '<span>Colour by<span>' +
               '<select>' +
                 '<option selected="true" value>-</option>' +
                 '<option value="BY_TAG">Tag</option>' +
