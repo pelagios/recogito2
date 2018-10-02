@@ -2,6 +2,9 @@ package services.user
 
 import com.mohiva.play.silhouette.api.{Identity, LoginInfo}
 import controllers.Security
+import java.sql.Timestamp
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import services.generated.tables.records.{FeatureToggleRecord, UserRecord, UserRoleRecord}
 
 case class User(
@@ -44,4 +47,20 @@ object Roles {
 
   case object Normal extends Role { override lazy val toString = "NORMAL" }
 
+}
+
+object User {
+  
+  implicit val userRecordWrites: Writes[UserRecord] = (
+    (JsPath \ "username").write[String] and
+    (JsPath \ "realname").write[String] and
+    (JsPath \ "member_since").write[Timestamp] and
+    (JsPath \ "quota_mb").write[Int]
+  )(u => (
+    u.getUsername,
+    u.getRealName,
+    u.getMemberSince,
+    u.getQuotaMb
+  ))
+  
 }
