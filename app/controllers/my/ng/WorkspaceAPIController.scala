@@ -34,9 +34,10 @@ class WorkspaceAPIController @Inject() (
     t._2.map(_.getContentType)
   ))
   
-  def my(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
-    documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { documents =>
-      jsonOk(Json.toJson(documents.toSeq))
+  // Quick hack for testing + CORS
+  def my(offset: Int, size: Int) = Action.async { implicit request =>
+    documents.findByOwnerWithPartMetadata("rainer", offset, size).map { documents =>
+      jsonOk(Json.toJson(documents.toSeq)).withHeaders("Access-Control-Allow-Origin" -> "*")
     }
   }
 
