@@ -4,6 +4,8 @@ version := "2.2"
 
 scalaVersion := "2.11.11"
 
+scalaVersion in ThisBuild := "2.11.11"
+
 publishMavenStyle in ThisBuild := false
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)

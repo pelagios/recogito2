@@ -12,3 +12,5 @@
 .project
 .settings
 .cache-*
+**ensime*
+pc.stdout.log
