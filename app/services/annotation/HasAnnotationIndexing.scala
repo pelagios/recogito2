@@ -16,7 +16,7 @@ import services.entity.builtin.IndexedEntity
   */
 trait HasAnnotationIndexing {
   
-  // Frontent serialization format
+  // Backend serialization format
   import services.annotation.BackendAnnotation._
 
   implicit object AnnotationIndexable extends Indexable[Annotation] {
