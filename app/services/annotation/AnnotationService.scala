@@ -1,21 +1,26 @@
 package services.annotation
 
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.searches.SearchDefinition
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 import play.api.Logger
+import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.relation.RelationService
 import services.entity.builtin.{EntityService, IndexedEntity}
-import storage.es.ES
+import storage.es.{ES, HasScrollProcessing}
 
 @Singleton
 class AnnotationService @Inject() (
   entityService: EntityService,
   implicit val ctx: ExecutionContext,
   implicit val es: ES
-) extends HasAnnotationIndexing with AnnotationHistoryService with RelationService {
+) extends HasAnnotationIndexing
+    with AnnotationHistoryService
+    with RelationService 
+    with HasScrollProcessing {
 
   /** Upserts an annotation.
     *
@@ -132,14 +137,41 @@ class AnnotationService @Inject() (
         termQuery("annotates.document_id" -> id)
       } limit 0
     } map { _.totalHits }
-
+    
+  private def scrollIfNeeded(query: SearchDefinition, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] ={
+    // Backend serialization format
+    import services.annotation.BackendAnnotation._
+          
+    es.client execute { 
+      query start offset limit limit
+    } flatMap { response =>
+      val total = response.totalHits
+      if (total > ES.MAX_SIZE) {
+        // Oversized doc... use scroll API
+        scrollQuery(query).map(_.map { hit =>
+          (Json.fromJson[Annotation](Json.parse(hit.sourceAsString)).get, hit.version)
+        })
+      } else {
+        Future.successful(response.to[(Annotation, Long)].toSeq)
+      }
+    } 
+  }
+    
   /** All annotations on the given document **/
-  def findByDocId(id: String, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
-    es.client execute {
+  def findByDocId(id: String, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] = 
+    scrollIfNeeded {
       search(ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.document_id" -> id)
-      } start offset limit limit
-    } map(_.to[(Annotation, Long)].toSeq)
+      }
+    }
+  
+  /** Retrieves all annotations on a given filepart **/
+  def findByFilepartId(id: UUID, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] = 
+    scrollIfNeeded {
+      search(ES.RECOGITO / ES.ANNOTATION) query {
+        termQuery("annotates.filepart_id" -> id.toString)
+       }
+    }
 
   /** Deletes all annotations & version history on a given document **/
   def deleteByDocId(docId: String): Future[Boolean] = {
@@ -169,14 +201,6 @@ class AnnotationService @Inject() (
       s2 <- deleteVersions
     } yield (s1 && s2)
   }
-
-  /** Retrieves all annotations on a given filepart **/
-  def findByFilepartId(id: UUID, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] =
-    es.client execute {
-      search(ES.RECOGITO / ES.ANNOTATION) query {
-        termQuery("annotates.filepart_id" -> id.toString)
-      } limit limit
-    } map(_.to[(Annotation, Long)].toSeq)
 
   /** Retrieves annotations on a document last updated after a given timestamp **/
   def findModifiedAfter(documentId: String, after: DateTime): Future[Seq[Annotation]] =
