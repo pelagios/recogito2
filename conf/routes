@@ -192,9 +192,9 @@ GET     /                                            controllers.landing.Landing
 # Workspace API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my/me.json                                  controllers.my.ng.WorkspaceAPIController.me
-GET     /my/documents.json                           controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 20)
-GET     /my/shared.json                              controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 20)
+GET     /my/api/account                              controllers.my.ng.WorkspaceAPIController.account
+GET     /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 20)
+GET     /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 20)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

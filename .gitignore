@@ -8,6 +8,8 @@
 /ops/vagrant/.vagrant
 /target
 /uploads
+**ensime*
+pc.stdout.log
 .classpath
 .project
 .settings
