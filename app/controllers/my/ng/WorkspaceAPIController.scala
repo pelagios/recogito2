@@ -40,6 +40,7 @@ class WorkspaceAPIController @Inject() (
     t._2.map(_.getContentType)
   ))
 
+  /** Returns account information **/
   def account = silhouette.SecuredAction.async { implicit request =>
     val username = request.identity.username
 
@@ -71,6 +72,7 @@ class WorkspaceAPIController @Inject() (
           )
         )
 
+      // TODO hack for testing only!
       jsonOk(json).withHeaders(
         "Access-Control-Allow-Origin" -> "http://localhost:7171",
         "Access-Control-Allow-Credentials" -> "true"
@@ -78,9 +80,11 @@ class WorkspaceAPIController @Inject() (
     }
   }
   
-  // Quick hack for testing  + CORS
+  /** Returns the list of my documents, taking into account user-specified col/sort config **/
   def myDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
     documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { documents =>
+
+      // TODO hack for testing only!
       jsonOk(Json.toJson(documents.toSeq)).withHeaders(
         "Access-Control-Allow-Origin" -> "http://localhost:7171",
         "Access-Control-Allow-Credentials" -> "true"
@@ -88,8 +92,11 @@ class WorkspaceAPIController @Inject() (
     }
   }
   
+  /** Returns the list of documents shared with me, taking into account user-specified col/sort config **/
   def sharedWithMe(offset: Int, size: Int) = Action.async { implicit request =>
     documents.findBySharedWith("username", offset, size).map { documents =>
+
+      // TODO hack for testing only!
       jsonOk(Json.toJson(documents.items.map(_._1))).withHeaders(
         "Access-Control-Allow-Origin" -> "http://localhost:7171",
         "Access-Control-Allow-Credentials" -> "true"
