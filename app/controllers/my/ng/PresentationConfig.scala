@@ -19,12 +19,12 @@ object Sorting {
 
 }
 
-case class PresentationConfig(columns: Seq[String], sort: Sorting)
+case class PresentationConfig(columns: Seq[String], sort: Option[Sorting])
 
 object PresentationConfig {
 
   implicit val presentationConfigReads: Reads[PresentationConfig] = (
-    (JsPath \ "columns").readNullable[Seq[String]] and
+    (JsPath \ "columns").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String])) and
     (JsPath \ "sort").readNullable[Sorting]
   )(PresentationConfig.apply _)
 

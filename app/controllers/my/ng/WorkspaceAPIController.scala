@@ -82,6 +82,10 @@ class WorkspaceAPIController @Inject() (
   
   /** Returns the list of my documents, taking into account user-specified col/sort config **/
   def myDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
+
+    val config = request.body.asJson
+    play.api.Logger.info(s"Payload: ${config}")
+
     documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { documents =>
 
       // TODO hack for testing only!
@@ -102,6 +106,14 @@ class WorkspaceAPIController @Inject() (
         "Access-Control-Allow-Credentials" -> "true"
       )
     }
+  }
+
+  def options() = Action { implicit request => 
+    Ok.withHeaders(
+      "Access-Control-Allow-Origin" -> "http://localhost:7171",
+      "Access-Control-Allow-Credentials" -> "true",
+      "Access-Control-Allow-Headers" -> "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+    )
   }
 
 }
