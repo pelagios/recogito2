@@ -46,9 +46,8 @@ class MaintenanceController @Inject()(
       <p>
         Like all of our Pelagios resources, Recogito is community-driven. Get the latest news, join the 
         discussion, and help improve them by 
-        <a href="https://groups.google.com/d/forum/pelagios-announcements/" target="_blank">joining our 
-        new mailing list</a>, or sign up to one of our 
-        <a href="https://groups.google.com/d/forum/pelagios-announcements/" target="_blank">Working Groups</a>.
+        <a href="https://groups.google.com/d/forum/pelagios-announcements/" target="_blank">signing up to our 
+        new mailing list</a>.
       </p>
     """).map(_ => Ok)
   }
