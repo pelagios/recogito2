@@ -43,14 +43,6 @@ landing.index.registration_form.placeholder.password=رمز ورود
 landing.index.registration_form.placeholder.register=ثبت نام
 landing.index.registration_form.disclaimer.text=با قوانین  و شرایط </a> ما<a href="{0}">و ذخیره نشانی ایمیلتان موافقت کنید.
 
-# News
-landing.index.news.title=News:
-landing.index.news.subtitle=Annotating Relations
-landing.index.news.text=We are excited to announce the general availability of our new \
-  <strong>Relations</strong> feature. Build networks from text by drawing connections between \
-  people, places, things, events. Make statements about how they relate using your own vocabulary. \
-  Get data out easily for further analysis and visualization. <a href="/help/relations">Here''s how</a>.
-
 # Tiles
 landing.index.tiles.1.title=مجموعه های به اشتراک گذاشته شده
 landing.index.tiles.1.text= متن ها و تصاویر را بارگذاری کنید. مجموعه خود را ایجاد نمایید. دیگران را به همکاری دعوت نمایید.

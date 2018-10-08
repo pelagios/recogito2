@@ -44,14 +44,6 @@ landing.index.registration_form.placeholder.register=Εγγραφείτε στο
 landing.index.registration_form.disclaimer.text=Συμφωνήστε με τους <a href="{0}">Όρους και Προϋποθέσεις Χρήσης</a> \
   και την αποθήκευση της διεύθυνσης ηλεκτρονικού ταχυδρομείου σας.
 
-# News
-landing.index.news.title=News:
-landing.index.news.subtitle=Annotating Relations
-landing.index.news.text=We are excited to announce the general availability of our new \
-  <strong>Relations</strong> feature. Build networks from text by drawing connections between \
-  people, places, things, events. Make statements about how they relate using your own vocabulary. \
-  Get data out easily for further analysis and visualization. <a href="/help/relations">Here''s how</a>.
-
 # Tiles
 landing.index.tiles.1.title=Κοινές συλλογές
 landing.index.tiles.1.text=Ανεβάστε κείμενα και εικόνες. Δημιουργήστε τις δικές σας συλλογές. Προσκαλέστε άλλους για συνεργασία.

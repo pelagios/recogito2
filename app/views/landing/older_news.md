@@ -1,3 +1,10 @@
+# Join our mailing list
+_Oct 08, 2018_
+
+All Pelagios Commons resources are community-driven. To get the latest news and help 
+improve them, [join our mailing list](https://groups.google.com/d/forum/pelagios-announcements/)
+and consider signing up for a [Working Group](http://commons.pelagios.org/working-groups).
+
 # News: Annotating Relations
 _Jun 07, 2018_
 

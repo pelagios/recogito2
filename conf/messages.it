@@ -44,14 +44,6 @@ landing.index.registration_form.placeholder.register=Registrati su Recogito
 landing.index.registration_form.disclaimer.text=Acconsenti alle nostre <a href="{0}">condizioni d''uso</a> \
   e alla raccolta del tuo indirizzo email.
 
-# News
-landing.index.news.title=News:
-landing.index.news.subtitle=Annotating Relations
-landing.index.news.text=We are excited to announce the general availability of our new \
-  <strong>Relations</strong> feature. Build networks from text by drawing connections between \
-  people, places, things, events. Make statements about how they relate using your own vocabulary. \
-  Get data out easily for further analysis and visualization. <a href="/help/relations">Here''s how</a>.
-
 # Tiles
 landing.index.tiles.1.title=Collezioni condivise
 landing.index.tiles.1.text=Carica testi e immagini. Crea la tua collezione. Invita altri a collaborare.
