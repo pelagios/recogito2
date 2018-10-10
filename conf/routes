@@ -119,6 +119,7 @@ GET     /document/:id/part/:partNo/raw               controllers.document.Docume
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /document/:id                                controllers.document.DocumentController.initialDocumentView(id: String)
+DELETE  /document                                    controllers.document.settings.SettingsController.bulkDeleteDocuments()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Annotation view resolver service
@@ -196,7 +197,7 @@ GET     /my/api/account                              controllers.my.ng.Workspace
 GET     /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 20)
 POST    /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 20)
 GET     /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 20)
-OPTIONS /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.options()           
+OPTIONS /*path                                       controllers.my.ng.WorkspaceAPIController.options(path: String)           
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

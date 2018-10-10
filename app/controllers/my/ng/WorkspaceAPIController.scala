@@ -106,10 +106,11 @@ class WorkspaceAPIController @Inject() (
     }
   }
 
-  def options() = Action { implicit request => 
+  def options(path: String) = Action { implicit request => 
     Ok.withHeaders(
       "Access-Control-Allow-Origin" -> "http://localhost:7171",
       "Access-Control-Allow-Credentials" -> "true",
+      "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS, PUT, DELETE",
       "Access-Control-Allow-Headers" -> "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
     )
   }
