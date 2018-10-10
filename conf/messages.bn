@@ -43,13 +43,6 @@ landing.index.registration_form.placeholder.password=পাসওয়ার্ড
 landing.index.registration_form.placeholder.register=Recogitoতে রেজিস্টার করুন
 landing.index.registration_form.disclaimer.text=আমাদের <a href="{0}">ব্যাবহারের শর্তাবলি</a> এবং আপনার ই-মেইল সংরক্ষনের ব্যাপারে সম্মতি জানান।
 
-# News
-landing.index.news.title=সংবাদঃ
-landing.index.news.subtitle=সম্পর্ক চিহ্নিত করুন
-landing.index.news.text=আমরা অতিশয় আনন্দের সাথে জানাচ্ছি যে আমাদের নতুন \
-  <strong>সম্পর্ক</strong> টুলটি এখন সবার ব্যাবহারের জন্য উপযুক্ত. আপনার বাক্য অথবা রচনার সাথে জনসাধারণ, বাসস্থান, বস্তু এবং ঘটনার মধ্যকার সম্পর্ক চিহ্নিত করে নেটওয়ার্ক তৈরি করুন। এরা কিভাবে সম্পর্কিত তা আপনার নিজের ভাষায় ব্যাখ্যা করুন। আরো বিশ্লেষণ এবং দৃশ্যযোগ্য করার জন্য সহজে আপনার তথ্য স্থানান্তর করুন। <a href="/help/relations">এখান থেকে জানুন কিভাবে</a>.
-
-
 # Tiles
 landing.index.tiles.1.title=শেয়ারকৃত সংগ্রহ
 landing.index.tiles.1.text=আপনার টেক্সট এবং ছবি আপলোড করুন। আপনার নিজস্ব সংগ্রহ তৈরি করুন। অন্যদের একত্রে কাজ করার জন্য আমন্ত্রণ জানান।

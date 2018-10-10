@@ -18,6 +18,7 @@ play.i18n.langs = [ "en", "bn", "de", "el", "es", "fa", "fr", "he", "it", "ja", 
 # Maximum size for file uploads
 # ~~~~~
 play.http.parser.maxDiskBuffer=500MB
+play.http.parser.maxMemoryBuffer=20MB
 
 # Server request timeout value (default = 20s)
 # ~~~~~

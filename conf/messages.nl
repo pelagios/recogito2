@@ -44,14 +44,6 @@ landing.index.registration_form.placeholder.register=Register voor Recogito
 landing.index.registration_form.disclaimer.text=Accepteer de <a href="{0}">gebruiksvooorwaarden</a> \
   en geef toestemming om uw emailadres op te slaan.
 
-# News
-landing.index.news.title=News:
-landing.index.news.subtitle=Annotating Relations
-landing.index.news.text=We are excited to announce the general availability of our new \
-  <strong>Relations</strong> feature. Build networks from text by drawing connections between \
-  people, places, things, events. Make statements about how they relate using your own vocabulary. \
-  Get data out easily for further analysis and visualization. <a href="/help/relations">Here''s how</a>.
-
 # Tiles
 landing.index.tiles.1.title=Gedeelde collecties
 landing.index.tiles.1.text=Text en afbeeldingen uploaden. Bouw uw eigen collecties. Nodig anderen \

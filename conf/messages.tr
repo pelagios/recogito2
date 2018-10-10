@@ -44,14 +44,6 @@ landing.index.registration_form.placeholder.register=Recogito'ya kaydol
 landing.index.registration_form.disclaimer.text=Lütfen e-posta adresinizin saklanmasını ve \
   <a href="{0}">Kurallar ve Kullanım Koşullarını</a> kabul ettiğinizi onaylayın.
 
-# News
-landing.index.news.title=News:
-landing.index.news.subtitle=Annotating Relations
-landing.index.news.text=We are excited to announce the general availability of our new \
-  <strong>Relations</strong> feature. Build networks from text by drawing connections between \
-  people, places, things, events. Make statements about how they relate using your own vocabulary. \
-  Get data out easily for further analysis and visualization. <a href="/help/relations">Here''s how</a>.
-
 # Tiles
 landing.index.tiles.1.title=Paylaşılan Koleksiyonlar
 landing.index.tiles.1.text=Metin ya da resim yükleyin. Kendi koleksiyonlarınızı oluşturun. \
