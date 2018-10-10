@@ -72,9 +72,11 @@ trait DatatableToCSV extends BaseSerializer with HasCSVParsing {
     
     exportMergedDocument[(File, String)](doc, { case (annotations, places, documentDir) =>
       
-      def extendRow(row: List[String], index: Int): List[String] = {
+      def extendRow(row: List[String], part: DocumentFilepartRecord, index: Int): List[String] = {
         val anchor = "row:" + index
-        val maybeAnnotation = annotations.find(_.anchor == anchor)
+        val maybeAnnotation = annotations.find { a => 
+          a.annotates.filepartId == part.getId && a.anchor == anchor
+        }
         
         val maybeFirstEntity = maybeAnnotation.flatMap(getFirstEntityBody(_))
         val maybePlace = maybeFirstEntity.flatMap(body => findPlace(body, places))
@@ -111,7 +113,7 @@ trait DatatableToCSV extends BaseSerializer with HasCSVParsing {
         val writer = underlying.asCsvWriter[Seq[String]](writerConfig)
         
         parseCSV(file, delimiter, header = true, { case (row, idx) =>
-          extendRow(row, idx)
+          extendRow(row, part, idx)
         }).foreach { _ match {
           case Some(row) => writer.write(row)
           case None => writer.write(Seq.empty[String])
