@@ -196,8 +196,8 @@ GET     /                                            controllers.landing.Landing
 GET     /my/api/account                              controllers.my.ng.WorkspaceAPIController.account
 GET     /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 20)
 POST    /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 20)
+GET     /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 20)
 POST    /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 20)
-OPTIONS /*path                                       controllers.my.ng.WorkspaceAPIController.options(path: String)           
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

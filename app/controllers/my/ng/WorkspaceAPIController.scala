@@ -56,27 +56,19 @@ class WorkspaceAPIController @Inject() (
 
     f.map { case (user, myDocCount, sharedCount) =>
       val usedMb = Math.round(100 * uploads.getUsedDiskspaceKB(username) / 1024).toDouble / 100
-
-      val json = 
-        Json.obj(
-          "username" -> user.username,
-          "real_name" -> user.realName,
-          "member_since" -> formatDate(new DateTime(user.memberSince.getTime)),
-          "documents" -> Json.obj(
-            "my_documents" -> myDocCount,
-            "shared_with_me" -> sharedCount
-          ),
-          "storage" -> Json.obj(
-            "quota_mb" -> user.quotaMb.toInt,
-            "used_mb" -> usedMb
-          )
+      jsonOk(Json.obj(
+        "username" -> user.username,
+        "real_name" -> user.realName,
+        "member_since" -> formatDate(new DateTime(user.memberSince.getTime)),
+        "documents" -> Json.obj(
+          "my_documents" -> myDocCount,
+          "shared_with_me" -> sharedCount
+        ),
+        "storage" -> Json.obj(
+          "quota_mb" -> user.quotaMb.toInt,
+          "used_mb" -> usedMb
         )
-
-      // TODO hack for testing only!
-      jsonOk(json).withHeaders(
-        "Access-Control-Allow-Origin" -> "http://localhost:7171",
-        "Access-Control-Allow-Credentials" -> "true"
-      )
+      ))
     }
   }
   
@@ -87,32 +79,16 @@ class WorkspaceAPIController @Inject() (
 
     documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { documents =>
       // TODO hack for testing only!
-      jsonOk(Json.toJson(documents.toSeq)).withHeaders(
-        "Access-Control-Allow-Origin" -> "http://localhost:7171",
-        "Access-Control-Allow-Credentials" -> "true"
-      )
+      jsonOk(Json.toJson(documents.toSeq))
     }
   }
   
   /** Returns the list of documents shared with me, taking into account user-specified col/sort config **/
   def sharedWithMe(offset: Int, size: Int) = Action.async { implicit request =>
     documents.findBySharedWith("username", offset, size).map { documents =>
-
       // TODO hack for testing only!
-      jsonOk(Json.toJson(documents.items.map(_._1))).withHeaders(
-        "Access-Control-Allow-Origin" -> "http://localhost:7171",
-        "Access-Control-Allow-Credentials" -> "true"
-      )
+      jsonOk(Json.toJson(documents.items.map(_._1)))
     }
-  }
-
-  def options(path: String) = Action { implicit request => 
-    Ok.withHeaders(
-      "Access-Control-Allow-Origin" -> "http://localhost:7171",
-      "Access-Control-Allow-Credentials" -> "true",
-      "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS, PUT, DELETE",
-      "Access-Control-Allow-Headers" -> "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
-    )
   }
 
 }
