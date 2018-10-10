@@ -102,7 +102,6 @@ GET     /document/:id/settings/collaborator/search   controllers.document.settin
 GET     /document/:id/settings/history.json          controllers.document.settings.SettingsController.getContributionHistory(id: String, offset: Int ?= 0, size: Int ?= 100)
 POST    /document/:id/settings/rollback              controllers.document.settings.SettingsController.rollbackByTime(id: String, contributionId: String)
 GET     /document/:id/settings/zip-export            controllers.document.settings.SettingsController.exportAsZip(id: String)
-DELETE  /document/:id/settings/delete                controllers.document.settings.SettingsController.deleteDocument(id: String)
 DELETE  /document/:id/settings/delete-annotations    controllers.document.settings.SettingsController.deleteAnnotations(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,7 +118,6 @@ GET     /document/:id/part/:partNo/raw               controllers.document.Docume
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /document/:id                                controllers.document.DocumentController.initialDocumentView(id: String)
-DELETE  /document                                    controllers.document.settings.SettingsController.bulkDeleteDocuments()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Annotation view resolver service
@@ -198,6 +196,9 @@ GET     /my/api/my-documents                         controllers.my.ng.Workspace
 POST    /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 20)
 GET     /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 20)
 POST    /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 20)
+
+DELETE  /document/bulk                               controllers.my.ng.WorkspaceAPIController.bulkDeleteDocuments()
+DELETE  /document/:id                                controllers.my.ng.WorkspaceAPIController.deleteDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

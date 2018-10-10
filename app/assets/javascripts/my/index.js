@@ -147,7 +147,7 @@ require([
             head = ids[0];
             tail = ids.slice(1);
 
-            jsRoutes.controllers.document.settings.SettingsController.deleteDocument(head).ajax()
+            jsRoutes.controllers.my.ng.WorkspaceAPIController.deleteDocument(head).ajax()
               .fail(function(error) {
                 console.log(error);
               })
