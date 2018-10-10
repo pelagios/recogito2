@@ -77,9 +77,8 @@ class WorkspaceAPIController @Inject() (
 
     // val config = request.body.asJson
 
-    documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { documents =>
-      // TODO hack for testing only!
-      jsonOk(Json.toJson(documents.toSeq))
+    documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { result =>
+      jsonOk(Json.toJson(result))
     }
   }
   

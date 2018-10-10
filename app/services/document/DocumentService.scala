@@ -304,7 +304,15 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
          .offset(offset)
          .fetchArray()
          
-    groupLeftJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
+    val asMap = groupLeftJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
+
+    val asOrderedTuples = records.map { record =>
+      val doc = record.into(classOf[DocumentRecord])
+      val fileparts = asMap.get(doc).get
+      (doc -> fileparts)
+    }
+
+    Page(System.currentTimeMillis - startTime, total, offset, limit, asOrderedTuples)
   }
   
   /** Retrieves documents from a given owner, visible to the given logged in user.
