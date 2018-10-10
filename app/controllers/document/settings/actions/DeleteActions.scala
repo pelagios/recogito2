@@ -91,7 +91,7 @@ trait DeleteActions { self: SettingsController =>
 
     val fSuccess = fDeleteableDocuments.flatMap { toDelete =>
       Future.sequence(toDelete.map(deleteOneDocument))
-    } map { _.exists(!_) }
+    } map { !_.exists(!_) } // "No false exists in the list"
 
     fSuccess.map { success => 
       if (success) Ok else InternalServerError
