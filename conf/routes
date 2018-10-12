@@ -200,6 +200,8 @@ POST    /my/api/shared-with-me                       controllers.my.ng.Workspace
 DELETE  /document/bulk                               controllers.my.ng.WorkspaceAPIController.bulkDeleteDocuments()
 DELETE  /document/:id                                controllers.my.ng.WorkspaceAPIController.deleteDocument(id: String)
 
+POST    /my/upload                                   controllers.my.ng.UploadController.storeFilepart()
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
