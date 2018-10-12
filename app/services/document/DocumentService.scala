@@ -296,7 +296,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     
     val total = sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
     
-    val records = 
+    val rows = 
       sql.selectFrom(DOCUMENT
            .join(DOCUMENT_FILEPART).on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID)))
          .where(DOCUMENT.OWNER.equal(owner))
@@ -304,12 +304,11 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
          .offset(offset)
          .fetchArray()
          
-    val asMap = groupLeftJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
+    val asMap = groupLeftJoinResult(rows, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
 
-    val asOrderedTuples = records.map { record =>
-      val doc = record.into(classOf[DocumentRecord])
-      val fileparts = asMap.get(doc).get
-      (doc -> fileparts)
+    val asOrderedTuples = rows.map(_.into(classOf[DocumentRecord])).distinct.map { document => 
+      val fileparts = asMap.get(document).get
+      (document -> fileparts)
     }
 
     Page(System.currentTimeMillis - startTime, total, offset, limit, asOrderedTuples)

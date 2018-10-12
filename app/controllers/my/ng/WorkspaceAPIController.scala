@@ -39,10 +39,12 @@ class WorkspaceAPIController @Inject() (
     
   implicit val documentWithMetadataWrites: Writes[(DocumentRecord, Seq[DocumentFilepartRecord])] = (
     (JsPath).write[DocumentRecord] and
-    (JsPath \ "filetypes").write[Seq[String]]
+    (JsPath \ "filetypes").write[Seq[String]] and
+    (JsPath \ "file_count").write[Int]
   )(t => (
     t._1,
-    t._2.map(_.getContentType)
+    t._2.map(_.getContentType).distinct,
+    t._2.size
   ))
 
   /** Utility to get the document, but only if the given user is the document's owner
