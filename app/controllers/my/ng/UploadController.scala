@@ -144,7 +144,13 @@ class UploadController @Inject() (
     }
   }
 
-  def storeFilepart() = silhouette.SecuredAction.async { implicit request => 
+  def initUpload() = silhouette.SecuredAction.async { implicit request =>
+    uploads.createPendingUpload(request.identity.username).map { upload =>
+      jsonOk(Json.obj("id" -> upload.getId.toInt))
+    }
+  }
+
+  def storeFilepart(uploadId: Int) = silhouette.SecuredAction.async { implicit request => 
     // File or remote URL?
     val isFileupload = request.body.asMultipartFormData.isDefined
 
@@ -159,6 +165,10 @@ class UploadController @Inject() (
       else 
         registerIIIFSource(pendingUpload, request.identity, request.body)
     }
+  }
+
+  def finalizeUpload() = silhouette.SecuredAction { implicit request =>
+    Ok // TODO
   }
 
 }
