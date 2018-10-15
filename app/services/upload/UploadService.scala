@@ -35,8 +35,8 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
     }
   }
 
-  def createPendingUpload(owner: String) =
-    storePendingUpload(owner, "New Document", "", "", "", "", "", "")
+  def createPendingUpload(owner: String, title: String) =
+    storePendingUpload(owner, title, "", "", "", "", "", "")
   
   /** Inserts a new upload, or updates an existing one if it already exists **/
   def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String) =

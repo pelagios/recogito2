@@ -144,8 +144,14 @@ class UploadController @Inject() (
     }
   }
 
+  /** Initializes a new upload **/
   def initUpload() = silhouette.SecuredAction.async { implicit request =>
-    uploads.createPendingUpload(request.identity.username).map { upload =>
+    val title = request.body.asMultipartFormData.flatMap(_.dataParts.get("title"))
+          .getOrElse(Seq.empty[String])
+          .headOption
+          .getOrElse("New document")
+          
+    uploads.createPendingUpload(request.identity.username, title).map { upload =>
       jsonOk(Json.obj("id" -> upload.getId.toInt))
     }
   }
@@ -154,21 +160,62 @@ class UploadController @Inject() (
     // File or remote URL?
     val isFileupload = request.body.asMultipartFormData.isDefined
 
-    val fPendingUpload: Future[UploadRecord] = uploads.findPendingUpload(request.identity.username).flatMap { _ match {
-      case Some(pendingUpload) => Future.successful(pendingUpload)
-      case None => uploads.createPendingUpload(request.identity.username)
-    }}
+    uploads.findPendingUpload(request.identity.username).flatMap { _ match {
+      case None =>
+        Future.successful(NotFound)
 
-    fPendingUpload.flatMap { pendingUpload =>
-      if (isFileupload)
-        storeFile(pendingUpload, request.identity, request.body)
-      else 
-        registerIIIFSource(pendingUpload, request.identity, request.body)
-    }
+      // Only the current user can add files to this upload
+      case Some(pendingUpload) if (pendingUpload.getId != uploadId) => 
+        Future.successful(Forbidden)
+
+      case Some(pendingUpload) =>
+        if (isFileupload)
+          storeFile(pendingUpload, request.identity, request.body)
+        else 
+          registerIIIFSource(pendingUpload, request.identity, request.body)
+    }}
   }
 
-  def finalizeUpload() = silhouette.SecuredAction { implicit request =>
-    Ok // TODO
+  def finalizeUpload(id: Int) = silhouette.SecuredAction.async { implicit request =>
+    uploads.findPendingUploadWithFileparts(request.identity.username).flatMap(_ match {
+      case None =>
+        Future.successful(NotFound)
+
+      case Some((pendingUpload, Seq())) =>
+        // No fileparts - doesn't make sense
+        Future.successful(BadRequest)
+    
+      case Some((pendingUpload, fileparts)) =>
+        uploads.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
+          // We'll forward a list of the running processing tasks to the view, so it can show progress
+          val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]
+          
+          // TODO this bit should be cleaned up
+
+          // Apply NER if requested
+          val applyNER = checkParamValue("apply-ner", "on")
+          if (applyNER) {
+            nerService.spawnTask(doc, docParts)
+            runningTasks.append(NERService.TASK_TYPE)
+          }
+
+          // Tile images
+          val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
+          if (imageParts.size > 0) {
+            tilingService.spawnTask(doc, imageParts)
+            runningTasks.append(TilingService.TASK_TYPE)
+          }
+          
+          // Parse TEI
+          val teiParts = docParts.filter(_.getContentType.equals(ContentType.TEXT_TEIXML.toString))
+          if (teiParts.size > 0) {
+            teiParserService.spawnTask(doc, teiParts)
+            runningTasks.append(TEIParserService.TASK_TYPE)              
+          }
+
+          jsonOk(Json.toJson(runningTasks.map(_.toString)))
+        }}
+    })
   }
 
 }

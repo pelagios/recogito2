@@ -202,7 +202,7 @@ DELETE  /document/:id                                controllers.my.ng.Workspace
 
 POST    /my/upload                                   controllers.my.ng.UploadController.initUpload()
 POST    /my/upload/:id/file                          controllers.my.ng.UploadController.storeFilepart(id: Int)
-POST    /my/upload/finalize                          controllers.my.ng.UploadController.finalizeUpload()
+POST    /my/upload/:id/finalize                      controllers.my.ng.UploadController.finalizeUpload(id: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root
