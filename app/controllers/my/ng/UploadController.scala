@@ -150,7 +150,7 @@ class UploadController @Inject() (
           .getOrElse(Seq.empty[String])
           .headOption
           .getOrElse("New document")
-          
+
     uploads.createPendingUpload(request.identity.username, title).map { upload =>
       jsonOk(Json.obj("id" -> upload.getId.toInt))
     }
@@ -213,7 +213,10 @@ class UploadController @Inject() (
             runningTasks.append(TEIParserService.TASK_TYPE)              
           }
 
-          jsonOk(Json.toJson(runningTasks.map(_.toString)))
+          jsonOk(Json.obj(
+            "document_id" -> doc.getId,
+            "running_tasks" -> runningTasks.map(_.toString)
+          ))
         }}
     })
   }
