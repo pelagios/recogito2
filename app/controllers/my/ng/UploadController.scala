@@ -91,7 +91,7 @@ class UploadController @Inject() (
   }
 
   private def registerIIIFSource(pendingUpload: UploadRecord, owner: User, body: AnyContent) = {
-    body.asFormUrlEncoded.flatMap(_.get("iiif_source").flatMap(_.headOption)) match {
+    body.asMultipartFormData.flatMap(_.dataParts.get("url").flatMap(_.headOption)) match {
       case Some(url) =>
         // Identify type of IIIF URL - image or item manifest? 
         IIIFParser.identify(url).flatMap {  
@@ -158,7 +158,7 @@ class UploadController @Inject() (
 
   def storeFilepart(uploadId: Int) = silhouette.SecuredAction.async { implicit request => 
     // File or remote URL?
-    val isFileupload = request.body.asMultipartFormData.isDefined
+    val isFileupload = request.body.asMultipartFormData.flatMap(_.file("file")).isDefined
 
     uploads.findPendingUpload(request.identity.username).flatMap { _ match {
       case None =>
