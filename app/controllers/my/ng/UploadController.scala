@@ -182,8 +182,10 @@ class UploadController @Inject() (
         Future.successful(NotFound)
 
       case Some((pendingUpload, Seq())) =>
-        // No fileparts - doesn't make sense
-        Future.successful(BadRequest)
+        // No fileparts: doesn't make sense - just cancel the pending upload
+        uploads.deletePendingUpload(request.identity.username).map { success =>
+          if (success) Ok else InternalServerError
+        }
     
       case Some((pendingUpload, fileparts)) =>
         uploads.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {

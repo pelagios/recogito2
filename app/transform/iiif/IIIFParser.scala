@@ -28,14 +28,14 @@ object IIIFParser {
             if ((response.json \ "protocol").as[String].endsWith("api/image"))
               Success(IIIF.IMAGE_INFO)
             else
-              Failure(new RuntimeException("Could not identify resource type"))
+              Failure(new RuntimeException("Unsupported content type"))
         }
       } recover { case t: Throwable =>
         Failure(t)
       }
       
     case _ =>
-      Future.successful(Failure(new RuntimeException("Could not identify resource type")))
+      Future.successful(Failure(new RuntimeException("Unsupported content type")))
   }
   
   /** Fetches a manifset over the net and parses it **/
