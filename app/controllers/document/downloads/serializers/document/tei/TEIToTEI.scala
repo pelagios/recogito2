@@ -79,6 +79,10 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
       
       el.appendChild(doc.createTextNode(quote))
 
+      val verificationStatus = annotation.bodies.flatMap(_.status).headOption.map(_.value)
+      if (verificationStatus.isDefined)
+        el.setAttribute("cert", verificationStatus.get.toString)
+
       el
     }
 

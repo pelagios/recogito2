@@ -1,10 +1,10 @@
 package controllers.document.downloads.serializers.document.tei
 
-import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import services.document.{ DocumentInfo, DocumentService }
-import play.api.mvc.{ AnyContent, Request }
-import scala.concurrent.{ Future, ExecutionContext }
-import scala.xml.{ UnprefixedAttribute, Node, Null, Text }
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
+import services.document.{DocumentInfo, DocumentService}
+import play.api.mvc.{AnyContent, Request}
+import scala.concurrent.{Future, ExecutionContext}
+import scala.xml.{UnprefixedAttribute, Node, Null, Text}
 import storage.uploads.Uploads
 
 trait PlaintextToTEI extends BaseTEISerializer {
@@ -27,6 +27,9 @@ trait PlaintextToTEI extends BaseTEISerializer {
       
     def getEntityType(annotation: Annotation) = 
       annotation.bodies.find(b => Set(PLACE, PERSON, EVENT).contains(b.hasType))
+
+    def getVerificationStatus(annotation: Annotation) =
+      annotation.bodies.flatMap(_.status).headOption.map(_.value)
     
     // XML, by nature can't handle overlapping annotations
     val nonOverlappingAnnotations = sort(annotations).foldLeft(Seq.empty[Annotation]) { case (result, next) =>
@@ -53,20 +56,25 @@ trait PlaintextToTEI extends BaseTEISerializer {
       val id = toTeiId(annotation.annotationId)
       val quote = escape(getQuote(annotation))
       val offset = getCharOffset(annotation)
-      val entityType = getEntityType(annotation)    
+      val entityType = getEntityType(annotation)   
       
       // Tags of form @key:value - to be used as XML attributes
       val attributes = getAttributeTags(annotation)
       
       // All other tags, rolled into one 'ana' attribute
       val tags = getNonAttributeTags(annotation)
-      val ana =  { if (tags.isEmpty) None else Some(tags.mkString(",")) }.map { xml.Text(_) }
+      val ana = { if (tags.isEmpty) None else Some(tags.mkString(",")) }.map { xml.Text(_) }
       
-       val baseTag = entityType.map { body =>
+      val cert = getVerificationStatus(annotation).map(s => xml.Text(s.toString)) 
+      
+      val baseTag = entityType.map { body =>
         body.hasType match {        
           case PLACE => body.uri match {
-            case Some(uri) => <placeName ref={uri} xml:id={id} ana={ana}>{quote}</placeName>
-            case None => <placeName xml:id={id} ana={ana}>{quote}</placeName>
+            case Some(uri) => 
+              <placeName ref={uri} xml:id={id} ana={ana} cert={cert}>{quote}</placeName>
+            
+            case None => 
+              <placeName xml:id={id} ana={ana} cert={cert}>{quote}</placeName>
           }
             
           case PERSON =>
