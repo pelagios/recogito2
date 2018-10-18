@@ -10,8 +10,9 @@ import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
+import services.document.DocumentInfo
 import services.entity.{Entity, EntityType}
 import services.entity.builtin.EntityService
 import storage.TempDir
@@ -25,7 +26,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
       places.find(_.uris.contains(uri))
     }
 
-  def annotationsToCSV(documentId: String)(
+  def annotationsToCSV(doc: DocumentInfo)(
     implicit annotationService: AnnotationService,
              entityService: EntityService, 
              tmpFile: TemporaryFileCreator,
@@ -33,7 +34,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
              ctx: ExecutionContext
   ) = {
 
-    def serializeOne(a: Annotation, places: Seq[Entity]): Seq[String] = {
+    def serializeOne(a: Annotation, filename: String, places: Seq[Entity]): Seq[String] = {
       val firstEntity = getFirstEntityBody(a)
       val maybePlace = firstEntity.flatMap(body => findPlace(body, places))
       
@@ -47,6 +48,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
       val placeTypes = maybePlace.map(_.subjects.map(_._1).mkString(","))
 
       Seq(a.annotationId.toString,
+          filename,
           quoteOrTranscription.getOrElse(EMPTY),
           a.anchor,
           firstEntity.map(_.hasType.toString).getOrElse(EMPTY),
@@ -60,24 +62,35 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
           getCommentBodies(a).flatMap(_.value).mkString("|"))
     }
 
-    val annotationQuery = annotationService.findByDocId(documentId)
-    val placeQuery = entityService.listEntitiesInDocument(documentId, Some(EntityType.PLACE))
+    val fAnnotationsByPart = Future.sequence {
+      doc.fileparts.map { part => 
+        annotationService.findByFilepartId(part.getId).map { annotationsWithId => 
+          (part, annotationsWithId.map(_._1))
+        }
+      }
+    }
+
+    val fPlaces = entityService.listEntitiesInDocument(doc.id, Some(EntityType.PLACE))
 
     val f = for {
-      annotations <- annotationQuery
-      places <- placeQuery
-    } yield (annotations, places.items.map(_._1.entity))
+      annotationByPart <- fAnnotationsByPart
+      places <- fPlaces
+    } yield (annotationByPart, places.items.map(_._1.entity))
 
-    f.map { case (annotations, places) =>
+    f.map { case (annotationsByPart, places) =>
       scala.concurrent.blocking {
-        val header = Seq("UUID", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
+        val header = Seq("UUID", "FILE", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
         
         val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
         val underlying = tmp.path.toFile
         val config = CsvConfiguration(',', '"', QuotePolicy.Always, Header.Explicit(header))
         val writer = underlying.asCsvWriter[Seq[String]](config)
-        
-        val tupled = sort(annotations.map(_._1)).map(a => serializeOne(a, places))
+
+        val sorted = annotationsByPart.flatMap { case (part, annotations) => 
+          sort(annotations).map { (_, part.getTitle) }
+        }
+
+        val tupled = sorted.map(t => serializeOne(t._1, t._2, places))
         tupled.foreach(t => writer.write(t))
         writer.close()
         
