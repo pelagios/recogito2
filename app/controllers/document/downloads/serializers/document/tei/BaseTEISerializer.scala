@@ -51,7 +51,7 @@ trait BaseTEISerializer extends BaseSerializer {
   /** Returns a TEI @cert value, if relevant */
   def getCert(annotation: Annotation): Option[String] = {
     annotation.bodies.flatMap(_.status).headOption.map(_.value).map { _ match {
-      case VERIFIED         => "1"
+      case VERIFIED         => "high"
       case UNVERIFIED       => "low"
       case NOT_IDENTIFIABLE => "unknown"
     }}
