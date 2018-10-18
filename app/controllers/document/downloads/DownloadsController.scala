@@ -121,7 +121,7 @@ class DownloadsController @Inject() (
       else
         // Normal table export only requires READ_DATA privileges
         if (userAccessLevel.canReadData)
-          annotationsToCSV(documentId).map { csv =>
+          annotationsToCSV(docInfo).map { csv =>
             Ok.sendFile(csv).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".csv" })
           }
         else
