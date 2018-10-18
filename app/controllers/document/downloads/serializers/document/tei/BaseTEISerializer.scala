@@ -2,7 +2,8 @@ package controllers.document.downloads.serializers.document.tei
 
 import controllers.document.downloads.serializers.BaseSerializer
 import java.util.UUID
-import services.annotation.{ Annotation, AnnotationBody }
+import services.annotation.{Annotation, AnnotationBody}
+import services.annotation.AnnotationStatus._
 
 trait BaseTEISerializer extends BaseSerializer {
   
@@ -46,6 +47,16 @@ trait BaseTEISerializer extends BaseSerializer {
       body.hasType == AnnotationBody.TAG && !isAttributeTag(body)
     }.map { _.value.get }
     
+
+  /** Returns a TEI @cert value, if relevant */
+  def getCert(annotation: Annotation): Option[String] = {
+    annotation.bodies.flatMap(_.status).headOption.map(_.value).map { _ match {
+      case VERIFIED         => "1"
+      case UNVERIFIED       => "low"
+      case NOT_IDENTIFIABLE => "unknown"
+    }}
+  }
+
   /** Generates a <listRelation> element for relations, if any are contained in the annotations **/
   def relationsToList(annotations: Seq[Annotation]) = 
     annotations.filter(_.relations.size > 0) match {

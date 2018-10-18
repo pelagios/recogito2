@@ -79,6 +79,10 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
       
       el.appendChild(doc.createTextNode(quote))
 
+      val cert = getCert(annotation)
+      if (cert.isDefined)
+        el.setAttribute("cert", cert.get)
+
       el
     }
 
