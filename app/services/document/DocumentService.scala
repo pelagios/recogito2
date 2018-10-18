@@ -295,15 +295,19 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     val startTime = System.currentTimeMillis
     
     val total = sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
-    
-    val rows = 
-      sql.selectFrom(DOCUMENT
-           .join(DOCUMENT_FILEPART).on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID)))
+
+    val subquery = 
+      sql.selectFrom(DOCUMENT)
          .where(DOCUMENT.OWNER.equal(owner))
-         .limit(limit)
-         .offset(offset)
+         .limit(limit).offset(offset)
+
+    val rows = 
+      sql.select().from(subquery)
+         .join(DOCUMENT_FILEPART)
+         .on(subquery.field(DOCUMENT.ID)
+         .equal(DOCUMENT_FILEPART.DOCUMENT_ID))
          .fetchArray()
-         
+
     val asMap = groupLeftJoinResult(rows, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
 
     val asOrderedTuples = rows.map(_.into(classOf[DocumentRecord])).distinct.map { document => 
