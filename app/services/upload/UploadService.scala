@@ -39,8 +39,16 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
     storePendingUpload(owner, title, "", "", "", "", "", "")
   
   /** Inserts a new upload, or updates an existing one if it already exists **/
-  def storePendingUpload(owner: String, title: String, author: String, dateFreeform: String, description: String, language: String, source: String, edition: String) =
-    db.withTransaction { sql =>
+  def storePendingUpload(
+    owner: String, 
+    title: String, 
+    author: String = null, 
+    dateFreeform: String = null, 
+    description: String = null, 
+    language: String = null, 
+    source: String = null, 
+    edition: String = null
+  ) = db.withTransaction { sql =>
       val upload =
         Option(sql.selectFrom(UPLOAD).where(UPLOAD.OWNER.equal(owner)).fetchOne()) match {
           case Some(upload) => {
@@ -78,7 +86,7 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
 
       upload.store()
       upload
-  }
+    }
 
   /** Inserts a new locally stored filepart - metadata goes to the DB, content to the pending-uploads dir **/
   def insertUploadFilepart(uploadId: Int, owner: User, filepart: FilePart[TemporaryFile]):

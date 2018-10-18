@@ -105,6 +105,8 @@ class UploadController @Inject() (
           case Success(IIIF.MANIFEST) =>
             IIIFParser.fetchManifest(url).flatMap { 
               case Success(manifest) =>
+                // Update the upload title with the manifset label (if any)
+                manifest.label.map { label => uploads.storePendingUpload(owner.username, label) }
 
                 // The weirdness of IIIF canvases. In order to get a label for the images,
                 // we zip the images with the label of the canvas they are on (images don't

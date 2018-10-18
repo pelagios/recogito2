@@ -33,7 +33,7 @@ trait BaseService {
     }).exists(_ == true)
     
   /** Java-interop helper that turns empty strings to null, so they are properly inserted by JOOQ **/
-  protected def nullIfEmpty(s: String) = if (s.trim.isEmpty) null else s
+  protected def nullIfEmpty(s: String) = if (s == null || s.trim.isEmpty) null else s
     
   /** Optional strings need to be turned to null for JOOQ **/
   protected def optString(str: Option[String]) = str match {
