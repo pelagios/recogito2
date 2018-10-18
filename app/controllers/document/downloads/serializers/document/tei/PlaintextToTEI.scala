@@ -28,9 +28,6 @@ trait PlaintextToTEI extends BaseTEISerializer {
     def getEntityType(annotation: Annotation) = 
       annotation.bodies.find(b => Set(PLACE, PERSON, EVENT).contains(b.hasType))
 
-    def getVerificationStatus(annotation: Annotation) =
-      annotation.bodies.flatMap(_.status).headOption.map(_.value)
-    
     // XML, by nature can't handle overlapping annotations
     val nonOverlappingAnnotations = sort(annotations).foldLeft(Seq.empty[Annotation]) { case (result, next) =>
       result.lastOption match {
@@ -65,7 +62,8 @@ trait PlaintextToTEI extends BaseTEISerializer {
       val tags = getNonAttributeTags(annotation)
       val ana = { if (tags.isEmpty) None else Some(tags.mkString(",")) }.map { xml.Text(_) }
       
-      val cert = getVerificationStatus(annotation).map(s => xml.Text(s.toString)) 
+      // Cert (if any), derived from annotation status
+      val cert = getCert(annotation).map(xml.Text(_)) 
       
       val baseTag = entityType.map { body =>
         body.hasType match {        
