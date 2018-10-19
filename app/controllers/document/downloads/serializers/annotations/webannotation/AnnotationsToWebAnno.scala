@@ -1,6 +1,7 @@
 package controllers.document.downloads.serializers.annotations.webannotation
 
 import controllers.document.downloads.serializers.BaseSerializer
+import services.ContentType
 import services.annotation.AnnotationService
 import services.document.{ DocumentInfo, DocumentService }
 import play.api.mvc.{ AnyContent, Request }
@@ -12,12 +13,13 @@ trait AnotationsToWebAnno extends BaseSerializer {
   def documentToWebAnnotation(doc: DocumentInfo)(implicit documentService: DocumentService,
       annotationService: AnnotationService, request: Request[AnyContent], ctx: ExecutionContext) = {
 
+    // To be used as 'generator' URI
     val recogitoURI = controllers.landing.routes.LandingController.index().absoluteURL
-    val documentURI = controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL
 
     annotationService.findByDocId(doc.id).map { annotations =>
       Json.toJson(annotations.map { case (annotation, _) =>
-        WebAnnotation(recogitoURI, documentURI, annotation)
+        val filepart = doc.fileparts.find(_.getId == annotation.annotates.filepartId).get
+        WebAnnotation(filepart, recogitoURI, annotation)
       })
     }
   }
