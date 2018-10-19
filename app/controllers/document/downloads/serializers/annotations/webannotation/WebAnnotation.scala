@@ -1,13 +1,14 @@
 package controllers.document.downloads.serializers.annotations.webannotation
 
-import services.HasDate
-import services.annotation.Annotation
 import org.joda.time.DateTime
 import play.api.mvc.{ AnyContent, Request }
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import services.HasDate
+import services.annotation.Annotation
+import services.generated.tables.records.DocumentFilepartRecord
 
-case class WebAnnotation(recogitoBaseURI: String, documentURI: String, annotation: Annotation)
+case class WebAnnotation(filepart: DocumentFilepartRecord, recogitoBaseURI: String, annotation: Annotation)
 
 object WebAnnotation extends HasDate {
   
@@ -21,12 +22,12 @@ object WebAnnotation extends HasDate {
     (JsPath \ "target").write[WebAnnotationTarget]
   )(a => (
     "http://www.w3.org/ns/anno.jsonld",
-    a.documentURI + "#" + a.annotation.annotationId.toString,
+    s"${a.recogitoBaseURI}annotation/${a.annotation.annotationId}",
     "Annotation",
     a.recogitoBaseURI,
     DateTime.now,
     a.annotation.bodies.flatMap(b => WebAnnotationBody.fromAnnotationBody(b, a.recogitoBaseURI)),
-    WebAnnotationTarget.fromAnnotation(a.annotation)
+    WebAnnotationTarget.fromAnnotation(a.filepart, a.annotation)
   ))
 
 }
