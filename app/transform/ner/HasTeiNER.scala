@@ -52,7 +52,7 @@ trait HasTeiNER {
         
         (entity, anchor)
       }
-    } filter { case (e, anchor) => // Don't include annotations inside existing place/persNames
+    } filter { case (_, anchor) => // Don't include annotations inside existing place/persNames
       !(anchor.contains("placename") || anchor.contains("persname")) 
     }
   }
