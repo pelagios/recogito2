@@ -114,7 +114,11 @@ class WorkspaceAPIController @Inject() (
   /** Returns the list of my documents, taking into account user-specified col/sort config **/
   def myDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
 
-    // val config = request.body.asJson
+    val config = request.body.asJson.flatMap { json => 
+      Try(Json.fromJson[PresentationConfig](json).get).toOption
+    }
+
+    play.api.Logger.info(config.toString)
 
     documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { result =>
       jsonOk(Json.toJson(result))

@@ -13,8 +13,11 @@ case class Sorting(sortBy: String, order: SortOrder.Order)
 object Sorting {
 
   implicit val sortingReads: Reads[Sorting] = (
-    (JsPath \ "sort_by").read[String] and
-    (JsPath \ "order").read[String].map(SortOrder.withName)
+    (JsPath \ "by").read[String] and
+    (JsPath \ "asc").readNullable[Boolean].map(_ match {
+      case Some(false) => SortOrder.DESC
+      case _ => SortOrder.ASC // Default
+    })
   )(Sorting.apply _)
 
 }
