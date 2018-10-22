@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import services.HasDate
 import services.annotation.AnnotationService
-import services.contribution.ContributionService
+import services.contribution.{Contribution, ContributionService}
 import services.document.{DocumentService, RuntimeAccessLevel}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.user.UserService
@@ -110,6 +110,42 @@ class WorkspaceAPIController @Inject() (
       ))
     }
   }
+  /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
+  private def fetchIndexedProperties(docIds: Seq[String], config: PresentationConfig): Future[Seq[(String, Option[Contribution], Long)]] = {
+
+    // Helper that wraps the common bits: conditional execution, sequence-ing, mapping to (id -> result) tuple
+    def fetchIfRequested[T](field: String*)(fn: String => Future[T]) =
+      if (config.hasAnyColumn(field))
+        Future.sequence(docIds.map(id => fn(id).map((id, _)))) 
+      else 
+        Future.successful(Seq())
+
+    val fLastEdits = fetchIfRequested("last_edit_at", "last_edit_by") { id =>
+      contributions.getLastContribution(id)
+    }
+
+    val fAnnotationCount = fetchIfRequested("annotations") { id =>
+      annotations.countByDocId(id)
+    }
+
+    // TODO status_ratio, activity
+          
+    val f = for {
+      lastEdits <- fLastEdits
+      annotationCounts <- fAnnotationCount
+    } yield (lastEdits.toMap, annotationCounts.toMap)   
+
+    // TODO something like an "insertIdexProperties" method...
+    // TODO takes the list of items, inlines requested values
+    
+    f.map { case (lastEdits, annotationsPerDoc) =>
+      docIds.map { id =>
+        val lastEdit = lastEdits.find(_._1 == id).flatMap(_._2)
+        val annotations = annotationsPerDoc.find(_._1 == id).map(_._2).getOrElse(0l)
+        (id, lastEdit, annotations)
+      }
+    }
+  }
   
   /** Returns the list of my documents, taking into account user-specified col/sort config **/
   def myDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
@@ -117,12 +153,56 @@ class WorkspaceAPIController @Inject() (
       Try(Json.fromJson[PresentationConfig](json).get).toOption
     }
 
-    // play.api.Logger.info(config.toString)
+    // TODO sorting?
+
+    val f = for {
+      documents <- documents.findByOwnerWithPartMetadata(request.identity.username, offset, size)
+      indexedProperties <- config match {
+        case Some(c) => fetchIndexedProperties(documents.items.map(_._1.getId), c)
+        case None => null // TODO devise a sane response format
+      }
+    } yield (documents, indexedProperties)
 
     documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { result =>
       jsonOk(Json.toJson(result))
     }
   }
+
+  /*
+    private def renderMyDocuments(user: User, usedSpace: Long, offset: Int, sortBy: String, sortOrder: SortOrder, size: Option[Int])(implicit request: RequestHeader) = {
+    val startTime = System.currentTimeMillis
+    val fSharedCount = documents.countBySharedWith(user.username)
+    val pageSize = size.getOrElse(DEFAULT_DOCUMENTS_PER_PAGE)
+    
+    val fMyDocs =
+      if (isSortingByIndex(sortBy)) {
+        documents.listAllIdsByOwner(user.username).flatMap { docIds =>
+          val f = for {
+            sortedIds <- sortByIndexProperty(docIds, sortBy, sortOrder, offset, pageSize)
+            docs <- documents.findByIds(sortedIds)
+          } yield (sortedIds, docs)
+          
+          f.map { case (sortedIds, docs) => 
+            val sorted = sortedIds.map(id => docs.find(_.getId == id).get)
+            Page(System.currentTimeMillis - startTime, docIds.size, offset, pageSize, sorted)
+          }
+        }
+      } else {
+        documents.findByOwner(user.username, offset, pageSize, Some(sortBy), Some(sortOrder))
+      }
+        
+    val f = for {
+      sharedCount <- fSharedCount
+      myDocs <- fMyDocs
+      indexedProps <- fetchIndexedProperties(myDocs.items.map(_.getId))
+    } yield (sharedCount, myDocs.zip(indexedProps)
+        .map({ case (doc, (_, lastEdit, annotations)) => (doc, lastEdit, annotations) }, System.currentTimeMillis - startTime))
+    
+    f.map { case (sharedCount, page) =>
+      Ok(views.html.my.my_private(user, usedSpace, page, sharedCount, sortBy, sortOrder, size))
+    }
+  }
+  */
   
   /** Returns the list of documents shared with me, taking into account user-specified col/sort config **/
   def sharedWithMe(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>

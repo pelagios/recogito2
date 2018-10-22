@@ -32,6 +32,11 @@ case class PresentationConfig(columns: Seq[String], sort: Option[Sorting]) {
   // True if columns include fields that reside in the DB
   lazy val containsDBFields = columns.find(DB_FIELDS.contains(_))
 
+  // Shorthands
+  def hasColumn(field: String) = columns.contains(field)
+
+  def hasAnyColumn(fields: Seq[String]) = fields.intersect(columns).size > 0
+
 }
 
 object PresentationConfig {
