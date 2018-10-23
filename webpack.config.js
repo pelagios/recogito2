@@ -12,8 +12,7 @@ module.exports = {
   },
   entry: {
     bulkannotation: path.join(srcPath, 'document/annotation/common/bulkannotation/App.jsx'),
-    gazetteers: path.join(srcPath, 'admin/gazetteers/App.jsx'),
-    workspace: path.join(srcPath, 'my/ng/App.jsx')
+    gazetteers: path.join(srcPath, 'admin/gazetteers/App.jsx')
   },
   output: {
     path:path.resolve(__dirname, jsPath, '../build'),
