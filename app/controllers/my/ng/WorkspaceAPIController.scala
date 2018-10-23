@@ -34,19 +34,6 @@ class WorkspaceAPIController @Inject() (
       with HasPrettyPrintJSON 
       with HasDate {
   
-  // DocumentRecord JSON serialization     
-  import services.document.DocumentService.documentRecordWrites
-    
-  implicit val documentWithMetadataWrites: Writes[(DocumentRecord, Seq[DocumentFilepartRecord])] = (
-    (JsPath).write[DocumentRecord] and
-    (JsPath \ "filetypes").write[Seq[String]] and
-    (JsPath \ "file_count").write[Int]
-  )(t => (
-    t._1,
-    t._2.map(_.getContentType).distinct,
-    t._2.size
-  ))
-
   /** Utility to get the document, but only if the given user is the document's owner
     * 
     * Will return none in error cases as well, i.e. when the document wasn't found, or something
@@ -57,7 +44,6 @@ class WorkspaceAPIController @Inject() (
       case Some((document, accesslevel)) =>
         if (accesslevel == RuntimeAccessLevel.OWNER) Some(document)
         else None
-
       case None => None
     }).recover { case t =>
       None
@@ -110,9 +96,9 @@ class WorkspaceAPIController @Inject() (
       ))
     }
   }
+  
   /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
   private def fetchIndexedProperties(docIds: Seq[String], config: PresentationConfig) = {
-
     // Helper that wraps the common bits: conditional execution, sequence-ing, mapping to (id -> result) tuple
     def fetchIfRequested[T](field: String*)(fn: String => Future[T]) =
       if (config.hasAnyColumn(field))
@@ -134,9 +120,6 @@ class WorkspaceAPIController @Inject() (
       lastEdits <- fLastEdits
       annotationCounts <- fAnnotationCount
     } yield (lastEdits.toMap, annotationCounts.toMap)   
-
-    // TODO something like an "insertIdexProperties" method...
-    // TODO takes the list of items, inlines requested values
     
     f.map { case (lastEdits, annotationsPerDoc) =>
       docIds.map { id =>
@@ -212,6 +195,7 @@ class WorkspaceAPIController @Inject() (
   def sharedWithMe(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
     documents.findBySharedWith("username", offset, size).map { documents =>
       // TODO hack for testing only!
+      import services.document.DocumentService.documentRecordWrites
       jsonOk(Json.toJson(documents.items.map(_._1)))
     }
   }
