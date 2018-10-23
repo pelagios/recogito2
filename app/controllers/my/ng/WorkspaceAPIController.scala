@@ -7,10 +7,10 @@ import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import services.HasDate
+import services.{HasDate, Page}
 import services.annotation.AnnotationService
 import services.contribution.{Contribution, ContributionService}
 import services.document.{DocumentService, RuntimeAccessLevel}
@@ -34,6 +34,11 @@ class WorkspaceAPIController @Inject() (
       with HasPrettyPrintJSON 
       with HasDate {
   
+  private val INDEX_SORT_PROPERTIES = Seq("last_edit_at", "last_edit_by", "annotations")
+  
+  private def isSortingByIndex(sortBy: String) =
+    INDEX_SORT_PROPERTIES.contains(sortBy.toLowerCase)
+
   /** Utility to get the document, but only if the given user is the document's owner
     * 
     * Will return none in error cases as well, i.e. when the document wasn't found, or something
@@ -129,17 +134,29 @@ class WorkspaceAPIController @Inject() (
       }
     }
   }
-  
-  /** Returns the list of my documents, taking into account user-specified col/sort config **/
-  def myDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
-    val config = request.body.asJson.flatMap { json => 
-      Try(Json.fromJson[PresentationConfig](json).get).toOption
-    }
 
+  private def sortByIndexProperty(
+    docIds: Seq[String], 
+    sort: Sorting,
+    offset: Int, 
+    size: Int
+  ): Future[Seq[String]] = sort.sortBy match {
+    case "last_edit_at" => contributions.sortDocsByLastModifiedAt(docIds, sort.order, offset, size)
+    case "last_edit_by" => contributions.sortDocsByLastModifiedBy(docIds, sort.order, offset, size)
+    case "annotations" => annotations.sortDocsByAnnotationCount(docIds, sort.order, offset, size)
+    case _ => Future.successful(docIds)
+  }
+  
+  /** Returns /my/documents API result, using DB-based sorting **/
+  private def myDocumentsByDB(
+    username: String,
+    offset: Int, 
+    size: Int, 
+    config: Option[PresentationConfig]
+  )(implicit request: Request[AnyContent]) = {
     val f = for {
-      documents <- documents.findByOwnerWithPartMetadata(
-        request.identity.username, 
-        offset, size,
+      documents <- documents.findByOwnerWithParts(
+        username, offset, size,
         config.flatMap(_.sort.map(_.sortBy)),
         config.flatMap(_.sort.map(_.order)))
 
@@ -158,41 +175,43 @@ class WorkspaceAPIController @Inject() (
     }
   }
 
-  /*
-    private def renderMyDocuments(user: User, usedSpace: Long, offset: Int, sortBy: String, sortOrder: SortOrder, size: Option[Int])(implicit request: RequestHeader) = {
+  private def myDocumentsByIndex(
+    username: String,
+    offset: Int, 
+    size: Int,
+    config: PresentationConfig
+  )(implicit request: Request[AnyContent]) = {
     val startTime = System.currentTimeMillis
-    val fSharedCount = documents.countBySharedWith(user.username)
-    val pageSize = size.getOrElse(DEFAULT_DOCUMENTS_PER_PAGE)
-    
-    val fMyDocs =
-      if (isSortingByIndex(sortBy)) {
-        documents.listAllIdsByOwner(user.username).flatMap { docIds =>
-          val f = for {
-            sortedIds <- sortByIndexProperty(docIds, sortBy, sortOrder, offset, pageSize)
-            docs <- documents.findByIds(sortedIds)
-          } yield (sortedIds, docs)
-          
-          f.map { case (sortedIds, docs) => 
-            val sorted = sortedIds.map(id => docs.find(_.getId == id).get)
-            Page(System.currentTimeMillis - startTime, docIds.size, offset, pageSize, sorted)
-          }
-        }
-      } else {
-        documents.findByOwner(user.username, offset, pageSize, Some(sortBy), Some(sortOrder))
-      }
-        
+
     val f = for {
-      sharedCount <- fSharedCount
-      myDocs <- fMyDocs
-      indexedProps <- fetchIndexedProperties(myDocs.items.map(_.getId))
-    } yield (sharedCount, myDocs.zip(indexedProps)
-        .map({ case (doc, (_, lastEdit, annotations)) => (doc, lastEdit, annotations) }, System.currentTimeMillis - startTime))
-    
-    f.map { case (sharedCount, page) =>
-      Ok(views.html.my.my_private(user, usedSpace, page, sharedCount, sortBy, sortOrder, size))
+      allIds <- documents.listAllIdsByOwner(username)
+      sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
+      docsWithParts <- documents.findByIdsWithParts(sortedIds)
+      indexedProperties <- fetchIndexedProperties(sortedIds, config)      
+    } yield (allIds, sortedIds, docsWithParts, indexedProperties)
+
+    f.map { case (allIds, sortedIds, docsWithParts, indexedProperties) => 
+      val dbResult = Page(System.currentTimeMillis - startTime, sortedIds.size, offset, size, docsWithParts)
+
+      val interleaved = ConfiguredPresentation.build(dbResult, Some(indexedProperties), Some(config.columns))
+      jsonOk(Json.toJson(interleaved))
     }
   }
-  */
+
+  /** Returns the list of my documents, taking into account user-specified col/sort config **/
+  def myDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
+    val config = request.body.asJson.flatMap { json => 
+      Try(Json.fromJson[PresentationConfig](json).get).toOption
+    }
+
+    // Does the config request a sorting based on an index property?
+    val sortByIndex = config.flatMap(_.sort.map(_.sortBy)).map(isSortingByIndex(_)).getOrElse(false)
+
+    if (sortByIndex)
+      myDocumentsByIndex(request.identity.username, offset, size, config.get)
+    else
+      myDocumentsByDB(request.identity.username, offset, size, config)
+  }
   
   /** Returns the list of documents shared with me, taking into account user-specified col/sort config **/
   def sharedWithMe(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>

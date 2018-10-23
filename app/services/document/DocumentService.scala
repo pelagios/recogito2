@@ -164,6 +164,28 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
   def findByIds(docIds: Seq[String]) = db.query { sql => 
     sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds)).fetchArray().toSeq
   }
+
+  /** Batch-retrieves the document records with the given IDs, along with their fileparts **/
+  def findByIdsWithParts(docIds: Seq[String]) = db.query { sql =>
+    val subquery = sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds))
+
+    val rows = 
+      sql.select().from(subquery)
+         .join(DOCUMENT_FILEPART)
+         .on(subquery.field(DOCUMENT.ID)
+           .equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+         .fetchArray
+
+    val asMap = groupLeftJoinResult(rows, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
+
+    val asTuples = rows.map(_.into(classOf[DocumentRecord])).distinct.map { document => 
+      val fileparts = asMap.get(document).get
+      (document -> fileparts)
+    }.toSeq
+
+    // Ensure results are in the same order as docIds
+    docIds.map(id => asTuples.find(_._1.getId == id).get)
+  }
   
   /** Batch-retrieves the document records with the given ID, plus the sharing policy with the given user **/
   def findByIdsWithSharingPolicy(docIds: Seq[String], sharedWith: String) = db.query { sql =>
@@ -291,7 +313,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     Page(System.currentTimeMillis - startTime, total, offset, limit, items)
   }
   
-  def findByOwnerWithPartMetadata(
+  def findByOwnerWithParts(
     owner: String, 
     offset: Int = 0, 
     limit: Int = 0,
@@ -322,7 +344,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
       sql.select().from(subquery)
          .join(DOCUMENT_FILEPART)
          .on(subquery.field(DOCUMENT.ID)
-         .equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+           .equal(DOCUMENT_FILEPART.DOCUMENT_ID))
          .fetchArray()
 
     val asMap = groupLeftJoinResult(rows, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
