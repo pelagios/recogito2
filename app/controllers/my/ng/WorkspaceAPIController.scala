@@ -111,7 +111,7 @@ class WorkspaceAPIController @Inject() (
     }
   }
   /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
-  private def fetchIndexedProperties(docIds: Seq[String], config: PresentationConfig): Future[Seq[(String, Option[Contribution], Long)]] = {
+  private def fetchIndexedProperties(docIds: Seq[String], config: PresentationConfig) = {
 
     // Helper that wraps the common bits: conditional execution, sequence-ing, mapping to (id -> result) tuple
     def fetchIfRequested[T](field: String*)(fn: String => Future[T]) =
@@ -142,7 +142,7 @@ class WorkspaceAPIController @Inject() (
       docIds.map { id =>
         val lastEdit = lastEdits.find(_._1 == id).flatMap(_._2)
         val annotations = annotationsPerDoc.find(_._1 == id).map(_._2).getOrElse(0l)
-        (id, lastEdit, annotations)
+        (id, IndexDerivedProperties(lastEdit.map(_.madeAt), lastEdit.map(_.madeBy), Some(annotations)))
       }
     }
   }
@@ -158,13 +158,17 @@ class WorkspaceAPIController @Inject() (
     val f = for {
       documents <- documents.findByOwnerWithPartMetadata(request.identity.username, offset, size)
       indexedProperties <- config match {
-        case Some(c) => fetchIndexedProperties(documents.items.map(_._1.getId), c)
-        case None => null // TODO devise a sane response format
+        case Some(c) => 
+          val ids = documents.items.map(_._1.getId)
+          fetchIndexedProperties(ids, c).map(Some(_))
+
+        case None => Future.successful(None)
       }
     } yield (documents, indexedProperties)
 
-    documents.findByOwnerWithPartMetadata(request.identity.username, offset, size).map { result =>
-      jsonOk(Json.toJson(result))
+    f.map { case (documents, indexedProperties) =>
+      val interleaved = ConfiguredPresentation.build(documents, indexedProperties, config.map(_.columns))
+      jsonOk(Json.toJson(interleaved))
     }
   }
 

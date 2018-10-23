@@ -3,7 +3,7 @@ package controllers.my.ng
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import services.HasDate
+import services.{HasDate, Page}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 
 case class IndexDerivedProperties(
@@ -38,12 +38,39 @@ case class ConfiguredPresentation(
 
 object ConfiguredPresentation extends HasDate {
 
+  val DEFAULT_CONFIG = Seq("author", "title", "uploaded_at", "date_freeform")
+
+  /** Builds a configured presentation.
+    * 
+    * Takes a DB search result, index-derived props and the column config 
+    * as input. Column config is optional and will default to a sensible value.
+    */
+  def build(
+    page: Page[(DocumentRecord, Seq[DocumentFilepartRecord])],
+    indexProps: Option[Seq[(String, IndexDerivedProperties)]],
+    columnConfig: Option[Seq[String]]): Page[ConfiguredPresentation] = {
+
+    val config = columnConfig.getOrElse(DEFAULT_CONFIG)
+
+    page.map { case (document, parts) =>
+      val props = indexProps.flatMap { p =>
+            p.find(_._1 == document.getId)
+            .map(_._2)
+          }.getOrElse(IndexDerivedProperties.EMPTY)
+
+      ConfiguredPresentation(document, parts, props, config)
+    }
+  }
+
   implicit val configuredPresentationWrites: Writes[ConfiguredPresentation] = (
     // Write mandatory properties in any case
     (JsPath \ "id").write[String] and
     (JsPath \ "owner").write[String] and 
     (JsPath \ "uploaded_at").write[DateTime] and
     (JsPath \ "title").write[String] and
+
+    (JsPath \ "filetypes").write[Seq[String]] and
+    (JsPath \ "file_count").write[Int] and
 
     // Selectable DB properties
     (JsPath \ "author").writeNullable[String] and 
@@ -63,6 +90,9 @@ object ConfiguredPresentation extends HasDate {
     p.document.getOwner,
     new DateTime(p.document.getUploadedAt.getTime),
     p.document.getTitle,
+
+    p.parts.map(_.getContentType).distinct,
+    p.parts.size,
 
     // DB-based props, based on whether they are defined in the column config
     p.getDBProp[String]("author", p.document.getAuthor),
