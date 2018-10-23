@@ -10,7 +10,7 @@ import services.user.{User, UserService}
 import services.document.DocumentService
 import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import org.webjars.play.WebJarsUtil
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{ControllerComponents, Cookie, RequestHeader}
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,6 +27,7 @@ class MyRecogitoController @Inject() (
     val config: Configuration,
     val silhouette: Silhouette[Security.Env],
     implicit val ctx: ExecutionContext,
+    implicit val env: Environment,
     implicit val webjars: WebJarsUtil
   ) extends BaseController(components, config, users) with I18nSupport {
 
@@ -86,7 +87,7 @@ class MyRecogitoController @Inject() (
     val startTime = System.currentTimeMillis
     val fSharedCount = documents.countBySharedWith(user.username)
     val pageSize = size.getOrElse(DEFAULT_DOCUMENTS_PER_PAGE)
-    
+
     val fMyDocs =
       if (isSortingByIndex(sortBy)) {
         documents.listAllIdsByOwner(user.username).flatMap { docIds =>
