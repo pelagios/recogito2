@@ -26,26 +26,17 @@ case class ConfiguredPresentation(
   columnConfig: Seq[String]
 ) {
 
-  import ConfiguredPresentation._
+  // Helper to get the value of a DB property, under consideration of the columConfig
+  def getDBProp[T](key: String, prop: T): Option[T] = 
+    if (columnConfig.contains(key)) Option(prop) else None
 
-  def getIfDefined[T](field: String): Option[T] = field match {
-    
-    // Standards Option[String] DB fields
-    case s if OPT_STRING_DBFIELDS.contains(s) => 
-      if (columnConfig.contains(s)) prop else None
-
-    // Other DB fields
-    case "is_public" => None // TODO
-
-    // Index-based fields: last_edit_at, last_edit_by, annotations
-  }
+  // The only difference for index props it that they are already properly Option-typed
+  def getIndexProp[T](key: String, prop: Option[T]): Option[T] =
+    if (columnConfig.contains(key)) prop else None
 
 }
 
 object ConfiguredPresentation extends HasDate {
-
-  val OPT_STRING_DBFIELDS = 
-    Seq("author", "date_freeform", "language", "source", "edition")
 
   implicit val configuredPresentationWrites: Writes[ConfiguredPresentation] = (
     // Write mandatory properties in any case
@@ -61,28 +52,30 @@ object ConfiguredPresentation extends HasDate {
     (JsPath \ "language").writeNullable[String] and
     (JsPath \ "source").writeNullable[String] and
     (JsPath \ "edition").writeNullable[String] and
-    (JsPath \ "is_public").writeNullable[Boolean] and
+    (JsPath \ "public_visibility").writeNullable[String] and
 
     // Selectable index properties
     (JsPath \ "last_edit_at").writeNullable[DateTime] and
     (JsPath \ "last_edit_by").writeNullable[String] and
     (JsPath \ "annotations").writeNullable[Long]
   )(p => (
-    p.document.id,
+    p.document.getId,
     p.document.getOwner,
-    p.document.getUploadedAt,
+    new DateTime(p.document.getUploadedAt.getTime),
     p.document.getTitle,
 
-    p.getIfDefined[String]("author"),
-    p.getIfDefined[String]("date_freeform"),
-    p.getIfDefined[String]("language"),
-    p.getIfDefined[String]("source"),
-    p.getIfDefined[String]("edition"),
-    p.getIfDefined[Boolean]("is_public"),
+    // DB-based props, based on whether they are defined in the column config
+    p.getDBProp[String]("author", p.document.getAuthor),
+    p.getDBProp[String]("date_freeform", p.document.getDateFreeform),
+    p.getDBProp[String]("language", p.document.getLanguage),
+    p.getDBProp[String]("source", p.document.getSource),
+    p.getDBProp[String]("edition", p.document.getEdition),
+    p.getDBProp[String]("public_visibility", p.document.getPublicVisibility),
 
-    p.getIfDefined[DateTime]("last_edit_at"),
-    p.getIfDefined[String]("last_edit_by"),
-    p.getIfDefined[Long]("annotations")
+    // Index-based properties
+    p.getIndexProp[DateTime]("last_edit_at", p.indexProps.lastEditAt),
+    p.getIndexProp[String]("last_edit_by", p.indexProps.lastEditBy),
+    p.getIndexProp[Long]("annotations", p.indexProps.annotations)
   ))
 
 }
