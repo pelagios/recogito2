@@ -2,13 +2,9 @@ package controllers.my.ng
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import services.SortOrder
 
-object SortOrder extends Enumeration {
-  type Order = Value
-  val ASC, DESC = Value
-}
-
-case class Sorting(sortBy: String, order: SortOrder.Order)
+case class Sorting(sortBy: String, order: SortOrder)
 
 object Sorting {
 

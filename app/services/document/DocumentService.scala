@@ -291,15 +291,32 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     Page(System.currentTimeMillis - startTime, total, offset, limit, items)
   }
   
-  def findByOwnerWithPartMetadata(owner: String, offset: Int = 0, limit: Int = 0) = db.query { sql =>
+  def findByOwnerWithPartMetadata(
+    owner: String, 
+    offset: Int = 0, 
+    limit: Int = 0,
+    sortBy: Option[String],
+    sortOrder: Option[SortOrder]
+  ) = db.query { sql =>
     val startTime = System.currentTimeMillis
-    
-    val total = sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
 
-    val subquery = 
-      sql.selectFrom(DOCUMENT)
-         .where(DOCUMENT.OWNER.equal(owner))
-         .limit(limit).offset(offset)
+    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT), fieldname, sortOrder))
+    
+    val total =
+      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
+
+    val subquery = sortField match {
+      case Some(f) =>
+        sql.selectFrom(DOCUMENT)
+          .where(DOCUMENT.OWNER.equal(owner))
+          .orderBy(f)
+          .limit(limit).offset(offset)
+
+      case None =>
+        sql.selectFrom(DOCUMENT)
+          .where(DOCUMENT.OWNER.equal(owner))
+          .limit(limit).offset(offset)
+    }
 
     val rows = 
       sql.select().from(subquery)

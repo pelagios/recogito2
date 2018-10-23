@@ -96,7 +96,7 @@ class WorkspaceAPIController @Inject() (
       ))
     }
   }
-  
+
   /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
   private def fetchIndexedProperties(docIds: Seq[String], config: PresentationConfig) = {
     // Helper that wraps the common bits: conditional execution, sequence-ing, mapping to (id -> result) tuple
@@ -136,10 +136,13 @@ class WorkspaceAPIController @Inject() (
       Try(Json.fromJson[PresentationConfig](json).get).toOption
     }
 
-    // TODO sorting?
-
     val f = for {
-      documents <- documents.findByOwnerWithPartMetadata(request.identity.username, offset, size)
+      documents <- documents.findByOwnerWithPartMetadata(
+        request.identity.username, 
+        offset, size,
+        config.flatMap(_.sort.map(_.sortBy)),
+        config.flatMap(_.sort.map(_.order)))
+
       indexedProperties <- config match {
         case Some(c) => 
           val ids = documents.items.map(_._1.getId)
