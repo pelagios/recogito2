@@ -3,10 +3,11 @@ package services.document
 import collection.JavaConversions._
 import java.sql.Timestamp
 import java.util.Date
+import org.jooq.Record21
 import play.api.Logger
 import services.{Page, SortOrder}
 import services.generated.Tables._
-import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord}
 import storage.db.DB
 
 trait SharingPolicies { self: DocumentService =>
@@ -71,18 +72,21 @@ trait SharingPolicies { self: DocumentService =>
   }
   
   /** Lists the documents shared with a given user (paged response **/
-  def findBySharedWith(sharedWith: String, offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
+  def findShared(
+    sharedWith: String,
+    offset: Int,
+    limit: Int, 
+    sortBy: Option[String] = None,
+    sortOrder: Option[SortOrder] = None
+  ) = db.query { sql =>
     val startTime = System.currentTimeMillis
-    
     val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT, SHARING_POLICY), fieldname, sortOrder))
-    
     val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
     
-    val query = 
-      sql.selectFrom(SHARING_POLICY
-           .join(DOCUMENT)
-           .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
-         .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
+    val query = sql.selectFrom(SHARING_POLICY
+          .join(DOCUMENT)
+          .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
+        .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
          
     val items = sortField match {
       case Some(sort) => query.orderBy(sort).limit(limit).offset(offset).fetchArray().toSeq
@@ -93,6 +97,124 @@ trait SharingPolicies { self: DocumentService =>
       .map(r => (r.into(classOf[DocumentRecord]), r.into(classOf[SharingPolicyRecord])))
 
     Page(System.currentTimeMillis - startTime, total, offset, limit, mapped)
+  }
+
+  def findSharedWithPart(
+    sharedWith: String,
+    offset: Int, 
+    limit: Int, 
+    sortBy: Option[String] = None, 
+    sortOrder: Option[SortOrder] = None
+  ) = db.query { sql => 
+    val startTime = System.currentTimeMillis
+    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT, SHARING_POLICY), fieldname, sortOrder))
+    val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
+
+    val subquery = sortField match {
+      case Some(f) => 
+        sql.select(SHARING_POLICY.FOLDER_ID,
+        SHARING_POLICY.DOCUMENT_ID,
+        SHARING_POLICY.SHARED_BY,
+        SHARING_POLICY.SHARED_WITH,
+        SHARING_POLICY.SHARED_AT,
+        SHARING_POLICY.ACCESS_LEVEL).from(SHARING_POLICY
+             .join(DOCUMENT)
+             .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
+           .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
+           .orderBy(f)
+           .limit(limit)
+           .offset(offset)
+
+      case None =>
+        sql.select(
+          DOCUMENT.ID,
+                  DOCUMENT.OWNER,
+        DOCUMENT.UPLOADED_AT,
+        DOCUMENT.TITLE,
+        DOCUMENT.AUTHOR,
+        DOCUMENT.DATE_NUMERIC,
+        DOCUMENT.DATE_FREEFORM,
+        DOCUMENT.DESCRIPTION,
+        DOCUMENT.LANGUAGE,
+        DOCUMENT.SOURCE,
+        DOCUMENT.EDITION,
+        DOCUMENT.LICENSE,
+        DOCUMENT.ATTRIBUTION,
+        DOCUMENT.PUBLIC_VISIBILITY,
+        DOCUMENT.PUBLIC_ACCESS_LEVEL,
+          SHARING_POLICY.FOLDER_ID,
+        SHARING_POLICY.DOCUMENT_ID,
+        SHARING_POLICY.SHARED_BY,
+        SHARING_POLICY.SHARED_WITH,
+        SHARING_POLICY.SHARED_AT,
+        SHARING_POLICY.ACCESS_LEVEL).from(SHARING_POLICY
+             .join(DOCUMENT)
+             .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
+           .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
+           .limit(20)
+           .offset(0)
+    }
+
+    val filepartFields = Seq(
+      DOCUMENT_FILEPART.ID.as("document_part_id"),
+      DOCUMENT_FILEPART.DOCUMENT_ID,
+      DOCUMENT_FILEPART.TITLE,
+      DOCUMENT_FILEPART.CONTENT_TYPE,
+      DOCUMENT_FILEPART.FILE,
+      DOCUMENT_FILEPART.SEQUENCE_NO,
+      DOCUMENT_FILEPART.SOURCE) // ++ SHARING_POLICY.fields ++ DOCUMENT.fields
+
+    val rows = sql.select(
+        subquery.field(DOCUMENT.ID),
+        subquery.field(DOCUMENT.OWNER),
+        subquery.field(DOCUMENT.UPLOADED_AT),
+        subquery.field(DOCUMENT.TITLE),
+        subquery.field(DOCUMENT.AUTHOR),
+        subquery.field(DOCUMENT.DATE_NUMERIC),
+        subquery.field(DOCUMENT.DATE_FREEFORM),
+        subquery.field(DOCUMENT.DESCRIPTION),
+        subquery.field(DOCUMENT.LANGUAGE),
+        subquery.field(DOCUMENT.SOURCE),
+        subquery.field(DOCUMENT.EDITION),
+        subquery.field(DOCUMENT.LICENSE),
+        subquery.field(DOCUMENT.ATTRIBUTION),
+        subquery.field(DOCUMENT.PUBLIC_VISIBILITY),
+        subquery.field(DOCUMENT.PUBLIC_ACCESS_LEVEL),
+        subquery.field(SHARING_POLICY.FOLDER_ID),
+        subquery.field(SHARING_POLICY.DOCUMENT_ID),
+        subquery.field(SHARING_POLICY.SHARED_BY),
+        subquery.field(SHARING_POLICY.SHARED_WITH),
+        subquery.field(SHARING_POLICY.SHARED_AT),
+        subquery.field(SHARING_POLICY.ACCESS_LEVEL),
+      
+        subquery.field(DOCUMENT.ID).as("document_id"),
+        DOCUMENT_FILEPART.ID.as("document_part_id"),
+        DOCUMENT_FILEPART.DOCUMENT_ID,
+        DOCUMENT_FILEPART.TITLE,
+        DOCUMENT_FILEPART.CONTENT_TYPE,
+        DOCUMENT_FILEPART.FILE,
+        DOCUMENT_FILEPART.SEQUENCE_NO,
+        DOCUMENT_FILEPART.SOURCE).from(subquery)
+                 .join(DOCUMENT_FILEPART)
+                 .on(subquery.field(SHARING_POLICY.DOCUMENT_ID).equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+                 .fetchArray
+
+    val documentsAndPolicies = rows.map { r =>
+      val document = r.into(classOf[DocumentRecord])
+      val sharingPolicy = r.into(classOf[SharingPolicyRecord])
+      (document, sharingPolicy)
+    }.distinct
+
+    val fileparts = rows.map(_.into(classOf[DocumentFilepartRecord])).toSeq
+
+    fileparts.foreach(d => play.api.Logger.info(d.toString))
+
+    val results = documentsAndPolicies.map { t =>
+      val parts = fileparts.filter(_.getDocumentId == t._1.getId)
+      (t._1, t._2, parts)
+    }.toSeq
+    
+    Page(System.currentTimeMillis - startTime, total, offset, limit, results)
   }
   
   /** Deletes all policies shared by and with the given user **/

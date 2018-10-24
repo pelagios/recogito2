@@ -19,6 +19,7 @@ import storage.uploads.Uploads
 
 case class PartOrdering(partId: UUID, seqNo: Int)
 
+/** TODO this source file is just huge. I wonder how we can split it up into different parts **/
 @Singleton
 class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) 
   extends BaseService 

@@ -136,7 +136,7 @@ class MyRecogitoController @Inject() (
           }
         }
       } else {
-        documents.findBySharedWith(user.username, offset, pageSize, Some(sortBy), Some(sortOrder))
+        documents.findShared(user.username, offset, pageSize, Some(sortBy), Some(sortOrder))
       }
     
     val f = for {

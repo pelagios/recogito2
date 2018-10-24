@@ -215,10 +215,15 @@ class WorkspaceAPIController @Inject() (
   
   /** Returns the list of documents shared with me, taking into account user-specified col/sort config **/
   def sharedWithMe(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
-    documents.findBySharedWith("username", offset, size).map { documents =>
-      // TODO hack for testing only!
-      import services.document.DocumentService.documentRecordWrites
-      jsonOk(Json.toJson(documents.items.map(_._1)))
+    documents.findSharedWithPart(request.identity.username, offset, size).map { result =>
+
+      // TODO for testing only...
+      val dumbedDown = result.map { case (doc, sharingPolicy, parts) =>
+        (doc, parts)
+      }
+      val presentation = ConfiguredPresentation.build(dumbedDown, None, None)
+
+      jsonOk(Json.toJson(presentation))
     }
   }
 
