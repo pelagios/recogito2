@@ -110,30 +110,12 @@ trait SharingPolicies { self: DocumentService =>
     val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT, SHARING_POLICY), fieldname, sortOrder))
     val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
 
-    // Pretty annonying, but can't think of another way to define the fields 
-    // with proper aliasing for the query
-    val subqueryFields = Seq(
-      DOCUMENT.ID,
-      DOCUMENT.OWNER,
-      DOCUMENT.UPLOADED_AT,
-      DOCUMENT.TITLE,
-      DOCUMENT.AUTHOR,
-      DOCUMENT.DATE_NUMERIC,
-      DOCUMENT.DATE_FREEFORM,
-      DOCUMENT.DESCRIPTION,
-      DOCUMENT.LANGUAGE,
-      DOCUMENT.SOURCE,
-      DOCUMENT.EDITION,
-      DOCUMENT.LICENSE,
-      DOCUMENT.ATTRIBUTION,
-      DOCUMENT.PUBLIC_VISIBILITY,
-      DOCUMENT.PUBLIC_ACCESS_LEVEL,
-      SHARING_POLICY.FOLDER_ID,
-      SHARING_POLICY.DOCUMENT_ID,
-      SHARING_POLICY.SHARED_BY,
-      SHARING_POLICY.SHARED_WITH,
-      SHARING_POLICY.SHARED_AT,
-      SHARING_POLICY.ACCESS_LEVEL)
+    // We'll retrieve all fields except SHARING_POLICY.ID, since this
+    // would cause ambiguity issues in the query further down the line
+    val subqueryFields = { 
+      DOCUMENT.fields() ++
+      SHARING_POLICY.fields() 
+    } filter { _ != SHARING_POLICY.ID }
 
     val subquery = sortField match {
       case Some(f) => 
@@ -156,38 +138,7 @@ trait SharingPolicies { self: DocumentService =>
            .offset(0)
     }
 
-    val joinQueryFields = Seq(
-      subquery.field(DOCUMENT.ID),
-      subquery.field(DOCUMENT.OWNER),
-      subquery.field(DOCUMENT.UPLOADED_AT),
-      subquery.field(DOCUMENT.TITLE),
-      subquery.field(DOCUMENT.AUTHOR),
-      subquery.field(DOCUMENT.DATE_NUMERIC),
-      subquery.field(DOCUMENT.DATE_FREEFORM),
-      subquery.field(DOCUMENT.DESCRIPTION),
-      subquery.field(DOCUMENT.LANGUAGE),
-      subquery.field(DOCUMENT.SOURCE),
-      subquery.field(DOCUMENT.EDITION),
-      subquery.field(DOCUMENT.LICENSE),
-      subquery.field(DOCUMENT.ATTRIBUTION),
-      subquery.field(DOCUMENT.PUBLIC_VISIBILITY),
-      subquery.field(DOCUMENT.PUBLIC_ACCESS_LEVEL),
-      subquery.field(SHARING_POLICY.FOLDER_ID),
-      subquery.field(SHARING_POLICY.DOCUMENT_ID),
-      subquery.field(SHARING_POLICY.SHARED_BY),
-      subquery.field(SHARING_POLICY.SHARED_WITH),
-      subquery.field(SHARING_POLICY.SHARED_AT),
-      subquery.field(SHARING_POLICY.ACCESS_LEVEL),
-      subquery.field(DOCUMENT.ID).as("document_id"),
-      DOCUMENT_FILEPART.ID.as("document_part_id"),
-      DOCUMENT_FILEPART.DOCUMENT_ID,
-      DOCUMENT_FILEPART.TITLE,
-      DOCUMENT_FILEPART.CONTENT_TYPE,
-      DOCUMENT_FILEPART.FILE,
-      DOCUMENT_FILEPART.SEQUENCE_NO,
-      DOCUMENT_FILEPART.SOURCE)
-
-    val rows = sql.select(joinQueryFields:_*)
+    val rows = sql.select()
                   .from(subquery)
                   .join(DOCUMENT_FILEPART)
                   .on(subquery.field(SHARING_POLICY.DOCUMENT_ID).equal(DOCUMENT_FILEPART.DOCUMENT_ID))
