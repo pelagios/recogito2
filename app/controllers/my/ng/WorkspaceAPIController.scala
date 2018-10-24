@@ -7,10 +7,10 @@ import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, Result}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import services.{HasDate, Page}
+import services.{HasDate, Page, SortOrder}
 import services.annotation.AnnotationService
 import services.contribution.{Contribution, ContributionService}
 import services.document.{DocumentService, RuntimeAccessLevel}
@@ -103,7 +103,7 @@ class WorkspaceAPIController @Inject() (
   }
 
   /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
-  private def fetchIndexedProperties(docIds: Seq[String], config: PresentationConfig) = {
+  private def fetchIndexProperties(docIds: Seq[String], config: PresentationConfig) = {
     // Helper that wraps the common bits: conditional execution, sequence-ing, mapping to (id -> result) tuple
     def fetchIfRequested[T](field: String*)(fn: String => Future[T]) =
       if (config.hasAnyColumn(field))
@@ -147,30 +147,53 @@ class WorkspaceAPIController @Inject() (
     case _ => Future.successful(docIds)
   }
   
-  /** Returns /my/documents API result, using DB-based sorting **/
+  /** Boilerplate code to fetch documents sorted via a DB property */
+  private def documentsByDB[T <: Product](
+    username: String,
+    offset: Int, 
+    size: Int, 
+    config: Option[PresentationConfig],
+    fn: (String, Int, Int, Option[String], Option[SortOrder]) => Future[Page[T]]
+  ) = for {
+    documents <- fn(username, offset, size, 
+      config.flatMap(_.sort.map(_.sortBy)),
+      config.flatMap(_.sort.map(_.order)))
+
+    indexProperties <- config match {
+      case Some(c) => 
+        val ids = documents.items.map(_.productElement(0).asInstanceOf[DocumentRecord].getId)
+        fetchIndexProperties(ids, c).map(Some(_))
+
+      case None => Future.successful(None)
+    }
+  } yield (documents, indexProperties)
+
+  /** Fetches 'Shared with me' documents sorted by DB property **/
+  private def sharedDocumentsByDB(
+    username: String,
+    offset: Int, 
+    size: Int, 
+    config: Option[PresentationConfig]
+  )(implicit request: Request[AnyContent]) = {   
+    documentsByDB(
+      username, offset, size, config, documents.findSharedWithPart
+    ).map { case (documents, indexProperties) =>
+      val interleaved = ConfiguredPresentation.forSharedDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
+      jsonOk(Json.toJson(interleaved))
+    }
+  }
+
+  /** Fetches 'My Documents' sorted by DB property **/
   private def myDocumentsByDB(
     username: String,
     offset: Int, 
     size: Int, 
     config: Option[PresentationConfig]
   )(implicit request: Request[AnyContent]) = {
-    val f = for {
-      documents <- documents.findByOwnerWithParts(
-        username, offset, size,
-        config.flatMap(_.sort.map(_.sortBy)),
-        config.flatMap(_.sort.map(_.order)))
-
-      indexedProperties <- config match {
-        case Some(c) => 
-          val ids = documents.items.map(_._1.getId)
-          fetchIndexedProperties(ids, c).map(Some(_))
-
-        case None => Future.successful(None)
-      }
-    } yield (documents, indexedProperties)
-
-    f.map { case (documents, indexedProperties) =>
-      val interleaved = ConfiguredPresentation.build(documents, indexedProperties, config.map(_.columns))
+    documentsByDB(
+      username, offset, size, config, documents.findByOwnerWithParts
+    ).map { case (documents, indexProperties) =>
+      val interleaved = ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
       jsonOk(Json.toJson(interleaved))
     }
   }
@@ -187,44 +210,73 @@ class WorkspaceAPIController @Inject() (
       allIds <- documents.listAllIdsByOwner(username)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
       docsWithParts <- documents.findByIdsWithParts(sortedIds)
-      indexedProperties <- fetchIndexedProperties(sortedIds, config)      
-    } yield (allIds, sortedIds, docsWithParts, indexedProperties)
+      indexProperties <- fetchIndexProperties(sortedIds, config)      
+    } yield (allIds, sortedIds, docsWithParts, indexProperties)
 
-    f.map { case (allIds, sortedIds, docsWithParts, indexedProperties) => 
+    f.map { case (allIds, sortedIds, docsWithParts, indexProperties) => 
       val dbResult = Page(System.currentTimeMillis - startTime, sortedIds.size, offset, size, docsWithParts)
-
-      val interleaved = ConfiguredPresentation.build(dbResult, Some(indexedProperties), Some(config.columns))
+      val interleaved = ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
       jsonOk(Json.toJson(interleaved))
     }
   }
 
-  /** Returns the list of my documents, taking into account user-specified col/sort config **/
-  def myDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
-    val config = request.body.asJson.flatMap { json => 
-      Try(Json.fromJson[PresentationConfig](json).get).toOption
+  private def sharedDocumentsByIndex(
+    username: String,
+    offset: Int, 
+    size: Int,
+    config: PresentationConfig
+  )(implicit request: Request[AnyContent]) = {
+    val startTime = System.currentTimeMillis
+
+    val f = for {
+      allIds <- documents.listAllIdsSharedWith(username)
+      sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
+      documents <- documents.findByIdsWithPartsAndSharingPolicy(sortedIds, username)
+      indexProperties <- fetchIndexProperties(sortedIds, config)
+    } yield (allIds, sortedIds, documents, indexProperties)
+
+    f.map { case (allIds, sortedIds, documents, indexProperties) =>
+      val dbResult = Page(System.currentTimeMillis - startTime, sortedIds.size, offset, size, documents)
+      val interleaved = ConfiguredPresentation.forSharedDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
+      jsonOk(Json.toJson(interleaved))
     }
+  }
+
+  // Helper to capture common bits for /my-documents and /shared-with-me requests
+  private def documentAPIRequest(
+    username: String, offset: Int, size: Int,
+    onSortByDB   : (String, Int, Int, Option[PresentationConfig]) => Future[Result],
+    onSortByIndex: (String, Int, Int, PresentationConfig) => Future[Result]
+  )(implicit request: Request[AnyContent]) = {
+    val config = request.body.asJson.flatMap(json => 
+      Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
     // Does the config request a sorting based on an index property?
     val sortByIndex = config.flatMap(_.sort.map(_.sortBy)).map(isSortingByIndex(_)).getOrElse(false)
-
     if (sortByIndex)
-      myDocumentsByIndex(request.identity.username, offset, size, config.get)
-    else
-      myDocumentsByDB(request.identity.username, offset, size, config)
+      onSortByIndex(username, offset, size, config.get)
+    else 
+      onSortByDB(username, offset, size, config)
+  }
+
+  /** Returns the list of my documents, taking into account user-specified col/sort config **/
+  def myDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
+    documentAPIRequest(
+      request.identity.username, 
+      offset, 
+      size, 
+      myDocumentsByDB, 
+      myDocumentsByIndex)
   }
   
   /** Returns the list of documents shared with me, taking into account user-specified col/sort config **/
   def sharedWithMe(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
-    documents.findSharedWithPart(request.identity.username, offset, size).map { result =>
-
-      // TODO for testing only...
-      val dumbedDown = result.map { case (doc, sharingPolicy, parts) =>
-        (doc, parts)
-      }
-      val presentation = ConfiguredPresentation.build(dumbedDown, None, None)
-
-      jsonOk(Json.toJson(presentation))
-    }
+    documentAPIRequest(
+      request.identity.username, 
+      offset, 
+      size, 
+      sharedDocumentsByDB, 
+      sharedDocumentsByIndex)
   }
 
   /** Deletes the document with the given ID, along with all annotations and files **/

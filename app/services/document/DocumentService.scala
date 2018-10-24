@@ -9,6 +9,7 @@ import services.{BaseService, HasDate, Page, SortOrder}
 import services.generated.Tables._
 import services.generated.tables.records._
 import org.joda.time.DateTime
+import org.jooq.Record
 import org.apache.commons.io.FileUtils
 import play.api.Logger
 import play.api.libs.json._
@@ -187,7 +188,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     // Ensure results are in the same order as docIds
     docIds.map(id => asTuples.find(_._1.getId == id).get)
   }
-  
+
   /** Batch-retrieves the document records with the given ID, plus the sharing policy with the given user **/
   def findByIdsWithSharingPolicy(docIds: Seq[String], sharedWith: String) = db.query { sql =>
     val results = sql.selectFrom(SHARING_POLICY
@@ -198,6 +199,46 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
        .fetchArray().toSeq
     
     results.map(r => (r.into(classOf[DocumentRecord]), r.into(classOf[SharingPolicyRecord])))
+  }
+
+  protected def collectSharedWithMeResults(results: Seq[Record]) = {
+    val documentsAndPolicies = results.map { r =>
+      val document = r.into(classOf[DocumentRecord])
+      val sharingPolicy = r.into(classOf[SharingPolicyRecord])
+      (document, sharingPolicy)
+    }.distinct
+
+    val fileparts = results.map(_.into(classOf[DocumentFilepartRecord])).toSeq
+
+    documentsAndPolicies.map { t =>
+      val parts = fileparts.filter(_.getDocumentId == t._1.getId)
+      (t._1, t._2, parts)
+    }
+  }
+
+  /** Combined version of the two queries above **/
+  def findByIdsWithPartsAndSharingPolicy(docIds: Seq[String], sharedWith: String) = db.query { sql =>
+    // We'll retrieve all fields except SHARING_POLICY.ID, since this
+    // would cause ambiguity issues in the query further down the line
+    val subqueryFields = { 
+      DOCUMENT.fields() ++
+      SHARING_POLICY.fields() 
+    } filter { _ != SHARING_POLICY.ID }
+
+    val subquery = sql.select(subqueryFields:_*).from(SHARING_POLICY
+          .join(DOCUMENT)
+          .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
+        .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
+        .and(DOCUMENT.ID.in(docIds))
+
+    val results =
+      sql.select().from(subquery)
+         .join(DOCUMENT_FILEPART)
+         .on(subquery.field(DOCUMENT.ID)
+           .equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+         .fetchArray
+
+    collectSharedWithMeResults(results)
   }
   
   /** Retrieves a document record by its ID, along with access permissions for the given user **/

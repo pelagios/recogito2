@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.{HasDate, Page}
-import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord}
 
 case class IndexDerivedProperties(
   lastEditAt: Option[DateTime],
@@ -22,6 +22,7 @@ object IndexDerivedProperties {
 case class ConfiguredPresentation(
   document: DocumentRecord, 
   parts: Seq[DocumentFilepartRecord],
+  sharedVia: Option[SharingPolicyRecord],
   indexProps: IndexDerivedProperties,
   columnConfig: Seq[String]
 ) {
@@ -40,25 +41,38 @@ object ConfiguredPresentation extends HasDate {
 
   val DEFAULT_CONFIG = Seq("author", "title", "uploaded_at", "date_freeform")
 
+  /** A helper to get the properties for the given doc from the list **/
+  private def findProps(document: DocumentRecord, indexProps: Option[Map[String, IndexDerivedProperties]]) =
+    indexProps.flatMap { p =>
+      p.get(document.getId)
+    }.getOrElse(IndexDerivedProperties.EMPTY)
+
   /** Builds a configured presentation.
     * 
     * Takes a DB search result, index-derived props and the column config 
     * as input. Column config is optional and will default to a sensible value.
     */
-  def build(
+  def forMyDocument(
     page: Page[(DocumentRecord, Seq[DocumentFilepartRecord])],
-    indexProps: Option[Seq[(String, IndexDerivedProperties)]],
-    columnConfig: Option[Seq[String]]): Page[ConfiguredPresentation] = {
-
+    indexProps: Option[Map[String, IndexDerivedProperties]],
+    columnConfig: Option[Seq[String]]
+  ) = {
     val config = columnConfig.getOrElse(DEFAULT_CONFIG)
-
     page.map { case (document, parts) =>
-      val props = indexProps.flatMap { p =>
-            p.find(_._1 == document.getId)
-            .map(_._2)
-          }.getOrElse(IndexDerivedProperties.EMPTY)
+      val props = findProps(document, indexProps)
+      ConfiguredPresentation(document, parts, None, props, config)
+    }
+  }
 
-      ConfiguredPresentation(document, parts, props, config)
+  def forSharedDocument(
+    page: Page[(DocumentRecord, SharingPolicyRecord, Seq[DocumentFilepartRecord])],
+    indexProps: Option[Map[String, IndexDerivedProperties]],
+    columnConfig: Option[Seq[String]]
+  ) = {
+    val config = columnConfig.getOrElse(DEFAULT_CONFIG)
+    page.map { case (document, sharingPolicy, parts) => 
+      val props = findProps(document, indexProps)
+      ConfiguredPresentation(document, parts, Some(sharingPolicy), props, config)
     }
   }
 

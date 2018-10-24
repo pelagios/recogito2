@@ -144,20 +144,8 @@ trait SharingPolicies { self: DocumentService =>
                   .on(subquery.field(SHARING_POLICY.DOCUMENT_ID).equal(DOCUMENT_FILEPART.DOCUMENT_ID))
                   .fetchArray
 
-    val documentsAndPolicies = rows.map { r =>
-      val document = r.into(classOf[DocumentRecord])
-      val sharingPolicy = r.into(classOf[SharingPolicyRecord])
-      (document, sharingPolicy)
-    }.distinct
-
-    val fileparts = rows.map(_.into(classOf[DocumentFilepartRecord])).toSeq
-
-    val results = documentsAndPolicies.map { t =>
-      val parts = fileparts.filter(_.getDocumentId == t._1.getId)
-      (t._1, t._2, parts)
-    }.toSeq
-    
-    Page(System.currentTimeMillis - startTime, total, offset, limit, results)
+    val grouped = collectSharedWithMeResults(rows)
+    Page(System.currentTimeMillis - startTime, total, offset, limit, grouped)
   }
   
   /** Deletes all policies shared by and with the given user **/
