@@ -288,7 +288,7 @@ class AnnotationService @Inject() (
     import scala.collection.JavaConverters._
 
     val numberOfBuckets =
-      if (sortOrder == services.SortOrder.DESC)
+      if (sortOrder == services.SortOrder.ASC)
         offset + limit
       else
         docIds.size
@@ -300,8 +300,8 @@ class AnnotationService @Inject() (
             docIds.map(id => termQuery("annotates.document_id" -> id))
           }
       } aggs {
-        termsAggregation("by_document") field "annotates.document_id"
-      } size numberOfBuckets limit 0
+        termsAggregation("by_document") field "annotates.document_id" size numberOfBuckets
+      } limit 0
     } map { response =>
       val byDocument = response.aggregations.termsResult("by_document")
       val annotatedDocs = byDocument.getBuckets.asScala.map(_.getKeyAsString).toSeq
