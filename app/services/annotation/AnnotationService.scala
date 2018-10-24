@@ -288,7 +288,7 @@ class AnnotationService @Inject() (
     import scala.collection.JavaConverters._
 
     val numberOfBuckets =
-      if (sortOrder == services.SortOrder.ASC)
+      if (sortOrder == services.SortOrder.DESC)
         offset + limit
       else
         docIds.size
