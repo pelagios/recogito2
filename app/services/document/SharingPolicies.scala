@@ -107,9 +107,9 @@ trait SharingPolicies { self: DocumentService =>
     sortOrder: Option[SortOrder] = None
   ) = db.query { sql => 
     val startTime = System.currentTimeMillis
-    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT, SHARING_POLICY), fieldname, sortOrder))
+    val subquerySortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT, SHARING_POLICY), fieldname, sortOrder))
     val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
-
+  
     // We'll retrieve all fields except SHARING_POLICY.ID, since this
     // would cause ambiguity issues in the query further down the line
     val subqueryFields = { 
@@ -117,7 +117,7 @@ trait SharingPolicies { self: DocumentService =>
       SHARING_POLICY.fields() 
     } filter { _ != SHARING_POLICY.ID }
 
-    val subquery = sortField match {
+    val subquery = subquerySortField match {
       case Some(f) => 
         sql.select(subqueryFields:_*)
            .from(SHARING_POLICY
@@ -138,11 +138,33 @@ trait SharingPolicies { self: DocumentService =>
            .offset(0)
     }
 
-    val rows = sql.select()
-                  .from(subquery)
-                  .join(DOCUMENT_FILEPART)
-                  .on(subquery.field(SHARING_POLICY.DOCUMENT_ID).equal(DOCUMENT_FILEPART.DOCUMENT_ID))
-                  .fetchArray
+    // Subquery makes this a little tricky...
+    val querySortfield = sortBy.flatMap { fieldname =>
+      val field = Seq(DOCUMENT, SHARING_POLICY).flatMap(_.fields).find(_.getName.equalsIgnoreCase(fieldname))
+      field.map { f => 
+        if (sortOrder.getOrElse(SortOrder.ASC) == SortOrder.ASC)
+          subquery.field(f).asc
+        else 
+          subquery.field(f).desc
+      }
+    }
+
+    val rows = querySortfield match {
+      case Some(f) =>
+        sql.select()
+           .from(subquery)
+           .join(DOCUMENT_FILEPART)
+           .on(subquery.field(SHARING_POLICY.DOCUMENT_ID).equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+           .orderBy(f)
+           .fetchArray
+
+      case None =>
+        sql.select()
+           .from(subquery)
+           .join(DOCUMENT_FILEPART)
+           .on(subquery.field(SHARING_POLICY.DOCUMENT_ID).equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+           .fetchArray
+    }
 
     val grouped = collectSharedWithMeResults(rows)
     Page(System.currentTimeMillis - startTime, total, offset, limit, grouped)
