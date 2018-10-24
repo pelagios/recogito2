@@ -214,7 +214,7 @@ class WorkspaceAPIController @Inject() (
     } yield (allIds, sortedIds, docsWithParts, indexProperties)
 
     f.map { case (allIds, sortedIds, docsWithParts, indexProperties) => 
-      val dbResult = Page(System.currentTimeMillis - startTime, sortedIds.size, offset, size, docsWithParts)
+      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, docsWithParts)
       val interleaved = ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
       jsonOk(Json.toJson(interleaved))
     }
@@ -236,7 +236,7 @@ class WorkspaceAPIController @Inject() (
     } yield (allIds, sortedIds, documents, indexProperties)
 
     f.map { case (allIds, sortedIds, documents, indexProperties) =>
-      val dbResult = Page(System.currentTimeMillis - startTime, sortedIds.size, offset, size, documents)
+      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, documents)
       val interleaved = ConfiguredPresentation.forSharedDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
       jsonOk(Json.toJson(interleaved))
     }

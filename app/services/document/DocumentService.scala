@@ -238,7 +238,8 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
            .equal(DOCUMENT_FILEPART.DOCUMENT_ID))
          .fetchArray
 
-    collectSharedWithMeResults(results)
+    val unsorted = collectSharedWithMeResults(results)
+    docIds.map(id => unsorted.find(_._1.getId == id).get)
   }
   
   /** Retrieves a document record by its ID, along with access permissions for the given user **/
