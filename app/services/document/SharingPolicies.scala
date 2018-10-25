@@ -134,8 +134,8 @@ trait SharingPolicies { self: DocumentService =>
              .join(DOCUMENT)
              .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
            .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
-           .limit(20)
-           .offset(0)
+           .limit(limit)
+           .offset(offset)
     }
 
     // Subquery makes this a little tricky...
