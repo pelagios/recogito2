@@ -15,14 +15,6 @@
      "value": "<span>From: <a href=\"http://example.org/db/1.html\">Some Collection</a></span>"}
   ],
   "description": "A longer description of this example book. It should give some real information.",
-  "thumbnail": {
-    "@id": "http://example.org/images/book1-page1/full/80,100/0/default.jpg",
-    "service": {
-      "@context": "http://iiif.io/api/image/2/context.json",
-      "@id": "http://example.org/images/book1-page1",
-      "profile": "http://iiif.io/api/image/2/level1.json"
-    }
-  },
   "viewingDirection": "right-to-left",
   "viewingHint": "paged",
   "navDate": "1856-01-01T00:00:00Z",

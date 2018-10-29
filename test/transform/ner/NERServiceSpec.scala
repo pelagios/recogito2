@@ -17,21 +17,29 @@ import java.io.BufferedWriter
 @RunWith(classOf[JUnitRunner])
 class NERServiceSpec extends Specification {
 
-  val TEST_TEXT =
-    Source.fromFile("test/resources/transform/ner/text-for-ner-01.txt").getLines().mkString("\n")
+  def parsePlaintext() = {
+    val TEST_TEXT = Source.fromFile("test/resources/transform/ner/text-for-ner-01.txt").getLines().mkString("\n")
+    NERService.parseText(TEST_TEXT)
+  }
+  
+  def enrichTEI() = {
+    val TEST_TEI = 
+      new File("test/resources/transform/ner/tei-for-ner.tei.xml")
     
-  val TEST_TEI = 
-    new File("test/resources/transform/ner/tei-for-ner.tei.xml")
+    val writer = new StringWriter()
+    NERService.enrichTEI(TEST_TEI, Some(new BufferedWriter(writer)))
+    $(writer.toString)
+  }
 
   "The NER text parse function" should {
-
-    val entities =  NERService.parseText(TEST_TEXT)
-    
+      
     "detect 8 Named Entites in the test text" in {
+      val entities = parsePlaintext()
       entities.size must equalTo (8)
     }
 
     "detect 3 Locations - Pylos, Sparta and Ithaca" in {
+      val entities = parsePlaintext()
       val locations = entities.filter(_.entityType == EntityType.LOCATION).map(_.chars)
       locations.size must equalTo(3)
       locations must contain("Pylos")
@@ -40,10 +48,12 @@ class NERServiceSpec extends Specification {
     }
 
     "detect 1 date" in {
+      val entities = parsePlaintext()
       entities.filter(_.entityType.equals(EntityType.DATE)).size must equalTo(1)
     }
 
     "detect 4 persons - Ulysses (2x), Penelope and Telemachus" in {
+      val entities = parsePlaintext()
       val persons = entities.filter(_.entityType == EntityType.PERSON).map(_.chars)
       persons.size must equalTo(4)
       persons must contain("Penelope")
@@ -52,6 +62,8 @@ class NERServiceSpec extends Specification {
     }
 
     "retain correct char offsets for each entity" in {
+      val TEST_TEXT = Source.fromFile("test/resources/transform/ner/text-for-ner-01.txt").getLines().mkString("\n")
+      val entities = parsePlaintext()
       entities.map(e => {
         val snippetFromSourceFile = TEST_TEXT.substring(e.charOffset, e.charOffset + e.chars.size)
         snippetFromSourceFile must equalTo(e.chars)
@@ -61,16 +73,14 @@ class NERServiceSpec extends Specification {
   }
   
   "The NER TEI enrichment function" should {
-    
-    val writer = new StringWriter()
-    NERService.enrichTEI(TEST_TEI, Some(new BufferedWriter(writer)))
-    val enriched = $(writer.toString)
-    
+        
     "insert 11 placeName tags" in {
+      val enriched = enrichTEI()
       enriched.find("placeName").size must equalTo(11) 
     }
     
     "insert 24 persName tags" in {
+      val enriched = enrichTEI()
       enriched.find("persName").size must equalTo(24)       
     }
     

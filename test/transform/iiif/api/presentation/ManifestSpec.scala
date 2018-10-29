@@ -18,7 +18,6 @@ class ManifestSpec extends PlaySpec with FileHelper {
       result.isSuccess mustBe true
       
       val manifest = result.get
-      manifest.thumbnail mustBe Some("http://example.org/images/book1-page1/full/80,100/0/default.jpg")
       manifest.sequences.size mustBe 1
       
       val sequence = manifest.sequences.head
@@ -31,7 +30,7 @@ class ManifestSpec extends PlaySpec with FileHelper {
       val image = canvas.images.head
       image.height mustBe 2000
       image.width mustBe 1500
-      image.service mustBe "http://example.org/images/book1-page1"
+      image.service mustBe "http://example.org/images/book1-page1/info.json"
     }
   
   }
