@@ -90,6 +90,8 @@ class WorkspaceAPIController @Inject() (
         "username" -> user.username,
         "real_name" -> user.realName,
         "member_since" -> formatDate(new DateTime(user.memberSince.getTime)),
+        "bio" -> user.bio,
+        "website" -> user.website,
         "documents" -> Json.obj(
           "my_documents" -> myDocCount,
           "shared_with_me" -> sharedCount
