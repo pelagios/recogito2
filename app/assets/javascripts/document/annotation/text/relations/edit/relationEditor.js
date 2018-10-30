@@ -1,8 +1,8 @@
 define([
-  'common/config',
+  'common/utils/annotationUtils',
   'document/annotation/text/relations/edit/hoverEmphasis',
   'document/annotation/text/relations/connection'
-], function(Config, HoverEmphasis, Connection) {
+], function(AnnotationUtils, HoverEmphasis, Connection) {
 
       /**
        * Helper: gets all stacked annotation SPANS for an element.
@@ -34,14 +34,25 @@ define([
       toNode = function(e) {
         var t = jQuery(e.target).closest('.annotation'),
             sourceSpan = (t.length > 0) ? t[0] : undefined,
-            annotationSpans, annotation, elements;
+            annotationSpans, annotation, elements,
+
+            // Helper to sort annotations by length, so that we can 
+            // reliably get the inner-most. Identical to what's happening
+            // in highlighter.getAnnotationsAt
+            sortByQuoteLengthDesc = function(annotations) {
+              return annotations.sort(function(a, b) {
+                return AnnotationUtils.getQuote(a).length - AnnotationUtils.getQuote(b).length;
+              });
+            };
 
         if (sourceSpan) {
           // All stacked annotation spans
           annotationSpans = getAnnotationSpansRecursive(sourceSpan);
 
-          // Annotation ID from the top-most span in the stack
-          annotation = annotationSpans[annotationSpans.length - 1].annotation;
+          // Annotation ID from the inner-most span in the stack
+          annotation = sortByQuoteLengthDesc(annotationSpans.map(function(span) {
+            return span.annotation;
+          }))[0];
 
           // ALL spans for this annotation (not just the hovered one)
           elements = jQuery('.annotation[data-id="' + annotation.annotation_id + '"]');
