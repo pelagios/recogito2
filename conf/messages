@@ -47,7 +47,7 @@ landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms
 # News
 landing.index.news.title=Join our new mailing list!
 landing.index.news.subtitle=
-landing.index.news.text=Happy Halloween from everyone here at the Pelagios HQ! Get the latest news, join the discussion \
+landing.index.news.text=All Pelagios resources are community-driven. Get the latest news, join the discussion \
   and help improve our resources by <a href="https://groups.google.com/d/forum/pelagios-announcements/">signing up to our \
   new mailing list</a>.
 
