@@ -49,18 +49,3 @@ object Roles {
 
 }
 
-object User {
-  
-  implicit val userRecordWrites: Writes[UserRecord] = (
-    (JsPath \ "username").write[String] and
-    (JsPath \ "realname").write[String] and
-    (JsPath \ "member_since").write[Timestamp] and
-    (JsPath \ "quota_mb").write[Int]
-  )(u => (
-    u.getUsername,
-    u.getRealName,
-    u.getMemberSince,
-    u.getQuotaMb
-  ))
-  
-}

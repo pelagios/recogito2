@@ -14,7 +14,7 @@ import storage.uploads.Uploads
 
 /** A quick hack for local testing of the new React UI **/
 @Singleton
-class WorkspaceAPIController @Inject() (
+class AccountInfoController @Inject() (
     val components: ControllerComponents,
     val documents: DocumentService,
     val silhouette: Silhouette[Security.Env],

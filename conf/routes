@@ -153,6 +153,27 @@ POST    /api/task                                    controllers.api.TaskAPICont
 GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Routes introduced for new UI
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GET     /api/me                                      controllers.my.ng.account.AccountInfoController.me
+GET     /api/account/my                              controllers.my.ng.account.AccountInfoController.getPersonalAccountInfo
+GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getVisitedAccountInfo(username)
+
+GET     /my/api/account                              controllers.my.ng.WorkspaceAPIController.account
+GET     /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 500)
+POST    /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 500)
+GET     /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 500)
+POST    /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 500)
+
+DELETE  /document/bulk                               controllers.my.ng.WorkspaceAPIController.bulkDeleteDocuments()
+DELETE  /document/:id                                controllers.my.ng.WorkspaceAPIController.deleteDocument(id: String)
+
+POST    /my/upload                                   controllers.my.ng.UploadController.initUpload()
+POST    /my/upload/:id/file                          controllers.my.ng.UploadController.storeFilepart(id: Int)
+POST    /my/upload/:id/finalize                      controllers.my.ng.UploadController.finalizeUpload(id: Int)
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -186,23 +207,6 @@ GET     /sitemap.txt                                 controllers.landing.Landing
 GET     /robots.txt                                  controllers.landing.LandingController.robots
 GET     /stats.json                                  controllers.landing.LandingController.getStats()
 GET     /                                            controllers.landing.LandingController.index
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Workspace API
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-GET     /my/api/account                              controllers.my.ng.WorkspaceAPIController.account
-GET     /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 500)
-POST    /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 500)
-GET     /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 500)
-POST    /my/api/shared-with-me                       controllers.my.ng.WorkspaceAPIController.sharedWithMe(offset: Int ?= 0, size: Int ?= 500)
-
-DELETE  /document/bulk                               controllers.my.ng.WorkspaceAPIController.bulkDeleteDocuments()
-DELETE  /document/:id                                controllers.my.ng.WorkspaceAPIController.deleteDocument(id: String)
-
-POST    /my/upload                                   controllers.my.ng.UploadController.initUpload()
-POST    /my/upload/:id/file                          controllers.my.ng.UploadController.storeFilepart(id: Int)
-POST    /my/upload/:id/finalize                      controllers.my.ng.UploadController.finalizeUpload(id: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space root

@@ -1,8 +1,10 @@
 package controllers.my.ng.account
 
 import java.sql.Timestamp
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import services.HasDate
 import services.user.User
 
 /** Personal account info.
@@ -16,12 +18,12 @@ case class PersonalAccountInfo(
   sharedWithMeCount: Long,
   usedMb: Double)
 
-object PersonalAccountInfo {
+object PersonalAccountInfo extends HasDate {
 
   implicit val personalAccountInfoWrites: Writes[PersonalAccountInfo] = (
     (JsPath \ "username").write[String] and
     (JsPath \ "real_name").writeNullable[String] and
-    (JsPath \ "member_since").write[Timestamp] and
+    (JsPath \ "member_since").write[DateTime] and
     (JsPath \ "bio").writeNullable[String] and
     (JsPath \ "website").writeNullable[String] and
     (JsPath \ "documents").write[JsObject] and
@@ -29,7 +31,7 @@ object PersonalAccountInfo {
   )(p => (
       p.user.username,
       p.user.realName,
-      p.user.memberSince,
+      new DateTime(p.user.memberSince.getTime),
       p.user.bio,
       p.user.website,
       Json.obj(
