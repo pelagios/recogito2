@@ -200,7 +200,7 @@ class MyRecogitoController @Inject() (
             case _ =>
               val forceOldWorkspace = request.getQueryString("ng").isDefined || request.cookies.get("ng").isDefined
               if (user.featureToggles.contains("new-workspace") && !forceOldWorkspace) {
-                Future.successful(Ok(views.html.my.ng()))
+                Future.successful(Ok(views.html.my.workspace()))
               } else {
                 if (request.getQueryString("ng").isDefined)
                   Future.successful(Redirect(routes.MyRecogitoController.index(usernameInPath, tab, page, sortBy, order, size)).withCookies(Cookie("ng", "true")).bakeCookies())

@@ -20,6 +20,8 @@ import storage.uploads.Uploads
 
 case class PartOrdering(partId: UUID, seqNo: Int)
 
+case class AccessibleDocumentsCount(public: Long, shared: Option[Long])
+
 /** TODO this source file is just huge. I wonder how we can split it up into different parts **/
 @Singleton
 class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) 
@@ -437,6 +439,31 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     val items = queries(1).limit(limit).offset(offset).fetch().into(classOf[DocumentRecord])
     
     Page(System.currentTimeMillis - startTime, total, offset, limit, items) 
+  }
+
+  def countAccessibleDocuments(owner: String, accessibleTo: Option[String]) = db.query { sql =>
+    val public =
+      sql.selectCount()
+         .from(DOCUMENT)
+         .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
+           .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
+         .fetchOne(0, classOf[Long])  
+
+    val shared = accessibleTo.map { username => 
+      sql.selectCount()
+         .from(DOCUMENT)
+         .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
+           // Don't double-count public docs!
+           .and(DOCUMENT.PUBLIC_VISIBILITY.notEqual(PublicAccess.PUBLIC.toString))
+           .and(DOCUMENT.ID.in(
+             sql.select(SHARING_POLICY.DOCUMENT_ID)
+                .from(SHARING_POLICY)
+                .where(SHARING_POLICY.SHARED_WITH.equal(username))
+             ))
+         ).fetchOne(0, classOf[Long])
+    }
+
+    AccessibleDocumentsCount(public, shared)
   }
   
   /** Lists users who have at least one document with visibility set to PUBLIC **/

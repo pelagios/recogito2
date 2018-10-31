@@ -54,9 +54,9 @@ class AccountSettingsController @Inject() (
     
     val form = accountSettingsForm.fill(AccountSettingsData(
       users.decryptEmail(u.email),
-      Option(u.realName),
-      Option(u.bio),
-      Option(u.website)))
+      u.realName,
+      u.bio,
+      u.website))
     
     Ok(views.html.my.settings.account(form, u))
   }

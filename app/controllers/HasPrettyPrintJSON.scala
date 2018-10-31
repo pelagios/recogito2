@@ -7,6 +7,12 @@ import scala.util.Try
 /** Helper for creating pretty-printed JSON responses with proper content-type header **/
 trait HasPrettyPrintJSON { self: AbstractController =>
 
+  protected val JSON_NOT_FOUND = 
+    NotFound(Json.obj("status" -> "Not Found"))
+
+  protected val JSON_FORBIDDEN = 
+    Forbidden(Json.obj("status" -> "Forbidden"))
+
   /** Pretty print URL param name **/
   private val PRETTY = "pretty"
 

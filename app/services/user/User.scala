@@ -23,11 +23,11 @@ case class User(
   
   val memberSince = record.getMemberSince
   
-  val realName = record.getRealName
+  val realName = Option(record.getRealName)
   
-  val bio = record.getBio
+  val bio = Option(record.getBio)
   
-  val website = record.getWebsite
+  val website = Option(record.getWebsite)
   
   val quotaMb = record.getQuotaMb
     
