@@ -63,4 +63,12 @@ trait SortByIndex { self: DocumentInfoController =>
     }
   }
 
+  protected def getAccessibleDocumentsSortedByIndex(
+    owner: String, 
+    loggedIn: Option[String],
+    offset: Int,
+    size: Int,
+    config: PresentationConfig
+  ) = ???
+
 }

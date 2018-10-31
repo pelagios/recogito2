@@ -20,7 +20,11 @@ import storage.uploads.Uploads
 
 case class PartOrdering(partId: UUID, seqNo: Int)
 
-case class AccessibleDocumentsCount(public: Long, shared: Option[Long])
+case class AccessibleDocumentsCount(public: Long, shared: Option[Long]) {
+
+  lazy val total = public + shared.getOrElse(0l)
+
+}
 
 /** TODO this source file is just huge. I wonder how we can split it up into different parts **/
 @Singleton
@@ -407,12 +411,12 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     * If there is currently no logged in user, only documents with public_visibility = PUBLIC are returned.  
     */
   def findAccessibleDocuments(
-      owner: String,
-      loggedInUser: Option[String],
-      offset: Int = 0, limit: Int = 20,
-      sortBy: Option[String] = None,
-      sortOrder: Option[SortOrder] = None
-    ) = db.query { sql =>
+    owner: String,
+    loggedInUser: Option[String],
+    offset: Int = 0, limit: Int = 20,
+    sortBy: Option[String] = None,
+    sortOrder: Option[SortOrder] = None
+  ) = db.query { sql =>
         
     val startTime = System.currentTimeMillis
     
@@ -439,6 +443,96 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     val items = queries(1).limit(limit).offset(offset).fetch().into(classOf[DocumentRecord])
     
     Page(System.currentTimeMillis - startTime, total, offset, limit, items) 
+  }
+
+  /** Just the document retrieval query, no counting **/
+  private def listAccessibleWithParts(
+    owner: String,
+    loggedInUser: Option[String],
+    offset: Int,
+    limit: Int,
+    sortBy: Option[String],
+    sortOrder: Option[SortOrder]
+  ) = db.query { sql =>
+    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT), fieldname, sortOrder))
+
+    val subquery = (sortField, loggedInUser) match {
+      // Sorted query with logged in visitor
+      case (Some(f), Some(user)) =>
+        sql.selectFrom(DOCUMENT)
+          .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
+            .and(DOCUMENT.ID.in(
+              sql.select(SHARING_POLICY.DOCUMENT_ID).from(SHARING_POLICY)
+                 .where(SHARING_POLICY.SHARED_WITH.equal(user)))
+            .or(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))))
+          .orderBy(f)
+          .limit(limit)
+          .offset(offset)
+
+      // Unsorted query with logged in visitor
+      case (None, Some(user)) =>
+        sql.selectFrom(DOCUMENT)
+          .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
+            .and(DOCUMENT.ID.in(
+              sql.select(SHARING_POLICY.DOCUMENT_ID).from(SHARING_POLICY)
+                 .where(SHARING_POLICY.SHARED_WITH.equal(user)))
+            .or(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))))
+            .limit(limit)
+            .offset(offset)
+
+      // Anonymous sorted query
+      case (Some(f), None) =>
+        sql.selectFrom(DOCUMENT)
+           .where(DOCUMENT.OWNER.equal(owner)
+             .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
+             .orderBy(f)
+             .limit(limit)
+             .offset(offset)
+
+      // Anonymous unsorted query
+      case (None, None) =>
+        sql.selectFrom(DOCUMENT)
+           .where(DOCUMENT.OWNER.equal(owner)
+             .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
+           .limit(limit)
+           .offset(offset)
+    }
+
+    val rows = 
+      sql.select().from(subquery)
+         .join(DOCUMENT_FILEPART)
+         .on(subquery.field(DOCUMENT.ID)
+           .equal(DOCUMENT_FILEPART.DOCUMENT_ID))
+         .fetchArray
+
+    val asMap = groupLeftJoinResult(rows, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
+
+    rows.map(_.into(classOf[DocumentRecord])).distinct.map { document => 
+      val fileparts = asMap.get(document).get
+      (document -> fileparts)
+    }.toSeq
+  }
+
+  def findAccessibleDocumentsWithParts(
+    owner: String,
+    loggedInUser: Option[String],
+    offset: Int,
+    limit: Int,
+    sortBy: Option[String],
+    sortOrder: Option[SortOrder]
+  )(implicit ctx: ExecutionContext) = {
+    val startTime = System.currentTimeMillis
+    val fCount = countAccessibleDocuments(owner, loggedInUser)
+    val fDocuments = listAccessibleWithParts(owner, loggedInUser, offset, limit, sortBy, sortOrder)
+
+    val f = for {
+      count <- fCount
+      documents <- fDocuments 
+    } yield (count, documents)
+
+    f.map { case (count, documents) =>
+      Page(System.currentTimeMillis - startTime, count.total, offset, limit, documents) 
+    }
   }
 
   def countAccessibleDocuments(owner: String, accessibleTo: Option[String]) = db.query { sql =>

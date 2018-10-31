@@ -32,8 +32,11 @@ class DocumentInfoController @Inject() (
   private val INDEX_SORT_PROPERTIES = 
     Seq("last_edit_at", "last_edit_by", "annotations")
 
-  private def isSortingByIndex(sortBy: String) =
-    INDEX_SORT_PROPERTIES.contains(sortBy.toLowerCase)
+  private def isSortingByIndex(config: Option[PresentationConfig]) =
+    config
+      .flatMap(_.sort.map(_.sortBy))
+      .map(field => INDEX_SORT_PROPERTIES.contains(field.toLowerCase))
+      .getOrElse(false)
 
   /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
   protected def fetchIndexProperties(docIds: Seq[String], config: PresentationConfig) = {
@@ -75,13 +78,7 @@ class DocumentInfoController @Inject() (
     val config = request.body.asJson.flatMap(json => 
       Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
-    // Does the config request a sorting based on an index property?
-    val sortByIndex = config
-      .flatMap(_.sort.map(_.sortBy))
-      .map(isSortingByIndex(_))
-      .getOrElse(false)
-
-    if (sortByIndex)
+    if (isSortingByIndex(config))
       onSortByIndex(username, offset, size, config.get)
     else 
       onSortByDB(username, offset, size, config)
@@ -108,7 +105,15 @@ class DocumentInfoController @Inject() (
   }
 
   def getAccessibleDocuments(owner: String, offset: Int, size: Int) = silhouette.UserAwareAction.async { implicit request =>
-    ???
+    val config = request.body.asJson.flatMap(json => 
+      Try(Json.fromJson[PresentationConfig](json).get).toOption)
+
+    val loggedIn = request.identity.map(_.username)
+
+    if (isSortingByIndex(config))
+      getAccessibleDocumentsSortedByIndex(owner, loggedIn, offset, size, config.get)
+    else 
+      getAccessibleDocumentsSortedByDB(owner, loggedIn, offset, size, config)
   }
 
 }

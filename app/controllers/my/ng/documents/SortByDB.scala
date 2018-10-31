@@ -11,16 +11,10 @@ trait SortByDB { self: DocumentInfoController =>
 
   /** Boilerplate to fetch documents sorted via a DB property */
   protected def documentsByDB[T <: Product](
-    username: String,
-    offset: Int, 
-    size: Int, 
     config: Option[PresentationConfig],
-    fn: (String, Int, Int, Option[String], Option[SortOrder]) => Future[Page[T]]
+    fn: () => Future[Page[T]]
   )(implicit ctx: ExecutionContext) = for {
-    documents <- fn(username, offset, size, 
-      config.flatMap(_.sort.map(_.sortBy)),
-      config.flatMap(_.sort.map(_.order)))
-
+    documents <- fn()
     indexProperties <- config match {
       case Some(c) => 
         val ids = documents.items.map(_.productElement(0).asInstanceOf[DocumentRecord].getId)
@@ -38,7 +32,11 @@ trait SortByDB { self: DocumentInfoController =>
     config: Option[PresentationConfig]
   )(implicit request: Request[AnyContent]) = {
     documentsByDB(
-      username, offset, size, config, documents.findByOwnerWithParts
+      config, 
+      () => documents.findByOwnerWithParts(
+              username, offset, size,
+              config.flatMap(_.sort.map(_.sortBy)),
+              config.flatMap(_.sort.map(_.order)))
     ).map { case (documents, indexProperties) =>
       val interleaved = ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
       jsonOk(Json.toJson(interleaved))
@@ -53,9 +51,33 @@ trait SortByDB { self: DocumentInfoController =>
     config: Option[PresentationConfig]
   )(implicit request: Request[AnyContent]) = {   
     documentsByDB(
-      username, offset, size, config, documents.findSharedWithPart
+      config, 
+      () => documents.findSharedWithPart(
+              username, offset, size,
+              config.flatMap(_.sort.map(_.sortBy)),
+              config.flatMap(_.sort.map(_.order)))
     ).map { case (documents, indexProperties) =>
       val interleaved = ConfiguredPresentation.forSharedDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
+      jsonOk(Json.toJson(interleaved))
+    }
+  }
+
+  protected def getAccessibleDocumentsSortedByDB(
+    owner: String, 
+    loggedIn: Option[String],
+    offset: Int,
+    size: Int,
+    config: Option[PresentationConfig]
+  )(implicit request: Request[AnyContent]) = {
+    documentsByDB(
+      config,
+      () => documents.findAccessibleDocumentsWithParts(
+              owner, loggedIn, offset, size,
+              config.flatMap(_.sort.map(_.sortBy)),
+              config.flatMap(_.sort.map(_.order)))
+    ).map { case (documents, indexProperties) =>
+      // TODO fetch with sharing permissions, if any
+      val interleaved = ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
       jsonOk(Json.toJson(interleaved))
     }
   }
