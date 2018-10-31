@@ -107,7 +107,7 @@ class DocumentInfoController @Inject() (
       getSharedDocumentsSortedByIndex)
   }
 
-  def getAccessibleDocuments(offset: Int, size: Int) = silhouette.UserAwareAction.async { implicit request =>
+  def getAccessibleDocuments(owner: String, offset: Int, size: Int) = silhouette.UserAwareAction.async { implicit request =>
     ???
   }
 

@@ -2,6 +2,7 @@ package controllers.my.ng
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, HasPrettyPrintJSON, Security}
+import controllers.my.ng.documents._
 import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 import play.api.Configuration
