@@ -157,8 +157,8 @@ GET     /api/task                                    controllers.api.TaskAPICont
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /api/me                                      controllers.my.ng.account.AccountInfoController.me
-GET     /api/account/my                              controllers.my.ng.account.AccountInfoController.getPersonalAccountInfo
-GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getVisitedAccountInfo(username)
+GET     /api/account/my                              controllers.my.ng.account.AccountInfoController.getPrivateAccountInfo
+GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getPublicAccountInfo(username)
 
 GET     /my/api/account                              controllers.my.ng.WorkspaceAPIController.account
 GET     /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 500)

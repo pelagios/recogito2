@@ -37,7 +37,7 @@ class AccountInfoController @Inject() (
   }
 
   /** Returns the personal info about your own account **/
-  def getPersonalAccountInfo = silhouette.SecuredAction.async { implicit request =>
+  def getPrivateAccountInfo = silhouette.SecuredAction.async { implicit request =>
     val username = request.identity.username
 
     val fUser = users.findByUsername(username)
@@ -55,18 +55,18 @@ class AccountInfoController @Inject() (
     } yield (user.get, myDocCount, sharedCount, usedMb)
 
     f.map { case (user, myDocs, shared, usedMb) =>
-      val info = PersonalAccountInfo(user, myDocs, shared, usedMb)
+      val info = PrivateAccountInfo(user, myDocs, shared, usedMb)
       jsonOk(Json.toJson(info))
     }
   }  
 
   /** Returns publicly available info about someone else's account **/
-  def getVisitedAccountInfo(username: String) = silhouette.UserAwareAction.async { implicit request =>
+  def getPublicAccountInfo(username: String) = silhouette.UserAwareAction.async { implicit request =>
     users.findByUsernameIgnoreCase(username).flatMap  { _ match {
       case Some(user) =>
         val loggedInAs = request.identity.map(_.username)
         documents.countAccessibleDocuments(user.username, loggedInAs).map { docs =>
-          jsonOk(Json.toJson(VisitedAccountInfo(user, docs)))
+          jsonOk(Json.toJson(PublicAccountInfo(user, docs)))
         }
         
       case None => Future.successful(JSON_NOT_FOUND)

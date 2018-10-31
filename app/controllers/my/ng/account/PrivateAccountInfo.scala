@@ -12,15 +12,15 @@ import services.user.User
   * Contains information that should not be visible
   * visiting users.
   */
-case class PersonalAccountInfo(
+case class PrivateAccountInfo(
   user: User, 
   myDocumentsCount: Long, 
   sharedWithMeCount: Long,
   usedMb: Double)
 
-object PersonalAccountInfo extends HasDate {
+object PrivateAccountInfo extends HasDate {
 
-  implicit val personalAccountInfoWrites: Writes[PersonalAccountInfo] = (
+  implicit val personalAccountInfoWrites: Writes[PrivateAccountInfo] = (
     (JsPath \ "username").write[String] and
     (JsPath \ "real_name").writeNullable[String] and
     (JsPath \ "member_since").write[DateTime] and
