@@ -51,7 +51,13 @@ class MyRecogitoController @Inject() (
     } yield (ownerWithRoles, docs)    
 
     f.map { case (maybeOwner, docs) => maybeOwner match {
-      case Some(owner) => Ok(views.html.my.my_public(owner, docs, loggedInUser))
+      case Some(owner) => 
+        val useNewWorkspace = loggedInUser.map(_.featureToggles.contains("new-workspace")).getOrElse(false)
+        if (useNewWorkspace)
+         Ok(views.html.my.profile())
+        else
+         Ok(views.html.my.my_public(owner, docs, loggedInUser))
+         
       case None => NotFoundPage
     }}
   }
