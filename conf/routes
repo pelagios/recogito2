@@ -160,6 +160,10 @@ GET     /api/me                                      controllers.my.ng.account.A
 GET     /api/account/my                              controllers.my.ng.account.AccountInfoController.getPrivateAccountInfo
 GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getPublicAccountInfo(username)
 
+GET     /api/documents/my                            controllers.my.ng.documents.DocumentInfoController.getMyDocuments(offset: Int ?= 0, size: Int ?= 500)
+GET     /api/documents/shared                        controllers.my.ng.documents.DocumentInfoController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500)
+GET     /api/documents/accessible/:owner             controllers.my.ng.documents.DocumentInfoController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500)
+
 GET     /my/api/account                              controllers.my.ng.WorkspaceAPIController.account
 GET     /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 500)
 POST    /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 500)

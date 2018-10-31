@@ -1,4 +1,4 @@
-package controllers.my.ng
+package controllers.my.ng.documents
 
 import org.joda.time.DateTime
 import play.api.libs.json._

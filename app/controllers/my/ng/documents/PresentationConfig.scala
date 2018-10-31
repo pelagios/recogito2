@@ -1,4 +1,4 @@
-package controllers.my.ng
+package controllers.my.ng.documents
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._

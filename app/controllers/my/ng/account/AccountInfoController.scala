@@ -7,12 +7,10 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{Future, ExecutionContext}
-import services.HasDate
 import services.document.DocumentService
 import services.user.UserService
 import storage.uploads.Uploads
 
-/** A quick hack for local testing of the new React UI **/
 @Singleton
 class AccountInfoController @Inject() (
     val components: ControllerComponents,
@@ -23,8 +21,7 @@ class AccountInfoController @Inject() (
     val config: Configuration,
     implicit val ctx: ExecutionContext
   ) extends BaseController(components, config, users)
-      with HasPrettyPrintJSON 
-      with HasDate {
+      with HasPrettyPrintJSON {
 
   /** Sometimes all you want to know is your current login status **/
   def me = silhouette.UserAwareAction { implicit request => 

@@ -185,42 +185,7 @@ class WorkspaceAPIController @Inject() (
     }
   }
 
-  /** Fetches 'My Documents' sorted by DB property **/
-  private def myDocumentsByDB(
-    username: String,
-    offset: Int, 
-    size: Int, 
-    config: Option[PresentationConfig]
-  )(implicit request: Request[AnyContent]) = {
-    documentsByDB(
-      username, offset, size, config, documents.findByOwnerWithParts
-    ).map { case (documents, indexProperties) =>
-      val interleaved = ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
-      jsonOk(Json.toJson(interleaved))
-    }
-  }
 
-  private def myDocumentsByIndex(
-    username: String,
-    offset: Int, 
-    size: Int,
-    config: PresentationConfig
-  )(implicit request: Request[AnyContent]) = {
-    val startTime = System.currentTimeMillis
-
-    val f = for {
-      allIds <- documents.listAllIdsByOwner(username)
-      sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
-      docsWithParts <- documents.findByIdsWithParts(sortedIds)
-      indexProperties <- fetchIndexProperties(sortedIds, config)      
-    } yield (allIds, sortedIds, docsWithParts, indexProperties)
-
-    f.map { case (allIds, sortedIds, docsWithParts, indexProperties) => 
-      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, docsWithParts)
-      val interleaved = ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
-      jsonOk(Json.toJson(interleaved))
-    }
-  }
 
   private def sharedDocumentsByIndex(
     username: String,
