@@ -36,7 +36,7 @@ object SystemStats extends HasDate {
   implicit val contributionHistoryWrites = Writes[(DateTime, Long)] { case (dateTime, value) =>
     Json.obj("date" -> dateTime, "value" -> value) }
   
-  implicit val contributionStatsWrites: Writes[SystemStats] = (
+  implicit val systemStatsWrites: Writes[SystemStats] = (
     (JsPath \ "took").write[Long] and
     (JsPath \ "total_contributions").write[Long] and
     (JsPath \ "by_user").write[Seq[(String, Long)]] and

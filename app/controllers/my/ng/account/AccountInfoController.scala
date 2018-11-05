@@ -61,14 +61,20 @@ class AccountInfoController @Inject() (
 
   /** Returns publicly available info about someone else's account **/
   def getPublicAccountInfo(username: String) = silhouette.UserAwareAction.async { implicit request =>
-
-    // contributions.getContributionStats(username)
-
     users.findByUsernameIgnoreCase(username).flatMap  { _ match {
       case Some(user) =>
         val loggedInAs = request.identity.map(_.username)
-        documents.countAccessibleDocuments(user.username, loggedInAs).map { docs =>
-          jsonOk(Json.toJson(PublicAccountInfo(user, docs)))
+
+        val fAccessibleDocs = documents.countAccessibleDocuments(user.username, loggedInAs)
+        val fContributorStats = contributions.getContributorStats(user.username)
+
+        val f = for {
+          docs <- fAccessibleDocs
+          stats <- fContributorStats
+        } yield (docs, stats)
+
+        f.map { case (docs, stats) =>
+          jsonOk(Json.toJson(PublicAccountInfo(user, docs, stats)))
         }
         
       case None => Future.successful(JSON_NOT_FOUND)

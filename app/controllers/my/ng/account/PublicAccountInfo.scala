@@ -5,13 +5,15 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.HasDate
+import services.contribution.ContributorStats
 import services.document.AccessibleDocumentsCount
 import services.user.User
 
 /** Visited account info **/
 case class PublicAccountInfo(
   user: User, 
-  accessibleDocuments: AccessibleDocumentsCount)
+  accessibleDocuments: AccessibleDocumentsCount,
+  stats: ContributorStats)
 
 object PublicAccountInfo extends HasDate {
 
@@ -26,14 +28,16 @@ object PublicAccountInfo extends HasDate {
     (JsPath \ "member_since").write[DateTime] and
     (JsPath \ "bio").writeNullable[String] and
     (JsPath \ "website").writeNullable[String] and
-    (JsPath \ "documents").write[AccessibleDocumentsCount]
+    (JsPath \ "documents").write[AccessibleDocumentsCount] and
+    (JsPath \ "stats").write[ContributorStats]
   )(v => (
       v.user.username,
       v.user.realName,
       new DateTime(v.user.memberSince.getTime),
       v.user.bio,
       v.user.website,
-      v.accessibleDocuments
+      v.accessibleDocuments,
+      v.stats
   ))  
   
 }

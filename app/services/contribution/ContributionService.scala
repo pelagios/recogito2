@@ -191,7 +191,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     }
   }
 
-  def getContributionStats(username: String) =
+  def getContributorStats(username: String) =
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) query {
         termQuery("made_by" -> username)
@@ -205,9 +205,10 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       val lastThreeMonths = response.aggregations.getAs[InternalFilter]("over_time")
         .getAggregations.get("last_3_months").asInstanceOf[InternalDateHistogram]
 
-      // TODO method response data structure?
-      play.api.Logger.info(response.toString)
-
+      ContributorStats(
+        response.totalHits,
+        lastThreeMonths.getBuckets.asScala.map(bucket =>
+          (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
     }
 
   def countLast24hrs() =
