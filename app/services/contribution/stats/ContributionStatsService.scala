@@ -11,6 +11,7 @@ import storage.es.ES
 
 trait ContributionStatsService { self: ContributionService =>
   
+  /** Base contributor stats: total edits and edits over time (past 3 months) **/
   def getContributorStats(username: String) =
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) query {
@@ -31,9 +32,58 @@ trait ContributionStatsService { self: ContributionService =>
           (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
     }
 
-  def getTopDocuments(username: String) = ???
+  /** Top documents this user contributed to **/
+  def getTopDocuments(username: String) =
+    es.client execute {
+      search (ES.RECOGITO / ES.CONTRIBUTION) query {
+        termQuery("made_by" -> username)
+      } aggs (
+        termsAggregation("by_document") field "affects_item.document_id"
+      ) limit 0
+    } map { _.aggregations
+      .termsResult("by_document")
+      .getBuckets.asScala
+      .map(b => (b.getKeyAsString, b.getDocCount))
+      .toSeq
+    }
 
-  /** Returns the system-wide contribution stats **/
+  /** Top collaborators for this user. 
+    *
+    * Works as a two-stage query: we'll retrieve the user's top documents first,
+    * then fetch the top co-contributors for these docs.
+    */
+  def getTopCollaborators(username: String) = {
+    val fTopDocIds = getTopDocuments(username).map(_.map(_._1))
+
+    def getTopContributors(ids: Seq[String]) = 
+      es.client execute {
+        search (ES.RECOGITO / ES.CONTRIBUTION) query {
+          boolQuery
+            must {
+              boolQuery
+                should {
+                  ids.map(id => termQuery("affects_item.document_id" -> id))
+                }
+            } not {
+              termQuery("made_by" -> username)
+            }  
+        } aggs (
+          termsAggregation("by_contributor") field ("made_by")
+        ) limit 0
+      } map { _.aggregations
+        .termsResult("by_contributor")
+        .getBuckets.asScala
+        .map(b => (b.getKeyAsString, b.getDocCount))
+        .toSeq
+      }
+
+    for {
+      docIds <- fTopDocIds
+      contributors <- getTopContributors(docIds)
+    } yield (contributors)
+  }
+
+  /** System-wide contribution stats **/
   def getSystemStats(): Future[SystemStats] =
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) aggs (

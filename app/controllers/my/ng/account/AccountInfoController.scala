@@ -83,9 +83,10 @@ class AccountInfoController @Inject() (
 
   /** Returns the top collaborators for this user **/
   def getCollaborators(username: String) = Action.async { implicit request =>
-
-    
-    ???
+    contributions.getTopCollaborators(username).map { tuples => 
+      val json = tuples.map(t => Json.obj("username" -> t._1, "edits" -> t._2)) 
+      jsonOk(Json.toJson(json))
+    }    
   }
 
 }

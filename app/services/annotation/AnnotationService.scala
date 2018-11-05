@@ -170,7 +170,7 @@ class AnnotationService @Inject() (
     scrollIfNeeded {
       search(ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.filepart_id" -> id.toString)
-       }
+      }
     }
 
   /** Deletes all annotations & version history on a given document **/

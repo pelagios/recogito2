@@ -158,7 +158,8 @@ GET     /api/task                                    controllers.api.TaskAPICont
 
 GET     /api/me                                      controllers.my.ng.account.AccountInfoController.me
 GET     /api/account/my                              controllers.my.ng.account.AccountInfoController.getPrivateAccountInfo
-GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getPublicAccountInfo(username)
+GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getPublicAccountInfo(username: String)
+GET     /api/account/:username/collaborators         controllers.my.ng.account.AccountInfoController.getCollaborators(username: String)
 
 GET     /api/documents/my                            controllers.my.ng.documents.DocumentInfoController.getMyDocuments(offset: Int ?= 0, size: Int ?= 500)
 GET     /api/documents/shared                        controllers.my.ng.documents.DocumentInfoController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500)
