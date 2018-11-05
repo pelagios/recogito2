@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.HasDate
-import services.contribution.ContributorStats
+import services.contribution.stats.ContributorStats
 import services.document.AccessibleDocumentsCount
 import services.user.User
 

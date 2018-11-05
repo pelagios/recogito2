@@ -81,4 +81,11 @@ class AccountInfoController @Inject() (
     }}
   }
 
+  /** Returns the top collaborators for this user **/
+  def getCollaborators(username: String) = Action.async { implicit request =>
+
+    
+    ???
+  }
+
 }

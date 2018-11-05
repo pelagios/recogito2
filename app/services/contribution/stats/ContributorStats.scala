@@ -1,10 +1,11 @@
-package services.contribution
+package services.contribution.stats
 
 import org.joda.time.DateTime
 import services.HasDate
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
+/** Base stats for a specific contributor **/
 case class ContributorStats(totalContributions: Long, overTime: Seq[(DateTime, Long)])
 
 object ContributorStats extends HasDate {

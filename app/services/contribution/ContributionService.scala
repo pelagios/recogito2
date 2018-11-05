@@ -5,20 +5,19 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import javax.inject.{Inject, Singleton}
 import services.{HasDate, HasTryToEither, Page}
 import org.elasticsearch.search.sort.SortOrder
-import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
-import org.elasticsearch.search.aggregations.bucket.histogram.{DateHistogramInterval, InternalDateHistogram}
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.{JsSuccess, Json}
-import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.reflectiveCalls
 import scala.util.Try
 import storage.es.ES
 import services.HasTryToEither
+import services.contribution.stats.ContributionStatsService
 
 @Singleton
-class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionContext) extends HasDate {
+class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionContext) 
+  extends HasDate with ContributionStatsService {
 
   implicit object ContributionIndexable extends Indexable[Contribution] {
     override def json(c: Contribution): String = Json.stringify(Json.toJson(c))
@@ -64,13 +63,22 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       }
     }
 
-  def getMostRecent(n: Int): Future[Seq[Contribution]] =
+  /** Retrieves a contribution by its ElasticSearch ID **/
+  def findById(id: String): Future[Option[(Contribution, String)]] =
     es.client execute {
-      search(ES.RECOGITO / ES.CONTRIBUTION) sortBy (
-        fieldSort("made_at") order SortOrder.DESC
-      ) limit n
+      get(id) from ES.RECOGITO / ES.CONTRIBUTION
     } map { response =>
-      response.to[(Contribution, String)].toSeq.map(_._1)
+      if (response.exists) {
+        Json.fromJson[Contribution](Json.parse(response.sourceAsString)) match {
+          case JsSuccess(contribution, _) =>
+            Some(contribution, response.id)
+          case _ =>
+            // Should never happen
+            throw new RuntimeException("Malformed contribution in index")
+        }
+      } else {
+        None
+      }
     }
 
   /** Returns the contribution history on a given document, as a paged result **/
@@ -106,24 +114,6 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   /** Sorts the given list of document IDs by the last modifying user **/
   def sortDocsByLastModifiedBy(docIds: Seq[String], sortOrder: services.SortOrder, offset: Int, limit: Int) =
     sortByField(docIds, sortOrder, offset, limit, { c => c.map(_.madeBy) })
-
-  /** Retrieves a contribution by its ElasticSearch ID **/
-  def findById(id: String): Future[Option[(Contribution, String)]] =
-    es.client execute {
-      get(id) from ES.RECOGITO / ES.CONTRIBUTION
-    } map { response =>
-      if (response.exists) {
-        Json.fromJson[Contribution](Json.parse(response.sourceAsString)) match {
-          case JsSuccess(contribution, _) =>
-            Some(contribution, response.id)
-          case _ =>
-            // Should never happen
-            throw new RuntimeException("Malformed contribution in index")
-        }
-      } else {
-        None
-      }
-    }
 
   /** Deletes the contribution history after a given timestamp **/
   def deleteHistoryAfter(documentId: String, after: DateTime): Future[Boolean] = {
@@ -191,26 +181,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     }
   }
 
-  def getContributorStats(username: String) =
-    es.client execute {
-      search (ES.RECOGITO / ES.CONTRIBUTION) query {
-        termQuery("made_by" -> username)
-      } aggs (
-        filterAggregation("over_time") query rangeQuery("made_at").gt("now-3M") subaggs (
-          dateHistogramAggregation("last_3_months") field "made_at" minDocCount 0 interval DateHistogramInterval.WEEK
-        )
-      ) limit 0
-    } map { response => 
-      val totalEdits = response.totalHits
-      val lastThreeMonths = response.aggregations.getAs[InternalFilter]("over_time")
-        .getAggregations.get("last_3_months").asInstanceOf[InternalDateHistogram]
-
-      ContributorStats(
-        response.totalHits,
-        lastThreeMonths.getBuckets.asScala.map(bucket =>
-          (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
-    }
-
+  /** Counts the contributions for the past 24 hours **/
   def countLast24hrs() =
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) query {
@@ -219,36 +190,15 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
         }
       } size 0
     } map { _.totalHits }
-    
-  /** Returns the system-wide contribution stats **/
-  def getSystemStats(): Future[SystemStats] =
-    es.client execute {
-      search (ES.RECOGITO / ES.CONTRIBUTION) aggs (
-        termsAggregation("by_user") field "made_by",
-        termsAggregation("by_action") field "action",
-        termsAggregation("by_item_type") field "affects_item.item_type",
-        filterAggregation("contribution_history") query rangeQuery("made_at").gt("now-30d") subaggs (
-          dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
-        )
-      ) limit 0
-    } map { response =>
-      val byUser = response.aggregations.termsResult("by_user")
-      val byAction = response.aggregations.termsResult("by_action")
-      val byItemType = response.aggregations.termsResult("by_item_type")
-      val contributionHistory = response.aggregations.getAs[InternalFilter]("contribution_history")
-        .getAggregations.get("last_30_days").asInstanceOf[InternalDateHistogram]
 
-      SystemStats(
-        response.tookInMillis,
-        response.totalHits,
-        byUser.getBuckets.asScala.map(bucket =>
-          (bucket.getKeyAsString, bucket.getDocCount)),
-        byAction.getBuckets.asScala.map(bucket =>
-          (ContributionAction.withName(bucket.getKeyAsString), bucket.getDocCount)),
-        byItemType.getBuckets.asScala.map(bucket =>
-          (ItemType.withName(bucket.getKeyAsString), bucket.getDocCount)),
-        contributionHistory.getBuckets.asScala.map(bucket =>
-          (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
+  /** Gets the most recent N contributions **/
+  def getMostRecent(n: Int): Future[Seq[Contribution]] =
+    es.client execute {
+      search(ES.RECOGITO / ES.CONTRIBUTION) sortBy (
+        fieldSort("made_at") order SortOrder.DESC
+      ) limit n
+    } map { response =>
+      response.to[(Contribution, String)].toSeq.map(_._1)
     }
 
 }

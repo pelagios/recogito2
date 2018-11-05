@@ -1,11 +1,12 @@
-package services.contribution
+package services.contribution.stats
 
 import org.joda.time.DateTime
 import services.HasDate
+import services.contribution.{ContributionAction, ItemType}
 import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
+/** System-wide contribution stats **/
 case class SystemStats(
     
   took: Long,
