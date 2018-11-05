@@ -40,7 +40,7 @@ class AdminController @Inject() (
     import DocumentService._
     
     val fRecentContributions = contributions.getMostRecent(10)
-    val fContributionStats = contributions.getGlobalStats()
+    val fSystemStats = contributions.getSystemStats()
     val fTotalAnnotations = annotations.countTotal()
     val fTotalVisits = visits.countTotal()
     val fTotalUsers = users.countUsers()
@@ -48,7 +48,7 @@ class AdminController @Inject() (
     val f = for {
       recentContributions <- fRecentContributions
       recentAffectedDocuments <- documents.findByIds(recentContributions.map(_.affectsItem.documentId))
-      stats <- fContributionStats
+      stats <- fSystemStats
       annotationCount <- fTotalAnnotations
       visitCount <- fTotalVisits
       userCount <- fTotalUsers

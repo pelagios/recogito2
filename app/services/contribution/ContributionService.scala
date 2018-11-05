@@ -191,6 +191,25 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     }
   }
 
+  def getContributionStats(username: String) =
+    es.client execute {
+      search (ES.RECOGITO / ES.CONTRIBUTION) query {
+        termQuery("made_by" -> username)
+      } aggs (
+        filterAggregation("over_time") query rangeQuery("made_at").gt("now-3M") subaggs (
+          dateHistogramAggregation("last_3_months") field "made_at" minDocCount 0 interval DateHistogramInterval.WEEK
+        )
+      ) limit 0
+    } map { response => 
+      val totalEdits = response.totalHits
+      val lastThreeMonths = response.aggregations.getAs[InternalFilter]("over_time")
+        .getAggregations.get("last_3_months").asInstanceOf[InternalDateHistogram]
+
+      // TODO method response data structure?
+      play.api.Logger.info(response.toString)
+
+    }
+
   def countLast24hrs() =
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) query {
@@ -201,7 +220,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
     } map { _.totalHits }
     
   /** Returns the system-wide contribution stats **/
-  def getGlobalStats(): Future[ContributionStats] =
+  def getSystemStats(): Future[SystemStats] =
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) aggs (
         termsAggregation("by_user") field "made_by",
@@ -218,7 +237,7 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
       val contributionHistory = response.aggregations.getAs[InternalFilter]("contribution_history")
         .getAggregations.get("last_30_days").asInstanceOf[InternalDateHistogram]
 
-      ContributionStats(
+      SystemStats(
         response.tookInMillis,
         response.totalHits,
         byUser.getBuckets.asScala.map(bucket =>

@@ -7,6 +7,7 @@ import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{Future, ExecutionContext}
+import services.contribution.ContributionService
 import services.document.DocumentService
 import services.user.UserService
 import storage.uploads.Uploads
@@ -14,6 +15,7 @@ import storage.uploads.Uploads
 @Singleton
 class AccountInfoController @Inject() (
     val components: ControllerComponents,
+    val contributions: ContributionService,
     val documents: DocumentService,
     val silhouette: Silhouette[Security.Env],
     val users: UserService,
@@ -59,6 +61,9 @@ class AccountInfoController @Inject() (
 
   /** Returns publicly available info about someone else's account **/
   def getPublicAccountInfo(username: String) = silhouette.UserAwareAction.async { implicit request =>
+
+    // contributions.getContributionStats(username)
+
     users.findByUsernameIgnoreCase(username).flatMap  { _ match {
       case Some(user) =>
         val loggedInAs = request.identity.map(_.username)
