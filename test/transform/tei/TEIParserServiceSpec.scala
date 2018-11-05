@@ -69,9 +69,9 @@ class TEIParserServiceSpec extends Specification {
       val tags = hyperion.bodies
         .filter(_.hasType == AnnotationBody.TAG)
         .flatMap(_.value)
-      
-      tags.size must equalTo(2)
-      tags.toSet must equalTo(Set("@xml:id:identifier", "@category:Deity")) 
+        
+      tags.size must equalTo(1)
+      tags must equalTo(Seq("@category:Deity")) 
     }
     
   }
