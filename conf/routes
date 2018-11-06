@@ -164,6 +164,7 @@ GET     /api/account/:username/collaborators         controllers.my.ng.account.A
 GET     /api/documents/my                            controllers.my.ng.documents.DocumentInfoController.getMyDocuments(offset: Int ?= 0, size: Int ?= 500)
 GET     /api/documents/shared                        controllers.my.ng.documents.DocumentInfoController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500)
 GET     /api/documents/accessible/:owner             controllers.my.ng.documents.DocumentInfoController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500)
+POST    /api/documents/accessible/:owner             controllers.my.ng.documents.DocumentInfoController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500)
 
 GET     /my/api/account                              controllers.my.ng.WorkspaceAPIController.account
 GET     /my/api/my-documents                         controllers.my.ng.WorkspaceAPIController.myDocuments(offset: Int ?= 0, size: Int ?= 500)
