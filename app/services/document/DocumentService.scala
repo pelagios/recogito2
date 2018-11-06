@@ -405,6 +405,28 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
 
     Page(System.currentTimeMillis - startTime, total, offset, limit, asOrderedTuples)
   }
+
+  def listAllAccessibleIds(owner: String, loggedInUser: Option[String]) = db.query { sql =>
+    loggedInUser match {
+      case Some(username) =>
+        sql.select(DOCUMENT.ID)
+           .from(DOCUMENT)
+           .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
+             .and(DOCUMENT.ID.in(
+               sql.select(SHARING_POLICY.DOCUMENT_ID)
+                  .from(SHARING_POLICY)
+                  .where(SHARING_POLICY.SHARED_WITH.equal(username))
+             ).or(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))))
+           .fetch(0, classOf[String]).toSeq
+
+      case None =>
+        sql.select(DOCUMENT.ID)
+           .from(DOCUMENT)
+           .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
+             .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
+           .fetch(0, classOf[String]).toSeq
+    }
+  }
   
   /** Retrieves documents from a given owner, visible to the given logged in user.
     *
@@ -417,11 +439,9 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     sortBy: Option[String] = None,
     sortOrder: Option[SortOrder] = None
   ) = db.query { sql =>
-        
     val startTime = System.currentTimeMillis
     
     // TODO sorting
-        
     val queries = Seq(sql.selectCount(), sql.select())
       .map { q => loggedInUser match {
           case Some(loggedIn) =>

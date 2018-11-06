@@ -69,6 +69,22 @@ trait SortByIndex { self: DocumentInfoController =>
     offset: Int,
     size: Int,
     config: PresentationConfig
-  ) = ???
+  )(implicit request: Request[AnyContent]) = {
+    val startTime = System.currentTimeMillis
+
+    val f = for {
+      allIds <- documents.listAllAccessibleIds(owner, loggedIn)
+      sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
+      documents <- documents.findByIdsWithParts(sortedIds)
+      indexProperties <- fetchIndexProperties(sortedIds, config)
+    } yield (allIds, sortedIds, documents, indexProperties)
+
+    f.map { case (allIds, sortedIds, documents, indexProperties) =>
+      // TODO fetch with sharing permissions, if any
+      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, documents)
+      val interleaved = ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
+      jsonOk(Json.toJson(interleaved))
+    }
+  }
 
 }
