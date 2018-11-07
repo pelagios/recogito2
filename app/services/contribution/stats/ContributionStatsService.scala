@@ -55,27 +55,30 @@ trait ContributionStatsService { self: ContributionService =>
   def getTopCollaborators(username: String) = {
     val fTopDocIds = getTopDocuments(username).map(_.map(_._1))
 
-    def getTopContributors(ids: Seq[String]) = 
-      es.client execute {
-        search (ES.RECOGITO / ES.CONTRIBUTION) query {
-          boolQuery
-            must {
-              boolQuery
-                should {
-                  ids.map(id => termQuery("affects_item.document_id" -> id))
-                }
-            } not {
-              termQuery("made_by" -> username)
-            }  
-        } aggs (
-          termsAggregation("by_contributor") field ("made_by")
-        ) limit 0
-      } map { _.aggregations
-        .termsResult("by_contributor")
-        .getBuckets.asScala
-        .map(b => (b.getKeyAsString, b.getDocCount))
-        .toSeq
-      }
+    def getTopContributors(ids: Seq[String]) =
+      if (ids.isEmpty)
+        Future.successful(Seq.empty[(String, Long)])
+      else  
+        es.client execute {
+          search (ES.RECOGITO / ES.CONTRIBUTION) query {
+            boolQuery
+              must {
+                boolQuery
+                  should {
+                    ids.map(id => termQuery("affects_item.document_id" -> id))
+                  }
+              } not {
+                termQuery("made_by" -> username)
+              }  
+          } aggs (
+            termsAggregation("by_contributor") field ("made_by")
+          ) limit 0
+        } map { _.aggregations
+          .termsResult("by_contributor")
+          .getBuckets.asScala
+          .map(b => (b.getKeyAsString, b.getDocCount))
+          .toSeq
+        }
 
     for {
       docIds <- fTopDocIds
