@@ -42,19 +42,21 @@ class AccountInfoController @Inject() (
     val fUser = users.findByUsername(username)
     val fMyDocCount = documents.countByOwner(username)
     val fSharedCount = documents.countBySharedWith(username)
+    val fContributorStats = contributions.getContributorStats(username)
     val fUsedMb = Future(uploads.getUsedDiskspaceKB(username)).map { used =>
       Math.round(100 * used / 1024).toDouble / 100
     }
-
+    
     val f = for {
       user <- fUser
       myDocCount <- fMyDocCount
       sharedCount <- fSharedCount
+      stats <- fContributorStats
       usedMb <- fUsedMb
-    } yield (user.get, myDocCount, sharedCount, usedMb)
+    } yield (user.get, myDocCount, sharedCount, stats, usedMb)
 
-    f.map { case (user, myDocs, shared, usedMb) =>
-      val info = PrivateAccountInfo(user, myDocs, shared, usedMb)
+    f.map { case (user, myDocs, shared, stats, usedMb) =>
+      val info = PrivateAccountInfo(user, myDocs, shared, stats, usedMb)
       jsonOk(Json.toJson(info))
     }
   }  

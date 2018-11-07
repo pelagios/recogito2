@@ -5,6 +5,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.HasDate
+import services.contribution.stats.ContributorStats
 import services.user.User
 
 /** Personal account info.
@@ -16,6 +17,7 @@ case class PrivateAccountInfo(
   user: User, 
   myDocumentsCount: Long, 
   sharedWithMeCount: Long,
+  stats: ContributorStats,
   usedMb: Double)
 
 object PrivateAccountInfo extends HasDate {
@@ -27,7 +29,8 @@ object PrivateAccountInfo extends HasDate {
     (JsPath \ "bio").writeNullable[String] and
     (JsPath \ "website").writeNullable[String] and
     (JsPath \ "documents").write[JsObject] and
-    (JsPath \ "storage").write[JsObject]
+    (JsPath \ "storage").write[JsObject] and
+    (JsPath \ "stats").write[ContributorStats]
   )(p => (
       p.user.username,
       p.user.realName,
@@ -41,7 +44,8 @@ object PrivateAccountInfo extends HasDate {
       Json.obj(
         "quota_mb" -> p.user.quotaMb.toInt,
         "used_mb" -> p.usedMb
-      )
+      ),
+      p.stats
   ))
 
 }
