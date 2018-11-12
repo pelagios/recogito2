@@ -245,7 +245,9 @@ class UserService @Inject() (
   }
 
   def getSignupsOverTime() = db.query { sql =>
+
     import org.jooq.impl.DSL.{count, trunc}
+    
     val perDay = trunc(USER.MEMBER_SINCE, DatePart.DAY).as("per_day")
     sql.select(perDay, count(USER.USERNAME))
         .from(USER)

@@ -169,7 +169,10 @@ POST    /api/documents/shared                        controllers.my.ng.documents
 GET     /api/documents/accessible/:owner             controllers.my.ng.documents.DocumentInfoController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500)
 POST    /api/documents/accessible/:owner             controllers.my.ng.documents.DocumentInfoController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500)
 
-DELETE  /document/bulk                               controllers.my.ng.WorkspaceAPIController.bulkDeleteDocuments()
+DELETE  /api/documents/shared/bulk                   controllers.my.ng.WorkspaceAPIController.bulkUnshareDocuments
+DELETE  /api/documents/shared/:id                    controllers.my.ng.WorkspaceAPIController.unshareDocument(id: String)
+
+DELETE  /document/bulk                               controllers.my.ng.WorkspaceAPIController.bulkDeleteDocuments
 DELETE  /document/:id                                controllers.my.ng.WorkspaceAPIController.deleteDocument(id: String)
 
 POST    /my/upload                                   controllers.my.ng.UploadController.initUpload()

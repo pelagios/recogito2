@@ -79,18 +79,28 @@ class WorkspaceAPIController @Inject() (
           if (success) Ok
           else InternalServerError
         }
-      case None => Future.successful(BadRequest)
+      case None => Future.successful(Forbidden)
     }}
   }
 
-  def bulkDeleteDocuments() = silhouette.SecuredAction.async { implicit request => 
-    val docIds = request.body.asJson match {
-      case Some(json) => 
-        Try(Json.fromJson[Seq[String]](json).get)
-          .toOption.getOrElse(Seq.empty[String])
-
-      case None => Seq.empty[String]
+  /** Deletes the user's sharing policy for the given document */
+  def unshareDocument(docId: String) = silhouette.SecuredAction.async { implicit request =>
+    documents.removeDocumentCollaborator(docId, request.identity.username).map { success =>
+      if (success) Ok else BadRequest
     }
+  }
+
+  private def getDocIdPayload(payload: Option[JsValue]) = payload match {
+    case Some(json) => 
+      Try(Json.fromJson[Seq[String]](json).get)
+        .toOption.getOrElse(Seq.empty[String])
+
+    case None => Seq.empty[String]
+  }
+
+  /** Bulk version of deleteDocument **/
+  def bulkDeleteDocuments() = silhouette.SecuredAction.async { implicit request => 
+    val docIds = getDocIdPayload(request.body.asJson)
 
     // All documents this user can - and is allowed to - delete
     val fDeleteableDocuments = Future.sequence {
@@ -99,10 +109,32 @@ class WorkspaceAPIController @Inject() (
 
     val fSuccess = fDeleteableDocuments.flatMap { toDelete =>
       Future.sequence(toDelete.map(deleteOneDocument))
-    } map { !_.exists(!_) } // "No false exists in the list"
+    }
 
-    fSuccess.map { success => 
-      if (success) Ok else InternalServerError
+    fSuccess.map { results => 
+      // Number of actual delete attempt = num. of allowed documents
+      val numDeleted = results.size 
+      val success = !results.exists(!_) // No "false" exists in the list
+
+      if (success && numDeleted == docIds.size) 
+        Ok 
+      else if (numDeleted != docIds.size) 
+        Forbidden // Not ideal response, since some docs might have been deleted
+      else
+        InternalServerError
+    }
+  }
+
+  /** Bulk version of unshareDocument **/
+  def bulkUnshareDocuments() = silhouette.SecuredAction.async { implicit request => 
+    val docIds = getDocIdPayload(request.body.asJson)
+    val user = request.identity.username
+
+    Future.sequence {
+      docIds.map(documents.removeDocumentCollaborator(_, user))
+    }.map { results =>
+      val success = !results.exists(!_)
+      if (success) Ok else BadRequest
     }
   }
 
