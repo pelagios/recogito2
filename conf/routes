@@ -62,6 +62,7 @@ GET     /admin/maintenance/broadcast/_deleteAll      controllers.admin.maintenan
 
 
 GET     /admin/stats.json                            controllers.admin.AdminController.getStats
+GET     /admin/signups.json                          controllers.admin.AdminController.getSignupHistory
 GET     /admin                                       controllers.admin.AdminController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

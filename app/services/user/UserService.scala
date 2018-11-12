@@ -15,7 +15,7 @@ import services.generated.tables.records.{UserRecord, UserRoleRecord, FeatureTog
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.RandomStringUtils
-import org.jooq.{ Record, SelectWhereStep }
+import org.jooq.{Record, SelectWhereStep, DatePart}
 import play.api.Configuration
 import play.api.cache.SyncCacheApi
 import scala.collection.JavaConversions._
@@ -242,6 +242,25 @@ class UserService @Inject() (
   private def computeHash(str: String) = {
     val md = MessageDigest.getInstance("SHA-256").digest(str.getBytes)
     new BigInteger(1, md).toString(16)
+  }
+
+  def getSignupsOverTime() = db.query { sql =>
+    import org.jooq.impl.DSL.{count, trunc}
+    val perDay = trunc(USER.MEMBER_SINCE, DatePart.DAY).as("per_day")
+    sql.select(perDay, count(USER.USERNAME))
+        .from(USER)
+        .groupBy(perDay)
+        .orderBy(perDay)
+        .fetchArray.toSeq
+        .foldLeft(Seq.empty[(Timestamp, Int)]) { (series, record) =>
+          val timestamp = record.getValue(0, classOf[Timestamp])
+          val count = record.getValue(1, classOf[Integer]).toInt
+
+          series match {
+            case Seq() => Seq((timestamp, count))
+            case _ => series :+ (timestamp, series.last._2 + count)
+          }
+        }
   }
 
 }

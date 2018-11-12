@@ -63,8 +63,14 @@ class AdminController @Inject() (
           "total_annotations" -> annotationCount,
           "total_visits" -> visitCount,
           "total_users" -> userCount)
-
       jsonOk(response)
+    }
+  }
+
+  def getSignupHistory = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+    users.getSignupsOverTime().map { history =>
+      val json = history.map(t => Json.obj("timestamp" -> t._1, "count" -> t._2))
+      jsonOk(Json.toJson(json))
     }
   }
   
