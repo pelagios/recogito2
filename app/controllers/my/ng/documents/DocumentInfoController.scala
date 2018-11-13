@@ -86,6 +86,9 @@ class DocumentInfoController @Inject() (
 
   /** Returns the list of my documents, taking into account col/sort config **/
   def getMyDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
+
+    // annotations.getCompletionRatios(Seq("dxggv3xbmcqbfl"))
+
     getDocumentInfo(
       request.identity.username, 
       offset, 

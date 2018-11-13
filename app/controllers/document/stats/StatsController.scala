@@ -8,7 +8,7 @@ import kantan.csv._
 import kantan.csv.ops._
 import kantan.csv.CsvConfiguration.{Header, QuotePolicy}
 import kantan.csv.engine.commons._
-import services.annotation.stats.AnnotationStatsService
+import services.annotation.AnnotationService
 import services.document.DocumentService
 import services.user.UserService
 import services.user.Roles._
@@ -27,7 +27,7 @@ class StatsController @Inject() (
   val components: ControllerComponents,
   val config: Configuration,
   val documents: DocumentService,
-  val statsService: AnnotationStatsService,
+  val annotations: AnnotationService,
   val users: UserService,
   val silhouette: Silhouette[Security.Env],
   implicit val visitService: VisitService,
@@ -78,7 +78,7 @@ class StatsController @Inject() (
   private def getTags(documentId: String)(action: (Seq[(String, Long)], Request[AnyContent]) => Result) =
     silhouette.UserAwareAction.async { implicit request =>
       documentReadResponse(documentId, request.identity,  { case (doc, accesslevel) =>
-          statsService.getTagStats(documentId).map { buckets =>
+          annotations.getTagStats(documentId).map { buckets =>
             action(buckets, request.request)
           }
         }

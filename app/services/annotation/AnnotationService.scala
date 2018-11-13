@@ -9,6 +9,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.relation.RelationService
+import services.annotation.stats.AnnotationStatsService
 import services.entity.builtin.{EntityService, IndexedEntity}
 import storage.es.{ES, HasScrollProcessing}
 
@@ -19,6 +20,7 @@ class AnnotationService @Inject() (
   implicit val es: ES
 ) extends HasAnnotationIndexing
     with AnnotationHistoryService
+    with AnnotationStatsService
     with RelationService 
     with HasScrollProcessing {
 

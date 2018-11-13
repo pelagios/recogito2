@@ -7,19 +7,16 @@ import org.elasticsearch.search.aggregations.bucket.nested.InternalNested
 import scala.concurrent.ExecutionContext
 import services.annotation.HasAnnotationIndexing
 import storage.es.ES
-import services.annotation.AnnotationBody
+import services.annotation.{AnnotationService, AnnotationBody}
 import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
 
 @Singleton
-class AnnotationStatsService @Inject() (
-  implicit val ctx: ExecutionContext,
-  implicit val es: ES
-) extends HasAnnotationIndexing {
+trait AnnotationStatsService { self: AnnotationService =>
   
   def getTagStats(documentId: String) =
     es.client execute {
-      search(ES.RECOGITO / ES.ANNOTATION) query {
+      search (ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.document_id" -> documentId)
       } aggregations (
         nestedAggregation("per_body", "bodies") subaggs (
@@ -33,6 +30,24 @@ class AnnotationStatsService @Inject() (
       .get[InternalFilter]("tags_only").getAggregations
       .get[StringTerms]("by_tag").getBuckets.asScala
       .map(b => (b.getKeyAsString, b.getDocCount))
+    }
+
+  def getCompletionRatios(documentIds: Seq[String]) =
+    es.client execute {
+      search (ES.RECOGITO / ES.ANNOTATION) query {
+        boolQuery
+          should {
+            documentIds.map(id => termQuery("annotates.document_id" -> id))
+          }
+      } aggregations (
+        termsAggregation("per_document") field ("annotates.document_id") subaggs (
+          nestedAggregation("per_body", "bodies") subaggs (
+            termsAggregation("by_status_value") field ("bodies.status.value")
+          )
+        )
+      ) size 0
+    } map { response =>
+      play.api.Logger.info(response.toString)
     }
   
 }
