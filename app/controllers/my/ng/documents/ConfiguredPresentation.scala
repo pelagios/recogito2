@@ -4,18 +4,20 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.{HasDate, Page}
+import services.annotation.stats.StatusRatio
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord}
 
 case class IndexDerivedProperties(
   lastEditAt: Option[DateTime],
   lastEditBy: Option[String],
-  annotations: Option[Long]
+  annotations: Option[Long],
+  statusRatio: Option[StatusRatio]
 )
 
 object IndexDerivedProperties {
 
   // Shorthand
-  val EMPTY = IndexDerivedProperties(None, None, None)
+  val EMPTY = IndexDerivedProperties(None, None, None, None)
 
 }
 
@@ -102,7 +104,8 @@ object ConfiguredPresentation extends HasDate {
     // Selectable index properties
     (JsPath \ "last_edit_at").writeNullable[DateTime] and
     (JsPath \ "last_edit_by").writeNullable[String] and
-    (JsPath \ "annotations").writeNullable[Long]
+    (JsPath \ "annotations").writeNullable[Long] and
+    (JsPath \ "status_ratio").writeNullable[JsObject]
   )(p => (
     p.document.getId,
     p.document.getOwner,
@@ -125,7 +128,13 @@ object ConfiguredPresentation extends HasDate {
     // Index-based properties
     p.getIndexProp[DateTime]("last_edit_at", p.indexProps.lastEditAt),
     p.getIndexProp[String]("last_edit_by", p.indexProps.lastEditBy),
-    p.getIndexProp[Long]("annotations", p.indexProps.annotations)
+    p.getIndexProp[Long]("annotations", p.indexProps.annotations),
+    p.getIndexProp[StatusRatio]("status_ratio", p.indexProps.statusRatio).map { r =>
+      Json.obj(
+        "verified" -> r.verified,
+        "unverified" -> r.unverified,
+        "not_identifiable" -> r.notIdentifiable)
+    }
   ))
 
 }

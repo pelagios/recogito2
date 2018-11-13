@@ -9,6 +9,7 @@ import play.api.mvc.{AnyContent, ControllerComponents, Request, Result}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import services.annotation.AnnotationService
+import services.annotation.stats.StatusRatio
 import services.contribution.ContributionService
 import services.document.DocumentService
 import services.user.UserService
@@ -54,17 +55,29 @@ class DocumentInfoController @Inject() (
     val fAnnotationCount = fetchIfRequested("annotations") { id =>
       annotations.countByDocId(id)
     }
+
+    val fStatusRatios =
+      if (config.hasColumn("status_ratio")) annotations.getStatusRatios(docIds)
+      else Future.successful(Map.empty[String, StatusRatio])
  
     val f = for {
       lastEdits <- fLastEdits
       annotationCounts <- fAnnotationCount
-    } yield (lastEdits.toMap, annotationCounts.toMap)   
+      statusRatios <- fStatusRatios
+    } yield (lastEdits.toMap, annotationCounts.toMap, statusRatios)   
     
-    f.map { case (lastEdits, annotationsPerDoc) =>
+    f.map { case (lastEdits, annotationsPerDoc, statusRatios) =>
       docIds.map { id =>
         val lastEdit = lastEdits.find(_._1 == id).flatMap(_._2)
         val annotations = annotationsPerDoc.find(_._1 == id).map(_._2).getOrElse(0l)
-        (id, IndexDerivedProperties(lastEdit.map(_.madeAt), lastEdit.map(_.madeBy), Some(annotations)))
+
+        val indexProps = IndexDerivedProperties(
+          lastEdit.map(_.madeAt),
+          lastEdit.map(_.madeBy),
+          Some(annotations),
+          statusRatios.get(id))
+
+        (id, indexProps)
       }
     }
   }
@@ -86,9 +99,6 @@ class DocumentInfoController @Inject() (
 
   /** Returns the list of my documents, taking into account col/sort config **/
   def getMyDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
-
-    // annotations.getCompletionRatios(Seq("dxggv3xbmcqbfl"))
-
     getDocumentInfo(
       request.identity.username, 
       offset, 

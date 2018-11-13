@@ -4,12 +4,15 @@ import collection.JavaConverters._
 import com.sksamuel.elastic4s.ElasticDsl._
 import javax.inject.{Inject, Singleton}
 import org.elasticsearch.search.aggregations.bucket.nested.InternalNested
-import scala.concurrent.ExecutionContext
+import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.HasAnnotationIndexing
 import storage.es.ES
-import services.annotation.{AnnotationService, AnnotationBody}
+import services.annotation.{AnnotationService, AnnotationBody, AnnotationStatus}
 import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms
+
+case class StatusRatio(verified: Long, unverified: Long, notIdentifiable: Long)
 
 @Singleton
 trait AnnotationStatsService { self: AnnotationService =>
@@ -32,7 +35,7 @@ trait AnnotationStatsService { self: AnnotationService =>
       .map(b => (b.getKeyAsString, b.getDocCount))
     }
 
-  def getCompletionRatios(documentIds: Seq[String]) =
+  def getStatusRatios(documentIds: Seq[String]): Future[Map[String, StatusRatio]] =
     es.client execute {
       search (ES.RECOGITO / ES.ANNOTATION) query {
         boolQuery
@@ -46,8 +49,27 @@ trait AnnotationStatsService { self: AnnotationService =>
           )
         )
       ) size 0
-    } map { response =>
-      play.api.Logger.info(response.toString)
+    } map { _.aggregations
+      .termsResult("per_document")
+      .getBuckets.asScala.map { docBucket => 
+        val docId = docBucket.getKeyAsString
+        val statusValues = docBucket
+          .getAggregations.get[InternalNested]("per_body")
+          .getAggregations.get[StringTerms]("by_status_value")
+          .getBuckets.asScala.map { statusBucket =>
+            val status = AnnotationStatus.withName(statusBucket.getKeyAsString)
+            val count = statusBucket.getDocCount
+            (status, count)
+          }.toMap
+        
+        val ratio = StatusRatio(
+          statusValues.get(AnnotationStatus.VERIFIED).getOrElse(0l),
+          statusValues.get(AnnotationStatus.UNVERIFIED).getOrElse(0l),
+          statusValues.get(AnnotationStatus.NOT_IDENTIFIABLE).getOrElse(0l)
+        )
+
+        (docId, ratio)
+      }.toMap
     }
   
 }
