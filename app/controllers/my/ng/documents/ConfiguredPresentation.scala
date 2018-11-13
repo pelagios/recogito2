@@ -31,6 +31,9 @@ case class ConfiguredPresentation(
   def getDBProp[T](key: String, prop: T): Option[T] = 
     if (columnConfig.contains(key)) Option(prop) else None
 
+  def getOptDBProp[T](key: String, prop: Option[T]): Option[T] =
+    if (columnConfig.contains(key)) prop else None
+
   // The only difference for index props it that they are already properly Option-typed
   def getIndexProp[T](key: String, prop: Option[T]): Option[T] =
     if (columnConfig.contains(key)) prop else None
@@ -89,11 +92,12 @@ object ConfiguredPresentation extends HasDate {
     // Selectable DB properties
     (JsPath \ "author").writeNullable[String] and 
     (JsPath \ "date_freeform").writeNullable[String] and
-    // TODO description?
     (JsPath \ "language").writeNullable[String] and
     (JsPath \ "source").writeNullable[String] and
     (JsPath \ "edition").writeNullable[String] and
     (JsPath \ "public_visibility").writeNullable[String] and
+    (JsPath \ "shared_by").writeNullable[String] and
+    (JsPath \ "access_level").writeNullable[String] and
 
     // Selectable index properties
     (JsPath \ "last_edit_at").writeNullable[DateTime] and
@@ -115,6 +119,8 @@ object ConfiguredPresentation extends HasDate {
     p.getDBProp[String]("source", p.document.getSource),
     p.getDBProp[String]("edition", p.document.getEdition),
     p.getDBProp[String]("public_visibility", p.document.getPublicVisibility),
+    p.getOptDBProp[String]("shared_by", p.sharedVia.map(_.getSharedBy)),
+    p.getOptDBProp[String]("access_level", p.sharedVia.map(_.getAccessLevel)),
 
     // Index-based properties
     p.getIndexProp[DateTime]("last_edit_at", p.indexProps.lastEditAt),
