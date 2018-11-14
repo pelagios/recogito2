@@ -61,7 +61,6 @@ object Keys {
 	// -------------------------------------------------------------------------
 
 	val IDENTITY_FEATURE_TOGGLE = Identities0.IDENTITY_FEATURE_TOGGLE
-	val IDENTITY_FOLDER = Identities0.IDENTITY_FOLDER
 	val IDENTITY_SHARING_POLICY = Identities0.IDENTITY_SHARING_POLICY
 	val IDENTITY_UPLOAD = Identities0.IDENTITY_UPLOAD
 	val IDENTITY_USER_ROLE = Identities0.IDENTITY_USER_ROLE
@@ -76,6 +75,7 @@ object Keys {
 	val DOCUMENT_PREFERENCES_PKEY = UniqueKeys0.DOCUMENT_PREFERENCES_PKEY
 	val FEATURE_TOGGLE_PKEY = UniqueKeys0.FEATURE_TOGGLE_PKEY
 	val FOLDER_PKEY = UniqueKeys0.FOLDER_PKEY
+	val FOLDER_OWNER_TITLE_PARENT_KEY = UniqueKeys0.FOLDER_OWNER_TITLE_PARENT_KEY
 	val FOLDER_ASSOCIATION_PKEY = UniqueKeys0.FOLDER_ASSOCIATION_PKEY
 	val SERVICE_ANNOUNCEMENT_PKEY = UniqueKeys0.SERVICE_ANNOUNCEMENT_PKEY
 	val SHARING_POLICY_PKEY = UniqueKeys0.SHARING_POLICY_PKEY
@@ -96,10 +96,8 @@ object Keys {
 	val FEATURE_TOGGLE__FEATURE_TOGGLE_USERNAME_FKEY = ForeignKeys0.FEATURE_TOGGLE__FEATURE_TOGGLE_USERNAME_FKEY
 	val FOLDER__FOLDER_OWNER_FKEY = ForeignKeys0.FOLDER__FOLDER_OWNER_FKEY
 	val FOLDER__FOLDER_PARENT_FKEY = ForeignKeys0.FOLDER__FOLDER_PARENT_FKEY
-	val FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY = ForeignKeys0.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY
 	val FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY = ForeignKeys0.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY
 	val SERVICE_ANNOUNCEMENT__SERVICE_ANNOUNCEMENT_FOR_USER_FKEY = ForeignKeys0.SERVICE_ANNOUNCEMENT__SERVICE_ANNOUNCEMENT_FOR_USER_FKEY
-	val SHARING_POLICY__SHARING_POLICY_FOLDER_ID_FKEY = ForeignKeys0.SHARING_POLICY__SHARING_POLICY_FOLDER_ID_FKEY
 	val SHARING_POLICY__SHARING_POLICY_SHARED_BY_FKEY = ForeignKeys0.SHARING_POLICY__SHARING_POLICY_SHARED_BY_FKEY
 	val SHARING_POLICY__SHARING_POLICY_SHARED_WITH_FKEY = ForeignKeys0.SHARING_POLICY__SHARING_POLICY_SHARED_WITH_FKEY
 	val UPLOAD__UPLOAD_OWNER_FKEY = ForeignKeys0.UPLOAD__UPLOAD_OWNER_FKEY
@@ -113,7 +111,6 @@ object Keys {
 
 	private object Identities0 extends AbstractKeys {
 		val IDENTITY_FEATURE_TOGGLE : Identity[FeatureToggleRecord, Integer] = AbstractKeys.createIdentity(FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.ID)
-		val IDENTITY_FOLDER : Identity[FolderRecord, Integer] = AbstractKeys.createIdentity(Folder.FOLDER, Folder.FOLDER.ID)
 		val IDENTITY_SHARING_POLICY : Identity[SharingPolicyRecord, Integer] = AbstractKeys.createIdentity(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
 		val IDENTITY_UPLOAD : Identity[UploadRecord, Integer] = AbstractKeys.createIdentity(Upload.UPLOAD, Upload.UPLOAD.ID)
 		val IDENTITY_USER_ROLE : Identity[UserRoleRecord, Integer] = AbstractKeys.createIdentity(UserRole.USER_ROLE, UserRole.USER_ROLE.ID)
@@ -126,6 +123,7 @@ object Keys {
 		val DOCUMENT_PREFERENCES_PKEY : UniqueKey[DocumentPreferencesRecord] = AbstractKeys.createUniqueKey(DocumentPreferences.DOCUMENT_PREFERENCES, DocumentPreferences.DOCUMENT_PREFERENCES.DOCUMENT_ID, DocumentPreferences.DOCUMENT_PREFERENCES.PREFERENCE_NAME)
 		val FEATURE_TOGGLE_PKEY : UniqueKey[FeatureToggleRecord] = AbstractKeys.createUniqueKey(FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.ID)
 		val FOLDER_PKEY : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
+		val FOLDER_OWNER_TITLE_PARENT_KEY : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.OWNER, Folder.FOLDER.TITLE, Folder.FOLDER.PARENT)
 		val FOLDER_ASSOCIATION_PKEY : UniqueKey[FolderAssociationRecord] = AbstractKeys.createUniqueKey(FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.FOLDER_ID, FolderAssociation.FOLDER_ASSOCIATION.DOCUMENT_ID)
 		val SERVICE_ANNOUNCEMENT_PKEY : UniqueKey[ServiceAnnouncementRecord] = AbstractKeys.createUniqueKey(ServiceAnnouncement.SERVICE_ANNOUNCEMENT, ServiceAnnouncement.SERVICE_ANNOUNCEMENT.ID)
 		val SHARING_POLICY_PKEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
@@ -144,10 +142,8 @@ object Keys {
 		val FEATURE_TOGGLE__FEATURE_TOGGLE_USERNAME_FKEY : ForeignKey[FeatureToggleRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.USERNAME)
 		val FOLDER__FOLDER_OWNER_FKEY : ForeignKey[FolderRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, Folder.FOLDER, Folder.FOLDER.OWNER)
 		val FOLDER__FOLDER_PARENT_FKEY : ForeignKey[FolderRecord, FolderRecord] = AbstractKeys.createForeignKey(services.generated.Keys.FOLDER_PKEY, Folder.FOLDER, Folder.FOLDER.PARENT)
-		val FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY : ForeignKey[FolderAssociationRecord, FolderRecord] = AbstractKeys.createForeignKey(services.generated.Keys.FOLDER_PKEY, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.FOLDER_ID)
 		val FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY : ForeignKey[FolderAssociationRecord, DocumentRecord] = AbstractKeys.createForeignKey(services.generated.Keys.DOCUMENT_PKEY, FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.DOCUMENT_ID)
 		val SERVICE_ANNOUNCEMENT__SERVICE_ANNOUNCEMENT_FOR_USER_FKEY : ForeignKey[ServiceAnnouncementRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, ServiceAnnouncement.SERVICE_ANNOUNCEMENT, ServiceAnnouncement.SERVICE_ANNOUNCEMENT.FOR_USER)
-		val SHARING_POLICY__SHARING_POLICY_FOLDER_ID_FKEY : ForeignKey[SharingPolicyRecord, FolderRecord] = AbstractKeys.createForeignKey(services.generated.Keys.FOLDER_PKEY, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.FOLDER_ID)
 		val SHARING_POLICY__SHARING_POLICY_SHARED_BY_FKEY : ForeignKey[SharingPolicyRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.SHARED_BY)
 		val SHARING_POLICY__SHARING_POLICY_SHARED_WITH_FKEY : ForeignKey[SharingPolicyRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.SHARED_WITH)
 		val UPLOAD__UPLOAD_OWNER_FKEY : ForeignKey[UploadRecord, UserRecord] = AbstractKeys.createForeignKey(services.generated.Keys.USER_PKEY, Upload.UPLOAD, Upload.UPLOAD.OWNER)

@@ -119,7 +119,7 @@ class SharingPolicy(alias : String, aliased : Table[SharingPolicyRecord], parame
 	}
 
 	override def getReferences : List[ ForeignKey[SharingPolicyRecord, _] ] = {
-		return Arrays.asList[ ForeignKey[SharingPolicyRecord, _] ](Keys.SHARING_POLICY__SHARING_POLICY_FOLDER_ID_FKEY, Keys.SHARING_POLICY__SHARING_POLICY_SHARED_BY_FKEY, Keys.SHARING_POLICY__SHARING_POLICY_SHARED_WITH_FKEY)
+		return Arrays.asList[ ForeignKey[SharingPolicyRecord, _] ](Keys.SHARING_POLICY__SHARING_POLICY_SHARED_BY_FKEY, Keys.SHARING_POLICY__SHARING_POLICY_SHARED_WITH_FKEY)
 	}
 
 	override def as(alias : String) : SharingPolicy = {

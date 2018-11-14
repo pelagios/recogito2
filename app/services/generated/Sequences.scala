@@ -30,11 +30,6 @@ object Sequences {
 	val FEATURE_TOGGLE_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("feature_toggle_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))
 
 	/**
-	 * The sequence <code>public.folder_id_seq</code>
-	 */
-	val FOLDER_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("folder_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))
-
-	/**
 	 * The sequence <code>public.sharing_policy_id_seq</code>
 	 */
 	val SHARING_POLICY_ID_SEQ : Sequence[Long] = new SequenceImpl[Long]("sharing_policy_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false))

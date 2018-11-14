@@ -1,5 +1,6 @@
 package services
 
+import java.util.UUID
 import org.jooq.{ Table, Record, SortField }
 import play.api.cache.SyncCacheApi
 import scala.concurrent.{ ExecutionContext, Future }
@@ -44,6 +45,11 @@ trait BaseService {
   /** Optional Ints need to be turned to Integer/null for JOOQ **/
   protected def optInt(i: Option[Int]): Integer = i match {
     case Some(i) => i
+    case None => null
+  }
+
+  protected def optUUID(id: Option[UUID]): UUID = id match {
+    case Some(uuid) => uuid
     case None => null
   }
   

@@ -96,11 +96,12 @@ CREATE TABLE document_preferences (
 
 -- users can organize documents into folders (for future use)
 CREATE TABLE folder (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY,
   owner TEXT NOT NULL REFERENCES "user"(username),
   title TEXT NOT NULL,
   -- if parent is empty then it's a root folder
-  parent INTEGER REFERENCES folder(id)
+  parent UUID REFERENCES folder(id),
+  UNIQUE (owner, title, parent)
 );
 
 CREATE TABLE folder_association (

@@ -6,11 +6,13 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.mvc.ControllerComponents
 import scala.concurrent.ExecutionContext
+import services.folder.FolderService
 import services.user.UserService
 
 @Singleton
 class FolderController @Inject() (
     val components: ControllerComponents,
+    val folders: FolderService,
     val silhouette: Silhouette[Security.Env],
     val users: UserService,
     val config: Configuration,
@@ -18,7 +20,7 @@ class FolderController @Inject() (
   ) extends BaseController(components, config, users)
       with HasPrettyPrintJSON {
 
-  def createFolder(title: String) = silhouette.SecuredAction.async { implicit request => ??? }
+  def createFolder() = silhouette.SecuredAction.async { implicit request => ??? }
 
   def deleteFolder(id: Int) = silhouette.SecuredAction.async { implicit request => ??? }
 

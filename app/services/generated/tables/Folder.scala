@@ -5,16 +5,15 @@ package services.generated.tables
 
 
 import java.lang.Class
-import java.lang.Integer
 import java.lang.String
 import java.util.Arrays
 import java.util.List
+import java.util.UUID
 
 import javax.annotation.Generated
 
 import org.jooq.Field
 import org.jooq.ForeignKey
-import org.jooq.Identity
 import org.jooq.Table
 import org.jooq.TableField
 import org.jooq.UniqueKey
@@ -55,7 +54,7 @@ class Folder(alias : String, aliased : Table[FolderRecord], parameters : Array[ 
 	/**
 	 * The column <code>public.folder.id</code>.
 	 */
-	val ID : TableField[FolderRecord, Integer] = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), "")
+	val ID : TableField[FolderRecord, UUID] = createField("id", org.jooq.impl.SQLDataType.UUID.nullable(false), "")
 
 	/**
 	 * The column <code>public.folder.owner</code>.
@@ -70,7 +69,7 @@ class Folder(alias : String, aliased : Table[FolderRecord], parameters : Array[ 
 	/**
 	 * The column <code>public.folder.parent</code>.
 	 */
-	val PARENT : TableField[FolderRecord, Integer] = createField("parent", org.jooq.impl.SQLDataType.INTEGER, "")
+	val PARENT : TableField[FolderRecord, UUID] = createField("parent", org.jooq.impl.SQLDataType.UUID, "")
 
 	/**
 	 * Create a <code>public.folder</code> table reference
@@ -90,16 +89,12 @@ class Folder(alias : String, aliased : Table[FolderRecord], parameters : Array[ 
 		this(alias, aliased, null)
 	}
 
-	override def getIdentity : Identity[FolderRecord, Integer] = {
-		Keys.IDENTITY_FOLDER
-	}
-
 	override def getPrimaryKey : UniqueKey[FolderRecord] = {
 		Keys.FOLDER_PKEY
 	}
 
 	override def getKeys : List[ UniqueKey[FolderRecord] ] = {
-		return Arrays.asList[ UniqueKey[FolderRecord] ](Keys.FOLDER_PKEY)
+		return Arrays.asList[ UniqueKey[FolderRecord] ](Keys.FOLDER_PKEY, Keys.FOLDER_OWNER_TITLE_PARENT_KEY)
 	}
 
 	override def getReferences : List[ ForeignKey[FolderRecord, _] ] = {

@@ -179,7 +179,7 @@ GET     /api/folders/my                              controllers.my.ng.folders.F
 GET     /api/folders/shared                          controllers.my.ng.folders.FolderController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500)
 GET     /api/folders/accessbile/:owner               controllers.my.ng.folders.FolderController.getAccessibleFolders(owner: String, offset: Int ?= 0, size: Int ?= 500)
 
-PUT     /folder/:title                               controllers.my.ng.folders.FolderController.createFolder(title: String)
+POST    /folder/new                                  controllers.my.ng.folders.FolderController.createFolder
 DELETE  /folder/bulk                                 controllers.my.ng.folders.FolderController.bulkDeleteFolders
 DELETE  /folder/:id                                  controllers.my.ng.folders.FolderController.deleteFolder(id: Int)
 
