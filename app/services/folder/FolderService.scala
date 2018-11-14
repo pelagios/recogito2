@@ -10,7 +10,8 @@ import services.generated.tables.records.FolderRecord
 import storage.db.DB
 
 @Singleton
-class FolderService @Inject() (implicit val db: DB) extends BaseService {
+class FolderService @Inject() (implicit val db: DB) 
+  extends BaseService with FolderAssociationService {
 
   def listFolders(owner: String, offset: Int, size: Int): Future[Page[FolderRecord]] = 
     db.query { sql => 

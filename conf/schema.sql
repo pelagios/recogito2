@@ -105,7 +105,8 @@ CREATE TABLE folder (
 
 CREATE TABLE folder_association (
   folder_id INTEGER NOT NULL REFERENCES folder(id),
-  document_id TEXT NOT NULL REFERENCES document(id)
+  document_id TEXT NOT NULL REFERENCES document(id),
+  PRIMARY KEY (folder_id, document_id)
 );
 
 -- ledger of shared documents and folders

@@ -16,6 +16,7 @@ import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Table
 import org.jooq.TableField
+import org.jooq.UniqueKey
 import org.jooq.impl.TableImpl
 
 import services.generated.Keys
@@ -78,8 +79,16 @@ class FolderAssociation(alias : String, aliased : Table[FolderAssociationRecord]
 		this(alias, aliased, null)
 	}
 
+	override def getPrimaryKey : UniqueKey[FolderAssociationRecord] = {
+		Keys.FOLDER_ASSOCIATION_PKEY
+	}
+
+	override def getKeys : List[ UniqueKey[FolderAssociationRecord] ] = {
+		return Arrays.asList[ UniqueKey[FolderAssociationRecord] ](Keys.FOLDER_ASSOCIATION_PKEY)
+	}
+
 	override def getReferences : List[ ForeignKey[FolderAssociationRecord, _] ] = {
-		return Arrays.asList[ ForeignKey[FolderAssociationRecord, _] ](Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY)
+		return Arrays.asList[ ForeignKey[FolderAssociationRecord, _] ](Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY, Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY)
 	}
 
 	override def as(alias : String) : FolderAssociation = {

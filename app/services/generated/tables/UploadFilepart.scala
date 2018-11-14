@@ -121,7 +121,7 @@ class UploadFilepart(alias : String, aliased : Table[UploadFilepartRecord], para
 	}
 
 	override def getKeys : List[ UniqueKey[UploadFilepartRecord] ] = {
-		return Arrays.asList[ UniqueKey[UploadFilepartRecord] ](Keys.UPLOAD_FILEPART_PKEY, Keys.UPLOAD_FILEPART_OWNER_TITLE_KEY)
+		return Arrays.asList[ UniqueKey[UploadFilepartRecord] ](Keys.UPLOAD_FILEPART_PKEY)
 	}
 
 	override def getReferences : List[ ForeignKey[UploadFilepartRecord, _] ] = {
