@@ -3,6 +3,8 @@ package services.folder
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import services.{Page, BaseService}
@@ -13,6 +15,16 @@ import storage.db.DB
 @Singleton
 class FolderService @Inject() (implicit val db: DB) 
   extends BaseService with FolderAssociationService {
+
+  def getFolder(id: UUID): Future[Option[FolderRecord]] = 
+    db.query { sql => 
+      Option(sql.selectFrom(FOLDER).where(FOLDER.ID.equal(id)).fetchOne)
+    }
+
+  def getFolders(ids: Seq[UUID]): Future[Seq[FolderRecord]] = 
+    db.query { sql => 
+      sql.selectFrom(FOLDER).where(FOLDER.ID.in(ids)).fetchArray
+    }
 
   def listFolders(owner: String, offset: Int, size: Int): Future[Page[FolderRecord]] = 
     db.query { sql => 
@@ -56,5 +68,21 @@ class FolderService @Inject() (implicit val db: DB)
         .where(FOLDER.ID.equal(id))
         .execute() == 1
     }
+
+}
+
+object FolderService {
+
+  implicit val folderWrites: Writes[FolderRecord] = (
+    (JsPath \ "id").write[UUID] and
+    (JsPath \ "owner").write[String] and
+    (JsPath \ "title").write[String] and
+    (JsPath \ "parent").writeNullable[UUID]
+  )(f => (
+    f.getId,
+    f.getOwner,
+    f.getTitle,
+    Option(f.getParent)
+  ))
 
 }
