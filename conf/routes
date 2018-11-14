@@ -175,6 +175,14 @@ DELETE  /api/documents/shared/:id                    controllers.my.ng.Workspace
 DELETE  /document/bulk                               controllers.my.ng.WorkspaceAPIController.bulkDeleteDocuments
 DELETE  /document/:id                                controllers.my.ng.WorkspaceAPIController.deleteDocument(id: String)
 
+GET     /api/folders/my                              controllers.my.ng.folders.FolderController.getMyFolders(offset: Int ?= 0, size: Int ?= 500)
+GET     /api/folders/shared                          controllers.my.ng.folders.FolderController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500)
+GET     /api/folders/accessbile/:owner               controllers.my.ng.folders.FolderController.getAccessibleFolders(owner: String, offset: Int ?= 0, size: Int ?= 500)
+
+PUT     /folder/:title                               controllers.my.ng.folders.FolderController.createFolder(title: String)
+DELETE  /folder/bulk                                 controllers.my.ng.folders.FolderController.bulkDeleteFolders
+DELETE  /folder/:id                                  controllers.my.ng.folders.FolderController.deleteFolder(id: Int)
+
 POST    /my/upload                                   controllers.my.ng.UploadController.initUpload()
 POST    /my/upload/:id/file                          controllers.my.ng.UploadController.storeFilepart(id: Int)
 POST    /my/upload/:id/finalize                      controllers.my.ng.UploadController.finalizeUpload(id: Int)
