@@ -109,12 +109,12 @@ define([
          * In a list of adjancent text nodes, this method computes the (node/offset)
          * pairs of a list of absolute character offsets in the total text.
          */
-        charOffsetsToDOMPosition = function(charOffsets) {
+        charOffsetsToDOMPosition = function(charOffsets, shadowDom) {
           var maxOffset = Math.max.apply(null, charOffsets),
 
               textNodeProps = (function() {
                 var start = 0;
-                return walkTextNodes(rootNode, maxOffset).map(function(node) {
+                return walkTextNodes(shadowDom, maxOffset).map(function(node) {
                   var nodeLength = jQuery(node).text().length,
                       nodeProps = { node: node, start: start, end: start + nodeLength };
 
@@ -126,9 +126,11 @@ define([
           return calculateDomPositionWithin(textNodeProps, charOffsets);
         },
 
-        wrapRange = function(range) {
-          var surround = function(range) {
-                var wrapper = document.createElement('SPAN');
+        wrapRange = function(range, shadowDom) {
+          var root = shadowDom ? shadowDom : rootNode,
+
+              surround = function(range) {
+                var wrapper = root.ownerDocument.createElement('SPAN');
                 range.surroundContents(wrapper);
                 return wrapper;
               };
@@ -139,7 +141,7 @@ define([
             // The tricky part - we need to break the range apart and create
             // sub-ranges for each segment
             var nodesBetween =
-              textNodesBetween(range.startContainer, range.endContainer, rootNode);
+              textNodesBetween(range.startContainer, range.endContainer, root);
 
             // Start with start and end nodes
             var startRange = rangy.createRange();
@@ -209,7 +211,7 @@ define([
 
                 // We only have one text element but, alas, browsers split them
                 // up into several nodes
-                return jQuery.map(rootNode.childNodes, function(node) {
+                return jQuery.map(shadowDom.childNodes, function(node) {
                   var nodeLength = jQuery(node).text().length,
                       nodeProps = { node: node, start: start, end: start + nodeLength };
                   start += nodeLength;
@@ -252,7 +254,7 @@ define([
                 positions, spans;
 
             if (previousBounds && intersects(previousBounds, bounds)) {
-              positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
+              positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ], shadowDom);
               range.setStart(positions[0].node, positions[0].offset);
               range.setEnd(positions[1].node, positions[1].offset);
               spans = wrapRange(range);
