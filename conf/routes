@@ -131,13 +131,54 @@ GET     /part/:id                                    controllers.document.annota
 # JSON API
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# ~~~ Account information ~~~
+
+GET     /api/me                                      controllers.my.ng.account.AccountInfoController.me
+GET     /api/account/my                              controllers.my.ng.account.AccountInfoController.getPrivateAccountInfo
+GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getPublicAccountInfo(username: String)
+GET     /api/account/:username/collaborators         controllers.my.ng.account.AccountInfoController.getCollaborators(username: String)
+
+# ~~~ Directory access ~~~
+
+GET     /api/directory/my                            controllers.my.ng.directory.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+POST    /api/directory/my                            controllers.my.ng.directory.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+GET     /api/directory/my/:folderId                  controllers.my.ng.directory.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+POST    /api/directory/my/:folderId                  controllers.my.ng.directory.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+
+GET     /api/directory/my/shared                     controllers.my.ng.directory.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+POST    /api/directory/my/shared                     controllers.my.ng.directory.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+GET     /api/directory/my/shared/:folderId           controllers.my.ng.directory.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+POST    /api/directory/my/shared/:folderId           controllers.my.ng.directory.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+
+GET     /api/directory/:owner                        controllers.my.ng.directory.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+POST    /api/directory/:owner                        controllers.my.ng.directory.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+GET     /api/directory/:owner/:folderId              controllers.my.ng.directory.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+POST    /api/directory/:owner/:folderId              controllers.my.ng.directory.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+
+# ~~~ Directory delete operations ~~~
+
+DELETE  /api/document/bulk                           controllers.my.ng.directory.DirectoryController.bulkDeleteDocuments
+DELETE  /api/document/:id                            controllers.my.ng.directory.DirectoryController.deleteDocument(id: String)
+
+DELETE  /api/folder/bulk                             controllers.my.ng.directory.DirectoryController.bulkDeleteFolders
+DELETE  /api/folder/:id                              controllers.my.ng.directory.DirectoryController.deleteFolder(id: java.util.UUID)
+
+DELETE  /api/shared/document/bulk                    controllers.my.ng.directory.DirectoryController.bulkUnshareDocuments
+DELETE  /api/shared/document/:id                     controllers.my.ng.directory.DirectoryController.unshareDocument(id: String)
+
+DELETE  /api/shared/folder/bulk                      controllers.my.ng.directory.DirectoryController.bulkUnshareFolders
+DELETE  /api/shared/folder/:id                       controllers.my.ng.directory.DirectoryController.unshareFolder(id: java.util.UUID)
+
+# ~~~ Annotations ~~~
+
 POST    /api/annotation                              controllers.api.AnnotationAPIController.createAnnotation
+
 GET     /api/annotation/:id.jpg                      controllers.api.AnnotationAPIController.getImage(id: java.util.UUID)
 GET     /api/annotation/:id                          controllers.api.AnnotationAPIController.getAnnotation(id: java.util.UUID, context: Boolean ?= false)
-DELETE  /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkDelete
-DELETE  /api/annotation/:id                          controllers.api.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
 
 POST    /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkUpsert
+DELETE  /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkDelete
+DELETE  /api/annotation/:id                          controllers.api.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
 
 GET     /api/document/:id/annotations                controllers.api.AnnotationAPIController.listAnnotationsInDocument(id: String)
 GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationAPIController.listAnnotationsInPart(id: String, part: Int)
@@ -145,47 +186,19 @@ GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationA
 GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
 GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
 
-GET     /api/place/search                            controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None, authorities: Option[String] ?= None)
-GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
+# ~~~ Authorities ~~~ 
 
 GET     /api/authorities/gazetteers                  controllers.api.AuthoritiesAPIController.listGazetteers
 
+# ~~~ Entities ~~~
+
+GET     /api/place/search                            controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None, authorities: Option[String] ?= None)
+GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
+
+# ~~~ Tasks ~~~
+
 POST    /api/task                                    controllers.api.TaskAPIController.spawnTask
 GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Routes introduced for new UI
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-GET     /api/me                                      controllers.my.ng.account.AccountInfoController.me
-GET     /api/account/my                              controllers.my.ng.account.AccountInfoController.getPrivateAccountInfo
-GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getPublicAccountInfo(username: String)
-GET     /api/account/:username/collaborators         controllers.my.ng.account.AccountInfoController.getCollaborators(username: String)
-
-GET     /api/documents/my                            controllers.my.ng.documents.DocumentInfoController.getMyDocuments(offset: Int ?= 0, size: Int ?= 500)
-POST    /api/documents/my                            controllers.my.ng.documents.DocumentInfoController.getMyDocuments(offset: Int ?= 0, size: Int ?= 500)
-GET     /api/documents/shared                        controllers.my.ng.documents.DocumentInfoController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500)
-POST    /api/documents/shared                        controllers.my.ng.documents.DocumentInfoController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500)
-GET     /api/documents/accessible/:owner             controllers.my.ng.documents.DocumentInfoController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500)
-POST    /api/documents/accessible/:owner             controllers.my.ng.documents.DocumentInfoController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500)
-
-DELETE  /api/documents/shared/bulk                   controllers.my.ng.WorkspaceAPIController.bulkUnshareDocuments
-DELETE  /api/documents/shared/:id                    controllers.my.ng.WorkspaceAPIController.unshareDocument(id: String)
-
-DELETE  /document/bulk                               controllers.my.ng.WorkspaceAPIController.bulkDeleteDocuments
-DELETE  /document/:id                                controllers.my.ng.WorkspaceAPIController.deleteDocument(id: String)
-
-GET     /api/folders/my                              controllers.my.ng.folders.FolderController.getMyFolders(offset: Int ?= 0, size: Int ?= 500)
-# GET     /api/folders/shared                          controllers.my.ng.folders.FolderController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500)
-# GET     /api/folders/accessbile/:owner               controllers.my.ng.folders.FolderController.getAccessibleFolders(owner: String, offset: Int ?= 0, size: Int ?= 500)
-
-POST    /folder/new                                  controllers.my.ng.folders.FolderController.createFolder
-DELETE  /folder/bulk                                 controllers.my.ng.folders.FolderController.bulkDeleteFolders
-DELETE  /folder/:id                                  controllers.my.ng.folders.FolderController.deleteFolder(id: java.util.UUID)
-
-POST    /my/upload                                   controllers.my.ng.UploadController.initUpload()
-POST    /my/upload/:id/file                          controllers.my.ng.UploadController.storeFilepart(id: Int)
-POST    /my/upload/:id/finalize                      controllers.my.ng.UploadController.finalizeUpload(id: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings
@@ -203,6 +216,8 @@ POST    /settings/restore                            controllers.my.settings.Res
 # Personal space - upload
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# ~~~ Legacy routes ~~~
+
 POST    /:username/upload/step-1                     controllers.my.UploadController.storeDocumentMetadata(username: String)
 GET     /:username/upload/step-1                     controllers.my.UploadController.showStep1(username: String)
 GET     /:username/upload/step-2                     controllers.my.UploadController.showStep2(username: String)
@@ -212,6 +227,12 @@ GET     /:username/upload/step-3                     controllers.my.UploadContro
 POST    /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
 GET     /:username/upload/cancel                     controllers.my.UploadController.cancelUploadWizard(username: String)
 GET     /:username/upload/progress/:docId            controllers.my.UploadController.queryTaskProgress(username: String, docId: String)
+
+# ~~~ New routes ~~~
+
+POST    /my/upload                                   controllers.my.ng.UploadController.initUpload()
+POST    /my/upload/:id/file                          controllers.my.ng.UploadController.storeFilepart(id: Int)
+POST    /my/upload/:id/finalize                      controllers.my.ng.UploadController.finalizeUpload(id: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Application root
