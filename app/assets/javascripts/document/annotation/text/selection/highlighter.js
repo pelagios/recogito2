@@ -202,10 +202,7 @@ define([
           var shadowDom = (function() {
                 var fragment = document.createDocumentFragment();
                 fragment.appendChild(rootNode.cloneNode(true)); // deep clone
-                
-                var wrapper = fragment.firstChild;
-                wrapper.removeAttribute('id');
-                return wrapper; // content Element
+                return fragment.firstChild; // content Element
               })(),
 
               textNodes = (function() {
@@ -276,7 +273,9 @@ define([
           }, false);
 
           rootNode.innerHTML = ''; // shadowDom.innerHTML;
-          rootNode.appendChild(shadowDom);
+          for (var i = shadowDom.childNodes.length - 1; i > -1; i--) {
+            rootNode.appendChild(shadowDom.childNodes[0]);
+          }
         },
 
         /**
