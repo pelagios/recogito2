@@ -155,7 +155,9 @@ POST    /api/directory/:owner                        controllers.my.ng.directory
 GET     /api/directory/:owner/:folderId              controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 POST    /api/directory/:owner/:folderId              controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
-# ~~~ Directory delete operations ~~~
+# ~~~ Directory create, delete & unshare operations ~~~
+
+POST    /api/folder                                  controllers.my.ng.directory.create.CreateController.createFolder
 
 DELETE  /api/document/bulk                           controllers.my.ng.directory.delete.DeleteController.bulkDeleteDocuments
 DELETE  /api/document/:id                            controllers.my.ng.directory.delete.DeleteController.deleteDocument(id: String)
