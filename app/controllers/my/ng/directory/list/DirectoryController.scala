@@ -1,7 +1,8 @@
-package controllers.my.ng.documents
+package controllers.my.ng.directory.list
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, HasPrettyPrintJSON, Security}
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.Json
@@ -10,24 +11,24 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import services.annotation.AnnotationService
 import services.annotation.stats.StatusRatio
-import services.contribution.ContributionService
 import services.document.DocumentService
+import services.contribution.ContributionService
 import services.user.UserService
 
 @Singleton
-class DocumentInfoController @Inject() (
-    val annotations: AnnotationService,
-    val components: ControllerComponents,
-    val contributions: ContributionService,
-    val documents: DocumentService,
-    val silhouette: Silhouette[Security.Env],
-    val users: UserService,
-    val config: Configuration,
-    implicit val ctx: ExecutionContext
-  ) extends BaseController(components, config, users)
-      with SortByDB
-      with SortByIndex
-      with HasPrettyPrintJSON {
+class DirectoryController @Inject() (
+  val annotations: AnnotationService,
+  val contributions: ContributionService,
+  val components: ControllerComponents,
+  val documents: DocumentService,
+  val silhouette: Silhouette[Security.Env],
+  val users: UserService,
+  val config: Configuration,
+  implicit val ctx: ExecutionContext
+) extends BaseController(components, config, users)
+    with SortByDB
+    with SortByIndex
+    with HasPrettyPrintJSON {
 
   // Document properties derived from the index
   private val INDEX_SORT_PROPERTIES = 
@@ -83,7 +84,7 @@ class DocumentInfoController @Inject() (
   }
 
   /** Common boilerplate code **/
-  private def getDocumentInfo(
+  private def getDocumentList(
     username: String, offset: Int, size: Int,
     onSortByDB   : (String, Int, Int, Option[PresentationConfig]) => Future[Result],
     onSortByIndex: (String, Int, Int, PresentationConfig) => Future[Result]
@@ -97,36 +98,37 @@ class DocumentInfoController @Inject() (
       onSortByDB(username, offset, size, config)
   }
 
-  /** Returns the list of my documents, taking into account col/sort config **/
-  def getMyDocuments(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
-    getDocumentInfo(
-      request.identity.username, 
-      offset, 
-      size, 
-      getMyDocumentsSortedByDB, 
-      getMyDocumentsSortedByIndex)
-  }
+  def getMyDirectory(offset: Int, size: Int, folderId: UUID) = 
+    silhouette.SecuredAction.async { implicit request =>
+      getDocumentList(
+        request.identity.username, 
+        offset, 
+        size, 
+        getMyDocumentsSortedByDB, 
+        getMyDocumentsSortedByIndex)
+    }
 
-  /** Returns the list of documents shared with me, taking into account col/sort config **/
-  def getSharedWithMe(offset: Int, size: Int) = silhouette.SecuredAction.async { implicit request =>
-    getDocumentInfo(
-      request.identity.username, 
-      offset, 
-      size, 
-      getSharedDocumentsSortedByDB, 
-      getSharedDocumentsSortedByIndex)
-  }
+  def getSharedWithMe(offset: Int, size: Int, folderId: UUID) = 
+    silhouette.SecuredAction.async { implicit request => 
+      getDocumentList(
+        request.identity.username, 
+        offset, 
+        size, 
+        getSharedDocumentsSortedByDB, 
+        getSharedDocumentsSortedByIndex)
+    }
 
-  def getAccessibleDocuments(owner: String, offset: Int, size: Int) = silhouette.UserAwareAction.async { implicit request =>
-    val config = request.body.asJson.flatMap(json => 
-      Try(Json.fromJson[PresentationConfig](json).get).toOption)
+  def getAccessibleDocuments(owner: String, offset: Int, size: Int, folderId: UUID) =
+    silhouette.UserAwareAction.async { implicit request =>
+      val config = request.body.asJson.flatMap(json => 
+        Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
-    val loggedIn = request.identity.map(_.username)
+      val loggedIn = request.identity.map(_.username)
 
-    if (isSortingByIndex(config))
-      getAccessibleDocumentsSortedByIndex(owner, loggedIn, offset, size, config.get)
-    else 
-      getAccessibleDocumentsSortedByDB(owner, loggedIn, offset, size, config)
-  }
+      if (isSortingByIndex(config))
+        getAccessibleDocumentsSortedByIndex(owner, loggedIn, offset, size, config.get)
+      else 
+        getAccessibleDocumentsSortedByDB(owner, loggedIn, offset, size, config)
+    }
 
 }

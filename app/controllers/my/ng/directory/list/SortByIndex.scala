@@ -1,11 +1,11 @@
-package controllers.my.ng.documents
+package controllers.my.ng.directory.list
 
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.Future
 import services.Page
 
-trait SortByIndex { self: DocumentInfoController =>
+trait SortByIndex { self: DirectoryController =>
 
   private def sortByIndexProperty(
     docIds: Seq[String], 

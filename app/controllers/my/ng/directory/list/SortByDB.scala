@@ -1,4 +1,4 @@
-package controllers.my.ng.documents
+package controllers.my.ng.directory.list
 
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, Request}
@@ -7,7 +7,7 @@ import services.{Page, SortOrder}
 import services.document.DocumentService
 import services.generated.tables.records.DocumentRecord
 
-trait SortByDB { self: DocumentInfoController =>
+trait SortByDB { self: DirectoryController =>
 
   /** Boilerplate to fetch documents sorted via a DB property */
   protected def documentsByDB[T <: Product](
