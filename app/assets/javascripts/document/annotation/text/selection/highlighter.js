@@ -109,12 +109,12 @@ define([
          * In a list of adjancent text nodes, this method computes the (node/offset)
          * pairs of a list of absolute character offsets in the total text.
          */
-        charOffsetsToDOMPosition = function(charOffsets, shadowDom) {
+        charOffsetsToDOMPosition = function(charOffsets) {
           var maxOffset = Math.max.apply(null, charOffsets),
 
               textNodeProps = (function() {
                 var start = 0;
-                return walkTextNodes(shadowDom, maxOffset).map(function(node) {
+                return walkTextNodes(rootNode, maxOffset).map(function(node) {
                   var nodeLength = jQuery(node).text().length,
                       nodeProps = { node: node, start: start, end: start + nodeLength };
 
@@ -126,10 +126,9 @@ define([
           return calculateDomPositionWithin(textNodeProps, charOffsets);
         },
 
-        wrapRange = function(range, shadowDom) {
-          var root = shadowDom ? shadowDom : rootNode; // Apply to given shadow DOM or root directly
+        wrapRange = function(range) {
           var surround = function(range) {
-                var wrapper = root.ownerDocument.createElement('SPAN');
+                var wrapper = document.createElement('SPAN');
                 range.surroundContents(wrapper);
                 return wrapper;
               };
@@ -140,7 +139,7 @@ define([
             // The tricky part - we need to break the range apart and create
             // sub-ranges for each segment
             var nodesBetween =
-              textNodesBetween(range.startContainer, range.endContainer, root);
+              textNodesBetween(range.startContainer, range.endContainer, rootNode);
 
             // Start with start and end nodes
             var startRange = rangy.createRange();
@@ -199,21 +198,12 @@ define([
         },
 
         initPage = function(annotations) {
-          var shadowDom = (function() {
-                var fragment = document.createDocumentFragment();
-                fragment.appendChild(rootNode.cloneNode(true)); // deep clone
-                
-                var wrapper = fragment.firstChild;
-                wrapper.removeAttribute('id');
-                return wrapper; // content Element
-              })(),
-
-              textNodes = (function() {
+          var textNodes = (function() {
                 var start = 0;
 
                 // We only have one text element but, alas, browsers split them
                 // up into several nodes
-                return jQuery.map(shadowDom.childNodes, function(node) {
+                return jQuery.map(rootNode.childNodes, function(node) {
                   var nodeLength = jQuery(node).text().length,
                       nodeProps = { node: node, start: start, end: start + nodeLength };
                   start += nodeLength;
@@ -256,10 +246,10 @@ define([
                 positions, spans;
 
             if (previousBounds && intersects(previousBounds, bounds)) {
-              positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ], shadowDom);
+              positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
               range.setStart(positions[0].node, positions[0].offset);
               range.setEnd(positions[1].node, positions[1].offset);
-              spans = wrapRange(range, shadowDom);
+              spans = wrapRange(range);
               if (perfectlyOverlaps(previousBounds, bounds))
                 spans.forEach(function(span) { span.className = 'stratified'; });
             } else {
@@ -274,9 +264,6 @@ define([
             bindToElements(annotation, spans);
             return bounds;
           }, false);
-
-          rootNode.innerHTML = ''; // shadowDom.innerHTML;
-          rootNode.appendChild(shadowDom);
         },
 
         /**
