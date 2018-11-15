@@ -46,7 +46,7 @@ class FolderService @Inject() (implicit val db: DB)
 
   def createFolder(owner: String, title: String, parent: Option[UUID]): Future[FolderRecord] = 
     db.withTransaction { sql => 
-      val folder = new FolderRecord(null, owner, title, optUUID(parent))
+      val folder = new FolderRecord(UUID.randomUUID, owner, title, optUUID(parent))
       sql.insertInto(FOLDER).set(folder).execute()
       folder
     }
