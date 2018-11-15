@@ -198,9 +198,6 @@ define([
         },
 
         initPage = function(annotations) {
-<<<<<<< HEAD
-          var textNodes = (function() {
-=======
           var shadowDom = (function() {
                 var fragment = document.createDocumentFragment();
                 fragment.appendChild(rootNode.cloneNode(true)); // deep clone
@@ -208,7 +205,6 @@ define([
               })(),
 
               textNodes = (function() {
->>>>>>> text-rendering-performance
                 var start = 0;
 
                 // We only have one text element but, alas, browsers split them
