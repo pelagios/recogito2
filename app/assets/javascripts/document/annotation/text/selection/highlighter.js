@@ -201,9 +201,14 @@ define([
 
         initPage = function(annotations) {
           var shadowDom = (function() {
-                var fragment = document.createDocumentFragment();
-                fragment.appendChild(rootNode.cloneNode(true)); // deep clone
-                return fragment.firstChild; // content Element
+                var fragment = document.createDocumentFragment(),
+                    wrapper = rootNode.cloneNode(true);
+
+                wrapper.removeAttribute('id');
+                wrapper.className = 'shadow-wrapper';
+                fragment.appendChild(wrapper);
+                console.log(fragment.firstChild);
+                return fragment.firstChild; // wrapper element
               })(),
 
               textNodes = (function() {
@@ -273,10 +278,8 @@ define([
             return bounds;
           }, false);
 
-          rootNode.innerHTML = ''; // shadowDom.innerHTML;
-          for (var i = shadowDom.childNodes.length - 1; i > -1; i--) {
-            rootNode.appendChild(shadowDom.childNodes[0]);
-          }
+          rootNode.innerHTML = '';
+          rootNode.appendChild(shadowDom);
         },
 
         /**
