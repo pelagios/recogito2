@@ -121,11 +121,13 @@ class DirectoryController @Inject() (
 
       f.map { case (directories, documents) => 
         // TODO merge dirs & documents
-        jsonOk(Json.toJson(documents))
+        jsonOk(Json.toJson(ListItem.merge(directories, documents)))
       }
     }
 
-  def getSharedWithMe(offset: Int, size: Int, folderId: UUID) = 
+  def getSharedWithMe(offset: Int, size: Int, folderId: UUID) =  {
+    import ConfiguredPresentation._
+    
     silhouette.SecuredAction.async { implicit request => 
       getDocumentList(
         request.identity.username, 
@@ -137,8 +139,11 @@ class DirectoryController @Inject() (
         jsonOk(Json.toJson(documents))
       }
     }
+  }
 
-  def getAccessibleDocuments(owner: String, offset: Int, size: Int, folderId: UUID) =
+  def getAccessibleDocuments(owner: String, offset: Int, size: Int, folderId: UUID) = {
+    import ConfiguredPresentation._
+
     silhouette.UserAwareAction.async { implicit request =>
       val config = request.body.asJson.flatMap(json => 
         Try(Json.fromJson[PresentationConfig](json).get).toOption)
@@ -155,5 +160,6 @@ class DirectoryController @Inject() (
         jsonOk(Json.toJson(documents))
       }
     }
+  }
 
 }
