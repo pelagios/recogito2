@@ -159,17 +159,15 @@ POST    /api/directory/:owner/:folderId              controllers.my.ng.directory
 
 POST    /api/folder                                  controllers.my.ng.directory.create.CreateController.createFolder
 
-DELETE  /api/document/bulk                           controllers.my.ng.directory.delete.DeleteController.bulkDeleteDocuments
-DELETE  /api/document/:id                            controllers.my.ng.directory.delete.DeleteController.deleteDocument(id: String)
+DELETE  /api/document/bulk                           controllers.my.ng.directory.delete.DocumentActionsController.bulkDeleteDocuments
+DELETE  /api/document/:id                            controllers.my.ng.directory.delete.DocumentActionsController.deleteDocument(id: String)
+DELETE  /api/shared/document/bulk                    controllers.my.ng.directory.delete.DocumentActionsController.bulkUnshareDocuments
+DELETE  /api/shared/document/:id                     controllers.my.ng.directory.delete.DocumentActionsController.unshareDocument(id: String)
 
-DELETE  /api/folder/bulk                             controllers.my.ng.directory.delete.DeleteController.bulkDeleteFolders
-DELETE  /api/folder/:id                              controllers.my.ng.directory.delete.DeleteController.deleteFolder(id: java.util.UUID)
-
-DELETE  /api/shared/document/bulk                    controllers.my.ng.directory.unshare.UnshareController.bulkUnshareDocuments
-DELETE  /api/shared/document/:id                     controllers.my.ng.directory.unshare.UnshareController.unshareDocument(id: String)
-
-DELETE  /api/shared/folder/bulk                      controllers.my.ng.directory.unshare.UnshareController.bulkUnshareFolders
-DELETE  /api/shared/folder/:id                       controllers.my.ng.directory.unshare.UnshareController.unshareFolder(id: java.util.UUID)
+DELETE  /api/folder/bulk                             controllers.my.ng.directory.delete.FolderActionsController.bulkDeleteFolders
+DELETE  /api/folder/:id                              controllers.my.ng.directory.delete.FolderActionsController.deleteFolder(id: java.util.UUID)
+DELETE  /api/shared/folder/bulk                      controllers.my.ng.directory.delete.FolderActionsController.bulkUnshareFolders
+DELETE  /api/shared/folder/:id                       controllers.my.ng.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
 
 # ~~~ Annotations ~~~
 

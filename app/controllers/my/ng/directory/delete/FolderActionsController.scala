@@ -11,7 +11,7 @@ import services.folder.FolderService
 import services.user.UserService
 
 @Singleton
-class DeleteController @Inject() (
+class FolderActionsController @Inject() (
   val components: ControllerComponents,
   val folders: FolderService,
   val silhouette: Silhouette[Security.Env],
@@ -20,12 +20,6 @@ class DeleteController @Inject() (
   implicit val ctx: ExecutionContext
 ) extends BaseController(components, config, users)
     with HasPrettyPrintJSON {
-
-  def deleteDocument(id: String) =
-    silhouette.SecuredAction.async { implicit request => ??? }
-
-  def bulkDeleteDocuments() =
-    silhouette.SecuredAction.async { implicit request => ??? }
 
   def deleteFolder(id: UUID) = silhouette.SecuredAction.async { implicit request =>
     folders.getFolder(id).flatMap { _ match {
@@ -45,6 +39,12 @@ class DeleteController @Inject() (
   }
 
   def bulkDeleteFolders() =
+    silhouette.SecuredAction.async { implicit request => ??? }
+
+  def unshareFolder(id: UUID) =
+    silhouette.SecuredAction.async { implicit request => ??? }
+
+  def bulkUnshareFolders() =
     silhouette.SecuredAction.async { implicit request => ??? }
 
 }
