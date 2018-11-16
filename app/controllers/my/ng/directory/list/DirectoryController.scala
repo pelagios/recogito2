@@ -105,11 +105,7 @@ class DirectoryController @Inject() (
 
   def getMyDirectory(offset: Int, size: Int, folderId: UUID) = 
     silhouette.SecuredAction.async { implicit request =>
-
-      // FOR TESTING ONLY
-      val fDirectories = folders.listFolders(request.identity.username, offset, size)
-        // play.api.Logger.info(folders.map(FolderItem(_)).toString)
-     
+      val fDirectories = folders.listFolders(request.identity.username, offset, size)     
       val fDocuments = getDocumentList(
         request.identity.username, 
         offset, 
