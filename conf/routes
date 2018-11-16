@@ -142,11 +142,13 @@ GET     /api/account/:username/collaborators         controllers.my.ng.account.A
 
 GET     /api/directory/my                            controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
 POST    /api/directory/my                            controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
-GET     /api/directory/my/:folderId                  controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
-POST    /api/directory/my/:folderId                  controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
 GET     /api/directory/my/shared                     controllers.my.ng.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
 POST    /api/directory/my/shared                     controllers.my.ng.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+
+GET     /api/directory/my/:folderId                  controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+POST    /api/directory/my/:folderId                  controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+
 GET     /api/directory/my/shared/:folderId           controllers.my.ng.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 POST    /api/directory/my/shared/:folderId           controllers.my.ng.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
