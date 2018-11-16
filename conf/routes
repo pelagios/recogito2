@@ -230,9 +230,9 @@ GET     /:username/upload/progress/:docId            controllers.my.UploadContro
 
 # ~~~ New routes ~~~
 
-POST    /my/upload                                   controllers.my.ng.UploadController.initUpload()
-POST    /my/upload/:id/file                          controllers.my.ng.UploadController.storeFilepart(id: Int)
-POST    /my/upload/:id/finalize                      controllers.my.ng.UploadController.finalizeUpload(id: Int)
+POST    /my/upload                                   controllers.my.ng.directory.create.CreateController.initUpload()
+POST    /my/upload/:id/file                          controllers.my.ng.directory.create.CreateController.storeFilepart(id: Int)
+POST    /my/upload/:id/finalize                      controllers.my.ng.directory.create.CreateController.finalizeUpload(id: Int)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Application root
