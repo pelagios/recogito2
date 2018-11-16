@@ -1,5 +1,6 @@
-package controllers.my.ng.directory.list
+package controllers.my.ng.directory.list.document
 
+import controllers.my.ng.directory.list.DirectoryItem
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -27,7 +28,7 @@ case class ConfiguredPresentation(
   sharedVia: Option[SharingPolicyRecord],
   indexProps: IndexDerivedProperties,
   columnConfig: Seq[String]
-) {
+) extends DirectoryItem {
 
   // Helper to get the value of a DB property, under consideration of the columConfig
   def getDBProp[T](key: String, prop: T): Option[T] = 
@@ -83,6 +84,7 @@ object ConfiguredPresentation extends HasDate {
 
   implicit val configuredPresentationWrites: Writes[ConfiguredPresentation] = (
     // Write mandatory properties in any case
+    (JsPath \ "type").write[String] and
     (JsPath \ "id").write[String] and
     (JsPath \ "owner").write[String] and 
     (JsPath \ "uploaded_at").write[DateTime] and
@@ -107,6 +109,7 @@ object ConfiguredPresentation extends HasDate {
     (JsPath \ "annotations").writeNullable[Long] and
     (JsPath \ "status_ratio").writeNullable[JsObject]
   )(p => (
+    DirectoryItem.DOCUMENT.toString,
     p.document.getId,
     p.document.getOwner,
     new DateTime(p.document.getUploadedAt.getTime),
