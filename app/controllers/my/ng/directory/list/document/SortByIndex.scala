@@ -37,8 +37,7 @@ trait SortByIndex { self: DirectoryController =>
 
     f.map { case (allIds, sortedIds, docsWithParts, indexProperties) => 
       val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, docsWithParts)
-      val interleaved = ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
-      jsonOk(Json.toJson(interleaved))
+      ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
     }
   }
 
@@ -59,8 +58,7 @@ trait SortByIndex { self: DirectoryController =>
 
     f.map { case (allIds, sortedIds, documents, indexProperties) =>
       val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, documents)
-      val interleaved = ConfiguredPresentation.forSharedDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
-      jsonOk(Json.toJson(interleaved))
+      ConfiguredPresentation.forSharedDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
     }
   }
 
@@ -83,8 +81,7 @@ trait SortByIndex { self: DirectoryController =>
     f.map { case (allIds, sortedIds, documents, indexProperties) =>
       // TODO fetch with sharing permissions, if any
       val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, documents)
-      val interleaved = ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
-      jsonOk(Json.toJson(interleaved))
+      ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
     }
   }
 

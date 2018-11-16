@@ -3,6 +3,7 @@ package controllers.my.ng.directory.list
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, HasPrettyPrintJSON, Security}
 import controllers.my.ng.directory.list.document._
+import controllers.my.ng.directory.list.folder._
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
@@ -10,9 +11,11 @@ import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, ControllerComponents, Request, Result}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+import services.Page
 import services.annotation.AnnotationService
 import services.annotation.stats.StatusRatio
 import services.document.DocumentService
+import services.folder.FolderService
 import services.contribution.ContributionService
 import services.user.UserService
 
@@ -22,6 +25,7 @@ class DirectoryController @Inject() (
   val contributions: ContributionService,
   val components: ControllerComponents,
   val documents: DocumentService,
+  val folders: FolderService,
   val silhouette: Silhouette[Security.Env],
   val users: UserService,
   val config: Configuration,
@@ -87,8 +91,8 @@ class DirectoryController @Inject() (
   /** Common boilerplate code **/
   private def getDocumentList(
     username: String, offset: Int, size: Int,
-    onSortByDB   : (String, Int, Int, Option[PresentationConfig]) => Future[Result],
-    onSortByIndex: (String, Int, Int, PresentationConfig) => Future[Result]
+    onSortByDB   : (String, Int, Int, Option[PresentationConfig]) => Future[Page[ConfiguredPresentation]],
+    onSortByIndex: (String, Int, Int, PresentationConfig) => Future[Page[ConfiguredPresentation]]
   )(implicit request: Request[AnyContent]) = {
     val config = request.body.asJson.flatMap(json => 
       Try(Json.fromJson[PresentationConfig](json).get).toOption)
@@ -101,12 +105,28 @@ class DirectoryController @Inject() (
 
   def getMyDirectory(offset: Int, size: Int, folderId: UUID) = 
     silhouette.SecuredAction.async { implicit request =>
-      getDocumentList(
+
+      // FOR TESTING ONLY
+      val fDirectories = folders.listFolders(request.identity.username, offset, size)
+        // play.api.Logger.info(folders.map(FolderItem(_)).toString)
+     
+      val fDocuments = getDocumentList(
         request.identity.username, 
         offset, 
         size, 
         getMyDocumentsSortedByDB, 
-        getMyDocumentsSortedByIndex)
+        getMyDocumentsSortedByIndex
+      )
+
+      val f = for {
+        directories <- fDirectories
+        documents <- fDocuments
+      } yield (directories.map(FolderItem(_)), documents)
+
+      f.map { case (directories, documents) => 
+        // TODO merge dirs & documents
+        jsonOk(Json.toJson(documents))
+      }
     }
 
   def getSharedWithMe(offset: Int, size: Int, folderId: UUID) = 
@@ -116,7 +136,10 @@ class DirectoryController @Inject() (
         offset, 
         size, 
         getSharedDocumentsSortedByDB, 
-        getSharedDocumentsSortedByIndex)
+        getSharedDocumentsSortedByIndex
+      ).map { documents => 
+        jsonOk(Json.toJson(documents))
+      }
     }
 
   def getAccessibleDocuments(owner: String, offset: Int, size: Int, folderId: UUID) =
@@ -126,10 +149,15 @@ class DirectoryController @Inject() (
 
       val loggedIn = request.identity.map(_.username)
 
-      if (isSortingByIndex(config))
-        getAccessibleDocumentsSortedByIndex(owner, loggedIn, offset, size, config.get)
-      else 
-        getAccessibleDocumentsSortedByDB(owner, loggedIn, offset, size, config)
+      val f = 
+        if (isSortingByIndex(config))
+          getAccessibleDocumentsSortedByIndex(owner, loggedIn, offset, size, config.get)
+        else 
+          getAccessibleDocumentsSortedByDB(owner, loggedIn, offset, size, config)
+
+      f.map { documents => 
+        jsonOk(Json.toJson(documents))
+      }
     }
 
 }

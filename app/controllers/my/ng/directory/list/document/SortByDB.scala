@@ -39,8 +39,7 @@ trait SortByDB { self: DirectoryController =>
               config.flatMap(_.sort.map(_.sortBy)),
               config.flatMap(_.sort.map(_.order)))
     ).map { case (documents, indexProperties) =>
-      val interleaved = ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
-      jsonOk(Json.toJson(interleaved))
+      ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
     }
   }
 
@@ -58,8 +57,7 @@ trait SortByDB { self: DirectoryController =>
               config.flatMap(_.sort.map(_.sortBy)),
               config.flatMap(_.sort.map(_.order)))
     ).map { case (documents, indexProperties) =>
-      val interleaved = ConfiguredPresentation.forSharedDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
-      jsonOk(Json.toJson(interleaved))
+      ConfiguredPresentation.forSharedDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
     }
   }
 
@@ -78,8 +76,7 @@ trait SortByDB { self: DirectoryController =>
               config.flatMap(_.sort.map(_.order)))
     ).map { case (documents, indexProperties) =>
       // TODO fetch with sharing permissions, if any
-      val interleaved = ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
-      jsonOk(Json.toJson(interleaved))
+      ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
     }
   }
 
