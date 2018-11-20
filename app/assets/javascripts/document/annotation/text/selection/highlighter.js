@@ -126,8 +126,10 @@ define([
           return calculateDomPositionWithin(textNodeProps, charOffsets);
         },
 
-        wrapRange = function(range) {
-          var surround = function(range) {
+        wrapRange = function(range, commonRoot) {
+          var root = commonRoot ? commonRoot : rootNode,
+
+              surround = function(range) {
                 var wrapper = document.createElement('SPAN');
                 range.surroundContents(wrapper);
                 return wrapper;
@@ -139,7 +141,7 @@ define([
             // The tricky part - we need to break the range apart and create
             // sub-ranges for each segment
             var nodesBetween =
-              textNodesBetween(range.startContainer, range.endContainer, rootNode);
+              textNodesBetween(range.startContainer, range.endContainer, root);
 
             // Start with start and end nodes
             var startRange = rangy.createRange();
@@ -153,6 +155,8 @@ define([
             var endWrapper = surround(endRange);
 
             // And wrap nodes in between, if any
+            console.log(nodesBetween);
+
             var centerWrappers = nodesBetween.reverse().map(function(node) {
               var wrapped = jQuery(node).wrap('<span></span>').closest('span');
               return wrapped[0];
