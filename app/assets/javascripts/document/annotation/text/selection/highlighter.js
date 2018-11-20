@@ -155,8 +155,6 @@ define([
             var endWrapper = surround(endRange);
 
             // And wrap nodes in between, if any
-            console.log(nodesBetween);
-
             var centerWrappers = nodesBetween.reverse().map(function(node) {
               var wrapped = jQuery(node).wrap('<span></span>').closest('span');
               return wrapped[0];
