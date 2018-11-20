@@ -69,12 +69,16 @@ define([
                 fromPosition = getDOMPosition(fromPath, shadowDom),
                 toPosition = getDOMPosition(toPath, shadowDom),
 
-                range = rangy.createRange(), spans;
+                range = rangy.createRange(), spans,
+                
+                commonParent = (fromPosition.node == toPosition.node) ?
+                  fromPosition.node.parentNode :
+                  jQuery(fromPosition.node).parents().has(toPosition.node).first()[0];
 
             range.setStart(fromPosition.node, fromPosition.offset);
             range.setEnd(toPosition.node, toPosition.offset);
 
-            spans = self.wrapRange(range);
+            spans = self.wrapRange(range, commonParent);
             self.updateStyles(annotation, spans);
             self.bindToElements(annotation, spans);
           });
