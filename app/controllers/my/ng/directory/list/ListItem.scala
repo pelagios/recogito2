@@ -15,13 +15,14 @@ object ListItem {
   case object DOCUMENT extends ListItemType
   case object FOLDER extends ListItemType  
 
-  // TODO really just a hack for now...
-  def merge(folders: Page[FolderItem], documents: Page[ConfiguredPresentation]) = {    
-    val took = Math.max(folders.took, documents.took)
-    val total = folders.total + documents.total
-    
-    val items = folders.items ++ documents.items
-    Page(took, total, folders.offset, folders.limit, items)
+  /** Concatenates a folder- and a document-list result **/
+  def concat(folders: Page[FolderItem], documents: Page[ConfiguredPresentation]) = {    
+    Page(
+      folders.took + documents.took, 
+      folders.total + documents.total,
+      folders.offset, 
+      folders.limit,
+      folders.items ++ documents.items)
   }
 
   implicit val listItemWrites = new Writes[ListItem] {

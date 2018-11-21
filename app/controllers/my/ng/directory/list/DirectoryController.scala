@@ -14,9 +14,10 @@ import scala.util.Try
 import services.Page
 import services.annotation.AnnotationService
 import services.annotation.stats.StatusRatio
+import services.contribution.ContributionService
 import services.document.DocumentService
 import services.folder.FolderService
-import services.contribution.ContributionService
+import services.generated.tables.records.FolderRecord
 import services.user.UserService
 
 @Singleton
@@ -105,23 +106,33 @@ class DirectoryController @Inject() (
 
   def getMyDirectory(offset: Int, size: Int, folderId: UUID) = 
     silhouette.SecuredAction.async { implicit request =>
-      val fDirectories = folders.listFolders(request.identity.username, offset, size)     
-      val fDocuments = getDocumentList(
-        request.identity.username, 
-        offset, 
-        size, 
-        getMyDocumentsSortedByDB, 
-        getMyDocumentsSortedByIndex
-      )
+      val fDirectories = 
+        folders.listFolders(request.identity.username, offset, size)     
+      
+      def fDocuments(folders: Page[FolderRecord]) = {
+        val shiftedOffset = Math.max(0l, offset - folders.total)
+        val shiftedSize = size - folders.items.size
+
+        if (shiftedOffset < 0)
+          // Result is folders only
+          Future.successful(Page.empty[ConfiguredPresentation])
+        else
+          getDocumentList(
+            request.identity.username, 
+            shiftedOffset.toInt, 
+            shiftedSize, 
+            getMyDocumentsSortedByDB, 
+            getMyDocumentsSortedByIndex
+          )
+      }
 
       val f = for {
         directories <- fDirectories
-        documents <- fDocuments
+        documents <- fDocuments(directories)
       } yield (directories.map(FolderItem(_)), documents)
 
       f.map { case (directories, documents) => 
-        // TODO merge dirs & documents
-        jsonOk(Json.toJson(ListItem.merge(directories, documents)))
+        jsonOk(Json.toJson(ListItem.concat(directories, documents)))
       }
     }
 
