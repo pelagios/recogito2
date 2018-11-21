@@ -94,13 +94,13 @@ class DirectoryController @Inject() (
     username: String, offset: Int, size: Int,
     folderId: Option[UUID],
     onSortByDB   : (String, Option[UUID], Int, Int, Option[PresentationConfig]) => Future[Page[ConfiguredPresentation]],
-    onSortByIndex: (String, Int, Int, PresentationConfig) => Future[Page[ConfiguredPresentation]]
+    onSortByIndex: (String, Option[UUID], Int, Int, PresentationConfig) => Future[Page[ConfiguredPresentation]]
   )(implicit request: Request[AnyContent]) = {
     val config = request.body.asJson.flatMap(json => 
       Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
     if (isSortingByIndex(config))
-      onSortByIndex(username, offset, size, config.get)
+      onSortByIndex(username, folderId, offset, size, config.get)
     else 
       onSortByDB(username, folderId, offset, size, config)
   }

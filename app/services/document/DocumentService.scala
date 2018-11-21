@@ -30,7 +30,7 @@ case class AccessibleDocumentsCount(public: Long, shared: Option[Long]) {
 @Singleton
 class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) 
   extends BaseService 
-  with queries.FindInFolder
+  with queries.InMyFolderSorted
   with DocumentIdFactory 
   with DocumentPrefsService
   with SharingPolicies {

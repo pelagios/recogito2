@@ -1,6 +1,7 @@
 package controllers.my.ng.directory.list.document
 
 import controllers.my.ng.directory.list.DirectoryController
+import java.util.UUID
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.Future
@@ -22,6 +23,7 @@ trait SortByIndex { self: DirectoryController =>
 
   protected def getMyDocumentsSortedByIndex(
     username: String,
+    folder: Option[UUID],
     offset: Int, 
     size: Int,
     config: PresentationConfig
@@ -43,6 +45,7 @@ trait SortByIndex { self: DirectoryController =>
 
   protected def getSharedDocumentsSortedByIndex(
     username: String,
+    folder: Option[UUID],
     offset: Int, 
     size: Int,
     config: PresentationConfig

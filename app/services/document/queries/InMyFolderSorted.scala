@@ -8,7 +8,7 @@ import services.document.DocumentService
 import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART, FOLDER_ASSOCIATION}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 
-trait FindInFolder { self: DocumentService =>
+trait InMyFolderSorted { self: DocumentService =>
 
   /** The number of documents in the folder **/
   def countInFolder(folderId: UUID) = db.query { sql => 
@@ -60,7 +60,8 @@ trait FindInFolder { self: DocumentService =>
     }
   }
 
-  def listInFolderWithParts(
+  def listInMyFolderWithParts(
+    owner: String,
     folderId: UUID,
     offset: Int,
     limit: Int,
@@ -74,7 +75,8 @@ trait FindInFolder { self: DocumentService =>
          .from(DOCUMENT)
          .fullOuterJoin(FOLDER_ASSOCIATION)
          .on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
-         .where(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId))
+         .where(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId)
+           .and(DOCUMENT.OWNER.equal(owner)))
 
     for {
       total <- countInFolder(folderId)
@@ -114,7 +116,7 @@ trait FindInFolder { self: DocumentService =>
     sortBy: Option[String],
     sortOrder: Option[SortOrder]
   )(implicit ctx: ExecutionContext) = maybeFolder match {
-    case Some(folderId) => listInFolderWithParts(folderId, offset, limit, sortBy, sortOrder)
+    case Some(folderId) => listInMyFolderWithParts(owner, folderId, offset, limit, sortBy, sortOrder)
     case None => listInRootFolderWithParts(owner, offset, limit, sortBy, sortOrder)
   }
 
