@@ -132,7 +132,7 @@
     </div> <!-- .sidebar -->
 
     <div id="main">
-      <div id="content">@content</div>
+      <div id="content" @doc.language.map(l => Html(s"""lang="${l}""""))>@content</div>
       <svg id="relations"></svg>
     </div>
 
