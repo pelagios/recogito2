@@ -125,7 +125,7 @@ class MyRecogitoController @Inject() (
 
   private def renderSharedWithMe(user: User, usedSpace: Long, offset: Int, sortBy: String, sortOrder: SortOrder, size: Option[Int])(implicit request: RequestHeader) = {
     val startTime = System.currentTimeMillis    
-    val fMyDocsCount = documents.countByOwner(user.username, false)
+    val fMyDocsCount = documents.countAllByOwner(user.username, false)
     val pageSize = size.getOrElse(DEFAULT_DOCUMENTS_PER_PAGE)
     
     val fDocsSharedWithMe =

@@ -40,7 +40,7 @@ class AccountInfoController @Inject() (
     val username = request.identity.username
 
     val fUser = users.findByUsername(username)
-    val fMyDocCount = documents.countByOwner(username)
+    val fMyDocCount = documents.countAllByOwner(username)
     val fSharedCount = documents.countBySharedWith(username)
     val fContributorStats = contributions.getContributorStats(username)
     val fUsedMb = Future(uploads.getUsedDiskspaceKB(username)).map { used =>

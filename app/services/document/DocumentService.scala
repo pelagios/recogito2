@@ -30,6 +30,7 @@ case class AccessibleDocumentsCount(public: Long, shared: Option[Long]) {
 @Singleton
 class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) 
   extends BaseService 
+  with queries.FindInFolder
   with DocumentIdFactory 
   with DocumentPrefsService
   with SharingPolicies {
@@ -325,7 +326,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
               .fetchOne())
   }
   
-  def countByOwner(owner: String, publicOnly: Boolean = false) = db.query { sql =>
+  def countAllByOwner(owner: String, publicOnly: Boolean = false) = db.query { sql =>
     if (publicOnly)
       sql.selectCount().from(DOCUMENT)
          .where(DOCUMENT.OWNER.equal(owner)
@@ -367,71 +368,57 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     }
   }
 
-  
   /** Retrieves documents by their owner **/
-  def findByOwner(owner: String, inFolder: Option[UUID], offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
+  def findByOwner(
+    owner: String, 
+    inFolder: Option[UUID], 
+    offset: Int = 0, 
+    limit: Int = 20, 
+    sortBy: Option[String] = None, 
+    sortOrder: Option[SortOrder] = None
+  )(implicit ctx: ExecutionContext) = {
     val startTime = System.currentTimeMillis
-
     val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT), fieldname, sortOrder))
 
-    val total =
-      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
-    
-    val query =
-      sql.selectFrom(DOCUMENT).where(DOCUMENT.OWNER.equal(owner))
+    for {
+      total <- inFolder match {
+                 case Some(folderId) => countInFolder(folderId)
+                 case None => countInRootFolder(owner)
+               }
 
-    val items = sortField match {
-      case Some(sort) => query.orderBy(sort).limit(limit).offset(offset).fetchArray().toSeq
-      case None => query.limit(limit).offset(offset).fetchArray().toSeq
-    }
-    
-    Page(System.currentTimeMillis - startTime, total, offset, limit, items)
+      items <- db.query { sql => 
+                val query = inFolder match {
+                  case Some(folderId) =>
+                    sql.select().from(DOCUMENT)
+                       .fullOuterJoin(FOLDER_ASSOCIATION)
+                       .on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
+                       .where(DOCUMENT.OWNER.equal(owner)
+                         .and(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId)))
+
+                  case None =>
+                    sql.select().from(DOCUMENT)
+                       .fullOuterJoin(FOLDER_ASSOCIATION)
+                       .on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
+                       .where(DOCUMENT.OWNER.equal(owner)
+                         .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull))
+                }
+
+                sortField match {
+                  case Some(sort) =>
+                    query.orderBy(sort).limit(limit).offset(offset)
+                         .fetch()
+                         .into(classOf[DocumentRecord]).toSeq
+
+                  case None => 
+                    query.limit(limit).offset(offset)
+                         .fetch()
+                         .into(classOf[DocumentRecord]).toSeq
+                }
+              }
+              
+    } yield Page(System.currentTimeMillis - startTime, total, offset, limit, items)
   }
   
-  def findByOwnerWithParts(
-    owner: String, 
-    offset: Int = 0, 
-    limit: Int = 0,
-    sortBy: Option[String],
-    sortOrder: Option[SortOrder]
-  ) = db.query { sql =>
-    val startTime = System.currentTimeMillis
-
-    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT), fieldname, sortOrder))
-    
-    val total =
-      sql.selectCount().from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetchOne(0, classOf[Int])
-
-    val subquery = sortField match {
-      case Some(f) =>
-        sql.selectFrom(DOCUMENT)
-          .where(DOCUMENT.OWNER.equal(owner))
-          .orderBy(f)
-          .limit(limit).offset(offset)
-
-      case None =>
-        sql.selectFrom(DOCUMENT)
-          .where(DOCUMENT.OWNER.equal(owner))
-          .limit(limit).offset(offset)
-    }
-
-    val rows = 
-      sql.select().from(subquery)
-         .join(DOCUMENT_FILEPART)
-         .on(subquery.field(DOCUMENT.ID)
-           .equal(DOCUMENT_FILEPART.DOCUMENT_ID))
-         .fetchArray()
-
-    val asMap = groupLeftJoinResult(rows, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
-
-    val asOrderedTuples = rows.map(_.into(classOf[DocumentRecord])).distinct.map { document => 
-      val fileparts = asMap.get(document).get
-      (document -> fileparts)
-    }
-
-    Page(System.currentTimeMillis - startTime, total, offset, limit, asOrderedTuples)
-  }
-
   def listAllAccessibleIds(owner: String, loggedInUser: Option[String]) = db.query { sql =>
     loggedInUser match {
       case Some(username) =>

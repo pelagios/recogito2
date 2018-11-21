@@ -1,6 +1,7 @@
 package controllers.my.ng.directory.list.document
 
 import controllers.my.ng.directory.list.DirectoryController
+import java.util.UUID
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,14 +29,15 @@ trait SortByDB { self: DirectoryController =>
   /** My Documents, sorted by a DB property **/
   protected def getMyDocumentsSortedByDB(
     username: String,
+    folder: Option[UUID],
     offset: Int, 
     size: Int, 
     config: Option[PresentationConfig]
   )(implicit request: Request[AnyContent]) = {
     documentsByDB(
       config, 
-      () => documents.findByOwnerWithParts(
-              username, offset, size,
+      () => documents.listByOwnerAndFolder(
+              username, folder, offset, size,
               config.flatMap(_.sort.map(_.sortBy)),
               config.flatMap(_.sort.map(_.order)))
     ).map { case (documents, indexProperties) =>
@@ -46,6 +48,7 @@ trait SortByDB { self: DirectoryController =>
   /** 'Shared with me' documents, sorted by a DB property **/
   protected def getSharedDocumentsSortedByDB(
     username: String,
+    folder: Option[UUID],
     offset: Int, 
     size: Int, 
     config: Option[PresentationConfig]

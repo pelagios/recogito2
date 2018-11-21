@@ -93,7 +93,7 @@ class DirectoryController @Inject() (
   private def getDocumentList(
     username: String, offset: Int, size: Int,
     folderId: Option[UUID],
-    onSortByDB   : (String, Int, Int, Option[PresentationConfig]) => Future[Page[ConfiguredPresentation]],
+    onSortByDB   : (String, Option[UUID], Int, Int, Option[PresentationConfig]) => Future[Page[ConfiguredPresentation]],
     onSortByIndex: (String, Int, Int, PresentationConfig) => Future[Page[ConfiguredPresentation]]
   )(implicit request: Request[AnyContent]) = {
     val config = request.body.asJson.flatMap(json => 
@@ -102,7 +102,7 @@ class DirectoryController @Inject() (
     if (isSortingByIndex(config))
       onSortByIndex(username, offset, size, config.get)
     else 
-      onSortByDB(username, offset, size, config)
+      onSortByDB(username, folderId, offset, size, config)
   }
 
   def getMyDirectory(offset: Int, size: Int, folderId: UUID) =
