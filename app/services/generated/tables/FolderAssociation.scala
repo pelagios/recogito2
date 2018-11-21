@@ -5,10 +5,10 @@ package services.generated.tables
 
 
 import java.lang.Class
-import java.lang.Integer
 import java.lang.String
 import java.util.Arrays
 import java.util.List
+import java.util.UUID
 
 import javax.annotation.Generated
 
@@ -54,7 +54,7 @@ class FolderAssociation(alias : String, aliased : Table[FolderAssociationRecord]
 	/**
 	 * The column <code>public.folder_association.folder_id</code>.
 	 */
-	val FOLDER_ID : TableField[FolderAssociationRecord, Integer] = createField("folder_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), "")
+	val FOLDER_ID : TableField[FolderAssociationRecord, UUID] = createField("folder_id", org.jooq.impl.SQLDataType.UUID.nullable(false), "")
 
 	/**
 	 * The column <code>public.folder_association.document_id</code>.
@@ -88,7 +88,7 @@ class FolderAssociation(alias : String, aliased : Table[FolderAssociationRecord]
 	}
 
 	override def getReferences : List[ ForeignKey[FolderAssociationRecord, _] ] = {
-		return Arrays.asList[ ForeignKey[FolderAssociationRecord, _] ](Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY)
+		return Arrays.asList[ ForeignKey[FolderAssociationRecord, _] ](Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_FOLDER_ID_FKEY, Keys.FOLDER_ASSOCIATION__FOLDER_ASSOCIATION_DOCUMENT_ID_FKEY)
 	}
 
 	override def as(alias : String) : FolderAssociation = {

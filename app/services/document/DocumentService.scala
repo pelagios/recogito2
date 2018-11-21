@@ -337,13 +337,39 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
          .fetchOne(0, classOf[Int])
   }
   
-  /** Convenience method to list all document IDs owned by the given user **/
-  def listAllIdsByOwner(owner: String) = db.query { sql => 
+  /** List all document IDs owned by the given user **/
+  def listAllIdsByOwner(owner: String) = db.query { sql =>
     sql.select(DOCUMENT.ID).from(DOCUMENT).where(DOCUMENT.OWNER.equal(owner)).fetch(0, classOf[String]).toSeq
   }
+
+  /** List all document IDs owned by the given user in the given folder.
+    *
+    * If inFolder is None, IDs from the root folder will be returned.
+    */
+  def listIdsByOwnerInFolder(owner: String, inFolder: Option[UUID]) = db.query { sql =>
+    val baseQuery =
+      sql.select(DOCUMENT.ID)
+         .from(DOCUMENT)
+         .fullOuterJoin(FOLDER_ASSOCIATION)
+         .on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))   
+         .where(DOCUMENT.OWNER.equal(owner)) 
+
+    inFolder match {
+      case Some(folderId) =>   
+        baseQuery
+          // .and(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId))
+          .fetch(0, classOf[String]).toSeq
+      
+      case None =>
+        baseQuery
+          .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull)
+          .fetch(0, classOf[String]).toSeq
+    }
+  }
+
   
   /** Retrieves documents by their owner **/
-  def findByOwner(owner: String, offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
+  def findByOwner(owner: String, inFolder: Option[UUID], offset: Int = 0, limit: Int = 20, sortBy: Option[String] = None, sortOrder: Option[SortOrder] = None) = db.query { sql =>
     val startTime = System.currentTimeMillis
 
     val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT), fieldname, sortOrder))

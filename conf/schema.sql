@@ -105,7 +105,7 @@ CREATE TABLE folder (
 );
 
 CREATE TABLE folder_association (
-  folder_id INTEGER NOT NULL REFERENCES folder(id),
+  folder_id UUID NOT NULL REFERENCES folder(id),
   document_id TEXT NOT NULL REFERENCES document(id),
   PRIMARY KEY (folder_id, document_id)
 );

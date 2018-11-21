@@ -108,7 +108,7 @@ class MyRecogitoController @Inject() (
           }
         }
       } else {
-        documents.findByOwner(user.username, offset, pageSize, Some(sortBy), Some(sortOrder))
+        documents.findByOwner(user.username, None, offset, pageSize, Some(sortBy), Some(sortOrder))
       }
         
     val f = for {
