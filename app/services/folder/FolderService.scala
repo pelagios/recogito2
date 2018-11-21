@@ -26,20 +26,47 @@ class FolderService @Inject() (implicit val db: DB)
       sql.selectFrom(FOLDER).where(FOLDER.ID.in(ids)).fetchArray
     }
 
-  def listFolders(owner: String, offset: Int, size: Int): Future[Page[FolderRecord]] = 
+  def listFolders(owner: String, offset: Int, size: Int, parent: Option[UUID]): Future[Page[FolderRecord]] = 
     db.query { sql => 
       val startTime = System.currentTimeMillis
 
-      val total = sql.selectCount().from(FOLDER).fetchOne(0, classOf[Int])
+      val total = parent match {
+        case Some(parentId) =>
+          sql.selectCount()
+             .from(FOLDER)
+             .where(FOLDER.OWNER.equal(owner))
+             .and(FOLDER.PARENT.equal(parentId))
+             .fetchOne(0, classOf[Int])
 
-      val items = 
-        sql.selectFrom(FOLDER)
-           .where(FOLDER.OWNER.equal(owner))
-           .orderBy(FOLDER.TITLE.asc)
-           .limit(size)
-           .offset(offset)
-           .fetch()
-           .into(classOf[FolderRecord])
+        case None => // Root folder
+          sql.selectCount()
+             .from(FOLDER)
+             .where(FOLDER.OWNER.equal(owner))
+             .and(FOLDER.PARENT.isNull)
+             .fetchOne(0, classOf[Int])
+      }
+
+      val items = parent match {
+        case Some(parentId) =>
+          sql.selectFrom(FOLDER)
+            .where(FOLDER.OWNER.equal(owner))
+            .and(FOLDER.PARENT.equal(parentId))
+            .orderBy(FOLDER.TITLE.asc)
+            .limit(size)
+            .offset(offset)
+            .fetch()
+            .into(classOf[FolderRecord])
+
+        case None => // Root folder
+          sql.selectFrom(FOLDER)
+            .where(FOLDER.OWNER.equal(owner))
+            .and(FOLDER.PARENT.isNull)
+            .orderBy(FOLDER.TITLE.asc)
+            .limit(size)
+            .offset(offset)
+            .fetch()
+            .into(classOf[FolderRecord])
+      }
 
       Page(System.currentTimeMillis - startTime, total, offset, size, items)
     }  

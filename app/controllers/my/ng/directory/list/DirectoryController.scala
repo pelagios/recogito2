@@ -92,6 +92,7 @@ class DirectoryController @Inject() (
   /** Common boilerplate code **/
   private def getDocumentList(
     username: String, offset: Int, size: Int,
+    folderId: Option[UUID],
     onSortByDB   : (String, Int, Int, Option[PresentationConfig]) => Future[Page[ConfiguredPresentation]],
     onSortByIndex: (String, Int, Int, PresentationConfig) => Future[Page[ConfiguredPresentation]]
   )(implicit request: Request[AnyContent]) = {
@@ -104,10 +105,10 @@ class DirectoryController @Inject() (
       onSortByDB(username, offset, size, config)
   }
 
-  def getMyDirectory(offset: Int, size: Int, folderId: UUID) = 
+  def getMyDirectory(offset: Int, size: Int, folderId: UUID) =
     silhouette.SecuredAction.async { implicit request =>
       val fDirectories = 
-        folders.listFolders(request.identity.username, offset, size)     
+        folders.listFolders(request.identity.username, offset, size, Option(folderId))     
       
       def fDocuments(folders: Page[FolderRecord]) = {
         val shiftedOffset = Math.max(0l, offset - folders.total)
@@ -121,6 +122,7 @@ class DirectoryController @Inject() (
             request.identity.username, 
             shiftedOffset.toInt, 
             shiftedSize, 
+            Option(folderId),
             getMyDocumentsSortedByDB, 
             getMyDocumentsSortedByIndex
           )
@@ -144,6 +146,7 @@ class DirectoryController @Inject() (
         request.identity.username, 
         offset, 
         size, 
+        Option(folderId),
         getSharedDocumentsSortedByDB, 
         getSharedDocumentsSortedByIndex
       ).map { documents => 
