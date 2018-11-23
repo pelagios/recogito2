@@ -13,10 +13,9 @@ import services.generated.Tables._
 import services.generated.tables.records._
 import services.user.User
 import play.api.libs.Files.TemporaryFile
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.MultipartFormData.FilePart
 import scala.collection.JavaConversions._
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import storage.db.DB
 import storage.uploads.Uploads
 
@@ -26,7 +25,8 @@ class UploadService @Inject() (
   documents: DocumentService, 
   folders: FolderService,
   uploads: Uploads,
-  implicit val db: DB) extends BaseService {
+  implicit val db: DB,
+  implicit val ctx: ExecutionContext) extends BaseService {
   
   /** Admin-level method to fetch all pending uploads in the system **/
   def listPendingUploads(olderThan: Option[Timestamp] = None) = db.query { sql =>
@@ -230,20 +230,15 @@ class UploadService @Inject() (
       Some(result.head)
   }
 
-  /** Promotes a pending upload in the staging area to actual document **/
-  def importPendingUpload(
+  private def importDocumentAndParts(
     upload: UploadRecord, 
-    fileparts: Seq[UploadFilepartRecord],
-    folder: Option[UUID]
+    fileparts: Seq[UploadFilepartRecord]
   ) = db.withTransaction { sql =>
     val document = documents.createDocumentFromUpload(upload)
 
     // Import Document and DocumentFileparts 
     sql.insertInto(DOCUMENT).set(document).execute()
-
-    // Move document to folder, if necessary
-    folder.map(id => folders.moveDocumentToFolder(document.getId, id))
-
+    
     val docFileparts = fileparts.zipWithIndex.map { case (part, idx) =>
       val sequenceNo: Integer = Option(part.getSequenceNo).getOrElse(idx + 1)
       new DocumentFilepartRecord(
@@ -274,6 +269,20 @@ class UploadService @Inject() (
     sql.deleteFrom(UPLOAD).where(UPLOAD.ID.equal(upload.getId)).execute()
 
     (document, docFileparts)
+  }
+
+    /** Promotes a pending upload in the staging area to actual document **/
+  def importPendingUpload(
+    upload: UploadRecord, 
+    fileparts: Seq[UploadFilepartRecord],
+    folder: Option[UUID]
+  ) = folder match {
+    case Some(folderId) => for {
+      t <- importDocumentAndParts(upload, fileparts)
+      _ <- folders.moveDocumentToFolder(t._1.getId, folderId)
+    } yield t
+
+    case None => importDocumentAndParts(upload, fileparts)
   }
 
 }

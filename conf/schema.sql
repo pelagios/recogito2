@@ -106,7 +106,7 @@ CREATE TABLE folder (
 
 CREATE TABLE folder_association (
   folder_id UUID NOT NULL REFERENCES folder(id),
-  document_id TEXT NOT NULL REFERENCES document(id),
+  document_id TEXT NOT NULL REFERENCES document(id) ON DELETE CASCADE,
   PRIMARY KEY (folder_id, document_id)
 );
 

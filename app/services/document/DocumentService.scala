@@ -32,7 +32,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
   extends BaseService 
   with queries.InMyFolderAllIds
   with queries.InMyFolderSorted
-  with DocumentIdFactory 
+  with DocumentIdFactory
   with DocumentPrefsService
   with SharingPolicies {
   
@@ -582,7 +582,7 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     sql.deleteFrom(SHARING_POLICY)
        .where(SHARING_POLICY.DOCUMENT_ID.equal(document.getId))
        .execute()
-    
+
     // Delete filepart records
     sql.deleteFrom(DOCUMENT_FILEPART)
        .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
