@@ -157,7 +157,7 @@ POST    /api/directory/:owner                        controllers.my.ng.directory
 GET     /api/directory/:owner/:folderId              controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 POST    /api/directory/:owner/:folderId              controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
-# ~~~ Directory create, delete & unshare operations ~~~
+# ~~~ Create, delete & unshare operations ~~~
 
 POST    /api/folder                                  controllers.my.ng.directory.create.CreateController.createFolder
 
@@ -234,7 +234,7 @@ GET     /:username/upload/progress/:docId            controllers.my.UploadContro
 
 POST    /my/upload                                   controllers.my.ng.directory.create.CreateController.initUpload()
 POST    /my/upload/:id/file                          controllers.my.ng.directory.create.CreateController.storeFilepart(id: Int)
-POST    /my/upload/:id/finalize                      controllers.my.ng.directory.create.CreateController.finalizeUpload(id: Int)
+POST    /my/upload/:id/finalize                      controllers.my.ng.directory.create.CreateController.finalizeUpload(id: Int, folder: Option[java.util.UUID])
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Application root

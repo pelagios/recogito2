@@ -90,7 +90,7 @@ class CreateController @Inject() (
     * Bit of a mix of concerns currently. Triggers processing services (NER, tiling, etc.)
     * and converts the Upload to a Recogito Document
     */
-  def finalizeUpload(id: Int) = silhouette.SecuredAction.async { implicit request =>
+  def finalizeUpload(id: Int, folder: Option[UUID]) = silhouette.SecuredAction.async { implicit request =>
     uploads.findPendingUploadWithFileparts(request.identity.username).flatMap(_ match {
       case None =>
         Future.successful(NotFound)
@@ -102,7 +102,7 @@ class CreateController @Inject() (
         }
     
       case Some((pendingUpload, fileparts)) =>
-        uploads.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
+        uploads.importPendingUpload(pendingUpload, fileparts, folder).map { case (doc, docParts) => {
           // We'll forward a list of the running processing tasks to the view, so it can show progress
           val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]
           

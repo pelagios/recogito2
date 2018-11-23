@@ -8,6 +8,7 @@ import java.util.{Date, UUID}
 import javax.inject.Inject
 import services.{ BaseService, ContentType }
 import services.document.DocumentService
+import services.folder.FolderService
 import services.generated.Tables._
 import services.generated.tables.records._
 import services.user.User
@@ -21,7 +22,11 @@ import storage.uploads.Uploads
 
 class QuotaExceededException(val remainingSpaceKb: Long, val filesizeKb: Double) extends RuntimeException
 
-class UploadService @Inject() (documents: DocumentService, uploads: Uploads, implicit val db: DB) extends BaseService {
+class UploadService @Inject() (
+  documents: DocumentService, 
+  folders: FolderService,
+  uploads: Uploads,
+  implicit val db: DB) extends BaseService {
   
   /** Admin-level method to fetch all pending uploads in the system **/
   def listPendingUploads(olderThan: Option[Timestamp] = None) = db.query { sql =>
@@ -226,11 +231,18 @@ class UploadService @Inject() (documents: DocumentService, uploads: Uploads, imp
   }
 
   /** Promotes a pending upload in the staging area to actual document **/
-  def importPendingUpload(upload: UploadRecord, fileparts: Seq[UploadFilepartRecord]) = db.withTransaction { sql =>
+  def importPendingUpload(
+    upload: UploadRecord, 
+    fileparts: Seq[UploadFilepartRecord],
+    folder: Option[UUID]
+  ) = db.withTransaction { sql =>
     val document = documents.createDocumentFromUpload(upload)
 
     // Import Document and DocumentFileparts 
     sql.insertInto(DOCUMENT).set(document).execute()
+
+    // Move document to folder, if necessary
+    folder.map(id => folders.moveDocumentToFolder(document.getId, id))
 
     val docFileparts = fileparts.zipWithIndex.map { case (part, idx) =>
       val sequenceNo: Integer = Option(part.getSequenceNo).getOrElse(idx + 1)

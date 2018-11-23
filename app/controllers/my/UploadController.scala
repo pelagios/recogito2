@@ -232,7 +232,7 @@ class UploadController @Inject() (
           Future.successful(Redirect(controllers.my.routes.UploadController.showStep2(usernameInPath)))
         } else {
           // Pending upload + fileparts available - proceed
-          uploads.importPendingUpload(pendingUpload, fileparts).map { case (doc, docParts) => {
+          uploads.importPendingUpload(pendingUpload, fileparts, None).map { case (doc, docParts) => {
             // We'll forward a list of the running processing tasks to the view, so it can show progress
             val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]
             
