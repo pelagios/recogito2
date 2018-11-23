@@ -5,6 +5,7 @@ import controllers.my.ng.directory.list.folder.FolderItem
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.Page
+import services.folder.Breadcrumb
 
 /** Marker trait for Folder and Document directory list items **/
 trait ListItem 
@@ -16,12 +17,13 @@ object ListItem {
   case object FOLDER extends ListItemType  
 
   /** Concatenates a folder- and a document-list result **/
-  def concat(folders: Page[FolderItem], documents: Page[ConfiguredPresentation]) = {    
-    Page(
+  def concat(breadcrumbs: Seq[Breadcrumb], folders: Page[FolderItem], documents: Page[ConfiguredPresentation]) = {    
+    DirectoryPage(
       folders.took + documents.took, 
       folders.total + documents.total,
       folders.offset, 
       folders.limit,
+      breadcrumbs,
       folders.items ++ documents.items)
   }
 

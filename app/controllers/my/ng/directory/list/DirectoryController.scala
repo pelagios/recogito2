@@ -107,6 +107,9 @@ class DirectoryController @Inject() (
 
   def getMyDirectory(offset: Int, size: Int, folderId: UUID) =
     silhouette.SecuredAction.async { implicit request =>
+      val fBreadcrumbs = 
+        folders.getBreadcrumbs(folderId)
+
       val fDirectories = 
         folders.listFolders(request.identity.username, offset, size, Option(folderId))     
       
@@ -129,12 +132,14 @@ class DirectoryController @Inject() (
       }
 
       val f = for {
+        breadcrumbs <- fBreadcrumbs
         directories <- fDirectories
         documents <- fDocuments(directories)
-      } yield (directories.map(FolderItem(_)), documents)
+      } yield (breadcrumbs, directories.map(FolderItem(_)), documents)
 
-      f.map { case (directories, documents) => 
-        jsonOk(Json.toJson(ListItem.concat(directories, documents)))
+      f.map { case (breadcrumbs, directories, documents) => 
+        val result = ListItem.concat(breadcrumbs, directories, documents)
+        jsonOk(Json.toJson(result))
       }
     }
 

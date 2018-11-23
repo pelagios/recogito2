@@ -2,6 +2,7 @@ package services.folder
 
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
+import org.jooq.impl.DSL
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -11,6 +12,8 @@ import services.{Page, BaseService}
 import services.generated.Tables.FOLDER
 import services.generated.tables.records.FolderRecord
 import storage.db.DB
+
+case class Breadcrumb(id: UUID, title: String)
 
 @Singleton
 class FolderService @Inject() (implicit val db: DB) 
@@ -25,6 +28,35 @@ class FolderService @Inject() (implicit val db: DB)
     db.query { sql => 
       sql.selectFrom(FOLDER).where(FOLDER.ID.in(ids)).fetchArray
     }
+
+  def getBreadcrumbs(id: UUID) = db.query { sql => 
+    // Capitulation. Gave up re-modelling this query in JOOQ, sorry.
+    val query = 
+      """
+      WITH RECURSIVE path AS (
+        SELECT id, owner, title, parent, 
+          ARRAY[id] AS path_ids,
+          ARRAY[title] AS path_titles
+        FROM folder
+        WHERE parent is null
+        UNION ALL
+          SELECT f.id, f.owner, f.title, f.parent, 
+            p.path_ids || f.id,
+            p.path_titles || f.title
+          FROM folder f
+          JOIN path p on f.parent = p.id
+      )
+      SELECT path_ids, path_titles FROM path WHERE id=?;
+      """
+
+    Option(sql.resultQuery(query, id).fetchOne).map { result => 
+      val ids = result.getValue("path_ids", classOf[Array[UUID]]).toSeq
+      val titles = result.getValue("path_titles", classOf[Array[String]]).toSeq
+      ids.zip(titles).map(t => Breadcrumb(t._1, t._2))
+    } getOrElse {
+      Seq.empty[Breadcrumb]
+    }
+ }
 
   def listFolders(owner: String, offset: Int, size: Int, parent: Option[UUID]): Future[Page[FolderRecord]] = 
     db.query { sql => 
