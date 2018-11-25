@@ -160,6 +160,7 @@ POST    /api/directory/:owner/:folderId              controllers.my.ng.directory
 # ~~~ Create, delete & unshare operations ~~~
 
 POST    /api/folder                                  controllers.my.ng.directory.create.CreateController.createFolder
+PUT     /api/folder/:id                              controllers.my.ng.directory.create.CreateController.renameFolder(id: java.util.UUID, title: String)
 
 DELETE  /api/document/bulk                           controllers.my.ng.directory.delete.DocumentActionsController.bulkDeleteDocuments
 DELETE  /api/document/:id                            controllers.my.ng.directory.delete.DocumentActionsController.deleteDocument(id: String)

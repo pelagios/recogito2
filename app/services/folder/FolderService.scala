@@ -120,7 +120,7 @@ class FolderService @Inject() (implicit val db: DB)
       sql.deleteFrom(FOLDER).where(FOLDER.OWNER.equal(owner)).execute == 1
     }
 
-  def updateFolderTitle(id: UUID, title: String): Future[Boolean] = 
+  def renameFolder(id: UUID, title: String): Future[Boolean] = 
     db.withTransaction { sql => 
       sql.update(FOLDER)
         .set(FOLDER.TITLE, title)
