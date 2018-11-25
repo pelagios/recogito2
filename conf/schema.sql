@@ -100,8 +100,7 @@ CREATE TABLE folder (
   owner TEXT NOT NULL REFERENCES "user"(username),
   title TEXT NOT NULL,
   -- if parent is empty then it's a root folder
-  parent UUID REFERENCES folder(id),
-  UNIQUE (owner, title, parent)
+  parent UUID REFERENCES folder(id)
 );
 
 CREATE TABLE folder_association (
