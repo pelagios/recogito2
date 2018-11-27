@@ -108,6 +108,11 @@ class User(alias : String, aliased : Table[UserRecord], parameters : Array[ Fiel
 	val GDPR_OPT_IN : TableField[UserRecord, Boolean] = createField("gdpr_opt_in", org.jooq.impl.SQLDataType.BOOLEAN, "")
 
 	/**
+	 * The column <code>public.user.readme</code>.
+	 */
+	val README : TableField[UserRecord, String] = createField("readme", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * Create a <code>public.user</code> table reference
 	 */
 	def this() = {

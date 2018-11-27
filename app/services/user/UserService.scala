@@ -82,7 +82,7 @@ class UserService @Inject() (
     val now = new Timestamp(new Date().getTime)
     val salt = randomSalt()
     val user = new UserRecord(username, encrypt(email), computeHash(salt + password), salt,
-      now, null, null, null, DEFAULT_QUOTA, now, optIn)
+      now, null, null, null, DEFAULT_QUOTA, now, optIn, null)
     sql.insertInto(USER).set(user).execute()
     user
   }
