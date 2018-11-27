@@ -16,7 +16,7 @@ import services.annotation.AnnotationService
 import services.annotation.stats.StatusRatio
 import services.contribution.ContributionService
 import services.document.DocumentService
-import services.folder.FolderService
+import services.folder.{Breadcrumb, FolderService}
 import services.generated.tables.records.FolderRecord
 import services.user.UserService
 
@@ -107,8 +107,10 @@ class DirectoryController @Inject() (
 
   def getMyDirectory(offset: Int, size: Int, folderId: UUID) =
     silhouette.SecuredAction.async { implicit request =>
-      val fBreadcrumbs = 
-        folders.getBreadcrumbs(folderId)
+      val fBreadcrumbs = Option(folderId) match {
+        case Some(id) => folders.getBreadcrumbs(id)
+        case None => Future.successful(Seq.empty[Breadcrumb])
+      }
 
       val fDirectories = 
         folders.listFolders(request.identity.username, offset, size, Option(folderId))     
