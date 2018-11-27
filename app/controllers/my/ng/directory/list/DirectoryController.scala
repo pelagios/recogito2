@@ -138,7 +138,7 @@ class DirectoryController @Inject() (
       } yield (readme, breadcrumbs, directories.map(FolderItem(_)), documents)
 
       f.map { case (readme, breadcrumbs, directories, documents) => 
-        val result = ListItem.concat(breadcrumbs, directories, documents)
+        val result = DirectoryPage.build(readme, breadcrumbs, directories, documents)
         jsonOk(Json.toJson(result))
       }
     }

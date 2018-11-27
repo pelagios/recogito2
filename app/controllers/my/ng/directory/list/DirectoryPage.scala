@@ -1,5 +1,8 @@
 package controllers.my.ng.directory.list
 
+import controllers.my.ng.directory.list.document.ConfiguredPresentation
+import controllers.my.ng.directory.list.folder.FolderItem
+import java.util.UUID
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.Page
@@ -11,7 +14,8 @@ case class DirectoryPage(
   offset: Int, 
   limit: Long,
   breadcrumbs: Seq[Breadcrumb],
-  items: Seq[ListItem]) {
+  readme: Option[String],
+  items: Seq[DirectoryItem]) {
 
   val page = Page(took, total, offset, limit, items)
 
@@ -19,14 +23,35 @@ case class DirectoryPage(
 
 object DirectoryPage {
 
-  implicit val directoryPageWrites = new Writes[DirectoryPage] {
+  def build(
+    readme: Option[String], 
+    breadcrumbs: Seq[Breadcrumb], 
+    folders: Page[FolderItem], 
+    documents: Page[ConfiguredPresentation]
+  ) = DirectoryPage(
+    folders.took + documents.took, 
+    folders.total + documents.total,
+    folders.offset, 
+    folders.limit,
+    breadcrumbs,
+    readme,
+    folders.items ++ documents.items
+  )
 
-    def writes(p: DirectoryPage): JsValue =
-      Json.toJson(p.page).as[JsObject] ++ 
-      Json.obj("breadcrumbs" -> p.breadcrumbs.map { b => 
-        Json.obj("title" -> b.title, "id" -> b.id)
-      })
-  }
+  implicit val breadcrumbWrites: Writes[Breadcrumb] = (
+    (JsPath \ "id").write[UUID] and 
+    (JsPath \ "title").write[String]
+  )(unlift(Breadcrumb.unapply))
+
+  implicit val directoryPageWrites: Writes[DirectoryPage] = (
+    (JsPath).write[Page[DirectoryItem]] and
+    (JsPath \ "breadcrumbs").write[Seq[Breadcrumb]] and
+    (JsPath \ "readme").writeNullable[String] 
+  )(p => (
+    p.page,
+    p.breadcrumbs,
+    p.readme
+  ))
 
 }
 

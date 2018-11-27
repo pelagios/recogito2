@@ -1,6 +1,6 @@
 package controllers.my.ng.directory.list.document
 
-import controllers.my.ng.directory.list.ListItem
+import controllers.my.ng.directory.list.DirectoryItem
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -28,7 +28,7 @@ case class ConfiguredPresentation(
   sharedVia: Option[SharingPolicyRecord],
   indexProps: IndexDerivedProperties,
   columnConfig: Seq[String]
-) extends ListItem {
+) extends DirectoryItem {
 
   // Helper to get the value of a DB property, under consideration of the columConfig
   def getDBProp[T](key: String, prop: T): Option[T] = 
@@ -109,7 +109,7 @@ object ConfiguredPresentation extends HasDate {
     (JsPath \ "annotations").writeNullable[Long] and
     (JsPath \ "status_ratio").writeNullable[JsObject]
   )(p => (
-    ListItem.DOCUMENT.toString,
+    DirectoryItem.DOCUMENT.toString,
     p.document.getId,
     p.document.getOwner,
     new DateTime(p.document.getUploadedAt.getTime),
