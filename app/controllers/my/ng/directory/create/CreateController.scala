@@ -69,7 +69,13 @@ class CreateController @Inject() (
   }
 
   def createReadme(folderId: UUID) =
-    silhouette.SecuredAction.async { implicit request => ??? }
+    silhouette.SecuredAction.async { implicit request =>
+      // TODO get readme string from form body
+      // TODO folders.createReadme(folderId, readme).map { success => 
+      //   if (success) Ok else InternalServerError
+      // }
+      ???
+    }
 
   /** Initializes a new upload record **/
   def initUpload() = silhouette.SecuredAction.async { implicit request =>

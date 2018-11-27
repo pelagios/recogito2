@@ -48,6 +48,10 @@ class FolderActionsController @Inject() (
     silhouette.SecuredAction.async { implicit request => ??? }
 
   def deleteReadme(folderId: UUID) =
-    silhouette.SecuredAction.async { implicit request => ??? }
+    silhouette.SecuredAction.async { implicit request => 
+      folders.deleteReadme(folderId).map { success => 
+        if (success) Ok else InternalServerError
+      }
+    }
 
 }
