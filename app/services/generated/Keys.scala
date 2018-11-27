@@ -75,7 +75,6 @@ object Keys {
 	val DOCUMENT_PREFERENCES_PKEY = UniqueKeys0.DOCUMENT_PREFERENCES_PKEY
 	val FEATURE_TOGGLE_PKEY = UniqueKeys0.FEATURE_TOGGLE_PKEY
 	val FOLDER_PKEY = UniqueKeys0.FOLDER_PKEY
-	val FOLDER_OWNER_TITLE_PARENT_KEY = UniqueKeys0.FOLDER_OWNER_TITLE_PARENT_KEY
 	val FOLDER_ASSOCIATION_PKEY = UniqueKeys0.FOLDER_ASSOCIATION_PKEY
 	val SERVICE_ANNOUNCEMENT_PKEY = UniqueKeys0.SERVICE_ANNOUNCEMENT_PKEY
 	val SHARING_POLICY_PKEY = UniqueKeys0.SHARING_POLICY_PKEY
@@ -124,7 +123,6 @@ object Keys {
 		val DOCUMENT_PREFERENCES_PKEY : UniqueKey[DocumentPreferencesRecord] = AbstractKeys.createUniqueKey(DocumentPreferences.DOCUMENT_PREFERENCES, DocumentPreferences.DOCUMENT_PREFERENCES.DOCUMENT_ID, DocumentPreferences.DOCUMENT_PREFERENCES.PREFERENCE_NAME)
 		val FEATURE_TOGGLE_PKEY : UniqueKey[FeatureToggleRecord] = AbstractKeys.createUniqueKey(FeatureToggle.FEATURE_TOGGLE, FeatureToggle.FEATURE_TOGGLE.ID)
 		val FOLDER_PKEY : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.ID)
-		val FOLDER_OWNER_TITLE_PARENT_KEY : UniqueKey[FolderRecord] = AbstractKeys.createUniqueKey(Folder.FOLDER, Folder.FOLDER.OWNER, Folder.FOLDER.TITLE, Folder.FOLDER.PARENT)
 		val FOLDER_ASSOCIATION_PKEY : UniqueKey[FolderAssociationRecord] = AbstractKeys.createUniqueKey(FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.FOLDER_ID, FolderAssociation.FOLDER_ASSOCIATION.DOCUMENT_ID)
 		val SERVICE_ANNOUNCEMENT_PKEY : UniqueKey[ServiceAnnouncementRecord] = AbstractKeys.createUniqueKey(ServiceAnnouncement.SERVICE_ANNOUNCEMENT, ServiceAnnouncement.SERVICE_ANNOUNCEMENT.ID)
 		val SHARING_POLICY_PKEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)

@@ -72,6 +72,11 @@ class Folder(alias : String, aliased : Table[FolderRecord], parameters : Array[ 
 	val PARENT : TableField[FolderRecord, UUID] = createField("parent", org.jooq.impl.SQLDataType.UUID, "")
 
 	/**
+	 * The column <code>public.folder.readme</code>.
+	 */
+	val README : TableField[FolderRecord, String] = createField("readme", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * Create a <code>public.folder</code> table reference
 	 */
 	def this() = {
@@ -94,7 +99,7 @@ class Folder(alias : String, aliased : Table[FolderRecord], parameters : Array[ 
 	}
 
 	override def getKeys : List[ UniqueKey[FolderRecord] ] = {
-		return Arrays.asList[ UniqueKey[FolderRecord] ](Keys.FOLDER_PKEY, Keys.FOLDER_OWNER_TITLE_PARENT_KEY)
+		return Arrays.asList[ UniqueKey[FolderRecord] ](Keys.FOLDER_PKEY)
 	}
 
 	override def getReferences : List[ ForeignKey[FolderRecord, _] ] = {
