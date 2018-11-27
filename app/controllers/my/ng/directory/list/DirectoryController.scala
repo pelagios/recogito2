@@ -34,6 +34,7 @@ class DirectoryController @Inject() (
 ) extends BaseController(components, config, users)
     with SortByDB
     with SortByIndex
+    with FolderUtils
     with HasPrettyPrintJSON {
 
   // Document properties derived from the index
@@ -107,13 +108,9 @@ class DirectoryController @Inject() (
 
   def getMyDirectory(offset: Int, size: Int, folderId: UUID) =
     silhouette.SecuredAction.async { implicit request =>
-      val fBreadcrumbs = Option(folderId) match {
-        case Some(id) => folders.getBreadcrumbs(id)
-        case None => Future.successful(Seq.empty[Breadcrumb])
-      }
-
-      val fDirectories = 
-        folders.listFolders(request.identity.username, offset, size, Option(folderId))     
+      val fReadme = getReadme(Option(folderId))
+      val fBreadcrumbs = getBreadcrumbs(Option(folderId))
+      val fDirectories = folders.listFolders(request.identity.username, offset, size, Option(folderId))     
       
       def fDocuments(folders: Page[FolderRecord]) = {
         val shiftedOffset = Math.max(0l, offset - folders.total)
@@ -134,12 +131,13 @@ class DirectoryController @Inject() (
       }
 
       val f = for {
+        readme <- fReadme
         breadcrumbs <- fBreadcrumbs
         directories <- fDirectories
         documents <- fDocuments(directories)
-      } yield (breadcrumbs, directories.map(FolderItem(_)), documents)
+      } yield (readme, breadcrumbs, directories.map(FolderItem(_)), documents)
 
-      f.map { case (breadcrumbs, directories, documents) => 
+      f.map { case (readme, breadcrumbs, directories, documents) => 
         val result = ListItem.concat(breadcrumbs, directories, documents)
         jsonOk(Json.toJson(result))
       }
