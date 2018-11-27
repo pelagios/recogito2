@@ -68,6 +68,9 @@ class CreateController @Inject() (
     }}
   }
 
+  def createReadme(folderId: UUID) =
+    silhouette.SecuredAction.async { implicit request => ??? }
+
   /** Initializes a new upload record **/
   def initUpload() = silhouette.SecuredAction.async { implicit request =>
     val title = request.body.asMultipartFormData.flatMap(_.dataParts.get("title"))

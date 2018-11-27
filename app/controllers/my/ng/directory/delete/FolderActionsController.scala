@@ -47,4 +47,7 @@ class FolderActionsController @Inject() (
   def bulkUnshareFolders() =
     silhouette.SecuredAction.async { implicit request => ??? }
 
+  def deleteReadme(folderId: UUID) =
+    silhouette.SecuredAction.async { implicit request => ??? }
+
 }

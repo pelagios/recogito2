@@ -157,6 +157,7 @@ POST    /api/directory/:owner                        controllers.my.ng.directory
 GET     /api/directory/:owner/:folderId              controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 POST    /api/directory/:owner/:folderId              controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
+
 # ~~~ Create, delete & unshare operations ~~~
 
 POST    /api/folder                                  controllers.my.ng.directory.create.CreateController.createFolder
@@ -171,6 +172,14 @@ DELETE  /api/folder/bulk                             controllers.my.ng.directory
 DELETE  /api/folder/:id                              controllers.my.ng.directory.delete.FolderActionsController.deleteFolder(id: java.util.UUID)
 DELETE  /api/shared/folder/bulk                      controllers.my.ng.directory.delete.FolderActionsController.bulkUnshareFolders
 DELETE  /api/shared/folder/:id                       controllers.my.ng.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
+
+# ~~~ Readme create & delete ~~~
+
+POST    /api/directory/my/readme                     controllers.my.ng.directory.create.CreateController.createReadme(folderId: java.util.UUID ?= null)
+POST    /api/folder/:id/readme                       controllers.my.ng.directory.create.CreateController.createReadme(id: java.util.UUID)   
+
+DELETE  /api/directory/my/readme                     controllers.my.ng.directory.delete.FolderActionsController.deleteReadme(folderId: java.util.UUID ?= null)
+DELETE  /api/folder/:id/readme                       controllers.my.ng.directory.delete.FolderActionsController.deleteReadme(id: java.util.UUID)     
 
 # ~~~ Annotations ~~~
 
