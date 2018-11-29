@@ -157,6 +157,16 @@ class UserService @Inject() (
     rows == 1
   }
 
+  def setReadme(username: String, readme: String): Future[Boolean] =
+    db.withTransaction { sql =>
+      sql.update(USER)
+         .set(USER.README, readme)
+         .where(USER.USERNAME.equal(username))
+         .execute == 1
+    }
+
+  def deleteReadme(username: String): Future[Boolean] = setReadme(username, null);
+
   /** This method is cached, since it's basically called on every request **/
   def findByUsername(username: String) =
     cachedLookup("user", username, findByUsernameNoCache(_ , false))

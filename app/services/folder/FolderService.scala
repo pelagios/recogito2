@@ -136,13 +136,7 @@ class FolderService @Inject() (implicit val db: DB)
          .execute == 1
     }
 
-  def deleteReadme(id: UUID): Future[Boolean] =
-    db.withTransaction { sql => 
-      sql.update(FOLDER)
-         .set(FOLDER.README, null.asInstanceOf[String])
-         .where(FOLDER.ID.equal(id))
-         .execute == 1
-    }
+  def deleteReadme(id: UUID): Future[Boolean] = setReadme(id, null)
 
 }
 

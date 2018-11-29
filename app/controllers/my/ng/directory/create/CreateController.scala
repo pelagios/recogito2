@@ -1,13 +1,14 @@
 package controllers.my.ng.directory.create
 
 import com.mohiva.play.silhouette.api.Silhouette
+import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import controllers.{BaseController, HasPrettyPrintJSON, Security}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{AnyContent, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import services.ContentType
 import services.folder.FolderService
@@ -68,18 +69,23 @@ class CreateController @Inject() (
     }}
   }
 
-  def createReadme(folderId: UUID) =
-    silhouette.SecuredAction.async { implicit request =>
-      request.body.asJson match {
-        case Some(json) =>
-          val data = (json \ "data").as[String]
-          folders.setReadme(folderId, data).map { success => 
-            if (success) Ok else InternalServerError
-          }
+  def createReadme(folderId: UUID) = silhouette.SecuredAction.async { implicit request =>
+    request.body.asJson match {
+      case Some(json) =>
+        val data = (json \ "data").as[String]
 
-        case None => Future.successful(BadRequest)
-      }
+        val f = Option(folderId) match {
+          case Some(id) => folders.setReadme(id, data)
+          case None => users.setReadme(request.identity.username, data)
+        }
+        
+        f.map { success => 
+          if (success) Ok else InternalServerError
+        }
+
+      case None => Future.successful(BadRequest)
     }
+  }
 
   /** Initializes a new upload record **/
   def initUpload() = silhouette.SecuredAction.async { implicit request =>

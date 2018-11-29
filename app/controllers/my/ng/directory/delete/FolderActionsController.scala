@@ -49,7 +49,12 @@ class FolderActionsController @Inject() (
 
   def deleteReadme(folderId: UUID) =
     silhouette.SecuredAction.async { implicit request => 
-      folders.deleteReadme(folderId).map { success => 
+      val f = Option(folderId) match {
+        case Some(id) => folders.deleteReadme(folderId)
+        case None => users.deleteReadme(request.identity.username)
+      }
+
+      f.map { success => 
         if (success) Ok else InternalServerError
       }
     }
