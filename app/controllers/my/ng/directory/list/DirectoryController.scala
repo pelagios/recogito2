@@ -108,7 +108,7 @@ class DirectoryController @Inject() (
 
   def getMyDirectory(offset: Int, size: Int, folderId: UUID) =
     silhouette.SecuredAction.async { implicit request =>
-      val fReadme = getReadme(Option(folderId))
+      val fReadme = getReadme(Option(folderId), request.identity)
       val fBreadcrumbs = getBreadcrumbs(Option(folderId))
       val fDirectories = folders.listFolders(request.identity.username, offset, size, Option(folderId))     
       

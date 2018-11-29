@@ -7,6 +7,7 @@ import java.util.UUID
 import play.api.mvc.AnyContent
 import scala.concurrent.Future
 import services.folder.Breadcrumb
+import services.user.User
 
 trait FolderUtils { self: DirectoryController =>
 
@@ -15,12 +16,12 @@ trait FolderUtils { self: DirectoryController =>
     case None => Future.successful(Seq.empty[Breadcrumb])
   }
 
-  protected def getReadme(maybeFolder: Option[UUID])(implicit request: SecuredRequest[Security.Env, AnyContent]) = maybeFolder match {
+  protected def getReadme(maybeFolder: Option[UUID], user: User)(implicit request: SecuredRequest[Security.Env, AnyContent]) = maybeFolder match {
     case Some(folderId) => 
       folders.getFolder(folderId).map(_.map(_.getReadme))
     
     case None =>
-      Future.successful(None)
+      Future.successful(user.readme)
   }
   
 }

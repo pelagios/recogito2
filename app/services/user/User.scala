@@ -30,6 +30,8 @@ case class User(
   val website = Option(record.getWebsite)
   
   val quotaMb = record.getQuotaMb
+
+  val readme = Option(record.getReadme)
     
   val featureToggles = featureToggleRecords.map(_.getHasToggle)
   
