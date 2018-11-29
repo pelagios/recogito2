@@ -159,10 +159,15 @@ class UserService @Inject() (
 
   def setReadme(username: String, readme: String): Future[Boolean] =
     db.withTransaction { sql =>
-      sql.update(USER)
-         .set(USER.README, readme)
-         .where(USER.USERNAME.equal(username))
-         .execute == 1
+      val rows = 
+        sql.update(USER)
+          .set(USER.README, readme)
+          .where(USER.USERNAME.equal(username))
+          .execute
+
+      removeFromCache("user", username)
+
+      rows == 1
     }
 
   def deleteReadme(username: String): Future[Boolean] = setReadme(username, null);
