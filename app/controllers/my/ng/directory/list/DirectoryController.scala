@@ -160,7 +160,7 @@ class DirectoryController @Inject() (
     }
   }
 
-  def getAccessibleDocuments(owner: String, offset: Int, size: Int, folderId: UUID) = {
+  def getAccessibleDocuments(fromOwner: String, offset: Int, size: Int, folderId: UUID) = {
     import ConfiguredPresentation._
 
     silhouette.UserAwareAction.async { implicit request =>
@@ -168,15 +168,34 @@ class DirectoryController @Inject() (
         Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
       val loggedIn = request.identity.map(_.username)
-
-      val f = 
+      val fOwner = users.findByUsernameIgnoreCase(fromOwner)
+      val fDocuments =
         if (isSortingByIndex(config))
-          getAccessibleDocumentsSortedByIndex(owner, loggedIn, offset, size, config.get)
+          getAccessibleDocumentsSortedByIndex(fromOwner, loggedIn, offset, size, config.get)
         else 
-          getAccessibleDocumentsSortedByDB(owner, loggedIn, offset, size, config)
+          getAccessibleDocumentsSortedByDB(fromOwner, loggedIn, offset, size, config)
 
-      f.map { documents => 
-        jsonOk(Json.toJson(documents))
+      val f = for {
+        owner <- fOwner
+        documents <- fDocuments
+      } yield (owner, documents)
+
+      f.map { case (owner, documents) => 
+        owner match {
+          case Some(user) =>
+            // Only expose readme if there are shared documents
+            val readme = 
+              if (documents.total > 0) user.readme else None
+
+            // TODO make folder-compatible
+            jsonOk(Json.toJson(DirectoryPage.build(
+              readme,
+              Seq.empty[Breadcrumb],
+              Page.empty[FolderItem], 
+              documents)))
+
+          case None => NotFound
+        }
       }
     }
   }
