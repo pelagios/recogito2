@@ -119,8 +119,8 @@ define([
           jsRoutes.controllers.api.TaskAPIController.spawnTask().ajax({
             data: JSON.stringify({
               task_type   : 'GEORESOLUTION',
-              document_id : Config.documentId,
-              filepart_id : Config.partId,
+              documents : [ Config.documentId ],
+              fileparts : [ Config.partId ],
               args        : {
                 delimiter    : metadata.delimiter,
                 toponym_column : placeColumn,

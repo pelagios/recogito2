@@ -17,20 +17,31 @@ import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
 import transform.georesolution.GeoresolutionService
 
-case class TaskDefinition(
-  taskType  : TaskType,
-  documentId: String,
-  filepartId: Option[UUID],
-  args      : Map[String, String])
+case class TaskDefinition (
+  taskType: TaskType, documents : Seq[String], fileparts : Seq[UUID]
+)
 
 object TaskDefinition {
 
-  implicit val taskDefinitonReads: Reads[TaskDefinition] = (
+  implicit val taskDefinitionReads: Reads[TaskDefinition] = (
     (JsPath \ "task_type").read[String].map(str => TaskType(str)) and
-    (JsPath \ "document_id").read[String] and
-    (JsPath \ "filepart_id").readNullable[UUID] and
-    (JsPath \ "args").read[Map[String, String]]
+    (JsPath \ "documents").read[Seq[String]] and
+    (JsPath \ "fileparts").readNullable[Seq[UUID]]
+      .map(_.getOrElse(Seq.empty[UUID]))
   )(TaskDefinition.apply _)
+
+}
+
+case class GeoresolutionTaskDefinition(
+  private val baseDef: TaskDefinition, args: Map[String, String]
+) 
+
+object GeoresolutionTaskDefinition {
+
+  implicit val georesolutionTaskDefinitionReads: Reads[GeoresolutionTaskDefinition] = (
+    (JsPath).read[TaskDefinition] and
+    (JsPath \ "args").read[Map[String, String]]
+  )(GeoresolutionTaskDefinition.apply _)
 
 }
 
@@ -51,11 +62,12 @@ class TaskAPIController @Inject() (
     request.body.asJson.map(json => Json.fromJson[TaskDefinition](json)) match {
       case Some(result) if result.isSuccess =>
         val taskDefinition = result.get
-        documentResponse(taskDefinition.documentId, request.identity, { case (docInfo, accesslevel) =>
+        documentResponse(taskDefinition.documents.head, request.identity, { case (docInfo, accesslevel) =>
           if (accesslevel.canWrite)
             taskDefinition.taskType match {  
               case TaskType("GEORESOLUTION") =>
-                georesolution.spawnTask(docInfo.document, docInfo.fileparts, taskDefinition.args)
+                val definition = Json.fromJson[GeoresolutionTaskDefinition](request.body.asJson.get).get
+                georesolution.spawnTask(docInfo.document, docInfo.fileparts, definition.args)
                 Ok
                 
               case t =>
