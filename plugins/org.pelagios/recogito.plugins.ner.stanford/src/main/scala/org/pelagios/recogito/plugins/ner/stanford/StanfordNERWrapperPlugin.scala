@@ -29,7 +29,7 @@ class StanfordNERWrapperPlugin extends NERPlugin {
   
   override val getName = "Stanford CoreNLP"
   
-  override val getDescription = "Out-of-the box engine with the default English language model"
+  override val getDescription = "The standard engine with the default English language model"
   
   override val getOrganization = "Stanford NLP Group"
   
