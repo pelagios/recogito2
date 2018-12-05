@@ -32,9 +32,21 @@ object TaskDefinition {
 
 }
 
+trait SpecificTaskDefinition {
+
+  protected val baseDef: TaskDefinition 
+
+  val task_type = baseDef.taskType
+
+  val documents = baseDef.documents
+
+  val fileparts = baseDef.fileparts
+
+}
+
 case class GeoresolutionTaskDefinition(
-  private val baseDef: TaskDefinition, args: Map[String, String]
-) 
+  protected val baseDef: TaskDefinition, args: Map[String, String]
+) extends SpecificTaskDefinition
 
 object GeoresolutionTaskDefinition {
 
@@ -42,6 +54,26 @@ object GeoresolutionTaskDefinition {
     (JsPath).read[TaskDefinition] and
     (JsPath \ "args").read[Map[String, String]]
   )(GeoresolutionTaskDefinition.apply _)
+
+}
+
+case class NERTaskDefinition(
+  protected val baseDef: TaskDefinition,
+  engine: String, 
+  useAllAuthorities: Boolean,
+  authorities: Seq[String]
+) extends SpecificTaskDefinition
+
+object NERTaskDefinition {
+
+  implicit val georesolutionTaskDefinitionReads: Reads[NERTaskDefinition] = (
+    (JsPath).read[TaskDefinition] and
+    (JsPath \ "engine").read[String] and
+    (JsPath \ "all_authorities").readNullable[Boolean]
+      .map(_.getOrElse(false)) and 
+    (JsPath \ "authorities").readNullable[Seq[String]]
+      .map(_.getOrElse(Seq.empty[String]))
+  )(NERTaskDefinition.apply _)
 
 }
 
@@ -68,6 +100,11 @@ class TaskAPIController @Inject() (
               case TaskType("GEORESOLUTION") =>
                 val definition = Json.fromJson[GeoresolutionTaskDefinition](request.body.asJson.get).get
                 georesolution.spawnTask(docInfo.document, docInfo.fileparts, definition.args)
+                Ok
+
+              case TaskType("NER") =>
+                val definition = Json.fromJson[NERTaskDefinition](request.body.asJson.get).get
+                // play.api.Logger.info(definition.toString)
                 Ok
                 
               case t =>
