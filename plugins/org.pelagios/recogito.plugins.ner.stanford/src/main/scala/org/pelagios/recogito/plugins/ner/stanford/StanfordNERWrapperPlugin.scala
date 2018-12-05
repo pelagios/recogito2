@@ -27,15 +27,15 @@ class StanfordNERWrapperPlugin extends NERPlugin {
     p
   }
   
-  override val getName = "StanfordNLP"
+  override val getName = "Stanford CoreNLP"
   
-  override val getDescription = "A wrapper around the StanfordNLP named entity recognition engine"
+  override val getDescription = "Out-of-the box engine with the default English language model"
   
-  override val getOrganization = "Pelagios Commons"
+  override val getOrganization = "Stanford NLP Group"
   
-  override val getVersion = "0.0.1"
+  override val getVersion = "3.9.1"
   
-  override val getSupportedLanguages = new ArrayList[String]()
+  override val getSupportedLanguages = Seq("en").asJava
   
   override def parse(text: String) = {
     logger.info("Initializing NER pipeline")
