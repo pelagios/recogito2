@@ -211,6 +211,9 @@ GET     /api/place/:uri                              controllers.api.PlaceAPICon
 POST    /api/task                                    controllers.api.TaskAPIController.spawnTask
 GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)
 
+# ~~~ NER plugins ~~~
+GET     /api/plugins/ner                             controllers.api.PluginAPIController.listNERPlugins
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
