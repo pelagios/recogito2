@@ -11,7 +11,7 @@ import services.annotation.{Annotation, AnnotationService}
 import services.document.{DocumentService, PublicAccess}
 import services.user.UserService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation._
@@ -139,10 +139,15 @@ class SignupController @Inject() (
     // Backend annotation format
     import services.annotation.BackendAnnotation._
 
-    for {
+    val f = for {
       _ <- documents.importDocument(document, Seq((filepart, fileInputStream)))    
       _ <- annotations.upsertAnnotation(Json.fromJson[Annotation](annotation).get)
     } yield ()
+
+    f.recover { case t: Throwable => 
+      t.printStackTrace
+      Logger.error(s"Error importing onboarding document: ${t.getMessage}")
+    }
   }
 
   def showSignupForm = Action.async { implicit request =>
