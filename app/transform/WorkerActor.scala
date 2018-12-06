@@ -18,17 +18,18 @@ abstract class WorkerActor(taskType: TaskType, taskService: TaskService) extends
         taskService.insertTask(
           taskType,
           this.getClass.getName,
+          msg.jobId,
           Some(msg.document.getId),
           Some(msg.part.getId),
           Some(msg.document.getOwner)),
         10.seconds)
         
-      taskService.updateStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
+      taskService.updateTaskStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
       
       // Actual work is left to the subclass to implement
       doWork(msg.document, msg.part, msg.dir, msg.args, taskId)
       
-      taskService.scheduleForRemoval(taskId, 60.minutes)(context.system)
+      taskService.scheduleTaskForRemoval(taskId, 60.minutes)(context.system)
   }
   
   def doWork(doc: DocumentRecord, part: DocumentFilepartRecord, dir: File, args: Map[String, String], taskId: UUID)
@@ -38,6 +39,7 @@ abstract class WorkerActor(taskType: TaskType, taskService: TaskService) extends
 object WorkerActor {
   
   case class WorkOnPart(
+    jobId    : UUID,
     document : DocumentRecord,
     part     : DocumentFilepartRecord,
     dir      : File,

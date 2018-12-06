@@ -124,7 +124,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
                system: ActorSystem) = {
 
     def restoreTilesets(document: DocumentRecord, imageParts: Seq[DocumentFilepartRecord]) = {
-      tilingService.spawnTask(document, imageParts)
+      tilingService.spawnJob(document, imageParts)
     }
 
     def restoreDocument(document: DocumentRecord, parts: Seq[DocumentFilepartRecord]) = {

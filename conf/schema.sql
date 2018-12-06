@@ -156,6 +156,7 @@ CREATE TABLE task (
   status TEXT NOT NULL DEFAULT 'PENDING',
   progress INTEGER NOT NULL
 );
+CREATE INDEX idx_task_job_id ON task(job_id);
 
 -- annoucement info to be shown to a user right after login
 CREATE TABLE service_announcement (

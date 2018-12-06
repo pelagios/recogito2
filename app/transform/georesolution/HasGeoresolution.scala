@@ -97,7 +97,7 @@ trait HasGeoresolution {
       counter += 1
       val p = progressRange._1 + (progressRange._2 - progressRange._1) * counter / total
       if (p > progress) {
-        taskService.updateProgress(taskId, p)
+        taskService.updateTaskProgress(taskId, p)
         progress = p
       } 
     }

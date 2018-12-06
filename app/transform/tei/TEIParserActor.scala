@@ -23,16 +23,16 @@ class TEIParserActor(
     
     val fUpsertAll = annotationService.upsertAnnotations(annotations).map { failed =>
       if (failed.size == 0) {
-        taskService.setCompleted(taskId)
+        taskService.setTaskCompleted(taskId)
       } else {
         val msg = "Failed to store " + failed.size + " annotations"
         Logger.warn(msg)
         failed.foreach(a => Logger.warn(a.toString))
-        taskService.setFailed(taskId, Some(msg))
+        taskService.setTaskFailed(taskId, Some(msg))
       } 
     } recover { case t: Throwable =>
       t.printStackTrace
-      taskService.setFailed(taskId, Some(t.getMessage))
+      taskService.setTaskFailed(taskId, Some(t.getMessage))
     }
 
     Await.result(fUpsertAll, 20.minutes)   

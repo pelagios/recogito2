@@ -30,10 +30,10 @@ class GeoresolutionActor(
     try {
       val toponyms = parse(part, dir, args).toSeq
       resolve(doc, part, toponyms, toponyms.size, taskId)
-      taskService.setCompleted(taskId)
+      taskService.setTaskCompleted(taskId)
     } catch { case t: Throwable =>
       t.printStackTrace()
-      taskService.setFailed(taskId, Some(t.getMessage))
+      taskService.setTaskFailed(taskId, Some(t.getMessage))
     }
   
   private def parse(part: DocumentFilepartRecord, dir: File, args: Map[String, String]) = {

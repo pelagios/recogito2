@@ -32,10 +32,23 @@ object TaskStatus extends Enumeration {
 @Singleton
 class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) extends BaseService {
   
-  def findById(uuid: UUID) = db.query { sql =>
+  def findByTaskId(uuid: UUID) = db.query { sql =>
     Option(sql.selectFrom(TASK).where(TASK.ID.equal(uuid)).fetchOne())
   }
+
+  def findByJobId(uuid: UUID) = db.query { sql =>
+    val tasks = 
+      sql.selectFrom(TASK)
+         .where(TASK.JOB_ID.equal(uuid))
+         .fetchArray.toSeq
+
+    if (tasks.size > 0)
+      Some(TaskRecordAggregate(tasks))
+    else 
+      None
+  }
   
+  /** @deprecated **/
   def findByDocument(documentId: String) = db.query { sql =>
     val records = 
       sql.selectFrom(TASK).where(TASK.DOCUMENT_ID.equal(documentId))
@@ -47,13 +60,21 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       None
   }
   
+  def deleteByJobId(id: UUID) = db.withTransaction { sql => 
+    sql.deleteFrom(TASK)
+       .where(TASK.JOB_ID.equal(id))
+       .execute
+  }
+  
+  /*
   def deleteByTypeAndDocument(taskType: TaskType, documentId: String) = db.withTransaction { sql =>
     sql.deleteFrom(TASK)
       .where(TASK.TASK_TYPE.equal(taskType.toString))
       .and(TASK.DOCUMENT_ID.equal(documentId)).execute()
   }
+  */
   
-  def scheduleForRemoval(uuid: UUID, in: FiniteDuration = 10.minutes)(implicit system: ActorSystem) = {
+  def scheduleTaskForRemoval(uuid: UUID, in: FiniteDuration = 10.minutes)(implicit system: ActorSystem) = {
     system.scheduler.scheduleOnce(in) {
       db.withTransaction { sql =>
         sql.deleteFrom(TASK).where(TASK.ID.equal(uuid)).execute()
@@ -61,21 +82,21 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
     }
   }
   
-  def updateProgress(uuid: UUID, progress: Int): Future[Unit] = db.withTransaction { sql => 
+  def updateTaskProgress(uuid: UUID, progress: Int): Future[Unit] = db.withTransaction { sql => 
     sql.update(TASK)
       .set[Integer](TASK.PROGRESS, progress)
       .where(TASK.ID.equal(uuid))
       .execute()
   }
     
-  def updateStatus(uuid: UUID, status: TaskStatus.Value): Future[Unit] = db.withTransaction { sql => 
+  def updateTaskStatus(uuid: UUID, status: TaskStatus.Value): Future[Unit] = db.withTransaction { sql => 
     sql.update(TASK)
       .set(TASK.STATUS, status.toString)
       .where(TASK.ID.equal(uuid))
       .execute()
   }
   
-  def updateStatusAndProgress(uuid: UUID, status: TaskStatus.Value, progress: Int): Future[Unit] = db.withTransaction { sql =>
+  def updateTaskStatusAndProgress(uuid: UUID, status: TaskStatus.Value, progress: Int): Future[Unit] = db.withTransaction { sql =>
     sql.update(TASK)
       .set(TASK.STATUS, status.toString)
       .set[Integer](TASK.PROGRESS, progress)
@@ -83,7 +104,7 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       .execute()
   }
   
-  def setCompleted(uuid: UUID, completedWith: Option[String] = None): Future[Unit] = db.withTransaction { sql =>
+  def setTaskCompleted(uuid: UUID, completedWith: Option[String] = None): Future[Unit] = db.withTransaction { sql =>
     sql.update(TASK)
       .set(TASK.STATUS, TaskStatus.COMPLETED.toString)
       .set(TASK.STOPPED_AT, new Timestamp(System.currentTimeMillis))
@@ -93,7 +114,7 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       .execute()
   }
   
-  def setFailed(uuid: UUID, failedWith: Option[String] = None): Future[Unit] = db.withTransaction { sql =>
+  def setTaskFailed(uuid: UUID, failedWith: Option[String] = None): Future[Unit] = db.withTransaction { sql =>
     sql.update(TASK)
       .set(TASK.STATUS, TaskStatus.FAILED.toString)
       .set(TASK.STOPPED_AT, new Timestamp(System.currentTimeMillis))
@@ -103,12 +124,13 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
   }
   
   def insertTask(
-      taskType: TaskType,
-      className: String,
-      documentId: Option[String],
-      filepartId: Option[UUID],
-      spawnedBy: Option[String]
-    ): Future[UUID] = db.withTransaction { sql =>
+    taskType: TaskType,
+    className: String,
+    jobId: UUID,
+    documentId: Option[String],
+    filepartId: Option[UUID],
+    spawnedBy: Option[String]
+  ): Future[UUID] = db.withTransaction { sql =>
       
     val uuid = UUID.randomUUID
     
@@ -116,6 +138,7 @@ class TaskService @Inject() (val db: DB, implicit val ctx: ExecutionContext) ext
       uuid,
       taskType.toString,
       className,
+      jobId,
       optString(documentId),
       filepartId.getOrElse(null),
       optString(spawnedBy),

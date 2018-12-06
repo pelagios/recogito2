@@ -92,7 +92,7 @@ class TaskAPIController @Inject() (
     implicit val ctx: ExecutionContext
   ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
-  def spawnTask = silhouette.SecuredAction.async { implicit request =>
+  def spawnJob = silhouette.SecuredAction.async { implicit request =>
     request.body.asJson.map(json => Json.fromJson[TaskDefinition](json)) match {
       case Some(result) if result.isSuccess =>
         val taskDefinition = result.get
@@ -101,14 +101,14 @@ class TaskAPIController @Inject() (
             taskDefinition.taskType match {  
               case TaskType("GEORESOLUTION") =>
                 val definition = Json.fromJson[GeoresolutionTaskDefinition](request.body.asJson.get).get
-                georesolution.spawnTask(docInfo.document, docInfo.fileparts, definition.args)
+                georesolution.spawnJob(docInfo.document, docInfo.fileparts, definition.args)
                 Ok
 
               case TaskType("NER") =>
                 val definition = Json.fromJson[NERTaskDefinition](request.body.asJson.get).get
 
                 // TODO redesign API to make use of task definiton
-                ner.spawnTask(docInfo.document, docInfo.fileparts)
+                ner.spawnJob(docInfo.document, docInfo.fileparts)
                 Ok
                 
               case t =>
@@ -122,7 +122,14 @@ class TaskAPIController @Inject() (
       case None => Future.successful(BadRequest(Json.parse("{ \"error\": \"missing task definition\" }")))
     }
   }
-    
+
+  def getJobProgress(jobId: UUID) = silhouette.SecuredAction.async { implicit request => 
+    tasks.findByJobId(jobId).map { _ match {
+      case Some(progress) => jsonOk(Json.toJson(progress))
+      case None => NotFound
+    }}
+  }
+
   def progressByDocument(id: String) = silhouette.SecuredAction.async { implicit request =>    
     documents.getExtendedInfo(id, Some(request.identity.username)).flatMap(_ match {
       case Some((doc, accesslevel)) =>

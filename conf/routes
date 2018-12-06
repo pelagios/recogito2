@@ -208,8 +208,9 @@ GET     /api/place/:uri                              controllers.api.PlaceAPICon
 
 # ~~~ Tasks ~~~
 
-POST    /api/task                                    controllers.api.TaskAPIController.spawnTask
-GET     /api/task                                    controllers.api.TaskAPIController.progressByDocument(id: String)
+POST    /api/job                                    controllers.api.TaskAPIController.spawnJob
+GET     /api/job                                    controllers.api.TaskAPIController.progressByDocument(id: String)
+GET     /api/job/:id                                controllers.api.TaskAPIController.getJobProgress(id: java.util.UUID)
 
 # ~~~ NER plugins ~~~
 GET     /api/plugins/ner                             controllers.api.PluginAPIController.listNERPlugins

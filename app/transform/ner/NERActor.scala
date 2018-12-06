@@ -38,7 +38,7 @@ class NERActor(
       val phrases = parseFilepart(doc, part, dir)
       
       Logger.info(s"NER completed on ${part.getId}")
-      taskService.updateProgress(taskId, 50)
+      taskService.updateTaskProgress(taskId, 50)
       
       val places = phrases.filter(_.entity.entityType == EntityType.LOCATION).map(Some(_))
       val persons = phrases.filter(_.entity.entityType == EntityType.PERSON)     
@@ -53,10 +53,10 @@ class NERActor(
       })
       Await.result(fInsertPeople, 20.minutes)
       
-      taskService.setCompleted(taskId)
+      taskService.setTaskCompleted(taskId)
     } catch { case t: Throwable =>
       t.printStackTrace()
-      taskService.setFailed(taskId, Some(t.getMessage))
+      taskService.setTaskFailed(taskId, Some(t.getMessage))
     }
     
   /** Select appropriate parser for part content type **/

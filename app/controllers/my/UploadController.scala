@@ -241,21 +241,21 @@ class UploadController @Inject() (
             // Apply NER if requested
             val applyNER = checkParamValue("apply-ner", "on")
             if (applyNER) {
-              nerService.spawnTask(doc, docParts)
+              nerService.spawnJob(doc, docParts)
               runningTasks.append(NERService.TASK_TYPE)
             }
 
             // Tile images
             val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
             if (imageParts.size > 0) {
-              tilingService.spawnTask(doc, imageParts)
+              tilingService.spawnJob(doc, imageParts)
               runningTasks.append(TilingService.TASK_TYPE)
             }
             
             // Parse TEI
             val teiParts = docParts.filter(_.getContentType.equals(ContentType.TEXT_TEIXML.toString))
             if (teiParts.size > 0) {
-              teiParserService.spawnTask(doc, teiParts)
+              teiParserService.spawnJob(doc, teiParts)
               runningTasks.append(TEIParserService.TASK_TYPE)              
             }
 

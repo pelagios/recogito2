@@ -137,29 +137,23 @@ class CreateController @Inject() (
     
       case Some((pendingUpload, fileparts)) =>
         uploads.importPendingUpload(pendingUpload, fileparts, folder).map { case (doc, docParts) => {
+
+          // TODO Change this to new task API!
+
           // We'll forward a list of the running processing tasks to the view, so it can show progress
           val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]
-          
-          // TODO this bit should be cleaned up
-
-          // Apply NER if requested
-          val applyNER = checkParamValue("apply-ner", "on")
-          if (applyNER) {
-            nerService.spawnTask(doc, docParts)
-            runningTasks.append(NERService.TASK_TYPE)
-          }
 
           // Tile images
           val imageParts = docParts.filter(_.getContentType.equals(ContentType.IMAGE_UPLOAD.toString))
           if (imageParts.size > 0) {
-            tilingService.spawnTask(doc, imageParts)
+            tilingService.spawnJob(doc, imageParts)
             runningTasks.append(TilingService.TASK_TYPE)
           }
           
           // Parse TEI
           val teiParts = docParts.filter(_.getContentType.equals(ContentType.TEXT_TEIXML.toString))
           if (teiParts.size > 0) {
-            teiParserService.spawnTask(doc, teiParts)
+            teiParserService.spawnJob(doc, teiParts)
             runningTasks.append(TEIParserService.TASK_TYPE)              
           }
 

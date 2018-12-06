@@ -21,9 +21,9 @@ class TilingActor(taskService: TaskService) extends WorkerActor(TilingService.TA
     
     try {
       TilingService.createZoomify(new File(dir, filename), tilesetDir)
-      taskService.setCompleted(taskId)
+      taskService.setTaskCompleted(taskId)
     } catch { case t: Throwable =>
-      taskService.setFailed(taskId, Some(t.getMessage))
+      taskService.setTaskFailed(taskId, Some(t.getMessage))
     }    
   }
   
