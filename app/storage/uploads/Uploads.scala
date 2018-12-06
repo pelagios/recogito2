@@ -1,6 +1,7 @@
 package storage.uploads
 
 import java.io.File
+import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
 import scala.concurrent.{ ExecutionContext, Future }
@@ -18,25 +19,39 @@ class Uploads @Inject() (config: Configuration) {
       case Some(filename) => new File(filename)
       case None => new File("uploads") // Default
     }
+    val path = dir.toPath
 
-    Logger.info("Using " + dir.getAbsolutePath + " as upload location")
+    Logger.info(s"Using ${path} as upload location")
 
-    if (!dir.exists)
-      dir.mkdir()
+    if (!Files.exists(path))
+      Logger.info(s"Creating ${path}: ${dir.mkdir()}")
+    else
+      Logger.info(s"${path} exists")
+
     dir
   }
 
   lazy val USER_DATA_DIR = {
     val dir = new File(UPLOAD_BASE, "user_data")
-    if (!dir.exists)
-      dir.mkdir()
+    val path = dir.toPath
+
+    if (!Files.exists(path))
+      Logger.info(s"Creating ${path}: ${dir.mkdir()}")
+    else 
+      Logger.info(s"${path} exists")
+
     dir
   }
 
   lazy val PENDING_UPLOADS_DIR = {
     val dir = new File(UPLOAD_BASE, "pending")
-    if (!dir.exists)
-      dir.mkdir()
+    val path = dir.toPath
+
+    if (!Files.exists(dir.toPath))
+      Logger.info(s"Creating ${path}: ${dir.mkdir()}")
+    else 
+      Logger.info(s"${path} exists")
+
     dir
   }
 
