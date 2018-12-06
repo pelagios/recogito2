@@ -68,6 +68,11 @@ class Task(alias : String, aliased : Table[TaskRecord], parameters : Array[ Fiel
 	val CLASS_NAME : TableField[TaskRecord, String] = createField("class_name", org.jooq.impl.SQLDataType.CLOB.nullable(false), "")
 
 	/**
+	 * The column <code>public.task.job_id</code>.
+	 */
+	val JOB_ID : TableField[TaskRecord, UUID] = createField("job_id", org.jooq.impl.SQLDataType.UUID.nullable(false), "")
+
+	/**
 	 * The column <code>public.task.document_id</code>.
 	 */
 	val DOCUMENT_ID : TableField[TaskRecord, String] = createField("document_id", org.jooq.impl.SQLDataType.CLOB, "")

@@ -143,6 +143,8 @@ CREATE TABLE task (
   id UUID PRIMARY KEY,
   task_type TEXT NOT NULL,
   class_name TEXT NOT NULL,
+  -- one ore more tasks belong to one job
+  job_id UUID NOT NULL,
   -- some tasks run on specific documents and/or fileparts
   document_id TEXT,
   filepart_id UUID,
