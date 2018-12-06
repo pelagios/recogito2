@@ -45,6 +45,9 @@ Documentation on how to import gazetteers is [on the Wiki](https://github.com/pe
 
 ## Running in production
 
+* When running in production you __must__ define a location where Recogito can store user
+  files, using an absolute path. The relevant property in the `conf/application.conf` file is
+  `recogito.upload.dir`.
 * To test production mode before deploying, type `sbt runProd`
 * To change to a different port (than default 9000), type `sbt "runProd -Dhttp.port=9876"`
 * For full production deployment, refer to the current [Play Framework
