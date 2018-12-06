@@ -16,6 +16,7 @@ import play.api.libs.functional.syntax._
 import play.api.mvc.ControllerComponents 
 import scala.concurrent.{ExecutionContext, Future}
 import transform.georesolution.GeoresolutionService
+import transform.ner.NERService
 
 case class TaskDefinition (
   taskType: TaskType, documents : Seq[String], fileparts : Seq[UUID]
@@ -83,6 +84,7 @@ class TaskAPIController @Inject() (
     val config: Configuration,
     val documents: DocumentService,
     val users: UserService,
+    val ner: NERService,
     val georesolution: GeoresolutionService,
     val silhouette: Silhouette[Security.Env],
     val tasks: TaskService,
@@ -104,7 +106,9 @@ class TaskAPIController @Inject() (
 
               case TaskType("NER") =>
                 val definition = Json.fromJson[NERTaskDefinition](request.body.asJson.get).get
-                // play.api.Logger.info(definition.toString)
+
+                // TODO redesign API to make use of task definiton
+                ner.spawnTask(docInfo.document, docInfo.fileparts)
                 Ok
                 
               case t =>
