@@ -12,7 +12,7 @@ case class TableGeoresolutionJobDefinition(
   longitudeColumn: Option[Int],
   useAllAuthorities: Boolean, 
   specificAuthorities: Seq[String]
-) extends SpecificJobDefinition
+) extends GeoresolutionJobDefinition
 
 object TableGeoresolutionJobDefinition {
 

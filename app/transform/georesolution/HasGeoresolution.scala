@@ -41,8 +41,6 @@ object Georesolvable {
 trait HasGeoresolution {
   
   type T <: Georesolvable
-  
-  // def getAnchor(resolvable: T, index: Int): String
     
   protected def resolve(
     document: DocumentRecord,
@@ -77,6 +75,7 @@ trait HasGeoresolution {
             toAnnotation(docId, partId, contentType, resolvable, None)
           }
       }
+      
     var counter = 0
     var progress = progressRange._1
     

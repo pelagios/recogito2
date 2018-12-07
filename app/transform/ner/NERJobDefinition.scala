@@ -3,13 +3,14 @@ package transform.ner
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import transform.{JobDefinition, SpecificJobDefinition}
+import transform.georesolution.GeoresolutionJobDefinition
 
 case class NERJobDefinition(
-  protected val baseDef: JobDefinition,
+  val baseDef: JobDefinition,
   engine: String, 
   useAllAuthorities: Boolean,
-  authorities: Seq[String]
-) extends SpecificJobDefinition
+  specificAuthorities: Seq[String]
+) extends GeoresolutionJobDefinition
 
 object NERJobDefinition {
 
