@@ -15,7 +15,7 @@ import services.entity.builtin.EntityService
 import services.task.TaskService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import transform.georesolution.{Georesolvable, HasGeoresolution}
-import transform.WorkerActor
+import transform.{WorkerActor, SpecificJobDefinition}
 
 case class EntityResolvable(entity: Entity, val anchor: String, val uri: Option[URI]) extends Georesolvable {
   val toponym = entity.chars
@@ -32,32 +32,38 @@ class NERActor(
   
   private implicit val ctx = context.dispatcher
   
-  override def doWork(doc: DocumentRecord, part: DocumentFilepartRecord, dir: File, args: Map[String, String], taskId: UUID) =
-    try {
-      Logger.info(s"Starting NER on ${part.getId}")
-      val phrases = parseFilepart(doc, part, dir)
-      
-      Logger.info(s"NER completed on ${part.getId}")
-      taskService.updateTaskProgress(taskId, 50)
-      
-      val places = phrases.filter(_.entity.entityType == EntityType.LOCATION).map(Some(_))
-      val persons = phrases.filter(_.entity.entityType == EntityType.PERSON)     
-      
-      resolve(doc, part, places, places.size, taskId, (50, 80))
-      
-      val fInsertPeople = annotationService.upsertAnnotations(persons.map { r => 
-        Annotation
-          .on(part, r.anchor)
-          .withBody(AnnotationBody.quoteBody(r.entity.chars))
-          .withBody(AnnotationBody.personBody())
-      })
-      Await.result(fInsertPeople, 20.minutes)
-      
-      taskService.setTaskCompleted(taskId)
-    } catch { case t: Throwable =>
-      t.printStackTrace()
-      taskService.setTaskFailed(taskId, Some(t.getMessage))
-    }
+  override def doWork(
+    doc: DocumentRecord, 
+    part: DocumentFilepartRecord, 
+    dir: File, 
+    jobDef: Option[SpecificJobDefinition], 
+    taskId: UUID
+  ) = try {
+    Logger.info(s"Starting NER on ${part.getId}")
+    Logger.info(s"definition: ${jobDef.get}")
+    val phrases = parseFilepart(doc, part, dir)
+    
+    Logger.info(s"NER completed on ${part.getId}")
+    taskService.updateTaskProgress(taskId, 50)
+    
+    val places = phrases.filter(_.entity.entityType == EntityType.LOCATION).map(Some(_))
+    val persons = phrases.filter(_.entity.entityType == EntityType.PERSON)     
+    
+    resolve(doc, part, places, places.size, taskId, (50, 80))
+    
+    val fInsertPeople = annotationService.upsertAnnotations(persons.map { r => 
+      Annotation
+        .on(part, r.anchor)
+        .withBody(AnnotationBody.quoteBody(r.entity.chars))
+        .withBody(AnnotationBody.personBody())
+    })
+    Await.result(fInsertPeople, 20.minutes)
+    
+    taskService.setTaskCompleted(taskId)
+  } catch { case t: Throwable =>
+    t.printStackTrace()
+    taskService.setTaskFailed(taskId, Some(t.getMessage))
+  }
     
   /** Select appropriate parser for part content type **/
   private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) =

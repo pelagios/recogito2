@@ -5,7 +5,7 @@ import java.io.File
 import java.util.UUID
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.task.TaskService
-import transform.WorkerActor
+import transform.{WorkerActor, SpecificJobDefinition}
 
 class TilingActor(taskService: TaskService) extends WorkerActor(TilingService.TASK_TYPE, taskService) {
 
@@ -13,7 +13,7 @@ class TilingActor(taskService: TaskService) extends WorkerActor(TilingService.TA
     doc: DocumentRecord, 
     part: DocumentFilepartRecord, 
     dir: File, 
-    args: Map[String, String], 
+    jobDef: Option[SpecificJobDefinition], 
     taskId: UUID
   ) = {
     val filename = part.getFile

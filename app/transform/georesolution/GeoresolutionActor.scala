@@ -14,7 +14,7 @@ import services.annotation.AnnotationService
 import services.entity.builtin.EntityService
 import services.task.TaskService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import transform.WorkerActor
+import transform.{WorkerActor, SpecificJobDefinition}
 
 class GeoresolutionActor(
   implicit val taskService: TaskService, 
@@ -26,15 +26,21 @@ class GeoresolutionActor(
   
   private implicit val ctx = context.dispatcher
   
-  def doWork(doc: DocumentRecord, part: DocumentFilepartRecord, dir: File, args: Map[String, String], taskId: UUID) =
-    try {
-      val toponyms = parse(part, dir, args).toSeq
-      resolve(doc, part, toponyms, toponyms.size, taskId)
-      taskService.setTaskCompleted(taskId)
-    } catch { case t: Throwable =>
-      t.printStackTrace()
-      taskService.setTaskFailed(taskId, Some(t.getMessage))
-    }
+  def doWork(
+    doc: DocumentRecord, 
+    part: DocumentFilepartRecord, 
+    dir: File, 
+    jobDef: Option[SpecificJobDefinition], 
+    taskId: UUID
+  ) = try {
+    val definition = jobDef.get.asInstanceOf[GeoresolutionJobDefinition]
+    val toponyms = parse(part, dir, definition.args).toSeq
+    resolve(doc, part, toponyms, toponyms.size, taskId)
+    taskService.setTaskCompleted(taskId)
+  } catch { case t: Throwable =>
+    t.printStackTrace()
+    taskService.setTaskFailed(taskId, Some(t.getMessage))
+  }
   
   private def parse(part: DocumentFilepartRecord, dir: File, args: Map[String, String]) = {
     val delimiter = args.get("delimiter").map(_.charAt(0)).getOrElse(',')

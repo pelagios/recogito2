@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import services.annotation.AnnotationService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.task.TaskService
-import transform.WorkerActor
+import transform.{WorkerActor, SpecificJobDefinition}
 
 class TEIParserActor(
   taskService: TaskService,
@@ -18,7 +18,13 @@ class TEIParserActor(
   
   implicit val ctx = context.dispatcher
   
-  override def doWork(doc: DocumentRecord, part: DocumentFilepartRecord, dir: File, args: Map[String, String], taskId: UUID) = {
+  override def doWork(
+    doc: DocumentRecord, 
+    part: DocumentFilepartRecord, 
+    dir: File, 
+    jobDef: Option[SpecificJobDefinition], 
+    taskId: UUID
+  ) = {
     val annotations = TEIParserService.extractEntities(part, new File(dir, part.getFile))
     
     val fUpsertAll = annotationService.upsertAnnotations(annotations).map { failed =>

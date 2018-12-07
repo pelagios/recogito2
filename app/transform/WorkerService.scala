@@ -19,21 +19,38 @@ class WorkerService(
   
   val router = system.actorOf(routerProps)
   
-  def spawnJob(
+  /** Spawns a new job on the given document & parts **/
+  private def spawn(
     document: DocumentRecord,
     parts   : Seq[DocumentFilepartRecord],
-    args    : Map[String, String] = Map.empty[String, String]
-  ) = parts.foreach { part =>  
+    jobDef  : Option[SpecificJobDefinition]
+  ) = {
+    // Create a job ID
     val jobId = UUID.randomUUID
 
-    router ! WorkerActor.WorkOnPart(
-      jobId,
-      document,
-      part,
-      uploads.getDocumentDir(document.getOwner, document.getId).get,
-      args)
+    // Distribute tasks to workers
+    parts.foreach { part =>  
+      router ! WorkerActor.WorkOnPart(
+        jobId,
+        document,
+        part,
+        uploads.getDocumentDir(document.getOwner, document.getId).get,
+        jobDef)
+    }
 
+    // Return job ID for outside reference
     jobId
   }
-  
+
+  /** Spawns a job with a specific job defintion **/
+  def spawnJob(
+    document: DocumentRecord, 
+    parts: Seq[DocumentFilepartRecord], 
+    jobDef: SpecificJobDefinition) = spawn(document, parts, Some(jobDef))
+
+  /** Spawns a job that doesn't need a specific job definition **/
+  def spawnJob(
+    document: DocumentRecord, 
+    parts: Seq[DocumentFilepartRecord]) = spawn(document, parts, None)
+
 }

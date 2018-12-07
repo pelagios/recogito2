@@ -8,12 +8,15 @@ import scala.concurrent.duration._
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.task._
 
-abstract class WorkerActor(taskType: TaskType, taskService: TaskService) extends Actor {
+abstract class WorkerActor(
+  taskType: TaskType, 
+  taskService: TaskService
+) extends Actor {
   
   def receive = {
     
     case msg: WorkerActor.WorkOnPart =>
-      
+      // Create a task record in the DB
       val taskId = Await.result(
         taskService.insertTask(
           taskType,
@@ -27,12 +30,17 @@ abstract class WorkerActor(taskType: TaskType, taskService: TaskService) extends
       taskService.updateTaskStatusAndProgress(taskId, TaskStatus.RUNNING, 1)
       
       // Actual work is left to the subclass to implement
-      doWork(msg.document, msg.part, msg.dir, msg.args, taskId)
+      doWork(msg.document, msg.part, msg.dir, msg.jobDef, taskId)
       
       taskService.scheduleTaskForRemoval(taskId, 60.minutes)(context.system)
   }
   
-  def doWork(doc: DocumentRecord, part: DocumentFilepartRecord, dir: File, args: Map[String, String], taskId: UUID)
+  def doWork(
+    doc: DocumentRecord, 
+    part: DocumentFilepartRecord, 
+    dir: File, 
+    jobDef: Option[SpecificJobDefinition], 
+    taskId: UUID)
   
 }
 
@@ -43,6 +51,6 @@ object WorkerActor {
     document : DocumentRecord,
     part     : DocumentFilepartRecord,
     dir      : File,
-    args     : Map[String, String] = Map.empty[String, String]) 
+    jobDef   : Option[SpecificJobDefinition]) 
   
 }
