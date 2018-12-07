@@ -63,8 +63,21 @@ trait HasGeoresolution {
           Future.successful(toAnnotation(docId, partId, contentType, resolvable, Some(uri.toString)))
           
         case None =>
+          val authorities = 
+            if (jobDef.useAllAuthorities) 
+              None 
+            else 
+              Some(jobDef.specificAuthorities)
+
           // Try to resolve toponym against the index
-          entityService.searchEntities(ES.sanitize(resolvable.toponym), Some(EntityType.PLACE), 0, 1, resolvable.coord).map { topHits =>
+          entityService.searchEntities(
+            ES.sanitize(resolvable.toponym), 
+            Some(EntityType.PLACE), 
+            0, 
+            1, 
+            resolvable.coord,
+            authorities
+          ).map { topHits =>
             if (topHits.total > 0)
               // TODO be smarter about choosing the right URI from the place
               toAnnotation(docId, partId, contentType, resolvable, Some(topHits.items(0).entity.uris.head))         
