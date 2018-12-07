@@ -14,11 +14,17 @@ object NERPluginManager {
 
     val plugins = serviceLoader.asScala.toSeq
     Logger.info("Successfully loaded " + plugins.size + " NER plugins:")
-    plugins.foreach(plugin => Logger.info("  " + plugin.getName))
 
-    plugins
+    plugins.map { plugin => 
+      Logger.info("  " + plugin.getName)
+      (plugin.getClass.getName -> plugin)
+    }
   }
 
-  def getDefaultNER() = plugins.head
+  /** I guess there's nothing smart we can do **/
+  def getDefaultEngine(): NERPlugin = plugins.head._2
+
+  def getEngine(className: String): Option[NERPlugin] = 
+    plugins.find(_._1 == className).map(_._2)
 
 }

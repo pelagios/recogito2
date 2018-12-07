@@ -19,7 +19,7 @@ class NERServiceSpec extends Specification {
 
   def parsePlaintext() = {
     val TEST_TEXT = Source.fromFile("test/resources/transform/ner/text-for-ner-01.txt").getLines().mkString("\n")
-    NERService.parseText(TEST_TEXT)
+    NERService.parseText(TEST_TEXT, None)
   }
   
   def enrichTEI() = {
@@ -27,7 +27,7 @@ class NERServiceSpec extends Specification {
       new File("test/resources/transform/ner/tei-for-ner.tei.xml")
     
     val writer = new StringWriter()
-    NERService.enrichTEI(TEST_TEI, Some(new BufferedWriter(writer)))
+    NERService.enrichTEI(TEST_TEI, None, Some(new BufferedWriter(writer)))
     $(writer.toString)
   }
 

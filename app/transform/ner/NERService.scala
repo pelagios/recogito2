@@ -28,8 +28,12 @@ object NERService extends HasTeiNER {
   val TASK_TYPE = TaskType("NER")
   
   /** Parses the text and returns the NER results as a list of entities **/
-  private[ner] def parseText(text: String): Seq[Entity] = {
-    val ner = NERPluginManager.getDefaultNER
+  private[ner] def parseText(text: String, engine: Option[String]): Seq[Entity] = {
+    val ner = engine match {
+      case Some(identifier) => NERPluginManager.getEngine(identifier).get
+      case None => NERPluginManager.getDefaultEngine
+    }
+
     val entities = ner.parse(text)
     entities.asScala
   }

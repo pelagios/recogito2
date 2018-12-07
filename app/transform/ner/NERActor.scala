@@ -36,12 +36,13 @@ class NERActor(
     doc: DocumentRecord, 
     part: DocumentFilepartRecord, 
     dir: File, 
-    jobDef: Option[SpecificJobDefinition], 
+    definition: Option[SpecificJobDefinition], 
     taskId: UUID
   ) = try {
+    val jobDef = definition.map(_.asInstanceOf[NERJobDefinition])
+
     Logger.info(s"Starting NER on ${part.getId}")
-    Logger.info(s"definition: ${jobDef.get}")
-    val phrases = parseFilepart(doc, part, dir)
+    val phrases = parseFilepart(doc, part, dir, jobDef.map(_.engine))
     
     Logger.info(s"NER completed on ${part.getId}")
     taskService.updateTaskProgress(taskId, 50)
@@ -66,18 +67,18 @@ class NERActor(
   }
     
   /** Select appropriate parser for part content type **/
-  private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, dir: File) =
+  private def parseFilepart(document: DocumentRecord, part: DocumentFilepartRecord, dir: File, engine: Option[String]) =
     ContentType.withName(part.getContentType) match {
       case Some(t) if t == ContentType.TEXT_PLAIN =>
         val text = Source.fromFile(new File(dir, part.getFile)).getLines.mkString("\n")
-        val entities = NERService.parseText(text)
+        val entities = NERService.parseText(text, engine)
         entities.map(e => EntityResolvable(e, s"char-offset:${e.charOffset}", Option(e.uri)))
         
       case Some(t) if t == ContentType.TEXT_TEIXML =>
         // For simplicity, NER results are inlined into the TEI document. They
         // will be extracted (together with all pre-existing tags) in a separate
         // step, anyway.
-        val entitiesAndAnchors = NERService.parseTEI(new File(dir, part.getFile))
+        val entitiesAndAnchors = NERService.parseTEI(new File(dir, part.getFile), engine)
         entitiesAndAnchors.map { case (e, anchor) => 
           EntityResolvable(e, anchor, Option(e.uri))
         }
