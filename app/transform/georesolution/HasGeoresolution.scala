@@ -6,7 +6,7 @@ import java.util.UUID
 import services.ContentType
 import services.annotation._
 import services.annotation.relation.Relation
-import services.entity.EntityType
+import services.entity.{Entity, EntityType}
 import services.entity.builtin.EntityService
 import services.task.TaskService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
@@ -78,12 +78,14 @@ trait HasGeoresolution {
             resolvable.coord,
             authorities
           ).map { topHits =>
-            if (topHits.total > 0)
-              // TODO be smarter about choosing the right URI from the place
-              toAnnotation(docId, partId, contentType, resolvable, Some(topHits.items(0).entity.uris.head))         
-            else
+            if (topHits.total > 0) {
+              // TODO be smarter about chosing the right URI
+              val uri = getUri(topHits.items(0).entity, authorities)
+              toAnnotation(docId, partId, contentType, resolvable, Some(uri))         
+            } else {
               // No gazetteer match found
               toAnnotation(docId, partId, contentType, resolvable, None)
+            }
           }.recover { case t: Throwable =>
             t.printStackTrace()
             toAnnotation(docId, partId, contentType, resolvable, None)
@@ -116,6 +118,17 @@ trait HasGeoresolution {
     }
     
   }
+
+  private def getUri(entity: Entity, authorities: Option[Seq[String]]) = 
+    authorities match {
+      case Some(allowed) => 
+        entity
+          .isConflationOf
+          .filter(e => allowed.contains(e.sourceAuthority))
+          .head.uri
+
+      case None => entity.uris.head
+    }
   
   private def toAnnotation(
     documentId: String,
