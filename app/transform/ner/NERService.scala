@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.routing.RoundRobinPool
 import javax.inject.{Inject, Singleton}
 import org.pelagios.recogito.sdk.ner.Entity
+import play.api.Logger
 import scala.collection.JavaConverters._
 import services.annotation.AnnotationService
 import services.entity.builtin.EntityService
@@ -34,6 +35,7 @@ object NERService extends HasTeiNER {
       case None => NERPluginManager.getDefaultEngine
     }
 
+    Logger.info(s"Running NER with engine ${ner.getName}")
     val entities = ner.parse(text)
     entities.asScala
   }

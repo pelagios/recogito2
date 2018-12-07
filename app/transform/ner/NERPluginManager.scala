@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 
 object NERPluginManager {
 
-  val plugins = {
+  private val pluginsByClassname = {
     Logger.info("Loading available NER plugins...")
     val serviceLoader = ServiceLoader.load(classOf[NERPlugin], Thread.currentThread().getContextClassLoader)
 
@@ -21,10 +21,12 @@ object NERPluginManager {
     }
   }
 
+  val plugins = pluginsByClassname.map(_._2)
+
   /** I guess there's nothing smart we can do **/
-  def getDefaultEngine(): NERPlugin = plugins.head._2
+  def getDefaultEngine(): NERPlugin = plugins.head
 
   def getEngine(className: String): Option[NERPlugin] = 
-    plugins.find(_._1 == className).map(_._2)
+    pluginsByClassname.find(_._1 == className).map(_._2)
 
 }
