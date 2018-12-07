@@ -14,7 +14,7 @@ import services.user.UserService
 import services.user.Roles._
 import scala.concurrent.{ExecutionContext, Future}
 import transform.JobDefinition
-import transform.georesolution.{GeoresolutionService, GeoresolutionJobDefinition}
+import transform.georesolution.{GeoresolutionService, TableGeoresolutionJobDefinition}
 import transform.ner.{NERService, NERJobDefinition}
 
 @Singleton
@@ -39,7 +39,7 @@ class TaskAPIController @Inject() (
           if (accesslevel.canWrite)
             taskDefinition.taskType match {  
               case TaskType("GEORESOLUTION") =>
-                val definition = Json.fromJson[GeoresolutionJobDefinition](request.body.asJson.get).get
+                val definition = Json.fromJson[TableGeoresolutionJobDefinition](request.body.asJson.get).get
                 georesolution.spawnJob(docInfo.document, docInfo.fileparts, definition)
                 Ok
 

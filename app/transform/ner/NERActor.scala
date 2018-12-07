@@ -40,9 +40,10 @@ class NERActor(
     taskId: UUID
   ) = try {
     val jobDef = definition.map(_.asInstanceOf[NERJobDefinition])
+    val engine = jobDef.map(_.engine)
 
     Logger.info(s"Starting NER on ${part.getId}")
-    val phrases = parseFilepart(doc, part, dir, jobDef.map(_.engine))
+    val phrases = parseFilepart(doc, part, dir, engine)
     
     Logger.info(s"NER completed on ${part.getId}")
     taskService.updateTaskProgress(taskId, 50)

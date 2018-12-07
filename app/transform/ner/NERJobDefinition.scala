@@ -13,7 +13,7 @@ case class NERJobDefinition(
 
 object NERJobDefinition {
 
-  implicit val georesolutionTaskDefinitionReads: Reads[NERJobDefinition] = (
+  implicit val nerJobDefinitionReads: Reads[NERJobDefinition] = (
     (JsPath).read[JobDefinition] and
     (JsPath \ "engine").read[String] and
     (JsPath \ "all_authorities").readNullable[Boolean]

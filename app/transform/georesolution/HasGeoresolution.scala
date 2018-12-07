@@ -45,13 +45,13 @@ trait HasGeoresolution {
   // def getAnchor(resolvable: T, index: Int): String
     
   protected def resolve(
-      document: DocumentRecord,
-      part: DocumentFilepartRecord,
-      resolvables: TraversableOnce[Option[T]],
-      total: Int,
-      taskId: UUID,
-      progressRange: (Int, Int) = (0, 100)
-    )(implicit annotationService: AnnotationService, entityService: EntityService, taskService: TaskService, ctx: ExecutionContext) = {
+    document: DocumentRecord,
+    part: DocumentFilepartRecord,
+    resolvables: TraversableOnce[Option[T]],
+    total: Int,
+    taskId: UUID,
+    progressRange: (Int, Int) = (0, 100)
+  )(implicit annotationService: AnnotationService, entityService: EntityService, taskService: TaskService, ctx: ExecutionContext) = {
     
     val docId = document.getId
     val partId = part.getId

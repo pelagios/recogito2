@@ -102,7 +102,7 @@ define([
                 if (str.trim().length === 0)
                   return undefined;
                 else
-                  return str;
+                  return parseInt(str);
               },
 
               placeColumn = undefinedIfEmpty(body.find('#place-column select').val()),
@@ -118,15 +118,13 @@ define([
 
           jsRoutes.controllers.api.TaskAPIController.spawnJob().ajax({
             data: JSON.stringify({
-              task_type   : 'GEORESOLUTION',
-              documents : [ Config.documentId ],
-              fileparts : [ Config.partId ],
-              args        : {
-                delimiter    : metadata.delimiter,
-                toponym_column : placeColumn,
-                lat_column   : latColumn,
-                lon_column   : lonColumn
-              }
+              task_type     : 'GEORESOLUTION',
+              documents     : [ Config.documentId ],
+              fileparts     : [ Config.partId ],
+              delimiter     : metadata.delimiter,
+              toponym_column: placeColumn,
+              lat_column    : latColumn,
+              lon_column    : lonColumn
             }),
             contentType: 'application/json; charset=utf-8'
           }).success(function(response) {
