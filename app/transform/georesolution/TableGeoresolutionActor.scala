@@ -35,7 +35,7 @@ class TableGeoresolutionActor(
   ) = try {
     val definition = jobDef.get.asInstanceOf[TableGeoresolutionJobDefinition]
     val toponyms = parse(part, dir, definition).toSeq
-    resolve(doc, part, toponyms, toponyms.size, taskId)
+    resolve(doc, part, toponyms, definition, toponyms.size, taskId)
     taskService.setTaskCompleted(taskId)
   } catch { case t: Throwable =>
     t.printStackTrace()

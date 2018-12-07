@@ -46,6 +46,7 @@ trait HasGeoresolution {
     document: DocumentRecord,
     part: DocumentFilepartRecord,
     resolvables: TraversableOnce[Option[T]],
+    jobDef: GeoresolutionJobDefinition,
     total: Int,
     taskId: UUID,
     progressRange: (Int, Int) = (0, 100)
@@ -104,14 +105,13 @@ trait HasGeoresolution {
   }
   
   private def toAnnotation(
-      documentId: String,
-      partId: UUID,
-      contentType: ContentType,
-      resolvable: T,
-      uri: Option[String]
-      // index: Int
-    ): Annotation = {
-    
+    documentId: String,
+    partId: UUID,
+    contentType: ContentType,
+    resolvable: T,
+    uri: Option[String]
+    // index: Int
+  ): Annotation = {
     val now = new DateTime()
     Annotation(
       UUID.randomUUID,

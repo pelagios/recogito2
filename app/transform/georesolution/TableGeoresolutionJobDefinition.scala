@@ -5,8 +5,8 @@ import play.api.libs.functional.syntax._
 import transform.{JobDefinition, SpecificJobDefinition}
 
 case class TableGeoresolutionJobDefinition(
-  val baseDef: JobDefinition,
-  val delimiter: Option[Char],
+  baseDef: JobDefinition,
+  delimiter: Option[Char],
   toponymColumn: Int,
   latitudeColumn: Option[Int],
   longitudeColumn: Option[Int],

@@ -6,7 +6,7 @@ import transform.{JobDefinition, SpecificJobDefinition}
 import transform.georesolution.GeoresolutionJobDefinition
 
 case class NERJobDefinition(
-  val baseDef: JobDefinition,
+  baseDef: JobDefinition,
   engine: String, 
   useAllAuthorities: Boolean,
   specificAuthorities: Seq[String]

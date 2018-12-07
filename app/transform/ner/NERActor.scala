@@ -14,7 +14,7 @@ import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.entity.builtin.EntityService
 import services.task.TaskService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import transform.georesolution.{Georesolvable, HasGeoresolution}
+import transform.georesolution.{Georesolvable, GeoresolutionJobDefinition, HasGeoresolution}
 import transform.{WorkerActor, SpecificJobDefinition}
 
 case class EntityResolvable(entity: Entity, val anchor: String, val uri: Option[URI]) extends Georesolvable {
@@ -51,7 +51,12 @@ class NERActor(
     val places = phrases.filter(_.entity.entityType == EntityType.LOCATION).map(Some(_))
     val persons = phrases.filter(_.entity.entityType == EntityType.PERSON)     
     
-    resolve(doc, part, places, places.size, taskId, (50, 80))
+    val resolutionDefinition: GeoresolutionJobDefinition = 
+      jobDef.getOrElse(
+        GeoresolutionJobDefinition.default(Seq(doc.getId), Seq(part.getId))
+      )
+
+    resolve(doc, part, places, resolutionDefinition, places.size, taskId, (50, 80))
     
     val fInsertPeople = annotationService.upsertAnnotations(persons.map { r => 
       Annotation
