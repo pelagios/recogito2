@@ -21,6 +21,25 @@ require([
         phraseAnnotator = new PhraseAnnotator(contentNode, highlighter);
 
     new BaseTextApp(contentNode, highlighter, selector, phraseAnnotator);
+
+    // TODO for testing!
+    var options = {
+      root: null, // viewport
+      threshold: 1.0
+    };
+
+    var callback = function(entries) {
+      if (entries[0].isIntersecting) {
+        console.log('visible!');
+        console.log(entries);
+      }
+    };
+    
+    var targets = document.querySelectorAll('.visibility-marker');
+    for(var i=0; i<targets.length; i++) {
+      var observer = new IntersectionObserver(callback, options);
+      observer.observe(targets[i]);
+    }
   });
 
 });

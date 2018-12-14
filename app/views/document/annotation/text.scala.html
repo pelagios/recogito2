@@ -132,7 +132,9 @@
     </div> <!-- .sidebar -->
 
     <div id="main">
-      <div id="content" @doc.language.map(l => Html(s"""lang="${l}""""))>@content</div>
+      <div id="content" @doc.language.map(l => Html(s"""lang="${l}""""))>@content.split("\n\n").map{paragraph =>@paragraph<div class="visibility-marker"></div>
+
+}</div>
       <svg id="relations"></svg>
     </div>
 
