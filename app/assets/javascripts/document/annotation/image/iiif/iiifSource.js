@@ -64,7 +64,7 @@ define([], function() {
    */
   var IIIFSource = function(options) {
 
-        baseUrl = options.baseUrl,
+    var baseUrl = options.baseUrl,
 
         extension = options.extension || 'jpg',
 
