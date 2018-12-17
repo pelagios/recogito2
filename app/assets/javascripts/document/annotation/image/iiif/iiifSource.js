@@ -3,8 +3,37 @@
  * https://raw.githubusercontent.com/klokantech/iiifviewer/master/src/iiifsource.js
  *
  * Please note below license text for KlokanTech's IIIFViewer.
+ * 
+ * UPDATE Dec 17, 2018: ported IIIF view layer fix provided by Lutz Helm:
+ * https://github.com/klokantech/iiifviewer/issues/23
  */
 define([], function() {
+
+  /** Check if provided resolutions are consecutive powers to 2 **/
+  var isResolutionsValid = function(resolutions) { 
+        var valid = true;
+
+        for (var i=0; i< resolutions.length; i++) {
+          if (Math.pow(2, i) != resolutions[i]) {
+            valid = false;
+            break;
+          }
+        }
+
+        return valid;
+      },
+
+      /** Provides a proper set of valid resolution levels **/
+      standardResolutions = function(maxZoom) {
+        var resolutions = [];
+        for (var i=0; i <= maxZoom; i++) {
+          resolutions.push(Math.pow(2, i));
+        }
+      },
+
+      ceil_log2 = function(x) {
+        return Math.ceil(Math.log(x) / Math.LN2);
+      };
 
   /**
    * Copyright 2014-2015 Klokan Technologies GmbH (http://www.klokantech.com). All rights reserved.
@@ -35,7 +64,7 @@ define([], function() {
    */
   var IIIFSource = function(options) {
 
-    var baseUrl = options.baseUrl,
+        baseUrl = options.baseUrl,
 
         extension = options.extension || 'jpg',
 
@@ -47,14 +76,33 @@ define([], function() {
 
         tileSize = options.tileSize || 256,
 
-        maxZoom = Math.ceil(Math.log2(Math.ceil(Math.max(width, height) / tileSize))),
+        // Sort resolutions because the spec does not specify any order 
+        resolutions = options.resolutions.sort(function(a, b) {
+          return a - b;
+        }),
+
+        maxZoom = (function() {
+          if (resolutions.length > 0 && isResolutionsValid(resolutions)) {
+            var maxScaleFactor = Math.max.apply(null, resolutions);
+            return Math.round(Math.log(maxScaleFactor) / Math.LN2);
+          } else {
+            var maxZoom = Math.max(
+              ceil_log2(width / tileSize),
+              ceil_log2(height / tileSize)
+            );
+
+            // Somewhat ugly due to side-effecting code
+            resolutions = standardResolutions(maxZoom);
+            return maxZoom;
+          }
+        })(),
 
         tilePixelRatio = Math.min((window.devicePixelRatio || 1), 4),
 
         logicalTileSize = tileSize / tilePixelRatio,
 
-        logicalResolutions = (tilePixelRatio == 1) ? options.resolutions :
-          options.resolutions.map(function(el, i, arr) {
+        logicalResolutions = (tilePixelRatio == 1) ? resolutions :
+          resolutions.map(function(el, i, arr) {
             return el * tilePixelRatio;
           }),
 
