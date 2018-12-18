@@ -54,6 +54,10 @@ libraryDependencies ++= Seq(
 
   "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1",
   "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1" classifier "models",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1" classifier "models-english",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1" classifier "models-french",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1" classifier "models-german",
+  "edu.stanford.nlp" % "stanford-corenlp" % "3.9.1" classifier "models-spanish",
 
   "eu.bitwalker" % "UserAgentUtils" % "1.20",
 

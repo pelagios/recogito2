@@ -1,2 +1,2 @@
--J-Xms512M
--J-Xmx3536M
+-J-Xms3536M
+-J-Xmx5304M

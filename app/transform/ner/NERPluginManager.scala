@@ -16,7 +16,7 @@ object NERPluginManager {
     Logger.info("Successfully loaded " + plugins.size + " NER plugins:")
 
     plugins.map { plugin => 
-      Logger.info("  " + plugin.getName)
+      Logger.info(s"  ${plugin.getName} (${plugin.getSupportedLanguages.asScala.mkString})")
       (plugin.getClass.getName -> plugin)
     }
   }

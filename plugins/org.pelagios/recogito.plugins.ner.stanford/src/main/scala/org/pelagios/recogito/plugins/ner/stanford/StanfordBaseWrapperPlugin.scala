@@ -3,6 +3,7 @@ package org.pelagios.recogito.plugins.ner.stanford
 import java.util.{ArrayList, Properties}
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.{CoreDocument, StanfordCoreNLP}
+import edu.stanford.nlp.util.StringUtils
 import org.pelagios.recogito.sdk.ner._
 import scala.collection.JavaConverters._
 import org.slf4j.LoggerFactory
@@ -10,7 +11,11 @@ import org.slf4j.LoggerFactory
 case class StanfordEntity(chars: String, entityTag: String, charOffset: Int)
 
 /** A Recogito plugin providing a wrapper around Stanford NER **/
-class StanfordNERWrapperPlugin extends NERPlugin {
+abstract class StanfordBaseWrapperPlugin(
+  lang: String,
+  config: String,
+  description: String
+) extends NERPlugin {
   
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -21,21 +26,21 @@ class StanfordNERWrapperPlugin extends NERPlugin {
     case _ => None
   }
   
-  private lazy val props = { 
-    val p = new Properties()
-    p.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner")
-    p
+  private lazy val props = {
+    val props = StringUtils.argsToProperties(Seq("-props", config):_*)
+    props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner")
+    props
   }
   
   override val getName = "Stanford CoreNLP"
   
-  override val getDescription = "The standard engine with the default English language model"
+  override val getDescription = description
   
   override val getOrganization = "Stanford NLP Group"
   
   override val getVersion = "3.9.1"
   
-  override val getSupportedLanguages = Seq("en").asJava
+  override val getSupportedLanguages = Seq(lang).asJava
   
   override def parse(text: String) = {
     logger.info("Initializing NER pipeline")
@@ -59,6 +64,8 @@ class StanfordNERWrapperPlugin extends NERPlugin {
           StanfordEntity(chars, entityTag, charOffset) +: result
       }
     }
+
+    StanfordCoreNLP.clearAnnotatorPool
 
     entities.withFilter(_.entityTag != "O")
       .flatMap(e => toEntityType(e.entityTag).map(etype => new Entity(e.chars, etype, e.charOffset))).asJava

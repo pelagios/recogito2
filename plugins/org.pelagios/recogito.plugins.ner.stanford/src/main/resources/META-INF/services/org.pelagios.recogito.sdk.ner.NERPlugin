@@ -1,1 +1,4 @@
-org.pelagios.recogito.plugins.ner.stanford.StanfordNERWrapperPlugin
+org.pelagios.recogito.plugins.ner.stanford.StanfordCoreNLPEnglish
+org.pelagios.recogito.plugins.ner.stanford.StanfordCoreNLPFrench
+org.pelagios.recogito.plugins.ner.stanford.StanfordCoreNLPGerman
+org.pelagios.recogito.plugins.ner.stanford.StanfordCoreNLPSpanish
