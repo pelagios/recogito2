@@ -23,7 +23,7 @@ trait RelationService { self: AnnotationService =>
             termQuery("annotates.document_id" -> id),
             existsQuery("relations.relates_to")
           )
-      }
+      } limit limit
     } map { _.to[(Annotation, Long)].toSeq.map(_._1) }
 
     // Takes a list of source annotations, inspects destination Ids, and returns
