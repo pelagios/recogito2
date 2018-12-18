@@ -16,7 +16,7 @@ object WebAnnotation extends HasDate {
     (JsPath \ "@context").write[String] and
     (JsPath \ "id").write[String] and
     (JsPath \ "type").write[String] and
-    (JsPath \ "generator").write[String] and
+    (JsPath \ "generator").write[Generator] and
     (JsPath \ "generated").write[DateTime] and
     (JsPath \ "body").write[Seq[WebAnnotationBody]] and
     (JsPath \ "target").write[WebAnnotationTarget]
@@ -24,7 +24,7 @@ object WebAnnotation extends HasDate {
     "http://www.w3.org/ns/anno.jsonld",
     s"${a.recogitoBaseURI}annotation/${a.annotation.annotationId}",
     "Annotation",
-    a.recogitoBaseURI,
+    Generator(a.recogitoBaseURI),
     DateTime.now,
     a.annotation.bodies.flatMap(b => WebAnnotationBody.fromAnnotationBody(b, a.recogitoBaseURI)),
     WebAnnotationTarget.fromAnnotation(a.filepart, a.annotation)
