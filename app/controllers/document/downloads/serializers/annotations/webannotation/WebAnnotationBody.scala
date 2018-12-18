@@ -7,8 +7,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 case class WebAnnotationBody(
-  hasType : Option[WebAnnotationBody.Value],
-  id      : Option[String], 
+  hasType : WebAnnotationBody.Value,
   value   : Option[String],
   note    : Option[String],
   creator : Option[String],
@@ -19,6 +18,8 @@ case class WebAnnotationBody(
 object WebAnnotationBody extends Enumeration with HasDate {
   
   val TextualBody = Value("TextualBody")
+
+  val SpecificResource = Value("SpecificResource")
   
   /** Note we don't explicitely serialize QUOTE bodies **/
   def fromAnnotationBody(b: AnnotationBody, recogitoBaseURI: String): Option[WebAnnotationBody] = {
@@ -26,8 +27,8 @@ object WebAnnotationBody extends Enumeration with HasDate {
     import AnnotationBody._
     
     val hasType = b.hasType match {
-      case COMMENT | TAG | QUOTE | TRANSCRIPTION => Some(TextualBody)
-      case _ => None
+      case COMMENT | TAG | QUOTE | TRANSCRIPTION => TextualBody
+      case _ => SpecificResource
     }
     
     val purpose = b.hasType match {
@@ -43,8 +44,7 @@ object WebAnnotationBody extends Enumeration with HasDate {
     else
       Some(WebAnnotationBody(
         hasType,
-        b.uri,
-        b.value,
+        Seq(b.uri, b.value).flatten.headOption,
         b.note,
         b.lastModifiedBy.map(by => recogitoBaseURI + by),
         b.lastModifiedAt,
@@ -52,8 +52,7 @@ object WebAnnotationBody extends Enumeration with HasDate {
   }
   
   implicit val webAnnotationBodyWrites: Writes[WebAnnotationBody] = (
-    (JsPath \ "type").writeNullable[WebAnnotationBody.Value] and
-    (JsPath \ "id").writeNullable[String] and
+    (JsPath \ "type").write[WebAnnotationBody.Value] and
     (JsPath \ "value").writeNullable[String] and
     (JsPath \ "note").writeNullable[String] and
     (JsPath \ "creator").writeNullable[String] and
