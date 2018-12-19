@@ -7,6 +7,7 @@ import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.mvc.ControllerComponents
+import plugins.PluginRegistry
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import services.document.DocumentService
@@ -41,6 +42,13 @@ class PluginAPIController @Inject() (
   def listNERPlugins = Action { implicit request =>
     val plugins = NERPluginManager.plugins
     jsonOk(Json.toJson(plugins))
+  }
+
+  def loadPlugin(extensionPoint: String, className: String) = Action.async { implicit request =>
+    PluginRegistry.loadPlugin(extensionPoint, className).map { _ match {
+      case Some(js) => Ok(js).as("application/javascript")
+      case None => NotFound 
+    }}
   }
 
 }

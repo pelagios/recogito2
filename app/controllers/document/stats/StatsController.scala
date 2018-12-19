@@ -41,7 +41,7 @@ class StatsController @Inject() (
   private val CSV_CONFIG = CsvConfiguration(',', '"', QuotePolicy.WhenNeeded, Header.None)
   
   // TODO DUMMY!
-  private val plugins = PluginRegistry.getPlugins("js.stats")
+  private val plugins = PluginRegistry.listConfigs("js.stats")
   
   implicit val tuple2Writes: Writes[Tuple2[String, Long]] = (
     (JsPath \ "value").write[String] and

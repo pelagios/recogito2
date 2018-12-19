@@ -3,6 +3,8 @@ package plugins
 import com.typesafe.config.{Config, ConfigFactory}
 import java.io.File
 import play.api.Logger
+import scala.concurrent.{ExecutionContext, Future}
+import scala.io.Source
 
 object PluginRegistry {
   
@@ -10,9 +12,15 @@ object PluginRegistry {
 
   Logger.info("Loading plugin configurations:")
   
-  private val configs: Seq[Config] = findFilesRecursive("plugin.conf", PLUGIN_DIR).map(ConfigFactory.parseFile(_))
+  private val configs: Seq[(Config, File)] = 
+    findFilesRecursive("plugin.conf", PLUGIN_DIR)
+      .map { file => 
+        val config = ConfigFactory.parseFile(file) 
+        val dir = file.getParentFile
+        (config, dir)
+      }
   
-  configs.foreach { c =>
+  configs.foreach { case (c, dir) =>
     Logger.info(s"  ${c.getString("extends")}.${c.getString("title")}")
   }
   
@@ -30,7 +38,22 @@ object PluginRegistry {
     matchingFiles ++ dirs.flatMap(dir => findFilesRecursive(name, dir))
   }
           
-  def getPlugins(extensionPoint: String): Seq[Config] =
-    configs.filter(c => c.getString("extends") == extensionPoint)
+  def listConfigs(extensionPoint: String): Seq[Config] =
+    configs
+      .filter(_._1.getString("extends").equalsIgnoreCase(extensionPoint))
+      .map(_._1)
+
+  def loadPlugin(extensionPoint: String, className: String)(implicit ctx: ExecutionContext): Future[Option[String]] =
+    scala.concurrent.blocking {
+      Future {
+        configs.find { case (config, dir) => 
+          config.getString("extends").equalsIgnoreCase(extensionPoint) &&
+          config.getString("className").equalsIgnoreCase(className)
+        } map { case (config, dir) => 
+          val pluginFile = new File(dir, "plugin.js")
+          Source.fromFile(pluginFile).getLines.mkString("\n")
+        }
+      }
+    }
   
 }

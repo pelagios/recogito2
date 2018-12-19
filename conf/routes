@@ -212,8 +212,9 @@ POST    /api/job                                    controllers.api.TaskAPIContr
 GET     /api/job                                    controllers.api.TaskAPIController.progressByDocument(id: String)
 GET     /api/job/:id                                controllers.api.TaskAPIController.getJobProgress(id: java.util.UUID)
 
-# ~~~ NER plugins ~~~
-GET     /api/plugins/ner                             controllers.api.PluginAPIController.listNERPlugins
+# ~~~ Plugins ~~~
+GET     /api/plugins/ner                            controllers.api.PluginAPIController.listNERPlugins
+GET     /api/plugins/js/:point/:className           controllers.api.PluginAPIController.loadPlugin(point: String, className: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings
