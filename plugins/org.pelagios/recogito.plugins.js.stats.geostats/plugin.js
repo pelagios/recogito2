@@ -12,13 +12,13 @@ plugins.PlaceStats = function(args) {
 
     return jQuery(
       '<table>' +
-        '<tr><td>Annotations total:</td><td>' + annotationsTotal + '</td></tr>' +
-        '<tr><td>Places total:</td><td>' + placesTotal + '</td></tr>' +
-        '<tr><td>Average distance (characters):</td><td>' + avgCharDistance + '</td></tr>' +
-        '<tr><td>Standard deviation:</td><td>' + charDistanceStdDeviation + '</td></tr>' +
-        '<tr><td>Resolved places total:</td><td>' + resolvedPlacesTotal + '</td></tr>' +
-        '<tr><td>Average centroid distance (km):</td><td>' + avgGeoDistance + '</td></tr>' +
-        '<tr><td>Standard deviation:</td><td>' + geoDistnaceStdDeviation + '</td></tr>' +
+        '<tr><td>Annotations total</td><td>' + annotationsTotal + '</td></tr>' +
+        '<tr><td>Places total</td><td>' + placesTotal + '</td></tr>' +
+        '<tr><td>Average distance (characters):</td><td>' + avgCharDistance.toFixed(2) + '</td></tr>' +
+        '<tr><td>Standard deviation</td><td>' + charDistanceStdDeviation.toFixed(2) + '</td></tr>' +
+        '<tr><td>Resolved places total</td><td>' + resolvedPlacesTotal + '</td></tr>' +
+        '<tr><td>Average centroid distance (km)</td><td>' + avgGeoDistance.toFixed(2) + '</td></tr>' +
+        '<tr><td>Standard deviation</td><td>' + geoDistnaceStdDeviation.toFixed(2) + '</td></tr>' +
       '</table>');
   };
       
