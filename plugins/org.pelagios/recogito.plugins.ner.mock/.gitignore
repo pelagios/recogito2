@@ -1,7 +1,0 @@
-target/classes
-target/resolution-cache
-target/streams
-project/target
-.classpath
-.project
-.cache-*
