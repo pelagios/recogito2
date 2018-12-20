@@ -1,4 +1,4 @@
-plugins.GeoStats = function(args) {
+plugins.PlaceStats = function(args) {
 
   var render = function(
         annotationsTotal,
@@ -182,7 +182,7 @@ plugins.GeoStats = function(args) {
         avgGeoDistance = sum(geoDistances) / geoDistances.length;
         geoDistancesStdDeviation = getStdDeviation(geoDistances, avgGeoDistance);
 
-    jQuery('#GeoStats').append(
+    jQuery('#placestats').append(
       render(
         args.annotations.length,
         placeAnnotations.length,

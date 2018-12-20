@@ -21,7 +21,7 @@ object PluginRegistry {
       }
   
   configs.foreach { case (c, dir) =>
-    Logger.info(s"  ${c.getString("extends")}.${c.getString("title")}")
+    Logger.info(s"  ${c.getString("extends")}.${c.getString("id")}")
   }
   
   Logger.info(s"${configs.size} configurations found")
@@ -43,17 +43,23 @@ object PluginRegistry {
       .filter(_._1.getString("extends").equalsIgnoreCase(extensionPoint))
       .map(_._1)
 
-  def loadPlugin(extensionPoint: String, className: String)(implicit ctx: ExecutionContext): Future[Option[String]] =
+  private def readFile(extensionPoint: String, id: String, filename: String)(implicit ctx: ExecutionContext) =
     scala.concurrent.blocking {
       Future {
         configs.find { case (config, dir) => 
           config.getString("extends").equalsIgnoreCase(extensionPoint) &&
-          config.getString("className").equalsIgnoreCase(className)
+          config.getString("id").equalsIgnoreCase(id)
         } map { case (config, dir) => 
-          val pluginFile = new File(dir, "plugin.js")
-          Source.fromFile(pluginFile).getLines.mkString("\n")
+          val file = new File(dir, filename)
+          Source.fromFile(file).getLines.mkString("\n")
         }
       }
-    }
-  
+    }  
+
+  def loadPlugin(extensionPoint: String, id: String)(implicit ctx: ExecutionContext): Future[Option[String]] =
+    readFile(extensionPoint, id, "plugin.js")
+
+  def loadCSS(extensionPoint: String, id: String)(implicit ctx: ExecutionContext): Future[Option[String]] =
+    readFile(extensionPoint, id, "plugin.css")
+
 }

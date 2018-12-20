@@ -214,7 +214,8 @@ GET     /api/job/:id                                controllers.api.TaskAPIContr
 
 # ~~~ Plugins ~~~
 GET     /api/plugins/ner                            controllers.api.PluginAPIController.listNERPlugins
-GET     /api/plugins/js/:point/:className           controllers.api.PluginAPIController.loadPlugin(point: String, className: String)
+GET     /api/plugins/js/:ext/:id.js                 controllers.api.PluginAPIController.loadPlugin(ext: String, id: String)
+GET     /api/plugins/js/:ext/:id.css                controllers.api.PluginAPIController.loadCSS(ext: String, id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings

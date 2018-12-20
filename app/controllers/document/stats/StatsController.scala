@@ -39,10 +39,7 @@ class StatsController @Inject() (
     with I18nSupport {
   
   private val CSV_CONFIG = CsvConfiguration(',', '"', QuotePolicy.WhenNeeded, Header.None)
-  
-  // TODO DUMMY!
-  private val plugins = PluginRegistry.listConfigs("js.stats")
-  
+    
   implicit val tuple2Writes: Writes[Tuple2[String, Long]] = (
     (JsPath \ "value").write[String] and
     (JsPath \ "count").write[Long]
@@ -60,17 +57,21 @@ class StatsController @Inject() (
     documentReadResponse(documentId, request.identity,  { case (doc, accesslevel) =>
       logDocumentView(doc.document, None, accesslevel)      
       tab.map(_.toLowerCase) match {
-        case Some(t) if t == "activity" =>
-          Future.successful(Ok(views.html.document.stats.activity(doc, request.identity, accesslevel)))
+        case Some(t) if t == "activity" =>  
+          val plugins = PluginRegistry.listConfigs("document.stats.activity")
+          Future.successful(Ok(views.html.document.stats.activity(doc, request.identity, accesslevel, plugins)))
           
         case Some(t) if t == "entities" =>
-          Future.successful(Ok(views.html.document.stats.entities(doc, request.identity, accesslevel)))
+          val plugins = PluginRegistry.listConfigs("document.stats.entities")
+          Future.successful(Ok(views.html.document.stats.entities(doc, request.identity, accesslevel, plugins)))
           
         case Some(t) if t == "tags" =>
+          val plugins = PluginRegistry.listConfigs("document.stats.tags")
           Future.successful(Ok(views.html.document.stats.tags(doc, request.identity, accesslevel, plugins)))
           
         case _ =>
-          Future.successful(Ok(views.html.document.stats.activity(doc, request.identity, accesslevel)))
+          val plugins = PluginRegistry.listConfigs("document.stats.activity")
+          Future.successful(Ok(views.html.document.stats.activity(doc, request.identity, accesslevel, plugins)))
       }
     })
   }

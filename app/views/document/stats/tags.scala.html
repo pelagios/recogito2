@@ -5,12 +5,7 @@
   p: Seq[plugins.PluginConf]
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
-@_layout("Tag Statistics", doc, currentUser, accessLevel, Some("tags")) {
-  <script>
-    window.config = { documentId: '@doc.id' }
-    window.plugins = {}
-  </script>
-
+@_layout("Tag Statistics", doc, currentUser, accessLevel, Some("tags"), p) {
   <div class="panel">
     <h2>Overall tag use <span class="tags-total"></h2>
     <div class="inner">
@@ -20,14 +15,6 @@
       </p>
     </div>
   </div>
-
-  @for(plugin <- p) {
-    <div class="panel">
-      <h2>@plugin.getString("title")</h2>
-      <div class="inner" id="@plugin.getString("className")"></div>
-      <script src="@controllers.api.routes.PluginAPIController.loadPlugin(plugin.getString("extends"), plugin.getString("className"))"></script>
-    </div>
-  }
 
   @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/stats/tags.js")))
 

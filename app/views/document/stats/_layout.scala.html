@@ -3,17 +3,26 @@
   doc: services.document.DocumentInfo,
   currentUser: Option[services.user.User],
   accessLevel: services.document.RuntimeAccessLevel,
-  activeTab: Option[String]
+  activeTab: Option[String],
+  p: Seq[plugins.PluginConf]
 )(content: Html)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 <!DOCTYPE html>
 <html>
   <head>
     <title>@title | @doc.author.map(_ + ": ")@doc.title</title>
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/stats/index.css")"/>
+    @for(plugin <- p) {
+      <link rel="stylesheet" href="@controllers.api.routes.PluginAPIController.loadCSS(plugin.getString("extends"), plugin.getString("id"))" />
+    }
     @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
     @Html(webJarsUtil.script("numeral.min.js"))
   </head>
   <body>
+    <script>
+      window.config = { documentId: '@doc.id' }
+      window.plugins = {}
+    </script>
+
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "stats")
 
     <div class="sidebar">
@@ -42,6 +51,14 @@
 
     <div class="content">
       @content
+
+      @for(plugin <- p) {
+        <div class="panel">
+          <h2>@plugin.getString("title")</h2>
+          <div class="inner" id="@plugin.getString("id")"></div>
+          <script src="@controllers.api.routes.PluginAPIController.loadPlugin(plugin.getString("extends"), plugin.getString("id"))"></script>
+        </div>
+      }
     </div>
   </body>
 </html>

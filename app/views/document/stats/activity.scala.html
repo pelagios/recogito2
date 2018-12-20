@@ -1,9 +1,10 @@
 @(
   doc: services.document.DocumentInfo,
   currentUser: Option[services.user.User],
-  accessLevel: services.document.RuntimeAccessLevel
+  accessLevel: services.document.RuntimeAccessLevel,
+  p: Seq[plugins.PluginConf]
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
-@_layout("Activity Statistics", doc, currentUser, accessLevel, Some("activity")) {
+@_layout("Activity Statistics", doc, currentUser, accessLevel, Some("activity"), p) {
   <p class="empty">The document annotations stats page is still under construction. Bear with us.</p>
 }

@@ -20,6 +20,7 @@ require.config({
     { name : 'document/settings/preferences' },
     { name : 'document/settings/history' },
     { name : 'document/settings/sharing' },
+    { name : 'document/stats/entities' },
     { name : 'document/stats/tags' },
     { name : 'help/tutorial'},
     { name : 'help/articles'},

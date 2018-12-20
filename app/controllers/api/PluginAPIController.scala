@@ -44,10 +44,17 @@ class PluginAPIController @Inject() (
     jsonOk(Json.toJson(plugins))
   }
 
-  def loadPlugin(extensionPoint: String, className: String) = Action.async { implicit request =>
-    PluginRegistry.loadPlugin(extensionPoint, className).map { _ match {
+  def loadPlugin(ext: String, id: String) = Action.async { implicit request =>
+    PluginRegistry.loadPlugin(ext, id).map { _ match {
       case Some(js) => Ok(js).as("application/javascript")
       case None => NotFound 
+    }}
+  }
+
+  def loadCSS(ext: String, id: String) = Action.async { implicit request => 
+    PluginRegistry.loadCSS(ext, id).map { _ match {
+      case Some(css) => Ok(css).as("text/css")
+      case None => NotFound
     }}
   }
 

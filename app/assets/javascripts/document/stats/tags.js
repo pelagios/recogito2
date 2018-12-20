@@ -4,31 +4,14 @@ require.config({
 });
 
 require([
-  'common/api',
   'common/config',
+  'common/plugins',
   'common/ui/formatting'
-], function(API, Config, Formatting) {
+], function(Config, Plugins, Formatting) {
 
   jQuery(document).ready(function() {
 
-    var initPlugins = function() {
-          Promise.all([
-            API.listAnnotationsInDocument(Config.documentId),
-            API.listPlacesInDocument(Config.documentId, 0, 10000)
-          ]).then(function(values) {
-            var args = {
-              annotations: values[0],
-              entities: values[1].items
-            };
-
-            for (var name in window.plugins) {
-              if (window.plugins.hasOwnProperty(name))
-                window.plugins[name](args);
-            }
-          });
-        },
-
-        loadTags = function() {
+    var loadTags = function() {
           return jsRoutes.controllers.document.stats.StatsController.getTagsAsJSON(Config.documentId).ajax();
         },
 
@@ -67,7 +50,7 @@ require([
         jQuery('.tags-by-count'),
         jQuery('.tags-total')
       ))
-      .then(initPlugins);
+      .then(Plugins.init);
   });
 
 });
