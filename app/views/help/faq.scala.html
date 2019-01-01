@@ -1,4 +1,6 @@
-@()(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
+@(
+  gazetteers: Seq[services.generated.tables.records.AuthorityFileRecord]
+)(implicit request: RequestHeader, webJarsUtil: org.webjars.play.WebJarsUtil)
 @_layout(
   "FAQ",
   "Recogito FAQ",
@@ -114,11 +116,16 @@
       <h2 id="available-gazetteers">Which gazetteers are available in Recogito?</h2>
       <p>The following gazetteers are currently available:</p>
       <ul>
-        <li><a href="http://pleiades.stoa.org" target="_blank">Pleiades Gazetteer of the Ancient World</a></li>
-        <li>Places published by the <a href="http://dare.ht.lu.se/" target="_blank">Digital Atlas of the
-          Roman Empire (DARE)</a></li>
-        <li>A <a href="http://github.com/pelagios/recogito2-places-geonames" target="_blank">subset of GeoNames</a></li>
-        <li>Places from the <a href="http://maps.cga.harvard.edu/chgis/" target="_blank">China Historical GIS</a></li>
+        @for(g <- gazetteers) {
+          <li>
+            @if(g.getHomepage == null) {
+              @g.getShortname
+            } else {
+              <a href="@g.getHomepage" target="_blank">@g.getShortname</a>
+            } -
+            @g.getFullname
+          </li>
+        }
       </ul>
 
       <h2 id="which-gazetteer">How do I know which gazetteer to use?</h2>

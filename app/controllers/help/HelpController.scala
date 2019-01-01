@@ -7,17 +7,21 @@ import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Environment}
 import play.api.mvc.{Action, AbstractController, ControllerComponents, RequestHeader}
 import play.twirl.api.HtmlFormat
+import scala.concurrent.ExecutionContext
 import scala.io.Source
 import scala.util.Try
+import services.entity.{AuthorityFileService, EntityType}
 
 @Singleton
 class HelpController @Inject() (
-    val components: ControllerComponents,
-    val config: Configuration,
-    val env: Environment,
-    implicit val visits: VisitService,
-    implicit val webjars: WebJarsUtil
-  ) extends AbstractController(components) with HasVisitLogging {
+  val authorities: AuthorityFileService,
+  val components: ControllerComponents,
+  val config: Configuration,
+  val env: Environment,
+  implicit val ctx: ExecutionContext,
+  implicit val visits: VisitService,
+  implicit val webjars: WebJarsUtil
+) extends AbstractController(components) with HasVisitLogging {
 
   private val adminEmail = config.get[String]("admin.email")
   private val imprint =
@@ -41,10 +45,15 @@ class HelpController @Inject() (
     }
   }
 
+  def faq = Action.async { implicit request => 
+    authorities.listAll(Some(EntityType.PLACE)).map { gazetteers =>
+      result(views.html.help.faq(gazetteers)) 
+    }
+  }
+
   def index     = Action { implicit request => result(views.html.help.index()) }
 
   def about        = Action { implicit request => result(views.html.help.general.about(imprint, adminEmail)) }
-  def faq          = Action { implicit request => result(views.html.help.faq()) }
   def privacy      = Action { implicit request => result(views.html.help.general.privacy(adminEmail)) }
   def relations    = Action { implicit request => result(views.html.help.relations()) }
   def sharingLinks = Action { implicit request => result(views.html.help.sharing_links()) }
