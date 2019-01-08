@@ -12,7 +12,7 @@
     "axios": "0.18.0",
     "react": "16.4.1",
     "react-color": "2.14.1",
-    "react-dom": "16.4.1",
+    "react-dom": ">=16.4.2",
     "react-draggable": "3.0.5",
     "react-transition-group": "2.4.0"
   },
