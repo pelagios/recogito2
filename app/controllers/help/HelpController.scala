@@ -59,5 +59,6 @@ class HelpController @Inject() (
   def sharingLinks = Action { implicit request => result(views.html.help.sharing_links()) }
   def terms        = Action { implicit request => result(views.html.help.general.terms()) }
   def tutorial     = Action { implicit request => result(views.html.help.tutorial.tutorial()) }
+  def workspace    = Action { implicit request => result(views.html.help.workspace()) }
 
 }

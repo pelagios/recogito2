@@ -31,6 +31,7 @@ GET     /help/relations                              controllers.help.HelpContro
 GET     /help/sharing-links                          controllers.help.HelpController.sharingLinks
 GET     /help/terms                                  controllers.help.HelpController.terms
 GET     /help/tutorial                               controllers.help.HelpController.tutorial
+GET     /help/workspace                              controllers.help.HelpController.workspace
 GET     /help/:lang/tutorial                         controllers.help.HelpController.localizedTutorial(lang: String)
 GET     /help                                        controllers.help.HelpController.index
 
