@@ -45,11 +45,11 @@ landing.index.registration_form.disclaimer.text=Agree to our <a href="{0}">Terms
   and the storage of your E-Mail address.
 
 # News
-landing.index.news.title=Join our new mailing list!
+landing.index.news.title=Join our mailing list!
 landing.index.news.subtitle=
 landing.index.news.text=All Pelagios resources are community-driven. Get the latest news, join the discussion \
   and help improve our resources by <a href="https://groups.google.com/d/forum/pelagios-announcements/">signing up to our \
-  new mailing list</a>.
+  mailing list</a>.
 
 # Tiles
 landing.index.tiles.1.title=Shared Collections
