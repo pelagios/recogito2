@@ -1,32 +1,34 @@
 @()(implicit request: RequestHeader)
 @_layout(
-  "Recogito Workspace",
-  "Recogito Workspace",
+  "Recogito Workspace Overview",
+  "Recogito Workspace Overview",
   "Learn what's new in Recogito's updated document management workspace.",
   "en"
 ) {
-  <h1>Workspace</h1>
+  <h1>Workspace Overview</h1>
   <span class="sub-title">
     <span class="icon">&#xf017;</span> 
-    Introducing the new document management interface
+    Introducing our new document management interface
   </span>
 } {
   <div class="article has-sidebar">
     <div class="inner">
+      <p>
+        We recently updated our document management interface. The
+        <strong>new workspace</strong> brings more than just a fresh look. It 
+        introduces a number of additional features and navigation enhancements.
+      </p>
+
       <h2>What's New?</h2>
-      <!-- p>
-        Apart from a complete facelift and navigation enhancements (such 
-        as more findable links to the help section):
-      </p -->
       <ul>
         <li>
-          <strong>Folders:</strong> organize your workspace into folders 
-          and sub-folders.
+          <strong>Folders:</strong> create folders and sub-folders to organize 
+          your documents into collections.
         </li>
         
         <li>
-          <strong>Readmes:</strong> add descriptive text to your 
-          folders to serve as a guide or welcome message.
+          <strong>Folder readmes:</strong> add descriptive text to your 
+          folders to serve as a guide or welcome message to others.
         </li>
 
         <li>
@@ -38,26 +40,26 @@
         <li>
           <strong>Configurable NER:</strong> Named Entity Recognition is now 
           available for multiple languages (English, Spanish, French, German
-          - for now), and you can choose the gazetteers Recogito should use
+          - for now). You can also select which gazetteers Recogito should use
           for geo-resolution.
         </li>
 
         <li>
-          <strong>Customizable document table:</strong> got a huge monitor? 
+          <strong>Table customization:</strong> got a huge monitor? 
           Or a small tablet? No problem - choose the metadata that appears 
           in the document list to suit your needs and screen size. 
         </li>
 
         <li>
           <strong>More table column types:</strong> to complement the configurable
-          table view, we added new column types to add to your workspace - such as 
-          the <strong>Verification Ratio</strong> showing the rate of verified vs. unverified 
-          annotations.
+          table view, we added new column types you can add to your workspace - such as 
+          the <strong>Verification Ratio widget</strong>, which shows the rate of 
+          verified vs. unverified annotations.
         </li>
 
         <li>
-          <strong>Document grid view:</strong> bored with the table view? Check out the 
-          our new grid view.
+          <strong>Grid layout:</strong> bored with the table view? Check out
+          our new grid layout.
         </li>
 
         <li>
@@ -66,10 +68,102 @@
         </li>
 
         <li>
-          <strong>Collaborator Quicklinks:</strong> see who you've been collaborating most 
-          recently in your workspace sidebar.
+          <strong>Collaborator Quicklinks:</strong> see who you've been annotating with most 
+          recently.
         </li>
       </ul>
+
+      <h2>Guided Tour</h2>
+      <p>
+        Some of the things you might be familiar with from the old document management interface
+        now work in a slightly different way. Here's quick guided tour of key features of the new
+        user interface.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/new-workspace.png")">
+      </p>
+
+      <h3>Import documents</h3>
+      <p>
+        Click the <strong>New</strong> button in the sidebar - or simply drag and drop one or more 
+        files into the document pane. Keep in mind that if you upload multiple files, Recogito will 
+        create one document with multiple parts.
+      </p>
+      <p>
+        To import an image document served via <a href="https://iiif.io/" target="_blank">IIIF</a>,
+        either pick the corresponding option from the <strong>New</strong> menu and paste the URL, 
+        or drag and drop the manifest link into the workspace. You can import manifests for single 
+        images as well as presentation manifests.
+      </p>
+
+      <h3>Create a new folder</h3>
+      <p>
+        Click the <strong>New</strong> button and select the <strong>Folder</strong> option. Enter a name 
+        for the folder. You can always change the name of an existing folder later on, by clicking on it 
+        in the table view.
+      </p>
+
+      <h3>Add a folder description</h3>
+      <p>
+        Click the <span class="icon">&#xf055;</span> <strong>Add a description</strong> link above the 
+        document pane. Descriptions support 
+        <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">Markdown 
+        syntax</a> for styling and links. You can edit or remove existing descriptions by clicking the 
+        <span class="icon">&#xf040;</span> icon at the top right.
+      </p>
+
+      <h3>Customize the document table</h3>
+      <p>
+        You can configure the columns that appear in your document table and their order. Click the 
+        <span class="icon">&#xf141;</span> icon on the right edge of the table header. This will open 
+        the column configuration dialog. Pick the columns you want to appear on the left. Change the 
+        order by dragging the boxes on the right.
+      </p>
+
+      <p>
+        <img src="@routes.Assets.versioned("images/help/column-config.png")">
+      </p>
+
+      <h3>Toggle document presentation</h3>
+      <p>
+        Switch between a table and a grid view of the document list by clicking the
+        <span class="icon">&#xf00a;</span> / <span class="icon">&#xf0c9;</span> icon
+        at the top right of the screen.
+      </p>
+
+      <h3>Named Entity Recognition</h3>
+      <p>
+        In the previous version of Recogito, Named Entity Recognition (NER) was a selectable option 
+        available during document upload. With the new workspace user interface, two things 
+        have changed about this:
+      </p>
+
+      <ol>
+        <li>
+          the old three-step &quot;upload wizard&quot; has been removed. Documents are now created 
+          instantly when you import them. NER is now available as a separate option you can (re-)run 
+          on existing documents.
+        </li>
+
+        <li>
+          the new workspace provides additional configuration options for NER.
+        </li>
+      </ol>
+
+      <p>
+        <strong>To run NER on a document</strong> select i, and open the <strong>Options</strong> menu using 
+        the blue button above the document pane. From the options, pick <strong>Named Entity Recognition</strong>.
+        Choose your preferred recognition engines and gazetteer choice using the NER configuration dialog. 
+      </p>
+
+      <h2>Need help?</h2>
+      <p>
+        We are hard at work improving and extending the functionality of the workspace. If you 
+        encounter problems, have suggestions or feature requests, please
+        <a href="mailto:commons@@pelagios.org" target="_blank">get in touch with us</a> or 
+        <a href="https://github.com/pelagios/recogito2/issues" target="_blank">file an issue on Github</a>.
+      </p>
     </div>
   </div>
 }
