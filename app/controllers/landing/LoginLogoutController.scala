@@ -17,13 +17,13 @@ case class LoginData(usernameOrPassword: String, password: String)
 
 @Singleton
 class LoginLogoutController @Inject() (  
-    val announcements: AnnouncementService,
-    val components: ControllerComponents,
-    val config: Configuration,
-    val silhouette: Silhouette[Security.Env],
-    val users: UserService,
-    implicit val ctx: ExecutionContext
-  ) extends AbstractController(components) with HasConfig with HasUserService with I18nSupport {
+  val announcements: AnnouncementService,
+  val components: ControllerComponents,
+  val config: Configuration,
+  val silhouette: Silhouette[Security.Env],
+  val users: UserService,
+  implicit val ctx: ExecutionContext
+) extends AbstractController(components) with HasConfig with HasUserService with I18nSupport {
 
   private val MESSAGE = "message"
 

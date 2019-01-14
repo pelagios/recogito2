@@ -181,6 +181,10 @@ DELETE  /api/folder/:id                              controllers.my.ng.directory
 DELETE  /api/shared/folder/bulk                      controllers.my.ng.directory.delete.FolderActionsController.bulkUnshareFolders
 DELETE  /api/shared/folder/:id                       controllers.my.ng.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
 
+# ~~~ Messages ~~~
+
+GET     /api/announcements/my/latest                 controllers.api.AnnouncementAPIController.myLatest
+
 # ~~~ Annotations ~~~
 
 POST    /api/annotation                              controllers.api.AnnotationAPIController.createAnnotation
