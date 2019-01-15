@@ -44,7 +44,9 @@ class MaintenanceController @Inject()(
     announcements.insertBroadcastAnnouncement(
     """# Welcome to your new workspace!
 
-We are happy to announce the launch of Recogito's __new document workspace interface__. This update brings more than just a fresh look. It adds a number of new features and enhancements, and makes room for further extensions we are planning for the new year.
+We are happy to announce the launch of Recogito's __new document workspace__.
+
+This update brings more than just a fresh look. It adds a number of new features and enhancements, and makes room for further extensions we have planned for the new year. 
 
 Learn more about all that's new [in the help section](/help/workspace).
     """).map(_ => Ok)
