@@ -57,22 +57,10 @@ class LoginLogoutController @Inject() (
             val destination = request.session.get("access_uri").getOrElse(routes.LandingController.index.toString)
             users.updateLastLogin(validUser.getUsername)
             
-            val fAnnouncement = announcements.findLatestUnread(validUser.getUsername)           
             val fAuthentication = auth.create(LoginInfo(Security.PROVIDER_ID, validUser.getUsername))
               .flatMap(auth.init(_))
-              
-            val f = for {
-              announcement <- fAnnouncement
-              authentication <- fAuthentication
-            } yield (announcement, authentication)
-            
-            f.flatMap {
-              case (Some(announcement), authentication) =>
-                auth.embed(authentication, 
-                  Ok(views.html.landing.announcement(announcement.getId, announcement.getContent, destination))
-                    .withSession(request.session - "access_uri"))
-                
-              case (None, authentication) =>               
+                          
+            fAuthentication.flatMap { authentication =>               
                 auth.embed(authentication,
                   Redirect(destination).withSession(request.session - "access_uri"))
             }
