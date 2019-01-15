@@ -2,6 +2,7 @@ package controllers.api
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json._
@@ -23,44 +24,22 @@ class AnnouncementAPIController @Inject() (
   implicit val ctx: ExecutionContext
 ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
-  /*
-  implicit val announcementWrites: Writes[ServiceAnnouncementRecord] = (
-    (JsPath \ "identifier").write[String] and
-    (JsPath \ "name").write[String] and
-    (JsPath \ "languages").write[Seq[String]] and
-    (JsPath \ "organization").write[String] and
-    (JsPath \ "description").write[String] and 
-    (JsPath \ "version").write[String]
-  )(p => (
-     p.getClass.getName,
-     p.getName,
-     p.getSupportedLanguages.asScala,
-     p.getOrganization,
-     p.getDescription,
-     p.getVersion
-  ))
-  */
-
-  /*
-  id UUID PRIMARY KEY,
-  for_user TEXT NOT NULL REFERENCES "user"(username),
-  content TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  viewed_at TIMESTAMP WITH TIME ZONE,
-  response TEXT
-  */
-
   def myLatest = silhouette.SecuredAction.async { implicit request =>
     announcements.findLatestUnread(request.identity.username).map { _ match {
       case Some(message) => 
-        Ok(Json.obj("content" -> message.getContent))
+        Ok(Json.obj(
+          "id" -> message.getId,
+          "content" -> message.getContent
+        ))
 
       case None => NotFound
     }}
   }
 
-  def reply = silhouette.SecuredAction.async { implicit request =>
-    null
+  def confirm(id: UUID) = silhouette.SecuredAction.async { implicit request =>
+    announcements.confirm(id, request.identity.username, "OK").map { success => 
+      if (success) Ok else BadRequest
+    }
   }
 
 }
