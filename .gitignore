@@ -16,3 +16,4 @@ pc.stdout.log
 .cache-*
 **ensime*
 pc.stdout.log
+recogito.plugins.ner.flair
