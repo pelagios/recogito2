@@ -88,6 +88,7 @@ POST    /document/:id/downloads/places/geojson       controllers.document.downlo
 GET     /document/:id/downloads/relations/node-csv   controllers.document.downloads.DownloadsController.downloadGephiNodes(id: String)
 GET     /document/:id/downloads/relations/edge-csv   controllers.document.downloads.DownloadsController.downloadGephiEdges(id: String)
 GET     /document/:id/downloads/merged/tei           controllers.document.downloads.DownloadsController.downloadTEI(id: String)
+GET     /document/:id/downloads/iob                  controllers.document.downloads.DownloadsController.downloadIOB(id: String)
 
 GET     /document/:id/discussion                     controllers.document.discussion.DiscussionController.showDiscussionBoard(id: String)
 

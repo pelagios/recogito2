@@ -73,6 +73,7 @@ class DownloadsController @Inject() (
     with document.geojson.DatatableToGazetteer
     with document.tei.PlaintextToTEI
     with document.tei.TEIToTEI
+    with document.iob.PlaintextToIOB
     with places.PlacesToGeoJSON
     with relations.RelationsToGephi
     with I18nSupport {
@@ -224,6 +225,21 @@ class DownloadsController @Inject() (
         
         f.map { xml => 
           Ok(xml).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}.tei.xml" })
+        }
+      }
+    })
+  }
+
+  def downloadIOB(documentId: String) = silhouette.UserAwareAction.async { implicit request => 
+    download(documentId, RuntimeAccessLevel.READ_ALL, { doc => 
+      // At the moment we only support IOB for single-file plaintext documents
+      if (doc.fileparts.size != 1) {
+        Future.successful(BadRequest("not supported for multi-part documents"))
+      } else if (doc.fileparts.head.getContentType != ContentType.TEXT_PLAIN.toString) {
+        Future.successful(BadRequest("unsupported content type"))
+      } else {
+        plaintextToIOB(doc).map { f => 
+          Ok.sendFile(f).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}.iob.txt" })
         }
       }
     })
