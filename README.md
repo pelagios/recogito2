@@ -6,8 +6,6 @@ Home of [Recogito](http://recogito.pelagios.org) - a Semantic Annotation tool fo
 images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our progress on
 [Waffle.io](http://waffle.io/pelagios/recogito2).
 
-![Screenshot](public/images/help/annotation-view.png)
-
 ## Prerequisites
 
 * Java 8 JDK
