@@ -185,6 +185,29 @@
         </div>
       </div>
 
+      @if(doc.fileparts.size == 1 && doc.fileparts.head.getContentType == "TEXT_PLAIN") {
+        <div class="panel">
+          <h2>Other</h2>
+          <div class="inner">
+            <ul>
+              <li>
+                <div class="description">
+                  <h3>IOB &nbsp;<span class="beta">BETA</span></h3>
+                  <p>
+                    The text tokenized in 
+                    <a href="https://en.wikipedia.org/wiki/Inside%E2%80%93outside%E2%80%93beginning_(tagging)" target="_blank">IOB format</a>,
+                    a common format used for machine learning training data.
+                  </p>
+                </div>
+                <div class="button-container">
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadIOB(doc.id)" class="btn small"><span class="icon">&#xf019;</span> IOB</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      }
+
       @if(doc.hasDataParts) {
         @helper.javascriptRouter("jsRoutes")(
           controllers.document.routes.javascript.DocumentController.getRaw
