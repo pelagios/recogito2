@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import java.util.UUID
 import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
-import services.annotation.{Annotation, AnnotationService}
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.document.DocumentInfo
 import services.generated.tables.records.DocumentFilepartRecord
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,11 +43,55 @@ trait PlaintextToIOB {
     }}
   }
 
-  /** Returns the annotation inside of which the given token is (if any) **/
-  private def isInsideOf(token: Token, annotations: Seq[(Int, Annotation)]): Option[Annotation] = ???
+  /** Keep only annotations that mark PLACE or PERSON entities **/
+  private def filterEntityAnnotations(annotations: Seq[Annotation]): Seq[Annotation] = {
+
+    def isEntityBody(body: AnnotationBody) =
+      body.hasType == AnnotationBody.PLACE || body.hasType == AnnotationBody.PERSON
+
+    annotations.filter(_.bodies.exists(isEntityBody))
+  }
 
   /** Parses the anchors and extracts numeric offsets **/
-  private def parseOffsets(annotations: Seq[Annotation]): Seq[(Int, Annotation)] = ???
+  private def parseOffsets(annotations: Seq[Annotation]): Seq[(Int, Annotation)] = {
+
+    val ANCHOR_PREFIX_LENGTH = "char-offset:".size
+
+    annotations.map { annotation => 
+      val offset = annotation.anchor.substring(ANCHOR_PREFIX_LENGTH).toInt
+      (offset, annotation)
+    }
+  }
+
+  /** Returns the annotation inside of which the given token is (if any) **/
+  private def isInsideOf(token: Token, annotations: Seq[(Int, Annotation)]): Option[Annotation] = {
+    val tokenStarts = token.charOffset
+    val tokenEnds = tokenStarts + token.text.size
+
+    def getQuote(a: Annotation) = 
+      a.bodies
+       .find(_.hasType == AnnotationBody.QUOTE)
+       .get // Safe to assume that this is a text annotation (or else: fail hard)
+       .value
+       .get
+
+    annotations.find { case (annotationStarts, annotation) => 
+      val annotationEnds = annotationStarts + getQuote(annotation).size
+      annotationStarts <= tokenStarts &&
+      annotationEnds > tokenStarts
+    } map { _._2 }
+  }
+
+  private def getTag(annotation: Annotation) = {
+    val firstEntityBody = annotation.bodies.find { b => 
+      b.hasType == AnnotationBody.PERSON || b.hasType == AnnotationBody.PLACE
+    }.get // Safe to assume there is an entity body in this case
+
+    firstEntityBody.hasType match {
+      case AnnotationBody.PERSON => "PER"
+      case AnnotationBody.PLACE => "LOC"
+    }
+  }
 
   def plaintextToIOB(
     doc: DocumentInfo
@@ -68,40 +112,36 @@ trait PlaintextToIOB {
 
     val fTokens = loadTokens(doc, part)
 
-    // TODO keep only entity annotations
-    val fAnnotations = annotationService.findByFilepartId(part.getId)
+    val fAnnotations = 
+      annotationService
+        .findByFilepartId(part.getId)
+        .map(a => filterEntityAnnotations(a.map(_._1)))
 
     val f = for {
       tokens <- fTokens
       annotations <- fAnnotations
-    } yield (tokens, parseOffsets(annotations.map(_._1)))
+    } yield (tokens, parseOffsets(annotations))
 
     f.map { case (tokens, annotations) => 
       tokens.foldLeft(Option.empty[Annotation]) { (previousAnnotation, token) =>
         val annotation = isInsideOf(token, annotations)
-
         val iob = (previousAnnotation, annotation) match {
-
-          // Begin
-          case (None, Some(annotation)) => "B"
-
           // Still inside the same annotation
-          case (Some(before), Some(current)) if before == current => "I"
+          case (Some(before), Some(current)) if before == current => s"I-${getTag(current)}"
 
-          // New token
-          case (Some(before), Some(current)) => "B"
+          // Begin new token
+          case (_, Some(annotation)) => s"B-${getTag(annotation)}"
 
           // (_, None)
           case _ => "O"
-         
         }
 
-        writer.println(s"$token $iob")
-
-        // Hand current annotation to the next iteration
+        writer.println(s"${token.text} $iob")
+        // Forward the current annotation to the next round for comparison
         annotation 
       }
-      
+
+      writer.close()
       underlying
     }
   }
