@@ -61,7 +61,7 @@
     </tbody>
   </table>
 
-  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, None, None, None, None, None).url, rows)
+  @views.html.pagination(controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase).url, rows)
 
   @helper.javascriptRouter("jsRoutes")(
     controllers.document.annotation.routes.javascript.AnnotationController.showAnnotationView,

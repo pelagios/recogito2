@@ -70,7 +70,7 @@ case class DatasetMeta(doc: DocumentInfo, annotationCount: Long, spatialCoverage
         "creator" -> Json.obj(
           "@type" -> "Person",
           "name" -> owner,
-          "url" -> controllers.my.routes.MyRecogitoController.index(doc.ownerName, None, None, None, None, None).absoluteURL
+          "url" -> controllers.my.routes.MyRecogitoController.index(doc.ownerName).absoluteURL
         ),
         "isAccessibleForFree" -> true,
         "distribution" -> Json.arr(

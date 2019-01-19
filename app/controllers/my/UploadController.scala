@@ -274,11 +274,11 @@ class UploadController @Inject() (
       .deletePendingUpload(request.identity.username)
       .map(success => {
         // TODO add error message if success == false
-        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None, None, None, None, None))
+        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
       })
       .recover{ case t =>
         // TODO add error message
-        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, None, None, None, None, None))
+        Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath))
       }
   }
 

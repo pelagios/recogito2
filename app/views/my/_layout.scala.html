@@ -62,13 +62,13 @@
     <div class="toolbar">
       <ul class="tabs">
         <li class="my-documents @if(activeTab == "my") { enabled }">
-          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("my"), None, None, None, pageSize)">
+          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase)">
             @messages("my.tabs.my_documents") (@myDocCount)
           </a>
         </li><!--
 
         --><li class="shared-with-me @if(activeTab == "shared") { enabled }">
-          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase, Some("shared"), None, None, None, pageSize)">
+          <a href="@controllers.my.routes.MyRecogitoController.index(user.username.toLowerCase)">
             @messages("my.tabs.shared_with_me")  (@sharedWithMeCount)
           </a>
         </li>

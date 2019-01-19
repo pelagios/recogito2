@@ -278,4 +278,4 @@ GET     /                                            controllers.landing.Landing
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /my                                          controllers.my.MyRecogitoController.my
-GET     /:username                                   controllers.my.MyRecogitoController.index(username: String, tab: Option[String], p: Option[Int], sortby: Option[String], order: Option[String], size: Option[Int])
+GET     /:username                                   controllers.my.MyRecogitoController.index(username: String)

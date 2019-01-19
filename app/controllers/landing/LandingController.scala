@@ -37,7 +37,7 @@ class LandingController @Inject() (
       case None =>
         request.identity match {
           case Some(user) =>
-            Redirect(controllers.my.routes.MyRecogitoController.index(user.username, None, None, None, None, None))
+            Redirect(controllers.my.routes.MyRecogitoController.index(user.username))
 
           case None =>
             logPageView()
