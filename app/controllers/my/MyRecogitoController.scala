@@ -43,14 +43,16 @@ class MyRecogitoController @Inject() (
     
     // TODO add pagination and sorting options
     
-    val fDocs = documents.findAccessibleDocuments(usernameInPath, loggedInUser.map(_.username), 0, 100)
+    // val fDocs = documents.findAccessibleDocuments(usernameInPath, loggedInUser.map(_.username), 0, 100)
     
+    /*
     val f = for {
       ownerWithRoles <- fOwnerWithRoles
       docs <- fDocs
     } yield (ownerWithRoles, docs)    
+    */
 
-    f.map { case (maybeOwner, docs) => maybeOwner match {
+    /* f.map { case (maybeOwner, docs) => maybeOwner match {
       case Some(owner) => 
         val useNewWorkspace = loggedInUser.map(_.featureToggles.contains("new-workspace")).getOrElse(false)
         if (useNewWorkspace)
@@ -59,18 +61,24 @@ class MyRecogitoController @Inject() (
          Ok(views.html.my.my_public(owner, docs, loggedInUser))
          
       case None => NotFoundPage
+    }} */
+
+    fOwnerWithRoles.map { _ match {
+      case Some(owner) => Ok(views.html.my.profile())
+      case None => NotFoundPage
     }}
   }
   
-  /** Takes a list of docIds and sorts them accourding to the given index property **/
+  /** Takes a list of docIds and sorts them accourding to the given index property **
   private def sortByIndexProperty(docIds: Seq[String], sortBy: String, sortOrder: SortOrder, offset: Int, pageSize: Int): Future[Seq[String]] = sortBy match {
     case "annotations" => annotations.sortDocsByAnnotationCount(docIds, sortOrder, offset, pageSize)
     case "last_modified_at" => contributions.sortDocsByLastModifiedAt(docIds, sortOrder, offset, pageSize)
     case "last_modified_by" => contributions.sortDocsByLastModifiedBy(docIds, sortOrder, offset, pageSize)
     case _ => Future.successful(docIds)
   }
+  */
   
-  /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
+  /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **
   private def fetchIndexedProperties(docIds: Seq[String]): Future[Seq[(String, Option[Contribution], Long)]] = {
     val fLastEdits = Future.sequence(docIds.map(id => contributions.getLastContribution(id).map((id, _))))
     val fAnnotationsPerDoc = Future.sequence(docIds.map(id => annotations.countByDocId(id).map((id, _))))
@@ -87,8 +95,9 @@ class MyRecogitoController @Inject() (
         (id, lastEdit, annotations)
       }
     }
-  }
+  } */
   
+  /*
   private def renderMyDocuments(user: User, usedSpace: Long, offset: Int, sortBy: String, sortOrder: SortOrder, size: Option[Int])(implicit request: RequestHeader) = {
     val startTime = System.currentTimeMillis
     val fSharedCount = documents.countBySharedWith(user.username)
@@ -156,6 +165,7 @@ class MyRecogitoController @Inject() (
       Ok(views.html.my.my_shared(user, usedSpace, myDocsCount, page, sortBy, sortOrder, size))
     }
   }
+  */
   
   /** A convenience '/my' route that redirects to the personal index **/
   def my = silhouette.UserAwareAction { implicit request =>
@@ -170,6 +180,7 @@ class MyRecogitoController @Inject() (
     }
   }
 
+  // TODO post-worspace-migration cleanup
   def index(
     usernameInPath: String,
     tab: Option[String],
@@ -184,9 +195,13 @@ class MyRecogitoController @Inject() (
       case None => false
     }
     
-    val offset = (page.getOrElse(1) - 1) * size.getOrElse(DEFAULT_DOCUMENTS_PER_PAGE)
+    // val offset = (page.getOrElse(1) - 1) * size.getOrElse(DEFAULT_DOCUMENTS_PER_PAGE)
 
     if (isProfileOwner) {
+
+      Future.successful(Ok(views.html.my.workspace()))
+
+      /*
       val normalizedSortOrder = order match {
         case None => 
           // No sort order specified: use default
@@ -194,8 +209,9 @@ class MyRecogitoController @Inject() (
         case Some(str) =>
           // Sort order specified: use only if valid
           SortOrder.fromString(str)
-      }
+      }*/
       
+      /*
       (sortBy, normalizedSortOrder) match {
         
         case (Some(s), Some(o)) =>
@@ -204,15 +220,15 @@ class MyRecogitoController @Inject() (
           tab match {
             case Some(t) if t.equals("shared") => renderSharedWithMe(user, usedSpace, offset, s, o, size)
             case _ =>
-              val forceOldWorkspace = request.getQueryString("ng").isDefined || request.cookies.get("ng").isDefined
-              if (user.featureToggles.contains("new-workspace") && !forceOldWorkspace) {
+              // val forceOldWorkspace = request.getQueryString("ng").isDefined || request.cookies.get("ng").isDefined
+              // if (user.featureToggles.contains("new-workspace") && !forceOldWorkspace) {
                 Future.successful(Ok(views.html.my.workspace()))
-              } else {
-                if (request.getQueryString("ng").isDefined)
-                  Future.successful(Redirect(routes.MyRecogitoController.index(usernameInPath, tab, page, sortBy, order, size)).withCookies(Cookie("ng", "true")).bakeCookies())
-                else 
-                  renderMyDocuments(user, usedSpace, offset, s, o, size)
-              }
+              // } else {
+              //  if (request.getQueryString("ng").isDefined)
+              //     Future.successful(Redirect(routes.MyRecogitoController.index(usernameInPath, tab, page, sortBy, order, size)).withCookies(Cookie("ng", "true")).bakeCookies())
+              //  else 
+              //     renderMyDocuments(user, usedSpace, offset, s, o, size)
+              // }
           }
           
         case _ =>
@@ -220,7 +236,7 @@ class MyRecogitoController @Inject() (
           // without sort order, but will redirect to sorted by most recent edit
           Future.successful(Redirect(controllers.my.routes.MyRecogitoController.index(usernameInPath, tab, page, Some("last_modified_at"), Some("asc"), size)))
           
-      }
+      }*/
     } else {
       renderPublicProfile(usernameInPath, request.identity)
     }
