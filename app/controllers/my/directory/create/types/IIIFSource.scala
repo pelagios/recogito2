@@ -1,6 +1,6 @@
-package controllers.my.ng.directory.create.types
+package controllers.my.directory.create.types
 
-import controllers.my.ng.directory.create.CreateController
+import controllers.my.directory.create.CreateController
 import play.api.Logger
 import play.api.mvc.AnyContent
 import scala.concurrent.Future

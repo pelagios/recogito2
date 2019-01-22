@@ -1,4 +1,4 @@
-package controllers.my.ng.directory.delete
+package controllers.my.directory.delete
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, HasPrettyPrintJSON, Security}

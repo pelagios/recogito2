@@ -1,7 +1,7 @@
-package controllers.my.ng.directory.list
+package controllers.my.directory.list
 
-import controllers.my.ng.directory.list.document.ConfiguredPresentation
-import controllers.my.ng.directory.list.folder.FolderItem
+import controllers.my.directory.list.document.ConfiguredPresentation
+import controllers.my.directory.list.folder.FolderItem
 import java.util.UUID
 import play.api.libs.json._
 import play.api.libs.functional.syntax._

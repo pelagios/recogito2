@@ -1,4 +1,4 @@
-package controllers.my.ng.account
+package controllers.my.account
 
 import java.sql.Timestamp
 import org.joda.time.DateTime

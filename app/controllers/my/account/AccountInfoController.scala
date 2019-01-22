@@ -1,4 +1,4 @@
-package controllers.my.ng.account
+package controllers.my.account
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, HasPrettyPrintJSON, Security}

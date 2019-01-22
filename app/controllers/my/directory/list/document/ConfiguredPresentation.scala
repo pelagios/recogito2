@@ -1,6 +1,6 @@
-package controllers.my.ng.directory.list.document
+package controllers.my.directory.list.document
 
-import controllers.my.ng.directory.list.DirectoryItem
+import controllers.my.directory.list.DirectoryItem
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._

@@ -1,9 +1,9 @@
-package controllers.my.ng.directory.list
+package controllers.my.directory.list
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, HasPrettyPrintJSON, Security}
-import controllers.my.ng.directory.list.document._
-import controllers.my.ng.directory.list.folder._
+import controllers.my.directory.list.document._
+import controllers.my.directory.list.folder._
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration

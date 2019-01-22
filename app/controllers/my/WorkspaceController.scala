@@ -1,4 +1,4 @@
-package controllers.my.ng
+package controllers.my
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, Security}

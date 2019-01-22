@@ -1,6 +1,6 @@
 @(owner: services.generated.tables.records.UserRecord)
 <div class="sidebar-header">
-  <a class="to-index" href="@controllers.my.ng.routes.WorkspaceController.workspace(owner.getUsername.toLowerCase)">
+  <a class="to-index" href="@controllers.my.routes.WorkspaceController.workspace(owner.getUsername.toLowerCase)">
     @if(Option(owner.getRealName).isDefined) {
       <h1>@owner.getRealName</h1>
       <h2>@@@owner.getUsername</h2>

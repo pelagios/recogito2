@@ -1,4 +1,4 @@
-package controllers.my.ng.directory.create
+package controllers.my.directory.create
 
 import com.mohiva.play.silhouette.api.Silhouette
 import com.mohiva.play.silhouette.api.actions.SecuredRequest

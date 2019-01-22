@@ -1,4 +1,4 @@
-package controllers.my.ng.account
+package controllers.my.account
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._

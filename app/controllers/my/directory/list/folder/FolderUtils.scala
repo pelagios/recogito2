@@ -1,8 +1,8 @@
-package controllers.my.ng.directory.list.folder
+package controllers.my.directory.list.folder
 
 import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import controllers.Security
-import controllers.my.ng.directory.list.DirectoryController
+import controllers.my.directory.list.DirectoryController
 import java.util.UUID
 import play.api.mvc.AnyContent
 import scala.concurrent.Future

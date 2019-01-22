@@ -135,52 +135,52 @@ GET     /part/:id                                    controllers.document.annota
 
 # ~~~ Account information ~~~
 
-GET     /api/me                                      controllers.my.ng.account.AccountInfoController.me
-GET     /api/account/my                              controllers.my.ng.account.AccountInfoController.getPrivateAccountInfo
-GET     /api/account/:username                       controllers.my.ng.account.AccountInfoController.getPublicAccountInfo(username: String)
-GET     /api/account/:username/collaborators         controllers.my.ng.account.AccountInfoController.getCollaborators(username: String)
+GET     /api/me                                      controllers.my.account.AccountInfoController.me
+GET     /api/account/my                              controllers.my.account.AccountInfoController.getPrivateAccountInfo
+GET     /api/account/:username                       controllers.my.account.AccountInfoController.getPublicAccountInfo(username: String)
+GET     /api/account/:username/collaborators         controllers.my.account.AccountInfoController.getCollaborators(username: String)
 
 # ~~~ Readme create & delete ~~~
 
-POST    /api/directory/my/readme                     controllers.my.ng.directory.create.CreateController.createReadme(id: java.util.UUID ?= null)
-POST    /api/folder/:id/readme                       controllers.my.ng.directory.create.CreateController.createReadme(id: java.util.UUID)   
+POST    /api/directory/my/readme                     controllers.my.directory.create.CreateController.createReadme(id: java.util.UUID ?= null)
+POST    /api/folder/:id/readme                       controllers.my.directory.create.CreateController.createReadme(id: java.util.UUID)   
 
-DELETE  /api/directory/my/readme                     controllers.my.ng.directory.delete.FolderActionsController.deleteReadme(id: java.util.UUID ?= null)
-DELETE  /api/folder/:id/readme                       controllers.my.ng.directory.delete.FolderActionsController.deleteReadme(id: java.util.UUID)     
+DELETE  /api/directory/my/readme                     controllers.my.directory.delete.FolderActionsController.deleteReadme(id: java.util.UUID ?= null)
+DELETE  /api/folder/:id/readme                       controllers.my.directory.delete.FolderActionsController.deleteReadme(id: java.util.UUID)     
 
 # ~~~ Directory list access ~~~
 
-GET     /api/directory/my                            controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
-POST    /api/directory/my                            controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+GET     /api/directory/my                            controllers.my.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+POST    /api/directory/my                            controllers.my.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
 
-GET     /api/directory/my/shared                     controllers.my.ng.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
-POST    /api/directory/my/shared                     controllers.my.ng.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+GET     /api/directory/my/shared                     controllers.my.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+POST    /api/directory/my/shared                     controllers.my.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
 
-GET     /api/directory/my/:folderId                  controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
-POST    /api/directory/my/:folderId                  controllers.my.ng.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+GET     /api/directory/my/:folderId                  controllers.my.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+POST    /api/directory/my/:folderId                  controllers.my.directory.list.DirectoryController.getMyDirectory(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
-GET     /api/directory/my/shared/:folderId           controllers.my.ng.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
-POST    /api/directory/my/shared/:folderId           controllers.my.ng.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+GET     /api/directory/my/shared/:folderId           controllers.my.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+POST    /api/directory/my/shared/:folderId           controllers.my.directory.list.DirectoryController.getSharedWithMe(offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
-GET     /api/directory/:owner                        controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
-POST    /api/directory/:owner                        controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
-GET     /api/directory/:owner/:folderId              controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
-POST    /api/directory/:owner/:folderId              controllers.my.ng.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+GET     /api/directory/:owner                        controllers.my.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+POST    /api/directory/:owner                        controllers.my.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID ?= null)
+GET     /api/directory/:owner/:folderId              controllers.my.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
+POST    /api/directory/:owner/:folderId              controllers.my.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
 # ~~~ Create, delete & unshare operations ~~~
 
-POST    /api/folder                                  controllers.my.ng.directory.create.CreateController.createFolder
-PUT     /api/folder/:id                              controllers.my.ng.directory.create.CreateController.renameFolder(id: java.util.UUID, title: String)
+POST    /api/folder                                  controllers.my.directory.create.CreateController.createFolder
+PUT     /api/folder/:id                              controllers.my.directory.create.CreateController.renameFolder(id: java.util.UUID, title: String)
 
-DELETE  /api/document/bulk                           controllers.my.ng.directory.delete.DocumentActionsController.bulkDeleteDocuments
-DELETE  /api/document/:id                            controllers.my.ng.directory.delete.DocumentActionsController.deleteDocument(id: String)
-DELETE  /api/shared/document/bulk                    controllers.my.ng.directory.delete.DocumentActionsController.bulkUnshareDocuments
-DELETE  /api/shared/document/:id                     controllers.my.ng.directory.delete.DocumentActionsController.unshareDocument(id: String)
+DELETE  /api/document/bulk                           controllers.my.directory.delete.DocumentActionsController.bulkDeleteDocuments
+DELETE  /api/document/:id                            controllers.my.directory.delete.DocumentActionsController.deleteDocument(id: String)
+DELETE  /api/shared/document/bulk                    controllers.my.directory.delete.DocumentActionsController.bulkUnshareDocuments
+DELETE  /api/shared/document/:id                     controllers.my.directory.delete.DocumentActionsController.unshareDocument(id: String)
 
-DELETE  /api/folder/bulk                             controllers.my.ng.directory.delete.FolderActionsController.bulkDeleteFolders
-DELETE  /api/folder/:id                              controllers.my.ng.directory.delete.FolderActionsController.deleteFolder(id: java.util.UUID)
-DELETE  /api/shared/folder/bulk                      controllers.my.ng.directory.delete.FolderActionsController.bulkUnshareFolders
-DELETE  /api/shared/folder/:id                       controllers.my.ng.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
+DELETE  /api/folder/bulk                             controllers.my.directory.delete.FolderActionsController.bulkDeleteFolders
+DELETE  /api/folder/:id                              controllers.my.directory.delete.FolderActionsController.deleteFolder(id: java.util.UUID)
+DELETE  /api/shared/folder/bulk                      controllers.my.directory.delete.FolderActionsController.bulkUnshareFolders
+DELETE  /api/shared/folder/:id                       controllers.my.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
 
 # ~~~ Search ~~~
 
@@ -246,9 +246,9 @@ POST    /settings/restore                            controllers.my.settings.Res
 # Personal space - upload
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-POST    /my/upload                                   controllers.my.ng.directory.create.CreateController.initUpload()
-POST    /my/upload/:id/file                          controllers.my.ng.directory.create.CreateController.storeFilepart(id: Int)
-POST    /my/upload/:id/finalize                      controllers.my.ng.directory.create.CreateController.finalizeUpload(id: Int, folder: Option[java.util.UUID])
+POST    /my/upload                                   controllers.my.directory.create.CreateController.initUpload()
+POST    /my/upload/:id/file                          controllers.my.directory.create.CreateController.storeFilepart(id: Int)
+POST    /my/upload/:id/finalize                      controllers.my.directory.create.CreateController.finalizeUpload(id: Int, folder: Option[java.util.UUID])
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Application root
@@ -263,5 +263,5 @@ GET     /                                            controllers.landing.Landing
 # Personal space root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my                                          controllers.my.ng.WorkspaceController.my
-GET     /:username                                   controllers.my.ng.WorkspaceController.workspace(username: String)
+GET     /my                                          controllers.my.WorkspaceController.my
+GET     /:username                                   controllers.my.WorkspaceController.workspace(username: String)
