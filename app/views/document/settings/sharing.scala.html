@@ -96,7 +96,7 @@
         @for(shared <- sharingPolicies) {
           <tr data-username="@shared.getSharedWith" data-level="@shared.getAccessLevel">
             <td class="col-user">
-              <a href="@controllers.my.routes.MyRecogitoController.index(shared.getSharedWith)">@shared.getSharedWith</a>
+              <a href="@controllers.my.ng.routes.WorkspaceController.workspace(shared.getSharedWith)">@shared.getSharedWith</a>
             </td>
             <td class="col-permissions">
               <button class="permissions btn small"><span class="label">@shared.getAccessLevel</span><span class="icon">&#xf0dd;</span></button>
@@ -122,7 +122,7 @@
   @Html(webJarsUtil.script("typeahead.jquery.min.js"))
   @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/settings/sharing.js")))
   @helper.javascriptRouter("jsRoutes")(
-    controllers.my.routes.javascript.MyRecogitoController.index,
+    controllers.my.ng.routes.javascript.WorkspaceController.workspace,
     controllers.document.settings.routes.javascript.SettingsController.setPublicVisibility,
     controllers.document.settings.routes.javascript.SettingsController.setPublicAccessLevel,
     controllers.document.settings.routes.javascript.SettingsController.searchUsers,

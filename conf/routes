@@ -246,20 +246,6 @@ POST    /settings/restore                            controllers.my.settings.Res
 # Personal space - upload
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# ~~~ Legacy routes ~~~
-
-POST    /:username/upload/step-1                     controllers.my.UploadController.storeDocumentMetadata(username: String)
-GET     /:username/upload/step-1                     controllers.my.UploadController.showStep1(username: String)
-GET     /:username/upload/step-2                     controllers.my.UploadController.showStep2(username: String)
-POST    /:username/upload/step-2                     controllers.my.UploadController.storeFilepart(username: String)
-DELETE  /:username/upload/step-2/:partId             controllers.my.UploadController.deleteFilepart(username: String, partId: java.util.UUID)
-GET     /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
-POST    /:username/upload/step-3                     controllers.my.UploadController.showStep3(username: String)
-GET     /:username/upload/cancel                     controllers.my.UploadController.cancelUploadWizard(username: String)
-GET     /:username/upload/progress/:docId            controllers.my.UploadController.queryTaskProgress(username: String, docId: String)
-
-# ~~~ New routes ~~~
-
 POST    /my/upload                                   controllers.my.ng.directory.create.CreateController.initUpload()
 POST    /my/upload/:id/file                          controllers.my.ng.directory.create.CreateController.storeFilepart(id: Int)
 POST    /my/upload/:id/finalize                      controllers.my.ng.directory.create.CreateController.finalizeUpload(id: Int, folder: Option[java.util.UUID])
@@ -277,5 +263,5 @@ GET     /                                            controllers.landing.Landing
 # Personal space root
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /my                                          controllers.my.MyRecogitoController.my
-GET     /:username                                   controllers.my.MyRecogitoController.index(username: String)
+GET     /my                                          controllers.my.ng.WorkspaceController.my
+GET     /:username                                   controllers.my.ng.WorkspaceController.workspace(username: String)

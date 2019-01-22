@@ -37,7 +37,7 @@ class LandingController @Inject() (
       case None =>
         request.identity match {
           case Some(user) =>
-            Redirect(controllers.my.routes.MyRecogitoController.index(user.username))
+            Redirect(controllers.my.ng.routes.WorkspaceController.workspace(user.username))
 
           case None =>
             logPageView()

@@ -1,4 +1,4 @@
-package controllers.my
+package controllers.my.ng
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, Security}
@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import storage.uploads.Uploads
 
 @Singleton
-class MyRecogitoController @Inject() (
+class WorkspaceController @Inject() (
     val annotations: AnnotationService,
     val components: ControllerComponents,
     val contributions: ContributionService,
@@ -30,28 +30,22 @@ class MyRecogitoController @Inject() (
     implicit val env: Environment,
     implicit val webjars: WebJarsUtil
   ) extends BaseController(components, config, users) with I18nSupport {
-  
-  private def renderPublicProfile(usernameInPath: String, loggedInUser: Option[User])(implicit request: RequestHeader) = {
-    users.findByUsernameIgnoreCase(usernameInPath).map { _ match {
-      case Some(owner) => Ok(views.html.my.profile())
-      case None => NotFoundPage
-    }}
-  }
-    
+
   /** A convenience '/my' route that redirects to the personal index **/
   def my = silhouette.UserAwareAction { implicit request =>
     request.identity match {
       case Some(userWithRoles) =>
-        Redirect(routes.MyRecogitoController.index(userWithRoles.username.toLowerCase))
+        Redirect(routes.WorkspaceController.workspace(userWithRoles.username.toLowerCase))
 
       case None =>
         // Not logged in - go to log in and then come back here
         Redirect(controllers.landing.routes.LoginLogoutController.showLoginForm(None))
-          .withSession("access_uri" -> routes.MyRecogitoController.my.url)
+          .withSession("access_uri" -> routes.WorkspaceController.my.url)
     }
   }
 
-  def index(usernameInPath: String) = silhouette.UserAwareAction.async { implicit request =>    
+  /**  User workspace **/
+  def workspace(usernameInPath: String) = silhouette.UserAwareAction.async { implicit request =>    
     // If the user is logged in & the name in the path == username it's the profile owner
     val isProfileOwner = request.identity match {
       case Some(userWithRoles) => userWithRoles.username.equalsIgnoreCase(usernameInPath)
@@ -63,5 +57,12 @@ class MyRecogitoController @Inject() (
     else
       renderPublicProfile(usernameInPath, request.identity)
   }
+
+  private def renderPublicProfile(usernameInPath: String, loggedInUser: Option[User])(implicit request: RequestHeader) = {
+    users.findByUsernameIgnoreCase(usernameInPath).map { _ match {
+      case Some(owner) => Ok(views.html.my.profile())
+      case None => NotFoundPage
+    }}
+  }    
   
 }
