@@ -3,33 +3,25 @@ package controllers.my
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseController, Security}
 import javax.inject.{Inject, Singleton}
-import services.{Page, SortOrder}
-import services.annotation.AnnotationService
 import services.contribution.{Contribution, ContributionService}
 import services.user.{User, UserService}
-import services.document.DocumentService
-import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Environment}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{ControllerComponents, Cookie, RequestHeader}
+import play.api.mvc.{ControllerComponents, RequestHeader}
 import scala.concurrent.{ExecutionContext, Future}
-import storage.uploads.Uploads
 
 @Singleton
 class WorkspaceController @Inject() (
-    val annotations: AnnotationService,
-    val components: ControllerComponents,
-    val contributions: ContributionService,
-    val documents: DocumentService,
-    val users: UserService,
-    val uploads: Uploads,
-    val config: Configuration,
-    val silhouette: Silhouette[Security.Env],
-    implicit val ctx: ExecutionContext,
-    implicit val env: Environment,
-    implicit val webjars: WebJarsUtil
-  ) extends BaseController(components, config, users) with I18nSupport {
+  val components: ControllerComponents,
+  val contributions: ContributionService,
+  val users: UserService,
+  val config: Configuration,
+  val silhouette: Silhouette[Security.Env],
+  implicit val ctx: ExecutionContext,
+  implicit val env: Environment,
+  implicit val webjars: WebJarsUtil
+) extends BaseController(components, config, users) with I18nSupport {
 
   /** A convenience '/my' route that redirects to the personal index **/
   def my = silhouette.UserAwareAction { implicit request =>
