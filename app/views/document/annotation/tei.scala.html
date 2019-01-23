@@ -133,11 +133,11 @@
 
     <script type="text/javascript" src="@routes.Assets.versioned("build/bulkannotation.js")"></script>
     @helper.javascriptRouter("jsRoutes")(
-      controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
-      controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
-      controllers.api.routes.javascript.AnnotationAPIController.deleteAnnotation,
-      controllers.api.routes.javascript.AnnotationAPIController.bulkUpsert,
-      controllers.api.routes.javascript.AnnotationAPIController.bulkDelete,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.createAnnotation,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.deleteAnnotation,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.bulkUpsert,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.bulkDelete,
       controllers.api.routes.javascript.AuthoritiesAPIController.listGazetteers,
       controllers.api.routes.javascript.PlaceAPIController.findPlaceByURI,
       controllers.api.routes.javascript.PlaceAPIController.searchPlaces,

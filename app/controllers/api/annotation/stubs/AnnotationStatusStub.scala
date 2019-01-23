@@ -1,4 +1,4 @@
-package controllers.api.stubs
+package controllers.api.annotation.stubs
 
 import org.joda.time.DateTime
 import play.api.libs.json._

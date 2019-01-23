@@ -119,15 +119,15 @@
     </div>
 
     @helper.javascriptRouter("jsRoutes")(
-      controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
-      controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
-      controllers.api.routes.javascript.AnnotationAPIController.bulkUpsert,
-      controllers.api.routes.javascript.AnnotationAPIController.deleteAnnotation,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.createAnnotation,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.bulkUpsert,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.deleteAnnotation,
       controllers.api.routes.javascript.AuthoritiesAPIController.listGazetteers,
       controllers.api.routes.javascript.PlaceAPIController.findPlaceByURI,
       controllers.api.routes.javascript.PlaceAPIController.searchPlaces,
-      controllers.api.routes.javascript.TaskAPIController.spawnJob,
-      controllers.api.routes.javascript.TaskAPIController.progressByDocument,
+      controllers.api.task.routes.javascript.TaskAPIController.spawnJob,
+      controllers.api.task.routes.javascript.TaskAPIController.progressByDocument,
       controllers.document.settings.routes.javascript.SettingsController.showDocumentSettings,
       controllers.document.routes.javascript.DocumentController.getRaw
     )

@@ -9,7 +9,7 @@
   @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/stats/entities.js")))
 
   @helper.javascriptRouter("jsRoutes")(
-    controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInDocument,
+    controllers.api.annotation.routes.javascript.AnnotationAPIController.listAnnotationsInDocument,
     controllers.api.routes.javascript.PlaceAPIController.listPlacesInDocument
   )
 }

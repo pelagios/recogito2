@@ -1,4 +1,4 @@
-package controllers.api
+package controllers.api.task
 
 import akka.actor.ActorSystem
 import com.mohiva.play.silhouette.api.Silhouette

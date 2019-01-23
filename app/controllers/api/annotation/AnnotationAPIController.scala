@@ -1,8 +1,8 @@
-package controllers.api
+package controllers.api.annotation
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers._
-import controllers.api.stubs._
+import controllers.api.annotation.stubs._
 import java.io.File
 import java.util.UUID
 import javax.inject.{Inject, Singleton}

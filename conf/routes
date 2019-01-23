@@ -195,17 +195,17 @@ PUT     /api/announcements/:id                       controllers.api.Announcemen
 
 # ~~~ Annotations ~~~
 
-POST    /api/annotation                              controllers.api.AnnotationAPIController.createAnnotation
+POST    /api/annotation                              controllers.api.annotation.AnnotationAPIController.createAnnotation
 
-GET     /api/annotation/:id.jpg                      controllers.api.AnnotationAPIController.getImage(id: java.util.UUID)
-GET     /api/annotation/:id                          controllers.api.AnnotationAPIController.getAnnotation(id: java.util.UUID, context: Boolean ?= false)
+GET     /api/annotation/:id.jpg                      controllers.api.annotation.AnnotationAPIController.getImage(id: java.util.UUID)
+GET     /api/annotation/:id                          controllers.api.annotation.AnnotationAPIController.getAnnotation(id: java.util.UUID, context: Boolean ?= false)
 
-POST    /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkUpsert
-DELETE  /api/annotation/bulk                         controllers.api.AnnotationAPIController.bulkDelete
-DELETE  /api/annotation/:id                          controllers.api.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
+POST    /api/annotation/bulk                         controllers.api.annotation.AnnotationAPIController.bulkUpsert
+DELETE  /api/annotation/bulk                         controllers.api.annotation.AnnotationAPIController.bulkDelete
+DELETE  /api/annotation/:id                          controllers.api.annotation.AnnotationAPIController.deleteAnnotation(id: java.util.UUID)
 
-GET     /api/document/:id/annotations                controllers.api.AnnotationAPIController.listAnnotationsInDocument(id: String)
-GET     /api/document/:id/part/:part/annotations     controllers.api.AnnotationAPIController.listAnnotationsInPart(id: String, part: Int)
+GET     /api/document/:id/annotations                controllers.api.annotation.AnnotationAPIController.listAnnotationsInDocument(id: String)
+GET     /api/document/:id/part/:part/annotations     controllers.api.annotation.AnnotationAPIController.listAnnotationsInPart(id: String, part: Int)
 
 GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
 GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
@@ -221,9 +221,9 @@ GET     /api/place/:uri                              controllers.api.PlaceAPICon
 
 # ~~~ Tasks ~~~
 
-POST    /api/job                                     controllers.api.TaskAPIController.spawnJob
-GET     /api/job                                     controllers.api.TaskAPIController.progressByDocument(id: String)
-GET     /api/job/:id                                 controllers.api.TaskAPIController.getJobProgress(id: java.util.UUID)
+POST    /api/job                                     controllers.api.task.TaskAPIController.spawnJob
+GET     /api/job                                     controllers.api.task.TaskAPIController.progressByDocument(id: String)
+GET     /api/job/:id                                 controllers.api.task.TaskAPIController.getJobProgress(id: java.util.UUID)
 
 # ~~~ Plugins ~~~
 GET     /api/plugins/ner                            controllers.api.PluginAPIController.listNERPlugins

@@ -167,9 +167,9 @@
     @helper.javascriptRouter("jsRoutes")(
       controllers.document.routes.javascript.DocumentController.getImageManifest,
       controllers.document.routes.javascript.DocumentController.getImageTile,
-      controllers.api.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
-      controllers.api.routes.javascript.AnnotationAPIController.createAnnotation,
-      controllers.api.routes.javascript.AnnotationAPIController.deleteAnnotation,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.listAnnotationsInPart,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.createAnnotation,
+      controllers.api.annotation.routes.javascript.AnnotationAPIController.deleteAnnotation,
       controllers.api.routes.javascript.AuthoritiesAPIController.listGazetteers,
       controllers.api.routes.javascript.PlaceAPIController.findPlaceByURI,
       controllers.api.routes.javascript.PlaceAPIController.searchPlaces

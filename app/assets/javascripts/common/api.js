@@ -9,19 +9,19 @@ define([
 
     getAnnotation : function(uuid, opt_include_context) {
       var context = (opt_include_context) ? opt_include_context : false;
-      return jsRoutes.controllers.api.AnnotationAPIController.getAnnotation(uuid, context).ajax();
+      return jsRoutes.controllers.api.annotation.AnnotationAPIController.getAnnotation(uuid, context).ajax();
     },
 
     listAnnotationsInDocument : function(docId) {
-      return jsRoutes.controllers.api.AnnotationAPIController.listAnnotationsInDocument(docId).ajax();
+      return jsRoutes.controllers.api.annotation.AnnotationAPIController.listAnnotationsInDocument(docId).ajax();
     },
 
     listAnnotationsInPart : function(docId, partNo) {
-      return jsRoutes.controllers.api.AnnotationAPIController.listAnnotationsInPart(docId, partNo).ajax();
+      return jsRoutes.controllers.api.annotation.AnnotationAPIController.listAnnotationsInPart(docId, partNo).ajax();
     },
 
     storeAnnotation : function(annotation) {
-      return jsRoutes.controllers.api.AnnotationAPIController.createAnnotation().ajax({
+      return jsRoutes.controllers.api.annotation.AnnotationAPIController.createAnnotation().ajax({
         type: 'POST',
         data: JSON.stringify(annotation),
         contentType: 'application/json'
@@ -29,7 +29,7 @@ define([
     },
 
     storeAnnotationBatch : function(annotations) {
-      return jsRoutes.controllers.api.AnnotationAPIController.bulkUpsert().ajax({
+      return jsRoutes.controllers.api.annotation.AnnotationAPIController.bulkUpsert().ajax({
         type: 'POST',
         data: JSON.stringify(annotations),
         contentType: 'application/json'
@@ -37,7 +37,7 @@ define([
     },
 
     bulkUpsertAnnotations : function(annotations) {
-      return jsRoutes.controllers.api.AnnotationAPIController.bulkUpsert().ajax({
+      return jsRoutes.controllers.api.annotation.AnnotationAPIController.bulkUpsert().ajax({
         type: 'POST',
         data: JSON.stringify(annotations),
         contentType: 'application/json'
@@ -45,11 +45,11 @@ define([
     },
 
     deleteAnnotation : function(id) {
-      return jsRoutes.controllers.api.AnnotationAPIController.deleteAnnotation(id).ajax();
+      return jsRoutes.controllers.api.annotation.AnnotationAPIController.deleteAnnotation(id).ajax();
     },
 
     deleteAnnotationBatch : function(ids) {
-      return jsRoutes.controllers.api.AnnotationAPIController.bulkDelete().ajax({
+      return jsRoutes.controllers.api.annotation.AnnotationAPIController.bulkDelete().ajax({
         type: 'DELETE',
         data: JSON.stringify(ids),
         contentType: 'application/json'

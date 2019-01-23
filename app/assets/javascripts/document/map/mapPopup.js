@@ -98,7 +98,7 @@ define([
 
               createImageSnippet = function() {
                 return'<div class="image-preview"><img src="' +
-                  jsRoutes.controllers.api.AnnotationAPIController
+                  jsRoutes.controllers.api.annotation.AnnotationAPIController
                     .getImage(annotation.annotation_id).absoluteURL() + '"></div>';
               },
 
