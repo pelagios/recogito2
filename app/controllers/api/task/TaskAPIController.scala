@@ -19,17 +19,17 @@ import transform.ner.{NERService, NERJobDefinition}
 
 @Singleton
 class TaskAPIController @Inject() (
-    val components: ControllerComponents,
-    val config: Configuration,
-    val documents: DocumentService,
-    val users: UserService,
-    val ner: NERService,
-    val georesolution: GeoresolutionService,
-    val silhouette: Silhouette[Security.Env],
-    val tasks: TaskService,
-    implicit val system: ActorSystem,
-    implicit val ctx: ExecutionContext
-  ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
+  val components: ControllerComponents,
+  val config: Configuration,
+  val documents: DocumentService,
+  val users: UserService,
+  val ner: NERService,
+  val georesolution: GeoresolutionService,
+  val silhouette: Silhouette[Security.Env],
+  val tasks: TaskService,
+  implicit val system: ActorSystem,
+  implicit val ctx: ExecutionContext
+) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
   def spawnJob = silhouette.SecuredAction.async { implicit request =>
     request.body.asJson.map(json => Json.fromJson[JobDefinition](json)) match {

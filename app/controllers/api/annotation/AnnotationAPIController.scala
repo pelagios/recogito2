@@ -26,24 +26,24 @@ import storage.uploads.Uploads
 
 @Singleton
 class AnnotationAPIController @Inject() (
-    val components: ControllerComponents,
-    val annotationService: AnnotationService,
-    val contributions: ContributionService,
-    val documents: DocumentService,
-    val silhouette: Silhouette[Security.Env],
-    val users: UserService,
-    implicit val config: Configuration,
-    implicit val mimeTypes: FileMimeTypes,
-    implicit val tmpFile: TemporaryFileCreator,
-    implicit val uploads: Uploads,
-    implicit val ctx: ExecutionContext
-  ) extends BaseController(components, config, users)
-      with HasAnnotationValidation
-      with HasPrettyPrintJSON
-      with HasTextSnippets
-      with HasTEISnippets
-      with HasCSVParsing {
-  
+  val components: ControllerComponents,
+  val annotationService: AnnotationService,
+  val contributions: ContributionService,
+  val documents: DocumentService,
+  val silhouette: Silhouette[Security.Env],
+  val users: UserService,
+  implicit val config: Configuration,
+  implicit val mimeTypes: FileMimeTypes,
+  implicit val tmpFile: TemporaryFileCreator,
+  implicit val uploads: Uploads,
+  implicit val ctx: ExecutionContext
+) extends BaseController(components, config, users)
+    with HasAnnotationValidation
+    with HasPrettyPrintJSON
+    with HasTextSnippets
+    with HasTEISnippets
+    with HasCSVParsing {
+
   // Frontent serialization format
   import services.annotation.FrontendAnnotation._
 

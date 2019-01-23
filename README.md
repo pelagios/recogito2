@@ -1,6 +1,6 @@
 # Recogito
 
-__Current version: [v3.1](https://github.com/pelagios/recogito2/releases/tag/v3.1)__
+__Current version: [v3.2](https://github.com/pelagios/recogito2/releases/tag/v3.2)__
 
 Home of [Recogito](http://recogito.pelagios.org) - a Semantic Annotation tool for texts and
 images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our progress on
@@ -10,9 +10,7 @@ images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our 
 
 * Java 8 JDK
 * [SBT](http://www.scala-sbt.org/) (version 1.0.x)
-* __NEW:__ as we are introducing [React](https://reactjs.org/) in some UI areas,
-  a number of additional dependencies must be installed. __Note that this is not
-  needed for v3.1 yet, only if you build from the current master!__
+* Node.js tooling
   - [node.js](https://nodejs.org/en/) (version 4.2.6)
   - [npm](https://www.npmjs.com/) (version 6.1.0)
   - `webpack` and `webpack-cli` packages (via npm)
@@ -32,6 +30,7 @@ images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our 
   Make any environment-specific changes there. (For the most part, the defaults should be fine.)
 * Create a database named 'recogito' on your Postgres DB server. (If you want a different name, adjust
   the settings in your `conf/application.conf` accordingly.)
+* Type `npm install` to download required JS dependencies
 * Type `sbt run` to start the application in development mode.
 * Point your browser to [http://localhost:9000](http://localhost:9000)
 * Recogito automatically creates a single user with administrator privileges with username
