@@ -108,7 +108,7 @@ define([
   return {
 
     initGazetteers: function() {
-      return jsRoutes.controllers.api.AuthoritiesAPIController.listGazetteers()
+      return jsRoutes.controllers.api.entity.AuthoritiesAPIController.listGazetteers()
         .ajax().then(function(gazetteers) {
           KNOWN_GAZETTEERS = gazetteers;
         });

@@ -207,17 +207,17 @@ DELETE  /api/annotation/:id                          controllers.api.annotation.
 GET     /api/document/:id/annotations                controllers.api.annotation.AnnotationAPIController.listAnnotationsInDocument(id: String)
 GET     /api/document/:id/part/:part/annotations     controllers.api.annotation.AnnotationAPIController.listAnnotationsInPart(id: String, part: Int)
 
-GET     /api/document/:id/places/search              controllers.api.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
-GET     /api/document/:id/places                     controllers.api.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
+GET     /api/document/:id/places/search              controllers.api.entity.PlaceAPIController.searchPlacesInDocument(q: String, id: String, offset: Int ?= 0, size: Int ?= 20)
+GET     /api/document/:id/places                     controllers.api.entity.PlaceAPIController.listPlacesInDocument(id: String, offset: Int ?= 0, size: Int ?= 0)
 
 # ~~~ Authorities ~~~ 
 
-GET     /api/authorities/gazetteers                  controllers.api.AuthoritiesAPIController.listGazetteers
+GET     /api/authorities/gazetteers                  controllers.api.entity.AuthoritiesAPIController.listGazetteers
 
 # ~~~ Entities ~~~
 
-GET     /api/place/search                            controllers.api.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None, authorities: Option[String] ?= None)
-GET     /api/place/:uri                              controllers.api.PlaceAPIController.findPlaceByURI(uri: String)
+GET     /api/place/search                            controllers.api.entity.PlaceAPIController.searchPlaces(q: String, offset: Int ?= 0, size: Int ?= 20, latlng: Option[String] ?= None, authorities: Option[String] ?= None)
+GET     /api/place/:uri                              controllers.api.entity.PlaceAPIController.findPlaceByURI(uri: String)
 
 # ~~~ Tasks ~~~
 

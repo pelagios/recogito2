@@ -1,4 +1,4 @@
-package controllers.api
+package controllers.api.entity
 
 import com.mohiva.play.silhouette.api.Silhouette
 import com.vividsolutions.jts.geom.Coordinate
@@ -17,14 +17,14 @@ import services.entity.EntityType
 
 @Singleton
 class PlaceAPIController @Inject() (
-    val components: ControllerComponents,
-    val config: Configuration,
-    val documents: DocumentService,
-    val users: UserService,
-    val entities: EntityService,
-    val silhouette: Silhouette[Security.Env],
-    implicit val ctx: ExecutionContext
-  ) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
+  val components: ControllerComponents,
+  val config: Configuration,
+  val documents: DocumentService,
+  val users: UserService,
+  val entities: EntityService,
+  val silhouette: Silhouette[Security.Env],
+  implicit val ctx: ExecutionContext
+) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
   /** Lookup by URI - open to all, so that it's available to public documents **/
   def findPlaceByURI(uri: String) = Action.async { implicit request =>

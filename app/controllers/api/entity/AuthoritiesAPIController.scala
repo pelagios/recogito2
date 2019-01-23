@@ -1,4 +1,4 @@
-package controllers.api
+package controllers.api.entity
 
 import controllers.{BaseOptAuthController, HasPrettyPrintJSON}
 import javax.inject.{Inject, Singleton}

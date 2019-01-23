@@ -59,14 +59,14 @@ define([
     /** Place API **/
 
     getPlace : function(uri) {
-      return jsRoutes.controllers.api.PlaceAPIController.findPlaceByURI(uri).ajax();
+      return jsRoutes.controllers.api.entity.PlaceAPIController.findPlaceByURI(uri).ajax();
     },
 
     listPlacesInDocument : function(docId, offset, size) {
       var o = (offset) ? offset : 0,
           s = (size) ? size : 20;
 
-      return jsRoutes.controllers.api.PlaceAPIController.listPlacesInDocument(docId, o, s).ajax();
+      return jsRoutes.controllers.api.entity.PlaceAPIController.listPlacesInDocument(docId, o, s).ajax();
     },
 
     searchPlaces : function(query, offset, size) {
@@ -79,11 +79,11 @@ define([
             Config.authorities.gazetteers.includes;
 
       if (searchAllGazetteers)
-        return jsRoutes.controllers.api.PlaceAPIController
+        return jsRoutes.controllers.api.entity.PlaceAPIController
           .searchPlaces(query, o, s)
           .ajax();
       else
-        return jsRoutes.controllers.api.PlaceAPIController
+        return jsRoutes.controllers.api.entity.PlaceAPIController
           .searchPlaces(query, o, s, null, includes)
           .ajax()
           .then(function(results) {
