@@ -1,4 +1,4 @@
-package controllers.api
+package controllers.api.message
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}

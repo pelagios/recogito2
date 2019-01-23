@@ -184,14 +184,14 @@ DELETE  /api/shared/folder/:id                       controllers.my.directory.de
 
 # ~~~ Search ~~~
 
-GET     /api/search/all                              controllers.api.SearchAPIController.searchAll
-GET     /api/search/my                               controllers.api.SearchAPIController.searchMy
-GET     /api/search/shared                           controllers.api.SearchAPIController.searchSharedWithMe
+GET     /api/search/all                              controllers.api.search.SearchAPIController.searchAll
+GET     /api/search/my                               controllers.api.search.SearchAPIController.searchMy
+GET     /api/search/shared                           controllers.api.search.SearchAPIController.searchSharedWithMe
 
 # ~~~ Announcements ~~~
 
-GET     /api/announcements/my/latest                 controllers.api.AnnouncementAPIController.myLatest
-PUT     /api/announcements/:id                       controllers.api.AnnouncementAPIController.confirm(id: java.util.UUID)
+GET     /api/announcements/my/latest                 controllers.api.message.AnnouncementAPIController.myLatest
+PUT     /api/announcements/:id                       controllers.api.message.AnnouncementAPIController.confirm(id: java.util.UUID)
 
 # ~~~ Annotations ~~~
 
@@ -226,9 +226,9 @@ GET     /api/job                                     controllers.api.task.TaskAP
 GET     /api/job/:id                                 controllers.api.task.TaskAPIController.getJobProgress(id: java.util.UUID)
 
 # ~~~ Plugins ~~~
-GET     /api/plugins/ner                            controllers.api.PluginAPIController.listNERPlugins
-GET     /api/plugins/js/:ext/:id.js                 controllers.api.PluginAPIController.loadPlugin(ext: String, id: String)
-GET     /api/plugins/js/:ext/:id.css                controllers.api.PluginAPIController.loadCSS(ext: String, id: String)
+GET     /api/plugins/ner                            controllers.api.plugin.PluginAPIController.listNERPlugins
+GET     /api/plugins/js/:ext/:id.js                 controllers.api.plugin.PluginAPIController.loadPlugin(ext: String, id: String)
+GET     /api/plugins/js/:ext/:id.css                controllers.api.plugin.PluginAPIController.loadCSS(ext: String, id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings

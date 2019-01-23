@@ -1,4 +1,4 @@
-package controllers.api
+package controllers.api.search
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, HasPrettyPrintJSON, Security}
