@@ -10,10 +10,8 @@ images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our 
 
 * Java 8 JDK
 * [SBT](http://www.scala-sbt.org/) (version 1.0.x)
-* Node.js tooling
-  - [node.js](https://nodejs.org/en/) (version 4.2.6)
-  - [npm](https://www.npmjs.com/) (version 6.1.0)
-  - `webpack` and `webpack-cli` packages (via npm)
+* [node.js](https://nodejs.org/en/) (version 4.2.6), along with [npm](https://www.npmjs.com/) (version 6.1.0) 
+  the `webpack` and `webpack-cli` npm packages (install globally)
 * PostgreSQL DB (tested with version 9.5)
 * __Important: as of version 2.2, Recogito requires an installation of
   [ElasticSearch v5.6.5](https://www.elastic.co/downloads/past-releases/elasticsearch-5-6-5).
