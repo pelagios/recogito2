@@ -169,7 +169,7 @@ require(['common/config'], function(Config) {
             data: JSON.stringify(data)
           }).done(function(result) {
             if (result.new_collaborator) {
-              var collabHome = jsRoutes.controllers.my.MyRecogitoController.index(result.collaborator).url,
+              var collabHome = jsRoutes.controllers.my.WorkspaceController.workspace(result.collaborator).url,
                   row = '<tr data-username="' + result.collaborator + '" data-level="' + result.access_level + '">' +
                           '<td class="col-user">' +
                             '<a href="' + collabHome + '">' + result.collaborator + '</a>' +
