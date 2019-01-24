@@ -13,9 +13,7 @@ images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our 
 * [node.js](https://nodejs.org/en/) (version 4.2.6), along with [npm](https://www.npmjs.com/) (version 6.1.0) 
   and the `webpack` and `webpack-cli` npm packages (install globally via `npm install -g {package-name}` )
 * PostgreSQL DB (tested with version 9.5)
-* __Important: as of version 2.2, Recogito requires an installation of
-  [ElasticSearch v5.6.5](https://www.elastic.co/downloads/past-releases/elasticsearch-5-6-5).
-  Automatic fallback to an embedded ElasticSearch index is no longer supported.__
+* [ElasticSearch v5.6.5](https://www.elastic.co/downloads/past-releases/elasticsearch-5-6-5)
 * To use image annotation, you need to have the [vips](http://www.vips.ecs.soton.ac.uk/) image
   processing system installed. If vips is not available on the command line, Recogito is set to
   reject uploaded images as 'unsupported content'. (Note: on Ubuntu, 'libvips-tools' is the
