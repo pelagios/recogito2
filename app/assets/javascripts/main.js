@@ -25,10 +25,6 @@ require.config({
     { name : 'help/tutorial'},
     { name : 'help/articles'},
     { name : 'landing/index' },
-    { name : 'my/settings/account' },
-    { name : 'my/upload/step1' },
-    { name : 'my/upload/step2' },
-    { name : 'my/upload/step3' },
-    { name : 'my/index' }
+    { name : 'my/settings/account' }
   ]
 });
