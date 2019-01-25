@@ -71,28 +71,6 @@ landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
   <a href="{3}" target="_blank">Twitter</a>
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal space
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=Katıldı
-my.header.account_settings=Hesap Bilgileri
-my.header.space_used=Kullanılan
-my.header.logout=Çıkış
-
-my.tabs.my_documents=Belgelerim
-my.tabs.shared_with_me=Benimle Paylaşılanlar
-
-my.tools.search=Ara
-my.tools.new_document=Yeni Belge
-
-my.table.header.uploaded=Yüklendi
-my.table.header.last_edit=En son düzenleme
-my.table.header.by=Tarafından
-my.table.header.public=Ortak
-my.table.header.owner=Sahibi
-my.table.header.shared_by=Tarafından Paylaşıldı
-my.table.header.access_level=Erişim
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 account_settings.sidebar.account=Hesap

@@ -73,28 +73,6 @@ landing.index.visit_us=<span class="icon">{0}</span> Επισκεφτείτε μ
   <a href="{3}" target="_blank">Twitter</a>
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal space
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=Χρήστης από
-my.header.account_settings=Ρυθμίσεις λογαριασμού
-my.header.space_used=Χρησιμοποιήθηκαν
-my.header.logout=Αποσύνδεση
-
-my.tabs.my_documents=Τα έγγραφά μου
-my.tabs.shared_with_me=Μοιράστηκαν με μένα
-
-my.tools.search=Αναζήτηση
-my.tools.new_document=Νέο έγγραφο
-
-my.table.header.uploaded=Ημερομηνία μεταφόρτωσης
-my.table.header.last_edit=Τελευταία επεξεργασία
-my.table.header.by=Από
-my.table.header.public=Δημόσιο
-my.table.header.owner=Ιδιοκτήτης
-my.table.header.shared_by=Μοιράστηκε από
-my.table.header.access_level=Πρόσβαση
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 account_settings.sidebar.account=Λογαριασμός

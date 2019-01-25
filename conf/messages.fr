@@ -74,28 +74,6 @@ landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
   <a href="{3}" target="_blank">Twitter</a>
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal space
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=Membre depuis le
-my.header.account_settings=Paramètres du compte
-my.header.space_used=Utilisé
-my.header.logout=Déconnexion
-
-my.tabs.my_documents=Mes documents
-my.tabs.shared_with_me=Partagé avec moi
-
-my.tools.search=Rechercher
-my.tools.new_document=Nouveau document
-
-my.table.header.uploaded=Téléchargé
-my.table.header.last_edit=Dernière édition
-my.table.header.by=Par
-my.table.header.public=Public
-my.table.header.owner=Propriétaire
-my.table.header.shared_by=Partagé par
-my.table.header.access_level=Accès
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 account_settings.sidebar.account=Compte

@@ -69,28 +69,6 @@ landing.index.visit_us=<span class="icon">{0}</span> 私たちを \
   <a href="{3}" target="_blank">Twitter</a>をフォロしてください。
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal space
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=参加を始めた日
-my.header.account_settings=アカウント設定
-my.header.space_used=使用日
-my.header.logout=ログアウト
-
-my.tabs.my_documents=自分のドキュメント
-my.tabs.shared_with_me=共有されたドキュメント
-
-my.tools.search=検索
-my.tools.new_document=新しいドキュメント
-
-my.table.header.uploaded=アップロードされた日
-my.table.header.last_edit=最後の編集
-my.table.header.by=から
-my.table.header.public=公共
-my.table.header.owner=所有者
-my.table.header.shared_by=共有者
-my.table.header.access_level=アクセス
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 account_settings.sidebar.account=アカウント

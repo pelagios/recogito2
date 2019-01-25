@@ -69,28 +69,6 @@ landing.index.visit_us=<span class="icon">{0}</span> আমাদের \
   <a href="{3}" target="_blank">Twitter</a> ফলো করুন।
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal space
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=যোগদান করার তারিখ
-my.header.account_settings=অ্যাকাউন্ট সেটিংস
-my.header.space_used=ব্যাবহারকৃত
-my.header.logout=লগআউট
-
-my.tabs.my_documents=আমার ডকুমেন্ট
-my.tabs.shared_with_me=আমার সাথে শেয়ার করা
-
-my.tools.search=অনুসন্ধান
-my.tools.new_document=নতুন ডকুমেন্ট
-
-my.table.header.uploaded=আপলোডকৃত
-my.table.header.last_edit=সর্বশেষ সম্পাদনা
-my.table.header.by=দ্বারা
-my.table.header.public=সর্বসাধারণের
-my.table.header.owner=স্বত্বাধিকারী
-my.table.header.shared_by=শেয়ার করেছেন
-my.table.header.access_level=প্রবেশ
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 account_settings.sidebar.account=অ্যাকাউন্ট

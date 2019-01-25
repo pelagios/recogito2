@@ -72,28 +72,6 @@ landing.index.visit_us=<span class="icon">{0}</span> Bezoek onze \
   <a href="{3}" target="_blank">Twitter</a>
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal space
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=Lid sinds
-my.header.account_settings=Profielinstellingen
-my.header.space_used=Gebruikt
-my.header.logout=Uitloggen
-
-my.tabs.my_documents=Mijn Documenten
-my.tabs.shared_with_me=Gedeeld met mij
-
-my.tools.search=Zoeken
-my.tools.new_document=Nieuw document
-
-my.table.header.uploaded=Geupload
-my.table.header.last_edit=Laatste wijziging
-my.table.header.by=Door
-my.table.header.public=Publiek
-my.table.header.owner=Eigenaar
-my.table.header.shared_by=Gedeeld door
-my.table.header.access_level=Toegang
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 account_settings.sidebar.account=Profiel

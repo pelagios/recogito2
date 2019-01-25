@@ -62,28 +62,6 @@ landing.index.about="نرم افزار متن باز توسط موسسه تکن�
 landing.index.visit_us=<span class="icon">{2}</span><a href="{3}" target="_blank">ما را در توییتر و </a> <span class="icon">{0}</span> <a href="{1}" target="_blank">Github</a> دنبال کنید"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal space
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-my.header.joined_on=عضو شده از
-my.header.account_settings=تنظیمات کاربری
-my.header.space_used=استفاده شده
-my.header.logout=خروج
-
-my.tabs.my_documents=مستندات من
-my.tabs.shared_with_me=اشتراک گذاری شده با من
-
-my.tools.search=جستجو
-my.tools.new_document=سند جدید
-
-my.table.header.uploaded=بارگذاری شده
-my.table.header.last_edit=آخرین ویرایش
-my.table.header.by=توسط
-my.table.header.public=عمومی
-my.table.header.owner=صاحب امتیاز
-my.table.header.shared_by=اشتراک گذاری شده توسط
-my.table.header.access_level=دسترسی
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Account settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 account_settings.sidebar.account=حساب کاربری
