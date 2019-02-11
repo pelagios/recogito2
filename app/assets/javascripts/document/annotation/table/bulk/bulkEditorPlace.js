@@ -116,7 +116,7 @@ define([
 
           progressModal.on('stopped', onStopped);
 
-          jsRoutes.controllers.api.TaskAPIController.spawnJob().ajax({
+          jsRoutes.controllers.api.task.TaskAPIController.spawnJob().ajax({
             data: JSON.stringify({
               task_type     : 'GEORESOLUTION',
               documents     : [ Config.documentId ],

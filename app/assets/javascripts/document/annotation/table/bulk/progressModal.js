@@ -56,7 +56,7 @@ define([
               },
 
               query = function() {
-                jsRoutes.controllers.api.TaskAPIController.progressByDocument(documentId).ajax()
+                jsRoutes.controllers.api.task.TaskAPIController.progressByDocument(documentId).ajax()
                   .done(onProgress)
                   .fail(onFail);
               };
