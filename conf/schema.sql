@@ -115,7 +115,7 @@ CREATE TABLE folder_association (
 CREATE TABLE sharing_policy (
   id SERIAL PRIMARY KEY,
   -- one of the following two needs to be defined
-  folder_id INTEGER REFERENCES folder(id),
+  folder_id UUID REFERENCES folder(id),
   document_id TEXT REFERENCES document(id),
   shared_by TEXT NOT NULL REFERENCES "user"(username),
   shared_with TEXT NOT NULL REFERENCES "user"(username),
