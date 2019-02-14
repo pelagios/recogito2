@@ -28,13 +28,16 @@ trait PlaintextToIOB {
     // Chop up
     fText.map { _ match {
       case Some(text) =>
-        text.split(" ").foldLeft(Seq.empty[Token]) { (result, next) =>
+        text.split("[,\\s\\-:\\?]").foldLeft(Seq.empty[Token]) { (result, next) =>
           val offset = result.lastOption match {
             case Some(last) => last.charOffset + last.text.size + 1
             case None => 0
           }
 
-          result :+ Token(next, offset)
+          if (next.size > 0)
+            result :+ Token(next, offset)
+          else 
+            result
         }
 
       case None => 
