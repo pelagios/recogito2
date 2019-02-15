@@ -70,7 +70,7 @@ trait PlaintextToSpacy {
           }
         }
 
-        lines.toSeq
+        lines.toSeq.filter(!_.text.isEmpty)
 
       case None => 
         // Should never happen
