@@ -203,6 +203,19 @@
                   <a href="@controllers.document.downloads.routes.DownloadsController.downloadIOB(doc.id)" class="btn small"><span class="icon">&#xf019;</span> IOB</a>
                 </div>
               </li>
+
+              <li>
+                <div class="description">
+                  <h3>Spacy JSON &nbsp;<span class="beta">BETA</span></h3>
+                  <p>
+                    The text, line by line, in a JSON format usable as training data input for the   
+                    <a href="https://spacy.io/usage/training" target="_blank">Spacy</a> machine learning library.
+                  </p>
+                </div>
+                <div class="button-container">
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadSpacy(doc.id)" class="btn small"><span class="icon">&#xf019;</span> Spacy</a>
+                </div>
+              </li>
             </ul>
           </div>
         </div>
