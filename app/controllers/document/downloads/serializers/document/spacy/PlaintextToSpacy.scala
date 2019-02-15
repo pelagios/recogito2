@@ -17,7 +17,7 @@ case class Sentence(text: String, charOffset: Int)
 
 case class SpacyEntity(start: Int, end: Int, tag: String)
 
-case class SpacyRecord (sentence: String, entities: Seq[SpacyEntity])
+case class SpacyRecord(sentence: String, entities: Seq[SpacyEntity])
 
 object SpacyEntity {
   
@@ -32,6 +32,8 @@ object SpacyRecord {
 }
 
 trait PlaintextToSpacy {
+
+  // private multiDelimSplit(text: String): 
 
   /** Loads the text document from storage and builds the token list. 
     * 
@@ -48,17 +50,27 @@ trait PlaintextToSpacy {
     // Chop up
     fText.map { _ match {
       case Some(text) =>
-        text.split("\n").foldLeft(Seq.empty[Sentence]) { (result, next) =>
-          val offset = result.lastOption match {
-            case Some(last) => last.charOffset + last.text.size + 1
-            case None => 0
-          }
 
-          if (next.size > 0)
-            result :+ Sentence(next, offset)
-          else 
-            result
+        // Horrible, but we need to keep the indices in sync for multiple
+        // occurrences of the delimiting character
+        val lines = scala.collection.mutable.ArrayBuffer.empty[Sentence]
+
+        var runningOffset = 0
+        var rest = text
+
+        while (rest.size > 0) {
+          val nextDelim = rest.indexOf("\n")
+          if (nextDelim > -1) {
+            lines.append(Sentence(rest.substring(0, nextDelim), runningOffset))
+            runningOffset += nextDelim + 1
+            rest = rest.substring(nextDelim + 1)
+          } else {
+            lines.append(Sentence(rest, runningOffset))
+            rest = ""
+          }
         }
+
+        lines.toSeq
 
       case None => 
         // Should never happen
@@ -145,12 +157,12 @@ trait PlaintextToSpacy {
     } yield (lines, parseOffsets(annotations))
 
     // TODO indentical to IOB - up until here. Refactor!
-    val records = f.map { case (lines, allAnnotations) => 
+    val fRecords = f.map { case (lines, allAnnotations) =>
       lines.map { line =>
         val annotationsInSentence = getAnnotationsInSentence(line, allAnnotations)
 
         val entities = annotationsInSentence.map { case (anchorOffset, a) =>
-          val start = anchorOffset - line.charOffset - 1
+          val start = anchorOffset - line.charOffset
           val end = start + getQuote(a).size
           SpacyEntity(start, end, getTag(a))
         }
@@ -159,7 +171,11 @@ trait PlaintextToSpacy {
       }
     }
 
-    records.map(Json.toJson(_)) 
+    fRecords.map { records => 
+      Json.toJson(records.map { r => 
+        Json.arr(r.sentence, Json.toJson(r.entities))
+      })
+    }
 
   }
 
