@@ -173,7 +173,9 @@ trait PlaintextToSpacy {
 
     fRecords.map { records => 
       Json.toJson(records.map { r => 
-        Json.arr(r.sentence, Json.toJson(r.entities))
+        Json.arr(r.sentence, Json.obj(
+          "entites" -> r.entities.map(r => Json.arr(r.start, r.end, r.tag))
+        ))
       })
     }
 
