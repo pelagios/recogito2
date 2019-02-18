@@ -35,8 +35,8 @@ libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette-testkit" % "5.0.0" % Test,
   "com.mohiva" %% "play-silhouette-cas" % "5.0.0",
 
-  "com.nrinaudo" %% "kantan.csv" % "0.2.1",
-  "com.nrinaudo" %% "kantan.csv-commons" % "0.2.1",
+  "com.nrinaudo" %% "kantan.csv" % "0.3.1",
+  "com.nrinaudo" %% "kantan.csv-commons" % "0.3.1",
 
   "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.6.1",
   "com.sksamuel.elastic4s" %% "elastic4s-tcp" % "5.6.1",

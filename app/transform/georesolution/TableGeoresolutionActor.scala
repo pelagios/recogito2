@@ -51,6 +51,8 @@ class TableGeoresolutionActor(
     new File(dir, part.getFile).asCsvReader[List[String]](config).map {
       case Success(line) =>
         val toponym = line(jobDef.toponymColumn).trim()        
+        counter += 1
+
         if (toponym.size > 0) {
           val coord =
             if (hasCoordHint) {
@@ -63,8 +65,7 @@ class TableGeoresolutionActor(
             } else {
               None
             }
-          
-          counter += 1
+  
           Some(Georesolvable(toponym, s"row:${counter}", coord))
         } else {
           None
