@@ -46,6 +46,8 @@ class UserAdminController @Inject() (
     (JsPath \ "email").write[String] and
     (JsPath \ "member_since").write[DateTime] and
     (JsPath \ "real_name").writeNullable[String] and
+    (JsPath \ "bio").writeNullable[String] and
+    (JsPath \ "website").writeNullable[String] and
     (JsPath \ "quota").write[Int] and
     (JsPath \ "last_login").write[DateTime]
   )(user => (
@@ -53,6 +55,8 @@ class UserAdminController @Inject() (
     users.decryptEmail(user.getEmail),
     new DateTime(user.getMemberSince.getTime),
     Option(user.getRealName),
+    Option(user.getBio),
+    Option(user.getWebsite),
     user.getQuotaMb,
     new DateTime(user.getLastLogin.getTime)
   ))
