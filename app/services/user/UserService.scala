@@ -109,10 +109,41 @@ class UserService @Inject() (
       .set(USER_ROLE.HAS_ROLE, role.toString)
       .execute()
   }
+
+  /** For convenience **/
+  def makeAdmin(username: String,  makeAdmin: Boolean) = db.withTransaction { sql => 
+    val isAlreadyAdmin =
+      sql
+        .select(USER_ROLE.HAS_ROLE)
+        .from(USER_ROLE)
+        .where(USER_ROLE.USERNAME.equal(username))
+        .fetchInto(classOf[String])
+        .contains("ADMIN")
+
+     if (!isAlreadyAdmin && makeAdmin)
+       sql.insertInto(USER_ROLE)
+         .set(USER_ROLE.USERNAME, username)
+         .set(USER_ROLE.HAS_ROLE, "ADMIN")
+         .execute()
+     else if (isAlreadyAdmin && !makeAdmin)
+       sql.delete(USER_ROLE)
+         .where(USER_ROLE.USERNAME.equal(username)
+           .and(USER_ROLE.HAS_ROLE.equal("ADMIN")))
+         .execute()
+     else
+       0 // Rows affected
+  }
   
   def updateLastLogin(username: String) = db.withTransaction { sql =>
     sql.update(USER)
       .set(USER.LAST_LOGIN, new Timestamp(new Date().getTime))
+      .where(USER.USERNAME.equal(username))
+      .execute()
+  }
+
+  def updateQuota(username: String, quota: Integer) = db.withTransaction { sql => 
+    sql.update(USER)
+      .set(USER.QUOTA_MB, quota)
       .where(USER.USERNAME.equal(username))
       .execute()
   }

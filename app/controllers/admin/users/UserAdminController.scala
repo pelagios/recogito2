@@ -94,8 +94,12 @@ class UserAdminController @Inject() (
         val quota = (json \ "quota").as[Int]
         val isAdmin = (json \ "is_admin").asOpt[Boolean].getOrElse(false)
 
-        // TODO implement
-        Future.successful(Ok)
+        val f = for {
+          _ <- users.updateQuota(username, quota)
+          _ <- users.makeAdmin(username, isAdmin)
+        } yield()
+
+        f.map { _ => Ok }
 
       case None => 
         Future.successful(BadRequest) // Cannot happen via UI
