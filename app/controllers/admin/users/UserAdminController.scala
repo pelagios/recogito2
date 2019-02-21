@@ -40,7 +40,7 @@ class UserAdminController @Inject() (
 ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON with HasDate with HasAccountRemoval {
   
   private val fmt = DateTimeFormat.forPattern("yyyy-MM-dd")
-  
+
   implicit val userRecordWrites: Writes[UserRecord] = (
     (JsPath \ "username").write[String] and
     (JsPath \ "email").write[String] and
@@ -61,6 +61,11 @@ class UserAdminController @Inject() (
     new DateTime(user.getLastLogin.getTime)
   ))
 
+  implicit val userWithAdminStatusWrites: Writes[(UserRecord, Boolean)] = (
+    (JsPath).write[UserRecord] and
+    (JsPath \ "is_admin").write[Boolean]
+  )(t => (t._1, t._2))
+
   def index = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
     Ok(views.html.admin.users.index())
   }
@@ -80,6 +85,20 @@ class UserAdminController @Inject() (
         
       case Failure(t) =>
         Future.successful(BadRequest(s"Invalid date: ${date}")) 
+    }
+  }
+
+  def updateSettings(username: String) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
+    request.body.asJson match {
+      case Some(json) =>
+        val quota = (json \ "quota").as[Int]
+        val isAdmin = (json \ "is_admin").asOpt[Boolean].getOrElse(false)
+
+        // TODO implement
+        Future.successful(Ok)
+
+      case None => 
+        Future.successful(BadRequest) // Cannot happen via UI
     }
   }
   

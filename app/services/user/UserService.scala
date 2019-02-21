@@ -45,14 +45,30 @@ class UserService @Inject() (
 
   def listUsers(offset: Int = 0, limit: Int = 20, sortBy: Option[String], sortOrder: Option[SortOrder]) = db.query { sql =>
     val startTime = System.currentTimeMillis
+
     val sortField = sortBy.flatMap(fieldname => getSortField(Seq(USER), fieldname, sortOrder))
     val total = sql.selectCount().from(USER).fetchOne(0, classOf[Int])
+
     val query = sortField match {
-      case Some(field) => sql.selectFrom(USER).orderBy(field)
-      case None => sql.selectFrom(USER)
+      case Some(field) => 
+        sql.select()
+           .from(USER)
+           .fullOuterJoin(USER_ROLE)
+           .on(USER.USERNAME.equal(USER_ROLE.USERNAME))  
+           .orderBy(field)
+
+      case None => 
+        sql.select()
+           .from(USER)
+           .fullOuterJoin(USER_ROLE)
+           .on(USER.USERNAME.equal(USER_ROLE.USERNAME))  
     }
 
-    val users = query.limit(limit).offset(offset).fetch().into(classOf[UserRecord])
+    val users = query.limit(limit).offset(offset).fetchArray().map { record => 
+      val user = record.into(classOf[UserRecord])
+      val isAdmin = record.getValue(USER_ROLE.HAS_ROLE) == "ADMIN"
+      (user, isAdmin)
+    }
     Page(System.currentTimeMillis - startTime, total, offset, limit, users.toSeq)
   }
   
