@@ -59,6 +59,10 @@ class GazetteerAdminController @Inject() (
       "color" -> optional(text)
     )(AuthorityMetadata.apply)(AuthorityMetadata.unapply)
   )
+
+  private def getStream(file: File, filename: String) =
+    if (filename.endsWith(".gz")) new GZIPInputStream(new FileInputStream(file))
+    else new FileInputStream(file)
   
   def index = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
     Ok(views.html.admin.gazetteers.index())
@@ -74,11 +78,7 @@ class GazetteerAdminController @Inject() (
           urls.split(",").map(_.trim).toSeq
         }.getOrElse(Seq.empty[String])
 
-        val maybeImport = request.body.asMultipartFormData
-          .flatMap(_.file("file"))
-          .map { formData => 
-            importDumpfile(formData.ref.path.toFile, formData.filename, authorityMeta.identifier)
-          }
+        val maybeDumpfile = request.body.asMultipartFormData.flatMap(_.file("file"))
           
         authorities.upsert(
           authorityMeta.identifier,
@@ -88,22 +88,25 @@ class GazetteerAdminController @Inject() (
           authorityMeta.homepage,
           authorityMeta.shortcode,
           authorityMeta.color,
-          urlPatterns).map { _ => maybeImport match {
-              case Some(_) => Ok("Started file import")
-              case None => Ok("Stored successfully")            
-            }
-          }.recover { case t: Throwable =>
-            InternalServerError(t.getMessage)
+          urlPatterns
+        ).map { _ => maybeDumpfile match {
+            case Some(formData) => 
+              Future {
+                importDumpfile(formData.ref.path.toFile, formData.filename, authorityMeta.identifier)
+              }
+              
+              Ok("Data updated succesfully. Started file import.")
+
+            case None => 
+              Ok("Data updated successfully.")            
           }
+        }.recover { case t: Throwable =>
+          InternalServerError(t.getMessage)
+        }
       }
     )
   }
-  
-  private def getStream(file: File, filename: String) =
-    if (filename.endsWith(".gz")) new GZIPInputStream(new FileInputStream(file))
-    else new FileInputStream(file)
 
-  /** Temporary hack... **/
   private def importDumpfile(file: File, filename: String, identifier: String) = {
     val importer = importerFactory.createImporter(EntityType.PLACE)
     filename.toLowerCase match {
