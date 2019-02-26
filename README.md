@@ -10,10 +10,11 @@ images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our 
 
 * Java 8 JDK
 * [SBT](http://www.scala-sbt.org/) (version 1.0.x)
-* [node.js](https://nodejs.org/en/) (version 4.2.6), along with [npm](https://www.npmjs.com/) (version 6.1.0) 
+* [node.js](https://nodejs.org/en/) (version 10.4.1), along with [npm](https://www.npmjs.com/) (version 6.1.0) 
   and the `webpack` and `webpack-cli` npm packages (install globally via `npm install -g {package-name}` )
 * PostgreSQL DB (tested with version 9.5)
-* [ElasticSearch v5.6.5](https://www.elastic.co/downloads/past-releases/elasticsearch-5-6-5)
+* [ElasticSearch v5.6.5](https://www.elastic.co/downloads/past-releases/elasticsearch-5-6-5) __(important: do not 
+  use ES v6.x, since this introduced breaking changes not compatible with the current version of Recogito)__
 * To use image annotation, you need to have the [vips](http://www.vips.ecs.soton.ac.uk/) image
   processing system installed. If vips is not available on the command line, Recogito is set to
   reject uploaded images as 'unsupported content'. (Note: on Ubuntu, 'libvips-tools' is the
