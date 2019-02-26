@@ -10,7 +10,7 @@ import org.elasticsearch.common.xcontent.XContentType
 import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
 import scala.io.Source
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, Future, ExecutionContext}
 import scala.concurrent.duration._
 import scala.util.{Try, Success, Failure}
 
@@ -113,5 +113,11 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
           mappings :+ (number, (name, json))
         }
       }).sortBy(_._1).map(_._2)
+      
+  
+  def countTotalDocs()(implicit ctx: ExecutionContext): Future[Long] =
+    client execute {
+      search(ES.RECOGITO) limit 0
+    } map { _.totalHits }
 
 }

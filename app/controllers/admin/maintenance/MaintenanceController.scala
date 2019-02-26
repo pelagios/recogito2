@@ -17,6 +17,7 @@ import services.upload.UploadService
 import services.user.UserService
 import services.user.Roles._
 import services.HasDate
+import storage.es.ES
 import storage.uploads.Uploads
 
 @Singleton
@@ -25,6 +26,7 @@ class MaintenanceController @Inject()(
   val components: ControllerComponents, 
   val config: Configuration,
   val documents: DocumentService,
+  val es: ES,
   val silhouette: Silhouette[Security.Env],
   val uploadService: UploadService,
   val uploadStorage: Uploads,
