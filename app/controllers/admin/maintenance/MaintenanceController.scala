@@ -71,13 +71,12 @@ class MaintenanceController @Inject()(
   
   def insertBroadcast = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     announcements.insertBroadcastAnnouncement(
-    """# Welcome to your new workspace!
+    """# Like Recogito? Vote for us!
 
-We are happy to announce the launch of Recogito's __new document workspace__.
+We are excited that Recogito has been nominated for the [Digital Humanities Awards](http://dhawards.org/dhawards2018/voting/) this year. 
+If you like Recogito, do consider voting for us.
 
-This update brings more than just a fresh look. It adds a number of new features and enhancements, and makes room for further extensions we have planned for the new year. 
-
-Learn more about all that's new [in the help section](/help/workspace).
+Many thanks & happy annotating!
     """).map(_ => Ok)
   }
   
