@@ -57,6 +57,7 @@ GET     /admin/visits/export                         controllers.admin.backup.Ba
 GET     /admin/visits/purge                          controllers.admin.backup.BackupAdminController.deleteVisitsOlderThan(date: Option[String])
 
 GET     /admin/maintenance                           controllers.admin.maintenance.MaintenanceController.index
+GET     /admin/maintenance/uploads.json              controllers.admin.maintenance.MaintenanceController.listPendingUploads
 DELETE  /admin/maintenance/uploads                   controllers.admin.maintenance.MaintenanceController.deleteAllPending
 DELETE  /admin/maintenance/uploads/:id               controllers.admin.maintenance.MaintenanceController.deletePending(id: Int)
 GET     /admin/maintenance/broadcast                 controllers.admin.maintenance.MaintenanceController.insertBroadcast

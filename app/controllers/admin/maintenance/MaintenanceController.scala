@@ -1,17 +1,22 @@
 package controllers.admin.maintenance
 
 import com.mohiva.play.silhouette.api.Silhouette
-import controllers.{BaseAuthController, Security}
+import controllers.{BaseAuthController, Security, HasPrettyPrintJSON}
 import javax.inject.{Inject, Singleton}
+import org.joda.time.DateTime
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.mvc.ControllerComponents
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
 import services.announcement.AnnouncementService
 import services.document.DocumentService
+import services.generated.tables.records.UploadRecord
 import services.upload.UploadService
 import services.user.UserService
 import services.user.Roles._
+import services.HasDate
 
 @Singleton
 class MaintenanceController @Inject()(
@@ -24,11 +29,27 @@ class MaintenanceController @Inject()(
   val users: UserService,
   implicit val ctx: ExecutionContext,
   implicit val webJarsUtil: WebJarsUtil
-) extends BaseAuthController(components, config, documents, users) {
+) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON with HasDate {
+
+  implicit val uploadRecordWrites: Writes[UploadRecord] = (
+    (JsPath \ "owner").write[String] and
+    (JsPath \ "title").write[String] and
+    (JsPath \ "created_at").write[DateTime]
+  )(upload => (
+    upload.getOwner,
+    upload.getTitle,
+    new DateTime(upload.getCreatedAt)
+  ))
   
   def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     uploads.listPendingUploads().map { uploads =>
       Ok(views.html.admin.maintenance.index(uploads))
+    }
+  }
+
+  def listPendingUploads = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
+    uploads.listPendingUploads().map { uploads =>
+      jsonOk(Json.toJson(uploads))
     }
   }
   
