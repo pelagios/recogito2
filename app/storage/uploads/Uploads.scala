@@ -141,4 +141,8 @@ class Uploads @Inject() (config: Configuration) {
     }
   }
 
+  def getTotalSize()(implicit ctx: ExecutionContext) = Future {
+    FileUtils.sizeOfDirectory(UPLOAD_BASE)
+  }
+
 }

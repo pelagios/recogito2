@@ -60,6 +60,7 @@ GET     /admin/maintenance                           controllers.admin.maintenan
 GET     /admin/maintenance/uploads.json              controllers.admin.maintenance.MaintenanceController.listPendingUploads
 DELETE  /admin/maintenance/uploads                   controllers.admin.maintenance.MaintenanceController.deleteAllPending
 DELETE  /admin/maintenance/uploads/:id               controllers.admin.maintenance.MaintenanceController.deletePending(id: Int)
+GET     /admin/maintenance/filestore/size.json       controllers.admin.maintenance.MaintenanceController.getFilestoreSize
 GET     /admin/maintenance/broadcast                 controllers.admin.maintenance.MaintenanceController.insertBroadcast
 GET     /admin/maintenance/broadcast/_deleteAll      controllers.admin.maintenance.MaintenanceController.deleteAllServiceAnnouncements
 

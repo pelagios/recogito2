@@ -17,6 +17,7 @@ import services.upload.UploadService
 import services.user.UserService
 import services.user.Roles._
 import services.HasDate
+import storage.uploads.Uploads
 
 @Singleton
 class MaintenanceController @Inject()(
@@ -25,7 +26,8 @@ class MaintenanceController @Inject()(
   val config: Configuration,
   val documents: DocumentService,
   val silhouette: Silhouette[Security.Env],
-  val uploads: UploadService,
+  val uploadService: UploadService,
+  val uploadStorage: Uploads,
   val users: UserService,
   implicit val ctx: ExecutionContext,
   implicit val webJarsUtil: WebJarsUtil
@@ -42,13 +44,13 @@ class MaintenanceController @Inject()(
   ))
   
   def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
-    uploads.listPendingUploads().map { uploads =>
+    uploadService.listPendingUploads().map { uploads =>
       Ok(views.html.admin.maintenance.index(uploads))
     }
   }
 
   def listPendingUploads = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
-    uploads.listPendingUploads().map { uploads =>
+    uploadService.listPendingUploads().map { uploads =>
       jsonOk(Json.toJson(uploads))
     }
   }
@@ -58,7 +60,13 @@ class MaintenanceController @Inject()(
   }
   
   def deleteAllPending = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
-    uploads.deleteAllPendingUploads().map(_ => Ok)
+    uploadService.deleteAllPendingUploads().map(_ => Ok)
+  }
+
+  def getFilestoreSize = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
+    uploadStorage.getTotalSize.map { size => 
+      jsonOk(Json.obj("size" -> size))
+    }
   }
   
   def insertBroadcast = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
