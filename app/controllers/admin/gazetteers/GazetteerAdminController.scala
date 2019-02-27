@@ -65,7 +65,7 @@ class GazetteerAdminController @Inject() (
     else new FileInputStream(file)
   
   def index = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
-    Ok(views.html.admin.gazetteers.index())
+    Ok(views.html.admin.authorities())
   }
   
   def upsertAuthority = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>

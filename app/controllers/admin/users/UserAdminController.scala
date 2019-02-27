@@ -67,7 +67,7 @@ class UserAdminController @Inject() (
   )(t => (t._1, t._2))
 
   def index = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
-    Ok(views.html.admin.users.index())
+    Ok(views.html.admin.users())
   }
   
   def listUsers(offset: Int, size: Int, sortBy: Option[String], sortOrder: Option[String]) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>

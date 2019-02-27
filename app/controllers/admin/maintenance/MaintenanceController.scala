@@ -49,7 +49,7 @@ class MaintenanceController @Inject()(
   
   def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     uploadService.listPendingUploads().map { uploads =>
-      Ok(views.html.admin.maintenance.index(uploads))
+      Ok(views.html.admin.maintenance())
     }
   }
 

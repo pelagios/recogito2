@@ -41,6 +41,7 @@ class BackupAdminController @Inject() (
     implicit val webJarsUtil: WebJarsUtil
   ) extends BaseAuthController(components, config, documents, users) with BackupReader {
 
+  /*
   def index = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     val fVisitsTotal = visits.countTotal()
     val fVisits6Months = visits.countSince(DateTime.now() minusMonths 6)
@@ -54,12 +55,13 @@ class BackupAdminController @Inject() (
       Ok(views.html.admin.backup.index(vTotal, v6Months))
     }
   }
+  */
 
   def restore = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     request.body.asMultipartFormData.flatMap(_.file("backup")) match {
       case Some(formData) =>
         restoreBackup(formData.ref.path.toFile, runAsAdmin = true, forcedOwner = None).map { case (doc, fileparts) =>
-          Redirect(routes.BackupAdminController.index)
+          Ok
         }.recover { case t: Throwable =>
           t.printStackTrace()
           InternalServerError

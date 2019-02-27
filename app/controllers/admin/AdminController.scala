@@ -31,7 +31,8 @@ class AdminController @Inject() (
 ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
         
   def index = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
-    Ok(views.html.admin.index())
+    // Ok(views.html.admin.index())
+    Ok(views.html.admin.activity())
   }
   
   def getStats() = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
