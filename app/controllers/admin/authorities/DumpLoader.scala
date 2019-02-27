@@ -1,4 +1,4 @@
-package controllers.admin.gazetteers
+package controllers.admin.authorities
 
 import java.io.{InputStream, File, FileInputStream}
 import java.util.zip.GZIPInputStream

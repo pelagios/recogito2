@@ -1,4 +1,4 @@
-package controllers.admin.gazetteers
+package controllers.admin.authorities
 
 import akka.stream.Materializer
 import com.mohiva.play.silhouette.api.Silhouette
@@ -34,7 +34,7 @@ case class AuthorityMetadata(
   color       : Option[String])
 
 @Singleton
-class GazetteerAdminController @Inject() (
+class AuthoritiesAdminController @Inject() (
   val components: ControllerComponents,
   val config: Configuration,
   val documents: DocumentService,

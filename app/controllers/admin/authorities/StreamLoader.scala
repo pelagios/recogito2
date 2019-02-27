@@ -1,4 +1,4 @@
-package controllers.admin.gazetteers
+package controllers.admin.authorities
 
 import akka.stream.{ActorAttributes, ClosedShape, Materializer, Supervision}
 import akka.stream.scaladsl._
