@@ -61,6 +61,7 @@ GET     /admin/maintenance/uploads.json              controllers.admin.maintenan
 DELETE  /admin/maintenance/uploads                   controllers.admin.maintenance.MaintenanceController.deleteAllPending
 DELETE  /admin/maintenance/uploads/:id               controllers.admin.maintenance.MaintenanceController.deletePending(id: Int)
 GET     /admin/maintenance/filestore/size.json       controllers.admin.maintenance.MaintenanceController.getFilestoreSize
+GET     /admin/maintenance/elasticsearch/props.json  controllers.admin.maintenance.MaintenanceController.getIndexProps
 GET     /admin/maintenance/logs/path.json            controllers.admin.maintenance.MaintenanceController.getLogLocation
 GET     /admin/maintenance/broadcast                 controllers.admin.maintenance.MaintenanceController.insertBroadcast
 GET     /admin/maintenance/broadcast/_deleteAll      controllers.admin.maintenance.MaintenanceController.deleteAllServiceAnnouncements

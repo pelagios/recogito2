@@ -18,6 +18,7 @@ import services.upload.UploadService
 import services.user.UserService
 import services.user.Roles._
 import services.HasDate
+import storage.es.ES
 import storage.uploads.Uploads
 
 @Singleton
@@ -27,6 +28,7 @@ class MaintenanceController @Inject()(
   val config: Configuration,
   val documents: DocumentService,
   val env: Environment,
+  val es: ES,
   val silhouette: Silhouette[Security.Env],
   val uploadService: UploadService,
   val uploadStorage: Uploads,
@@ -73,6 +75,12 @@ class MaintenanceController @Inject()(
   
   def getLogLocation = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request => 
     jsonOk(Json.obj("path" -> s"${env.rootPath.getAbsolutePath}${File.separator}logs"))
+  }
+
+  def getIndexProps = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
+    es.countTotalDocs.map { total => 
+      jsonOk(Json.obj("total_documents" -> total))
+    }
   }
 
   def insertBroadcast = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
