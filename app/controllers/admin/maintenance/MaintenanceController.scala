@@ -2,10 +2,11 @@ package controllers.admin.maintenance
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, Security, HasPrettyPrintJSON}
+import java.io.File
 import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 import org.webjars.play.WebJarsUtil
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import play.api.mvc.ControllerComponents
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -25,6 +26,7 @@ class MaintenanceController @Inject()(
   val components: ControllerComponents, 
   val config: Configuration,
   val documents: DocumentService,
+  val env: Environment,
   val silhouette: Silhouette[Security.Env],
   val uploadService: UploadService,
   val uploadStorage: Uploads,
@@ -69,6 +71,10 @@ class MaintenanceController @Inject()(
     }
   }
   
+  def getLogLocation = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request => 
+    jsonOk(Json.obj("path" -> s"${env.rootPath.getAbsolutePath}${File.separator}logs"))
+  }
+
   def insertBroadcast = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     announcements.insertBroadcastAnnouncement(
     """# Like Recogito? Vote for us!
