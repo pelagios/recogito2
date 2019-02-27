@@ -39,8 +39,6 @@ class UserAdminController @Inject() (
   implicit val webJarsUtil: WebJarsUtil
 ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON with HasDate with HasAccountRemoval {
   
-  private val fmt = DateTimeFormat.forPattern("yyyy-MM-dd")
-
   implicit val userRecordWrites: Writes[UserRecord] = (
     (JsPath \ "username").write[String] and
     (JsPath \ "email").write[String] and
@@ -77,6 +75,7 @@ class UserAdminController @Inject() (
   }
   
   def listIdleUsers(date: String, offset: Int, size: Int) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+    val fmt = DateTimeFormat.forPattern("yyyy-MM-dd")
     Try(fmt.parseDateTime(date)) match {
       case Success(date) =>
         users.listIdleUsers(new Timestamp(date.getMillis), offset, size).map { users =>

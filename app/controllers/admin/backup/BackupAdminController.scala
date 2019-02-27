@@ -98,9 +98,4 @@ class BackupAdminController @Inject() (
     }
   }
 
-  def runMigration = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
-    migrationUtil.runMigration
-    Ok("Good Luck.")
-  }
-
 }

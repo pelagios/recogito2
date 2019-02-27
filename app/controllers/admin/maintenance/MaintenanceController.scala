@@ -53,20 +53,7 @@ class MaintenanceController @Inject()(
     }
   }
 
-  def listPendingUploads = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
-    uploadService.listPendingUploads().map { uploads =>
-      jsonOk(Json.toJson(uploads))
-    }
-  }
-  
-  def deletePending(id: Int) = silhouette.SecuredAction(Security.WithRole(Admin)) { implicit request =>
-    Ok
-  }
-  
-  def deleteAllPending = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
-    uploadService.deleteAllPendingUploads().map(_ => Ok)
-  }
-
+  /** TODO roll into one request **/
   def getFilestoreSize = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
     uploadStorage.getTotalSize.map { size => 
       jsonOk(Json.obj("size" -> size))
@@ -83,6 +70,17 @@ class MaintenanceController @Inject()(
     }
   }
 
+  def listPendingUploads = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
+    uploadService.listPendingUploads().map { uploads =>
+      jsonOk(Json.toJson(uploads))
+    }
+  }
+  
+  def deleteAllPending = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
+    uploadService.deleteAllPendingUploads().map(_ => Ok)
+  }
+
+  /** TODO  UI for broadcast message **/
   def insertBroadcast = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     announcements.insertBroadcastAnnouncement(
     """# Like Recogito? Vote for us!
