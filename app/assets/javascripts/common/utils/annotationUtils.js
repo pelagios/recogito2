@@ -28,21 +28,36 @@ define(function() {
     },
 
     /**
-     * Returns true if bodies are equal in terms of their value. I.e.
-     * this check considers type, value and URI fields, but ignores
+     * Returns true if bodies are equal in terms of their value (and the
+     * annotation status attached to it). I.e. this check considers type, 
+     * value, URI fields, and annotation status value, but ignores
      * creator and creation timestamp.
      */
     bodyValueEquals : function(a, b) {
+      var equalStatusValue = function() {
+            if (a.status && b.status)
+              // Both have a status
+              return a.status.value == b.status.value;
+            else if (a.status || b.status) 
+              // One has a status -> not equal
+              return false;
+            else
+              // Neither has a status -> equal
+              return true;
+          };
+
       if (a.type != b.type) return false;
       if (a.value != b.value) return false;
       if (a.uri != b.uri) return false;
+      if (!equalStatusValue()) return false;
       return true;
     },
 
     /**
      * Returns true if the annotation contains a body with the same
-     * value as the given body. Equality is checked according to the rules
-     * of bodyValueEquals (above)
+     * value and annotation statsus (if applicable) as the given body. 
+     * Body equality is checked according to the rules of 
+     * bodyValueEquals (above)
      */
     containsBodyOfValue : function(annotationOrListOfBodies, body) {
       var that = this,
