@@ -1,3 +1,10 @@
+# DH Awards 2018
+_Mar 06, 2019_
+
+We are thrilled that Recogito has received the title of __Best Digital Humanities Tool 2018__ in this year's
+[Digital Humanities Awards](http://dhawards.org/dhawards2018/results/). A huge Thank You to everyone who 
+voted for us!
+
 # Join our mailing list
 _Oct 08, 2018_
 

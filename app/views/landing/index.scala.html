@@ -111,13 +111,14 @@
 
     <div class="featurette inner"@views.html.dir(messages.lang)>
       <div class="columns">
-        <div class="one-quarter column">
+        <div class="one-third column">
           <h3>
-            @Html(messages("landing.index.news.title"))<br/>
-            @Html(messages("landing.index.news.subtitle"))
+            <img src="@routes.Assets.versioned("images/DHAwards2018-tool.png")">
+            <!-- @Html(messages("landing.index.news.title"))<br/> -->
+            <!-- @Html(messages("landing.index.news.subtitle")) -->
           </h3>
         </div>
-        <div class="three-quarters column">
+        <div class="two-thirds column">
           <p>
             @Html(messages("landing.index.news.text"))
           </p>
