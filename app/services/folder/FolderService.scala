@@ -175,6 +175,20 @@ class FolderService @Inject() (implicit val db: DB)
 
   def deleteReadme(id: UUID): Future[Boolean] = setReadme(id, null)
 
+  def updatePublicVisibility(ids: Seq[UUID], value: PublicAccess.Visibility) = db.withTransaction { sql =>
+    sql.update(FOLDER)
+       .set(FOLDER.PUBLIC_VISIBILITY, value.toString)
+       .where(FOLDER.ID.in(ids))
+       .execute > 0
+  }
+
+  def updatePublicAccessLevel(ids: Seq[UUID], value: PublicAccess.AccessLevel) = db.withTransaction { sql => 
+    sql.update(FOLDER)
+       .set(FOLDER.PUBLIC_ACCESS_LEVEL, value.toString)
+       .where(FOLDER.ID.in(ids))
+       .execute > 0
+  }
+
 }
 
 object FolderService {

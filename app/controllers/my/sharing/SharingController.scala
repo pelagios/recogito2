@@ -6,7 +6,8 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import services.PublicAccess
 import services.folder.FolderService
 import services.user.UserService
 
@@ -19,34 +20,60 @@ class SharingController @Inject() (
   implicit val ctx: ExecutionContext
 ) extends AbstractController(components) with HasPrettyPrintJSON {
   
-
-  // TODO need to re-apply recursively
-
   def searchUsers(query: String) = silhouette.SecuredAction.async { implicit request =>
     users.searchUsers(query, 10).map { matches =>
       jsonOk(Json.toJson(matches))
     }
   }
 
+  // TODO restrict to folder owners and admins
+  def getFolderVisibility(id: UUID) = silhouette.SecuredAction.async { implicit request => 
+    folders.getFolder(id).map { _ match {
+      case Some(folder) => 
+        if (folder.getOwner == request.identity.username)
+          jsonOk(Json.obj(
+            "id" -> folder.getId,
+            "visibility" -> folder.getPublicVisibility,
+            "access_level" -> folder.getPublicAccessLevel
+          ))
+        else 
+          Forbidden
+
+      case None => 
+        NotFound
+    }}
+  }
+
+  // TODO restrict to folder owners and admins
   def setFolderVisibility() = silhouette.SecuredAction.async { implicit request =>
+    request.body.asJson match {
+      case Some(json) => 
+        val id = (json \ "ids").as[Seq[UUID]]
+        val visibility = (json \ "visibility").asOpt[String]
+        val accessLevel = (json \ "access_level").asOpt[String]
 
-    // Step 1: get folder ID from JSON payload
+        // TODO recursive!
 
-    // Step 2: get visibility settting from JSON payload
+        val fUpdateVisibility = visibility.map { v => 
+          folders.updatePublicVisibility(id, PublicAccess.Visibility.withName(v))
+        }
 
-    // Step 3: get folder
+        val fUpdateAccessLevel = accessLevel.map { a => 
+          folders.updatePublicAccessLevel(id, PublicAccess.AccessLevel.withName(a).get)
+        }
 
-    // Step 4: get folder children (recursive)
-
-    // Step 5: apply visibility settings to all of them
-
+        val f = Future.sequence(Seq(fUpdateVisibility, fUpdateAccessLevel).flatten)
+        f.map { _ => Ok }
+        
+      case None =>
+        Future.successful(BadRequest)
+    }
+    
     /*  
     folders.getChildrenRecursive(id).map { idsAndTitles =>
       Ok
     }
     */
-
-    ???
   }
 
   /** Currently restricted to sharing a single folder only **/

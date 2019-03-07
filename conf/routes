@@ -187,7 +187,8 @@ DELETE  /api/shared/folder/:id                       controllers.my.directory.de
 # ~~~ Public sharing ~~~
 
 GET     /api/sharing/search                          controllers.my.sharing.SharingController.searchUsers(q: String)
-GET     /api/sharing/folders/visibility              controllers.my.sharing.SharingController.setFolderVisibility
+GET     /api/sharing/folders/:id/visibility          controllers.my.sharing.SharingController.getFolderVisibility(id: java.util.UUID)
+POST    /api/sharing/folders/visibility              controllers.my.sharing.SharingController.setFolderVisibility
 POST    /api/sharing/folders/collaborator            controllers.my.sharing.SharingController.addFolderCollaborator
 DELETE  /api/sharing/folders/collaborator            controllers.my.sharing.SharingController.removeFolderCollaborator
 
