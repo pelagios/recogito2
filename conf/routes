@@ -39,9 +39,9 @@ GET     /help                                        controllers.help.HelpContro
 # Administration area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /admin/authorities                            controllers.admin.authorities.AuthoritiesAdminController.index
-POST    /admin/authorities                            controllers.admin.authorities.AuthoritiesAdminController.upsertAuthority
-DELETE  /admin/authorities/:name                      controllers.admin.authorities.AuthoritiesAdminController.deleteGazetteer(name: String)
+GET     /admin/authorities                           controllers.admin.authorities.AuthoritiesAdminController.index
+POST    /admin/authorities                           controllers.admin.authorities.AuthoritiesAdminController.upsertAuthority
+DELETE  /admin/authorities/:name                     controllers.admin.authorities.AuthoritiesAdminController.deleteGazetteer(name: String)
 
 GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 GET     /admin/idle-users.json                       controllers.admin.users.UserAdminController.listIdleUsers(since: String, offset: Int ?= 0, size: Int ?= 100)
@@ -183,6 +183,14 @@ DELETE  /api/folder/bulk                             controllers.my.directory.de
 DELETE  /api/folder/:id                              controllers.my.directory.delete.FolderActionsController.deleteFolder(id: java.util.UUID)
 DELETE  /api/shared/folder/bulk                      controllers.my.directory.delete.FolderActionsController.bulkUnshareFolders
 DELETE  /api/shared/folder/:id                       controllers.my.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
+
+# ~~~ Public sharing ~~~
+
+GET     /api/sharing/search                          controllers.my.sharing.SharingController.searchUsers(q: String)
+GET     /api/sharing/folders/visibility              controllers.my.sharing.SharingController.setFolderVisibility
+POST    /api/sharing/folders/collaborator            controllers.my.sharing.SharingController.addFolderCollaborator
+DELETE  /api/sharing/folders/collaborator            controllers.my.sharing.SharingController.removeFolderCollaborator
+
 
 # ~~~ Search ~~~
 

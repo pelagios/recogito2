@@ -279,11 +279,12 @@ class UserService @Inject() (
     * To keep result size low (and add some extra 'privacy') the method only matches on
     * usernames that are at most 2 characters longer than the query.
     */
-  def searchUsers(query: String): Future[Seq[String]] = db.query { sql =>
+  def searchUsers(query: String, limit: Int = 20): Future[Seq[String]] = db.query { sql =>
     if (query.size > 2)
       sql.selectFrom(USER)
          .where(USER.USERNAME.lower.like(query.toLowerCase + "%")
            .and(USER.USERNAME.length().lt(query.size + 8)))
+         .limit(limit)
          .fetch()
          .getValues(USER.USERNAME, classOf[String]).toSeq
     else

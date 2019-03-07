@@ -29,6 +29,12 @@ class FolderService @Inject() (implicit val db: DB)
       sql.selectFrom(FOLDER).where(FOLDER.ID.in(ids)).fetchArray
     }
 
+  /** Gets the breadcrumb trail for a specific folder.
+    * 
+    * The breadcrumb trail includes the current folder (with the specified
+    * id) and all parent folders in the hierarchy, top to bottom. I.e. the 
+    * first item in the list is the top-most ancestor.
+    */
   def getBreadcrumbs(id: UUID) = db.query { sql => 
     // Capitulation. Gave up re-modelling this query in JOOQ, sorry.
     val query = 
@@ -56,8 +62,39 @@ class FolderService @Inject() (implicit val db: DB)
     } getOrElse {
       Seq.empty[Breadcrumb]
     }
- }
+  }
 
+
+  /** A flattended list of IDs of all children below the given folder **/
+  def getChildrenRecursive(id: UUID) = db.query { sql => 
+    val query =
+      """
+      WITH RECURSIVE path AS (
+        SELECT 
+          id, title, parent,
+          ARRAY[id] AS path_ids,
+          ARRAY[title] AS path_titles
+        FROM folder
+        UNION ALL
+          SELECT
+            f.id, f.title, f.parent,
+            p.path_ids || f.id,
+            p.path_titles || f.title
+          FROM folder f
+          JOIN path p on f.id = p.parent
+      )
+      SELECT
+        path_ids[1] AS id,
+        path_titles[1] AS title
+      FROM path WHERE parent=?;
+      """
+
+    sql.resultQuery(query, id).fetchArray.map { record => 
+      record.into(classOf[(UUID, String)])
+    }
+  }
+
+  /** 'ls'-like command, lists folders by an owner, in the root or a subdirectory **/
   def listFolders(owner: String, offset: Int, size: Int, parent: Option[UUID]): Future[Page[FolderRecord]] = 
     db.query { sql => 
       val startTime = System.currentTimeMillis
