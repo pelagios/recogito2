@@ -77,6 +77,16 @@ class Folder(alias : String, aliased : Table[FolderRecord], parameters : Array[ 
 	val README : TableField[FolderRecord, String] = createField("readme", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
+	 * The column <code>public.folder.public_visibility</code>.
+	 */
+	val PUBLIC_VISIBILITY : TableField[FolderRecord, String] = createField("public_visibility", org.jooq.impl.SQLDataType.CLOB.nullable(false).defaulted(true), "")
+
+	/**
+	 * The column <code>public.folder.public_access_level</code>.
+	 */
+	val PUBLIC_ACCESS_LEVEL : TableField[FolderRecord, String] = createField("public_access_level", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * Create a <code>public.folder</code> table reference
 	 */
 	def this() = {
