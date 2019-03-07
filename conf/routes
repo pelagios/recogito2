@@ -189,9 +189,9 @@ DELETE  /api/shared/folder/:id                       controllers.my.directory.de
 GET     /api/sharing/search                          controllers.my.sharing.SharingController.searchUsers(q: String)
 GET     /api/sharing/folders/:id/visibility          controllers.my.sharing.SharingController.getFolderVisibility(id: java.util.UUID)
 POST    /api/sharing/folders/visibility              controllers.my.sharing.SharingController.setFolderVisibility
+GET     /api/sharing/folders/:id/collaborators       controllers.my.sharing.SharingController.getFolderCollaborators(id: java.util.UUID)
 POST    /api/sharing/folders/collaborator            controllers.my.sharing.SharingController.addFolderCollaborator
 DELETE  /api/sharing/folders/collaborator            controllers.my.sharing.SharingController.removeFolderCollaborator
-
 
 # ~~~ Search ~~~
 
@@ -237,9 +237,9 @@ GET     /api/job                                     controllers.api.task.TaskAP
 GET     /api/job/:id                                 controllers.api.task.TaskAPIController.getJobProgress(id: java.util.UUID)
 
 # ~~~ Plugins ~~~
-GET     /api/plugins/ner                            controllers.api.plugin.PluginAPIController.listNERPlugins
-GET     /api/plugins/js/:ext/:id.js                 controllers.api.plugin.PluginAPIController.loadPlugin(ext: String, id: String)
-GET     /api/plugins/js/:ext/:id.css                controllers.api.plugin.PluginAPIController.loadCSS(ext: String, id: String)
+GET     /api/plugins/ner                             controllers.api.plugin.PluginAPIController.listNERPlugins
+GET     /api/plugins/js/:ext/:id.js                  controllers.api.plugin.PluginAPIController.loadPlugin(ext: String, id: String)
+GET     /api/plugins/js/:ext/:id.css                 controllers.api.plugin.PluginAPIController.loadCSS(ext: String, id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings

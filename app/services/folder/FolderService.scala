@@ -16,8 +16,9 @@ import storage.db.DB
 case class Breadcrumb(id: UUID, title: String)
 
 @Singleton
-class FolderService @Inject() (implicit val db: DB) 
-  extends BaseService with FolderAssociationService {
+class FolderService @Inject() (implicit val db: DB) extends BaseService
+  with FolderAssociationService
+  with SharedFolderService {
 
   def getFolder(id: UUID): Future[Option[FolderRecord]] = 
     db.query { sql => 
