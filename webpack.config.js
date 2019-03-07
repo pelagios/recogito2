@@ -11,8 +11,7 @@ module.exports = {
     poll: true
   },
   entry: {
-    bulkannotation: path.join(srcPath, 'document/annotation/common/bulkannotation/App.jsx'),
-    gazetteers: path.join(srcPath, 'admin/gazetteers/App.jsx')
+    bulkannotation: path.join(srcPath, 'document/annotation/common/bulkannotation/App.jsx')
   },
   output: {
     path:path.resolve(__dirname, jsPath, '../build'),

@@ -6,9 +6,6 @@ require.config({
     i18n: '../../../../../public/vendor/i18n'
   },
   modules : [
-    { name : 'admin/dashboard' },
-    { name : 'admin/maintenance' },
-    { name : 'admin/users' },
     { name : 'document/annotation/image/app' },
     { name : 'document/annotation/table/app' },
     { name : 'document/annotation/tei/app' },
