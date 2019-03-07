@@ -8,7 +8,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
-import services.{Page, BaseService}
+import services.{Page, BaseService, PublicAccess}
 import services.generated.Tables.FOLDER
 import services.generated.tables.records.FolderRecord
 import storage.db.DB
@@ -142,7 +142,7 @@ class FolderService @Inject() (implicit val db: DB)
 
   def createFolder(owner: String, title: String, parent: Option[UUID]): Future[FolderRecord] = 
     db.withTransaction { sql => 
-      val folder = new FolderRecord(UUID.randomUUID, owner, title, optUUID(parent), null)
+      val folder = new FolderRecord(UUID.randomUUID, owner, title, optUUID(parent), null, PublicAccess.PRIVATE.toString, null)
       sql.insertInto(FOLDER).set(folder).execute()
       folder
     }

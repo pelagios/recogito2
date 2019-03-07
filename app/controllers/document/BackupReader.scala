@@ -19,7 +19,7 @@ import services.annotation.relation.Relation
 import services.document.DocumentService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import transform.tiling.TilingService
-import services.document.PublicAccess
+import services.PublicAccess
 
 trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
 

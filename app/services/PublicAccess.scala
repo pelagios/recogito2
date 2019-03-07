@@ -1,4 +1,4 @@
-package services.document
+package services
 
 object PublicAccess {
   

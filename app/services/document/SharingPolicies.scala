@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import java.util.Date
 import org.jooq.Record21
 import play.api.Logger
-import services.{Page, SortOrder}
+import services.{Page, SortOrder, PublicAccess}
 import services.generated.Tables._
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord}
 import storage.db.DB

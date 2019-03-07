@@ -12,7 +12,7 @@
       <div class="inner">
         <form id="public-visibility">
           <div class="sharing-option">
-            <input type="radio" name="public-access" id="pa-off" value="PRIVATE"@if(doc.publicVisibility == services.document.PublicAccess.PRIVATE) { checked="true"}/>
+            <input type="radio" name="public-access" id="pa-off" value="PRIVATE"@if(doc.publicVisibility == services.PublicAccess.PRIVATE) { checked="true"}/>
             <label for="pa-off">
               <strong>Off</strong>
               <span class="save-notifier">Saved</span>
@@ -30,7 +30,7 @@
           </div>
 
           <div class="sharing-option@if(disabled){ disabled}">
-            <input type="radio" name="public-access" id="pa-public" value="PUBLIC"@if(disabled){ disabled="true"}@if(doc.publicVisibility == services.document.PublicAccess.PUBLIC) { checked="true"}/>
+            <input type="radio" name="public-access" id="pa-public" value="PUBLIC"@if(disabled){ disabled="true"}@if(doc.publicVisibility == services.PublicAccess.PUBLIC) { checked="true"}/>
             <label for="pa-public">
               <strong>Anyone on the Web</strong>
               <span class="save-notifier">Saved</span>
@@ -41,7 +41,7 @@
           </div>
 
           <div class="sharing-option@if(disabled){ disabled}">
-            <input type="radio" name="public-access" id="pa-with-link" value="WITH_LINK"@if(disabled){ disabled="true"}@if(doc.publicVisibility == services.document.PublicAccess.WITH_LINK) { checked="true"}/>
+            <input type="radio" name="public-access" id="pa-with-link" value="WITH_LINK"@if(disabled){ disabled="true"}@if(doc.publicVisibility == services.PublicAccess.WITH_LINK) { checked="true"}/>
             <label for="pa-with-link">
               <strong>Anyone with the Link</strong>
               <span class="save-notifier">Saved</span>
@@ -55,7 +55,7 @@
         </form>
       </div>
 
-      @defining(disabled || doc.publicVisibility == services.document.PublicAccess.PRIVATE) { noaccess =>
+      @defining(disabled || doc.publicVisibility == services.PublicAccess.PRIVATE) { noaccess =>
         <div class="inner access-level@if(noaccess){ disabled}">
           <strong>Access:</strong> anyone can
           <select@if(noaccess){ disabled="true"}>
@@ -63,11 +63,11 @@
               view the document.
             </option>
 
-            <option value="READ_DATA"@if(doc.publicAccessLevel == Some(services.document.PublicAccess.READ_DATA)) { selected="true"}>
+            <option value="READ_DATA"@if(doc.publicAccessLevel == Some(services.PublicAccess.READ_DATA)) { selected="true"}>
               see map and downloads, but not the document.
             </option>
 
-            <option value="WRITE"@if(doc.publicAccessLevel == Some(services.document.PublicAccess.WRITE)) { selected="true"}>
+            <option value="WRITE"@if(doc.publicAccessLevel == Some(services.PublicAccess.WRITE)) { selected="true"}>
               annotate the document.
             </option>
           </select>

@@ -5,7 +5,7 @@ import java.io.{File, InputStream}
 import java.nio.file.Files
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import services.{BaseService, HasDate, Page, SortOrder}
+import services.{BaseService, HasDate, Page, SortOrder, PublicAccess}
 import services.generated.Tables._
 import services.generated.tables.records._
 import org.joda.time.DateTime
