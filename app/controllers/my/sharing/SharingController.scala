@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
-import services.PublicAccess
+import services.{PublicAccess, SharingLevel}
 import services.folder.FolderService
 import services.user.UserService
 
@@ -105,38 +105,18 @@ class SharingController @Inject() (
     request.body.asJson match {
       case Some(json) => 
         val ids = (json \ "ids").as[Seq[UUID]]
-        val username = (json \ "username").as[String]
-        val accessLevel = (json \ "access_level").asOpt[String]
-          .flatMap(PublicAccess.AccessLevel.withName(_))
-          .getOrElse(PublicAccess.READ_ALL)
+        val collaborator = (json \ "username").as[String]
+        val level = (json \ "access_level").asOpt[String]
+          .flatMap(SharingLevel.withName)
+          .getOrElse(SharingLevel.READ)
         
-        folders.addCollaborator(ids, username, accessLevel).map { _ => Ok }
+        folders.addCollaborator(
+          ids.head, request.identity.username, collaborator, level
+        ).map { _ => Ok }
 
       case None =>
         Future.successful(BadRequest)
     }
-    /*
-    val currentUser = request.identity.username    
-    jsonDocumentAdminAction[CollaboratorStub](documentId, currentUser, { case (document, stub) =>
-      if (stub.collaborator == document.getOwner) {
-        // Doc owner as collaborator wouldn't make sense
-        Future.successful(BadRequest)
-      } else {
-        // If no access level given, use READ as minimum default
-        val accessLevel = stub.accessLevel.getOrElse(SharingLevel.READ)
-        users.findByUsername(stub.collaborator).flatMap { _ match {
-          case Some(user) => 
-            documents.addDocumentCollaborator(documentId, currentUser, user.username, accessLevel)
-              .map { case (policy, isNew) => jsonOk(Json.toJson(CollaboratorStub.fromSharingPolicy(policy, isNew))) }
-            
-          case None => 
-            Future.successful(NotFoundPage)
-        }}
-      }
-    })
-    */
-
-    ???
   }
 
   def removeFolderCollaborator() = silhouette.SecuredAction.async { implicit request => ??? 

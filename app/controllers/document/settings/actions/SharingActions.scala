@@ -1,8 +1,8 @@
 package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
-import services.PublicAccess
-import services.document.{DocumentInfo, SharingLevel}
+import services.{PublicAccess, SharingLevel}
+import services.document.DocumentInfo
 import services.generated.tables.records.SharingPolicyRecord
 import services.user.Roles._
 import play.api.libs.json._
