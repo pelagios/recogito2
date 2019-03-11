@@ -92,7 +92,7 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
 
     sql.resultQuery(query, id).fetchArray.map { record => 
       record.into(classOf[(UUID, String)])
-    }
+    }.toSeq
   }
 
   /** 'ls'-like command, lists folders by an owner, in the root or a subdirectory **/

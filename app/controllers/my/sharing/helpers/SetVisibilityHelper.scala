@@ -9,7 +9,11 @@ import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 
 trait SetVisibilityHelper {
 
-  /** Private helper that does the actual work of applying the visibility setting, if allowed */
+  /** Helper that does the actual work of applying the visibility setting, if allowed.
+    * 
+    * Returns Future[false] when the setting was not applied due to access 
+    * restrictions, Future[true] otherwise.
+    */
   private def applyVisibilityIfAllowed(
     doc: DocumentRecord, 
     policy: Option[SharingPolicyRecord], 
@@ -32,20 +36,52 @@ trait SetVisibilityHelper {
   /** Applies visibility settings to all documents in the given folder.
     * 
     * This method is NOT recursive. Documents in sub-folders of this folder
-    * will not be affected.
+    * will not be affected. Returns Future[false] if there was any documents where
+    * the setting could not be applied due to access restrictions, Future[true]
+    * otherwise.
     */
-  def setDocumentVisiblity(
+  private def setDocumentVisiblity(
     folderId: UUID,
     loggedInAs: String,
     visibility: PublicAccess.Visibility,
     accessLevel: PublicAccess.AccessLevel
-  )(
-    implicit documentService: DocumentService, folderService: FolderService, ctx: ExecutionContext
-  ) = {
+  )(implicit 
+      documentService: DocumentService, 
+      folderService: FolderService, 
+      ctx: ExecutionContext
+  ): Future[Boolean] =  {
     folderService.listDocumentsInFolder(folderId, loggedInAs)
-      .map { result => 
-        result.map(t => applyVisibilityIfAllowed(t._1, t._2, loggedInAs, visibility, accessLevel))
+      .flatMap { result => 
+        Future.sequence {
+          result.map(t => applyVisibilityIfAllowed(t._1, t._2, loggedInAs, visibility, accessLevel))
+        } map { !_.exists(_ == false) }
       }
+  }
+
+  /** Applies visibility settings to all documents in this folder and all nested folders.
+    * 
+    * This method is NOT recursive. Documents in sub-folders of this folder
+    * will not be affected. Returns Future[false] if there was any documents where
+    * the setting could not be applied due to access restrictions, Future[true]
+    * otherwise.
+    */
+  def setDocumentVisibilityRecursive(
+    folderId: UUID,
+    loggedInAs: String,
+    visibility: PublicAccess.Visibility,
+    accessLevel: PublicAccess.AccessLevel
+  )(implicit
+      documentService: DocumentService,
+      folderService: FolderService,
+      ctx: ExecutionContext
+  ): Future[Boolean] = {
+    folderService.getChildrenRecursive(folderId).flatMap { nestedFolders =>
+      Future.sequence {
+        nestedFolders.map { case (id, title) => 
+          setDocumentVisiblity(id, loggedInAs, visibility, accessLevel) 
+        }
+      } map { !_.exists(_ == false) }
+    }
   }
 
 }

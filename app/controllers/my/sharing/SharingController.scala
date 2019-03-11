@@ -18,7 +18,9 @@ class SharingController @Inject() (
   silhouette: Silhouette[Security.Env],
   users: UserService,
   implicit val ctx: ExecutionContext
-) extends AbstractController(components) with HasPrettyPrintJSON {
+) extends AbstractController(components) 
+    with HasPrettyPrintJSON 
+    with helpers.SetVisibilityHelper {
   
   def searchUsers(query: String) = silhouette.SecuredAction.async { implicit request =>
     users.searchUsers(query, 10).map { matches =>
