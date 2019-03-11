@@ -89,8 +89,12 @@ class SharingController @Inject() (
       case (Some(folder), policies) => 
         if (folder.getOwner == request.identity.username)
           jsonOk(Json.obj(
-            "id" -> folder.getId
-          )) // TODO serialize policies
+            "id" -> folder.getId,
+            "collaborators" -> policies.map { p => Json.obj(
+              "username" -> p.getSharedWith,
+              "access_level" -> p.getAccessLevel
+            )}
+          ))
         else 
           Forbidden
 

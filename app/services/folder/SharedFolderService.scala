@@ -10,9 +10,9 @@ trait SharedFolderService { self: FolderService =>
 
   /** Returns the list of collaborators on this folder **/
   def getCollaborators(id: UUID) = db.query { sql => 
-
-    ???
-    
+    sql.selectFrom(SHARING_POLICY)
+       .where(SHARING_POLICY.FOLDER_ID.equal(id))
+       .fetchArray
   }
 
   def addCollaborator(folderId: UUID, sharedBy: String, sharedWith: String, level: SharingLevel) = 
