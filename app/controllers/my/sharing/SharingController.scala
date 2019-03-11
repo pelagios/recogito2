@@ -124,7 +124,7 @@ class SharingController @Inject() (
   }
 
   def removeFolderCollaborator() = silhouette.SecuredAction.async { implicit request => ??? 
-  
+    
   }
 
   // TODO set public access for (list of) document(s)
@@ -132,22 +132,5 @@ class SharingController @Inject() (
   // TODO add collaborators to document(s)
 
   // TODO remove collaborators from document(s)
-
-  /* reminder - sharing policy schema:
-
-    CREATE TABLE sharing_policy (
-      id SERIAL PRIMARY KEY,
-      -- one of the following two needs to be defined
-      folder_id UUID REFERENCES folder(id),
-      document_id TEXT REFERENCES document(id),
-      shared_by TEXT NOT NULL REFERENCES "user"(username),
-      shared_with TEXT NOT NULL REFERENCES "user"(username),
-      shared_at TIMESTAMP WITH TIME ZONE NOT NULL,
-      access_level TEXT NOT NULL,
-      UNIQUE (document_id, shared_with)
-    );
-
-  */
-
 
 }

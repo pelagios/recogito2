@@ -2,8 +2,8 @@ package services.folder
 
 import java.util.UUID
 import org.jooq.DSLContext
-import services.generated.Tables.FOLDER_ASSOCIATION
-import services.generated.tables.records.FolderAssociationRecord
+import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
+import services.generated.tables.records.{DocumentRecord, FolderAssociationRecord, SharingPolicyRecord}
 import scala.concurrent.Future
 
 trait FolderAssociationService { self: FolderService =>
@@ -35,5 +35,25 @@ trait FolderAssociationService { self: FolderService =>
          .where(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(documentId))
          .execute
     }
+
+  /** Lists documents in this folder, along with current user acess permissions, if any */
+  def listDocumentsInFolder(folderId: UUID, loggedInAs: String) = db.query { sql => 
+    sql.select().from(FOLDER_ASSOCIATION)
+      .join(DOCUMENT).on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
+      .leftOuterJoin(SHARING_POLICY).on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)
+        .and(SHARING_POLICY.SHARED_WITH.equal(loggedInAs)))
+      .fetchArray().toSeq
+      .map { record => 
+        val doc = record.into(classOf[DocumentRecord])
+        val policy = record.into(classOf[SharingPolicyRecord])
+
+        // If there is no policy stored, the record will still be there, but 
+        // with all fields == null
+        if (policy.getSharedWith == null)
+          (doc, None)
+        else 
+          (doc, Some(policy))
+      }
+  }
 
 }
