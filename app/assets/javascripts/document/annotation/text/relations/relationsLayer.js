@@ -76,22 +76,17 @@ define([
           if (!Config.writeAccess) jQuery(svg).addClass('readonly');
 
           connections = annotations.reduce(function(arr, annotation) {
-            try {
-              if (annotation.relations && annotation.relations.length > 0) {
-                // For each annotation that has relations, build the corresponding connections...
-                var connections = annotation.relations.map(function(r) {
-                  var c = new Connection(content, svg, annotation, tagPopup, r);
-                  // if (Config.writeAccess) c.on('update', that.forwardEvent('updateRelations'));
-                  return c;
-                });
+            if (annotation.relations && annotation.relations.length > 0) {
+              // For each annotation that has relations, build the corresponding connections...
+              var connections = annotation.relations.map(function(r) {
+                var c = new Connection(content, svg, annotation, tagPopup, r);
+                // if (Config.writeAccess) c.on('update', that.forwardEvent('updateRelations'));
+                return c;
+              });
 
-                // Attach the relations from this annotations to the global list
-                return arr.concat(connections);
-              } else {
-                return arr;
-              }
-            } catch (error) {
-              console.log(annotation.annotation_id);
+              // Attach the relations from this annotations to the global list
+              return arr.concat(connections);
+            } else {
               return arr;
             }
           }, []);
