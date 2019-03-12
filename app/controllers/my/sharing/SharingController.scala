@@ -14,10 +14,10 @@ import services.user.UserService
 @Singleton
 class SharingController @Inject() (
   components: ControllerComponents,
-  folders: FolderService,
   silhouette: Silhouette[Security.Env],
   users: UserService,
-  implicit val ctx: ExecutionContext
+  implicit val ctx: ExecutionContext,
+  implicit val folders: FolderService
 ) extends AbstractController(components) 
     with HasPrettyPrintJSON 
     with helpers.SetVisibilityHelper {
@@ -30,8 +30,8 @@ class SharingController @Inject() (
 
   // TODO restrict to folder owners and admins
   def getFolderVisibility(id: UUID) = silhouette.SecuredAction.async { implicit request => 
-    folders.getFolder(id).map { _ match {
-      case Some(folder) => 
+    folders.getFolder(id, request.identity.username).map { _ match {
+      case Some((folder, _)) => 
         if (folder.getOwner == request.identity.username)
           jsonOk(Json.obj(
             "id" -> folder.getId,
@@ -51,22 +51,16 @@ class SharingController @Inject() (
   def setFolderVisibility() = silhouette.SecuredAction.async { implicit request =>
     request.body.asJson match {
       case Some(json) => 
-        val ids = (json \ "ids").as[Seq[UUID]]
+        val id = (json \ "ids").as[Seq[UUID]].head
         val visibility = (json \ "visibility").asOpt[String]
+          .map(PublicAccess.Visibility.withName)
         val accessLevel = (json \ "access_level").asOpt[String]
+          .flatMap(PublicAccess.AccessLevel.withName)
 
-        // TODO recursive!
-
-        val fUpdateVisibility = visibility.map { v => 
-          folders.updatePublicVisibility(ids, PublicAccess.Visibility.withName(v))
-        }
-
-        val fUpdateAccessLevel = accessLevel.map { a => 
-          folders.updatePublicAccessLevel(ids, PublicAccess.AccessLevel.withName(a).get)
-        }
-
-        val f = Future.sequence(Seq(fUpdateVisibility, fUpdateAccessLevel).flatten)
-        f.map { _ => Ok }
+        setVisibilityRecursive(id, request.identity.username, visibility, accessLevel)
+          .map { success => 
+            if (success) Ok else MultiStatus
+          }
         
       case None =>
         Future.successful(BadRequest)
@@ -83,9 +77,9 @@ class SharingController @Inject() (
   // TODO restrict to folder owners and admins
   def getFolderCollaborators(id: UUID) = silhouette.SecuredAction.async { implicit request =>
     val f = for {
-      folder <- folders.getFolder(id)
+      f <- folders.getFolder(id, request.identity.username)
       policies <- folders.getCollaborators(id)
-    } yield (folder, policies)
+    } yield (f.map(_._1), policies)
 
     f.map { _ match {
       case (Some(folder), policies) => 

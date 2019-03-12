@@ -2,6 +2,7 @@ package services.folder
 
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
+import org.jooq.Record
 import org.jooq.impl.DSL
 import play.api.Logger
 import play.api.libs.json._
@@ -9,8 +10,8 @@ import play.api.libs.functional.syntax._
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import services.{Page, BaseService, PublicAccess}
-import services.generated.Tables.FOLDER
-import services.generated.tables.records.FolderRecord
+import services.generated.Tables.{FOLDER, SHARING_POLICY}
+import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 import storage.db.DB
 
 case class Breadcrumb(id: UUID, title: String)
@@ -20,15 +21,56 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
   with FolderAssociationService
   with SharedFolderService {
 
-  def getFolder(id: UUID): Future[Option[FolderRecord]] = 
-    db.query { sql => 
-      Option(sql.selectFrom(FOLDER).where(FOLDER.ID.equal(id)).fetchOne)
-    }
+  /** Marshals a joined folder/sharingpolicy record to a typed tuple **/
+  private def toFolderAndPolicy(
+    record: Record
+  ): (FolderRecord, Option[SharingPolicyRecord]) = {
+    val folder = record.into(classOf[FolderRecord])
+    val policy = record.into(classOf[SharingPolicyRecord])
 
-  def getFolders(ids: Seq[UUID]): Future[Seq[FolderRecord]] = 
-    db.query { sql => 
-      sql.selectFrom(FOLDER).where(FOLDER.ID.in(ids)).fetchArray
-    }
+    // If there is no policy stored, the record will still be there, but 
+    // with all fields == null
+    if (policy.getSharedWith == null)
+      (folder, None)
+    else 
+      (folder, Some(policy))
+  }
+
+  /** Returns the folder with the given ID, plus the sharing policy 
+    * associated with the given user, if any.
+    */
+  def getFolder(
+    id: UUID,
+    loggedInAs: String
+  ): Future[Option[(FolderRecord, Option[SharingPolicyRecord])]] = db.query { sql => 
+    val record = 
+      sql.select().from(FOLDER)
+         .leftOuterJoin(SHARING_POLICY)
+           .on(SHARING_POLICY.FOLDER_ID.equal(FOLDER.ID)
+             .and(SHARING_POLICY.SHARED_WITH.equal(loggedInAs)))
+         .where(FOLDER.ID.equal(id))
+         .fetchOne
+
+    Option(record).map(toFolderAndPolicy)
+  }
+
+  /** Returns the requested folders (if they exist), along with the sharing  
+    * policies for the given user, if any
+    */
+  def getFolders(
+    ids: Seq[UUID],
+    loggedInAs: String
+  ): Future[Seq[(FolderRecord, Option[SharingPolicyRecord])]] = db.query { sql => 
+    val records = 
+      sql.select().from(FOLDER)
+         .leftOuterJoin(SHARING_POLICY)
+           .on(SHARING_POLICY.FOLDER_ID.equal(FOLDER.ID)
+             .and(SHARING_POLICY.SHARED_WITH.equal(loggedInAs)))
+         .where(FOLDER.ID.in(ids))
+         .fetchArray
+
+    records.map(toFolderAndPolicy)
+  }
 
   /** Gets the breadcrumb trail for a specific folder.
     * 
@@ -64,7 +106,6 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
       Seq.empty[Breadcrumb]
     }
   }
-
 
   /** A flattended list of IDs of all children below the given folder **/
   def getChildrenRecursive(id: UUID) = db.query { sql => 
@@ -176,17 +217,17 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
 
   def deleteReadme(id: UUID): Future[Boolean] = setReadme(id, null)
 
-  def updatePublicVisibility(ids: Seq[UUID], value: PublicAccess.Visibility) = db.withTransaction { sql =>
+  def updatePublicVisibility(id: UUID, value: PublicAccess.Visibility) = db.withTransaction { sql =>
     sql.update(FOLDER)
        .set(FOLDER.PUBLIC_VISIBILITY, value.toString)
-       .where(FOLDER.ID.in(ids))
+       .where(FOLDER.ID.equal(id))
        .execute > 0
   }
 
-  def updatePublicAccessLevel(ids: Seq[UUID], value: PublicAccess.AccessLevel) = db.withTransaction { sql => 
+  def updatePublicAccessLevel(id: UUID, value: PublicAccess.AccessLevel) = db.withTransaction { sql => 
     sql.update(FOLDER)
        .set(FOLDER.PUBLIC_ACCESS_LEVEL, value.toString)
-       .where(FOLDER.ID.in(ids))
+       .where(FOLDER.ID.equal(id))
        .execute > 0
   }
 
