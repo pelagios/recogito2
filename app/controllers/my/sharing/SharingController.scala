@@ -8,6 +8,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import services.{PublicAccess, SharingLevel}
+import services.document.DocumentService
 import services.folder.FolderService
 import services.user.UserService
 
@@ -17,6 +18,7 @@ class SharingController @Inject() (
   silhouette: Silhouette[Security.Env],
   users: UserService,
   implicit val ctx: ExecutionContext,
+  implicit val documents: DocumentService,
   implicit val folders: FolderService
 ) extends AbstractController(components) 
     with HasPrettyPrintJSON 
@@ -46,8 +48,6 @@ class SharingController @Inject() (
     }}
   }
 
-  // TODO restrict to folder owners and admins
-  // TODO subfolders
   def setFolderVisibility() = silhouette.SecuredAction.async { implicit request =>
     request.body.asJson match {
       case Some(json) => 
@@ -65,12 +65,6 @@ class SharingController @Inject() (
       case None =>
         Future.successful(BadRequest)
     }
-    
-    /*  
-    folders.getChildrenRecursive(id).map { idsAndTitles =>
-      Ok
-    }
-    */
   }
 
 

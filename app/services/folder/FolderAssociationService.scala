@@ -42,6 +42,7 @@ trait FolderAssociationService { self: FolderService =>
       .join(DOCUMENT).on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
       .leftOuterJoin(SHARING_POLICY).on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)
         .and(SHARING_POLICY.SHARED_WITH.equal(loggedInAs)))
+      .where(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId))
       .fetchArray().toSeq
       .map { record => 
         val doc = record.into(classOf[DocumentRecord])

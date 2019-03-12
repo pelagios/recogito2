@@ -14,6 +14,10 @@ import services.generated.tables.records.{DocumentRecord, FolderRecord, SharingP
   */
 trait SetVisibilityHelper {
 
+  private def isFolderAllowed(folder: FolderRecord, policy: Option[SharingPolicyRecord], loggedInAs: String) = 
+    folder.getOwner == loggedInAs || // folder owner OR
+    policy.map(_.getAccessLevel == SharingLevel.ADMIN).getOrElse(false)
+
   /** Does the actual work of applying the visibility setting to 
     * a single FolderRecord, if permissions allow.
     * 
@@ -30,11 +34,7 @@ trait SetVisibilityHelper {
       folderService: FolderService,
       ctx: ExecutionContext
   ): Future[Boolean] = {
-    val isAllowed = 
-      folder.getOwner == loggedInAs || // folder owner OR
-      policy.map(_.getAccessLevel == SharingLevel.ADMIN).getOrElse(false)
-
-    if (isAllowed) {
+    if (isFolderAllowed(folder, policy, loggedInAs)) {
       val fUpdateVisibility = visibility.map { v => 
         folderService.updatePublicVisibility(folder.getId, v)
       }
@@ -61,44 +61,26 @@ trait SetVisibilityHelper {
     doc: DocumentRecord, 
     policy: Option[SharingPolicyRecord], 
     loggedInAs: String,
-    visibility: PublicAccess.Visibility,
-    accessLevel: PublicAccess.AccessLevel
-  )(
-    implicit documentService: DocumentService
+    visibility: Option[PublicAccess.Visibility],
+    accessLevel: Option[PublicAccess.AccessLevel]
+  )(implicit
+      documentService: DocumentService,
+      ctx: ExecutionContext
   ): Future[Boolean] = {
     val isAllowed = 
       doc.getOwner == loggedInAs || // document owner OR
       policy.map(_.getAccessLevel == SharingLevel.ADMIN).getOrElse(false) // Has admin rights
 
-    if (isAllowed)
-      documentService.setPublicAccessOptions(doc.getId, visibility, Some(accessLevel))
-    else
-      Future.successful(false) // don't execute
-  }
+    if (isAllowed) {
+      val fSetVisiblity = visibility.map(v => documentService.setPublicVisibility(doc.getId, v))
+      val fSetAccessLevel = accessLevel.map(l => documentService.setPublicAccessLevel(doc.getId, Some(l)))
 
-  /** Applies visibility settings to all documents in the folder with the given ID.
-    * 
-    * This method is NOT recursive. Documents in sub-folders of this folder
-    * will not be affected. Returns Future(false) if there was any documents where
-    * the setting could not be applied due to access restrictions, Future(true)
-    * otherwise.
-    */
-  private def applyVisibilityToDocumentsList(
-    folderId: UUID,
-    loggedInAs: String,
-    visibility: PublicAccess.Visibility,
-    accessLevel: PublicAccess.AccessLevel
-  )(implicit 
-      documentService: DocumentService, 
-      folderService: FolderService, 
-      ctx: ExecutionContext
-  ): Future[Boolean] = {
-    folderService.listDocumentsInFolder(folderId, loggedInAs)
-      .flatMap { result => 
-        Future.sequence {
-          result.map(t => applyVisibilityToOneDocument(t._1, t._2, loggedInAs, visibility, accessLevel))
-        } map { !_.exists(_ == false) }
-      }
+      Future.sequence {
+        Seq(fSetVisiblity, fSetAccessLevel).flatten
+      } map { !_.exists(_ == false) }
+    } else {
+      Future.successful(false) // don't execute
+    }
   }
 
   /** Applies visibility settings to the list of folders. This method is not
@@ -109,7 +91,7 @@ trait SetVisibilityHelper {
     * otherwise.
     */
   private def applyVisibilityToFolderList(
-    folderIds: Seq[UUID],
+    folders: Seq[(FolderRecord, Option[SharingPolicyRecord])],
     loggedInAs: String,
     visibility: Option[PublicAccess.Visibility],
     accessLevel: Option[PublicAccess.AccessLevel]
@@ -117,11 +99,30 @@ trait SetVisibilityHelper {
       folderService: FolderService,
       ctx: ExecutionContext
   ): Future[Boolean] = {
-    folderService.getFolders(folderIds, loggedInAs).flatMap { result => 
-      Future.sequence {
-        result.map(t => applyVisibilityToOneFolder(t._1, t._2, loggedInAs, visibility, accessLevel))
-      } map { !_.exists(_ == false) }
-    }
+    Future.sequence {
+      folders.map(t => applyVisibilityToOneFolder(t._1, t._2, loggedInAs, visibility, accessLevel))
+    } map { !_.exists(_ == false) }
+  }
+
+  /** Applies visibility settings to all documents in the folder with the given ID.
+    * 
+    * This method is NOT recursive. Documents in sub-folders of this folder
+    * will not be affected. Returns Future(false) if there was any documents where
+    * the setting could not be applied due to access restrictions, Future(true)
+    * otherwise.
+    */
+  private def applyVisibilityToDocumentsList(
+    documents: Seq[(DocumentRecord, Option[SharingPolicyRecord])],
+    loggedInAs: String,
+    visibility: Option[PublicAccess.Visibility],
+    accessLevel: Option[PublicAccess.AccessLevel]
+  )(implicit 
+      documentService: DocumentService, 
+      ctx: ExecutionContext
+  ): Future[Boolean] = {
+    Future.sequence {
+      documents.map(t => applyVisibilityToOneDocument(t._1, t._2, loggedInAs, visibility, accessLevel))
+    } map { !_.exists(_ == false) }
   }
 
   /** Applies visibility settings to all folders, documents and nested items. 
@@ -137,14 +138,47 @@ trait SetVisibilityHelper {
     accessLevel: Option[PublicAccess.AccessLevel]
   )(implicit
       folderService: FolderService,
+      documentService: DocumentService,
       ctx: ExecutionContext 
   ): Future[Boolean] = {
 
-    // TODO handle nested documents
+    def getNestedDocuments(ids: Seq[UUID]): Future[Seq[(DocumentRecord, Option[SharingPolicyRecord], UUID)]] =
+      Future.sequence {
+        ids.map { id => 
+          folderService.listDocumentsInFolder(id, loggedInAs).map { _.map { t => 
+            (t._1, t._2, id)
+          }}
+        }
+      } map { _.flatten }
 
-    folderService.getChildrenRecursive(folderId).flatMap { children => 
-      val allFolders = folderId +: children.map(_._1)
-      applyVisibilityToFolderList(allFolders, loggedInAs, visibility, accessLevel)
+    val f = for {
+      // All folders: current + nested subfolders
+      folderIds <- folderService.getChildrenRecursive(folderId).map(sub => folderId +: sub.map(_._1))
+      folders <- folderService.getFolders(folderIds, loggedInAs)
+      documents <- getNestedDocuments(folderIds)
+    } yield (folders, documents)
+
+    f.flatMap { case (folders, documents) => 
+      // Apply folder visibility (permissions are being checked folder-by-folder)
+      val fFolderSuccess = applyVisibilityToFolderList(folders, loggedInAs, visibility, accessLevel)
+
+      // Zip the documents list with info about each doc's parent folder
+      val documentsWithParentFolder = documents.map { case (doc, policy, folderId) => 
+        (doc, policy, folders.find(_._1.getId == folderId).get)
+      }
+
+      // Remove all documents where we don't have access on the parent folder
+      val allowedDocuments = documentsWithParentFolder.filter { case (doc, policy, f) => 
+        isFolderAllowed(f._1, f._2, loggedInAs)
+      } map { case t => (t._1, t._2) }
+
+      // Apply document visibility in allowed folders (document permissions are being checked case by case)
+      val fDocumentSuccess = applyVisibilityToDocumentsList(allowedDocuments, loggedInAs, visibility, accessLevel)
+      
+      for {
+        folderSuccess <- fFolderSuccess
+        documentSuccess <- fDocumentSuccess
+      } yield (folderSuccess && documentSuccess)
     }
   }
 

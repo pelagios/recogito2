@@ -86,6 +86,13 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
          .set(DOCUMENT.PUBLIC_ACCESS_LEVEL, optString(accessLevel.map(_.toString)))
          .where(DOCUMENT.ID.equal(docId)).execute() == 1
     }
+
+  def setPublicVisibility(docId: String, visibility: PublicAccess.Visibility) = 
+    db.query { sql => 
+      sql.update(DOCUMENT)
+        .set(DOCUMENT.PUBLIC_VISIBILITY, visibility.toString)
+        .where(DOCUMENT.ID.equal(docId)).execute() == 1
+    }
   
   /** Updates the user-defined metadata fields **/
   def updateMetadata(
