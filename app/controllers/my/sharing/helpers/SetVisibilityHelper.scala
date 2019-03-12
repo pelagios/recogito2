@@ -15,11 +15,11 @@ import services.generated.tables.records.{DocumentRecord, FolderRecord, SharingP
   */
 trait SetVisibilityHelper {
 
-  /** Does the actual work of applying the visibility setting to 
-    * a single FolderRecord, if permissions allow.
+  /** Does the actual work of applying the visibility setting 
+    * to a single FolderRecord, if permissions allow.
     * 
-    * Returns Future(false) when the setting was not applied due to
-    * access restrictions, Future(true) otherwise.
+    * Returns Future(false) when the setting was not applied 
+    * due to access restrictions, Future(true) otherwise.
     */
   private def applyVisibilityToOneFolder(
     folder: FolderRecord, 
@@ -51,8 +51,8 @@ trait SetVisibilityHelper {
   /** Does the actual work of applying the visibility setting
     * to a single DocumentRecord, if permissions allow.
     * 
-    * Returns Future(false) when the setting was not applied due to access 
-    * restrictions, Future(true) otherwise.
+    * Returns Future(false) when the setting was not applied 
+    * due to access restrictions, Future(true) otherwise.
     */
   private def applyVisibilityToOneDocument(
     doc: DocumentRecord, 
@@ -76,12 +76,12 @@ trait SetVisibilityHelper {
     }
   }
 
-  /** Applies visibility settings to the list of folders. This method is not
-    * recursive.
+  /** Applies visibility settings to the list of folders. This 
+    * method is not recursive.
     *
-    * Returns Future(false) if there was any folder or document where the
-    * setting could not be applied due to access restrictions, Future(true)
-    * otherwise.
+    * Returns Future(false) if there was any folder where the
+    * setting could not be applied due to access restrictions, 
+    * Future(true) otherwise.
     */
   private def applyVisibilityToFolderList(
     folders: Seq[(FolderRecord, Option[SharingPolicyRecord])],
@@ -97,12 +97,11 @@ trait SetVisibilityHelper {
     } map { !_.exists(_ == false) }
   }
 
-  /** Applies visibility settings to all documents in the folder with the given ID.
+  /** Applies visibility settings to all documents in the list.
     * 
-    * This method is NOT recursive. Documents in sub-folders of this folder
-    * will not be affected. Returns Future(false) if there was any documents where
-    * the setting could not be applied due to access restrictions, Future(true)
-    * otherwise.
+    * Returns Future(false) if there was any documents where the
+    * setting could not be applied due to access restrictions, 
+    * Future(true) otherwise.
     */
   private def applyVisibilityToDocumentsList(
     documents: Seq[(DocumentRecord, Option[SharingPolicyRecord])],
@@ -112,13 +111,12 @@ trait SetVisibilityHelper {
   )(implicit 
       documentService: DocumentService, 
       ctx: ExecutionContext
-  ): Future[Boolean] = {
-    Future.sequence {
-      documents.map(t => applyVisibilityToOneDocument(t._1, t._2, loggedInAs, visibility, accessLevel))
-    } map { !_.exists(_ == false) }
-  }
+  ): Future[Boolean] = Future.sequence {
+    documents.map(t => applyVisibilityToOneDocument(t._1, t._2, loggedInAs, visibility, accessLevel))
+  } map { !_.exists(_ == false) }
 
-  /** Applies visibility settings to all folders, documents and nested items. 
+  /** Applies visibility settings to the given folder, the documents 
+    * inside it, and recursively all sub-folders and their documents. 
     *
     * Returns Future(false) if there was any folder or document where the
     * setting could not be applied due to access restrictions, Future(true)
