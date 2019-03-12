@@ -1,5 +1,6 @@
 package controllers.my.sharing.helpers
 
+import AccessibleItems.Utils._
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import services.{PublicAccess, SharingLevel}
@@ -99,7 +100,7 @@ trait SetVisibilityHelper {
 
   /** Applies visibility settings to all documents in the list.
     * 
-    * Returns Future(false) if there was any documents where the
+    * Returns Future(false) if there was any document where the
     * setting could not be applied due to access restrictions, 
     * Future(true) otherwise.
     */
@@ -133,38 +134,13 @@ trait SetVisibilityHelper {
       ctx: ExecutionContext 
   ): Future[Boolean] = {
 
-    def getNestedDocuments(ids: Seq[UUID]): Future[Seq[(DocumentRecord, Option[SharingPolicyRecord], UUID)]] =
-      Future.sequence {
-        ids.map { id => 
-          folderService.listDocumentsInFolder(id, loggedInAs).map { _.map { t => 
-            (t._1, t._2, id)
-          }}
-        }
-      } map { _.flatten }
-
-    val f = for {
-      // All folders: current + nested subfolders
-      folderIds <- folderService.getChildrenRecursive(folderId).map(sub => folderId +: sub.map(_._1))
-      folders <- folderService.getFolders(folderIds, loggedInAs)
-      documents <- getNestedDocuments(folderIds)
-    } yield (folders, documents)
-
-    f.flatMap { case (folders, documents) => 
+    val accessibleItems = listAccessibleItemsRecursive(folderId, loggedInAs)
+    accessibleItems.flatMap { items => 
       // Apply folder visibility (permissions are being checked folder-by-folder)
-      val fFolderSuccess = applyVisibilityToFolderList(folders, loggedInAs, visibility, accessLevel)
-
-      // Zip the documents list with info about each doc's parent folder
-      val documentsWithParentFolder = documents.map { case (doc, policy, folderId) => 
-        (doc, policy, folders.find(_._1.getId == folderId).get)
-      }
-
-      // Remove all documents where we don't have access on the parent folder
-      val allowedDocuments = documentsWithParentFolder.filter { case (doc, policy, f) => 
-        isFolderAdmin(loggedInAs, f._1, f._2)
-      } map { case t => (t._1, t._2) }
+      val fFolderSuccess = applyVisibilityToFolderList(items.folders, loggedInAs, visibility, accessLevel)
 
       // Apply document visibility in allowed folders (document permissions are being checked case by case)
-      val fDocumentSuccess = applyVisibilityToDocumentsList(allowedDocuments, loggedInAs, visibility, accessLevel)
+      val fDocumentSuccess = applyVisibilityToDocumentsList(items.documents, loggedInAs, visibility, accessLevel)
       
       for {
         folderSuccess <- fFolderSuccess

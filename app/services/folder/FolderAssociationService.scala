@@ -4,7 +4,7 @@ import java.util.UUID
 import org.jooq.DSLContext
 import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
 import services.generated.tables.records.{DocumentRecord, FolderAssociationRecord, SharingPolicyRecord}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait FolderAssociationService { self: FolderService =>
 
@@ -56,5 +56,17 @@ trait FolderAssociationService { self: FolderService =>
           (doc, Some(policy))
       }
   }
+
+  /** Shorthand to list documents in multiple folders **/
+  def listDocumentsInFolders(
+    ids: Seq[UUID],
+    loggedInAs: String
+  )(implicit ctx: ExecutionContext) = Future.sequence {
+    ids.map { id => 
+      listDocumentsInFolder(id, loggedInAs).map { _.map { t => 
+        (t._1, t._2, id)
+      }}
+    }
+  } map { _.flatten }
 
 }
