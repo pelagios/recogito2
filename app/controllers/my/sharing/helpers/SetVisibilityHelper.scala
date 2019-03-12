@@ -3,6 +3,7 @@ package controllers.my.sharing.helpers
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import services.{PublicAccess, SharingLevel}
+import services.SharingLevel.Utils._
 import services.document.DocumentService
 import services.folder.FolderService
 import services.generated.tables.records.{DocumentRecord, FolderRecord, SharingPolicyRecord}
@@ -13,10 +14,6 @@ import services.generated.tables.records.{DocumentRecord, FolderRecord, SharingP
   * nested documents and subfolders. 
   */
 trait SetVisibilityHelper {
-
-  private def isFolderAllowed(folder: FolderRecord, policy: Option[SharingPolicyRecord], loggedInAs: String) = 
-    folder.getOwner == loggedInAs || // folder owner OR
-    policy.map(_.getAccessLevel == SharingLevel.ADMIN).getOrElse(false)
 
   /** Does the actual work of applying the visibility setting to 
     * a single FolderRecord, if permissions allow.
@@ -34,7 +31,7 @@ trait SetVisibilityHelper {
       folderService: FolderService,
       ctx: ExecutionContext
   ): Future[Boolean] = {
-    if (isFolderAllowed(folder, policy, loggedInAs)) {
+    if (isFolderAdmin(loggedInAs, folder, policy)) {
       val fUpdateVisibility = visibility.map { v => 
         folderService.updatePublicVisibility(folder.getId, v)
       }
@@ -67,11 +64,7 @@ trait SetVisibilityHelper {
       documentService: DocumentService,
       ctx: ExecutionContext
   ): Future[Boolean] = {
-    val isAllowed = 
-      doc.getOwner == loggedInAs || // document owner OR
-      policy.map(_.getAccessLevel == SharingLevel.ADMIN).getOrElse(false) // Has admin rights
-
-    if (isAllowed) {
+    if (isDocumentAdmin(loggedInAs, doc, policy)) {
       val fSetVisiblity = visibility.map(v => documentService.setPublicVisibility(doc.getId, v))
       val fSetAccessLevel = accessLevel.map(l => documentService.setPublicAccessLevel(doc.getId, Some(l)))
 
@@ -169,7 +162,7 @@ trait SetVisibilityHelper {
 
       // Remove all documents where we don't have access on the parent folder
       val allowedDocuments = documentsWithParentFolder.filter { case (doc, policy, f) => 
-        isFolderAllowed(f._1, f._2, loggedInAs)
+        isFolderAdmin(loggedInAs, f._1, f._2)
       } map { case t => (t._1, t._2) }
 
       // Apply document visibility in allowed folders (document permissions are being checked case by case)
