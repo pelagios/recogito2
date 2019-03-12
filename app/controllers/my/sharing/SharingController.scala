@@ -22,6 +22,7 @@ class SharingController @Inject() (
   implicit val folders: FolderService
 ) extends AbstractController(components) 
     with HasPrettyPrintJSON 
+    with helpers.AddCollaboratorHelper
     with helpers.SetVisibilityHelper {
   
   def searchUsers(query: String) = silhouette.SecuredAction.async { implicit request =>
@@ -30,7 +31,7 @@ class SharingController @Inject() (
     }
   }
 
-  // TODO restrict to folder owners and admins
+  // TODO show only to folder owners and collaborators?
   def getFolderVisibility(id: UUID) = silhouette.SecuredAction.async { implicit request => 
     folders.getFolder(id, request.identity.username).map { _ match {
       case Some((folder, _)) => 
@@ -48,27 +49,7 @@ class SharingController @Inject() (
     }}
   }
 
-  def setFolderVisibility() = silhouette.SecuredAction.async { implicit request =>
-    request.body.asJson match {
-      case Some(json) => 
-        val id = (json \ "ids").as[Seq[UUID]].head
-        val visibility = (json \ "visibility").asOpt[String]
-          .map(PublicAccess.Visibility.withName)
-        val accessLevel = (json \ "access_level").asOpt[String]
-          .flatMap(PublicAccess.AccessLevel.withName)
-
-        setVisibilityRecursive(id, request.identity.username, visibility, accessLevel)
-          .map { success => 
-            if (success) Ok else MultiStatus
-          }
-        
-      case None =>
-        Future.successful(BadRequest)
-    }
-  }
-
-
-  // TODO restrict to folder owners and admins
+  // TODO show only to folder owners and collaborators?
   def getFolderCollaborators(id: UUID) = silhouette.SecuredAction.async { implicit request =>
     val f = for {
       f <- folders.getFolder(id, request.identity.username)
@@ -93,20 +74,42 @@ class SharingController @Inject() (
     }}
   }
 
+  def setFolderVisibility() = silhouette.SecuredAction.async { implicit request =>
+    request.body.asJson match {
+      case Some(json) => 
+        val id = (json \ "ids").as[Seq[UUID]].head
+        val visibility = (json \ "visibility").asOpt[String]
+          .map(PublicAccess.Visibility.withName)
+        val accessLevel = (json \ "access_level").asOpt[String]
+          .flatMap(PublicAccess.AccessLevel.withName)
+
+        // Using method from SetVisibilityHelper
+        setVisibilityRecursive(id, request.identity.username, visibility, accessLevel)
+          .map { success => 
+            if (success) Ok else MultiStatus
+          }
+        
+      case None =>
+        Future.successful(BadRequest)
+    }
+  }
+
   // TODO restrict to folder owners and admins
   // TODO subfolders
   def addFolderCollaborator() = silhouette.SecuredAction.async { implicit request =>
     request.body.asJson match {
       case Some(json) => 
-        val ids = (json \ "ids").as[Seq[UUID]]
+        val id = (json \ "ids").as[Seq[UUID]].head
         val collaborator = (json \ "username").as[String]
         val level = (json \ "access_level").asOpt[String]
           .flatMap(SharingLevel.withName)
           .getOrElse(SharingLevel.READ)
         
-        folders.addCollaborator(
-          ids.head, request.identity.username, collaborator, level
-        ).map { _ => Ok }
+        // Using method from AddCollaboratorHelper
+        addCollaboratorRecursive(id, request.identity.username, collaborator, level)
+          .map { success => 
+            if (success) Ok else MultiStatus
+          }
 
       case None =>
         Future.successful(BadRequest)
