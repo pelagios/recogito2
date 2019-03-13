@@ -169,7 +169,7 @@ POST    /api/directory/:owner                        controllers.my.directory.li
 GET     /api/directory/:owner/:folderId              controllers.my.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 POST    /api/directory/:owner/:folderId              controllers.my.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
-# ~~~ Create, delete & unshare operations ~~~
+# ~~~ Create, delete & unshare (my shared) operations ~~~
 
 POST    /api/folder                                  controllers.my.directory.create.CreateController.createFolder
 PUT     /api/folder/:id                              controllers.my.directory.create.CreateController.renameFolder(id: java.util.UUID, title: String)
@@ -184,7 +184,7 @@ DELETE  /api/folder/:id                              controllers.my.directory.de
 DELETE  /api/shared/folder/bulk                      controllers.my.directory.delete.FolderActionsController.bulkUnshareFolders
 DELETE  /api/shared/folder/:id                       controllers.my.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
 
-# ~~~ Public sharing ~~~
+# ~~~ Bulk sharing ~~~
 
 GET     /api/sharing/search                          controllers.my.sharing.SharingController.searchUsers(q: String)
 GET     /api/sharing/folders/:id/visibility          controllers.my.sharing.SharingController.getFolderVisibility(id: java.util.UUID)
