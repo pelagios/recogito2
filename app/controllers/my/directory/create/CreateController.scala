@@ -11,6 +11,7 @@ import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import services.{SharingLevel, ContentType}
+import services.SharingLevel.Utils._
 import services.folder.FolderService
 import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 import services.upload.UploadService
@@ -38,17 +39,6 @@ class CreateController @Inject() (
     with types.IIIFSource
     with HasPrettyPrintJSON {
 
-  /** Shorthand access check.
-    * 
-    * Returns true if the user is either owner or admin on the folder.
-    */
-  private def isAllowed(username: String, folder: FolderRecord, policy: Option[SharingPolicyRecord]) = {
-    folder.getOwner == username || 
-      policy.map { p => 
-        p.getSharedWith == username && p.getAccessLevel == SharingLevel.ADMIN.toString
-      }.getOrElse(false)
-  }
-
   def createFolder() = silhouette.SecuredAction.async { implicit request => 
     request.body.asJson match {
       case None => Future.successful(BadRequest)
@@ -69,7 +59,7 @@ class CreateController @Inject() (
   def renameFolder(id: UUID, title: String) = silhouette.SecuredAction.async { implicit request => 
     folders.getFolder(id, request.identity.username).flatMap { _ match {
       case Some((folder, policy)) =>
-        if (isAllowed(request.identity.username, folder, policy))
+        if (isFolderAdmin(request.identity.username, folder, policy))
           folders.renameFolder(id, title).map { success =>
             if (success) Ok else InternalServerError
           }
