@@ -44,6 +44,14 @@ trait SharedFolderService { self: FolderService =>
       }
       
       policy.store() == 1
+    }
+
+  def removeCollaborator(folderId: UUID, sharedWith: String) =
+    db.query { sql => 
+      sql.deleteFrom(SHARING_POLICY)
+         .where(SHARING_POLICY.FOLDER_ID.equal(folderId)
+           .and(SHARING_POLICY.SHARED_WITH.equal(sharedWith)))
+         .execute == 1
     } 
 
 }

@@ -1,6 +1,6 @@
 package controllers.my.sharing.helpers
 
-import AccessibleItems.Utils._
+import controllers.my.sharing.helpers.AccessibleItems.Utils._
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 import services.SharingLevel
@@ -73,10 +73,10 @@ trait AddCollaboratorHelper {
     folders.map(t => addCollaboratorToOneFolder(t._1, t._2, loggedInAs, collaborator, level))      
   } map { !_.exists(_ == false) }
 
-  /** Adss a collaborator to all documents in the list.
+  /** Adds a collaborator to all documents in the list.
     * 
     * Returns Future(false) if there was any document where the
-    * setting could not be applied due to access restrictions, 
+    * collaborator could not be added due to access restrictions, 
     * Future(true) otherwise.
     */
   private def addCollaboratorToDocumentList(
@@ -108,7 +108,6 @@ trait AddCollaboratorHelper {
       documentService: DocumentService,
       ctx: ExecutionContext
   ): Future[Boolean] = {
-
     val accessibleItems = listAccessibleItemsRecursive(folderId, loggedInAs)
     accessibleItems.flatMap { items =>
       val fFolderSuccess = addCollaboratorToFolderList(items.folders, loggedInAs, collaborator, level)
