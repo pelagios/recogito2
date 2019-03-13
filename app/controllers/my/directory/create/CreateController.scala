@@ -24,7 +24,6 @@ import transform.tiling.TilingService
 @Singleton
 class CreateController @Inject() (
   val components: ControllerComponents,
-  val folders: FolderService,
   val silhouette: Silhouette[Security.Env],
   val uploads: UploadService,
   val users: UserService,
@@ -32,12 +31,14 @@ class CreateController @Inject() (
   val tilingService: TilingService,
   val teiParserService: TEIParserService,
   val nerService: NERService,
+  implicit val folders: FolderService,
   implicit val ctx: ExecutionContext,
   implicit val ws: WSClient
 ) extends BaseController(components, config, users)
     with types.FileUpload
     with types.IIIFSource
-    with HasPrettyPrintJSON {
+    with HasPrettyPrintJSON 
+    with helpers.InheritVisibilityHelper {
 
   def createFolder() = silhouette.SecuredAction.async { implicit request => 
     request.body.asJson match {
@@ -49,7 +50,14 @@ class CreateController @Inject() (
 
           case Some(title) =>
             val parent = (json \ "parent").asOpt[UUID]
-            folders.createFolder(request.identity.username, title, parent).map { folder => 
+
+            val f = for {
+              folder <- folders.createFolder(request.identity.username, title, parent)
+              visibilitySuccess <- inheritVisibility(folder, request.identity.username)
+              // collaboratorSuccess <- inheritCollaborators(folder)
+            } yield (folder, visibilitySuccess) //  && collaboratorSuccess)
+
+            f.map { case (folder, success) => 
               jsonOk(Json.obj("id" -> folder.getId))
             }
         }

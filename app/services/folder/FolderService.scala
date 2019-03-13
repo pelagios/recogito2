@@ -231,6 +231,18 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
        .execute > 0
   }
 
+  def updateVisibilitySettings(
+    id: UUID,
+    visibility: PublicAccess.Visibility, 
+    accessLevel: Option[PublicAccess.AccessLevel]
+  ) = db.withTransaction { sql => 
+    sql.update(FOLDER)
+       .set(FOLDER.PUBLIC_VISIBILITY, visibility.toString)
+       .set(FOLDER.PUBLIC_ACCESS_LEVEL, optString(accessLevel.map(_.toString)))
+       .where(FOLDER.ID.equal(id))
+       .execute == 1
+  }
+
 }
 
 object FolderService {
