@@ -13,6 +13,7 @@ trait SharedFolderService { self: FolderService =>
     sql.selectFrom(SHARING_POLICY)
        .where(SHARING_POLICY.FOLDER_ID.equal(id))
        .fetchArray
+       .toSeq
   }
 
   def addCollaborator(folderId: UUID, sharedBy: String, sharedWith: String, level: SharingLevel) = 

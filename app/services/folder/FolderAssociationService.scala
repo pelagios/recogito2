@@ -2,8 +2,8 @@ package services.folder
 
 import java.util.UUID
 import org.jooq.DSLContext
-import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
-import services.generated.tables.records.{DocumentRecord, FolderAssociationRecord, SharingPolicyRecord}
+import services.generated.Tables.{DOCUMENT, FOLDER, FOLDER_ASSOCIATION, SHARING_POLICY}
+import services.generated.tables.records.{DocumentRecord, FolderRecord, FolderAssociationRecord, SharingPolicyRecord}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait FolderAssociationService { self: FolderService =>
@@ -27,6 +27,17 @@ trait FolderAssociationService { self: FolderService =>
 
       insertAssociation(documentId, folderId, sql)
     }
+
+  /** Returns the folder the given document is in (if any) **/
+  def getContainingFolder(documentId: String) = db.query { sql =>
+    Option(
+      sql.select().from(FOLDER_ASSOCIATION)
+         .join(FOLDER)
+           .on(FOLDER.ID.equal(FOLDER_ASSOCIATION.FOLDER_ID))
+         .where(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(documentId))
+         .fetchOne
+    ).map(_.into(classOf[FolderRecord]))
+  }
 
   /** Deletes all associations for this document **/
   def deleteFolderAssociations(documentId: String) = 

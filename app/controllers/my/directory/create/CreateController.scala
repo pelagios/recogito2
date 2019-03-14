@@ -12,6 +12,7 @@ import play.api.mvc.{AnyContent, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import services.{SharingLevel, ContentType}
 import services.SharingLevel.Utils._
+import services.document.DocumentService
 import services.folder.FolderService
 import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 import services.upload.UploadService
@@ -31,6 +32,7 @@ class CreateController @Inject() (
   val tilingService: TilingService,
   val teiParserService: TEIParserService,
   val nerService: NERService,
+  implicit val documents: DocumentService,
   implicit val folders: FolderService,
   implicit val ctx: ExecutionContext,
   implicit val ws: WSClient
@@ -38,7 +40,8 @@ class CreateController @Inject() (
     with types.FileUpload
     with types.IIIFSource
     with HasPrettyPrintJSON 
-    with helpers.InheritVisibilityHelper {
+    with helpers.InheritVisibilityHelper
+    with helpers.InheritCollaboratorsHelper {
 
   def createFolder() = silhouette.SecuredAction.async { implicit request => 
     request.body.asJson match {
@@ -54,8 +57,8 @@ class CreateController @Inject() (
             val f = for {
               folder <- folders.createFolder(request.identity.username, title, parent)
               visibilitySuccess <- inheritVisibility(folder, request.identity.username)
-              // collaboratorSuccess <- inheritCollaborators(folder)
-            } yield (folder, visibilitySuccess) //  && collaboratorSuccess)
+              collaboratorSuccess <- inheritCollaborators(folder, request.identity.username)
+            } yield (folder, visibilitySuccess && collaboratorSuccess)
 
             f.map { case (folder, success) => 
               jsonOk(Json.obj("id" -> folder.getId))
@@ -145,9 +148,17 @@ class CreateController @Inject() (
         }
     
       case Some((pendingUpload, fileparts)) =>
-        uploads.importPendingUpload(pendingUpload, fileparts, folder).map { case (doc, docParts) => {
+        val f = for {
+          (doc, docParts) <- uploads.importPendingUpload(pendingUpload, fileparts, folder)
+          visibilitySuccess <- inheritVisibility(doc)
+          collabSuccess <- inheritCollaborators(doc)
+        } yield (doc, docParts, visibilitySuccess && collabSuccess)
+
+        f.map { case (doc, docParts, success) => {
 
           // TODO Change this to new task API!
+
+          // TODO make use of success in response
 
           // We'll forward a list of the running processing tasks to the view, so it can show progress
           val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]

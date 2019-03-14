@@ -2,8 +2,9 @@ package controllers.my.directory.create.helpers
 
 import scala.concurrent.{ExecutionContext, Future}
 import services.PublicAccess
+import services.document.DocumentService
 import services.folder.FolderService
-import services.generated.tables.records.FolderRecord
+import services.generated.tables.records.{DocumentRecord, FolderRecord}
 
 trait InheritVisibilityHelper {
 
@@ -36,5 +37,26 @@ trait InheritVisibilityHelper {
     case None =>
       Future.successful(true)
   }   
-  
+
+  def inheritVisibility(
+    document: DocumentRecord
+  )(implicit 
+      documentService: DocumentService,
+      folderService: FolderService,
+      ctx: ExecutionContext
+  ): Future[Boolean] = {
+    folderService.getContainingFolder(document.getId).flatMap { _ match {
+      case Some(folder) =>
+        val visibility = PublicAccess.Visibility.withName(folder.getPublicVisibility)
+        val accessLevel = Option(folder.getPublicAccessLevel).flatMap { level => 
+          PublicAccess.AccessLevel.withName(level) }
+
+        documentService.setPublicAccessOptions(document.getId, visibility, accessLevel)
+
+      case None =>
+        // No parent folder
+        Future.successful(true)
+    }}
+  }
+
 }
