@@ -145,6 +145,20 @@ class DirectoryController @Inject() (
 
   def getSharedWithMe(offset: Int, size: Int, folderId: UUID) =  {
     import ConfiguredPresentation._
+
+    // TODO make folder-sensitive
+
+    /*
+    SELECT * FROM sharing_policy
+    JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
+    JOIN document ON sharing_policy.document_id = document.id
+    WHERE shared_with = 'leifuss' AND folder_association.folder_id = '1eb398f6-654a-4752-9bd5-b3a89a7df340' ;
+
+    -- SELECT * FROM sharing_policy
+    -- LEFT OUTER JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
+    -- JOIN document ON sharing_policy.document_id = document.id
+    -- WHERE shared_with = 'leifuss' AND folder_association.folder_id IS NULL;
+    */
     
     silhouette.SecuredAction.async { implicit request => 
       getDocumentList(
