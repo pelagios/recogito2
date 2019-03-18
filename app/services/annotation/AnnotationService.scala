@@ -95,6 +95,11 @@ class AnnotationService @Inject() (
         None
     }
 
+  def findByIds(ids: Seq[UUID]): Future[Seq[Option[Annotation]]] =
+    Future.sequence {
+      ids.map(id => findById(id).map(_.map(_._1)))
+    }
+
   private def deleteById(annotationId: String): Future[Boolean] =
     es.client execute {
       delete(annotationId.toString) from ES.RECOGITO / ES.ANNOTATION

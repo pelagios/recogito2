@@ -104,7 +104,7 @@ class AnnotationAPIController @Inject() (
             if (isValidUpdate(annotation, previousVersion))
             
             (annotationStored, _) <- annotationService.upsertAnnotation(annotation)
-            
+
             success <- if (annotationStored)
                          contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
                        else
@@ -138,7 +138,23 @@ class AnnotationAPIController @Inject() (
             doc.fileparts.find(_.getId == partIds.head) match {
               case Some(filepart) =>
                 val annotations = annotationStubs.map(_.toAnnotation(username))
-                annotationService.upsertAnnotations(annotations).map { failed =>
+                val ids = annotations.map(_.annotationId)
+
+                def isValidBulkUpdate(previous: Seq[Option[Annotation]]) = {
+                  val validity = annotations.zip(previous)
+                    .map { t => isValidUpdate(t._1, t._2) }
+
+                  // All values == true
+                  !validity.exists(_ == false)
+                }
+
+                val f = for {
+                  previousVersions <- annotationService.findByIds(ids)                  
+                  if (isValidBulkUpdate(previousVersions))
+                  failed <- annotationService.upsertAnnotations(annotations)
+                } yield failed
+
+                f.map { failed =>
                   if (failed.size == 0)
                     // TODO add username and timestamp
                     jsonOk(Json.toJson(annotations))
