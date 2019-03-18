@@ -174,6 +174,15 @@ trait HasAnnotationValidation {
     // TODO check any things the current user should not be able to manipulate
     // - createdAt/By info on bodies not touched by the user must be unchanged
 
+    // TODO a preliminary hack
+    (annotation.annotates.contentType, previousVersion) match {
+      case (cType, Some(previous)) if cType.isText => 
+        if (annotation.anchor != previous.anchor)
+          throw new RuntimeException("Invalid annotation anchor")
+
+      case _ => ()
+    }
+
     computeContributions(annotation, previousVersion, document)
   }
   
