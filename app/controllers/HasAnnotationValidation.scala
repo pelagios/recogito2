@@ -171,19 +171,36 @@ trait HasAnnotationValidation {
     // - make sure filepart content type remains unchanged
     // - make sure annotation ID remains unchanged
 
-    // TODO check any things the current user should not be able to manipulate
-    // - createdAt/By info on bodies not touched by the user must be unchanged
-
-    // TODO a preliminary hack
-    (annotation.annotates.contentType, previousVersion) match {
-      case (cType, Some(previous)) if cType.isText => 
-        if (annotation.anchor != previous.anchor)
-          throw new RuntimeException("Invalid annotation anchor")
-
-      case _ => ()
-    }
-
     computeContributions(annotation, previousVersion, document)
+  }
+
+  def isValidUpdate(annotation: Annotation, previousVersion: Option[Annotation]): Boolean = {
+    previousVersion match {
+      case Some(previous) => 
+        val isSameId = annotation.annotationId == previous.annotationId
+
+        // Change of content type not allowed
+        val isSameContentType =
+          annotation.annotates.contentType == previous.annotates.contentType
+
+        // Change of doc/filepart ID not allowed
+        val isSameFilepart = 
+          annotation.annotates.documentId == previous.annotates.documentId &&
+          annotation.annotates.filepartId == previous.annotates.filepartId
+
+        // Anchors are only allowed to change on images (= modified shape)
+        val isValidAnchor = 
+          annotation.annotates.contentType.isImage ||
+            annotation.anchor == previous.anchor
+
+        // TODO check any things the current user should not be able to manipulate
+        // - createdAt/By info on bodies not touched by the user must be unchanged
+        isSameId && isSameContentType && isSameFilepart && isValidAnchor
+
+      case None => 
+        // A new insert is always a valid update
+        true
+    }
   }
   
   /** Performs a 'diff' on the annotations, returning the corresponding Contributions **/

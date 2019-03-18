@@ -99,11 +99,17 @@ class AnnotationAPIController @Inject() (
         if (accesslevel.canWrite) {
           val annotation = annotationStub.toAnnotation(username)
           val f = for {
-            (annotationStored, previousVersion) <- annotationService.upsertAnnotation(annotation)
+            previousVersion <- annotationService.findById(annotation.annotationId).map(_.map(_._1))
+
+            if (isValidUpdate(annotation, previousVersion))
+            
+            (annotationStored, _) <- annotationService.upsertAnnotation(annotation)
+            
             success <- if (annotationStored)
                          contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
                        else
                          Future.successful(false)
+            
           } yield success
 
           f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
