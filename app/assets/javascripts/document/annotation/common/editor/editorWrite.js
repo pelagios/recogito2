@@ -14,7 +14,7 @@ define([
 
         element = (function() {
           var el = jQuery(
-                '<div class="annotation-editor-popup">' +
+                '<div class="annotation-editor-popup editor-popup">' +
                   '<div class="arrow"></div>' +
                   '<div class="annotation-editor-popup-inner">' +
                     '<div class="transcription-sections"></div>' +

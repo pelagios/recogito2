@@ -241,30 +241,36 @@ define([
           // We're folding over the array, with a 2-sliding window so we can
           // check if this annotation overlaps the previous one
           annotations.reduce(function(previousBounds, annotation) {
-            var anchor = parseInt(annotation.anchor.substr(12)),
-                quote = AnnotationUtils.getQuote(annotation),
-                bounds = { start: anchor, end: anchor + quote.length },
-                range = rangy.createRange(),
-                positions, spans;
+            // try {
+              var anchor = parseInt(annotation.anchor.substr(12)),
+                  quote = AnnotationUtils.getQuote(annotation),
+                  bounds = { start: anchor, end: anchor + quote.length },
+                  range = rangy.createRange(),
+                  positions, spans;
 
-            if (previousBounds && intersects(previousBounds, bounds)) {
-              positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
-              range.setStart(positions[0].node, positions[0].offset);
-              range.setEnd(positions[1].node, positions[1].offset);
-              spans = wrapRange(range);
-              if (perfectlyOverlaps(previousBounds, bounds))
-                spans.forEach(function(span) { span.className = 'stratified'; });
-            } else {
-              // Fast rendering through Rangy's API
-              setNonOverlappingRange(range, anchor, quote.length);
-              classApplier.applyToRange(range);
-              spans = [ range.getNodes()[0].parentElement ];
-            }
+              if (previousBounds && intersects(previousBounds, bounds)) {
+                positions = charOffsetsToDOMPosition([ bounds.start, bounds.end ]);
+                range.setStart(positions[0].node, positions[0].offset);
+                range.setEnd(positions[1].node, positions[1].offset);
+                spans = wrapRange(range);
+                if (perfectlyOverlaps(previousBounds, bounds))
+                  spans.forEach(function(span) { span.className = 'stratified'; });
+              } else {
+                // Fast rendering through Rangy's API
+                setNonOverlappingRange(range, anchor, quote.length);
+                classApplier.applyToRange(range);
+                spans = [ range.getNodes()[0].parentElement ];
+              }
 
-            // Attach annotation data as payload to the SPANs and set id, if any
-            updateStyles(annotation, spans);
-            bindToElements(annotation, spans);
-            return bounds;
+              // Attach annotation data as payload to the SPANs and set id, if any
+              updateStyles(annotation, spans);
+              bindToElements(annotation, spans);
+              return bounds;
+            // } catch (error) {
+            //   console.log('Invalid annotation');
+            //   console.log(annotation);
+            //   return previousBounds;
+            // }
           }, false);
         },
 
