@@ -57,7 +57,7 @@ define([
               isSelectionOnEditor =
                 jQuery(selection.anchorNode) // mouse event target
                   .add(jQuery(selection.focusNode)) // start node of the selection
-                  .closest('.annotation-editor-popup').length > 0,
+                  .closest('.editor-popup').length > 0,
 
               // Util function to check if the selection is an exact overlap to any
               // annotations that already exist at this point

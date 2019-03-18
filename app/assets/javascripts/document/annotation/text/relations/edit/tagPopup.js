@@ -27,7 +27,7 @@ define([
     var that = this,
 
         element = jQuery(
-          '<div class="connection-editor-popup">' +
+          '<div class="connection-editor-popup editor-popup">' +
             '<div class="input" contentEditable="true" data-placeholder="Tag..."></div>' +
             '<div class="buttons">' +
               '<span class="icon delete">&#xf014;</span>' +
