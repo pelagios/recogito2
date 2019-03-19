@@ -81,15 +81,21 @@ trait SharedFolderService { self: FolderService =>
           
         case None =>
           // Shared documents at root level
-
-          /*
-          SELECT * FROM sharing_policy
-          JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
-          JOIN document ON sharing_policy.document_id = document.id
-          WHERE shared_with = 'leifuss' AND folder_association.folder_id = '1eb398f6-654a-4752-9bd5-b3a89a7df340' ;
-          */
-
-          ???
+          val query = 
+            """
+            SELECT 
+              sharing_policy.*,
+              document.*,
+              folder_policy.shared_with AS folder_shared
+            FROM sharing_policy
+              JOIN document ON sharing_policy.document_id = document.id
+              LEFT OUTER JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
+              LEFT OUTER JOIN sharing_policy folder_policy ON folder_policy.folder_id = folder_association.folder_id
+            WHERE sharing_policy.shared_with = ?
+              AND folder_policy.shared_with IS NULL;
+            """
+          
+          sql.resultQuery(query, username).fetchArray.map(asTuple)
       }
     }
 
