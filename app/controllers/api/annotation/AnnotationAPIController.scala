@@ -38,11 +38,12 @@ class AnnotationAPIController @Inject() (
   implicit val uploads: Uploads,
   implicit val ctx: ExecutionContext
 ) extends BaseController(components, config, users)
-    with HasAnnotationValidation
     with HasPrettyPrintJSON
     with HasTextSnippets
     with HasTEISnippets
-    with HasCSVParsing {
+    with HasCSVParsing 
+    with helpers.AnnotationValidator
+    with helpers.ContributionHelper {
 
   // Frontent serialization format
   import services.annotation.FrontendAnnotation._
@@ -103,10 +104,10 @@ class AnnotationAPIController @Inject() (
 
             if (isValidUpdate(annotation, previousVersion))
             
-            (annotationStored, _) <- annotationService.upsertAnnotation(annotation)
+            annotationStored <- annotationService.upsertAnnotation(annotation)
 
             success <- if (annotationStored)
-                         contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
+                         contributions.insertContributions(computeContributions(annotation, previousVersion, document))
                        else
                          Future.successful(false)
             
