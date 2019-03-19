@@ -92,7 +92,7 @@ class AnnotationService @Inject() (
         None
     }
 
-  def findByIds(ids: Seq[UUID]): Future[Seq[Option[Annotation]]] =
+  def findByIds(ids: Seq[UUID]) =
     Future.sequence {
       ids.map(id => findById(id).map(_.map(_._1)))
     }

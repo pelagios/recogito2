@@ -27,11 +27,11 @@ import storage.uploads.Uploads
 @Singleton
 class AnnotationAPIController @Inject() (
   val components: ControllerComponents,
-  val annotationService: AnnotationService,
   val contributions: ContributionService,
   val documents: DocumentService,
   val silhouette: Silhouette[Security.Env],
   val users: UserService,
+  implicit val annotationService: AnnotationService,
   implicit val config: Configuration,
   implicit val mimeTypes: FileMimeTypes,
   implicit val tmpFile: TemporaryFileCreator,
@@ -102,7 +102,9 @@ class AnnotationAPIController @Inject() (
           val f = for {
             previousVersion <- annotationService.findById(annotation.annotationId).map(_.map(_._1))
 
-            if (isValidUpdate(annotation, previousVersion))
+            isValidUpdate <- isValidUpdate(annotation, previousVersion)
+
+            if (isValidUpdate)
             
             annotationStored <- annotationService.upsertAnnotation(annotation)
 
@@ -141,17 +143,19 @@ class AnnotationAPIController @Inject() (
                 val annotations = annotationStubs.map(_.toAnnotation(username))
                 val ids = annotations.map(_.annotationId)
 
-                def isValidBulkUpdate(previous: Seq[Option[Annotation]]) = {
-                  val validity = annotations.zip(previous)
-                    .map { t => isValidUpdate(t._1, t._2) }
-
-                  // All values == true
-                  !validity.exists(_ == false)
-                }
+                def isValidBulkUpdate(previous: Seq[Option[Annotation]]) =
+                  Future.sequence {
+                    annotations.zip(previous)
+                      .map { t => isValidUpdate(t._1, t._2) }
+                  } map { ! _.exists(_ == false) }
 
                 val f = for {
-                  previousVersions <- annotationService.findByIds(ids)                  
-                  if (isValidBulkUpdate(previousVersions))
+                  previousVersions <- annotationService.findByIds(ids)   
+
+                  isValidBulkUpdate <- isValidBulkUpdate(previousVersions)               
+
+                  if (isValidBulkUpdate)
+                  
                   failed <- annotationService.upsertAnnotations(annotations)
                 } yield failed
 
