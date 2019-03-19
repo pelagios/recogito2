@@ -27,22 +27,23 @@ import storage.uploads.Uploads
 @Singleton
 class AnnotationAPIController @Inject() (
   val components: ControllerComponents,
-  val annotationService: AnnotationService,
   val contributions: ContributionService,
   val documents: DocumentService,
   val silhouette: Silhouette[Security.Env],
   val users: UserService,
+  implicit val annotationService: AnnotationService,
   implicit val config: Configuration,
   implicit val mimeTypes: FileMimeTypes,
   implicit val tmpFile: TemporaryFileCreator,
   implicit val uploads: Uploads,
   implicit val ctx: ExecutionContext
 ) extends BaseController(components, config, users)
-    with HasAnnotationValidation
     with HasPrettyPrintJSON
     with HasTextSnippets
     with HasTEISnippets
-    with HasCSVParsing {
+    with HasCSVParsing 
+    with helpers.AnnotationValidator
+    with helpers.ContributionHelper {
 
   // Frontent serialization format
   import services.annotation.FrontendAnnotation._
@@ -99,11 +100,19 @@ class AnnotationAPIController @Inject() (
         if (accesslevel.canWrite) {
           val annotation = annotationStub.toAnnotation(username)
           val f = for {
-            (annotationStored, previousVersion) <- annotationService.upsertAnnotation(annotation)
+            previousVersion <- annotationService.findById(annotation.annotationId).map(_.map(_._1))
+
+            isValidUpdate <- isValidUpdate(annotation, previousVersion)
+
+            if (isValidUpdate)
+            
+            annotationStored <- annotationService.upsertAnnotation(annotation)
+
             success <- if (annotationStored)
-                         contributions.insertContributions(validateUpdate(annotation, previousVersion, document))
+                         contributions.insertContributions(computeContributions(annotation, previousVersion, document))
                        else
                          Future.successful(false)
+            
           } yield success
 
           f.map(success => if (success) Ok(Json.toJson(annotation)) else InternalServerError)
@@ -132,7 +141,25 @@ class AnnotationAPIController @Inject() (
             doc.fileparts.find(_.getId == partIds.head) match {
               case Some(filepart) =>
                 val annotations = annotationStubs.map(_.toAnnotation(username))
-                annotationService.upsertAnnotations(annotations).map { failed =>
+                val ids = annotations.map(_.annotationId)
+
+                def isValidBulkUpdate(previous: Seq[Option[Annotation]]) =
+                  Future.sequence {
+                    annotations.zip(previous)
+                      .map { t => isValidUpdate(t._1, t._2) }
+                  } map { ! _.exists(_ == false) }
+
+                val f = for {
+                  previousVersions <- annotationService.findByIds(ids)   
+
+                  isValidBulkUpdate <- isValidBulkUpdate(previousVersions)               
+
+                  if (isValidBulkUpdate)
+                  
+                  failed <- annotationService.upsertAnnotations(annotations)
+                } yield failed
+
+                f.map { failed =>
                   if (failed.size == 0)
                     // TODO add username and timestamp
                     jsonOk(Json.toJson(annotations))

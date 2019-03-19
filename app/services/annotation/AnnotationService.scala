@@ -28,10 +28,9 @@ class AnnotationService @Inject() (
     *
     * Automatically deals with version history.
     *
-    * @return a boolean flag indicating successful completion, the internal ElasticSearch
-    * version, and the previous version of the annotation, if any.
+    * @return a boolean flag indicating successful completion
     */
-  def upsertAnnotation(annotation: Annotation, versioned: Boolean = true): Future[(Boolean, Option[Annotation])] = {
+  def upsertAnnotation(annotation: Annotation, versioned: Boolean = true): Future[Boolean] = {
     val fResolveEntityReferences = {
       val entityURIs = annotation.bodies.flatMap(_.uri)
       val fResolved = Future.sequence(entityURIs.map(entityService.findByURI(_)))
@@ -52,8 +51,6 @@ class AnnotationService @Inject() (
 
     for {
       resolvedEntities <- fResolveEntityReferences
-      maybePrevious <- if (versioned) findById(annotation.annotationId)
-                       else Future.successful(None)
       stored <- upsertAnnotation(addUnionIds(annotation, resolvedEntities))
       success <- if (stored) {
                    if (versioned) insertVersion(annotation)
@@ -61,13 +58,13 @@ class AnnotationService @Inject() (
                  } else {
                    Future.successful(false)
                  }
-    } yield (success, maybePrevious.map(_._1))
+    } yield (success)
   }
 
   def upsertAnnotations(annotations: Seq[Annotation], versioned: Boolean = true, retries: Int = ES.MAX_RETRIES): Future[Seq[Annotation]] =
     annotations.foldLeft(Future.successful(Seq.empty[Annotation])) { case (future, annotation) =>
       future.flatMap { failedAnnotations =>
-        upsertAnnotation(annotation).map { case (success, _) =>
+        upsertAnnotation(annotation).map { success =>
           if (success) failedAnnotations else failedAnnotations :+ annotation
         }
       }
@@ -93,6 +90,11 @@ class AnnotationService @Inject() (
         Some(response.to[(Annotation, Long)])
       else
         None
+    }
+
+  def findByIds(ids: Seq[UUID]) =
+    Future.sequence {
+      ids.map(id => findById(id).map(_.map(_._1)))
     }
 
   private def deleteById(annotationId: String): Future[Boolean] =
@@ -248,7 +250,7 @@ class AnnotationService @Inject() (
             // The annotation was already deleted at the rollback state - do nothing
             Future.successful(true)
           else
-            upsertAnnotation(historyRecord.asAnnotation, false).map(_._1)
+            upsertAnnotation(historyRecord.asAnnotation, false)
 
         case None =>
           // The annotation did not exist at the rollback time - delete

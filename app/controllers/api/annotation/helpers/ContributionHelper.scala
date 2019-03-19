@@ -1,4 +1,4 @@
-package controllers
+package controllers.api.annotation.helpers
 
 import services.ContentType
 import services.annotation.{Annotation, AnnotationBody, AnnotationStatus}
@@ -6,7 +6,7 @@ import services.annotation.relation.Relation
 import services.contribution._
 import services.generated.tables.records.DocumentRecord
 
-trait HasAnnotationValidation {
+trait ContributionHelper {
   
   /** The context field is a hint for the user in which... context... the contribution occured.
     *
@@ -163,19 +163,6 @@ trait HasAnnotationValidation {
       Seq.empty[String],
       getContext(annotationAfter)
     )
-
-  def validateUpdate(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord): Seq[Contribution] = {
-
-    // TODO validation!
-    // - make sure doc/filepart ID remains unchanged
-    // - make sure filepart content type remains unchanged
-    // - make sure annotation ID remains unchanged
-
-    // TODO check any things the current user should not be able to manipulate
-    // - createdAt/By info on bodies not touched by the user must be unchanged
-
-    computeContributions(annotation, previousVersion, document)
-  }
   
   /** Performs a 'diff' on the annotations, returning the corresponding Contributions **/
   def computeContributions(annotation: Annotation, previousVersion: Option[Annotation], document: DocumentRecord) =

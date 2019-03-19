@@ -33,18 +33,11 @@ trait RelationService { self: AnnotationService =>
       val destinationIds = sourceAnnotations.flatMap(_.relations.map(_.relatesTo)).distinct
       destinationIds diff sourceIds
     }
-
-    // Batch-retrieves a list of annotations by their Ids
-    def findByIds(ids: Seq[UUID]) = es.client execute {
-      multiget (
-        ids.map { id => get(id.toString) from ES.RECOGITO / ES.ANNOTATION }
-      )
-    } map { _.to[(Annotation, Long)].toSeq.map(_._1) }
     
     for {
       sourceAnnotations <- fSourceAnnotations
       additionalDestinations <- findByIds(determineMissingDestinations(sourceAnnotations))
-    } yield (sourceAnnotations ++ additionalDestinations)
+    } yield (sourceAnnotations ++ additionalDestinations.flatten)
   }
   
   def hasRelations(id: String): Future[Boolean] =
