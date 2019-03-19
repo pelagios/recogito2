@@ -143,36 +143,41 @@ class DirectoryController @Inject() (
       }
     }
 
-  def getSharedWithMe(offset: Int, size: Int, folderId: UUID) =  {
-    import ConfiguredPresentation._
-
-    // TODO make folder-sensitive
-
-    /*
-    SELECT * FROM sharing_policy
-    JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
-    JOIN document ON sharing_policy.document_id = document.id
-    WHERE shared_with = 'leifuss' AND folder_association.folder_id = '1eb398f6-654a-4752-9bd5-b3a89a7df340' ;
-
-    -- SELECT * FROM sharing_policy
-    -- LEFT OUTER JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
-    -- JOIN document ON sharing_policy.document_id = document.id
-    -- WHERE shared_with = 'leifuss' AND folder_association.folder_id IS NULL;
-    */
-    
+  def getSharedWithMe(offset: Int, size: Int, folderId: UUID) = 
     silhouette.SecuredAction.async { implicit request => 
-      getDocumentList(
+
+      import ConfiguredPresentation._
+
+      val fDirectories = folders.listFoldersSharedWithMe(request.identity.username, Option(folderId))
+    
+      /*
+      SELECT * FROM sharing_policy
+      JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
+      JOIN document ON sharing_policy.document_id = document.id
+      WHERE shared_with = 'leifuss' AND folder_association.folder_id = '1eb398f6-654a-4752-9bd5-b3a89a7df340' ;
+      */
+    
+      val fDocuments = getDocumentList(
         request.identity.username, 
         offset, 
         size, 
         Option(folderId),
         getSharedDocumentsSortedByDB, 
         getSharedDocumentsSortedByIndex
-      ).map { documents => 
+      )
+
+      val f = for {
+        directories <- fDirectories
+        documents <- fDocuments
+      } yield (directories, documents)
+
+      f.map { case (directories, documents) => 
+
+        // play.api.Logger.info(directories.toString)
+
         jsonOk(Json.toJson(documents))
       }
     }
-  }
 
   def getAccessibleDocuments(fromOwner: String, offset: Int, size: Int, folderId: UUID) = {
     import ConfiguredPresentation._

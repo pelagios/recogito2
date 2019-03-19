@@ -10,7 +10,7 @@ import play.api.libs.functional.syntax._
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import services.{Page, BaseService, PublicAccess}
-import services.generated.Tables.{FOLDER, SHARING_POLICY}
+import services.generated.Tables.{DOCUMENT, FOLDER, FOLDER_ASSOCIATION, SHARING_POLICY}
 import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 import storage.db.DB
 
@@ -181,6 +181,49 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
 
       Page(System.currentTimeMillis - startTime, total, offset, size, items)
     }  
+
+  def listFoldersSharedWithMe(username: String, parent: Option[UUID]): Future[Seq[(FolderRecord, SharingPolicyRecord)]] = 
+    db.query { sql =>
+
+      parent match {
+        
+        case Some(parentId) => 
+          // Subfolder
+          val query = 
+            """
+            SELECT * 
+            FROM sharing_policy
+              JOIN folder ON folder.id = sharing_policy.folder_id
+            WHERE shared_with = ? AND parent = ?;
+            """
+
+          sql.resultQuery(query, username, parentId).fetchArray.map { record => 
+            record.into(classOf[(FolderRecord, SharingPolicyRecord)])
+          }
+
+        case None => 
+          // Root folder
+          val query = 
+            """
+            SELECT 
+              sharing_policy.*, 
+              folder.*, 
+              parent_sharing_policy.shared_with AS parent_shared
+            FROM sharing_policy
+              JOIN folder ON folder.id = sharing_policy.folder_id
+              LEFT OUTER JOIN folder parent_folder ON parent_folder.id = folder.parent
+              LEFT OUTER JOIN sharing_policy parent_sharing_policy ON parent_sharing_policy.folder_id = parent_folder.id
+            WHERE 
+              sharing_policy.shared_with = ? AND
+              parent_sharing_policy IS NULL;
+            """
+
+          sql.resultQuery(query, username).fetchArray.map { record => 
+            record.into(classOf[(FolderRecord, SharingPolicyRecord)])
+          }.toSeq
+
+      }
+    }
 
   def createFolder(owner: String, title: String, parent: Option[UUID]): Future[FolderRecord] = 
     db.withTransaction { sql => 
