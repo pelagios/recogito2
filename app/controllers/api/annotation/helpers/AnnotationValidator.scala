@@ -23,9 +23,6 @@ trait AnnotationValidator {
         annotation.relations.map(_.relatesTo)
 
       annotationService.findByIds(destinationIds).map { destinations => 
-        play.api.Logger.info(s"${destinations.flatten.size} destinations, ${destinationIds.size} IDs")
-        play.api.Logger.info(destinations.toString)
-
         // Same number of annotations as destination Ids?
         destinations.flatten.size == destinationIds.size
       }
