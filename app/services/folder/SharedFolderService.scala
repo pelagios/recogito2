@@ -2,9 +2,10 @@ package services.folder
 
 import java.util.{Date, UUID}
 import java.sql.Timestamp
+import org.jooq.Record
 import services.{PublicAccess, SharingLevel}
-import services.generated.Tables.SHARING_POLICY
-import services.generated.tables.records.SharingPolicyRecord
+import services.generated.Tables.{SHARING_POLICY, FOLDER_ASSOCIATION, DOCUMENT}
+import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 
 trait SharedFolderService { self: FolderService => 
 
@@ -55,9 +56,41 @@ trait SharedFolderService { self: FolderService =>
          .execute == 1
     } 
 
-  def listDocumentsSharedWithMe(username: String, folderId: Option[UUID]) =
+  def listDocumentsSharedWithMe(username: String, folder: Option[UUID]) =
     db.query { sql => 
-      
+
+      // Helper
+      def asTuple(record: Record) = {
+        val document = record.into(classOf[DocumentRecord])
+        val policy = record.into(classOf[SharingPolicyRecord])
+        (document, policy)
+      }
+
+      folder match {
+        case Some(folderId) =>
+          // Shared documents in this folder
+          sql.select().from(SHARING_POLICY)
+             .join(FOLDER_ASSOCIATION)
+               .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(SHARING_POLICY.DOCUMENT_ID))
+             .join(DOCUMENT)
+               .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
+             .where(SHARING_POLICY.SHARED_WITH.equal(username)
+               .and(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId)))
+             .fetchArray
+             .map(asTuple)
+          
+        case None =>
+          // Shared documents at root level
+
+          /*
+          SELECT * FROM sharing_policy
+          JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
+          JOIN document ON sharing_policy.document_id = document.id
+          WHERE shared_with = 'leifuss' AND folder_association.folder_id = '1eb398f6-654a-4752-9bd5-b3a89a7df340' ;
+          */
+
+          ???
+      }
     }
 
 }
