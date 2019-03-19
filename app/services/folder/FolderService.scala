@@ -182,8 +182,15 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
       Page(System.currentTimeMillis - startTime, total, offset, size, items)
     }  
 
-  def listFoldersSharedWithMe(username: String, parent: Option[UUID]): Future[Seq[(FolderRecord, SharingPolicyRecord)]] = 
+  def listFoldersSharedWithMe(username: String, parent: Option[UUID]): Future[Seq[(FolderRecord, SharingPolicyRecord)]] =
     db.query { sql =>
+
+      // Helper
+      def asTuple(record: Record) = {
+        val folder = record.into(classOf[FolderRecord])
+        val policy = record.into(classOf[SharingPolicyRecord])
+        (folder, policy)
+      }
 
       parent match {
         
@@ -197,9 +204,7 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
             WHERE shared_with = ? AND parent = ?;
             """
 
-          sql.resultQuery(query, username, parentId).fetchArray.map { record => 
-            record.into(classOf[(FolderRecord, SharingPolicyRecord)])
-          }
+          sql.resultQuery(query, username, parentId).fetchArray.map(asTuple)
 
         case None => 
           // Root folder
@@ -218,9 +223,7 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
               parent_sharing_policy IS NULL;
             """
 
-          sql.resultQuery(query, username).fetchArray.map { record => 
-            record.into(classOf[(FolderRecord, SharingPolicyRecord)])
-          }.toSeq
+          sql.resultQuery(query, username).fetchArray.map(asTuple)
 
       }
     }

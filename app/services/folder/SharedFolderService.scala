@@ -55,4 +55,9 @@ trait SharedFolderService { self: FolderService =>
          .execute == 1
     } 
 
+  def listDocumentsSharedWithMe(username: String, folderId: Option[UUID]) =
+    db.query { sql => 
+      
+    }
+
 }
