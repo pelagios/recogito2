@@ -69,32 +69,57 @@ trait SharedFolderService { self: FolderService =>
       folder match {
         case Some(folderId) =>
           // Shared documents in this folder
-          sql.select().from(SHARING_POLICY)
-             .join(FOLDER_ASSOCIATION)
-               .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(SHARING_POLICY.DOCUMENT_ID))
-             .join(DOCUMENT)
-               .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
-             .where(SHARING_POLICY.SHARED_WITH.equal(username)
-               .and(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId)))
-             .fetchArray
-             .map(asTuple)
+          val query = 
+            """
+            SELECT 
+              document.*,
+              sharing_policy.*,
+              file_count,
+              content_types
+            FROM sharing_policy
+              JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
+              JOIN document ON document.id = sharing_policy.document_id
+              JOIN (
+                SELECT
+                  count(*) AS file_count,
+                  array_agg(DISTINCT content_type) AS content_types,
+                  document_id
+                FROM document_filepart
+                GROUP BY document_id
+              ) AS parts ON parts.document_id = document.id
+            WHERE sharing_policy.shared_with = ?
+              AND folder_association.folder_id = ?;
+            """
+
+            // TODO surface file count and content types list
+            sql.resultQuery(query, username).fetchArray.map(asTuple)
           
         case None =>
           // Shared documents at root level
           val query = 
             """
             SELECT 
-              sharing_policy.*,
               document.*,
-              folder_policy.shared_with AS folder_shared
+              sharing_policy.*,
+              file_count,
+              content_types
             FROM sharing_policy
               JOIN document ON sharing_policy.document_id = document.id
               LEFT OUTER JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
               LEFT OUTER JOIN sharing_policy folder_policy ON folder_policy.folder_id = folder_association.folder_id
+              LEFT JOIN (
+                SELECT
+                  count(*) AS file_count,
+                  array_agg(DISTINCT content_type) AS content_types,
+                  document_id
+                FROM document_filepart
+                GROUP BY document_id
+              ) AS parts ON parts.document_id = document.id
             WHERE sharing_policy.shared_with = ?
               AND folder_policy.shared_with IS NULL;
             """
           
+          // TODO surface file count and content types list
           sql.resultQuery(query, username).fetchArray.map(asTuple)
       }
     }
