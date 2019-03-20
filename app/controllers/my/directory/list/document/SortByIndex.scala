@@ -5,7 +5,8 @@ import java.util.UUID
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.Future
-import services.Page
+import services.{ContentType, Page}
+import services.folder.SharedDocument
 
 trait SortByIndex { self: DirectoryController =>
 
@@ -60,7 +61,15 @@ trait SortByIndex { self: DirectoryController =>
     } yield (allIds, sortedIds, documents, indexProperties)
 
     f.map { case (allIds, sortedIds, documents, indexProperties) =>
-      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, documents)
+      val sharedDocs = documents.map { case (document, policy, fileparts) => 
+        SharedDocument(
+          document, 
+          policy, 
+          fileparts.size, 
+          fileparts.flatMap(p => ContentType.withName(p.getContentType)).distinct)
+      }
+
+      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, sharedDocs)
       ConfiguredPresentation.forSharedDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
     }
   }

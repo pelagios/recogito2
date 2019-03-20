@@ -3,7 +3,8 @@ package services.folder
 import java.util.{Date, UUID}
 import java.sql.Timestamp
 import org.jooq.Record
-import services.{PublicAccess, SharingLevel}
+import scala.concurrent.Future
+import services.{ContentType, Page, PublicAccess, SharingLevel}
 import services.generated.Tables.{SHARING_POLICY, FOLDER_ASSOCIATION, DOCUMENT}
 import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 
@@ -56,17 +57,24 @@ trait SharedFolderService { self: FolderService =>
          .execute == 1
     } 
 
-  def listDocumentsSharedWithMe(username: String, folder: Option[UUID]) =
+  def listDocumentsSharedWithMe(username: String, folder: Option[UUID]): Future[Page[SharedDocument]] =
     db.query { sql => 
+      val startTime = System.currentTimeMillis
 
-      // Helper
-      def asTuple(record: Record) = {
+      def asSharedDocument(record: Record) = {
         val document = record.into(classOf[DocumentRecord])
         val policy = record.into(classOf[SharingPolicyRecord])
-        (document, policy)
+        val fileCount = record.getValue("file_count", classOf[Integer]).toInt
+        val contentTypes = 
+          record
+            .getValue("content_types", classOf[Array[String]])
+            .toSeq
+            .flatMap(ContentType.withName)
+
+        SharedDocument(document, policy, fileCount, contentTypes)
       }
 
-      folder match {
+      val query = folder match {
         case Some(folderId) =>
           // Shared documents in this folder
           val query = 
@@ -92,7 +100,7 @@ trait SharedFolderService { self: FolderService =>
             """
 
             // TODO surface file count and content types list
-            sql.resultQuery(query, username).fetchArray.map(asTuple)
+            sql.resultQuery(query, username)
           
         case None =>
           // Shared documents at root level
@@ -120,8 +128,11 @@ trait SharedFolderService { self: FolderService =>
             """
           
           // TODO surface file count and content types list
-          sql.resultQuery(query, username).fetchArray.map(asTuple)
+          sql.resultQuery(query, username)
       }
+
+      val records = query.fetchArray.map(asSharedDocument)
+      Page(System.currentTimeMillis - startTime, records.size, 0, records.size, records)
     }
 
 }

@@ -4,8 +4,9 @@ import controllers.my.directory.list.DirectoryItem
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import services.{HasDate, Page}
+import services.{ContentType, HasDate, Page}
 import services.annotation.stats.StatusRatio
+import services.folder.SharedDocument
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord}
 
 case class IndexDerivedProperties(
@@ -24,7 +25,8 @@ object IndexDerivedProperties {
 
 case class ConfiguredPresentation(
   document: DocumentRecord, 
-  parts: Seq[DocumentFilepartRecord],
+  fileCount: Int,
+  contentTypes: Seq[ContentType],
   sharedVia: Option[SharingPolicyRecord],
   indexProps: IndexDerivedProperties,
   columnConfig: Seq[String]
@@ -66,10 +68,17 @@ object ConfiguredPresentation extends HasDate {
     val config = columnConfig.getOrElse(DEFAULT_CONFIG)
     page.map { case (document, parts) =>
       val props = findProps(document, indexProps)
-      ConfiguredPresentation(document, parts, None, props, config)
+      ConfiguredPresentation(
+        document, 
+        parts.size, 
+        parts.flatMap(p => ContentType.withName(p.getContentType)).distinct,
+        None, 
+        props, 
+        config)
     }
   }
 
+  /*
   def forSharedDocument(
     page: Page[(DocumentRecord, SharingPolicyRecord, Seq[DocumentFilepartRecord])],
     indexProps: Option[Map[String, IndexDerivedProperties]],
@@ -78,7 +87,32 @@ object ConfiguredPresentation extends HasDate {
     val config = columnConfig.getOrElse(DEFAULT_CONFIG)
     page.map { case (document, sharingPolicy, parts) => 
       val props = findProps(document, indexProps)
-      ConfiguredPresentation(document, parts, Some(sharingPolicy), props, config)
+      ConfiguredPresentation(
+        document, 
+        parts.size,
+        parts.flatMap(p => ContentType.withName(p.getContentType)).distinct, 
+        Some(sharingPolicy), 
+        props, 
+        config)
+    }
+  }
+  */
+
+  def forSharedDocument(
+    page: Page[SharedDocument],
+    indexProps: Option[Map[String, IndexDerivedProperties]],
+    columnConfig: Option[Seq[String]]
+  ) = {
+    val config = columnConfig.getOrElse(DEFAULT_CONFIG)
+    page.map { doc => 
+      val props = findProps(doc.document, indexProps)
+      ConfiguredPresentation(
+        doc.document,
+        doc.fileCount,
+        doc.contentTypes,
+        Some(doc.sharedVia),
+        props,
+        config)
     }
   }
 
@@ -115,8 +149,8 @@ object ConfiguredPresentation extends HasDate {
     new DateTime(p.document.getUploadedAt.getTime),
     p.document.getTitle,
 
-    p.parts.map(_.getContentType).distinct,
-    p.parts.size,
+    p.contentTypes.map(_.toString),
+    p.fileCount,
 
     // DB-based props, based on whether they are defined in the column config
     p.getDBProp[String]("author", p.document.getAuthor),
