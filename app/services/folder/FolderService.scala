@@ -107,6 +107,45 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
     }
   }
 
+  def getSharedWithMeBreadcrumbTrail(id: UUID, username: String) = db.query { sql => 
+    val query = 
+      """
+      WITH RECURSIVE path AS (
+        SELECT 
+          sharing_policy.shared_with, 
+          folder.id,
+          ARRAY[folder.id] AS path_ids,
+          ARRAY[folder.title] AS path_titles
+        FROM sharing_policy
+          JOIN folder ON folder.id = sharing_policy.folder_id
+          LEFT OUTER JOIN folder parent_folder ON parent_folder.id = folder.parent
+          LEFT OUTER JOIN sharing_policy parent_sharing_policy ON parent_sharing_policy.folder_id = parent_folder.id
+        WHERE 
+          sharing_policy.shared_with = ? AND
+          parent_sharing_policy IS NULL
+
+        UNION ALL
+
+        SELECT 
+          s.shared_with, 
+          folder.id, 
+          p.path_ids || folder.id,
+          p.path_titles || folder.title
+        FROM sharing_policy s
+          JOIN folder ON folder.id = s.folder_id
+          LEFT OUTER JOIN folder parent_folder ON parent_folder.id = folder.parent
+          LEFT OUTER JOIN sharing_policy parent_sharing_policy ON parent_sharing_policy.folder_id = parent_folder.id
+          JOIN path p on folder.parent = p.id
+        WHERE 
+          s.shared_with = ? AND
+          parent_sharing_policy IS NULL
+      )
+      SELECT path_ids, path_titles, shared_with FROM path WHERE id=?;
+      """
+
+      // TODO
+  }
+
   /** A flattended list of IDs of all children below the given folder **/
   def getChildrenRecursive(id: UUID) = db.query { sql => 
     val query =
