@@ -4,9 +4,12 @@ import controllers.my.directory.list.DirectoryItem
 import java.util.UUID
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import services.generated.tables.records.FolderRecord
+import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 
-case class FolderItem(folder: FolderRecord) extends DirectoryItem 
+case class FolderItem(
+  folder: FolderRecord,
+  sharedVia: Option[SharingPolicyRecord] = None
+) extends DirectoryItem 
 
 object FolderItem {
 

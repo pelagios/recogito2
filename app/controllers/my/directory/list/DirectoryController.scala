@@ -150,13 +150,6 @@ class DirectoryController @Inject() (
 
       val fDirectories = folders.listFoldersSharedWithMe(request.identity.username, Option(folderId))
     
-      /*
-      SELECT * FROM sharing_policy
-      JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
-      JOIN document ON sharing_policy.document_id = document.id
-      WHERE shared_with = 'leifuss' AND folder_association.folder_id = '1eb398f6-654a-4752-9bd5-b3a89a7df340' ;
-      */
-    
       val fDocuments = getDocumentList(
         request.identity.username, 
         offset, 
@@ -169,13 +162,24 @@ class DirectoryController @Inject() (
       val f = for {
         directories <- fDirectories
         documents <- fDocuments
-      } yield (directories, documents)
+      } yield (
+        directories.map(t => FolderItem(t._1, Some(t._2))), 
+        documents
+      )
 
       f.map { case (directories, documents) => 
 
-        // play.api.Logger.info(directories.toString)
+        // TODO breadcrumbs!?
+        // TODO readme
 
-        jsonOk(Json.toJson(documents))
+        val result = DirectoryPage.build(
+          None, // Readme
+          Seq.empty[Breadcrumb],
+          directories,
+          documents
+        )
+
+        jsonOk(Json.toJson(result))
       }
     }
 

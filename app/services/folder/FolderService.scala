@@ -182,8 +182,11 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
       Page(System.currentTimeMillis - startTime, total, offset, size, items)
     }  
 
-  def listFoldersSharedWithMe(username: String, parent: Option[UUID]): Future[Seq[(FolderRecord, SharingPolicyRecord)]] =
+  def listFoldersSharedWithMe(username: String, parent: Option[UUID]): Future[Page[(FolderRecord, SharingPolicyRecord)]] =
     db.query { sql =>
+
+      // TODO implement proper totals count, offset, sorting
+      val startTime = System.currentTimeMillis
 
       // Helper
       def asTuple(record: Record) = {
@@ -192,8 +195,7 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
         (folder, policy)
       }
 
-      parent match {
-        
+      val query = parent match {
         case Some(parentId) => 
           // Subfolder
           val query = 
@@ -203,8 +205,7 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
               JOIN folder ON folder.id = sharing_policy.folder_id
             WHERE shared_with = ? AND parent = ?;
             """
-
-          sql.resultQuery(query, username, parentId).fetchArray.map(asTuple)
+          sql.resultQuery(query, username, parentId)
 
         case None => 
           // Root folder
@@ -222,10 +223,11 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
               sharing_policy.shared_with = ? AND
               parent_sharing_policy IS NULL;
             """
-
-          sql.resultQuery(query, username).fetchArray.map(asTuple)
-
+          sql.resultQuery(query, username)
       }
+
+      val records = query.fetchArray.map(asTuple)
+      Page(System.currentTimeMillis - startTime, records.size, 0, records.size, records)
     }
 
   def createFolder(owner: String, title: String, parent: Option[UUID]): Future[FolderRecord] = 
