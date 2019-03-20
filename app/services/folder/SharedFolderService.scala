@@ -98,9 +98,7 @@ trait SharedFolderService { self: FolderService =>
             WHERE sharing_policy.shared_with = ?
               AND folder_association.folder_id = ?;
             """
-
-            // TODO surface file count and content types list
-            sql.resultQuery(query, username)
+            sql.resultQuery(query, username, folderId)
           
         case None =>
           // Shared documents at root level
@@ -126,8 +124,6 @@ trait SharedFolderService { self: FolderService =>
             WHERE sharing_policy.shared_with = ?
               AND folder_policy.shared_with IS NULL;
             """
-          
-          // TODO surface file count and content types list
           sql.resultQuery(query, username)
       }
 
