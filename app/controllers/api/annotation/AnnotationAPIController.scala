@@ -1,6 +1,7 @@
 package controllers.api.annotation
 
 import com.mohiva.play.silhouette.api.Silhouette
+import com.mohiva.play.silhouette.api.actions.UserAwareRequest
 import controllers._
 import controllers.api.annotation.stubs._
 import java.io.File
@@ -76,23 +77,29 @@ class AnnotationAPIController @Inject() (
   }
 
   /** Common boilerplate code for all API methods carrying JSON config payload **/
-  private def jsonOp[T](op: T => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]) = {
-    request.body.asJson match {
-      case Some(json) =>
-        Json.fromJson[T](json) match {
-          case s: JsSuccess[T]  => op(s.get)
-          case e: JsError =>
-            Logger.warn("Call to annotation API but invalid JSON: " + e.toString)
+  private def jsonOp[T](op: T => Future[Result])(implicit request: UserAwareRequest[Security.Env, AnyContent], reads: Reads[T]) = {
+    request.identity match {
+      case Some(user) => 
+        request.body.asJson match {
+          case Some(json) =>
+            Json.fromJson[T](json) match {
+              case s: JsSuccess[T]  => op(s.get)
+              case e: JsError =>
+                Logger.warn("Call to annotation API but invalid JSON: " + e.toString)
+                Future.successful(BadRequest)
+            }
+          case None =>
+            Logger.warn("Call to annotation API but no JSON payload")
             Future.successful(BadRequest)
         }
+
       case None =>
-        Logger.warn("Call to annotation API but no JSON payload")
-        Future.successful(BadRequest)
+        Future.successful(Forbidden)
     }
   }
 
-  def createAnnotation() = silhouette.SecuredAction.async { implicit request => jsonOp[AnnotationStub] { annotationStub =>
-    val username = request.identity.username
+  def createAnnotation() = silhouette.UserAwareAction.async { implicit request => jsonOp[AnnotationStub] { annotationStub =>
+    val username = request.identity.get.username
 
     // Fetch the associated document to check access privileges
     documents.getDocumentRecord(annotationStub.annotates.documentId, Some(username)).flatMap(_ match {
@@ -128,9 +135,9 @@ class AnnotationAPIController @Inject() (
     })
   }}
 
-  def bulkUpsert() = silhouette.SecuredAction.async { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
+  def bulkUpsert() = silhouette.UserAwareAction.async { implicit request => jsonOp[Seq[AnnotationStub]] { annotationStubs =>
     // We currently restrict to bulk upserts for a single document part only
-    val username = request.identity.username
+    val username = request.identity.get.username
     val documentIds = annotationStubs.map(_.annotates.documentId).distinct
     val partIds = annotationStubs.map(_.annotates.filepartId).distinct
 
@@ -349,8 +356,8 @@ class AnnotationAPIController @Inject() (
     }
   }
   
-  def bulkDelete() = silhouette.SecuredAction.async { implicit request => jsonOp[Seq[UUID]] { ids =>
-    val username = request.identity.username
+  def bulkDelete() = silhouette.UserAwareAction.async { implicit request => jsonOp[Seq[UUID]] { ids =>
+    val username = request.identity.get.username
     val now = DateTime.now
     
     // Shorthand for readability

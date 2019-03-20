@@ -25,6 +25,8 @@ define([
         type: 'POST',
         data: JSON.stringify(annotation),
         contentType: 'application/json'
+      }).then(function(result) {
+        console.log(result);
       });
     },
 
