@@ -39,9 +39,9 @@ GET     /help                                        controllers.help.HelpContro
 # Administration area
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GET     /admin/authorities                            controllers.admin.authorities.AuthoritiesAdminController.index
-POST    /admin/authorities                            controllers.admin.authorities.AuthoritiesAdminController.upsertAuthority
-DELETE  /admin/authorities/:name                      controllers.admin.authorities.AuthoritiesAdminController.deleteGazetteer(name: String)
+GET     /admin/authorities                           controllers.admin.authorities.AuthoritiesAdminController.index
+POST    /admin/authorities                           controllers.admin.authorities.AuthoritiesAdminController.upsertAuthority
+DELETE  /admin/authorities/:name                     controllers.admin.authorities.AuthoritiesAdminController.deleteGazetteer(name: String)
 
 GET     /admin/users.json                            controllers.admin.users.UserAdminController.listUsers(offset: Int ?= 0, size: Int ?= 100, sortBy: Option[String] ?= None, sortOrder: Option[String] ?= None)
 GET     /admin/idle-users.json                       controllers.admin.users.UserAdminController.listIdleUsers(since: String, offset: Int ?= 0, size: Int ?= 100)
@@ -169,7 +169,7 @@ POST    /api/directory/:owner                        controllers.my.directory.li
 GET     /api/directory/:owner/:folderId              controllers.my.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 POST    /api/directory/:owner/:folderId              controllers.my.directory.list.DirectoryController.getAccessibleDocuments(owner: String, offset: Int ?= 0, size: Int ?= 500, folderId: java.util.UUID)
 
-# ~~~ Create, delete & unshare operations ~~~
+# ~~~ Create, delete & unshare (my shared) operations ~~~
 
 POST    /api/folder                                  controllers.my.directory.create.CreateController.createFolder
 PUT     /api/folder/:id                              controllers.my.directory.create.CreateController.renameFolder(id: java.util.UUID, title: String)
@@ -183,6 +183,15 @@ DELETE  /api/folder/bulk                             controllers.my.directory.de
 DELETE  /api/folder/:id                              controllers.my.directory.delete.FolderActionsController.deleteFolder(id: java.util.UUID)
 DELETE  /api/shared/folder/bulk                      controllers.my.directory.delete.FolderActionsController.bulkUnshareFolders
 DELETE  /api/shared/folder/:id                       controllers.my.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
+
+# ~~~ Bulk sharing ~~~
+
+GET     /api/sharing/search                          controllers.my.sharing.SharingController.searchUsers(q: String)
+GET     /api/sharing/folders/:id/visibility          controllers.my.sharing.SharingController.getFolderVisibility(id: java.util.UUID)
+POST    /api/sharing/folders/visibility              controllers.my.sharing.SharingController.setFolderVisibility
+GET     /api/sharing/folders/:id/collaborators       controllers.my.sharing.SharingController.getFolderCollaborators(id: java.util.UUID)
+POST    /api/sharing/folders/collaborator            controllers.my.sharing.SharingController.addFolderCollaborator
+DELETE  /api/sharing/folders/collaborator            controllers.my.sharing.SharingController.removeFolderCollaborator
 
 # ~~~ Search ~~~
 
@@ -228,9 +237,9 @@ GET     /api/job                                     controllers.api.task.TaskAP
 GET     /api/job/:id                                 controllers.api.task.TaskAPIController.getJobProgress(id: java.util.UUID)
 
 # ~~~ Plugins ~~~
-GET     /api/plugins/ner                            controllers.api.plugin.PluginAPIController.listNERPlugins
-GET     /api/plugins/js/:ext/:id.js                 controllers.api.plugin.PluginAPIController.loadPlugin(ext: String, id: String)
-GET     /api/plugins/js/:ext/:id.css                controllers.api.plugin.PluginAPIController.loadCSS(ext: String, id: String)
+GET     /api/plugins/ner                             controllers.api.plugin.PluginAPIController.listNERPlugins
+GET     /api/plugins/js/:ext/:id.js                  controllers.api.plugin.PluginAPIController.loadPlugin(ext: String, id: String)
+GET     /api/plugins/js/:ext/:id.css                 controllers.api.plugin.PluginAPIController.loadCSS(ext: String, id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Personal space - settings

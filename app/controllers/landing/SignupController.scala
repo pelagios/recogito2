@@ -6,9 +6,9 @@ import javax.inject.{Inject, Singleton}
 import java.io.FileInputStream
 import java.sql.Timestamp
 import java.util.{Date, UUID}
-import services.ContentType
+import services.{ContentType, PublicAccess}
 import services.annotation.{Annotation, AnnotationService}
-import services.document.{DocumentService, PublicAccess}
+import services.document.DocumentService
 import services.user.UserService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.{Configuration, Logger}

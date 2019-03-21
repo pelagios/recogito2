@@ -143,22 +143,49 @@ class DirectoryController @Inject() (
       }
     }
 
-  def getSharedWithMe(offset: Int, size: Int, folderId: UUID) =  {
-    import ConfiguredPresentation._
-    
+  def getSharedWithMe(offset: Int, size: Int, folderId: UUID) = 
     silhouette.SecuredAction.async { implicit request => 
-      getDocumentList(
+
+      import ConfiguredPresentation._
+
+      val fBreadcrumbs = Option(folderId).map { id => 
+          folders.getSharedWithMeBreadcrumbTrail(request.identity.username, id)
+        } getOrElse { Future.successful(Seq.empty[Breadcrumb]) }
+
+      val fDirectories = folders.listFoldersSharedWithMe(request.identity.username, Option(folderId))
+    
+      val fDocuments = getDocumentList(
         request.identity.username, 
         offset, 
         size, 
         Option(folderId),
         getSharedDocumentsSortedByDB, 
         getSharedDocumentsSortedByIndex
-      ).map { documents => 
-        jsonOk(Json.toJson(documents))
+      )
+
+      val f = for {
+        breadcrumbs <- fBreadcrumbs
+        directories <- fDirectories
+        documents <- fDocuments
+      } yield (
+        breadcrumbs,
+        directories.map(t => FolderItem(t._1, Some(t._2))), 
+        documents
+      )
+
+      f.map { case (breadcrumbs, directories, documents) => 
+        // TODO readme
+
+        val result = DirectoryPage.build(
+          None, // Readme
+          breadcrumbs,
+          directories,
+          documents
+        )
+
+        jsonOk(Json.toJson(result))
       }
     }
-  }
 
   def getAccessibleDocuments(fromOwner: String, offset: Int, size: Int, folderId: UUID) = {
     import ConfiguredPresentation._

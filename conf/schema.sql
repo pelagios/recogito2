@@ -102,7 +102,9 @@ CREATE TABLE folder (
   title TEXT NOT NULL,
   -- if parent is empty then it's a root folder
   parent UUID REFERENCES folder(id),
-  readme TEXT
+  readme TEXT,
+  public_visibility TEXT NOT NULL DEFAULT 'PRIVATE',
+  public_access_level TEXT
 );
 
 CREATE TABLE folder_association (

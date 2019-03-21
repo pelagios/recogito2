@@ -55,12 +55,13 @@ trait SortByDB { self: DirectoryController =>
   )(implicit request: Request[AnyContent]) = {   
     documentsByDB(
       config, 
-      () => documents.findSharedWithPart(
-              username, offset, size,
-              config.flatMap(_.sort.map(_.sortBy)),
-              config.flatMap(_.sort.map(_.order)))
-    ).map { case (documents, indexProperties) =>
-      ConfiguredPresentation.forSharedDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
+      // () => documents.findSharedWithPart(
+      //         username, offset, size,
+      //        config.flatMap(_.sort.map(_.sortBy)),
+      //        config.flatMap(_.sort.map(_.order)))
+      () => folders.listDocumentsSharedWithMe(username, folder)
+    ).map { case (sharedDocs, indexProperties) =>
+      ConfiguredPresentation.forSharedDocument(sharedDocs, indexProperties.map(_.toMap), config.map(_.columns))
     }
   }
 

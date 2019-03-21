@@ -10,8 +10,11 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
-import services.ContentType
+import services.{SharingLevel, ContentType}
+import services.SharingLevel.Utils._
+import services.document.DocumentService
 import services.folder.FolderService
+import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 import services.upload.UploadService
 import services.task.TaskType
 import services.user.UserService
@@ -22,7 +25,6 @@ import transform.tiling.TilingService
 @Singleton
 class CreateController @Inject() (
   val components: ControllerComponents,
-  val folders: FolderService,
   val silhouette: Silhouette[Security.Env],
   val uploads: UploadService,
   val users: UserService,
@@ -30,12 +32,16 @@ class CreateController @Inject() (
   val tilingService: TilingService,
   val teiParserService: TEIParserService,
   val nerService: NERService,
+  implicit val documents: DocumentService,
+  implicit val folders: FolderService,
   implicit val ctx: ExecutionContext,
   implicit val ws: WSClient
 ) extends BaseController(components, config, users)
     with types.FileUpload
     with types.IIIFSource
-    with HasPrettyPrintJSON {
+    with HasPrettyPrintJSON 
+    with helpers.InheritVisibilityHelper
+    with helpers.InheritCollaboratorsHelper {
 
   def createFolder() = silhouette.SecuredAction.async { implicit request => 
     request.body.asJson match {
@@ -47,7 +53,14 @@ class CreateController @Inject() (
 
           case Some(title) =>
             val parent = (json \ "parent").asOpt[UUID]
-            folders.createFolder(request.identity.username, title, parent).map { folder => 
+
+            val f = for {
+              folder <- folders.createFolder(request.identity.username, title, parent)
+              visibilitySuccess <- inheritVisibility(folder, request.identity.username)
+              collaboratorSuccess <- inheritCollaborators(folder, request.identity.username)
+            } yield (folder, visibilitySuccess && collaboratorSuccess)
+
+            f.map { case (folder, success) => 
               jsonOk(Json.obj("id" -> folder.getId))
             }
         }
@@ -55,10 +68,9 @@ class CreateController @Inject() (
   }
 
   def renameFolder(id: UUID, title: String) = silhouette.SecuredAction.async { implicit request => 
-    folders.getFolder(id).flatMap { _ match {
-      case Some(folder) =>
-        // For the time being, only folder owner may rename
-        if (folder.getOwner == request.identity.username)
+    folders.getFolder(id, request.identity.username).flatMap { _ match {
+      case Some((folder, policy)) =>
+        if (isFolderAdmin(request.identity.username, folder, policy))
           folders.renameFolder(id, title).map { success =>
             if (success) Ok else InternalServerError
           }
@@ -136,9 +148,17 @@ class CreateController @Inject() (
         }
     
       case Some((pendingUpload, fileparts)) =>
-        uploads.importPendingUpload(pendingUpload, fileparts, folder).map { case (doc, docParts) => {
+        val f = for {
+          (doc, docParts) <- uploads.importPendingUpload(pendingUpload, fileparts, folder)
+          visibilitySuccess <- inheritVisibility(doc)
+          collabSuccess <- inheritCollaborators(doc)
+        } yield (doc, docParts, visibilitySuccess && collabSuccess)
+
+        f.map { case (doc, docParts, success) => {
 
           // TODO Change this to new task API!
+
+          // TODO make use of success in response
 
           // We'll forward a list of the running processing tasks to the view, so it can show progress
           val runningTasks = scala.collection.mutable.ListBuffer.empty[TaskType]

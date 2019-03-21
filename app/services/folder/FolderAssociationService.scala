@@ -2,9 +2,9 @@ package services.folder
 
 import java.util.UUID
 import org.jooq.DSLContext
-import services.generated.Tables.FOLDER_ASSOCIATION
-import services.generated.tables.records.FolderAssociationRecord
-import scala.concurrent.Future
+import services.generated.Tables.{DOCUMENT, FOLDER, FOLDER_ASSOCIATION, SHARING_POLICY}
+import services.generated.tables.records.{DocumentRecord, FolderRecord, FolderAssociationRecord, SharingPolicyRecord}
+import scala.concurrent.{ExecutionContext, Future}
 
 trait FolderAssociationService { self: FolderService =>
 
@@ -28,6 +28,17 @@ trait FolderAssociationService { self: FolderService =>
       insertAssociation(documentId, folderId, sql)
     }
 
+  /** Returns the folder the given document is in (if any) **/
+  def getContainingFolder(documentId: String) = db.query { sql =>
+    Option(
+      sql.select().from(FOLDER_ASSOCIATION)
+         .join(FOLDER)
+           .on(FOLDER.ID.equal(FOLDER_ASSOCIATION.FOLDER_ID))
+         .where(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(documentId))
+         .fetchOne
+    ).map(_.into(classOf[FolderRecord]))
+  }
+
   /** Deletes all associations for this document **/
   def deleteFolderAssociations(documentId: String) = 
     db.withTransaction { sql => 
@@ -35,5 +46,38 @@ trait FolderAssociationService { self: FolderService =>
          .where(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(documentId))
          .execute
     }
+
+  /** Lists documents in this folder, along with current user acess permissions, if any */
+  def listDocumentsInFolder(folderId: UUID, loggedInAs: String) = db.query { sql => 
+    sql.select().from(FOLDER_ASSOCIATION)
+      .join(DOCUMENT).on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
+      .leftOuterJoin(SHARING_POLICY).on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)
+        .and(SHARING_POLICY.SHARED_WITH.equal(loggedInAs)))
+      .where(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId))
+      .fetchArray().toSeq
+      .map { record => 
+        val doc = record.into(classOf[DocumentRecord])
+        val policy = record.into(classOf[SharingPolicyRecord])
+
+        // If there is no policy stored, the record will still be there, but 
+        // with all fields == null
+        if (policy.getSharedWith == null)
+          (doc, None)
+        else 
+          (doc, Some(policy))
+      }
+  }
+
+  /** Shorthand to list documents in multiple folders **/
+  def listDocumentsInFolders(
+    ids: Seq[UUID],
+    loggedInAs: String
+  )(implicit ctx: ExecutionContext) = Future.sequence {
+    ids.map { id => 
+      listDocumentsInFolder(id, loggedInAs).map { _.map { t => 
+        (t._1, t._2, id)
+      }}
+    }
+  } map { _.flatten }
 
 }

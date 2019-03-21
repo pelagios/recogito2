@@ -10,6 +10,7 @@ import java.lang.String
 import java.sql.Timestamp
 import java.util.Arrays
 import java.util.List
+import java.util.UUID
 
 import javax.annotation.Generated
 
@@ -61,7 +62,7 @@ class SharingPolicy(alias : String, aliased : Table[SharingPolicyRecord], parame
 	/**
 	 * The column <code>public.sharing_policy.folder_id</code>.
 	 */
-	val FOLDER_ID : TableField[SharingPolicyRecord, Integer] = createField("folder_id", org.jooq.impl.SQLDataType.INTEGER, "")
+	val FOLDER_ID : TableField[SharingPolicyRecord, UUID] = createField("folder_id", org.jooq.impl.SQLDataType.UUID, "")
 
 	/**
 	 * The column <code>public.sharing_policy.document_id</code>.

@@ -18,7 +18,7 @@ trait FolderUtils { self: DirectoryController =>
 
   protected def getReadme(maybeFolder: Option[UUID], user: User)(implicit request: SecuredRequest[Security.Env, AnyContent]) = maybeFolder match {
     case Some(folderId) => 
-      folders.getFolder(folderId).map(_.map(_.getReadme))
+      folders.getFolder(folderId, request.identity.username).map(_.map(_._1.getReadme))
     
     case None =>
       Future.successful(user.readme)

@@ -119,5 +119,5 @@ trait InMyFolderSorted { self: DocumentService =>
     case Some(folderId) => listInMyFolderWithParts(owner, folderId, offset, limit, sortBy, sortOrder)
     case None => listInRootFolderWithParts(owner, offset, limit, sortBy, sortOrder)
   }
-
+  
 }
