@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import services.HasDate
+import services.{HasDate, HasNullableSeq}
 import services.contribution.stats.ContributorStats
 import services.user.User
 
@@ -20,7 +20,7 @@ case class PrivateAccountInfo(
   stats: ContributorStats,
   usedMb: Double)
 
-object PrivateAccountInfo extends HasDate {
+object PrivateAccountInfo extends HasDate with HasNullableSeq {
 
   implicit val personalAccountInfoWrites: Writes[PrivateAccountInfo] = (
     (JsPath \ "username").write[String] and
@@ -28,6 +28,7 @@ object PrivateAccountInfo extends HasDate {
     (JsPath \ "member_since").write[DateTime] and
     (JsPath \ "bio").writeNullable[String] and
     (JsPath \ "website").writeNullable[String] and
+    (JsPath \ "feature_toggles").writeNullable[Seq[String]] and
     (JsPath \ "documents").write[JsObject] and
     (JsPath \ "storage").write[JsObject] and
     (JsPath \ "stats").write[ContributorStats]
@@ -37,6 +38,7 @@ object PrivateAccountInfo extends HasDate {
       new DateTime(p.user.memberSince.getTime),
       p.user.bio,
       p.user.website,
+      toOptSeq(p.user.featureToggles),
       Json.obj(
         "my_documents" -> p.myDocumentsCount,
         "shared_with_me" -> p.sharedWithMeCount
