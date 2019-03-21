@@ -144,8 +144,12 @@ trait PlaintextToTEI extends BaseTEISerializer {
             </publicationStmt>
             <sourceDesc>
               <p><link target={ controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL } /></p>
-              { if (relations.isDefined) relations.get } 
             </sourceDesc>
+            { if (relations.isDefined)
+              <particDesc>
+                {relations.get}
+              </particDesc>
+            }
           </fileDesc>
           <encodingDesc>
             <projectDesc><p>Downloaded from { controllers.landing.routes.LandingController.index().absoluteURL}</p></projectDesc>

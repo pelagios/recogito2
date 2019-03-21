@@ -26,7 +26,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
   }
   
   /** Returns the sourceDesc element of the TEI document, creating it in place if it doesn't exist already **/
-  private[tei] def getOrCreateSourceDesc(document: Document) = {
+  private[tei] def getOrCreateParticDesc(document: Document) = {
     
     def getOrCreate(parent: Match, childName: String, prepend: Boolean): Match = {
       val maybeChild = parent.find(childName)
@@ -42,7 +42,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     val doc = $(document)
     val teiHeader = getOrCreate(doc, "teiHeader", true) // prepend
     val fileDesc = getOrCreate(teiHeader, "fileDesc", false) // append
-    getOrCreate(fileDesc, "sourceDesc", false) // append
+    getOrCreate(fileDesc, "particDesc", false) // append
   }
 
   def partToTEI(part: DocumentFilepartRecord, xml: String, annotations: Seq[Annotation]) = {
@@ -99,7 +99,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     
     val relations = relationsToList(annotations)
     if (relations.isDefined)
-      getOrCreateSourceDesc(doc).append($(relations.get.toString))
+      getOrCreateParticDesc(doc).append($(relations.get.toString))
 
     $(doc).toString
   }
