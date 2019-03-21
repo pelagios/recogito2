@@ -148,6 +148,10 @@ class DirectoryController @Inject() (
 
       import ConfiguredPresentation._
 
+      val fBreadcrumbs = Option(folderId).map { id => 
+          folders.getSharedWithMeBreadcrumbTrail(request.identity.username, id)
+        } getOrElse { Future.successful(Seq.empty[Breadcrumb]) }
+
       val fDirectories = folders.listFoldersSharedWithMe(request.identity.username, Option(folderId))
     
       val fDocuments = getDocumentList(
@@ -160,21 +164,21 @@ class DirectoryController @Inject() (
       )
 
       val f = for {
+        breadcrumbs <- fBreadcrumbs
         directories <- fDirectories
         documents <- fDocuments
       } yield (
+        breadcrumbs,
         directories.map(t => FolderItem(t._1, Some(t._2))), 
         documents
       )
 
-      f.map { case (directories, documents) => 
-
-        // TODO breadcrumbs!?
+      f.map { case (breadcrumbs, directories, documents) => 
         // TODO readme
 
         val result = DirectoryPage.build(
           None, // Readme
-          Seq.empty[Breadcrumb],
+          breadcrumbs,
           directories,
           documents
         )
