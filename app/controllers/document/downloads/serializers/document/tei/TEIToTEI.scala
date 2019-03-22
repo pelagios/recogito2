@@ -41,8 +41,8 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
         
     val doc = $(document)
     val teiHeader = getOrCreate(doc, "teiHeader", true) // prepend
-    val fileDesc = getOrCreate(teiHeader, "fileDesc", false) // append
-    getOrCreate(fileDesc, "particDesc", false) // append
+    val profileDesc = getOrCreate(teiHeader, "profileDesc", false) // append
+    getOrCreate(profileDesc, "particDesc", false) // append
   }
 
   def partToTEI(part: DocumentFilepartRecord, xml: String, annotations: Seq[Annotation]) = {
