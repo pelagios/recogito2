@@ -6,7 +6,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.HasDate
 import services.contribution.stats.ContributorStats
-import services.document.AccessibleDocumentsCount
+import services.document.read.AccessibleDocumentsCount
 import services.user.User
 
 /** Visited account info **/

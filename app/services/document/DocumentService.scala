@@ -20,16 +20,13 @@ import storage.uploads.Uploads
 
 case class PartOrdering(partId: UUID, seqNo: Int)
 
-case class AccessibleDocumentsCount(public: Long, shared: Option[Long]) {
-
-  lazy val total = public + shared.getOrElse(0l)
-
-}
-
 /** TODO this source file is just huge. I wonder how we can split it up into different parts **/
 @Singleton
-class DocumentService @Inject() (uploads: Uploads, implicit val db: DB) 
-  extends BaseService 
+class DocumentService @Inject() (
+  implicit val uploads: Uploads, 
+  implicit val db: DB
+) extends BaseService 
+  with read.AccessibleDocumentOps
   with queries.InMyFolderAllIds
   with queries.InMyFolderSorted
   with DocumentIdFactory
@@ -544,43 +541,6 @@ class DocumentService @Inject() (uploads: Uploads, implicit val db: DB)
     f.map { case (count, documents) =>
       Page(System.currentTimeMillis - startTime, count.total, offset, limit, documents) 
     }
-  }
-
-  def countAccessibleDocuments(owner: String, accessibleTo: Option[String]) = db.query { sql =>
-    val public =
-      sql.selectCount()
-         .from(DOCUMENT)
-         .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
-           .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
-         .fetchOne(0, classOf[Long])  
-
-    val shared = accessibleTo.map { username => 
-      sql.selectCount()
-         .from(DOCUMENT)
-         .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
-           // Don't double-count public docs!
-           .and(DOCUMENT.PUBLIC_VISIBILITY.notEqual(PublicAccess.PUBLIC.toString))
-           .and(DOCUMENT.ID.in(
-             sql.select(SHARING_POLICY.DOCUMENT_ID)
-                .from(SHARING_POLICY)
-                .where(SHARING_POLICY.SHARED_WITH.equal(username))
-             ))
-         ).fetchOne(0, classOf[Long])
-    }
-
-    AccessibleDocumentsCount(public, shared)
-  }
-  
-  /** Lists users who have at least one document with visibility set to PUBLIC **/
-  def listOwnersWithPublicDocuments(offset: Int = 0, limit: Int = 10000) = db.query { sql =>
-    sql.select(DOCUMENT.OWNER).from(DOCUMENT)
-      .where(DOCUMENT.PUBLIC_VISIBILITY
-        .equal(PublicAccess.PUBLIC.toString))
-      .groupBy(DOCUMENT.OWNER)
-      .limit(limit)
-      .offset(offset)
-      .fetch().into(classOf[String])
-      .toSeq
   }
     
   /** Deletes a document by its ID, along with filepart records and files **/
