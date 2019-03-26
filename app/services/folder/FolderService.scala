@@ -113,32 +113,7 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
       val records = query.fetchArray.map(asTuple)
       Page(System.currentTimeMillis - startTime, records.size, 0, records.size, records)
     }
-
-  def createFolder(owner: String, title: String, parent: Option[UUID]): Future[FolderRecord] = 
-    db.withTransaction { sql => 
-      val folder = new FolderRecord(UUID.randomUUID, owner, title, optUUID(parent), null, PublicAccess.PRIVATE.toString, null)
-      sql.insertInto(FOLDER).set(folder).execute()
-      folder
-    }
-
-  def renameFolder(id: UUID, title: String): Future[Boolean] = 
-    db.withTransaction { sql => 
-      sql.update(FOLDER)
-        .set(FOLDER.TITLE, title)
-        .where(FOLDER.ID.equal(id))
-        .execute() == 1
-    }
-
-  def setReadme(id: UUID, readme: String): Future[Boolean] =
-    db.withTransaction { sql =>
-      sql.update(FOLDER)
-         .set(FOLDER.README, readme)
-         .where(FOLDER.ID.equal(id))
-         .execute == 1
-    }
-
-  def deleteReadme(id: UUID): Future[Boolean] = setReadme(id, null)
-
+    
   /** Returns the folder the given document is in (if any) **/
   def getContainingFolder(documentId: String) = db.query { sql =>
     Option(

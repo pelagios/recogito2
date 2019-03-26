@@ -12,6 +12,14 @@ trait DeleteOps { self: FolderService =>
       sql.deleteFrom(FOLDER).where(FOLDER.ID.equal(id)).execute == 1
     }
 
+  def deleteReadme(id: UUID): Future[Boolean] =
+    db.withTransaction { sql =>
+      sql.update(FOLDER)
+        .set(FOLDER.README, null.asInstanceOf[String])
+        .where(FOLDER.ID.equal(id))
+        .execute == 1
+    }
+
   /** Deletes all associations for this document **/
   def removeDocumentFromFolder(documentId: String) = 
     db.withTransaction { sql => 

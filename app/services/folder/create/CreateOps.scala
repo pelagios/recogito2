@@ -3,12 +3,20 @@ package services.folder.create
 import java.util.{Date, UUID}
 import java.sql.Timestamp
 import org.jooq.DSLContext
-import services.SharingLevel
+import scala.concurrent.Future
+import services.{PublicAccess, SharingLevel}
 import services.folder.FolderService
-import services.generated.Tables.{FOLDER_ASSOCIATION, SHARING_POLICY}
-import services.generated.tables.records.{FolderAssociationRecord, SharingPolicyRecord}
+import services.generated.Tables.{FOLDER, FOLDER_ASSOCIATION, SHARING_POLICY}
+import services.generated.tables.records.{FolderRecord, FolderAssociationRecord, SharingPolicyRecord}
 
 trait CreateOps { self: FolderService => 
+
+  def createFolder(owner: String, title: String, parent: Option[UUID]): Future[FolderRecord] = 
+    db.withTransaction { sql => 
+      val folder = new FolderRecord(UUID.randomUUID, owner, title, optUUID(parent), null, PublicAccess.PRIVATE.toString, null)
+      sql.insertInto(FOLDER).set(folder).execute()
+      folder
+    }
 
   private def insertAssociation(documentId: String, folderId: UUID, sql: DSLContext) = {
     val association = new FolderAssociationRecord(folderId, documentId)
