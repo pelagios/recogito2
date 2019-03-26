@@ -5,8 +5,6 @@ import javax.inject.{Inject, Singleton}
 import org.jooq.Record
 import org.jooq.impl.DSL
 import play.api.Logger
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import services.{Page, BaseService, PublicAccess}
@@ -16,12 +14,11 @@ import storage.db.DB
 
 @Singleton
 class FolderService @Inject() (implicit val db: DB) extends BaseService
+  with create.CreateOps
   with read.FolderReadOps
   with read.BreadcrumbReadOps
   with update.UpdateOps
-  with delete.DeleteOps
-  with FolderAssociationService
-  with SharedFolderService {
+  with delete.DeleteOps {
 
   /** 'ls'-like command, lists folders by an owner, in the root or a subdirectory **/
   def listFolders(owner: String, offset: Int, size: Int, parent: Option[UUID]): Future[Page[FolderRecord]] = 
@@ -142,20 +139,15 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
 
   def deleteReadme(id: UUID): Future[Boolean] = setReadme(id, null)
 
-}
-
-object FolderService {
-
-  implicit val folderWrites: Writes[FolderRecord] = (
-    (JsPath \ "id").write[UUID] and
-    (JsPath \ "owner").write[String] and
-    (JsPath \ "title").write[String] and
-    (JsPath \ "parent").writeNullable[UUID]
-  )(f => (
-    f.getId,
-    f.getOwner,
-    f.getTitle,
-    Option(f.getParent)
-  ))
+  /** Returns the folder the given document is in (if any) **/
+  def getContainingFolder(documentId: String) = db.query { sql =>
+    Option(
+      sql.select().from(FOLDER_ASSOCIATION)
+         .join(FOLDER)
+           .on(FOLDER.ID.equal(FOLDER_ASSOCIATION.FOLDER_ID))
+         .where(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(documentId))
+         .fetchOne
+    ).map(_.into(classOf[FolderRecord]))
+  }
 
 }

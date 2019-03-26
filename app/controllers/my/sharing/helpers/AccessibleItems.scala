@@ -34,7 +34,7 @@ object AccessibleItems {
         // All folders: root + nested subfolders
         folderIds <- folderService.getAllSubfoldersRecursive(folderId).map(sub => folderId +: sub.map(_._1))
         folders <- folderService.getFolders(folderIds, loggedInAs)
-        documents <- folderService.listDocumentsInFolders(folderIds, loggedInAs)
+        documents <- documentService.listDocumentsInFolders(folderIds, loggedInAs)
       } yield (folders, documents)
 
       f.map { case (folders, documents) => 

@@ -1,8 +1,10 @@
 package services.document.read
 
 import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 import services.document.DocumentService
-import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION}
+import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
+import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 
 /** Helper functions that read documents from specific folders **/
 trait ReadFromFolderOps { self: DocumentService => 
@@ -25,5 +27,38 @@ trait ReadFromFolderOps { self: DocumentService =>
          .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull))
        .fetchOne(0, classOf[Int])
   }
+
+  /** Lists documents in this folder, along with current user acess permissions, if any */
+  def listDocumentsInFolder(folderId: UUID, loggedInAs: String) = db.query { sql => 
+    sql.select().from(FOLDER_ASSOCIATION)
+      .join(DOCUMENT).on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
+      .leftOuterJoin(SHARING_POLICY).on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)
+        .and(SHARING_POLICY.SHARED_WITH.equal(loggedInAs)))
+      .where(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId))
+      .fetchArray().toSeq
+      .map { record => 
+        val doc = record.into(classOf[DocumentRecord])
+        val policy = record.into(classOf[SharingPolicyRecord])
+
+        // If there is no policy stored, the record will still be there, but 
+        // with all fields == null
+        if (policy.getSharedWith == null)
+          (doc, None)
+        else 
+          (doc, Some(policy))
+      }
+  }
+
+  /** Shorthand to list documents in multiple folders **/
+  def listDocumentsInFolders(
+    ids: Seq[UUID],
+    loggedInAs: String
+  )(implicit ctx: ExecutionContext) = Future.sequence {
+    ids.map { id => 
+      listDocumentsInFolder(id, loggedInAs).map { _.map { t => 
+        (t._1, t._2, id)
+      }}
+    }
+  } map { _.flatten }
 
 }
