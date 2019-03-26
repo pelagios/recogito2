@@ -62,7 +62,7 @@
   </div>
 
   <script>
-    @defining(services.document.DocumentService.documentFilepartRecordWrites) { implicit writes =>
+    @defining(services.document.DocumentToJSON.documentFilepartRecordWrites) { implicit writes =>
       window.config = {
         documentId: "@doc.id",
         fileparts: @Html(play.api.libs.json.Json.toJson(doc.fileparts).toString)

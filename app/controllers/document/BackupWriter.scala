@@ -9,7 +9,7 @@ import java.util.UUID
 import java.util.zip.{ZipEntry, ZipOutputStream}
 import services.HasDate
 import services.annotation.{Annotation, AnnotationService}
-import services.document.ExtendedDocumentMetadata
+import services.document.{ExtendedDocumentMetadata, DocumentToJSON}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.libs.json.Json
 import play.api.libs.Files.TemporaryFileCreator
@@ -59,7 +59,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     def getMetadataAsStream(doc: ExtendedDocumentMetadata) = {
       
       // DocumentRecord JSON serialization
-      import services.document.DocumentService._
+      import services.document.DocumentToJSON._
       
       val json = Json.prettyPrint(Json.toJson((doc.document, doc.fileparts)))
       new ByteArrayInputStream(json.getBytes)

@@ -5,7 +5,7 @@ import controllers.{BaseAuthController, Security}
 import javax.inject.{Inject, Singleton}
 import services.annotation.AnnotationService
 import services.contribution.ContributionService
-import services.document.DocumentService
+import services.document.{DocumentService, DocumentToJSON}
 import services.user.UserService
 import services.user.Roles._
 import services.visit.VisitService
@@ -36,7 +36,7 @@ class AdminController @Inject() (
   
   def getStats() = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     // DocumentRecord JSON serialization
-    import DocumentService._
+    import DocumentToJSON._
     
     val fRecentContributions = contributions.getMostRecent(10)
     val fSystemStats = contributions.getSystemStats()
