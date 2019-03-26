@@ -11,4 +11,12 @@ trait FilepartReadOps { self: DocumentService =>
     Option(sql.selectFrom(DOCUMENT_FILEPART).where(DOCUMENT_FILEPART.ID.equal(id)).fetchOne())
   }
 
+    /** Retrieves a filepart by document ID and sequence number **/
+  def findPartByDocAndSeqNo(docId: String, seqNo: Int) = db.query { sql =>
+    Option(sql.selectFrom(DOCUMENT_FILEPART)
+              .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId))
+              .and(DOCUMENT_FILEPART.SEQUENCE_NO.equal(seqNo))
+              .fetchOne())
+  }
+
 }

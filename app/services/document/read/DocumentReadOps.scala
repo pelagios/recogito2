@@ -5,7 +5,7 @@ import play.api.Logger
 import scala.concurrent.Future
 import services.{PublicAccess, RuntimeAccessLevel, SharingLevel}
 import services.document.{DocumentService, ExtendedDocumentMetadata}
-import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART, SHARING_POLICY, USER}
+import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART, DOCUMENT_PREFERENCES, SHARING_POLICY, USER}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord, UserRecord}
 
 /** Default Read operations on document records **/
@@ -147,6 +147,13 @@ trait DocumentReadOps { self: DocumentService =>
       val owner = records.head.into(classOf[UserRecord])      
       (ExtendedDocumentMetadata(document, parts.sortBy(_.getSequenceNo), owner), determineAccessLevel(document, sharingPolicies, loggedInUser))
     }
+  }
+
+  /** Reads the document preferences for the given document **/
+  def getDocumentPreferences(docId: String) = db.query { sql =>
+    sql.selectFrom(DOCUMENT_PREFERENCES)
+       .where(DOCUMENT_PREFERENCES.DOCUMENT_ID.equal(docId))
+       .fetchArray.toSeq
   }
 
 }

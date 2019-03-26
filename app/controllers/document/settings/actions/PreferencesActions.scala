@@ -27,7 +27,7 @@ trait PreferencesActions { self: SettingsController =>
   
   def showAnnotationPreferences(doc: ExtendedDocumentMetadata, user: User)(implicit request: RequestHeader) = {
     val fGazetteers= self.authorities.listAll(Some(EntityType.PLACE))
-    val fCurrentPrefs = self.documents.getPreferences(doc.id)
+    val fCurrentPrefs = self.documents.getDocumentPreferences(doc.id)
     
     val f = for {
       gazetteers <- fGazetteers

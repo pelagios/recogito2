@@ -24,6 +24,7 @@ class DocumentService @Inject() (
   implicit val uploads: Uploads, 
   implicit val db: DB
 ) extends BaseService 
+  with create.CreateOps
   with read.DocumentReadOps
   with read.FilepartReadOps
   with read.AccessibleDocumentOps
@@ -32,7 +33,6 @@ class DocumentService @Inject() (
   with queries.InMyFolderAllIds
   with queries.InMyFolderSorted
   with DocumentIdFactory
-  with DocumentPrefsService
   with SharingPolicies {
   
   /** Creates a new DocumentRecord from an UploadRecord **/
@@ -53,23 +53,7 @@ class DocumentService @Inject() (
           null, // attribution
           PublicAccess.PRIVATE.toString, // public_visibility
           null) // public_access_level
-  
-  /** Imports document and filepart records to DB, and filepart content to user dir **/
-  def importDocument(document: DocumentRecord, fileparts: Seq[(DocumentFilepartRecord, InputStream)]) = db.withTransaction { sql =>
-    // Import DocumentRecord 
-    sql.insertInto(DOCUMENT).set(document).execute()
     
-    // Import DocumentFilepartRecords 
-    val inserts = fileparts.map { case (part, _) => sql.insertInto(DOCUMENT_FILEPART).set(part) }    
-    sql.batch(inserts:_*).execute()
-    
-    // Import files
-    fileparts.foreach { case (part, stream) =>
-      val destination = new File(uploads.getDocumentDir(document.getOwner, document.getId, true).get, part.getFile).toPath
-      Files.copy(stream, destination)
-    }
-  }
-  
   /** Batch-retrieves the document records with the given IDs, along with their fileparts **/
   def findByIdsWithParts(docIds: Seq[String]) = db.query { sql =>
     val subquery = sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds))
@@ -133,14 +117,6 @@ class DocumentService @Inject() (
     docIds.map(id => unsorted.find(_._1.getId == id).get)
   }
 
-  /** Retrieves a filepart by document ID and sequence number **/
-  def findPartByDocAndSeqNo(docId: String, seqNo: Int) = db.query { sql =>
-    Option(sql.selectFrom(DOCUMENT_FILEPART)
-              .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(docId))
-              .and(DOCUMENT_FILEPART.SEQUENCE_NO.equal(seqNo))
-              .fetchOne())
-  }
-  
   def countAllByOwner(owner: String, publicOnly: Boolean = false) = db.query { sql =>
     if (publicOnly)
       sql.selectCount().from(DOCUMENT)

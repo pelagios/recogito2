@@ -62,7 +62,7 @@ class AnnotationController @Inject() (
   def showAnnotationView(documentId: String, seqNo: Int) = silhouette.UserAwareAction.async { implicit request =>
     val loggedIn = request.identity
     
-    val fPreferences = documents.getPreferences(documentId)
+    val fPreferences = documents.getDocumentPreferences(documentId)
     
     val fRedirectedVia = request.flash.get("annotation") match {
       case Some(annotationId) => annotations.findById(UUID.fromString(annotationId)).map { _.map(_._1) }

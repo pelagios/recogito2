@@ -5,7 +5,8 @@ import play.api.Logger
 import scala.concurrent.Future
 import services.PublicAccess
 import services.document.{DocumentService, License, PartOrdering}
-import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART}
+import services.generated.tables.records.DocumentPreferencesRecord
+import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART, DOCUMENT_PREFERENCES}
 
 /** Various document update operations **/
 trait UpdateOps { self: DocumentService => 
@@ -119,6 +120,15 @@ trait UpdateOps { self: DocumentService =>
          .where(DOCUMENT_FILEPART.ID.equal(ordering.partId)))
 
     sql.batch(updates:_*).execute()
+  }
+
+  def upsertPreferences(docId: String, name: String, prefs: String): Future[Boolean] = db.query { sql =>
+    val prefRecord = new DocumentPreferencesRecord(docId, name, prefs)
+    sql.insertInto(DOCUMENT_PREFERENCES)
+       .set(prefRecord)
+       .onDuplicateKeyUpdate()
+       .set(prefRecord)
+       .execute() == 1
   }
   
 }
