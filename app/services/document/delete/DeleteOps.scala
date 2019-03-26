@@ -64,5 +64,13 @@ trait DeleteOps { self: DocumentService =>
     // Delete files
     uploads.deleteUserDir(username)
   }
+ 
+  /** Deletes all policies shared by and with the given user **/
+  def deletePoliciesByUsername(username: String) = db.withTransaction { sql =>
+    sql.deleteFrom(SHARING_POLICY)
+      .where(SHARING_POLICY.SHARED_WITH.equal(username)
+        .or(SHARING_POLICY.SHARED_BY.equal(username)))
+      .execute()
+  }
 
 }

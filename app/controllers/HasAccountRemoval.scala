@@ -54,7 +54,7 @@ trait HasAccountRemoval {
     val fDeletePendingUpload = uploads.deletePendingUpload(username)
     
     // Delete sharing policies shared by and with this user
-    val fDeleteSharingPolicies = documents.deleteAffectedPolicies(username)
+    val fDeleteSharingPolicies = documents.deletePoliciesByUsername(username)
     
     // Delete pending/archived announcements for this user, if any
     val fDeleteAnnouncements = announcements.deleteForUser(username)

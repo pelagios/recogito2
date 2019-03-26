@@ -41,7 +41,7 @@ class AccountInfoController @Inject() (
 
     val fUser = users.findByUsername(username)
     val fMyDocCount = documents.countAllByOwner(username)
-    val fSharedCount = documents.countBySharedWith(username)
+    val fSharedCount = documents.countDocumentsSharedWithMe(username)
     val fContributorStats = contributions.getContributorStats(username)
     val fUsedMb = Future(uploads.getUsedDiskspaceKB(username)).map { used =>
       Math.round(100 * used / 1024).toDouble / 100

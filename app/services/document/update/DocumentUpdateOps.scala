@@ -9,7 +9,7 @@ import services.generated.tables.records.DocumentPreferencesRecord
 import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART, DOCUMENT_PREFERENCES}
 
 /** Various document update operations **/
-trait UpdateOps { self: DocumentService => 
+trait DocumentUpdateOps { self: DocumentService => 
 
   /** Updates document metadata for the given document ID **/
   def updateMetadata(
