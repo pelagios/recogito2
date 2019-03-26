@@ -1,5 +1,6 @@
 package services.document.read
 
+import collection.JavaConversions._
 import play.api.Logger
 import scala.concurrent.Future
 import services.{PublicAccess, RuntimeAccessLevel, SharingLevel}
@@ -98,6 +99,11 @@ trait DocumentReadOps { self: DocumentService =>
         Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne()).map(document =>
           (document, determineAccessLevel(document, Seq.empty[SharingPolicyRecord], loggedInUser)))
     }
+  }
+
+  /** Batch-retrieves the document records with the given IDs **/
+  def getDocumentRecordsById(docIds: Seq[String]) = db.query { sql => 
+    sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds)).fetchArray().toSeq
   }
 
   /** Retrieves extended document metadata, along with runtime access permissions.

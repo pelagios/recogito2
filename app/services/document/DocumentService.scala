@@ -25,6 +25,7 @@ class DocumentService @Inject() (
   implicit val db: DB
 ) extends BaseService 
   with read.DocumentReadOps
+  with read.FilepartReadOps
   with read.AccessibleDocumentOps
   with update.UpdateOps
   with delete.DeleteOps
@@ -69,11 +70,6 @@ class DocumentService @Inject() (
     }
   }
   
-  /** Batch-retrieves the document records with the given IDs **/
-  def findByIds(docIds: Seq[String]) = db.query { sql => 
-    sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds)).fetchArray().toSeq
-  }
-
   /** Batch-retrieves the document records with the given IDs, along with their fileparts **/
   def findByIdsWithParts(docIds: Seq[String]) = db.query { sql =>
     val subquery = sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds))
@@ -94,18 +90,6 @@ class DocumentService @Inject() (
 
     // Ensure results are in the same order as docIds
     docIds.map(id => asTuples.find(_._1.getId == id).get)
-  }
-
-  /** Batch-retrieves the document records with the given ID, plus the sharing policy with the given user **/
-  def findByIdsWithSharingPolicy(docIds: Seq[String], sharedWith: String) = db.query { sql =>
-    val results = sql.selectFrom(SHARING_POLICY
-         .join(DOCUMENT)
-         .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
-       .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
-       .and(DOCUMENT.ID.in(docIds))
-       .fetchArray().toSeq
-    
-    results.map(r => (r.into(classOf[DocumentRecord]), r.into(classOf[SharingPolicyRecord])))
   }
 
   protected def collectSharedWithMeResults(results: Seq[Record]) = {
@@ -147,11 +131,6 @@ class DocumentService @Inject() (
 
     val unsorted = collectSharedWithMeResults(results)
     docIds.map(id => unsorted.find(_._1.getId == id).get)
-  }
-  
-  /** Retrieves a part record by ID **/
-  def findPartById(id: UUID) = db.query { sql => 
-    Option(sql.selectFrom(DOCUMENT_FILEPART).where(DOCUMENT_FILEPART.ID.equal(id)).fetchOne())
   }
 
   /** Retrieves a filepart by document ID and sequence number **/

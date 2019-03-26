@@ -46,7 +46,7 @@ class AdminController @Inject() (
 
     val f = for {
       recentContributions <- fRecentContributions
-      recentAffectedDocuments <- documents.findByIds(recentContributions.map(_.affectsItem.documentId))
+      recentAffectedDocuments <- documents.getDocumentRecordsById(recentContributions.map(_.affectsItem.documentId))
       stats <- fSystemStats
       annotationCount <- fTotalAnnotations
       visitCount <- fTotalVisits
