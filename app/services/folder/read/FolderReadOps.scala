@@ -5,7 +5,7 @@ import org.jooq.Record
 import scala.concurrent.Future
 import scala.collection.JavaConversions._
 import services.folder.FolderService
-import services.generated.Tables.{FOLDER, SHARING_POLICY}
+import services.generated.Tables.{FOLDER, FOLDER_ASSOCIATION, SHARING_POLICY}
 import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 
 trait FolderReadOps { self: FolderService => 
@@ -88,6 +88,17 @@ trait FolderReadOps { self: FolderService =>
     sql.resultQuery(query, id).fetchArray.map { record => 
       record.into(classOf[(UUID, String)])
     }.toSeq
+  }
+
+  /** Returns the folder the given document is in (if any) **/
+  def getContainingFolder(documentId: String) = db.query { sql =>
+    Option(
+      sql.select().from(FOLDER_ASSOCIATION)
+         .join(FOLDER)
+           .on(FOLDER.ID.equal(FOLDER_ASSOCIATION.FOLDER_ID))
+         .where(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(documentId))
+         .fetchOne
+    ).map(_.into(classOf[FolderRecord]))
   }
 
   /** Returns the list of collaborators on this folder **/
