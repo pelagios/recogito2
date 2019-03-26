@@ -87,7 +87,7 @@ class CreateController @Inject() (
         val data = (json \ "data").as[String]
 
         val f = Option(folderId) match {
-          case Some(id) => folders.setReadme(id, data)
+          case Some(id) => folders.updateReadme(id, data)
           case None => users.setReadme(request.identity.username, data)
         }
         
