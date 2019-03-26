@@ -2,7 +2,7 @@ package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
 import services.{PublicAccess, SharingLevel}
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.generated.tables.records.SharingPolicyRecord
 import services.user.Roles._
 import play.api.libs.json._
@@ -31,7 +31,7 @@ object CollaboratorStub {
 
 trait SharingActions { self: SettingsController =>
   
-  def publicAccessAction(docId: String, username: String, fn: DocumentInfo => Future[Result]) =
+  def publicAccessAction(docId: String, username: String, fn: ExtendedDocumentMetadata => Future[Result]) =
     documentAdminAction(docId, username, { doc =>
       // Make sure the document has an open license - otherwise public access options cannot be changed
       val hasOpenLicense = doc.license.map(_.isOpen).getOrElse(false)

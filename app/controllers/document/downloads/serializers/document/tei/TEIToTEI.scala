@@ -1,13 +1,13 @@
 package controllers.document.downloads.serializers.document.tei
 
 import controllers.HasTEISnippets
-import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import services.document.{ DocumentInfo, DocumentService }
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
+import services.document.{ExtendedDocumentMetadata, DocumentService}
 import services.generated.tables.records.DocumentFilepartRecord
 import org.joox.Match
 import org.joox.JOOX._
 import org.w3c.dom.Document
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.Elem
 import storage.uploads.Uploads
 
@@ -104,7 +104,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     $(doc).toString
   }
 
-  def teiToTEI(docInfo: DocumentInfo)(implicit documentService: DocumentService,
+  def teiToTEI(docInfo: ExtendedDocumentMetadata)(implicit documentService: DocumentService,
       uploads: Uploads, annotationService: AnnotationService, ctx: ExecutionContext): Future[Elem] = {
 
     val fParts = Future.sequence(

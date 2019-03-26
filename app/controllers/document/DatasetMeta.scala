@@ -3,11 +3,11 @@ package controllers.document
 import com.vividsolutions.jts.geom.Envelope
 import play.api.libs.json._
 import play.api.mvc.RequestHeader
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.generated.tables.DocumentFilepart
 import services.ContentType
 
-case class DatasetMeta(doc: DocumentInfo, annotationCount: Long, spatialCoverage: Option[Envelope] = None) {
+case class DatasetMeta(doc: ExtendedDocumentMetadata, annotationCount: Long, spatialCoverage: Option[Envelope] = None) {
 
   lazy val name = 
     if (doc.fileparts.forall(_.getContentType == ContentType.DATA_CSV.toString)) // Tabular data

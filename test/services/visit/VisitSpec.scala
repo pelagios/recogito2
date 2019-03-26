@@ -2,7 +2,7 @@ package services.visit
 
 import java.util.UUID
 import services.ContentType
-import services.document.RuntimeAccessLevel
+import services.RuntimeAccessLevel
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._

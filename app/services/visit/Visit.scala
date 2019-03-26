@@ -2,7 +2,7 @@ package services.visit
 
 import java.util.UUID
 import services.{ ContentType, HasContentTypeList, HasDate }
-import services.document.RuntimeAccessLevel
+import services.RuntimeAccessLevel
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.json.Reads._

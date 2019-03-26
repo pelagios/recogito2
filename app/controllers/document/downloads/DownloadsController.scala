@@ -7,9 +7,9 @@ import com.mohiva.play.silhouette.api.actions.UserAwareRequest
 import controllers.{BaseOptAuthController, Security, HasPrettyPrintJSON}
 import controllers.document.downloads.serializers._
 import javax.inject.{Inject, Singleton}
-import services.ContentType
+import services.{ContentType, RuntimeAccessLevel}
 import services.annotation.AnnotationService
-import services.document.{DocumentInfo, DocumentService, RuntimeAccessLevel}
+import services.document.{ExtendedDocumentMetadata, DocumentService}
 import services.entity.builtin.EntityService
 import services.user.UserService
 import org.apache.jena.riot.RDFFormat
@@ -83,7 +83,7 @@ class DownloadsController @Inject() (
   private def download(
     documentId: String, 
     requiredAccessLevel: RuntimeAccessLevel, 
-    export: DocumentInfo => Future[Result]
+    export: ExtendedDocumentMetadata => Future[Result]
   )(implicit request: UserAwareRequest[Security.Env, AnyContent]) = 
     documentReadResponse(documentId, request.identity, { case (docInfo, userAccessLevel) =>
       if (userAccessLevel >= requiredAccessLevel)
@@ -162,7 +162,7 @@ class DownloadsController @Inject() (
       }
     
     // Places + spreadsheet info, according to Pelagios gazetteer GeoJSON conventions
-    def downloadGazetteer(doc: DocumentInfo) = request.body.asFormUrlEncoded.flatMap(_.get("json").flatMap(_.headOption)) match {
+    def downloadGazetteer(doc: ExtendedDocumentMetadata) = request.body.asFormUrlEncoded.flatMap(_.get("json").flatMap(_.headOption)) match {
       case Some(str) =>
         Json.fromJson[FieldMapping](Json.parse(str)) match {
           case result: JsSuccess[FieldMapping] =>

@@ -8,9 +8,10 @@ import play.api.libs.json.{Json, JsValue}
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+import services.RuntimeAccessLevel
 import services.annotation.AnnotationService
 import services.contribution.ContributionService
-import services.document.{DocumentService, RuntimeAccessLevel}
+import services.document.DocumentService
 import services.folder.FolderService
 import services.generated.tables.records.DocumentRecord
 import services.user.UserService
@@ -44,7 +45,7 @@ class DocumentActionsController @Inject() (
     * went wrong.
     */
   private def getDocumentIfOwned(docId: String, username: String): Future[Option[DocumentRecord]] =
-    documents.getDocumentRecord(docId, Some(username)).map(_ match {
+    documents.getDocumentRecordById(docId, Some(username)).map(_ match {
       case Some((document, accesslevel)) =>
         if (accesslevel == RuntimeAccessLevel.OWNER) Some(document)
         else None

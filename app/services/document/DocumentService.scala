@@ -26,7 +26,9 @@ class DocumentService @Inject() (
   implicit val uploads: Uploads, 
   implicit val db: DB
 ) extends BaseService 
+  with read.DocumentReadOps
   with read.AccessibleDocumentOps
+  with delete.DeleteOps
   with queries.InMyFolderAllIds
   with queries.InMyFolderSorted
   with DocumentIdFactory
@@ -254,70 +256,6 @@ class DocumentService @Inject() (
     docIds.map(id => unsorted.find(_._1.getId == id).get)
   }
   
-  /** Retrieves a document record by its ID, along with access permissions for the given user **/
-  def getDocumentRecord(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
-    loggedInUser match {
-      case Some(user) => {
-        val records = 
-          sql.selectFrom(DOCUMENT
-               .leftJoin(SHARING_POLICY)
-               .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
-               .and(SHARING_POLICY.SHARED_WITH.equal(user)))
-             .where(DOCUMENT.ID.equal(id))
-             .fetchArray
-             
-        val grouped = groupLeftJoinResult(records, classOf[DocumentRecord], classOf[SharingPolicyRecord])
-        if (grouped.size > 1)
-          throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
-                      
-        grouped.headOption.map { case (document, sharingPolicies) =>
-          (document, determineAccessLevel(document, sharingPolicies, loggedInUser)) }
-      }
-      
-      case None =>
-        // Anonymous request - just retrieve document
-        Option(sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.equal(id)).fetchOne()).map(document =>
-          (document, determineAccessLevel(document, Seq.empty[SharingPolicyRecord], loggedInUser)))
-    }
-  }
-
-  /** Retrieves the document record, filepart metadata and owner information, along with access permissions **/
-  def getExtendedInfo(id: String, loggedInUser: Option[String] = None) = db.query { sql =>
-    val records = loggedInUser match {
-      case Some(username) =>
-        // Retrieve with sharing policies that may apply
-        sql.selectFrom(DOCUMENT
-             .join(DOCUMENT_FILEPART).on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID))
-             .join(USER).on(DOCUMENT.OWNER.equal(USER.USERNAME))
-             .leftJoin(SHARING_POLICY)
-               .on(DOCUMENT.ID.equal(SHARING_POLICY.DOCUMENT_ID))
-               .and(SHARING_POLICY.SHARED_WITH.equal(username)))
-          .where(DOCUMENT.ID.equal(id))
-          .fetchArray()
-
-      case None =>
-        // Anyonymous request - just retrieve parts and owner
-        sql.selectFrom(DOCUMENT
-             .join(DOCUMENT_FILEPART).on(DOCUMENT.ID.equal(DOCUMENT_FILEPART.DOCUMENT_ID))
-             .join(USER).on(DOCUMENT.OWNER.equal(USER.USERNAME)))
-           .where(DOCUMENT.ID.equal(id))
-           .fetchArray()
-
-    }
-
-    val grouped = groupLeftJoinResult(records, classOf[DocumentRecord], classOf[DocumentFilepartRecord])
-    if (grouped.size > 1)
-      throw new RuntimeException("Got " + grouped.size + " DocumentRecords with the same ID: " + grouped.keys.map(_.getId).mkString(", "))
-
-    val sharingPolicies = records.map(_.into(classOf[SharingPolicyRecord])).filter(isNotNull(_)).distinct
-
-    // Return with parts sorted by sequence number
-    grouped.headOption.map { case (document, parts) =>
-      val owner = records.head.into(classOf[UserRecord])
-      (DocumentInfo(document, parts.sortBy(_.getSequenceNo), owner), determineAccessLevel(document, sharingPolicies, loggedInUser))
-    }
-  }
-  
   /** Retrieves a part record by ID **/
   def findPartById(id: UUID) = db.query { sql => 
     Option(sql.selectFrom(DOCUMENT_FILEPART).where(DOCUMENT_FILEPART.ID.equal(id)).fetchOne())
@@ -343,57 +281,6 @@ class DocumentService @Inject() (
          .fetchOne(0, classOf[Int])
   }
 
-  /** Retrieves documents by their owner **/
-  def findByOwner(
-    owner: String, 
-    inFolder: Option[UUID], 
-    offset: Int = 0, 
-    limit: Int = 20, 
-    sortBy: Option[String] = None, 
-    sortOrder: Option[SortOrder] = None
-  )(implicit ctx: ExecutionContext) = {
-    val startTime = System.currentTimeMillis
-    val sortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT), fieldname, sortOrder))
-
-    for {
-      total <- inFolder match {
-                 case Some(folderId) => countInFolder(folderId)
-                 case None => countInRootFolder(owner)
-               }
-
-      items <- db.query { sql => 
-                val query = inFolder match {
-                  case Some(folderId) =>
-                    sql.select().from(DOCUMENT)
-                       .fullOuterJoin(FOLDER_ASSOCIATION)
-                       .on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
-                       .where(DOCUMENT.OWNER.equal(owner)
-                         .and(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId)))
-
-                  case None =>
-                    sql.select().from(DOCUMENT)
-                       .fullOuterJoin(FOLDER_ASSOCIATION)
-                       .on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))
-                       .where(DOCUMENT.OWNER.equal(owner)
-                         .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull))
-                }
-
-                sortField match {
-                  case Some(sort) =>
-                    query.orderBy(sort).limit(limit).offset(offset)
-                         .fetch()
-                         .into(classOf[DocumentRecord]).toSeq
-
-                  case None => 
-                    query.limit(limit).offset(offset)
-                         .fetch()
-                         .into(classOf[DocumentRecord]).toSeq
-                }
-              }
-              
-    } yield Page(System.currentTimeMillis - startTime, total, offset, limit, items)
-  }
-  
   def listAllAccessibleIds(owner: String, loggedInUser: Option[String]) = db.query { sql =>
     loggedInUser match {
       case Some(username) =>
@@ -416,43 +303,6 @@ class DocumentService @Inject() (
     }
   }
   
-  /** Retrieves documents from a given owner, visible to the given logged in user.
-    *
-    * If there is currently no logged in user, only documents with public_visibility = PUBLIC are returned.  
-    */
-  def findAccessibleDocuments(
-    owner: String,
-    loggedInUser: Option[String],
-    offset: Int = 0, limit: Int = 20,
-    sortBy: Option[String] = None,
-    sortOrder: Option[SortOrder] = None
-  ) = db.query { sql =>
-    val startTime = System.currentTimeMillis
-    
-    // TODO sorting
-    val queries = Seq(sql.selectCount(), sql.select())
-      .map { q => loggedInUser match {
-          case Some(loggedIn) =>
-            q.from(DOCUMENT)
-             .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
-               .and(DOCUMENT.ID.in(
-                  sql.select(SHARING_POLICY.DOCUMENT_ID).from(SHARING_POLICY)
-                    .where(SHARING_POLICY.SHARED_WITH.equal(loggedIn))
-               ).or(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))))
-                 
-          case None =>       
-            q.from(DOCUMENT)
-              .where(DOCUMENT.OWNER.equal(owner)
-                .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
-        }
-      }
-    
-    val total = queries(0).fetchOne(0, classOf[Int])   
-    val items = queries(1).limit(limit).offset(offset).fetch().into(classOf[DocumentRecord])
-    
-    Page(System.currentTimeMillis - startTime, total, offset, limit, items) 
-  }
-
   /** Just the document retrieval query, no counting **/
   private def listAccessibleWithParts(
     owner: String,
@@ -542,54 +392,7 @@ class DocumentService @Inject() (
       Page(System.currentTimeMillis - startTime, count.total, offset, limit, documents) 
     }
   }
-    
-  /** Deletes a document by its ID, along with filepart records and files **/
-  def delete(document: DocumentRecord): Future[Unit] = db.withTransaction { sql =>
-    // Delete sharing policies
-    sql.deleteFrom(SHARING_POLICY)
-       .where(SHARING_POLICY.DOCUMENT_ID.equal(document.getId))
-       .execute()
-
-    // Delete filepart records
-    sql.deleteFrom(DOCUMENT_FILEPART)
-       .where(DOCUMENT_FILEPART.DOCUMENT_ID.equal(document.getId))
-       .execute()
-    
-    // Delete document records
-    sql.deleteFrom(DOCUMENT)
-       .where(DOCUMENT.ID.equal(document.getId))
-       .execute()
-       
-    // Delete files - note: some documents may not have local files (e.g. IIIF)  
-    val maybeDocumentDir = uploads.getDocumentDir(document.getOwner, document.getId)
-    if (maybeDocumentDir.isDefined)
-      FileUtils.deleteDirectory(maybeDocumentDir.get)
-  }
-  
-  def deleteByOwner(username: String)(implicit ctx: ExecutionContext) = db.withTransaction { sql =>
-    // Delete sharing policies
-    sql.deleteFrom(SHARING_POLICY)
-       .where(SHARING_POLICY.DOCUMENT_ID.in(
-         sql.select(DOCUMENT.ID).from(DOCUMENT).where(DOCUMENT.OWNER.equal(username))
-       ))
-       .execute()
-    
-    // Delete filepart records
-    sql.deleteFrom(DOCUMENT_FILEPART)
-       .where(DOCUMENT_FILEPART.DOCUMENT_ID.in(
-         sql.select(DOCUMENT.ID).from(DOCUMENT).where(DOCUMENT.OWNER.equal(username))
-       ))
-       .execute()
-       
-    // Delete document records
-    sql.deleteFrom(DOCUMENT)
-       .where(DOCUMENT.OWNER.equal(username))
-       .execute()
-       
-    // Delete files
-    uploads.deleteUserDir(username)
-  }
-  
+      
 }
 
 object DocumentService extends HasDate {

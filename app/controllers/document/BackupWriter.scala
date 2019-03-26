@@ -9,7 +9,7 @@ import java.util.UUID
 import java.util.zip.{ZipEntry, ZipOutputStream}
 import services.HasDate
 import services.annotation.{Annotation, AnnotationService}
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.libs.json.Json
 import play.api.libs.Files.TemporaryFileCreator
@@ -43,7 +43,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
     new BigInteger(1, md.digest()).toString(16)
   }
   
-  def createBackup(doc: DocumentInfo)(implicit ctx: ExecutionContext, uploads: Uploads, 
+  def createBackup(doc: ExtendedDocumentMetadata)(implicit ctx: ExecutionContext, uploads: Uploads, 
       annotations: AnnotationService, tmpFile: TemporaryFileCreator): Future[File] = {
     
     def getFileAsStream(owner: String, documentId: String, filename: String) = {
@@ -56,7 +56,7 @@ trait BackupWriter extends HasBackupValidation { self: HasConfig =>
       new ByteArrayInputStream(manifest.getBytes)
     }
     
-    def getMetadataAsStream(doc: DocumentInfo) = {
+    def getMetadataAsStream(doc: ExtendedDocumentMetadata) = {
       
       // DocumentRecord JSON serialization
       import services.document.DocumentService._

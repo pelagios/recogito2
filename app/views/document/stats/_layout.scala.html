@@ -1,8 +1,8 @@
 @(
   title: String,
-  doc: services.document.DocumentInfo,
+  doc: services.document.ExtendedDocumentMetadata,
   currentUser: Option[services.user.User],
-  accessLevel: services.document.RuntimeAccessLevel,
+  accessLevel: services.RuntimeAccessLevel,
   activeTab: Option[String],
   p: Seq[plugins.PluginConf]
 )(content: Html)(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)

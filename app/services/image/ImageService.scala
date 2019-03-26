@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
 import services.annotation.Annotation
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.generated.tables.records.DocumentFilepartRecord
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
@@ -16,7 +16,7 @@ import storage.TempDir
 object ImageService {
 
   def cutout(
-    doc: DocumentInfo,
+    doc: ExtendedDocumentMetadata,
     part: DocumentFilepartRecord,
     annotation: Annotation
   )(implicit uploads: Uploads, ctx: ExecutionContext, tmpCreator: TemporaryFileCreator, config: Configuration) = Future {
@@ -69,7 +69,7 @@ object ImageService {
     
   }
   
-  def iiifSnippet(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): String = {
+  def iiifSnippet(doc: ExtendedDocumentMetadata, part: DocumentFilepartRecord, annotation: Annotation): String = {
     val b = ImageAnchor.parse(annotation.anchor).bounds
     
     val baseUrl = 

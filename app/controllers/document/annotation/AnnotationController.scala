@@ -4,9 +4,9 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, HasVisitLogging, HasTEISnippets, Security}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import services.ContentType
+import services.{ContentType, RuntimeAccessLevel}
 import services.annotation.{Annotation, AnnotationService}
-import services.document.{RuntimeAccessLevel, DocumentInfo, DocumentService}
+import services.document.{ExtendedDocumentMetadata, DocumentService}
 import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord, DocumentPreferencesRecord, UserRecord}
 import services.user.{User, UserService}
 import services.visit.VisitService
@@ -87,7 +87,7 @@ class AnnotationController @Inject() (
   }
 
   private def renderResponse(
-    doc: DocumentInfo,
+    doc: ExtendedDocumentMetadata,
     currentPart: DocumentFilepartRecord,
     loggedInUser: Option[User],
     accesslevel: RuntimeAccessLevel,

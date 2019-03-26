@@ -12,7 +12,6 @@ import scala.concurrent.ExecutionContext
 import scala.util.Try
 import services.{ContentType, HasGeometry, HasNullableSeq}
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
-import services.document.DocumentInfo
 import services.entity.{Entity, EntityRecord, EntityType}
 import services.entity.builtin.EntityService
 import storage.es.ES 

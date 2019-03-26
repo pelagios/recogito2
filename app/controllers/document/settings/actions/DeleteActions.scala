@@ -1,7 +1,7 @@
 package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
-import services.document.RuntimeAccessLevel
+import services.RuntimeAccessLevel
 import services.generated.tables.records.DocumentRecord
 import services.user.Roles._
 import play.api.mvc.{ AnyContent, Request }
@@ -12,7 +12,7 @@ import scala.util.Try
 trait DeleteActions { self: SettingsController =>
   
   protected def documentOwnerAction(docId: String, username: String, action: DocumentRecord => Future[Boolean]) = {
-    documents.getDocumentRecord(docId, Some(username)).flatMap(_ match {
+    documents.getDocumentRecordById(docId, Some(username)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel == RuntimeAccessLevel.OWNER) // We allow only the owner to delete a document
           action(document).map { success =>

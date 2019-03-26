@@ -1,6 +1,7 @@
 package controllers
 
-import services.document.{RuntimeAccessLevel, DocumentInfo, DocumentService}
+import services.RuntimeAccessLevel
+import services.document.{ExtendedDocumentMetadata, DocumentService}
 import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord}
 import services.user.{User, UserService}
 import play.api.Configuration
@@ -22,9 +23,9 @@ abstract class BaseAuthController(
   protected def documentResponse(
     docId: String,
     user: User,
-    response: (DocumentInfo, RuntimeAccessLevel) => Result
+    response: (ExtendedDocumentMetadata, RuntimeAccessLevel) => Result
   )(implicit ctx: ExecutionContext) = {
-    documents.getExtendedInfo(docId, Some(user.username)).map(_ match {
+    documents.getExtendedMeta(docId, Some(user.username)).map(_ match {
       case Some((doc, accesslevel)) => {
         if (accesslevel.canReadData)
           // As long as there are read rights we'll allow access here - the response
@@ -48,7 +49,7 @@ abstract class BaseAuthController(
     docId: String,
     partNo: Int,
     user: User,
-    response: (DocumentInfo, DocumentFilepartRecord, RuntimeAccessLevel) => Result
+    response: (ExtendedDocumentMetadata, DocumentFilepartRecord, RuntimeAccessLevel) => Result
   )(implicit ctx: ExecutionContext) = {
     documentResponse(docId, user, { case (doc, accesslevel) =>
       doc.fileparts.find(_.getSequenceNo == partNo) match {

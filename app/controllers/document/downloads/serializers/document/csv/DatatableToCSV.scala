@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import services.ContentType
 import services.annotation.{AnnotationService, AnnotationBody}
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.entity.Entity
 import services.entity.builtin.EntityService
 import services.generated.tables.records.DocumentFilepartRecord
@@ -32,7 +32,7 @@ trait DatatableToCSV extends BaseSerializer with HasCSVParsing {
   
   /** Exports a ZIP of user-uploaded tables, with annotation info merged into the original CSVs **/ 
   def exportMergedTables(
-    doc: DocumentInfo
+    doc: ExtendedDocumentMetadata
   )(implicit
       annotationService: AnnotationService, 
       entityService: EntityService,

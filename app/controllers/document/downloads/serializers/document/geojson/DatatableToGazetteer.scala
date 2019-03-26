@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext
 import scala.util.Try
 import services.{HasGeometry, HasNullableSeq, ContentType}
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.entity.{Entity, EntityRecord}
 import services.entity.builtin.EntityService
 import storage.uploads.Uploads
@@ -34,7 +34,7 @@ trait DatatableToGazetteer extends BaseSerializer with HasCSVParsing {
   }
 
   def exportGeoJSONGazetteer(
-    doc: DocumentInfo,
+    doc: ExtendedDocumentMetadata,
     fieldMapping: FieldMapping
   )(implicit annotationService: AnnotationService,
     entityService: EntityService, 

@@ -1,7 +1,7 @@
 @(
-  doc: services.document.DocumentInfo,
+  doc: services.document.ExtendedDocumentMetadata,
   currentUser: Option[services.user.User],
-  accessLevel: services.document.RuntimeAccessLevel,
+  accessLevel: services.RuntimeAccessLevel,
   annotationCount: Long,
   annotationBounds: com.vividsolutions.jts.geom.Envelope,
   hasRelations: Boolean

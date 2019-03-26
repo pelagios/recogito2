@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import services.PublicAccess
 import services.generated.tables.records.{ DocumentRecord, DocumentFilepartRecord, UserRecord }
 
-case class DocumentInfo(document: DocumentRecord, fileparts: Seq[DocumentFilepartRecord], owner: UserRecord) {
+case class ExtendedDocumentMetadata(document: DocumentRecord, fileparts: Seq[DocumentFilepartRecord], owner: UserRecord) {
   
   /** Document property shorthands for convenience & readability **/
   

@@ -1,8 +1,7 @@
-package services.document
+package services
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import services.SharingLevel
 
 /** Runtime privileges define what a particular user can do on a particluar document.
   *  

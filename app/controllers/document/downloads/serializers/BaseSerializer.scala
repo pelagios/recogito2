@@ -5,7 +5,7 @@ import play.api.Logger
 import scala.concurrent.ExecutionContext
 import services.ContentType
 import services.annotation.{ Annotation, AnnotationBody, AnnotationService }
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.entity.{Entity, EntityRecord, EntityType}
 import services.entity.builtin.EntityService
 import storage.es.ES
@@ -65,7 +65,7 @@ trait BaseSerializer {
     a.bodies.filter(_.hasType == AnnotationBody.TAG)
   
   protected def exportMergedDocument[T](
-    doc: DocumentInfo,
+    doc: ExtendedDocumentMetadata,
     fn: (Seq[Annotation], Seq[Entity], File) => T
   )(implicit entityService: EntityService, annotationService: AnnotationService, uploads: Uploads, ctx: ExecutionContext) = {
     

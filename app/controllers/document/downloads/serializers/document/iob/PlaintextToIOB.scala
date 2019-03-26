@@ -6,7 +6,7 @@ import java.util.UUID
 import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.generated.tables.records.DocumentFilepartRecord
 import scala.concurrent.{ExecutionContext, Future}
 import storage.TempDir
@@ -18,7 +18,7 @@ trait PlaintextToIOB {
 
   /** Loads the text document from storage and builds the token list */
   private def loadTokens(
-    doc: DocumentInfo,
+    doc: ExtendedDocumentMetadata,
     part: DocumentFilepartRecord
   )(implicit uploads: Uploads, ctx: ExecutionContext): Future[Seq[Token]] = {
     // Load the text
@@ -97,7 +97,7 @@ trait PlaintextToIOB {
   }
 
   def plaintextToIOB(
-    doc: DocumentInfo
+    doc: ExtendedDocumentMetadata
   )(implicit 
     annotationService: AnnotationService,
     conf: Configuration,

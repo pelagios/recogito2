@@ -1,7 +1,7 @@
 package controllers.document.downloads.serializers.document.tei
 
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
-import services.document.{DocumentInfo, DocumentService}
+import services.document.{ExtendedDocumentMetadata, DocumentService}
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.{Future, ExecutionContext}
 import scala.xml.{UnprefixedAttribute, Node, Null, Text}
@@ -97,7 +97,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
     ranges._1 :+ new Text(remainder)
   }
   
-  def plaintextToTEI(doc: DocumentInfo)(implicit documentService: DocumentService,
+  def plaintextToTEI(doc: ExtendedDocumentMetadata)(implicit documentService: DocumentService,
       uploads: Uploads, annotationService: AnnotationService, request: Request[AnyContent], ctx: ExecutionContext) = {
     
     val fTexts = Future.sequence {

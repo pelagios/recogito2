@@ -7,7 +7,7 @@ import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.json._
 import scala.concurrent.{ExecutionContext, Future}
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.generated.tables.records.DocumentFilepartRecord
 import storage.TempDir
@@ -40,7 +40,7 @@ trait PlaintextToSpacy {
     * TODO pretty much identical with tokenization for IOB - refactor
     */
   private def loadLines(
-    doc: DocumentInfo,
+    doc: ExtendedDocumentMetadata,
     part: DocumentFilepartRecord
   )(implicit uploads: Uploads, ctx: ExecutionContext): Future[Seq[Sentence]] = {
     // Load the text
@@ -129,7 +129,7 @@ trait PlaintextToSpacy {
     }
 
   def plaintextToSpacy(
-    doc: DocumentInfo
+    doc: ExtendedDocumentMetadata
   )(implicit 
     annotationService: AnnotationService,
     conf: Configuration,

@@ -3,7 +3,7 @@ package controllers
 import eu.bitwalker.useragentutils.UserAgent
 import services.visit._
 import services.ContentType
-import services.document.RuntimeAccessLevel
+import services.RuntimeAccessLevel
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import org.joda.time.DateTime
 import play.api.mvc.{AnyContent, RequestHeader}

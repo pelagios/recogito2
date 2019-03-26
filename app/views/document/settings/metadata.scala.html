@@ -1,6 +1,6 @@
 @(
   metadataForm: Form[controllers.document.settings.actions.DocumentMetadata],
-  doc: services.document.DocumentInfo,
+  doc: services.document.ExtendedDocumentMetadata,
   currentUser: services.user.User
 )(implicit header: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil, flash: Flash)
 

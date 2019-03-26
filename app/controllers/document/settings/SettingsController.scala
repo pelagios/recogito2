@@ -4,9 +4,10 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import controllers.document.settings.actions._
 import javax.inject.{Inject, Singleton}
+import services.RuntimeAccessLevel
 import services.annotation.AnnotationService
 import services.contribution.ContributionService
-import services.document.{DocumentService, DocumentInfo, RuntimeAccessLevel}
+import services.document.{DocumentService, ExtendedDocumentMetadata}
 import services.entity.{AuthorityFileService, EntityType}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.user.UserService
@@ -83,9 +84,9 @@ class SettingsController @Inject() (
   protected def documentAdminAction(
     documentId: String,
     username: String,
-    action: DocumentInfo => Future[Result]
+    action: ExtendedDocumentMetadata => Future[Result]
   ) = {
-    documents.getExtendedInfo(documentId, Some(username)).flatMap(_ match {
+    documents.getExtendedMeta(documentId, Some(username)).flatMap(_ match {
       case Some((doc, accesslevel)) if (accesslevel.isAdmin) => action(doc)
       case Some(_) => Future.successful(ForbiddenPage)
       case None => Future.successful(NotFoundPage)
@@ -101,7 +102,7 @@ class SettingsController @Inject() (
     request.body.asJson match {
       case Some(json) => Json.fromJson[T](json) match {
         case s: JsSuccess[T] =>
-          documents.getDocumentRecord(documentId, Some(username)).flatMap(_ match {
+          documents.getDocumentRecordById(documentId, Some(username)).flatMap(_ match {
             case Some((document, accesslevel))
               if (accesslevel == RuntimeAccessLevel.OWNER || accesslevel == RuntimeAccessLevel.ADMIN) =>
                 action(document, s.get)

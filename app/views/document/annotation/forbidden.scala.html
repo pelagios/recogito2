@@ -1,5 +1,5 @@
 @(
-  doc: services.document.DocumentInfo,
+  doc: services.document.ExtendedDocumentMetadata,
   currentPart: services.generated.tables.records.DocumentFilepartRecord,
   currentUser: Option[services.user.User],
   annotationCount: Long
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/forbidden.css")"/>
   </head>
   <body>
-    @views.html.document.iconbar(doc.document, currentUser, services.document.RuntimeAccessLevel.READ_DATA, "edit")
+    @views.html.document.iconbar(doc.document, currentUser, services.RuntimeAccessLevel.READ_DATA, "edit")
     <div class="header-infobox">
       <h1>
         @doc.author.map(_ + ": ")@doc.title

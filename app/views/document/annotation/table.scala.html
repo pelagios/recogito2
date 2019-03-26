@@ -1,8 +1,8 @@
 @(
-  doc: services.document.DocumentInfo,
+  doc: services.document.ExtendedDocumentMetadata,
   currentPart: services.generated.tables.records.DocumentFilepartRecord,
   currentUser: Option[services.user.User],
-  accessLevel: services.document.RuntimeAccessLevel,
+  accessLevel: services.RuntimeAccessLevel,
   prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord],
   annotationCount: Long
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)

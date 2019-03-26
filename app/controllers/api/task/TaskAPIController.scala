@@ -8,7 +8,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents 
-import services.document.{DocumentInfo, DocumentService}
+import services.document.DocumentService
 import services.task.{TaskType, TaskService, TaskRecordAggregate}
 import services.user.UserService
 import services.user.Roles._
@@ -68,7 +68,7 @@ class TaskAPIController @Inject() (
   }
 
   def progressByDocument(id: String) = silhouette.SecuredAction.async { implicit request =>    
-    documents.getExtendedInfo(id, Some(request.identity.username)).flatMap(_ match {
+    documents.getExtendedMeta(id, Some(request.identity.username)).flatMap(_ match {
       case Some((doc, accesslevel)) =>
         if (accesslevel.canReadAll) {
           tasks.findByDocument(id).map {

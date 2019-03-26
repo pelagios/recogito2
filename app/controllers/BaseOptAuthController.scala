@@ -1,6 +1,7 @@
 package controllers
 
-import services.document.{RuntimeAccessLevel, DocumentInfo, DocumentService}
+import services.RuntimeAccessLevel
+import services.document.{ExtendedDocumentMetadata, DocumentService}
 import services.generated.tables.records.{DocumentFilepartRecord, DocumentRecord}
 import services.user.{User, UserService}
 import play.api.Configuration
@@ -22,10 +23,10 @@ abstract class BaseOptAuthController(
   protected def documentResponse(
       documentId: String,
       maybeUser: Option[User],
-      response: (DocumentInfo, RuntimeAccessLevel) => Future[Result]
+      response: (ExtendedDocumentMetadata, RuntimeAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext) = {
 
-    documents.getExtendedInfo(documentId, maybeUser.map(_.username)).flatMap(_ match {
+    documents.getExtendedMeta(documentId, maybeUser.map(_.username)).flatMap(_ match {
       case Some((doc, accesslevel)) => response(doc, accesslevel)
       case None => Future.successful(NotFoundPage)
     }).recover { case t =>
@@ -38,7 +39,7 @@ abstract class BaseOptAuthController(
   protected def documentReadResponse(
       documentId: String,
       maybeUser: Option[User],
-      response: (DocumentInfo, RuntimeAccessLevel) => Future[Result]
+      response: (ExtendedDocumentMetadata, RuntimeAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext, request: Request[AnyContent])  = {
     
     documentResponse(documentId, maybeUser, { case (doc, accesslevel) =>
@@ -59,7 +60,7 @@ abstract class BaseOptAuthController(
       documentId: String,
       partNo: Int,
       maybeUser: Option[User],
-      response: (DocumentInfo, DocumentFilepartRecord, RuntimeAccessLevel) => Future[Result]
+      response: (ExtendedDocumentMetadata, DocumentFilepartRecord, RuntimeAccessLevel) => Future[Result]
     )(implicit ctx: ExecutionContext, request: Request[AnyContent]) = {
     
     documentReadResponse(documentId, maybeUser, { case (doc, accesslevel) =>

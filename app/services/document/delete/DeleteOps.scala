@@ -9,14 +9,11 @@ import storage.db.DB
 import storage.uploads.Uploads
 
 /** Document delete operations **/
-trait DeleteOps {
+trait DeleteOps { self: DocumentService =>
 
   /** Deletes a document by its ID, along with sharing policies and files **/
   def delete(
     document: DocumentRecord
-  )(implicit 
-      db: DB,
-      uploads: Uploads
   ): Future[Unit] = db.withTransaction { sql =>
 
     // Delete sharing policies
@@ -40,15 +37,10 @@ trait DeleteOps {
       FileUtils.deleteDirectory(maybeDocumentDir.get)
   }
   
-
   /** Bulk-deletes all documents owned by the given user **/
   def deleteByOwner(
     username: String
-  )(implicit 
-      db: DB,
-      ctx: ExecutionContext,
-      uploads: Uploads
-  ) = db.withTransaction { sql =>
+  )(implicit ctx: ExecutionContext) = db.withTransaction { sql =>
 
     // Delete sharing policies
     sql.deleteFrom(SHARING_POLICY)

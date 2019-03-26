@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import java.util.UUID
 import services.HasDate
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
-import services.document.{DocumentInfo, DocumentService}
+import services.document.{ExtendedDocumentMetadata, DocumentService}
 import org.apache.jena.rdf.model.{Model, ModelFactory}
 import org.apache.jena.riot.{RDFDataMgr, RDFFormat}
 import org.apache.jena.vocabulary.{DCTerms, RDF}
@@ -48,7 +48,7 @@ object Pelagios extends BaseVocab("http://pelagios.github.io/vocab/terms#") {
 
 trait AnnotationsToOA extends BaseSerializer with HasDate {
     
-  private def createDocumentResource(docInfo: DocumentInfo, baseUri: String, model: Model) = {
+  private def createDocumentResource(docInfo: ExtendedDocumentMetadata, baseUri: String, model: Model) = {
     val resource = model.createResource(baseUri)
     resource.addProperty(RDF.`type`, Pelagios.AnnotatedThing)
     resource.addProperty(DCTerms.title, docInfo.title)
@@ -61,7 +61,7 @@ trait AnnotationsToOA extends BaseSerializer with HasDate {
     docInfo.license.map(license => resource.addProperty(DCTerms.license, license.toString))
   }
   
-  private def createAnnotationResource(docInfo: DocumentInfo, annotation: Annotation, baseUri: String, model: Model) = {
+  private def createAnnotationResource(docInfo: ExtendedDocumentMetadata, annotation: Annotation, baseUri: String, model: Model) = {
     val annotationResource = model.createResource(baseUri + "#" + annotation.annotationId)
     annotationResource.addProperty(RDF.`type`, OA.Annotation)
     annotationResource.addProperty(OA.hasTarget, model.createResource(baseUri))
@@ -85,7 +85,7 @@ trait AnnotationsToOA extends BaseSerializer with HasDate {
     }    
   }
   
-  def documentToRDF(doc: DocumentInfo, format: RDFFormat)(implicit documentService: DocumentService,
+  def documentToRDF(doc: ExtendedDocumentMetadata, format: RDFFormat)(implicit documentService: DocumentService,
       annotationService: AnnotationService, request: Request[AnyContent], tmpFile: TemporaryFileCreator,
       ctx: ExecutionContext, conf: Configuration) = {
     

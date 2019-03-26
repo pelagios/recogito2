@@ -5,7 +5,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.mvc.RequestHeader
 import services.HasNullableSeq
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.entity.EntityType
 import services.user.User
 
@@ -25,7 +25,7 @@ object GazetteerPreferences extends HasNullableSeq {
 
 trait PreferencesActions { self: SettingsController =>
   
-  def showAnnotationPreferences(doc: DocumentInfo, user: User)(implicit request: RequestHeader) = {
+  def showAnnotationPreferences(doc: ExtendedDocumentMetadata, user: User)(implicit request: RequestHeader) = {
     val fGazetteers= self.authorities.listAll(Some(EntityType.PLACE))
     val fCurrentPrefs = self.documents.getPreferences(doc.id)
     

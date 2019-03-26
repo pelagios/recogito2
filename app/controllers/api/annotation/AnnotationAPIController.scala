@@ -15,11 +15,11 @@ import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.{ExecutionContext, Future}
-import services.{ContentType, HasDate}
+import services.{ContentType, HasDate, RuntimeAccessLevel}
 import services.annotation._
 import services.annotation.relation._
 import services.contribution._
-import services.document.{DocumentService, DocumentInfo, RuntimeAccessLevel}
+import services.document.{DocumentService, ExtendedDocumentMetadata}
 import services.user.UserService
 import services.image.ImageService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
@@ -102,7 +102,7 @@ class AnnotationAPIController @Inject() (
     val username = request.identity.get.username
 
     // Fetch the associated document to check access privileges
-    documents.getDocumentRecord(annotationStub.annotates.documentId, Some(username)).flatMap(_ match {
+    documents.getDocumentRecordById(annotationStub.annotates.documentId, Some(username)).flatMap(_ match {
       case Some((document, accesslevel)) => {
         if (accesslevel.canWrite) {
           val annotation = annotationStub.toAnnotation(username)
@@ -142,7 +142,7 @@ class AnnotationAPIController @Inject() (
     val partIds = annotationStubs.map(_.annotates.filepartId).distinct
 
     if (documentIds.size == 1 || partIds.size == 1) {
-      documents.getExtendedInfo(documentIds.head, Some(username)).flatMap {
+      documents.getExtendedMeta(documentIds.head, Some(username)).flatMap {
         case Some((doc, accesslevel)) =>
           if (accesslevel.canWrite) {
             doc.fileparts.find(_.getId == partIds.head) match {
@@ -200,7 +200,7 @@ class AnnotationAPIController @Inject() (
         val docId = annotation.annotates.documentId
         val partId = annotation.annotates.filepartId
 
-        documents.getExtendedInfo(docId, username).flatMap {
+        documents.getExtendedMeta(docId, username).flatMap {
           case Some((doc, accesslevel)) =>
             doc.fileparts.find(_.getId == partId) match {
               case Some(filepart) =>
@@ -237,7 +237,7 @@ class AnnotationAPIController @Inject() (
   }
 
   def getAnnotation(id: UUID, includeContext: Boolean) = silhouette.UserAwareAction.async { implicit request =>
-    def getTextContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] =
+    def getTextContext(doc: ExtendedDocumentMetadata, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] =
       uploads.readTextfile(doc.ownerName, doc.id, part.getFile) map {
         case Some(text) =>
           val snippet = ContentType.withName(part.getContentType).get match {
@@ -253,7 +253,7 @@ class AnnotationAPIController @Inject() (
           JsNull
       }
 
-    def getDataContext(doc: DocumentInfo, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = {
+    def getDataContext(doc: ExtendedDocumentMetadata, part: DocumentFilepartRecord, annotation: Annotation): Future[JsValue] = {
       uploads.getDocumentDir(doc.ownerName, doc.id).map { dir =>
         extractLine(new File(dir, part.getFile), annotation.anchor.substring(4).toInt).map(snippet => Json.toJson(snippet))
       } getOrElse {
@@ -262,7 +262,7 @@ class AnnotationAPIController @Inject() (
       }
     }
 
-    def getContext(doc: DocumentInfo, annotation: Annotation): Future[JsValue] = annotation.annotates.contentType match {
+    def getContext(doc: ExtendedDocumentMetadata, annotation: Annotation): Future[JsValue] = annotation.annotates.contentType match {
       case t if t.isImage => Future.successful(JsNull)
 
       case t if t.isText | t.isData => doc.fileparts.find(_.getId == annotation.annotates.filepartId) match {
@@ -284,7 +284,7 @@ class AnnotationAPIController @Inject() (
     annotationService.findById(id).flatMap {
       case Some((annotation, _)) => {
         if (includeContext) {
-          documents.getExtendedInfo(annotation.annotates.documentId, request.identity.map(_.username)).flatMap {
+          documents.getExtendedMeta(annotation.annotates.documentId, request.identity.map(_.username)).flatMap {
             case Some((doc, accesslevel)) =>
               if (accesslevel.canReadData)
                 getContext(doc, annotation).map(context =>
@@ -328,7 +328,7 @@ class AnnotationAPIController @Inject() (
     annotationService.findById(id).flatMap {
       case Some((annotation, version)) =>
         // Fetch the associated document
-        documents.getDocumentRecord(annotation.annotates.documentId, Some(username)).flatMap {
+        documents.getDocumentRecordById(annotation.annotates.documentId, Some(username)).flatMap {
           case Some((document, accesslevel)) => {
             if (accesslevel.canWrite) {
               val now = DateTime.now
@@ -365,7 +365,7 @@ class AnnotationAPIController @Inject() (
       affectedAnnotations.flatten.map(_._1.annotates.documentId)
       
     // Deletes one annotation after checking access permissions
-    def deleteOne(annotation: Annotation, docsAndPermissions: Seq[(DocumentInfo, RuntimeAccessLevel)]) = {
+    def deleteOne(annotation: Annotation, docsAndPermissions: Seq[(ExtendedDocumentMetadata, RuntimeAccessLevel)]) = {
       val hasWritePermissions = docsAndPermissions
         .find(_._1.id == annotation.annotates.documentId)
         .map(_._2.canWrite)
@@ -392,7 +392,7 @@ class AnnotationAPIController @Inject() (
       affectedAnnotations <- Future.sequence(ids.map(annotationService.findById))
       affectedDocuments <- Future.sequence { 
         getDocumentIds(affectedAnnotations).map { docId => 
-          documents.getExtendedInfo(docId, Some(username))
+          documents.getExtendedMeta(docId, Some(username))
         }
       }
     } yield (affectedAnnotations.flatten.map(_._1), affectedDocuments.flatten)

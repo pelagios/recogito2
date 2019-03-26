@@ -12,7 +12,7 @@ import play.api.Configuration
 import play.api.libs.Files.TemporaryFileCreator
 import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
-import services.document.DocumentInfo
+import services.document.ExtendedDocumentMetadata
 import services.entity.{Entity, EntityType}
 import services.entity.builtin.EntityService
 import storage.TempDir
@@ -26,7 +26,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
       places.find(_.uris.contains(uri))
     }
 
-  def annotationsToCSV(doc: DocumentInfo)(
+  def annotationsToCSV(doc: ExtendedDocumentMetadata)(
     implicit annotationService: AnnotationService,
              entityService: EntityService, 
              tmpFile: TemporaryFileCreator,

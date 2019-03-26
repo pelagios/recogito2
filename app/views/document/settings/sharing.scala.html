@@ -1,5 +1,5 @@
 @(
-  doc: services.document.DocumentInfo,
+  doc: services.document.ExtendedDocumentMetadata,
   currentUser: services.user.User,
   sharingPolicies: Seq[services.generated.tables.records.SharingPolicyRecord]
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
