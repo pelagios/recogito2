@@ -18,37 +18,10 @@ import storage.db.DB
 class FolderService @Inject() (implicit val db: DB) extends BaseService
   with read.FolderReadOps
   with read.BreadcrumbReadOps
+  with update.UpdateOps
+  with delete.DeleteOps
   with FolderAssociationService
   with SharedFolderService {
-
-  /** A flattended list of IDs of all children below the given folder **/
-  def getChildrenRecursive(id: UUID) = db.query { sql => 
-    val query =
-      """
-      WITH RECURSIVE path AS (
-        SELECT 
-          id, title, parent,
-          ARRAY[id] AS path_ids,
-          ARRAY[title] AS path_titles
-        FROM folder
-        UNION ALL
-          SELECT
-            f.id, f.title, f.parent,
-            p.path_ids || f.id,
-            p.path_titles || f.title
-          FROM folder f
-          JOIN path p on f.id = p.parent
-      )
-      SELECT
-        path_ids[1] AS id,
-        path_titles[1] AS title
-      FROM path WHERE parent=?;
-      """
-
-    sql.resultQuery(query, id).fetchArray.map { record => 
-      record.into(classOf[(UUID, String)])
-    }.toSeq
-  }
 
   /** 'ls'-like command, lists folders by an owner, in the root or a subdirectory **/
   def listFolders(owner: String, offset: Int, size: Int, parent: Option[UUID]): Future[Page[FolderRecord]] = 
@@ -151,16 +124,6 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
       folder
     }
 
-  def deleteFolder(id: UUID): Future[Boolean] = 
-    db.withTransaction { sql => 
-      sql.deleteFrom(FOLDER).where(FOLDER.ID.equal(id)).execute == 1
-    }
-
-  def deleteByOwner(owner: String): Future[Boolean] = 
-    db.withTransaction { sql => 
-      sql.deleteFrom(FOLDER).where(FOLDER.OWNER.equal(owner)).execute == 1
-    }
-
   def renameFolder(id: UUID, title: String): Future[Boolean] = 
     db.withTransaction { sql => 
       sql.update(FOLDER)
@@ -178,32 +141,6 @@ class FolderService @Inject() (implicit val db: DB) extends BaseService
     }
 
   def deleteReadme(id: UUID): Future[Boolean] = setReadme(id, null)
-
-  def updatePublicVisibility(id: UUID, value: PublicAccess.Visibility) = db.withTransaction { sql =>
-    sql.update(FOLDER)
-       .set(FOLDER.PUBLIC_VISIBILITY, value.toString)
-       .where(FOLDER.ID.equal(id))
-       .execute > 0
-  }
-
-  def updatePublicAccessLevel(id: UUID, value: PublicAccess.AccessLevel) = db.withTransaction { sql => 
-    sql.update(FOLDER)
-       .set(FOLDER.PUBLIC_ACCESS_LEVEL, value.toString)
-       .where(FOLDER.ID.equal(id))
-       .execute > 0
-  }
-
-  def updateVisibilitySettings(
-    id: UUID,
-    visibility: PublicAccess.Visibility, 
-    accessLevel: Option[PublicAccess.AccessLevel]
-  ) = db.withTransaction { sql => 
-    sql.update(FOLDER)
-       .set(FOLDER.PUBLIC_VISIBILITY, visibility.toString)
-       .set(FOLDER.PUBLIC_ACCESS_LEVEL, optString(accessLevel.map(_.toString)))
-       .where(FOLDER.ID.equal(id))
-       .execute == 1
-  }
 
 }
 

@@ -32,7 +32,7 @@ object AccessibleItems {
 
       val f = for {
         // All folders: root + nested subfolders
-        folderIds <- folderService.getChildrenRecursive(folderId).map(sub => folderId +: sub.map(_._1))
+        folderIds <- folderService.getAllSubfoldersRecursive(folderId).map(sub => folderId +: sub.map(_._1))
         folders <- folderService.getFolders(folderIds, loggedInAs)
         documents <- folderService.listDocumentsInFolders(folderIds, loggedInAs)
       } yield (folders, documents)

@@ -61,6 +61,35 @@ trait FolderReadOps { self: FolderService =>
     records.map(toFolderAndPolicy)
   }
 
+  /** A flattended list of IDs of all children below the given folder **/
+  def getAllSubfoldersRecursive(id: UUID) = db.query { sql => 
+    val query =
+      """
+      WITH RECURSIVE path AS (
+        SELECT 
+          id, title, parent,
+          ARRAY[id] AS path_ids,
+          ARRAY[title] AS path_titles
+        FROM folder
+        UNION ALL
+          SELECT
+            f.id, f.title, f.parent,
+            p.path_ids || f.id,
+            p.path_titles || f.title
+          FROM folder f
+          JOIN path p on f.id = p.parent
+      )
+      SELECT
+        path_ids[1] AS id,
+        path_titles[1] AS title
+      FROM path WHERE parent=?;
+      """
+
+    sql.resultQuery(query, id).fetchArray.map { record => 
+      record.into(classOf[(UUID, String)])
+    }.toSeq
+  }
+
   /** Returns the list of collaborators on this folder **/
   def getFolderCollaborators(id: UUID) = db.query { sql => 
     sql.selectFrom(SHARING_POLICY)
