@@ -31,7 +31,7 @@ trait InheritCollaboratorsHelper {
     Option(folder.getParent) match {
       case Some(parentId) => 
         for {
-          parentCollaborators <- folderService.getCollaborators(parentId)
+          parentCollaborators <- folderService.getFolderCollaborators(parentId)
           success <- applyPolicies(parentCollaborators)
         } yield (success)
 
@@ -63,7 +63,7 @@ trait InheritCollaboratorsHelper {
     folderService.getContainingFolder(document.getId).flatMap { _ match {
       case Some(folder) => 
         for {
-          folderCollaborators <- folderService.getCollaborators(folder.getId)
+          folderCollaborators <- folderService.getFolderCollaborators(folder.getId)
           success <- applyPolicies(folderCollaborators)
         } yield (success)
 

@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.Future
 import services.{ContentType, Page}
-import services.folder.SharedDocument
+import services.document.SharedDocument
 
 trait SortByIndex { self: DirectoryController =>
 

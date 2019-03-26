@@ -61,7 +61,7 @@ class SharingController @Inject() (
   def getFolderCollaborators(id: UUID) = silhouette.SecuredAction.async { implicit request =>
     val f = for {
       f <- folders.getFolder(id, request.identity.username)
-      collabPolicies <- folders.getCollaborators(id)
+      collabPolicies <- folders.getFolderCollaborators(id)
     } yield (f, collabPolicies)
 
     f.map { _ match {

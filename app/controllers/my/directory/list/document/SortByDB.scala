@@ -59,7 +59,7 @@ trait SortByDB { self: DirectoryController =>
       //         username, offset, size,
       //        config.flatMap(_.sort.map(_.sortBy)),
       //        config.flatMap(_.sort.map(_.order)))
-      () => folders.listDocumentsSharedWithMe(username, folder)
+      () => documents.listDocumentsSharedWithMe(username, folder)
     ).map { case (sharedDocs, indexProperties) =>
       ConfiguredPresentation.forSharedDocument(sharedDocs, indexProperties.map(_.toMap), config.map(_.columns))
     }
