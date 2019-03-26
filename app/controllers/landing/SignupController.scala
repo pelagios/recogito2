@@ -8,7 +8,7 @@ import java.sql.Timestamp
 import java.util.{Date, UUID}
 import services.{ContentType, PublicAccess}
 import services.annotation.{Annotation, AnnotationService}
-import services.document.DocumentService
+import services.document.{DocumentService, DocumentIdFactory}
 import services.user.UserService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import play.api.{Configuration, Logger}
@@ -20,6 +20,7 @@ import play.api.libs.json.{Json, JsObject}
 import play.api.mvc.{AbstractController, ControllerComponents}
 import scala.concurrent.{Await, Future, ExecutionContext}
 import scala.concurrent.duration._
+import storage.db.DB
 
 case class SignupData(username: String, email: String, password: String, agreedToTerms: Boolean)
 
@@ -31,6 +32,7 @@ class SignupController @Inject() (
     val annotations: AnnotationService,
     val documents: DocumentService,
     val silhouette: Silhouette[Security.Env],
+    implicit val db: DB,
     implicit val ctx: ExecutionContext
   ) extends AbstractController(components) with HasUserService with HasConfig with I18nSupport {
   
@@ -97,7 +99,7 @@ class SignupController @Inject() (
   
   private def importOnboardingContent(username: String) = {
     val document = new DocumentRecord(
-      documents.generateRandomID(),
+      DocumentIdFactory.generateRandomID(),
       username,
       new Timestamp(new Date().getTime),
       "Welcome to Recogito",

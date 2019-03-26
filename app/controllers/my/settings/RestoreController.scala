@@ -10,10 +10,11 @@ import services.annotation.AnnotationService
 import services.document.DocumentService
 import services.user.Roles._
 import services.user.UserService
-import play.api.{ Configuration, Logger }
-import play.api.i18n.{ I18nSupport, MessagesApi }
+import play.api.{Configuration, Logger}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{AbstractController, ControllerComponents}
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
+import storage.db.DB
 import transform.tiling.TilingService
 
 class RestoreController @Inject() (
@@ -22,6 +23,7 @@ class RestoreController @Inject() (
   val users: UserService,
   val silhouette: Silhouette[Security.Env],
   implicit val annotations: AnnotationService,
+  implicit val db: DB,
   implicit val documents: DocumentService,
   implicit val tiling: TilingService,
   implicit val ctx: ExecutionContext,

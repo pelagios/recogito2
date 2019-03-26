@@ -8,13 +8,13 @@ import scala.concurrent.duration._
 import services.generated.Tables._
 import storage.db.DB
 
-trait DocumentIdFactory { self: DocumentService =>
+object DocumentIdFactory {
   
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
   private val ID_LENGTH = 14
   
   // Utility function to check if an ID exists in the DB
-  def existsId(id: String) = {
+  def existsId(id: String)(implicit db: DB) = {
     def checkExists() = db.query { sql =>
       val count = sql.select(DOCUMENT.ID)
          .from(DOCUMENT)
@@ -28,7 +28,7 @@ trait DocumentIdFactory { self: DocumentService =>
     Await.result(checkExists(), 10.seconds)    
   }
   
-  def generateRandomID(retriesLeft: Int = 10): String = {
+  def generateRandomID(retriesLeft: Int = 10)(implicit db: DB): String = {
     
     // Takes a set of strings and returns those that already exist in the DB as doc IDs
     def findIds(ids: Set[String])(implicit db: DB) = db.query { sql =>

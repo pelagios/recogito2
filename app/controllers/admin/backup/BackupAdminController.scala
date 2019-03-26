@@ -21,6 +21,7 @@ import play.api.mvc.{ControllerComponents, ResponseHeader, Result}
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.http.HttpEntity
 import scala.concurrent.{ExecutionContext, Future}
+import storage.db.DB
 import storage.es.migration.AnnotationMigrationUtil
 import transform.tiling.TilingService
 
@@ -32,6 +33,7 @@ class BackupAdminController @Inject() (
     val users: UserService,
     val visits: VisitService,
     val silhouette: Silhouette[Security.Env],
+    implicit val db: DB,
     implicit val tilingService: TilingService,
     implicit val annotations: AnnotationService,
     implicit val documents: DocumentService,

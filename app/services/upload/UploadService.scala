@@ -6,8 +6,8 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 import java.sql.Timestamp
 import java.util.{Date, UUID}
 import javax.inject.Inject
-import services.{ BaseService, ContentType }
-import services.document.DocumentService
+import services.{BaseService, ContentType, PublicAccess}
+import services.document.DocumentIdFactory
 import services.folder.FolderService
 import services.generated.Tables._
 import services.generated.tables.records._
@@ -22,7 +22,6 @@ import storage.uploads.Uploads
 class QuotaExceededException(val remainingSpaceKb: Long, val filesizeKb: Double) extends RuntimeException
 
 class UploadService @Inject() (
-  documents: DocumentService, 
   folders: FolderService,
   uploads: Uploads,
   implicit val db: DB,
@@ -230,11 +229,30 @@ class UploadService @Inject() (
       Some(result.head)
   }
 
+  /** Creates a new DocumentRecord from an UploadRecord **/
+  private def createDocumentFromUpload(upload: UploadRecord) =
+    new DocumentRecord(
+          DocumentIdFactory.generateRandomID(),
+          upload.getOwner,
+          upload.getCreatedAt,
+          upload.getTitle,
+          upload.getAuthor,
+          null, // TODO date_numeric
+          upload.getDateFreeform,
+          upload.getDescription,
+          upload.getLanguage,
+          upload.getSource,
+          upload.getEdition,
+          upload.getLicense,
+          null, // attribution
+          PublicAccess.PRIVATE.toString, // public_visibility
+          null) // public_access_level
+
   private def importDocumentAndParts(
     upload: UploadRecord, 
     fileparts: Seq[UploadFilepartRecord]
   ) = db.withTransaction { sql =>
-    val document = documents.createDocumentFromUpload(upload)
+    val document = createDocumentFromUpload(upload)
 
     // Import Document and DocumentFileparts 
     sql.insertInto(DOCUMENT).set(document).execute()

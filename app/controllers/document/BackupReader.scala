@@ -16,10 +16,11 @@ import scala.io.Source
 import services.{ContentType, HasDate, HasContentTypeList, HasNullableSeq}
 import services.annotation._
 import services.annotation.relation.Relation
-import services.document.DocumentService
+import services.document.{DocumentService, DocumentIdFactory}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import transform.tiling.TilingService
 import services.PublicAccess
+import storage.db.DB
 
 trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
 
@@ -30,7 +31,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
     (zipFile, zipFile.entries.asScala.toSeq.filter(!_.getName.startsWith("__MACOSX")))
   }
 
-  def readMetadata(file: File, runAsAdmin: Boolean, forcedOwner: Option[String])(implicit ctx: ExecutionContext, documentService: DocumentService) = Future {
+  def readMetadata(file: File, runAsAdmin: Boolean, forcedOwner: Option[String])(implicit ctx: ExecutionContext, db: DB) = Future {
 
     def parseDocumentMetadata(json: JsValue) = {
       // Use ID from backup, or create new if allowed (for interop with legacy backups)
@@ -39,10 +40,10 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
           if (!runAsAdmin) // Only admins may import legacy backups
             throw new HasBackupValidation.InvalidBackupException
 
-          documentService.generateRandomID()
+          DocumentIdFactory.generateRandomID()
         }
 
-      if (documentService.existsId(id))
+      if (DocumentIdFactory.existsId(id))
         throw new HasBackupValidation.DocumentExistsException
 
       val owner = forcedOwner match {
@@ -114,14 +115,17 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
   }
 
   def restoreBackup(
-      file: File,
-      runAsAdmin: Boolean,
-      forcedOwner: Option[String]
-    )(implicit annotationService: AnnotationService,
-               documentService: DocumentService,
-               tilingService: TilingService,
-               ctx: ExecutionContext,
-               system: ActorSystem) = {
+    file: File,
+    runAsAdmin: Boolean,
+    forcedOwner: Option[String]
+  )(implicit
+      annotationService: AnnotationService,
+      db: DB,
+      documentService: DocumentService,
+      tilingService: TilingService,
+      ctx: ExecutionContext,
+      system: ActorSystem
+  ) = {
 
     def restoreTilesets(document: DocumentRecord, imageParts: Seq[DocumentFilepartRecord]) = {
       tilingService.spawnJob(document, imageParts)
@@ -156,7 +160,7 @@ trait BackupReader extends HasDate with HasBackupValidation { self: HasConfig =>
       annotationService.upsertAnnotations(annotations.toSeq)
     }
 
-    def restore() = {
+    def restore()= {
       val fReadMetadata = readMetadata(file, runAsAdmin, forcedOwner)
       val fReadAnnotations = readAnnotations(file)
 

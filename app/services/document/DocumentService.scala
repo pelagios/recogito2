@@ -30,27 +30,7 @@ class DocumentService @Inject() (
   with read.AccessibleDocumentOps
   with update.DocumentUpdateOps
   with update.CollaboratorUpdateOps
-  with delete.DeleteOps
-  with DocumentIdFactory {
-  
-  /** Creates a new DocumentRecord from an UploadRecord **/
-  private[services] def createDocumentFromUpload(upload: UploadRecord) =
-    new DocumentRecord(
-          generateRandomID(),
-          upload.getOwner,
-          upload.getCreatedAt,
-          upload.getTitle,
-          upload.getAuthor,
-          null, // TODO date_numeric
-          upload.getDateFreeform,
-          upload.getDescription,
-          upload.getLanguage,
-          upload.getSource,
-          upload.getEdition,
-          upload.getLicense,
-          null, // attribution
-          PublicAccess.PRIVATE.toString, // public_visibility
-          null) // public_access_level
+  with delete.DeleteOps {
     
   /** Batch-retrieves the document records with the given IDs, along with their fileparts **/
   def findByIdsWithParts(docIds: Seq[String]) = db.query { sql =>
