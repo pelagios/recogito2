@@ -17,3 +17,4 @@ pc.stdout.log
 **ensime*
 pc.stdout.log
 recogito.plugins.ner.flair
+recogito.plugins.ner.herodotus

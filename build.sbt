@@ -14,6 +14,8 @@ scalacOptions ++= Seq("-feature")
 
 updateOptions := updateOptions.value.withGigahorse(false)
 
+PlayKeys.devSettings += "play.server.akka.requestTimeout" -> "600s"
+
 resolvers ++= Seq(
   "Typesafe" at "http://repo.typesafe.com/typesafe/releases/",
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
