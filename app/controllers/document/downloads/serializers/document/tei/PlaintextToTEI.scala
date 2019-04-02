@@ -125,7 +125,12 @@ trait PlaintextToTEI extends BaseTEISerializer {
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
           <fileDesc>
-            <titleStmt><title>{ doc.author.map(_ + ": ").getOrElse("") }{ doc.title }</title></titleStmt>
+            <titleStmt>
+              <title>{ doc.author.map(_ + ": ").getOrElse("") }{ doc.title }</title>
+              { if (doc.author.isDefined)
+                <author>{doc.author.get}</author>
+              }
+            </titleStmt>
             <publicationStmt>
               { 
                 (doc.dateFreeform, doc.dateNumeric) match {
