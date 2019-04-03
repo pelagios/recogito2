@@ -5,6 +5,7 @@ import org.joox.JOOX._
 import org.pelagios.recogito.sdk.ner.{Entity, EntityType}
 import org.w3c.dom.{Node, NodeList}
 import org.w3c.dom.ranges.DocumentRange
+import play.api.Configuration
 
 trait HasTeiNER {
   
@@ -29,7 +30,7 @@ trait HasTeiNER {
     * include only the offset, inside that text node, the method also computes the global
     * XPath position separately and returns it along with the entity. 
     */
-  private[ner] def parseTEI(file: File, engine: Option[String]): Seq[(Entity, String)] = {    
+  private[ner] def parseTEI(file: File, engine: Option[String], config: Configuration): Seq[(Entity, String)] = {    
     val tei = $(file)
     val ranges = tei.document().asInstanceOf[DocumentRange]
     
@@ -40,7 +41,7 @@ trait HasTeiNER {
       val parentNode = textNode.getParentNode
       val xpath = $(parentNode).xpath().toLowerCase.replaceAll("\\[1\\]", "")
         
-      val entities = NERService.parseText(textNode.getNodeValue, engine)
+      val entities = NERService.parseText(textNode.getNodeValue, engine, config)
             
       results ++ entities.map { entity => 
         val rangeBefore = ranges.createRange()
@@ -65,7 +66,7 @@ trait HasTeiNER {
     * This implementation isn't used in Recogito at the moment. But we it might be handy later at
     * some point.
     */
-  private[ner] def enrichTEI(file: File, engine: Option[String], writer: Option[Writer] = None) = {
+  private[ner] def enrichTEI(file: File, engine: Option[String], config: Configuration, writer: Option[Writer] = None) = {
 
     def replaceTextNode(textNode: Node, enrichedText: String) = {
       // Buffer owner doc and parent node reference
@@ -103,7 +104,7 @@ trait HasTeiNER {
     textNodes.foreach { node =>
       val originalText = node.getNodeValue
       
-      val entities = NERService.parseText(originalText, engine).sortBy(_.charOffset)
+      val entities = NERService.parseText(originalText, engine, config).sortBy(_.charOffset)
       
       // Original text + inserted <placeName> and <persName> tags
       val enrichedText = entities.foldLeft(originalText, 0) { case ((text, runningOffset), entity) =>

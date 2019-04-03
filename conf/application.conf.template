@@ -117,3 +117,8 @@ play.mailer {
   password = admin
   mock = true
 }
+
+# Recogito plugins
+# plugins {
+#  python.executable = python3 # in case your system uses a different python executable alias
+# }

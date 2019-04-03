@@ -4,6 +4,7 @@ import java.util.{ArrayList, Properties}
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.pipeline.{CoreDocument, StanfordCoreNLP}
 import edu.stanford.nlp.util.StringUtils
+import org.pelagios.recogito.sdk.PluginEnvironment
 import org.pelagios.recogito.sdk.ner._
 import scala.collection.JavaConverters._
 import org.slf4j.LoggerFactory
@@ -42,7 +43,7 @@ abstract class StanfordBaseWrapperPlugin(
   
   override val getSupportedLanguages = Seq(lang).asJava
   
-  override def parse(text: String) = {
+  override def parse(text: String, env: PluginEnvironment) = {
     logger.info("Initializing NER pipeline")
     val pipeline = new StanfordCoreNLP(props)
     logger.info("Pipeline initialized")

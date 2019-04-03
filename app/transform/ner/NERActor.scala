@@ -5,7 +5,7 @@ import java.io.File
 import java.net.URI
 import java.util.UUID
 import org.pelagios.recogito.sdk.ner._
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.Source
@@ -25,7 +25,8 @@ case class EntityResolvable(entity: Entity, val anchor: String, val uri: Option[
 class NERActor(
   implicit val taskService: TaskService,
   implicit val annotationService: AnnotationService,
-  implicit val entityService: EntityService
+  implicit val entityService: EntityService,
+  val config: Configuration
 ) extends WorkerActor(NERService.TASK_TYPE, taskService) with HasGeoresolution {
   
   type T = EntityResolvable
@@ -77,14 +78,14 @@ class NERActor(
     ContentType.withName(part.getContentType) match {
       case Some(t) if t == ContentType.TEXT_PLAIN =>
         val text = Source.fromFile(new File(dir, part.getFile)).getLines.mkString("\n")
-        val entities = NERService.parseText(text, engine)
+        val entities = NERService.parseText(text, engine, config)
         entities.map(e => EntityResolvable(e, s"char-offset:${e.charOffset}", Option(e.uri)))
         
       case Some(t) if t == ContentType.TEXT_TEIXML =>
         // For simplicity, NER results are inlined into the TEI document. They
         // will be extracted (together with all pre-existing tags) in a separate
         // step, anyway.
-        val entitiesAndAnchors = NERService.parseTEI(new File(dir, part.getFile), engine)
+        val entitiesAndAnchors = NERService.parseTEI(new File(dir, part.getFile), engine, config)
         entitiesAndAnchors.map { case (e, anchor) => 
           EntityResolvable(e, anchor, Option(e.uri))
         }
@@ -98,7 +99,11 @@ class NERActor(
 
 object NERActor {
   
-  def props(taskService: TaskService, annotationService: AnnotationService, entityService: EntityService) = 
-    Props(classOf[NERActor], taskService, annotationService, entityService)
+  def props(
+    taskService: TaskService, 
+    annotationService: AnnotationService, 
+    entityService: EntityService,
+    config: Configuration 
+  ) = Props(classOf[NERActor], taskService, annotationService, entityService, config)
 
 }
