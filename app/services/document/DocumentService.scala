@@ -31,6 +31,25 @@ class DocumentService @Inject() (
   with update.DocumentUpdateOps
   with update.CollaboratorUpdateOps
   with delete.DeleteOps {
+
+
+  /** Shorthand **/
+  def listIds(folder: Option[UUID], loggedInAs: String)(implicit ctx: ExecutionContext) =
+    folder match {
+      case Some(folderId) => 
+        listDocumentsInFolder(folderId, loggedInAs)
+          .map { _.map { case (doc, _) => 
+            doc.getId
+          }}
+
+      case None => 
+        listRootIdsByOwner(loggedInAs)
+    }
+
+
+
+
+    
     
   /** Batch-retrieves the document records with the given IDs, along with their fileparts **/
   def findByIdsWithParts(docIds: Seq[String]) = db.query { sql =>
@@ -197,40 +216,6 @@ class DocumentService @Inject() (
     }.toSeq
   }
 
-  /** List all document IDs owned by the given user **/
-  def listAllIdsByOwner(owner: String) = db.query { sql =>
-    sql.select(DOCUMENT.ID)
-       .from(DOCUMENT)
-       .where(DOCUMENT.OWNER.equal(owner))
-       .fetch(0, classOf[String])
-       .toSeq
-  }
- 
-  /** List all document IDs owned by the given user in the given folder.
-    *
-    * If inFolder is None, IDs from the root folder will be returned.
-    */
-  def listIdsByOwnerInFolder(owner: String, inFolder: Option[UUID]) = db.query { sql =>
-    val baseQuery =
-      sql.select(DOCUMENT.ID)
-         .from(DOCUMENT)
-         .fullOuterJoin(FOLDER_ASSOCIATION)
-         .on(DOCUMENT.ID.equal(FOLDER_ASSOCIATION.DOCUMENT_ID))   
-         .where(DOCUMENT.OWNER.equal(owner)) 
-
-    inFolder match {
-      case Some(folderId) =>   
-        baseQuery
-          .and(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId))
-          .fetch(0, classOf[String]).toSeq
-      
-      case None =>
-        baseQuery
-          .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull)
-          .fetch(0, classOf[String]).toSeq
-    }
-  }
-
   def findAccessibleDocumentsWithParts(
     owner: String,
     loggedInUser: Option[String],
@@ -252,6 +237,8 @@ class DocumentService @Inject() (
       Page(System.currentTimeMillis - startTime, count.total, offset, limit, documents) 
     }
   }
+
+  /** TODO simplify the below queries **/
 
   /** Common boilerplate code for listInFolder and listInRoot **/
   private def list(
@@ -342,77 +329,6 @@ class DocumentService @Inject() (
   )(implicit ctx: ExecutionContext) = maybeFolder match {
     case Some(folderId) => listInMyFolderWithParts(owner, folderId, offset, limit, sortBy, sortOrder)
     case None => listInRootFolderWithParts(owner, offset, limit, sortBy, sortOrder)
-  }
-
-  def findSharedWithPart(
-    sharedWith: String,
-    offset: Int, 
-    limit: Int, 
-    sortBy: Option[String] = None, 
-    sortOrder: Option[SortOrder] = None
-  ) = db.query { sql => 
-    val startTime = System.currentTimeMillis
-    val subquerySortField = sortBy.flatMap(fieldname => getSortField(Seq(DOCUMENT, SHARING_POLICY), fieldname, sortOrder))
-    val total = sql.selectCount().from(SHARING_POLICY).where(SHARING_POLICY.SHARED_WITH.equal(sharedWith)).fetchOne(0, classOf[Int])
-  
-    // We'll retrieve all fields except SHARING_POLICY.ID, since this
-    // would cause ambiguity issues in the query further down the line
-    val subqueryFields = { 
-      DOCUMENT.fields() ++
-      SHARING_POLICY.fields() 
-    } filter { _ != SHARING_POLICY.ID }
-
-    val subquery = subquerySortField match {
-      case Some(f) => 
-        sql.select(subqueryFields:_*)
-           .from(SHARING_POLICY
-             .join(DOCUMENT)
-             .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
-           .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
-           .orderBy(f)
-           .limit(limit)
-           .offset(offset)
-
-      case None =>
-        sql.select(subqueryFields:_*)
-           .from(SHARING_POLICY
-             .join(DOCUMENT)
-             .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID)))
-           .where(SHARING_POLICY.SHARED_WITH.equal(sharedWith))
-           .limit(limit)
-           .offset(offset)
-    }
-
-    // Subquery makes this a little tricky...
-    val querySortfield = sortBy.flatMap { fieldname =>
-      val field = Seq(DOCUMENT, SHARING_POLICY).flatMap(_.fields).find(_.getName.equalsIgnoreCase(fieldname))
-      field.map { f => 
-        if (sortOrder.getOrElse(SortOrder.ASC) == SortOrder.ASC)
-          subquery.field(f).asc
-        else 
-          subquery.field(f).desc
-      }
-    }
-
-    val rows = querySortfield match {
-      case Some(f) =>
-        sql.select()
-           .from(subquery)
-           .join(DOCUMENT_FILEPART)
-           .on(subquery.field(SHARING_POLICY.DOCUMENT_ID).equal(DOCUMENT_FILEPART.DOCUMENT_ID))
-           .orderBy(f)
-           .fetchArray
-
-      case None =>
-        sql.select()
-           .from(subquery)
-           .join(DOCUMENT_FILEPART)
-           .on(subquery.field(SHARING_POLICY.DOCUMENT_ID).equal(DOCUMENT_FILEPART.DOCUMENT_ID))
-           .fetchArray
-    }
-
-    val grouped = collectSharedWithMeResults(rows)
-    Page(System.currentTimeMillis - startTime, total, offset, limit, grouped)
   }
       
 }

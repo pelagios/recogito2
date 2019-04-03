@@ -38,7 +38,7 @@ trait SortByIndex { self: DirectoryController =>
     val startTime = System.currentTimeMillis
 
     val f = for {
-      allIds <- documents.listIdsByOwnerInFolder(username, folder)
+      allIds <- documents.listIds(folder, username)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
       docsWithParts <- documents.findByIdsWithParts(sortedIds)
       indexProperties <- fetchIndexProperties(sortedIds, config)      

@@ -5,7 +5,7 @@ import play.api.Logger
 import scala.concurrent.Future
 import services.{PublicAccess, RuntimeAccessLevel, SharingLevel}
 import services.document.{DocumentService, ExtendedDocumentMetadata}
-import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART, DOCUMENT_PREFERENCES, SHARING_POLICY, USER}
+import services.generated.Tables._
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord, UserRecord}
 
 /** Default Read operations on document records **/
@@ -147,6 +147,30 @@ trait DocumentReadOps { self: DocumentService =>
       val owner = records.head.into(classOf[UserRecord])      
       (ExtendedDocumentMetadata(document, parts.sortBy(_.getSequenceNo), owner), determineAccessLevel(document, sharingPolicies, loggedInUser))
     }
+  }
+
+  /** List all documents in the owner's root folder **/
+  def listRootIdsByOwner(owner: String) = db.query { sql => 
+    sql.select(DOCUMENT.ID)
+      .from(DOCUMENT)
+      .fullOuterJoin(FOLDER_ASSOCIATION)
+        .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(DOCUMENT.ID))
+      .where(DOCUMENT.OWNER.equal(owner)
+        .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull))
+      .fetch(0, classOf[String])
+      .toSeq
+  }
+
+  /** List all document IDs owned by the given user. 
+    *
+    * This info is only required for account removal.
+    */
+  def listAllIdsByOwner(owner: String) = db.query { sql =>
+    sql.select(DOCUMENT.ID)
+       .from(DOCUMENT)
+       .where(DOCUMENT.OWNER.equal(owner))
+       .fetch(0, classOf[String])
+       .toSeq
   }
 
   /** Reads the document preferences for the given document **/
