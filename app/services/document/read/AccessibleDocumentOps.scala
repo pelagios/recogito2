@@ -3,9 +3,10 @@ package services.document.read
 import collection.JavaConversions._
 import java.util.UUID
 import scala.concurrent.Future
-import services.PublicAccess
+import services.{ContentType, PublicAccess, SortOrder}
 import services.document.DocumentService
 import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
+import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import storage.db.DB
 
 /** For convenience: wraps public and shared documents count **/
@@ -14,6 +15,13 @@ case class AccessibleDocumentsCount(public: Long, shared: Option[Long]) {
   lazy val total = public + shared.getOrElse(0l)
 
 }
+
+/** Wraps and accessible document with sharing policy (if any) and minimal part info **/
+case class AccessibleDocument(
+  document: DocumentRecord,
+  sharedVia: Option[SharingPolicyRecord],
+  fileCount: Int,
+  contentTypes: Seq[ContentType])
 
 /** Read-operations related to accessible/public/shared documents **/
 trait AccessibleDocumentOps { self: DocumentService =>
@@ -35,6 +43,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
       .toSeq
   }
 
+  /** Lists IDs of root-level documents accessible to the given visitor **/
   private def listAccessibleIdsInRoot(owner: String, loggedInAs: Option[String]) = db.query { sql => 
     loggedInAs match {
       case Some(username) =>
@@ -68,6 +77,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
     }
   }
 
+  /** Lists IDs of documents accessible to the given visitor in the given folder **/
   private def listAccessibleIdsInFolder(folder: UUID, loggedInAs: Option[String]) = db.query { sql => 
     loggedInAs match {
       case Some(username) => 
@@ -102,11 +112,44 @@ trait AccessibleDocumentOps { self: DocumentService =>
     owner: String, 
     folder: Option[UUID], 
     loggedInAs: Option[String]
-  ): Future[Seq[String]] = 
-    folder match {
-      case Some(folderId) => listAccessibleIdsInFolder(folderId, loggedInAs)
-      case None => listAccessibleIdsInRoot(owner, loggedInAs)
-    }
+  ): Future[Seq[String]] = folder match {
+    case Some(folderId) => listAccessibleIdsInFolder(folderId, loggedInAs)
+    case None => listAccessibleIdsInRoot(owner, loggedInAs)
+  }
+
+  /** Lists the root-level documents accessible to the given visitor **/
+  private def listAccessibleDocumentsInRoot(
+    owner: String, 
+    loggedInAs: Option[String],
+    offset: Int,
+    limit: Int,
+    maybeSortBy: Option[String],
+    maybeSortOrder: Option[SortOrder]
+  ): Future[Seq[AccessibleDocument]] = ???
+  
+  /** Lists the documents accessible to the given visitor in the given folder **/
+  private def listAccessibleDocumentsInFolder(
+    folder: UUID, 
+    loggedInAs: Option[String],
+    offset: Int,
+    limit: Int,
+    maybeSortBy: Option[String],
+    maybeSortOrder: Option[SortOrder]
+  ): Future[Seq[AccessibleDocument]] = ???
+
+  /** Delegate to the appropriate private method, based on folder value **/
+  def listAccessibleDocuments(
+    owner: String,
+    folder: Option[UUID],
+    loggedInAs: Option[String],
+    offset: Int,
+    limit: Int,
+    maybeSortBy: Option[String],
+    maybeSortOrder: Option[SortOrder]
+  ): Future[Seq[AccessibleDocument]] = folder match {
+    case Some(folderId) => listAccessibleDocumentsInFolder(folder, loggedInAs, offset, limit, maybeSortBy, maybeSortOrder)
+    case None => listAccessibleDocumentsInRoot(owner, loggedInAs, offset, limit, maybeSortBy, maybeSortOrder)
+  }
 
   /** Counts the total accessible documents that exist for the given owner. 
     * 
