@@ -15,11 +15,17 @@ trait SortByIndex { self: DirectoryController =>
     sort: Sorting,
     offset: Int, 
     size: Int
-  ): Future[Seq[String]] = sort.sortBy match {
-    case "last_edit_at" => contributions.sortDocsByLastModifiedAt(docIds, sort.order, offset, size)
-    case "last_edit_by" => contributions.sortDocsByLastModifiedBy(docIds, sort.order, offset, size)
-    case "annotations" => annotations.sortDocsByAnnotationCount(docIds, sort.order, offset, size)
-    case _ => Future.successful(docIds)
+  ): Future[Seq[String]] = {
+    if (docIds.isEmpty) { // Just being defensive here
+      Future.successful(docIds)
+    } else {
+      sort.sortBy match {
+        case "last_edit_at" => contributions.sortDocsByLastModifiedAt(docIds, sort.order, offset, size)
+        case "last_edit_by" => contributions.sortDocsByLastModifiedBy(docIds, sort.order, offset, size)
+        case "annotations" => annotations.sortDocsByAnnotationCount(docIds, sort.order, offset, size)
+        case _ => Future.successful(docIds)
+      }
+    }
   }
 
   protected def getMyDocumentsSortedByIndex(
