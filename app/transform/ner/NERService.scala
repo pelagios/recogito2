@@ -58,7 +58,6 @@ object NERService extends HasTeiNER {
 
     Logger.info(s"Running NER with engine ${ner.getName}")
 
-    // TODO forward SDK environment and props key/value list
     val entities = ner.parse(text, getEnvironment(config))
     entities.asScala
   }
