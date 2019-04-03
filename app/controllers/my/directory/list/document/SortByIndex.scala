@@ -54,7 +54,7 @@ trait SortByIndex { self: DirectoryController =>
     val startTime = System.currentTimeMillis
 
     val f = for {
-      allIds <- documents.listAllIdsSharedWithMe(username)
+      allIds <- documents.listIdsSharedWithMe(username, folder)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
       documents <- documents.findByIdsWithPartsAndSharingPolicy(sortedIds, username)
       indexProperties <- fetchIndexProperties(sortedIds, config)

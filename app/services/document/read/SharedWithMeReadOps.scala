@@ -6,7 +6,7 @@ import collection.JavaConversions._
 import scala.concurrent.Future
 import services.{ContentType, Page, SortOrder}
 import services.document.{DocumentService, SharedDocument}
-import services.generated.Tables.SHARING_POLICY
+import services.generated.Tables.{FOLDER_ASSOCIATION, SHARING_POLICY}
 import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 
 trait SharedWithMeReadOps { self: DocumentService =>
@@ -19,12 +19,40 @@ trait SharedWithMeReadOps { self: DocumentService =>
        .fetchOne(0, classOf[Int])
   }
   
-  /** Convenience method to list all document IDs shared with the given user **/
-  def listAllIdsSharedWithMe(username: String) = db.query { sql => 
-    sql.select(SHARING_POLICY.DOCUMENT_ID)
-       .from(SHARING_POLICY)
-       .where(SHARING_POLICY.SHARED_WITH.equal(username))
-       .fetch(0, classOf[String]).toSeq
+  /** List all document IDs shared with the given user (optionally, in the given folder) **/
+  def listIdsSharedWithMe(username: String, folder: Option[UUID]) = db.query { sql => 
+    folder match {
+      case Some(folderId) => 
+        // In folder
+        sql.select(SHARING_POLICY.DOCUMENT_ID)
+          .from(SHARING_POLICY)
+          .join(FOLDER_ASSOCIATION)
+            .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(SHARING_POLICY.DOCUMENT_ID))
+          .where(FOLDER_ASSOCIATION.FOLDER_ID.equal(folderId)
+            .and(SHARING_POLICY.DOCUMENT_ID.isNotNull)
+            .and(SHARING_POLICY.SHARED_WITH.equal(username)))
+          .fetch(0, classOf[String])
+          .toSeq
+
+      case None => 
+        // Root
+        val query = 
+          """
+          SELECT 
+            sharing_policy.document_id
+          FROM sharing_policy
+          LEFT OUTER JOIN folder_association
+            ON folder_association.document_id = sharing_policy.document_id
+          LEFT OUTER JOIN sharing_policy folder_policy
+            ON folder_policy.folder_id = folder_association.folder_id
+          WHERE sharing_policy.document_id IS NOT NULL
+            AND sharing_policy.shared_with = ?
+            AND folder_policy.shared_with IS NULL
+          """
+        sql.resultQuery(query, username)
+          .fetch(0, classOf[String])
+          .toSeq
+    }
   }
 
   /** List documents shared with me (in the given folder, or on root level) **/

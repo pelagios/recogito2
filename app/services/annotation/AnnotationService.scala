@@ -296,7 +296,7 @@ class AnnotationService @Inject() (
         offset + limit
       else
         docIds.size
-
+            
     es.client execute {
       search(ES.RECOGITO / ES.ANNOTATION) query {
         boolQuery
