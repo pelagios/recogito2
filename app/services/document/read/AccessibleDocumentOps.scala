@@ -1,9 +1,10 @@
 package services.document.read
 
 import collection.JavaConversions._
+import java.util.UUID
 import services.PublicAccess
 import services.document.DocumentService
-import services.generated.Tables.{DOCUMENT, SHARING_POLICY}
+import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
 import storage.db.DB
 
 /** For convenience: wraps public and shared documents count **/
@@ -33,6 +34,71 @@ trait AccessibleDocumentOps { self: DocumentService =>
       .toSeq
   }
 
+  private def listAccessibleIdsInRoot(owner: String, loggedInAs: Option[String]) = db.query { sql => 
+    loggedInAs match {
+      case Some(username) =>
+        sql.select(DOCUMENT.ID)
+          .from(DOCUMENT)
+          .leftOuterJoin(FOLDER_ASSOCIATION)
+            .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(DOCUMENT.ID))
+          .leftOuterJoin(SHARING_POLICY)
+            .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID))
+          .where(
+            DOCUMENT.OWNER.equalIgnoreCase(owner)
+              .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull)
+              .and(
+                DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)
+                  .or(SHARING_POLICY.SHARED_WITH.equal(username))
+              )
+            )
+          .fetch(0, classOf[String])
+
+      case None => 
+        sql.select(DOCUMENT.ID)
+          .from(DOCUMENT)
+          .leftOuterJoin(FOLDER_ASSOCIATION)
+            .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(DOCUMENT.ID))
+          .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
+            .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))
+            .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull))
+          .fetch(0, classOf[String]).toSeq
+    }
+  }
+
+  private def listAccessibleIdsInFolder(folder: UUID, loggedInAs: Option[String]) = db.query { sql => 
+    loggedInAs match {
+      case Some(username) => 
+        sql.select(DOCUMENT.ID)
+          .from(DOCUMENT)
+          .leftOuterJoin(FOLDER_ASSOCIATION)
+            .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(DOCUMENT.ID))
+          .leftOuterJoin(SHARING_POLICY)
+            .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID))
+          .where(FOLDER_ASSOCIATION.FOLDER_ID.equal(folder)
+            .and(
+              DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)
+                .or(SHARING_POLICY.SHARED_WITH.equal(username))
+            ))
+          .fetch(0, classOf[String])
+      
+      case None => 
+        sql.select(DOCUMENT.ID)
+          .from(DOCUMENT)
+          .leftJoin(FOLDER_ASSOCIATION)
+            .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(DOCUMENT.ID))
+          .where(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)
+            .and(FOLDER_ASSOCIATION.FOLDER_ID.equal(folder)))
+          .fetch(0, classOf[String]).toSeq
+    }
+  }
+
+  /** Delegate to the appropriate private method, based on folder value **/
+  def listAccessibleIds(owner: String, folder: Option[UUID], loggedInAs: Option[String]) = 
+    folder match {
+      case Some(folderId) => listAccessibleIdsInFolder(folderId, loggedInAs)
+      case None => listAccessibleIdsInRoot(owner, loggedInAs)
+    }
+
   /** Counts the total accessible documents that exist for the given owner. 
     * 
     * The result of this method depends on who's requesting the information. 
@@ -40,7 +106,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
     * documents only. For a specific logged-in user, additional documents 
     * may be accessible, because they are shared with her/him.
     */
-  def countAccessibleDocuments(
+  def countAllAccessibleDocuments(
     owner: String, 
     accessibleTo: Option[String]
   ) = db.query { sql =>

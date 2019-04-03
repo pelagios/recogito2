@@ -213,7 +213,7 @@ class DocumentService @Inject() (
     sortOrder: Option[SortOrder]
   )(implicit ctx: ExecutionContext) = {
     val startTime = System.currentTimeMillis
-    val fCount = countAccessibleDocuments(owner, loggedInUser)
+    val fCount = countAllAccessibleDocuments(owner, loggedInUser)
     val fDocuments = listAccessibleWithParts(owner, loggedInUser, offset, limit, sortBy, sortOrder)
 
     val f = for {

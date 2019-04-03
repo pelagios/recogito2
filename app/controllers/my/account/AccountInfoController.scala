@@ -67,7 +67,7 @@ class AccountInfoController @Inject() (
       case Some(user) =>
         val loggedInAs = request.identity.map(_.username)
 
-        val fAccessibleDocs = documents.countAccessibleDocuments(user.username, loggedInAs)
+        val fAccessibleDocs = documents.countAllAccessibleDocuments(user.username, loggedInAs)
         val fContributorStats = contributions.getContributorStats(user.username)
 
         val f = for {
