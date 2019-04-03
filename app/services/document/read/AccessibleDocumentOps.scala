@@ -125,7 +125,47 @@ trait AccessibleDocumentOps { self: DocumentService =>
     limit: Int,
     maybeSortBy: Option[String],
     maybeSortOrder: Option[SortOrder]
-  ): Future[Seq[AccessibleDocument]] = ???
+  ): Future[Seq[AccessibleDocument]] = db.query { sql => 
+
+    val sortBy = maybeSortBy.getOrElse("document.uploaded_at")
+    val sortOrder = maybeSortOrder.map(_.toString).getOrElse("desc")
+
+    val query = loggedInAs match {
+      case Some(username) => ???
+
+      case None =>
+        val query = 
+          s"""
+           SELECT 
+             document.*,
+             sharing_policy.*,
+             file_count,
+             content_types
+           FROM document
+             LEFT OUTER JOIN sharing_policy 
+               ON sharing_policy.document_id = document.id
+             LEFT OUTER JOIN folder_association 
+               ON folder_association.document_id = document.id
+             JOIN (
+               SELECT
+                 count(*) AS file_count,
+                 array_agg(DISTINCT content_type) AS content_types,
+                 document_id
+               FROM document_filepart
+               GROUP BY document_id
+             ) AS parts ON parts.document_id = document.id
+           WHERE document.owner = ?
+             AND document.public_visibility = 'PUBLIC'
+             AND folder_association.folder_id IS NULL
+           ORDER BY ${sortBy} ${sortOrder}
+           OFFSET ${offset} LIMIT ${limit};
+           """
+        sql.resultQuery(query, owner)
+       
+    }
+
+    ???
+  }
   
   /** Lists the documents accessible to the given visitor in the given folder **/
   private def listAccessibleDocumentsInFolder(
@@ -135,7 +175,45 @@ trait AccessibleDocumentOps { self: DocumentService =>
     limit: Int,
     maybeSortBy: Option[String],
     maybeSortOrder: Option[SortOrder]
-  ): Future[Seq[AccessibleDocument]] = ???
+  ): Future[Seq[AccessibleDocument]] = db.query { sql => 
+
+    val sortBy = maybeSortBy.getOrElse("document.uploaded_at")
+    val sortOrder = maybeSortOrder.map(_.toString).getOrElse("desc")
+
+    val query = loggedInAs match {
+      case Some(username) =>
+
+      case None => 
+        val query = 
+          s"""
+           SELECT 
+             document.*,
+             sharing_policy.*,
+             file_count,
+             content_types
+           FROM document
+             LEFT OUTER JOIN sharing_policy 
+               ON sharing_policy.document_id = document.id
+             LEFT OUTER JOIN folder_association 
+               ON folder_association.document_id = document.id
+             JOIN (
+               SELECT
+                 count(*) AS file_count,
+                 array_agg(DISTINCT content_type) AS content_types,
+                 document_id
+               FROM document_filepart
+               GROUP BY document_id
+             ) AS parts ON parts.document_id = document.id
+           WHERE document.public_visibility = 'PUBLIC'
+             AND folder_association.folder_id = ?
+           ORDER BY ${sortBy} ${sortOrder}
+           OFFSET ${offset} LIMIT ${limit};
+           """
+        sql.resultQuery(query, folder)
+    }
+
+    ???
+  }
 
   /** Delegate to the appropriate private method, based on folder value **/
   def listAccessibleDocuments(
@@ -147,7 +225,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
     maybeSortBy: Option[String],
     maybeSortOrder: Option[SortOrder]
   ): Future[Seq[AccessibleDocument]] = folder match {
-    case Some(folderId) => listAccessibleDocumentsInFolder(folder, loggedInAs, offset, limit, maybeSortBy, maybeSortOrder)
+    case Some(folderId) => listAccessibleDocumentsInFolder(folderId, loggedInAs, offset, limit, maybeSortBy, maybeSortOrder)
     case None => listAccessibleDocumentsInRoot(owner, loggedInAs, offset, limit, maybeSortBy, maybeSortOrder)
   }
 

@@ -107,6 +107,7 @@ trait SharedWithMeReadOps { self: DocumentService =>
                ) AS parts ON parts.document_id = document.id
              WHERE sharing_policy.shared_with = ?
                AND folder_association.folder_id = ?
+             ORDER BY ${sortBy} ${sortOrder}
              OFFSET ${offset} LIMIT ${limit};
              """
           sql.resultQuery(query, username, folderId)
