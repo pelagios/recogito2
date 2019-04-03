@@ -49,7 +49,7 @@ class DocumentService @Inject() (
 
 
 
-    
+
     
   /** Batch-retrieves the document records with the given IDs, along with their fileparts **/
   def findByIdsWithParts(docIds: Seq[String]) = db.query { sql =>
@@ -112,18 +112,6 @@ class DocumentService @Inject() (
 
     val unsorted = collectSharedWithMeResults(results)
     docIds.map(id => unsorted.find(_._1.getId == id).get)
-  }
-
-  def countAllByOwner(owner: String, publicOnly: Boolean = false) = db.query { sql =>
-    if (publicOnly)
-      sql.selectCount().from(DOCUMENT)
-         .where(DOCUMENT.OWNER.equal(owner)
-         .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
-         .fetchOne(0, classOf[Int])
-    else
-      sql.selectCount().from(DOCUMENT)
-         .where(DOCUMENT.OWNER.equal(owner))
-         .fetchOne(0, classOf[Int])
   }
 
   def listAllAccessibleIds(owner: String, loggedInUser: Option[String]) = db.query { sql =>

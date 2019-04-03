@@ -173,6 +173,19 @@ trait DocumentReadOps { self: DocumentService =>
        .toSeq
   }
 
+  /** Used by private/public account info API method **/
+  def countAllByOwner(owner: String, publicOnly: Boolean = false) = db.query { sql =>
+    if (publicOnly)
+      sql.selectCount().from(DOCUMENT)
+         .where(DOCUMENT.OWNER.equal(owner)
+         .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
+         .fetchOne(0, classOf[Int])
+    else
+      sql.selectCount().from(DOCUMENT)
+         .where(DOCUMENT.OWNER.equal(owner))
+         .fetchOne(0, classOf[Int])
+  }
+
   /** Reads the document preferences for the given document **/
   def getDocumentPreferences(docId: String) = db.query { sql =>
     sql.selectFrom(DOCUMENT_PREFERENCES)
