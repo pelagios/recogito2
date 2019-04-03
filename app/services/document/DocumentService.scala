@@ -114,28 +114,6 @@ class DocumentService @Inject() (
     docIds.map(id => unsorted.find(_._1.getId == id).get)
   }
 
-  def listAllAccessibleIds(owner: String, loggedInUser: Option[String]) = db.query { sql =>
-    loggedInUser match {
-      case Some(username) =>
-        sql.select(DOCUMENT.ID)
-           .from(DOCUMENT)
-           .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
-             .and(DOCUMENT.ID.in(
-               sql.select(SHARING_POLICY.DOCUMENT_ID)
-                  .from(SHARING_POLICY)
-                  .where(SHARING_POLICY.SHARED_WITH.equal(username))
-             ).or(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))))
-           .fetch(0, classOf[String]).toSeq
-
-      case None =>
-        sql.select(DOCUMENT.ID)
-           .from(DOCUMENT)
-           .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
-             .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)))
-           .fetch(0, classOf[String]).toSeq
-    }
-  }
-  
   /** Just the document retrieval query, no counting **/
   private def listAccessibleWithParts(
     owner: String,

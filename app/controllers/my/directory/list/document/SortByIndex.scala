@@ -82,6 +82,7 @@ trait SortByIndex { self: DirectoryController =>
 
   protected def getAccessibleDocumentsSortedByIndex(
     owner: String, 
+    folder: Option[UUID],
     loggedIn: Option[String],
     offset: Int,
     size: Int,
@@ -90,7 +91,7 @@ trait SortByIndex { self: DirectoryController =>
     val startTime = System.currentTimeMillis
 
     val f = for {
-      allIds <- documents.listAllAccessibleIds(owner, loggedIn)
+      allIds <- documents.listAccessibleIds(owner, folder, loggedIn)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
       documents <- documents.findByIdsWithParts(sortedIds)
       indexProperties <- fetchIndexProperties(sortedIds, config)

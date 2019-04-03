@@ -2,6 +2,7 @@ package services.document.read
 
 import collection.JavaConversions._
 import java.util.UUID
+import scala.concurrent.Future
 import services.PublicAccess
 import services.document.DocumentService
 import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
@@ -52,6 +53,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
               )
             )
           .fetch(0, classOf[String])
+          .toSeq
 
       case None => 
         sql.select(DOCUMENT.ID)
@@ -61,7 +63,8 @@ trait AccessibleDocumentOps { self: DocumentService =>
           .where(DOCUMENT.OWNER.equalIgnoreCase(owner)
             .and(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))
             .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull))
-          .fetch(0, classOf[String]).toSeq
+          .fetch(0, classOf[String])
+          .toSeq
     }
   }
 
@@ -80,6 +83,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
                 .or(SHARING_POLICY.SHARED_WITH.equal(username))
             ))
           .fetch(0, classOf[String])
+          .toSeq
       
       case None => 
         sql.select(DOCUMENT.ID)
@@ -88,12 +92,17 @@ trait AccessibleDocumentOps { self: DocumentService =>
             .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(DOCUMENT.ID))
           .where(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString)
             .and(FOLDER_ASSOCIATION.FOLDER_ID.equal(folder)))
-          .fetch(0, classOf[String]).toSeq
+          .fetch(0, classOf[String])
+          .toSeq
     }
   }
 
   /** Delegate to the appropriate private method, based on folder value **/
-  def listAccessibleIds(owner: String, folder: Option[UUID], loggedInAs: Option[String]) = 
+  def listAccessibleIds(
+    owner: String, 
+    folder: Option[UUID], 
+    loggedInAs: Option[String]
+  ): Future[Seq[String]] = 
     folder match {
       case Some(folderId) => listAccessibleIdsInFolder(folderId, loggedInAs)
       case None => listAccessibleIdsInRoot(owner, loggedInAs)

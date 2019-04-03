@@ -198,7 +198,7 @@ class DirectoryController @Inject() (
       val fOwner = users.findByUsernameIgnoreCase(fromOwner)
       val fDocuments =
         if (isSortingByIndex(config))
-          getAccessibleDocumentsSortedByIndex(fromOwner, loggedIn, offset, size, config.get)
+          getAccessibleDocumentsSortedByIndex(fromOwner, Option(folderId), loggedIn, offset, size, config.get)
         else 
           getAccessibleDocumentsSortedByDB(fromOwner, loggedIn, offset, size, config)
 
