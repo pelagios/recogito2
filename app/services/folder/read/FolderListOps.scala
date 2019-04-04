@@ -136,7 +136,7 @@ trait FolderListOps { self: FolderService =>
                   AND sharing_policy.shared_with = ?
             WHERE folder.parent IS NULL
               AND (
-                folder.public_visiblity = 'PUBLIC' OR
+                folder.public_visibility = 'PUBLIC' OR
                   sharing_policy.shared_with = ?
               );
             """
@@ -147,7 +147,7 @@ trait FolderListOps { self: FolderService =>
             """
             SELECT * FROM folder
             WHERE folder.parent IS NULL
-              AND folder.public_visiblity = 'PUBLIC';
+              AND folder.public_visibility = 'PUBLIC';
             """
           sql.resultQuery(query)
       }
@@ -175,7 +175,7 @@ trait FolderListOps { self: FolderService =>
                   AND sharing_policy.shared_with = ?
             WHERE folder.parent = ?
               AND (
-                folder.public_visiblity = 'PUBLIC' OR
+                folder.public_visibility = 'PUBLIC' OR
                   sharing_policy.shared_with = ?
               );
             """
@@ -186,7 +186,7 @@ trait FolderListOps { self: FolderService =>
             """
             SELECT * FROM folder
             WHERE folder.parent = ?
-              AND folder.public_visiblity = 'PUBLIC';
+              AND folder.public_visibility = 'PUBLIC';
             """
           sql.resultQuery(query, folder)
       }

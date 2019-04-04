@@ -192,6 +192,8 @@ class DirectoryController @Inject() (
 
       import ConfiguredPresentation._
 
+      val fDirectories = folders.listAccessibleFolders(fromOwner, request.identity.map(_.username), Option(folderId))
+
       val config = request.body.asJson.flatMap(json => 
         Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
@@ -205,10 +207,14 @@ class DirectoryController @Inject() (
 
       val f = for {
         owner <- fOwner
+        directories <- fDirectories
         documents <- fDocuments
-      } yield (owner, documents)
+      } yield (
+        owner,
+        directories.map(t => FolderItem(t._1, t._2)), 
+        documents)
 
-      f.map { case (owner, documents) => 
+      f.map { case (owner, directories, documents) => 
         owner match {
           case Some(user) =>
             // Only expose readme if there are shared documents
@@ -219,7 +225,7 @@ class DirectoryController @Inject() (
             jsonOk(Json.toJson(DirectoryPage.build(
               readme,
               Seq.empty[Breadcrumb],
-              Page.empty[FolderItem], 
+              directories, 
               documents)))
 
           case None => NotFound
