@@ -2,8 +2,9 @@ package services.document.read
 
 import collection.JavaConversions._
 import java.util.UUID
+import org.jooq.Record
 import scala.concurrent.Future
-import services.{ContentType, PublicAccess, SortOrder}
+import services.{ContentType, Page, PublicAccess, SortOrder}
 import services.document.DocumentService
 import services.document.DocumentSortField._
 import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
@@ -23,6 +24,26 @@ case class AccessibleDocument(
   sharedVia: Option[SharingPolicyRecord],
   fileCount: Int,
   contentTypes: Seq[ContentType])
+
+object AccessibleDocument {
+
+  def build(record: Record) = {
+    val document = record.into(classOf[DocumentRecord])
+    val policy = {
+      val p = record.into(classOf[SharingPolicyRecord])
+      Option(p.getId).map(_ => p)
+    }
+    val fileCount = record.getValue("file_count", classOf[Integer]).toInt
+    val contentTypes = 
+      record
+        .getValue("content_types", classOf[Array[String]])
+        .toSeq
+        .flatMap(ContentType.withName)
+
+    AccessibleDocument(document, policy, fileCount, contentTypes)
+  }
+
+}
 
 /** Read-operations related to accessible/public/shared documents **/
 trait AccessibleDocumentOps { self: DocumentService =>
@@ -126,15 +147,14 @@ trait AccessibleDocumentOps { self: DocumentService =>
     limit: Int,
     maybeSortBy: Option[String],
     maybeSortOrder: Option[SortOrder]
-  ): Future[Seq[AccessibleDocument]] = db.query { sql => 
+  ): Future[Page[AccessibleDocument]] = db.query { sql => 
+    val startTime = System.currentTimeMillis
 
     val sortBy = maybeSortBy.flatMap(sanitize).getOrElse("document.uploaded_at")
     val sortOrder = maybeSortOrder.map(_.toString).getOrElse("desc")
 
     val query = loggedInAs match {
-      case Some(username) => ???
-
-      case None =>
+      case Some(username) =>
         val query = 
           s"""
            SELECT 
@@ -144,7 +164,37 @@ trait AccessibleDocumentOps { self: DocumentService =>
              content_types
            FROM document
              LEFT OUTER JOIN sharing_policy 
-               ON sharing_policy.document_id = document.id
+               ON sharing_policy.document_id = document.id AND
+                  sharing_policy.shared_with = ?
+             LEFT OUTER JOIN folder_association 
+               ON folder_association.document_id = document.id
+             JOIN (
+               SELECT
+                 count(*) AS file_count,
+                 array_agg(DISTINCT content_type) AS content_types,
+                 document_id
+               FROM document_filepart
+               GROUP BY document_id
+             ) AS parts ON parts.document_id = document.id
+           WHERE document.owner = ?
+             AND (
+               document.public_visibility = 'PUBLIC' 
+                 OR sharing_policy.shared_with = ?
+             )
+             AND folder_association.folder_id IS NULL
+           ORDER BY ${sortBy} ${sortOrder}
+           OFFSET ${offset} LIMIT ${limit};
+           """
+        sql.resultQuery(query, username, owner, username)
+
+      case None =>
+        val query = 
+          s"""
+           SELECT 
+             document.*,
+             file_count,
+             content_types
+           FROM document
              LEFT OUTER JOIN folder_association 
                ON folder_association.document_id = document.id
              JOIN (
@@ -165,7 +215,8 @@ trait AccessibleDocumentOps { self: DocumentService =>
        
     }
 
-    ???
+    val records = query.fetchArray.map(AccessibleDocument.build)
+    Page(System.currentTimeMillis - startTime, records.size, 0, records.size, records)
   }
   
   /** Lists the documents accessible to the given visitor in the given folder **/
@@ -176,15 +227,14 @@ trait AccessibleDocumentOps { self: DocumentService =>
     limit: Int,
     maybeSortBy: Option[String],
     maybeSortOrder: Option[SortOrder]
-  ): Future[Seq[AccessibleDocument]] = db.query { sql => 
+  ): Future[Page[AccessibleDocument]] = db.query { sql => 
+    val startTime = System.currentTimeMillis
 
     val sortBy = maybeSortBy.flatMap(sanitize).getOrElse("document.uploaded_at")
     val sortOrder = maybeSortOrder.map(_.toString).getOrElse("desc")
 
     val query = loggedInAs match {
       case Some(username) =>
-
-      case None => 
         val query = 
           s"""
            SELECT 
@@ -194,7 +244,37 @@ trait AccessibleDocumentOps { self: DocumentService =>
              content_types
            FROM document
              LEFT OUTER JOIN sharing_policy 
-               ON sharing_policy.document_id = document.id
+               ON sharing_policy.document_id = document.id AND
+                  sharing_policy.shared_with = ?
+             LEFT OUTER JOIN folder_association 
+               ON folder_association.document_id = document.id
+             JOIN (
+               SELECT
+                 count(*) AS file_count,
+                 array_agg(DISTINCT content_type) AS content_types,
+                 document_id
+               FROM document_filepart
+               GROUP BY document_id
+             ) AS parts ON parts.document_id = document.id
+           WHERE folder_association.folder_id = ?
+             AND (
+               document.public_visibility = 'PUBLIC' 
+                 OR sharing_policy.shared_with = ?
+             )
+             AND 
+           ORDER BY ${sortBy} ${sortOrder}
+           OFFSET ${offset} LIMIT ${limit};
+           """
+        sql.resultQuery(query, username, folder, username)
+
+      case None => 
+        val query = 
+          s"""
+           SELECT 
+             document.*,
+             file_count,
+             content_types
+           FROM document
              LEFT OUTER JOIN folder_association 
                ON folder_association.document_id = document.id
              JOIN (
@@ -213,7 +293,8 @@ trait AccessibleDocumentOps { self: DocumentService =>
         sql.resultQuery(query, folder)
     }
 
-    ???
+    val records = query.fetchArray.map(AccessibleDocument.build)
+    Page(System.currentTimeMillis - startTime, records.size, 0, records.size, records)
   }
 
   /** Delegate to the appropriate private method, based on folder value **/
@@ -225,7 +306,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
     limit: Int,
     maybeSortBy: Option[String],
     maybeSortOrder: Option[SortOrder]
-  ): Future[Seq[AccessibleDocument]] = folder match {
+  ): Future[Page[AccessibleDocument]] = folder match {
     case Some(folderId) => listAccessibleDocumentsInFolder(folderId, loggedInAs, offset, limit, maybeSortBy, maybeSortOrder)
     case None => listAccessibleDocumentsInRoot(owner, loggedInAs, offset, limit, maybeSortBy, maybeSortOrder)
   }

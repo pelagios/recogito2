@@ -96,8 +96,10 @@ trait SharedWithMeReadOps { self: DocumentService =>
                file_count,
                content_types
              FROM sharing_policy
-               JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
-               JOIN document ON document.id = sharing_policy.document_id
+               JOIN folder_association 
+                 ON folder_association.document_id = sharing_policy.document_id
+               JOIN document 
+                 ON document.id = sharing_policy.document_id
                JOIN (
                  SELECT
                    count(*) AS file_count,
@@ -123,9 +125,12 @@ trait SharedWithMeReadOps { self: DocumentService =>
                file_count,
                content_types
              FROM sharing_policy
-               JOIN document ON sharing_policy.document_id = document.id
-               LEFT OUTER JOIN folder_association ON folder_association.document_id = sharing_policy.document_id
-               LEFT OUTER JOIN sharing_policy folder_policy ON folder_policy.folder_id = folder_association.folder_id
+               JOIN document
+                 ON sharing_policy.document_id = document.id
+               LEFT OUTER JOIN folder_association 
+                 ON folder_association.document_id = sharing_policy.document_id
+               LEFT OUTER JOIN sharing_policy folder_policy 
+                 ON folder_policy.folder_id = folder_association.folder_id
                LEFT JOIN (
                  SELECT
                    count(*) AS file_count,
