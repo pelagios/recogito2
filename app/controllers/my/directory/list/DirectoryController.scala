@@ -187,10 +187,11 @@ class DirectoryController @Inject() (
       }
     }
 
-  def getAccessibleDocuments(fromOwner: String, offset: Int, size: Int, folderId: UUID) = {
-    import ConfiguredPresentation._
-
+  def getAccessibleDocuments(fromOwner: String, offset: Int, size: Int, folderId: UUID) =
     silhouette.UserAwareAction.async { implicit request =>
+
+      import ConfiguredPresentation._
+
       val config = request.body.asJson.flatMap(json => 
         Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
@@ -225,6 +226,5 @@ class DirectoryController @Inject() (
         }
       }
     }
-  }
 
 }

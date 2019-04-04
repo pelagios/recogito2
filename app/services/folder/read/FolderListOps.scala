@@ -11,6 +11,17 @@ import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 
 trait FolderListOps { self: FolderService =>
 
+  /** Helper to marshal a combined folder/sharingpolicy record **/
+  private def asAccessibleFolder(record: Record) = {
+    val folder = record.into(classOf[FolderRecord])
+    val policy = {
+      val p = record.into(classOf[SharingPolicyRecord])
+      Option(p.getId).map(_ => p)
+    }
+
+    (folder, policy)
+  }
+
   /** 'ls'-like command, lists folders by an owner, in the root or a subdirectory **/
   def listFolders(owner: String, offset: Int, size: Int, parent: Option[UUID]): Future[Page[FolderRecord]] = 
     db.query { sql => 
@@ -57,6 +68,7 @@ trait FolderListOps { self: FolderService =>
       Page(System.currentTimeMillis - startTime, total, offset, size, items)
     }  
 
+  /** Lists folders Shared with Me, in the root or a subdirectory **/
   def listFoldersSharedWithMe(username: String, parent: Option[UUID]): Future[Page[(FolderRecord, SharingPolicyRecord)]] =
     db.query { sql =>
 
@@ -103,6 +115,97 @@ trait FolderListOps { self: FolderService =>
 
       val records = query.fetchArray.map(asTuple)
       Page(System.currentTimeMillis - startTime, records.size, 0, records.size, records)
+    }
+
+    /** Lists folders accessible in the public profile of a user, at root leve **/
+    private def listAccessibleFoldersAtRoot(
+      username: String, 
+      loggedInAs: Option[String]
+    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord])]] = db.query { sql =>
+      val startTime = System.currentTimeMillis
+
+      val query = loggedInAs match {
+
+        case Some(loggedIn) =>
+          val query = 
+            """
+            SELECT * 
+            FROM folder
+              LEFT OUTER JOIN sharing_policy 
+                ON sharing_policy.folder_id = folder.id 
+                  AND sharing_policy.shared_with = ?
+            WHERE folder.parent IS NULL
+              AND (
+                folder.public_visiblity = 'PUBLIC' OR
+                  sharing_policy.shared_with = ?
+              );
+            """
+          sql.resultQuery(query, loggedIn, loggedIn)
+
+        case None => 
+          val query = 
+            """
+            SELECT * FROM folder
+            WHERE folder.parent IS NULL
+              AND folder.public_visiblity = 'PUBLIC';
+            """
+          sql.resultQuery(query)
+      }
+
+      val records = query.fetchArray.map(asAccessibleFolder)
+      Page(System.currentTimeMillis - startTime, records.size, 0, records.size, records)
+    }
+
+    /** Lists subfolders accessible in the public view, in the given folder **/
+    private def listAccessibleSubFolders(
+      loggedInAs: Option[String],
+      folder: UUID
+    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord])]] = db.query { sql => 
+      val startTime = System.currentTimeMillis
+      
+      val query = loggedInAs match {
+
+        case Some(loggedIn) =>
+          val query = 
+            """
+            SELECT * 
+            FROM folder
+              LEFT OUTER JOIN sharing_policy 
+                ON sharing_policy.folder_id = folder.id 
+                  AND sharing_policy.shared_with = ?
+            WHERE folder.parent = ?
+              AND (
+                folder.public_visiblity = 'PUBLIC' OR
+                  sharing_policy.shared_with = ?
+              );
+            """
+          sql.resultQuery(query, loggedIn, folder, loggedIn)
+
+        case None =>
+          val query = 
+            """
+            SELECT * FROM folder
+            WHERE folder.parent = ?
+              AND folder.public_visiblity = 'PUBLIC';
+            """
+          sql.resultQuery(query, folder)
+      }
+
+      val records = query.fetchArray.map(asAccessibleFolder)
+      Page(System.currentTimeMillis - startTime, records.size, 0, records.size, records)
+    }
+
+    /** Lists (sub)folders accessible in the public view. 
+      * 
+      * Delegates to the appropriate private method above.
+      */
+    def listAccessibleFolders(
+      username: String,
+      loggedInAs: Option[String],
+      parent: Option[UUID]
+    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord])]] = parent match {
+      case Some(folderId) => listAccessibleSubFolders(loggedInAs, folderId)
+      case None => listAccessibleFoldersAtRoot(username, loggedInAs)
     }
 
 }
