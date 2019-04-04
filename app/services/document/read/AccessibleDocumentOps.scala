@@ -5,6 +5,7 @@ import java.util.UUID
 import scala.concurrent.Future
 import services.{ContentType, PublicAccess, SortOrder}
 import services.document.DocumentService
+import services.document.DocumentSortField._
 import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
 import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 import storage.db.DB
@@ -127,7 +128,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
     maybeSortOrder: Option[SortOrder]
   ): Future[Seq[AccessibleDocument]] = db.query { sql => 
 
-    val sortBy = maybeSortBy.getOrElse("document.uploaded_at")
+    val sortBy = maybeSortBy.flatMap(sanitize).getOrElse("document.uploaded_at")
     val sortOrder = maybeSortOrder.map(_.toString).getOrElse("desc")
 
     val query = loggedInAs match {
@@ -177,7 +178,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
     maybeSortOrder: Option[SortOrder]
   ): Future[Seq[AccessibleDocument]] = db.query { sql => 
 
-    val sortBy = maybeSortBy.getOrElse("document.uploaded_at")
+    val sortBy = maybeSortBy.flatMap(sanitize).getOrElse("document.uploaded_at")
     val sortOrder = maybeSortOrder.map(_.toString).getOrElse("desc")
 
     val query = loggedInAs match {

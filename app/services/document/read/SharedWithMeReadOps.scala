@@ -6,6 +6,7 @@ import collection.JavaConversions._
 import scala.concurrent.Future
 import services.{ContentType, Page, SortOrder}
 import services.document.{DocumentService, SharedDocument}
+import services.document.DocumentSortField._
 import services.generated.Tables.{FOLDER_ASSOCIATION, SHARING_POLICY}
 import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 
@@ -81,7 +82,7 @@ trait SharedWithMeReadOps { self: DocumentService =>
         SharedDocument(document, policy, fileCount, contentTypes)
       }
 
-      val sortBy = maybeSortBy.getOrElse("document.uploaded_at")
+      val sortBy = maybeSortBy.flatMap(sanitize).getOrElse("document.uploaded_at")
       val sortOrder = maybeSortOrder.map(_.toString).getOrElse("desc")
 
       val query = folder match {
