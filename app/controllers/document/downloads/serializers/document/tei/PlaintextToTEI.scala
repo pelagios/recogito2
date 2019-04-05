@@ -53,7 +53,12 @@ trait PlaintextToTEI extends BaseTEISerializer {
       val id = toTeiId(annotation.annotationId)
       val quote = escape(getQuote(annotation))
       val offset = getCharOffset(annotation)
-      val entityType = getEntityType(annotation)   
+      val entityType = getEntityType(annotation)  
+
+      // Commentary notes
+      val notes = getCommentBodies(annotation).flatMap { comment => 
+        <note resp={comment.lastModifiedBy.get}>{comment.value.get}</note>
+      }
       
       // Tags of form @key:value - to be used as XML attributes
       val attributes = getAttributeTags(annotation)
@@ -88,7 +93,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
       }
       
       val nextNodes = 
-        Seq(new Text(escape(text.substring(beginIndex, offset))), teiTag)
+        Seq(new Text(escape(text.substring(beginIndex, offset))), teiTag) ++ notes
           
       (nodes ++ nextNodes, offset + quote.size)
     }

@@ -46,7 +46,6 @@ trait BaseTEISerializer extends BaseSerializer {
     annotation.bodies.filter { body =>
       body.hasType == AnnotationBody.TAG && !isAttributeTag(body)
     }.map { _.value.get }
-    
 
   /** Returns a TEI @cert value, if relevant */
   def getCert(annotation: Annotation): Option[String] = {
