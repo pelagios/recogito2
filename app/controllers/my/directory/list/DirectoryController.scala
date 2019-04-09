@@ -192,6 +192,8 @@ class DirectoryController @Inject() (
 
       import ConfiguredPresentation._
 
+      play.api.Logger.info(Option(folderId).toString)
+
       val fDirectories = folders.listAccessibleFolders(fromOwner, request.identity.map(_.username), Option(folderId))
 
       val config = request.body.asJson.flatMap(json => 
