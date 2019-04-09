@@ -90,4 +90,51 @@ trait BreadcrumbReadOps { self: FolderService =>
     }
   }
 
+  def getAccessibleDocsBreadcrumbTrail(owner: String, id: UUID) = db.query { sql =>
+    val query = 
+      """
+      WITH RECURSIVE path AS (
+        SELECT 
+          sharing_policy.shared_with, 
+          folder.id,
+          ARRAY[folder.id] AS path_ids,
+          ARRAY[folder.title] AS path_titles
+        FROM sharing_policy
+          JOIN folder ON folder.id = sharing_policy.folder_id
+          LEFT OUTER JOIN folder parent_folder ON parent_folder.id = folder.parent
+          LEFT OUTER JOIN sharing_policy parent_sharing_policy ON parent_sharing_policy.folder_id = parent_folder.id
+        WHERE 
+            (sharing_policy.shared_with = ? OR folder.public_visibility = 'PUBLIC')
+          AND
+            (parent_sharing_policy IS NULL AND NOT parent_folder.public_visibility = 'PUBLIC')
+
+        UNION ALL
+
+        SELECT 
+          s.shared_with, 
+          folder.id, 
+          p.path_ids || folder.id,
+          p.path_titles || folder.title
+        FROM sharing_policy s
+          JOIN folder ON folder.id = s.folder_id
+          LEFT OUTER JOIN folder parent_folder ON parent_folder.id = folder.parent
+          LEFT OUTER JOIN sharing_policy parent_sharing_policy ON parent_sharing_policy.folder_id = parent_folder.id
+          JOIN path p on folder.parent = p.id
+        WHERE 
+            (s.shared_with = ? OR folder.public_visibility = 'PUBLIC')
+          AND
+            (parent_sharing_policy IS NULL AND NOT parent_folder.public_visibility = 'PUBLIC')
+      )
+      SELECT path_ids, path_titles FROM path WHERE id=?;
+      """
+
+    Option(sql.resultQuery(query, owner, owner, id).fetchOne).map { result => 
+      val ids = result.getValue("path_ids", classOf[Array[UUID]]).toSeq
+      val titles = result.getValue("path_titles", classOf[Array[String]]).toSeq
+      ids.zip(titles).map(t => Breadcrumb(t._1, t._2))
+    } getOrElse {
+      Seq.empty[Breadcrumb]
+    }
+  }
+
 }

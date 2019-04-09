@@ -192,7 +192,9 @@ class DirectoryController @Inject() (
 
       import ConfiguredPresentation._
 
-      play.api.Logger.info(Option(folderId).toString)
+      val fBreadcrumbs = Option(folderId).map { id => 
+          folders.getAccessibleDocsBreadcrumbTrail(fromOwner, id)
+        } getOrElse { Future.successful(Seq.empty[Breadcrumb]) }
 
       val fDirectories = folders.listAccessibleFolders(fromOwner, request.identity.map(_.username), Option(folderId))
 
@@ -209,14 +211,16 @@ class DirectoryController @Inject() (
 
       val f = for {
         owner <- fOwner
+        breadcrumbs <- fBreadcrumbs
         directories <- fDirectories
         documents <- fDocuments
       } yield (
         owner,
+        breadcrumbs,
         directories.map(t => FolderItem(t._1, t._2)), 
         documents)
 
-      f.map { case (owner, directories, documents) => 
+      f.map { case (owner, breadcrumbs, directories, documents) => 
         owner match {
           case Some(user) =>
             // Only expose readme if there are shared documents
@@ -226,7 +230,7 @@ class DirectoryController @Inject() (
             // TODO make folder-compatible
             jsonOk(Json.toJson(DirectoryPage.build(
               readme,
-              Seq.empty[Breadcrumb],
+              breadcrumbs,
               directories, 
               documents)))
 
