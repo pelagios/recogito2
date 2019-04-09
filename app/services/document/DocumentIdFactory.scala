@@ -11,7 +11,7 @@ import storage.db.DB
 object DocumentIdFactory {
   
   // We use random alphanumeric IDs with 14 chars length (because 62^14 should be enough for anyone (TM))  
-  private val ID_LENGTH = 14
+  val ID_LENGTH = 14
   
   // Utility function to check if an ID exists in the DB
   def existsId(id: String)(implicit db: DB) = {

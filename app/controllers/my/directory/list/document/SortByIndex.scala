@@ -6,7 +6,6 @@ import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.Future
 import services.{ContentType, Page}
-import services.document.SharedDocument
 
 trait SortByIndex { self: DirectoryController =>
 
@@ -40,12 +39,12 @@ trait SortByIndex { self: DirectoryController =>
     val f = for {
       allIds <- documents.listIds(folder, username)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
-      docsWithParts <- documents.findByIdsWithParts(sortedIds)
+      documents <- documents.getDocumentsById(sortedIds)
       indexProperties <- fetchIndexProperties(sortedIds, config)      
-    } yield (allIds, sortedIds, docsWithParts, indexProperties)
+    } yield (allIds, sortedIds, documents, indexProperties)
 
-    f.map { case (allIds, sortedIds, docsWithParts, indexProperties) => 
-      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, docsWithParts)
+    f.map { case (allIds, sortedIds, documents, indexProperties) => 
+      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, documents)
       ConfiguredPresentation.forMyDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
     }
   }
@@ -62,20 +61,12 @@ trait SortByIndex { self: DirectoryController =>
     val f = for {
       allIds <- documents.listIdsSharedWithMe(username, folder)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
-      documents <- documents.findByIdsWithPartsAndSharingPolicy(sortedIds, username)
+      documents <- documents.getDocsSharedWithMeById(sortedIds, username)
       indexProperties <- fetchIndexProperties(sortedIds, config)
     } yield (allIds, sortedIds, documents, indexProperties)
 
     f.map { case (allIds, sortedIds, documents, indexProperties) =>
-      val sharedDocs = documents.map { case (document, policy, fileparts) => 
-        SharedDocument(
-          document, 
-          policy, 
-          fileparts.size, 
-          fileparts.flatMap(p => ContentType.withName(p.getContentType)).distinct)
-      }
-
-      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, sharedDocs)
+      val dbResult = Page(System.currentTimeMillis - startTime, allIds.size, offset, size, documents)
       ConfiguredPresentation.forSharedDocument(dbResult, Some(indexProperties.toMap), Some(config.columns))
     }
   }
@@ -93,7 +84,7 @@ trait SortByIndex { self: DirectoryController =>
     val f = for {
       allIds <- documents.listAccessibleIds(owner, folder, loggedIn)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
-      documents <- documents.findByIdsWithParts(sortedIds)
+      documents <- documents.getDocumentsById(sortedIds)
       indexProperties <- fetchIndexProperties(sortedIds, config)
     } yield (allIds, sortedIds, documents, indexProperties)
 

@@ -3,8 +3,9 @@ package services.document.read
 import collection.JavaConversions._
 import play.api.Logger
 import scala.concurrent.Future
-import services.{PublicAccess, RuntimeAccessLevel, SharingLevel}
+import services.{ContentType, PublicAccess, RuntimeAccessLevel, SharingLevel}
 import services.document.{DocumentService, ExtendedDocumentMetadata}
+import services.document.read.results.MyDocument
 import services.generated.Tables._
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord, UserRecord}
 
@@ -104,6 +105,40 @@ trait DocumentReadOps { self: DocumentService =>
   /** Batch-retrieves the document records with the given IDs **/
   def getDocumentRecordsById(docIds: Seq[String]) = db.query { sql => 
     sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds)).fetchArray().toSeq
+  }
+
+  /** Batch-retrieves the documents with the given IDs, adding extra part count
+    * and content type Info
+    */
+  def getDocumentsById(docIds: Seq[String]) = db.query { sql =>
+    if (docIds.isEmpty) {
+      Seq.empty[MyDocument]
+    } else {
+      val idSet = docIds
+        .flatMap(sanitizeDocId) // prevent injection attacks
+        .map(id => s"'${id}'") // SQL quoting
+        .mkString(",") // join
+
+      val query = 
+        s"""
+        SELECT 
+          document.*,
+          file_count,
+          content_types
+        FROM document
+        JOIN (
+          SELECT
+            count(*) AS file_count,
+            array_agg(DISTINCT content_type) AS content_types,
+            document_id
+          FROM document_filepart
+          GROUP BY document_id
+        ) AS parts ON parts.document_id = document.id
+        WHERE document.id IN (${idSet});
+        """
+
+      sql.resultQuery(query).fetchArray.map(MyDocument.build).toSeq
+    }
   }
 
   /** Retrieves extended document metadata, along with runtime access permissions.

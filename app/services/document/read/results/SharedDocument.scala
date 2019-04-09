@@ -1,24 +1,22 @@
-package services.document
+package services.document.read.results
 
 import org.jooq.Record
 import services.ContentType
 import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
 
-/** Wraps and accessible document with sharing policy (if any) and minimal part info **/
-case class AccessibleDocument(
+/** A document 'Shared with Me' **/
+case class SharedDocument(
   document: DocumentRecord,
-  sharedVia: Option[SharingPolicyRecord],
+  sharedVia: SharingPolicyRecord,
   fileCount: Int,
   contentTypes: Seq[ContentType])
 
-object AccessibleDocument {
+
+object SharedDocument {
 
   def build(record: Record) = {
     val document = record.into(classOf[DocumentRecord])
-    val policy = {
-      val p = record.into(classOf[SharingPolicyRecord])
-      Option(p.getId).map(_ => p)
-    }
+    val policy = record.into(classOf[SharingPolicyRecord])
     val fileCount = record.getValue("file_count", classOf[Integer]).toInt
     val contentTypes = 
       record
@@ -26,7 +24,7 @@ object AccessibleDocument {
         .toSeq
         .flatMap(ContentType.withName)
 
-    AccessibleDocument(document, policy, fileCount, contentTypes)
+    SharedDocument(document, policy, fileCount, contentTypes)
   }
 
 }

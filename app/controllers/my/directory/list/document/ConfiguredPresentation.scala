@@ -6,7 +6,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.{ContentType, HasDate, Page}
 import services.annotation.stats.StatusRatio
-import services.document.{AccessibleDocument, SharedDocument}
+import services.document.read.results._
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord}
 
 case class IndexDerivedProperties(
@@ -61,17 +61,17 @@ object ConfiguredPresentation extends HasDate {
     * as input. Column config is optional and will default to a sensible value.
     */
   def forMyDocument(
-    page: Page[(DocumentRecord, Seq[DocumentFilepartRecord])],
+    page: Page[MyDocument],
     indexProps: Option[Map[String, IndexDerivedProperties]],
     columnConfig: Option[Seq[String]]
   ) = {
     val config = columnConfig.getOrElse(DEFAULT_CONFIG)
-    page.map { case (document, parts) =>
-      val props = findProps(document, indexProps)
+    page.map { myDoc =>
+      val props = findProps(myDoc.document, indexProps)
       ConfiguredPresentation(
-        document, 
-        parts.size, 
-        parts.flatMap(p => ContentType.withName(p.getContentType)).distinct,
+        myDoc.document, 
+        myDoc.fileCount, 
+        myDoc.contentTypes,
         None, 
         props, 
         config)
