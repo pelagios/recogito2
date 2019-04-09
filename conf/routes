@@ -184,6 +184,10 @@ DELETE  /api/folder/:id                              controllers.my.directory.de
 DELETE  /api/shared/folder/bulk                      controllers.my.directory.delete.FolderActionsController.bulkUnshareFolders
 DELETE  /api/shared/folder/:id                       controllers.my.directory.delete.FolderActionsController.unshareFolder(id: java.util.UUID)
 
+# ~~~ Duplicate ~~~
+
+POST    /api/duplicate/document/:id                  controllers.my.duplicate.DuplicateController.duplicateDocument(id: String)
+
 # ~~~ Bulk sharing ~~~
 
 GET     /api/sharing/search                          controllers.my.sharing.SharingController.searchUsers(q: String)
