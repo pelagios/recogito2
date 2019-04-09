@@ -192,22 +192,24 @@ class DirectoryController @Inject() (
 
       import ConfiguredPresentation._
 
+      val loggedIn = request.identity.map(_.username)
+
+      val fOwner = users.findByUsernameIgnoreCase(fromOwner)
+
       val fBreadcrumbs = Option(folderId).map { id => 
-          folders.getAccessibleDocsBreadcrumbTrail(fromOwner, request.identity.map(_.username), id)
+          folders.getAccessibleDocsBreadcrumbTrail(fromOwner, loggedIn, id)
         } getOrElse { Future.successful(Seq.empty[Breadcrumb]) }
 
-      val fDirectories = folders.listAccessibleFolders(fromOwner, request.identity.map(_.username), Option(folderId))
+      val fDirectories = folders.listAccessibleFolders(fromOwner, loggedIn, Option(folderId))
 
       val config = request.body.asJson.flatMap(json => 
         Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
-      val loggedIn = request.identity.map(_.username)
-      val fOwner = users.findByUsernameIgnoreCase(fromOwner)
       val fDocuments =
         if (isSortingByIndex(config))
           getAccessibleDocumentsSortedByIndex(fromOwner, Option(folderId), loggedIn, offset, size, config.get)
         else 
-          getAccessibleDocumentsSortedByDB(fromOwner, loggedIn, offset, size, config)
+          getAccessibleDocumentsSortedByDB(fromOwner, Option(folderId), loggedIn, offset, size, config)
 
       val f = for {
         owner <- fOwner
@@ -226,8 +228,7 @@ class DirectoryController @Inject() (
             // Only expose readme if there are shared documents
             val readme = 
               if (documents.total > 0) user.readme else None
-
-            // TODO make folder-compatible
+              
             jsonOk(Json.toJson(DirectoryPage.build(
               readme,
               breadcrumbs,

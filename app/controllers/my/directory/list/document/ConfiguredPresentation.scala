@@ -6,7 +6,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.{ContentType, HasDate, Page}
 import services.annotation.stats.StatusRatio
-import services.document.SharedDocument
+import services.document.{AccessibleDocument, SharedDocument}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord, SharingPolicyRecord}
 
 case class IndexDerivedProperties(
@@ -91,6 +91,24 @@ object ConfiguredPresentation extends HasDate {
         doc.fileCount,
         doc.contentTypes,
         Some(doc.sharedVia),
+        props,
+        config)
+    }
+  }
+
+  def forAccessibleDocument(
+    page: Page[AccessibleDocument],
+    indexProps: Option[Map[String, IndexDerivedProperties]],
+    columnConfig: Option[Seq[String]]
+  ) = {
+    val config = columnConfig.getOrElse(DEFAULT_CONFIG)
+    page.map { doc => 
+      val props = findProps(doc.document, indexProps)
+      ConfiguredPresentation(
+        doc.document,
+        doc.fileCount,
+        doc.contentTypes,
+        doc.sharedVia,
         props,
         config)
     }

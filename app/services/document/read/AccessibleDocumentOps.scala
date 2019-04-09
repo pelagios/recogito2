@@ -5,7 +5,7 @@ import java.util.UUID
 import org.jooq.Record
 import scala.concurrent.Future
 import services.{ContentType, Page, PublicAccess, SortOrder}
-import services.document.DocumentService
+import services.document.{AccessibleDocument, DocumentService}
 import services.document.DocumentSortField._
 import services.generated.Tables.{DOCUMENT, FOLDER_ASSOCIATION, SHARING_POLICY}
 import services.generated.tables.records.{DocumentRecord, SharingPolicyRecord}
@@ -15,33 +15,6 @@ import storage.db.DB
 case class AccessibleDocumentsCount(public: Long, shared: Option[Long]) {
 
   lazy val total = public + shared.getOrElse(0l)
-
-}
-
-/** Wraps and accessible document with sharing policy (if any) and minimal part info **/
-case class AccessibleDocument(
-  document: DocumentRecord,
-  sharedVia: Option[SharingPolicyRecord],
-  fileCount: Int,
-  contentTypes: Seq[ContentType])
-
-object AccessibleDocument {
-
-  def build(record: Record) = {
-    val document = record.into(classOf[DocumentRecord])
-    val policy = {
-      val p = record.into(classOf[SharingPolicyRecord])
-      Option(p.getId).map(_ => p)
-    }
-    val fileCount = record.getValue("file_count", classOf[Integer]).toInt
-    val contentTypes = 
-      record
-        .getValue("content_types", classOf[Array[String]])
-        .toSeq
-        .flatMap(ContentType.withName)
-
-    AccessibleDocument(document, policy, fileCount, contentTypes)
-  }
 
 }
 

@@ -182,28 +182,6 @@ class DocumentService @Inject() (
     }.toSeq
   }
 
-  def findAccessibleDocumentsWithParts(
-    owner: String,
-    loggedInUser: Option[String],
-    offset: Int,
-    limit: Int,
-    sortBy: Option[String],
-    sortOrder: Option[SortOrder]
-  )(implicit ctx: ExecutionContext) = {
-    val startTime = System.currentTimeMillis
-    val fCount = countAllAccessibleDocuments(owner, loggedInUser)
-    val fDocuments = listAccessibleWithParts(owner, loggedInUser, offset, limit, sortBy, sortOrder)
-
-    val f = for {
-      count <- fCount
-      documents <- fDocuments 
-    } yield (count, documents)
-
-    f.map { case (count, documents) =>
-      Page(System.currentTimeMillis - startTime, count.total, offset, limit, documents) 
-    }
-  }
-
   /** TODO simplify the below queries **/
 
   /** Common boilerplate code for listInFolder and listInRoot **/

@@ -66,6 +66,7 @@ trait SortByDB { self: DirectoryController =>
 
   protected def getAccessibleDocumentsSortedByDB(
     owner: String, 
+    folder: Option[UUID],
     loggedIn: Option[String],
     offset: Int,
     size: Int,
@@ -73,13 +74,12 @@ trait SortByDB { self: DirectoryController =>
   )(implicit request: Request[AnyContent]) = {
     documentsByDB(
       config,
-      () => documents.findAccessibleDocumentsWithParts(
-              owner, loggedIn, offset, size,
+      () => documents.listAccessibleDocuments(
+              owner, folder, loggedIn, offset, size,
               config.flatMap(_.sort.map(_.sortBy)),
               config.flatMap(_.sort.map(_.order)))
     ).map { case (documents, indexProperties) =>
-      // TODO fetch with sharing permissions, if any
-      ConfiguredPresentation.forMyDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
+      ConfiguredPresentation.forAccessibleDocument(documents, indexProperties.map(_.toMap), config.map(_.columns))
     }
   }
 
