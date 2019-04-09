@@ -193,7 +193,7 @@ class DirectoryController @Inject() (
       import ConfiguredPresentation._
 
       val fBreadcrumbs = Option(folderId).map { id => 
-          folders.getAccessibleDocsBreadcrumbTrail(fromOwner, id)
+          folders.getAccessibleDocsBreadcrumbTrail(fromOwner, request.identity.map(_.username), id)
         } getOrElse { Future.successful(Seq.empty[Breadcrumb]) }
 
       val fDirectories = folders.listAccessibleFolders(fromOwner, request.identity.map(_.username), Option(folderId))
