@@ -11,9 +11,9 @@ import services.entity.builtin.importer.crosswalks.geojson.BaseGeoJSONCrosswalk
 
 object LPFCrosswalk extends BaseGeoJSONCrosswalk {
   
-  private def toEntityRecord(source: String, f: LPFFeature) = EntityRecord(
+  private def toEntityRecord(identifier: String, f: LPFFeature) = EntityRecord(
     f.id,
-    source,
+    identifier,
     DateTime.now().withZone(DateTimeZone.UTC),
     None, // lastChangedAt
     f.title,
@@ -28,17 +28,15 @@ object LPFCrosswalk extends BaseGeoJSONCrosswalk {
     Seq.empty[Link] // TODO create from matches
   )
 
-  def fromJsonLines(filename: String)(record: String): Option[EntityRecord] = super.fromJson[LPFFeature](record, { f =>
-    val source = filename.substring(0, filename.indexOf('.'))
-    toEntityRecord(source, f)
+  def fromJsonLines(identifier: String)(record: String): Option[EntityRecord] = super.fromJson[LPFFeature](record, { f =>
+    toEntityRecord(identifier, f)
   })
   
-  def fromGeoJSON(filename: String)(in: InputStream): Seq[EntityRecord] = {
-    val source = filename.substring(0, filename.indexOf('.'))
+  def fromGeoJSON(identifier: String)(in: InputStream): Seq[EntityRecord] = {
     val maybeFc = Json.fromJson[LPFFeatureCollection](Json.parse(in)) // .get
     if (maybeFc.isError) println(maybeFc.toString)
     val fc = maybeFc.get
-    fc.features.map(toEntityRecord(source, _))
+    fc.features.map(toEntityRecord(identifier, _))
   }
   
 }

@@ -10,12 +10,11 @@ import play.api.libs.functional.syntax._
 
 object PelagiosGeoJSONCrosswalk extends BaseGeoJSONCrosswalk {
 
-  def fromGeoJSON(filename: String)(in: InputStream): Seq[EntityRecord] = {
-    val source = filename.substring(0, filename.indexOf('.'))
+  def fromGeoJSON(identifier: String)(in: InputStream): Seq[EntityRecord] = {
     val fc = Json.fromJson[PelagiosGazetteerFeatureCollection](Json.parse(in)).get
     fc.features.map(f => EntityRecord(
       f.uri,
-      source,
+      identifier,
       DateTime.now().withZone(DateTimeZone.UTC),
       None, // lastChangedAt
       f.title,
