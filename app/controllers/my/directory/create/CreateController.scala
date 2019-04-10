@@ -12,6 +12,7 @@ import play.api.mvc.{AnyContent, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import services.{SharingLevel, ContentType}
 import services.SharingLevel.Utils._
+import services.annotation.AnnotationService
 import services.document.DocumentService
 import services.folder.FolderService
 import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
@@ -24,6 +25,7 @@ import transform.tiling.TilingService
 
 @Singleton
 class CreateController @Inject() (
+  val annotations: AnnotationService,
   val components: ControllerComponents,
   val silhouette: Silhouette[Security.Env],
   val uploads: UploadService,
@@ -183,6 +185,31 @@ class CreateController @Inject() (
           ))
         }}
     })
+  }
+
+  /** Creates a copy of a document in the workspace **/
+  def duplicateDocument(id: String) = silhouette.SecuredAction.async { implicit request => 
+    documents.getExtendedMeta(id: String, Some(request.identity.username)).flatMap { _ match { 
+      case Some((doc, accesslevel)) =>
+        if (accesslevel.isAdmin) { // For the time being, enforce admin access         
+          val f = for {
+            cloned <- documents.duplicateDocument(doc.document, doc.fileparts)
+            success <- annotations.cloneAnnotationsTo(
+              cloned.docIdBefore,
+              cloned.docIdAfter,
+              cloned.filepartIds)
+            _ <- Future { Thread.sleep(1000) } // Horrible but ES needs time to reflect the update
+          } yield (success)
+
+          f.map { success => 
+            if (success) Ok else InternalServerError
+          }
+        } else {
+          Future.successful(Forbidden)
+        } 
+
+      case None => Future.successful(NotFound)
+    }}
   }
 
 }
