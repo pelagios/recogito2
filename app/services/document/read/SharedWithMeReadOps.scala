@@ -137,36 +137,40 @@ trait SharedWithMeReadOps { self: DocumentService =>
     }
 
   def getDocsSharedWithMeById(docIds: Seq[String], sharedWith: String) = db.query { sql => 
-    val idSet = docIds
-      .flatMap(sanitizeDocId) // prevent injection attacks
-      .map(id => s"'${id}'") // SQL quoting
-      .mkString(",") // join
+    if (docIds.isEmpty) {
+      Seq.empty[SharedDocument]
+    } else {
+      val idSet = docIds
+        .flatMap(sanitizeDocId) // prevent injection attacks
+        .map(id => s"'${id}'") // SQL quoting
+        .mkString(",") // join
 
-    val query = 
-      s"""
-       SELECT 
-         document.*,
-         sharing_policy.*,
-         file_count,
-         content_types
-       FROM document
-         JOIN sharing_policy 
-           ON sharing_policy.document_id = document.id AND
-              sharing_policy.shared_with = ?
-         JOIN (
-           SELECT
-             count(*) AS file_count,
-             array_agg(DISTINCT content_type) AS content_types,
-             document_id
-           FROM document_filepart
-           GROUP BY document_id
-         ) AS parts ON parts.document_id = document.id
-       WHERE document.id IN (${idSet});
-       """
+      val query = 
+        s"""
+        SELECT 
+          document.*,
+          sharing_policy.*,
+          file_count,
+          content_types
+        FROM document
+          JOIN sharing_policy 
+            ON sharing_policy.document_id = document.id AND
+                sharing_policy.shared_with = ?
+          JOIN (
+            SELECT
+              count(*) AS file_count,
+              array_agg(DISTINCT content_type) AS content_types,
+              document_id
+            FROM document_filepart
+            GROUP BY document_id
+          ) AS parts ON parts.document_id = document.id
+        WHERE document.id IN (${idSet});
+        """
 
-    // Restore result order
-    val documents = sql.resultQuery(query, sharedWith).fetchArray.map(SharedDocument.build).toSeq
-    docIds.flatMap(id => documents.find(_.document.getId == id))
+      // Restore result order
+      val documents = sql.resultQuery(query, sharedWith).fetchArray.map(SharedDocument.build).toSeq
+      docIds.flatMap(id => documents.find(_.document.getId == id))
+    }
   }
 
 }
