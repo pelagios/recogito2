@@ -94,11 +94,11 @@ trait CreateOps { self: DocumentService =>
     filepartRecord
   }
 
-  /** Duplicates a  */
+  /** Duplicates the given document and fileparts **/
   def duplicateDocument(
     doc: DocumentRecord,
     fileparts: Seq[DocumentFilepartRecord]
-  ) = db.withTransaction { implicit sql =>
+  ): Future[DocumentRecord] = db.withTransaction { implicit sql =>
     val clonedDocId = DocumentIdFactory.generateRandomID()
 
     // Clone the document record
@@ -126,7 +126,7 @@ trait CreateOps { self: DocumentService =>
       duplicateFilepart(doc, clonedDoc, part)
     }
 
-    // TODO clone annotations (note: history & contribution records will be ignored)
+    clonedDoc
   }
 
 }
