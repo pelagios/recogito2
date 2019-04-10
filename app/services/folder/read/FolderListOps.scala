@@ -134,22 +134,29 @@ trait FolderListOps { self: FolderService =>
               LEFT OUTER JOIN sharing_policy 
                 ON sharing_policy.folder_id = folder.id 
                   AND sharing_policy.shared_with = ?
-            WHERE folder.parent IS NULL
-              AND (
-                folder.public_visibility = 'PUBLIC' OR
-                  sharing_policy.shared_with = ?
-              );
+            WHERE 
+              folder.owner = ?
+                AND
+              folder.parent IS NULL
+                AND (
+                  folder.public_visibility = 'PUBLIC' OR
+                    sharing_policy.shared_with = ?
+                );
             """
-          sql.resultQuery(query, loggedIn, loggedIn)
+          sql.resultQuery(query, loggedIn, username, loggedIn)
 
         case None => 
           val query = 
             """
             SELECT * FROM folder
-            WHERE folder.parent IS NULL
-              AND folder.public_visibility = 'PUBLIC';
+            WHERE 
+              folder.owner = ?
+                AND
+              folder.parent IS NULL
+                AND 
+              folder.public_visibility = 'PUBLIC';
             """
-          sql.resultQuery(query)
+          sql.resultQuery(query, username)
       }
 
       val records = query.fetchArray.map(asAccessibleFolder)
