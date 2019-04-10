@@ -125,11 +125,11 @@ class AuthoritiesAdminController @Inject() (
         val loader = new StreamLoader()
         loader.importPlaces(getStream(file, filename), GeoNamesCrosswalk.fromJson, importer)
         
-      // Bit of a hack for now...
-      // case f if f.endsWith("json") && f.contains("lpf") =>
-      //   Logger.info("Importing LPF-style GeoJSON")
-      //   val loader = new DumpLoader()
-      //   loader.importDump(file, filename, LPFCrosswalk.fromJson(filename), importer)
+      // A hack for now...
+      case f if f.endsWith("json") && f.contains("lpf") =>
+        Logger.info("Importing LPF-style GeoJSON")
+        val loader = new DumpLoader()
+        loader.importDump(file, filename, LPFCrosswalk.fromGeoJSON(filename), importer)
         
       case f if f.endsWith("jsonl") && f.contains("lpf") =>
         Logger.info("Importing LPF-style GeoJSON")
