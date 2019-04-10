@@ -3,8 +3,7 @@
 __Current version: [v3.2](https://github.com/pelagios/recogito2/releases/tag/v3.2)__
 
 Home of [Recogito](http://recogito.pelagios.org) - a Semantic Annotation tool for texts and
-images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our progress on
-[Waffle.io](http://waffle.io/pelagios/recogito2).
+images, developed by [Pelagios Commons](http://commons.pelagios.org).
 
 ## Prerequisites
 
@@ -37,7 +36,12 @@ images, developed by [Pelagios Commons](http://commons.pelagios.org). Track our 
 
 ## Importing gazetteers
 
-Documentation on how to import gazetteers is [on the Wiki](https://github.com/pelagios/recogito2/wiki/Importing-Gazetteers).
+You can import gazetteers through the administration dashboard. 
+
+* Log in with a user that has admin privileges (such as the default 'recogito' user created automatically) 
+* Point your browser to [http://localhost:9000/admin/authorities](http://localhost:9000/admin/authorities)
+* Click __Add Authority File__ to upload a gazetteer (see [our Wiki](https://github.com/pelagios/recogito2/wiki/Importing-Gazetteers)
+  for information on supported data formats).
 
 ## Running in production
 
