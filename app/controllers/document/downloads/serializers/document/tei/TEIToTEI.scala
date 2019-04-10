@@ -86,6 +86,15 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
       el
     }
 
+    def getNotes(annotation: Annotation) = {
+      getCommentBodies(annotation).map { comment => 
+        val noteEl = doc.createElement("note")
+        noteEl.setAttribute("resp", comment.lastModifiedBy.get)
+        noteEl.appendChild(doc.createTextNode(comment.value.get))
+        noteEl
+      }
+    }
+
     sortByOffsetDesc(annotations).foreach { annotation =>
       val range = toRange(annotation.anchor, doc)
 
@@ -94,6 +103,12 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
         val tag = toTag(annotation)
         range.deleteContents()
         range.surroundContents(tag)
+
+        val notes = getNotes(annotation)
+        if (notes.size > 0) {
+          range.collapse(false)        
+          notes.reverse.foreach(n => range.insertNode(n))
+        }
       }
     }
     
