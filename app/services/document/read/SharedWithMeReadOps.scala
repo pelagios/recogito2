@@ -164,7 +164,9 @@ trait SharedWithMeReadOps { self: DocumentService =>
        WHERE document.id IN (${idSet});
        """
 
-    sql.resultQuery(query, sharedWith).fetchArray.map(SharedDocument.build).toSeq
+    // Restore result order
+    val documents = sql.resultQuery(query, sharedWith).fetchArray.map(SharedDocument.build).toSeq
+    docIds.flatMap(id => documents.find(_.document.getId == id))
   }
 
 }

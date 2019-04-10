@@ -119,6 +119,7 @@ trait DocumentReadOps { self: DocumentService =>
         .map(id => s"'${id}'") // SQL quoting
         .mkString(",") // join
 
+      // Note that this query does NOT maintain the order from the idSet
       val query = 
         s"""
         SELECT 
@@ -137,7 +138,10 @@ trait DocumentReadOps { self: DocumentService =>
         WHERE document.id IN (${idSet});
         """
 
-      sql.resultQuery(query).fetchArray.map(MyDocument.build).toSeq
+      val documents = sql.resultQuery(query).fetchArray.map(MyDocument.build).toSeq
+
+      // Restore result order
+      docIds.flatMap(id => documents.find(_.document.getId == id))
     }
   }
 
