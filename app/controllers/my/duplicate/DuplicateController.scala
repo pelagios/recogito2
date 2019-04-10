@@ -19,7 +19,7 @@ class DuplicateController @Inject() (
   def duplicateDocument(id: String) = silhouette.SecuredAction.async { implicit request => 
     documentService.getExtendedMeta(id: String, Some(request.identity.username)).flatMap { _ match { 
       case Some((doc, accesslevel)) =>
-        if (accesslevel.canReadAll) // Read access is sufficient to duplicate a document
+        if (accesslevel.isAdmin) // For the time being, enforce admin access
           documentService.duplicateDocument(doc.document, doc.fileparts).map { _ => 
 
             // TODO 

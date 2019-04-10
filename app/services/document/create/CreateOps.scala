@@ -4,7 +4,9 @@ import java.io.{File, InputStream}
 import java.nio.file.Files
 import java.sql.Timestamp
 import java.util.{Date, UUID}
+import org.jooq.DSLContext
 import scala.concurrent.Future
+import services.ContentType
 import services.document.{DocumentService, DocumentIdFactory}
 import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
@@ -27,39 +29,80 @@ trait CreateOps { self: DocumentService =>
     }
   }
 
-  /** TODO not all fileparts have files!! **/
-  private def duplicateFilepart(origPart: DocumentFilepartRecord, origDoc: DocumentRecord, clonedDoc: DocumentRecord) = {
-    val clonedPartId = UUID.randomUUID
-
+  /** Creates a copy of the file associated with the given part 
+    * 
+    * Warning: this method strictly assumes that there IS a local
+    * file for this filepart. Checking whether the 'file' field of 
+    * the part points to a local file or a remote source has to 
+    * happen outside of this method.
+    */
+  private def copyFile(
+    origDoc: DocumentRecord, // The original document the source part is from
+    origPart: DocumentFilepartRecord, // The original source part
+    clonedDoc: DocumentRecord, // The cloned document record the new, cloned part should be part of
+    clonedPartId: UUID // The ID the new, cloned part should have
+  ): String = {
     val sourceFile = new File(
       uploads.getDocumentDir(origDoc.getOwner, origDoc.getId).get, 
       origPart.getFile
     ).toPath
 
+    // Destination filename = new UUID + old file extension
     val sourceExtension = origPart.getFile.substring(origPart.getFile.lastIndexOf('.'))
     val destinationFilename = s"${clonedPartId}.${sourceExtension}"
 
     val destinationFile = new File(
-      uploads.getDocumentDir(clonedDoc.getOwner, clonedDoc.getId).get,
+      uploads.getDocumentDir(clonedDoc.getOwner, clonedDoc.getId, true).get,
       destinationFilename
     ).toPath
 
     Files.copy(sourceFile, destinationFile)
 
-    // TODO duplicate record
+    destinationFile.getFileName.toString
+  }
+
+  /** Duplicates the given filepart record, copying the file as needed **/
+  private def duplicateFilepart(
+    origDoc: DocumentRecord,
+    clonedDoc: DocumentRecord,
+    origPart: DocumentFilepartRecord
+  )(implicit sql: DSLContext): DocumentFilepartRecord = {
+
+    // Create a new UUID for the cloned filepart
+    val clonedPartId = UUID.randomUUID
+
+    // Depending on the content type, 'file' will either point to a copy of the local file, 
+    // or the same remote source
+    val origContentType = ContentType.withName(origPart.getContentType).get
+    val clonedFile = 
+      if (origContentType.isLocal) {
+        copyFile(origDoc, origPart, clonedDoc, clonedPartId) 
+      } else {
+        origPart.getFile
+      }
+
+    val filepartRecord = new DocumentFilepartRecord(
+      clonedPartId,
+      clonedDoc.getId,
+      origPart.getTitle,
+      origPart.getContentType,
+      clonedFile,
+      origPart.getSequenceNo,
+      origPart.getSource)
+
+    sql.insertInto(DOCUMENT_FILEPART).set(filepartRecord).execute()
+    filepartRecord
   }
 
   /** Duplicates a  */
   def duplicateDocument(
     doc: DocumentRecord,
     fileparts: Seq[DocumentFilepartRecord]
-  ): Future[Boolean] /** TODO or document instead? **/ = {
+  ) = db.withTransaction { implicit sql =>
     val clonedDocId = DocumentIdFactory.generateRandomID()
 
-    // TODO place in same folder
-
-    // Step 1 - clone the doc record
-    val cloneDocument = new DocumentRecord(
+    // Clone the document record
+    val clonedDoc = new DocumentRecord(
       clonedDocId,
       doc.getOwner, // TODO make configurable later ("forking")
       new Timestamp(new Date().getTime),
@@ -76,25 +119,14 @@ trait CreateOps { self: DocumentService =>
       doc.getPublicVisibility,
       doc.getPublicAccessLevel)
 
-    // TODO Step 2 - copy files
+    sql.insertInto(DOCUMENT).set(clonedDoc).execute()
 
-
-    // Step 3 - clone the filepart records
+    // Clone fileparts (DB records + local files, if any)
     val clonedParts = fileparts.map { part => 
-      new DocumentFilepartRecord(
-        UUID.randomUUID,
-        clonedDocId,
-        part.getTitle,
-        part.getContentType,
-        null, // TODO part.getFile -> use clone location
-        part.getSequenceNo,
-        part.getSource)
+      duplicateFilepart(doc, clonedDoc, part)
     }
 
-    // Step 4 - annotations (note: history & contribution records will be ignored)
-
-    ???
-
+    // TODO clone annotations (note: history & contribution records will be ignored)
   }
 
 }

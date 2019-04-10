@@ -137,10 +137,9 @@ trait DocumentReadOps { self: DocumentService =>
         ) AS parts ON parts.document_id = document.id
         WHERE document.id IN (${idSet});
         """
-
-      val documents = sql.resultQuery(query).fetchArray.map(MyDocument.build).toSeq
-
+        
       // Restore result order
+      val documents = sql.resultQuery(query).fetchArray.map(MyDocument.build).toSeq
       docIds.flatMap(id => documents.find(_.document.getId == id))
     }
   }
