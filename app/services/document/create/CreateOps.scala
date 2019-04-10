@@ -11,6 +11,12 @@ import services.document.{DocumentService, DocumentIdFactory}
 import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 
+/** Helper to encapsulate doc and filepart Ids before and after cloning **/
+case class CloneCorrespondence(
+  docIdBefore: String,
+  docIdAfter: String,
+  filepartIds: Map[UUID, UUID])
+
 trait CreateOps { self: DocumentService => 
 
   /** Imports document and filepart records to DB, and filepart content to user dir **/
@@ -98,7 +104,7 @@ trait CreateOps { self: DocumentService =>
   def duplicateDocument(
     doc: DocumentRecord,
     fileparts: Seq[DocumentFilepartRecord]
-  ): Future[DocumentRecord] = db.withTransaction { implicit sql =>
+  ): Future[CloneCorrespondence] = db.withTransaction { implicit sql =>
     val clonedDocId = DocumentIdFactory.generateRandomID()
 
     // Clone the document record
@@ -126,7 +132,12 @@ trait CreateOps { self: DocumentService =>
       duplicateFilepart(doc, clonedDoc, part)
     }
 
-    clonedDoc
+    CloneCorrespondence(
+      doc.getId,
+      clonedDoc.getId,
+      fileparts.zip(clonedParts).map { case (before, after) =>
+        before.getId -> after.getId
+      }.toMap)
   }
 
 }

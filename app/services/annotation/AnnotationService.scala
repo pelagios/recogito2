@@ -206,6 +206,29 @@ class AnnotationService @Inject() (
     } yield (s1 && s2)
   }
 
+  def cloneAnnotationsTo(docIdBefore: String, docIdAfter: String, filepartIds: Map[UUID, UUID]): Future[Boolean] = {
+    // Logger.info(s"Cloning annotations from ${docIdBefore} to ${docIdAfter}")
+    findByDocId(docIdBefore).flatMap { annotationsAndVersions => 
+      // Logger.info(s"Found ${annotationsAndVersions.size} annotations to clone")
+
+      if (annotationsAndVersions.size > 0) {
+        val cloned = annotationsAndVersions.map { case (a, _) => 
+          val filepartBefore = a.annotates.filepartId
+          val filepartAfter = filepartIds.get(filepartBefore).get
+          a.cloneTo(docIdAfter, filepartAfter)
+        }
+        
+        // Logger.info("Cloning...")
+        upsertAnnotations(cloned, false).map { failed => 
+          // Logger.info(s"${failed.size} failed inserts")
+          failed.size == 0
+        }
+      } else {
+        Future.successful(true)
+      }
+    }
+  }
+
   /** Retrieves annotations on a document last updated after a given timestamp **/
   def findModifiedAfter(documentId: String, after: DateTime): Future[Seq[Annotation]] =
     es.client execute {

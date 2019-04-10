@@ -23,7 +23,14 @@ case class Annotation(
   
   def withBody(body: AnnotationBody) = 
     this.copy(bodies = this.bodies :+ body.copy(lastModifiedAt = this.lastModifiedAt))
-  
+
+  def cloneTo(docId: String, filepartId: UUID) = 
+    this.copy(
+      annotationId = UUID.randomUUID,
+      versionId = UUID.randomUUID,
+      annotates = 
+        AnnotatedObject(docId, filepartId, this.annotates.contentType))
+
 }
 
 case class AnnotatedObject(documentId: String, filepartId: UUID, contentType: ContentType)
