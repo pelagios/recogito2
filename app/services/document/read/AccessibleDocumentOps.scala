@@ -48,6 +48,7 @@ trait AccessibleDocumentOps { self: DocumentService =>
             .on(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(DOCUMENT.ID))
           .leftOuterJoin(SHARING_POLICY)
             .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID))
+              .and(SHARING_POLICY.SHARED_WITH.equal(username))
           .where(
             DOCUMENT.OWNER.equalIgnoreCase(owner)
               .and(FOLDER_ASSOCIATION.FOLDER_ID.isNull)
@@ -234,7 +235,6 @@ trait AccessibleDocumentOps { self: DocumentService =>
                document.public_visibility = 'PUBLIC' 
                  OR sharing_policy.shared_with = ?
              )
-             AND 
            ORDER BY ${sortBy} ${sortOrder}
            OFFSET ${offset} LIMIT ${limit};
            """
