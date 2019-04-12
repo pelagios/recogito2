@@ -198,8 +198,11 @@ DELETE  /api/sharing/folders/collaborator            controllers.my.sharing.Shar
 # ~~~ Search ~~~
 
 GET     /api/search/all                              controllers.my.directory.search.SearchController.searchAll(q: String)
+POST    /api/search/all                              controllers.my.directory.search.SearchController.searchAll(q: String)
 GET     /api/search/my                               controllers.my.directory.search.SearchController.searchMy(q: String)
+POST    /api/search/my                               controllers.my.directory.search.SearchController.searchMy(q: String)
 GET     /api/search/shared                           controllers.my.directory.search.SearchController.searchSharedWithMe(q: String)
+POST    /api/search/shared                           controllers.my.directory.search.SearchController.searchSharedWithMe(q: String)
 
 # ~~~ Announcements ~~~
 
