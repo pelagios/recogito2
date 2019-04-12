@@ -12,34 +12,55 @@ trait SearchOps { self: DocumentService =>
   def searchAll(loggedInAs: Option[String], query: String) = db.query { sql => 
     val startTime = System.currentTimeMillis
 
-    val documents = loggedInAs match {
+    val query = loggedInAs match {
+
       case Some(username) => 
-        // Public documents + mine + shared with me
-        sql.select().from(DOCUMENT)
-           .leftOuterJoin(SHARING_POLICY)
-             .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID))
-             .and(SHARING_POLICY.SHARED_WITH.equal(username))
-           .where(
-             DOCUMENT.OWNER.equal(username)
-               .or(SHARING_POLICY.SHARED_WITH.equal(username))
-               .or(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))
-           ).and(lower(DOCUMENT.TITLE).like(s"%${query.toLowerCase}%"))
-           .fetchArray.map(_.into(classOf[DocumentRecord]))
-           .toSeq
+        // TODO include shared documents
+        val q = 
+          s"""
+            SELECT 
+              document.*,
+              file_count,
+              content_types
+            FROM document
+              LEFT JOIN (
+                SELECT
+                  count(*) AS file_count,
+                  array_agg(DISTINCT content_type) AS content_types,
+                  document_id
+                FROM document_filepart
+                GROUP BY document_id
+              ) AS parts ON parts.document_id = document.id
+            WHERE document.public_visibility = 'PUBLIC';
+            """
+
+        sql.resultQuery(q)
 
       case None => 
-        // Public documents only
-        sql.selectFrom(DOCUMENT)
-           .where(DOCUMENT.PUBLIC_VISIBILITY.equal(PublicAccess.PUBLIC.toString))
-             .and(lower(DOCUMENT.TITLE).like(s"%${query.toLowerCase}%"))
-           .fetchArray
-           .toSeq
+        val q = 
+          s"""
+            SELECT 
+              document.*,
+              file_count,
+              content_types
+            FROM document
+              LEFT JOIN (
+                SELECT
+                  count(*) AS file_count,
+                  array_agg(DISTINCT content_type) AS content_types,
+                  document_id
+                FROM document_filepart
+                GROUP BY document_id
+              ) AS parts ON parts.document_id = document.id
+            WHERE document.public_visibility = 'PUBLIC';
+            """
+
+        sql.resultQuery(q)
+
     }
 
-    // Just a dummy for experimentation
-    Page(System.currentTimeMillis - startTime, documents.size, 0, 20, documents.map { d => 
-      MyDocument(d, 1, Seq.empty[ContentType])
-    })
+    val documents = query.fetchArray.map(MyDocument.build)
+    Page(System.currentTimeMillis - startTime, documents.size, 0, documents.size, documents)
   }
 
   def searchMyDocuments(username: String, query: String) = db.query { sql =>
