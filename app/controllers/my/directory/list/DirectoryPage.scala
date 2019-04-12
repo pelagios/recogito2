@@ -1,6 +1,6 @@
 package controllers.my.directory.list
 
-import controllers.my.directory.list.document.ConfiguredPresentation
+import controllers.my.directory.ConfiguredPresentation
 import controllers.my.directory.list.folder.FolderItem
 import java.util.UUID
 import play.api.libs.json._

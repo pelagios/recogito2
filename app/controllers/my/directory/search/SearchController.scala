@@ -1,4 +1,4 @@
-package controllers.my.search
+package controllers.my.directory.search
 
 import controllers.{Security, HasPrettyPrintJSON}
 import com.mohiva.play.silhouette.api.Silhouette

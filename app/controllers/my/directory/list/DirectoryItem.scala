@@ -1,6 +1,6 @@
 package controllers.my.directory.list
 
-import controllers.my.directory.list.document.ConfiguredPresentation
+import controllers.my.directory.ConfiguredPresentation
 import controllers.my.directory.list.folder.FolderItem
 import play.api.libs.json._
 import play.api.libs.functional.syntax._

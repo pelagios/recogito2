@@ -1,4 +1,4 @@
-package controllers.my.directory.list.document
+package controllers.my.directory
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._

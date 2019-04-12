@@ -1,4 +1,4 @@
-package controllers.my.search
+package controllers.my.directory.search
 
 import org.joda.time.DateTime
 import play.api.libs.json._

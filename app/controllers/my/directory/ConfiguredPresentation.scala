@@ -1,4 +1,4 @@
-package controllers.my.directory.list.document
+package controllers.my.directory
 
 import controllers.my.directory.list.DirectoryItem
 import org.joda.time.DateTime
