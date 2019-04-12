@@ -12,7 +12,7 @@ trait SearchOps { self: DocumentService =>
   def searchAll(loggedInAs: Option[String], query: String) = db.query { sql => 
     val startTime = System.currentTimeMillis
 
-    val query = loggedInAs match {
+    val q = loggedInAs match {
 
       case Some(username) => 
         // TODO include shared documents
@@ -31,10 +31,11 @@ trait SearchOps { self: DocumentService =>
                 FROM document_filepart
                 GROUP BY document_id
               ) AS parts ON parts.document_id = document.id
-            WHERE document.public_visibility = 'PUBLIC';
+            WHERE document.public_visibility = 'PUBLIC'
+              AND lower(document.title) LIKE ?;
             """
 
-        sql.resultQuery(q)
+        sql.resultQuery(q, s"%${query.toLowerCase}%")
 
       case None => 
         val q = 
@@ -52,14 +53,15 @@ trait SearchOps { self: DocumentService =>
                 FROM document_filepart
                 GROUP BY document_id
               ) AS parts ON parts.document_id = document.id
-            WHERE document.public_visibility = 'PUBLIC';
+            WHERE document.public_visibility = 'PUBLIC'
+              AND lower(document.title) LIKE ?;
             """
 
-        sql.resultQuery(q)
+        sql.resultQuery(q, s"%${query.toLowerCase}%")
 
     }
 
-    val documents = query.fetchArray.map(MyDocument.build)
+    val documents = q.fetchArray.map(MyDocument.build)
     Page(System.currentTimeMillis - startTime, documents.size, 0, documents.size, documents)
   }
 
