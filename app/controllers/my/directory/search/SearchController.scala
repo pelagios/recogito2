@@ -1,6 +1,7 @@
 package controllers.my.directory.search
 
 import controllers.{Security, HasPrettyPrintJSON}
+import controllers.my.directory.ConfiguredPresentation
 import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
@@ -18,6 +19,8 @@ class SearchController @Inject() (
 ) extends AbstractController(components) 
     with HasPrettyPrintJSON {
 
+  import ConfiguredPresentation._
+
   private def getSearchOpts(request: Request[AnyContent]) = {
     request.body.asJson.flatMap(json => 
       Try(Json.fromJson[SearchOptions](json).get).toOption)
@@ -26,9 +29,8 @@ class SearchController @Inject() (
   /** Search all of public Recogito, plus my own accessible documents **/
   def searchAll(query: String) = silhouette.UserAwareAction.async { implicit request =>
     documentService.searchAll(request.identity.map(_.username), query).map { documents => 
-      jsonOk(Json.toJson(documents.map { doc => 
-        Json.obj("id" -> doc.getId, "title" -> doc.getTitle)
-      }))
+      val presentation = ConfiguredPresentation.forMyDocument(documents, None, None)
+      jsonOk(Json.toJson(presentation))
     }
   }
 

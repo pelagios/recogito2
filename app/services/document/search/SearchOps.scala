@@ -1,7 +1,8 @@
-package services.document.read
+package services.document.search
 
 import org.jooq.impl.DSL._
-import services.PublicAccess
+import services.{ContentType, Page, PublicAccess}
+import services.document.read.results.MyDocument
 import services.document.DocumentService
 import services.generated.tables.records.DocumentRecord
 import services.generated.Tables.{SHARING_POLICY, DOCUMENT}
@@ -9,7 +10,9 @@ import services.generated.Tables.{SHARING_POLICY, DOCUMENT}
 trait SearchOps { self: DocumentService => 
 
   def searchAll(loggedInAs: Option[String], query: String) = db.query { sql => 
-    loggedInAs match {
+    val startTime = System.currentTimeMillis
+
+    val documents = loggedInAs match {
       case Some(username) => 
         // Public documents + mine + shared with me
         sql.select().from(DOCUMENT)
@@ -32,6 +35,11 @@ trait SearchOps { self: DocumentService =>
            .fetchArray
            .toSeq
     }
+
+    // Just a dummy for experimentation
+    Page(System.currentTimeMillis - startTime, documents.size, 0, 20, documents.map { d => 
+      MyDocument(d, 1, Seq.empty[ContentType])
+    })
   }
 
   def searchMyDocuments(username: String, query: String) = db.query { sql =>

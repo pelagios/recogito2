@@ -20,7 +20,7 @@ class DocumentService @Inject() (
   with read.CollaboratorReadOps
   with read.SharedWithMeReadOps
   with read.AccessibleDocumentOps
-  with read.SearchOps
+  with search.SearchOps
   with update.DocumentUpdateOps
   with update.CollaboratorUpdateOps
   with delete.DeleteOps {

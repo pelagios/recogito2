@@ -146,9 +146,6 @@ class DirectoryController @Inject() (
 
   def getSharedWithMe(offset: Int, size: Int, folderId: UUID) = 
     silhouette.SecuredAction.async { implicit request => 
-
-      import ConfiguredPresentation._
-
       val fBreadcrumbs = Option(folderId).map { id => 
           folders.getSharedWithMeBreadcrumbTrail(request.identity.username, id)
         } getOrElse { Future.successful(Seq.empty[Breadcrumb]) }
@@ -190,9 +187,6 @@ class DirectoryController @Inject() (
 
   def getAccessibleDocuments(fromOwner: String, offset: Int, size: Int, folderId: UUID) =
     silhouette.UserAwareAction.async { implicit request =>
-
-      import ConfiguredPresentation._
-
       val loggedIn = request.identity.map(_.username)
 
       val fOwner = users.findByUsernameIgnoreCase(fromOwner)
