@@ -2,7 +2,7 @@ name := "recogito-plugin-ner-stanford"
 
 organization := "org.pelagios"
 
-version := "1.0"
+version := "1.1"
 
 scalaVersion := "2.11.11"
 

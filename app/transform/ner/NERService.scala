@@ -23,7 +23,7 @@ class NERService @Inject() (
   system: ActorSystem
 ) extends WorkerService(
   system, uploads,
-  NERActor.props(taskService, annotationService, entityService, config), 10  
+  NERActor.props(taskService, annotationService, entityService, config), 3  
 )
 
 object NERService extends HasTeiNER {

@@ -20,6 +20,13 @@ abstract class StanfordBaseWrapperPlugin(
   
   private val logger = LoggerFactory.getLogger(this.getClass)
 
+  private lazy val pipeline = {
+    logger.info("Initializing NER pipeline")
+    val pipeline = new StanfordCoreNLP(props)
+    logger.info("Pipeline initialized")
+    pipeline
+  }
+
   private def toEntityType(entityTag: String) = entityTag match {
     case "LOCATION" | "CITY" | "COUNTRY" | "STATE_OR_PROVINCE" | "NATIONALITY" => Some(EntityType.LOCATION)
     case "PERSON" => Some(EntityType.PERSON)
@@ -44,9 +51,6 @@ abstract class StanfordBaseWrapperPlugin(
   override val getSupportedLanguages = Seq(lang).asJava
   
   override def parse(text: String, env: PluginEnvironment) = {
-    logger.info("Initializing NER pipeline")
-    val pipeline = new StanfordCoreNLP(props)
-    logger.info("Pipeline initialized")
     val document = new CoreDocument(text) 
     pipeline.annotate(document)    
     
@@ -66,7 +70,7 @@ abstract class StanfordBaseWrapperPlugin(
       }
     }
 
-    StanfordCoreNLP.clearAnnotatorPool
+    // StanfordCoreNLP.clearAnnotatorPool
 
     entities.withFilter(_.entityTag != "O")
       .flatMap(e => toEntityType(e.entityTag).map(etype => new Entity(e.chars, etype, e.charOffset))).asJava
