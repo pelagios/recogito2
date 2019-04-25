@@ -95,6 +95,17 @@
           <h2>Relations</h2>
           <div class="inner">
             <ul>
+              <li>
+                <div class="description">
+                  <h3>Basic CSV</h3>
+                  <p>
+                    A basic CSV export of relationships in the document.
+                  </p>
+                </div>
+                <div class="button-container">
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadRelationTriples(doc.id)" class="btn class"><span class="icon">&#xf019;</span> CSV</a>
+                </div>
+              </li>
               <li class="two-buttons">
                 <div class="description">
                   <h3>Gephi CSV Node/Edge Lists</h3>

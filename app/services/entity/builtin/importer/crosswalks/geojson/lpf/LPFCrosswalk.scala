@@ -33,8 +33,13 @@ object LPFCrosswalk extends BaseGeoJSONCrosswalk {
   })
   
   def fromGeoJSON(identifier: String)(in: InputStream): Seq[EntityRecord] = {
-    val maybeFc = Json.fromJson[LPFFeatureCollection](Json.parse(in)) // .get
-    if (maybeFc.isError) println(maybeFc.toString)
+    play.api.Logger.info("Parsing FeatureCollection")
+    val maybeFc = Json.fromJson[LPFFeatureCollection](Json.parse(in))
+    if (maybeFc.isError)
+      play.api.Logger.error(maybeFc.toString) 
+    else
+      play.api.Logger.info("Successful.") 
+    
     val fc = maybeFc.get
     fc.features.map(toEntityRecord(identifier, _))
   }

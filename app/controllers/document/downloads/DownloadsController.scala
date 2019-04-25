@@ -76,6 +76,7 @@ class DownloadsController @Inject() (
     with document.iob.PlaintextToIOB
     with document.spacy.PlaintextToSpacy
     with places.PlacesToGeoJSON
+    with relations.RelationsToTriplesCSV
     with relations.RelationsToGephi
     with HasPrettyPrintJSON
     with I18nSupport {
@@ -195,6 +196,12 @@ class DownloadsController @Inject() (
          else
            Future.successful(Forbidden)
      })     
+  }
+
+  def downloadRelationTriples(documentId: String) = silhouette.UserAwareAction.async { implicit request => 
+    relationsToTriplesCSV(documentId).map { file =>
+      Ok.sendFile(file).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + "_relations.csv" })
+    }
   }
   
   def downloadGephiNodes(documentId: String) = silhouette.UserAwareAction.async { implicit request =>

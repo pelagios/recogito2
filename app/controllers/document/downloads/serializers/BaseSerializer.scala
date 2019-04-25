@@ -53,6 +53,9 @@ trait BaseSerializer {
   protected def getFirstTranscription(a: Annotation): Option[String] =
     a.bodies.find(_.hasType == AnnotationBody.TRANSCRIPTION).flatMap(_.value)
 
+  protected def getFirstQuoteOrTranscription(a: Annotation): Option[String] =
+    Seq(getFirstQuote(a), getFirstTranscription(a)).flatten.headOption
+
   protected def getFirstEntityBody(a: Annotation): Option[AnnotationBody] = {
     import AnnotationBody._
     a.bodies.find(b => Set(PERSON, PLACE, EVENT).contains(b.hasType))
