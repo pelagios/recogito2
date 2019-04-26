@@ -21,7 +21,9 @@ resolvers ++= Seq(
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
   "GeoTools" at "http://download.osgeo.org/webdav/geotools/",
   "Boundless" at "http://repo.boundlessgeo.com/main/",
-  "Atlassian Releases" at "https://maven.atlassian.com/public/"
+  "Atlassian Releases" at "https://maven.atlassian.com/public/",
+  "Atlassian Maven" at "https://maven.atlassian.com/content/repositories/atlassian-public/",
+  Resolver.jcenterRepo 
 )
 
 libraryDependencies ++= Seq(
