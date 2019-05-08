@@ -18,3 +18,4 @@ pc.stdout.log
 pc.stdout.log
 recogito.plugins.ner.flair
 recogito.plugins.ner.herodotus
+recogito.plugins.ner.kima
