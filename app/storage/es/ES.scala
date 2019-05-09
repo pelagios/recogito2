@@ -57,7 +57,8 @@ class ES @Inject() (config: Configuration, lifecycle: ApplicationLifecycle) {
   lazy val client = {
     val host = config.getOptional[String]("es.host").getOrElse("localhost")
     val port = config.getOptional[Int]("es.port").getOrElse(9300)
-    val remoteClient = TcpClient.transport(ElasticsearchClientUri(host, port))
+    val clusterName = config.getOptional[String]("es.cluster.name").getOrElse("elasticsearch")
+    val remoteClient = TcpClient.transport(Settings.builder().put("cluster.name", clusterName).build(),ElasticsearchClientUri(host, port))
 
     Try(Await.result(remoteClient execute { clusterStats }, 3.seconds)) match {
       case Success(_) =>
