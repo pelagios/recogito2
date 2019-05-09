@@ -66,6 +66,7 @@ db.default.password="postgres-password-goes-here"
 # ~~~~~
 # es.host = localhost
 # es.port = 9300
+# es.cluster.name = elasticsearch
 
 # Evolutions
 # ~~~~~
