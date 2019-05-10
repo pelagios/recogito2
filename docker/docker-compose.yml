@@ -1,0 +1,59 @@
+#Docker-compose for running a Recogito image with the official Elasticsearch
+#image as its ES backend. The database server is assumed to be external to
+#Docker.
+
+version: '3.4'
+services:
+# The elasticsearch configuration - options are essentially lifted straight
+# from the sample compose file in the official documentation at 
+# https://www.elastic.co/guide/en/elasticsearch/reference/5.6/docker.html
+# Note, though, that we are only running a single instance, which might or
+# might not be wise.
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
+    container_name: elasticsearch
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      - cluster.name=docker-cluster
+      - xpack.security.enabled=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    deploy: 
+      resources:
+        limits:
+          memory: 1g
+    networks:
+      - intranet
+# The recogito image. Nothing terribly special here. We bind mount the
+# configuration from the local file system, expose the right ports, mount a
+# volume for persistent data, and finally we sleep a short time while the
+# ES service gets ready. 
+  recogito:
+    image: recogito-slim # Or whatever you have tagged your dockerimage
+    container_name: recogito
+    volumes:
+     - type: bind
+       source: /path/to/application.conf
+       target: /opt/recogito/conf/application.conf
+     - recogitodata:/opt/recogito/uploads/
+    ports: 
+     - 9000:9000
+    networks:
+      - intranet
+    command: sh -c "sleep 10 && bin/recogito2"
+
+networks:
+  intranet:
+
+# Quick and unoptimized volume configuration. Make sure to backup these
+# volumes for persistence.  
+volumes:
+  recogitodata:
+    driver: local
+  esdata:
+    driver: local
