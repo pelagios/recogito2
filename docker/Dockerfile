@@ -7,8 +7,8 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     apt install -y nodejs libvips-tools && \
     apt-get clean
 
-#For now we work with the master branch TODO change back to pelagios
-RUN git clone https://github.com/pettter/recogito2 /usr/share/recogito
+#For now we work with the master branch
+RUN git clone https://github.com/pelagios/recogito2 /usr/share/recogito
 
 # Move to workdir
 WORKDIR /usr/share/recogito
