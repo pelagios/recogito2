@@ -139,7 +139,7 @@ class AuthoritiesAdminController @Inject() (
       case f if f.endsWith("json") =>
         Logger.info("Importing Pelagios GeoJSON FeatureCollection")
         val loader = new DumpLoader()
-        loader.importDump(file, filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(filename), importer)        
+        loader.importDump(file, filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(identifier), importer)        
     }    
   }
 
