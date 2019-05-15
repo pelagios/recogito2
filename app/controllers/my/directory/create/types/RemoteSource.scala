@@ -3,7 +3,7 @@ package controllers.my.directory.create.types
 import controllers.my.directory.create.CreateController
 import java.nio.file.Paths
 import java.util.UUID
-import play.api.{Configuration, Logger}
+import play.api.Logger
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, Result}
@@ -22,7 +22,6 @@ trait RemoteSource { self: CreateController =>
     owner: User, 
     body: AnyContent
   )(implicit
-    conf: Configuration,
     tmpFile: TemporaryFileCreator,
     ws: WSClient
   ) = {
@@ -48,7 +47,6 @@ trait RemoteSource { self: CreateController =>
     owner: User, 
     url: String
   )(implicit 
-    conf: Configuration,
     tmpFile: TemporaryFileCreator,
     ws: WSClient
   ): Future[Result] = {
