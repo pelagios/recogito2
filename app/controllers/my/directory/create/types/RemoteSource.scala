@@ -1,6 +1,7 @@
 package controllers.my.directory.create.types
 
 import controllers.my.directory.create.CreateController
+import java.io.PrintWriter
 import java.nio.file.Paths
 import java.util.UUID
 import play.api.Logger
@@ -50,24 +51,23 @@ trait RemoteSource { self: CreateController =>
     tmpFile: TemporaryFileCreator,
     ws: WSClient
   ): Future[Result] = {
-    play.api.Logger.info(s"Importing CTS from $url")
+    Logger.info(s"Importing CTS from $url")
 
     // Resolve URL and download temporary file
     ws.url(url).withFollowRedirects(true).get().map { response => 
       // Extract TEI to temporary file
       val tei = (response.xml \\ "TEI")
 
-      val p = Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv")
+      val p = Paths.get(TempDir.get(), s"${UUID.randomUUID}.tei.xml")
       val tmp = tmpFile.create(p)
       val underlying = p.toFile
 
-      scala.xml.XML.save(underlying.getAbsolutePath, tei(0))
+      new PrintWriter(underlying) { write(tei(0).toString); close }
 
       // TODO Store TEI filepart
       // uploads.insertUploadFilepart(pendingUpload.getId, owner, underlying)
+      Ok
     }
-
-    ???
   }
 
   private def registerIIIFSource(pendingUpload: UploadRecord, owner: User, url: String): Future[Result] = {
