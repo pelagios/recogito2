@@ -60,5 +60,4 @@ trait FileUpload { self: CreateController =>
     })
   }
 
-
 }

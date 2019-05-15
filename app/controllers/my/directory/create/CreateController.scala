@@ -7,6 +7,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.Json
+import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,10 +38,11 @@ class CreateController @Inject() (
   implicit val documents: DocumentService,
   implicit val folders: FolderService,
   implicit val ctx: ExecutionContext,
+  implicit val tmpFile: TemporaryFileCreator,
   implicit val ws: WSClient
 ) extends BaseController(components, config, users)
     with types.FileUpload
-    with types.IIIFSource
+    with types.RemoteSource
     with HasPrettyPrintJSON 
     with helpers.InheritVisibilityHelper
     with helpers.InheritCollaboratorsHelper {
@@ -129,7 +131,7 @@ class CreateController @Inject() (
         if (isFileupload)
           storeFile(pendingUpload, request.identity, request.body)
         else 
-          registerIIIFSource(pendingUpload, request.identity, request.body)
+          registerRemoteSource(pendingUpload, request.identity, request.body)
     }}
   }
 
