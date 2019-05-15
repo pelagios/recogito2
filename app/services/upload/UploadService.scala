@@ -92,11 +92,15 @@ class UploadService @Inject() (
       upload
     }
 
-  /** Inserts a new locally stored filepart - metadata goes to the DB, content to the pending-uploads dir **/
   def insertUploadFilepart(uploadId: Int, owner: User, filepart: FilePart[TemporaryFile]):
+    Future[Either[Exception, UploadFilepartRecord]] =
+      insertUploadFilepart(uploadId, owner, filepart.ref, filepart.filename)
+
+  /** Inserts a new locally stored filepart - metadata goes to the DB, content to the pending-uploads dir **/
+  def insertUploadFilepart(uploadId: Int, owner: User, file: TemporaryFile, filename: String):
     Future[Either[Exception, UploadFilepartRecord]] = db.withTransaction { sql =>
      
-    val filesizeKb = Files.size(filepart.ref.path).toDouble / 1024
+    val filesizeKb = Files.size(file.path).toDouble / 1024
     
     val usedDiskspaceKb = uploads.getUsedDiskspaceKB(owner.username)
     val remainingDiskspaceKb = owner.quotaMb * 1024 - usedDiskspaceKb
@@ -106,15 +110,14 @@ class UploadService @Inject() (
       Left(new QuotaExceededException(remainingDiskspaceKb, filesizeKb))
     } else {
       val id = UUID.randomUUID
-      val title = filepart.filename
-      val extension = title.substring(title.lastIndexOf('.'))
-      val file = new File(uploads.PENDING_UPLOADS_DIR, id.toString + extension)
-      filepart.ref.moveTo(file)
-      file.setReadable(true, false)
+      val extension = filename.substring(filename.lastIndexOf('.'))
+      val dest = new File(uploads.PENDING_UPLOADS_DIR, id.toString + extension)
+      file.moveTo(dest)
+      dest.setReadable(true, false)
       
       ContentType.fromFile(file) match {
         case Right(contentType) => {
-          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.username, title, contentType.toString, file.getName, filesizeKb, null, null)
+          val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.username, filename, contentType.toString, dest.getName, filesizeKb, null, null)
           sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()
           Right(filepartRecord)
         }

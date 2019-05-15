@@ -5,6 +5,7 @@ import java.io.PrintWriter
 import java.nio.file.Paths
 import java.util.UUID
 import play.api.Logger
+import play.api.libs.json.Json
 import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, Result}
@@ -54,7 +55,7 @@ trait RemoteSource { self: CreateController =>
     Logger.info(s"Importing CTS from $url")
 
     // Resolve URL and download temporary file
-    ws.url(url).withFollowRedirects(true).get().map { response => 
+    ws.url(url).withFollowRedirects(true).get().flatMap { response => 
       // Extract TEI to temporary file
       val tei = (response.xml \\ "TEI")
 
@@ -64,9 +65,15 @@ trait RemoteSource { self: CreateController =>
 
       new PrintWriter(underlying) { write(tei(0).toString); close }
 
-      // TODO Store TEI filepart
-      // uploads.insertUploadFilepart(pendingUpload.getId, owner, underlying)
-      Ok
+      // Store TEI filepart 
+      // TODO pick filename from URL (or CTS XML?)
+      uploads.insertUploadFilepart(pendingUpload.getId, owner, tmp, "foo").map { _ match {
+        case Right(filepart) =>
+          Ok(Json.toJson(UploadSuccess(filepart.getId, filepart.getContentType)))
+   
+        case Left(e) =>
+          InternalServerError
+      }}
     }
   }
 
