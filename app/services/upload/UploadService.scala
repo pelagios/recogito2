@@ -115,7 +115,7 @@ class UploadService @Inject() (
       file.moveTo(dest)
       dest.setReadable(true, false)
       
-      ContentType.fromFile(file) match {
+      ContentType.fromFile(dest) match {
         case Right(contentType) => {
           val filepartRecord = new UploadFilepartRecord(id, uploadId, owner.username, filename, contentType.toString, dest.getName, filesizeKb, null, null)
           sql.insertInto(UPLOAD_FILEPART).set(filepartRecord).execute()

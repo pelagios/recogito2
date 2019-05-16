@@ -44,6 +44,7 @@ trait RemoteSource { self: CreateController =>
     }
   }
 
+  /** TODO set proper filename from URL (or CTS XML?) **/
   private def registerCTSSource(
     pendingUpload: UploadRecord, 
     owner: User, 
@@ -52,8 +53,6 @@ trait RemoteSource { self: CreateController =>
     tmpFile: TemporaryFileCreator,
     ws: WSClient
   ): Future[Result] = {
-    Logger.info(s"Importing CTS from $url")
-
     // Resolve URL and download temporary file
     ws.url(url).withFollowRedirects(true).get().flatMap { response => 
       // Extract TEI to temporary file
@@ -66,8 +65,7 @@ trait RemoteSource { self: CreateController =>
       new PrintWriter(underlying) { write(tei(0).toString); close }
 
       // Store TEI filepart 
-      // TODO pick filename from URL (or CTS XML?)
-      uploads.insertUploadFilepart(pendingUpload.getId, owner, tmp, "foo").map { _ match {
+      uploads.insertUploadFilepart(pendingUpload.getId, owner, tmp, "cts-import.tei.xml").map { _ match {
         case Right(filepart) =>
           Ok(Json.toJson(UploadSuccess(filepart.getId, filepart.getContentType)))
    
