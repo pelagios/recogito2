@@ -28,6 +28,7 @@ object PluginRegistry {
   
   /** Recursively walks a directory, looking for files with the given name **/
   private def findFilesRecursive(name: String, dir: File): Seq[File] = {
+    if (dir.exists) {
     val all = dir.listFiles
    
     val dirs = all.filter(_.isDirectory)
@@ -36,6 +37,7 @@ object PluginRegistry {
     val matchingFiles = files.filter(_.getName == name)
     
     matchingFiles ++ dirs.flatMap(dir => findFilesRecursive(name, dir))
+    } else Seq()
   }
           
   def listConfigs(extensionPoint: String): Seq[Config] =
