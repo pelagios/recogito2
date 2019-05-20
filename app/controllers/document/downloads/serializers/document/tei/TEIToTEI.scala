@@ -76,7 +76,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
       val tags = getNonAttributeTags(annotation)
       if (tags.size > 0)
         el.setAttribute("ana", tags.mkString(","))
-      
+
       el.appendChild(doc.createTextNode(quote))
 
       val cert = getCert(annotation)
@@ -101,6 +101,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
       // We only support TEI export for annotations that don't cross node boundaries
       if (range.getStartContainer == range.getEndContainer) {
         val tag = toTag(annotation)
+        
         range.deleteContents()
         range.surroundContents(tag)
 
