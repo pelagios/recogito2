@@ -15,9 +15,6 @@ define([
             return '<option value="' + idx + '">' + name + '</option>';
           }).join(''),
 
-        gazetteers = // TODO
-          '<option></option>',
-
         body = jQuery(
           '<div>' +
             '<form class="crud">' +
@@ -55,18 +52,20 @@ define([
               '</p>' +
 
               '<dl id="preferred-gazetteer">' +
-                '<dt><label for="preferred-gazetteer">Preferred gazetteer</label></dt>' +
-                '<dd><select disabled="true">' + gazetteers + '</select></dd>' +
+                '<dt><label for="preferred-gazetteer">Use gazetteer</label></dt>' +
+                '<dd><select><option value="ALL">All gazetteers</select></dd>' +
                 '<dd class="info">Optional</dd>' +
               '</dl>' +
-
+             
+              /*
               '<dl id="use-exclusive">' +
                 '<dt></dt>' +
                 '<dd>' +
-                  '<input type="checkbox" id="exclusive" disabled="true">' +
+                  '<input type="checkbox" id="exclusive">' +
                   '<label for="exclusive">Exclusive</label>' +
                 '</dd>' +
               '</dl>' +
+              */
 
               '<div class="buttons">' +
                 '<button type="submit" class="btn">Go</button>' +
@@ -86,7 +85,18 @@ define([
               '">document settings</a> first.</p>' +
           '<div>'),
 
+        loadGazetteers = function() {
+          var parent = body.find('#preferred-gazetteer select');
+          jsRoutes.controllers.api.entity.AuthoritiesAPIController.listGazetteers().ajax().success(function(response) {
+            response.forEach(function(g) {
+              parent.append('<option value="' + g.identifier + '">' + g.shortname + '</option>');              
+            });
+          });
+        },
+
         init = function() {
+          loadGazetteers();
+
           if (hasAnnotations) {
             body.append(hasAnnotationsBlocker);
           } else {
@@ -109,6 +119,9 @@ define([
               latColumn = undefinedIfEmpty(body.find('#lat-column select').val()),
               lonColumn = undefinedIfEmpty(body.find('#lon-column select').val()),
 
+              authorities = body.find('#preferred-gazetteer select').val() === 'ALL' ? null : 
+                [ body.find('#preferred-gazetteer select').val() ],
+              
               onStopped = function(result) {
                 progressModal.destroy();
                 location.reload(true);
@@ -118,13 +131,15 @@ define([
 
           jsRoutes.controllers.api.task.TaskAPIController.spawnJob().ajax({
             data: JSON.stringify({
-              task_type     : 'GEORESOLUTION',
-              documents     : [ Config.documentId ],
-              fileparts     : [ Config.partId ],
-              delimiter     : metadata.delimiter,
-              toponym_column: placeColumn,
-              lat_column    : latColumn,
-              lon_column    : lonColumn
+              task_type       : 'GEORESOLUTION',
+              documents       : [ Config.documentId ],
+              fileparts       : [ Config.partId ],
+              delimiter       : metadata.delimiter,
+              all_authorities : authorities === null,
+              authorities     : authorities,
+              toponym_column  : placeColumn,
+              lat_column      : latColumn,
+              lon_column      : lonColumn
             }),
             contentType: 'application/json; charset=utf-8'
           }).success(function(response) {
