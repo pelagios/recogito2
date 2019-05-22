@@ -175,7 +175,7 @@ POST    /api/directory/:owner/:folderId              controllers.my.directory.li
 POST    /api/folder                                  controllers.my.directory.create.CreateController.createFolder
 PUT     /api/folder/:id                              controllers.my.directory.create.CreateController.renameFolder(id: java.util.UUID, title: String)
 
-POST    /api/duplicate/document/:id                  controllers.my.directory.create.CreateController.duplicateDocument(id: String)
+POST    /api/clone/document/:id                      controllers.my.directory.create.CreateController.cloneDocument(id: String)
 
 DELETE  /api/document/bulk                           controllers.my.directory.delete.DocumentActionsController.bulkDeleteDocuments
 DELETE  /api/document/:id                            controllers.my.directory.delete.DocumentActionsController.deleteDocument(id: String)

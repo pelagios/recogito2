@@ -68,7 +68,7 @@ trait CreateOps { self: DocumentService =>
   }
 
   /** Duplicates the given filepart record, copying the file as needed **/
-  private def duplicateFilepart(
+  private def cloneFilepart(
     origDoc: DocumentRecord,
     clonedDoc: DocumentRecord,
     origPart: DocumentFilepartRecord
@@ -100,11 +100,11 @@ trait CreateOps { self: DocumentService =>
     filepartRecord
   }
 
-  /** Duplicates the given document and fileparts
+  /** Clones the given document and fileparts
     *
     * Optionally, to a different user's workspace.
     */
-  def duplicateDocument(
+  def cloneDocument(
     doc: DocumentRecord,
     fileparts: Seq[DocumentFilepartRecord],
     newOwner: Option[String] = None
@@ -154,9 +154,11 @@ trait CreateOps { self: DocumentService =>
 
     sql.insertInto(DOCUMENT).set(clonedDoc).execute()
 
+    // TODO folder association! (only for duplicates, not forks)
+
     // Clone fileparts (DB records + local files, if any)
     val clonedParts = fileparts.map { part => 
-      duplicateFilepart(doc, clonedDoc, part)
+      cloneFilepart(doc, clonedDoc, part)
     }
 
     CloneCorrespondence(
