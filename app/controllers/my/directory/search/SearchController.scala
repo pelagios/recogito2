@@ -6,7 +6,7 @@ import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContent, Request, AbstractController, ControllerComponents}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 import services.document.DocumentService
 
@@ -21,35 +21,41 @@ class SearchController @Inject() (
 
   import ConfiguredPresentation._
 
-  private def getSearchOpts(request: Request[AnyContent]) = {
-    request.body.asJson.flatMap(json => 
-      Try(Json.fromJson[SearchOptions](json).get).toOption)
-  }
+  private def getSearchOpts(request: Request[AnyContent]): Option[SearchOptions] = 
+    request.body.asJson match {
+      case Some(json) => 
+        Try(Json.fromJson[SearchOptions](json).get).toOption
+
+      case None => // In case of no JSON payload, try URL params
+        val params = request.queryString
+          .mapValues(_.headOption)
+          .filter(_._2.isDefined)
+          .mapValues(_.get)
+
+        // TODO other params
+
+        params.get("q").map { q => // Require at least a query phrase
+          SearchOptions(
+            Some(q),
+            params.get("in").flatMap(Scope.withName).getOrElse(Scope.ALL_OF_RECOGITO),
+            None, None, None
+          ) 
+        }
+
+    }
   
   /** Search all of public Recogito, plus my own accessible documents **/
-  def searchAll(query: String) = silhouette.UserAwareAction.async { implicit request =>
-    documentService.searchAll(request.identity.map(_.username), query).map { documents => 
-      val presentation = ConfiguredPresentation.forMyDocument(documents, None, None)
-      jsonOk(Json.toJson(presentation))
-    }
-  }
+  def search = silhouette.UserAwareAction.async { implicit request =>
+    getSearchOpts(request) match {
+      case Some(opts) => 
+        documentService.searchAll(request.identity.map(_.username), opts.query.get).map { documents => 
+          val presentation = ConfiguredPresentation.forMyDocument(documents, None, None)
+          jsonOk(Json.toJson(presentation))
+        }
 
-  /** Searches just my own documents **/
-  def searchMy(query: String) = silhouette.SecuredAction.async { implicit request => 
-    documentService.searchMyDocuments(request.identity.username, query).map { documents => 
-      jsonOk(Json.toJson(documents.map { doc => 
-        Json.obj("id" -> doc.getId, "title" -> doc.getTitle)
-      }))
-    }
-  }
-
-  /** Searches just the documents shared with me **/
-  def searchSharedWithMe(query: String) = silhouette.SecuredAction.async { implicit request =>
-    documentService.searchSharedWithMe(request.identity.username, query).map { documents => 
-      jsonOk(Json.toJson(documents.map { doc => 
-        Json.obj("id" -> doc.getId, "title" -> doc.getTitle)
-      }))
-    }
+      case None =>
+        Future.successful(BadRequest)
+    } 
   }
 
 }
