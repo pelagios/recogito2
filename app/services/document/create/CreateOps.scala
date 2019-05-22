@@ -6,7 +6,7 @@ import java.sql.Timestamp
 import java.util.{Date, UUID}
 import org.jooq.DSLContext
 import scala.concurrent.Future
-import services.ContentType
+import services.{ContentType, PublicAccess}
 import services.document.{DocumentService, DocumentIdFactory}
 import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
@@ -100,31 +100,57 @@ trait CreateOps { self: DocumentService =>
     filepartRecord
   }
 
-  /** Duplicates the given document and fileparts **/
+  /** Duplicates the given document and fileparts
+    *
+    * Optionally, to a different user's workspace.
+    */
   def duplicateDocument(
     doc: DocumentRecord,
-    fileparts: Seq[DocumentFilepartRecord]
+    fileparts: Seq[DocumentFilepartRecord],
+    newOwner: Option[String] = None
   ): Future[CloneCorrespondence] = db.withTransaction { implicit sql =>
     val clonedDocId = DocumentIdFactory.generateRandomID()
 
     // Clone the document record
-    val clonedDoc = new DocumentRecord(
-      clonedDocId,
-      doc.getOwner, // TODO make configurable later ("forking")
-      new Timestamp(new Date().getTime),
-      s"${doc.getTitle} (copy)",
-      doc.getAuthor,
-      doc.getDateNumeric,
-      doc.getDateFreeform,
-      doc.getDescription,
-      doc.getLanguage,
-      doc.getSource,
-      doc.getEdition,
-      doc.getLicense,
-      doc.getAttribution,
-      doc.getPublicVisibility,
-      doc.getPublicAccessLevel,
-      doc.getId)
+    val clonedDoc = newOwner match {
+      case None => // Just clone inside users workspace
+        new DocumentRecord(
+          clonedDocId,
+          doc.getOwner, // TODO make configurable later ("forking")
+          new Timestamp(new Date().getTime),
+          s"${doc.getTitle} (copy)",
+          doc.getAuthor,
+          doc.getDateNumeric,
+          doc.getDateFreeform,
+          doc.getDescription,
+          doc.getLanguage,
+          doc.getSource,
+          doc.getEdition,
+          doc.getLicense,
+          doc.getAttribution,
+          doc.getPublicVisibility,
+          doc.getPublicAccessLevel,
+          doc.getId)
+
+      case Some(username) => // Clone to someone else's workspace
+        new DocumentRecord(
+          clonedDocId,
+          username,
+          new Timestamp(new Date().getTime),
+          doc.getTitle,
+          doc.getAuthor,
+          doc.getDateNumeric,
+          doc.getDateFreeform,
+          doc.getDescription,
+          doc.getLanguage,
+          doc.getSource,
+          doc.getEdition,
+          doc.getLicense,
+          doc.getAttribution,
+          PublicAccess.PRIVATE.toString, // default visibility
+          null, // default access level
+          doc.getId)
+    }
 
     sql.insertInto(DOCUMENT).set(clonedDoc).execute()
 
