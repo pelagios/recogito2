@@ -193,9 +193,15 @@ class CreateController @Inject() (
   def duplicateDocument(id: String) = silhouette.SecuredAction.async { implicit request => 
     documents.getExtendedMeta(id: String, Some(request.identity.username)).flatMap { _ match { 
       case Some((doc, accesslevel)) =>
+        val newOwner = 
+          if (doc.owner == request.identity.username)
+            None // current user is document owner - just a duplicate, no fork
+          else 
+            Some(request.identity.username) // Fork to current user workspace
+
         if (accesslevel.isAdmin) { // For the time being, enforce admin access         
           val f = for {
-            cloned <- documents.duplicateDocument(doc.document, doc.fileparts)
+            cloned <- documents.duplicateDocument(doc.document, doc.fileparts, newOwner)
             success <- annotations.cloneAnnotationsTo(
               cloned.docIdBefore,
               cloned.docIdAfter,
