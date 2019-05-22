@@ -15,11 +15,16 @@ object LoginStatus {
   implicit val loginStatusWrites: Writes[LoginStatus] = (
     (JsPath \ "logged_in").write[Boolean] and
     (JsPath \ "username").writeNullable[String] and
-    (JsPath \ "real_name").writeNullable[String]
+    (JsPath \ "real_name").writeNullable[String] and 
+    (JsPath \ "feature_toggles").writeNullable[Seq[String]]
   )(l => (
       l.loggedIn,
       l.user.map(_.username),
-      l.user.flatMap(_.realName)
+      l.user.flatMap(_.realName),
+      l.user.flatMap { u => 
+        if (u.featureToggles.isEmpty) None 
+        else Some(u.featureToggles)
+      }
   ))
 
 }
