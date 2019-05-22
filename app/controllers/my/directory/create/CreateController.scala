@@ -204,7 +204,7 @@ class CreateController @Inject() (
           else 
             Some(request.identity.username) // Fork to current user workspace
 
-        if (accesslevel.isAdmin) { // For the time being, enforce admin access         
+        if (accesslevel.canReadAll) { // At least read access required for forking         
           val f = for {
             cloned <- documents.cloneDocument(doc.document, doc.fileparts, newOwner)
             success <- annotations.cloneAnnotationsTo(
