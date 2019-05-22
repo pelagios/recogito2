@@ -72,7 +72,8 @@ CREATE TABLE document (
   license TEXT,
   attribution TEXT,
   public_visibility TEXT NOT NULL DEFAULT 'PRIVATE',
-  public_access_level TEXT
+  public_access_level TEXT,
+  cloned_from TEXT
 );
 CREATE INDEX idx_document_owner ON document(owner);
 

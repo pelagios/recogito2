@@ -249,7 +249,8 @@ class UploadService @Inject() (
           upload.getLicense,
           null, // attribution
           PublicAccess.PRIVATE.toString, // public_visibility
-          null) // public_access_level
+          null, // public_access_level
+          null) // cloned_from
 
   private def importDocumentAndParts(
     upload: UploadRecord, 

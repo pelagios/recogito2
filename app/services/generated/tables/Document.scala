@@ -127,6 +127,11 @@ class Document(alias : String, aliased : Table[DocumentRecord], parameters : Arr
 	val PUBLIC_ACCESS_LEVEL : TableField[DocumentRecord, String] = createField("public_access_level", org.jooq.impl.SQLDataType.CLOB, "")
 
 	/**
+	 * The column <code>public.document.cloned_from</code>.
+	 */
+	val CLONED_FROM : TableField[DocumentRecord, String] = createField("cloned_from", org.jooq.impl.SQLDataType.CLOB, "")
+
+	/**
 	 * Create a <code>public.document</code> table reference
 	 */
 	def this() = {

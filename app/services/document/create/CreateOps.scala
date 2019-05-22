@@ -123,7 +123,8 @@ trait CreateOps { self: DocumentService =>
       doc.getLicense,
       doc.getAttribution,
       doc.getPublicVisibility,
-      doc.getPublicAccessLevel)
+      doc.getPublicAccessLevel,
+      doc.getId)
 
     sql.insertInto(DOCUMENT).set(clonedDoc).execute()
 

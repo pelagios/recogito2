@@ -113,7 +113,8 @@ class SignupController @Inject() (
       null, // license
       null, // attribution
       PublicAccess.PRIVATE.toString, // public visiblity
-      null) // public access level
+      null, // public access level
+      null) // cloned from
     
     val filepart = new DocumentFilepartRecord(
       UUID.randomUUID(),
