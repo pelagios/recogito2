@@ -18,7 +18,7 @@ object Scope {
   case object SHARED  extends Scope
 
   def withName(name: String): Option[Scope] =
-    Seq(ALL, MY, SHARED).find(_.toString.toUpperCase == name)  
+    Seq(ALL, MY, SHARED).find(_.toString == name.toUpperCase)  
 
 }
 
@@ -31,6 +31,6 @@ object DocumentType {
   case object TABLE extends DocumentType
 
   def withName(name: String): Option[DocumentType] =
-    Seq(TEXT, IMAGE, TABLE).find(_.toString.toUpperCase == name)
+    Seq(TEXT, IMAGE, TABLE).find(_.toString == name.toUpperCase)
 
 }
