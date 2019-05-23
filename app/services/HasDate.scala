@@ -3,6 +3,7 @@ package services
 import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
+import scala.util.Try
 
 trait HasDate {
 
@@ -21,5 +22,7 @@ trait HasDate {
     
   /** Convenience method for external use, outside JSON serialization **/
   def formatDate(dt: DateTime) = formatter.print(dt.withZone(DateTimeZone.UTC))
+
+  def parseDate(str: String) = Try(formatter.parseDateTime(str)).toOption
 
 }

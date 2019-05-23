@@ -4,11 +4,15 @@ import controllers.{Security, HasPrettyPrintJSON}
 import controllers.my.directory.ConfiguredPresentation
 import com.mohiva.play.silhouette.api.Silhouette
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.Json
+import org.joda.time.DateTime
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import play.api.mvc.{AnyContent, Request, AbstractController, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+import services.HasDate
 import services.document.DocumentService
+import services.document.search._
 
 @Singleton
 class SearchController @Inject() (
@@ -17,36 +21,47 @@ class SearchController @Inject() (
   documentService: DocumentService,
   implicit val ctx: ExecutionContext
 ) extends AbstractController(components) 
-    with HasPrettyPrintJSON {
+    with HasPrettyPrintJSON
+    with HasDate {
 
   import ConfiguredPresentation._
 
-  private def getSearchOpts(request: Request[AnyContent]): Option[SearchOptions] = 
-    request.body.asJson match {
-      case Some(json) => 
-        Try(Json.fromJson[SearchOptions](json).get).toOption
+  implicit val searchOptionsReads: Reads[SearchArgs] = (
+    (JsPath \ "q").readNullable[String] and
+    (JsPath \ "in").readNullable[String]
+      .map(_.flatMap(Scope.withName).getOrElse(Scope.ALL)) and
+    (JsPath \ "type").readNullable[String]
+      .map(_.flatMap(DocumentType.withName)) and
+    (JsPath \ "owner").readNullable[String] and
+    (JsPath \ "max_age").readNullable[DateTime]
+  )(SearchArgs.apply _) 
 
-      case None => // In case of no JSON payload, try URL params
-        val params = request.queryString
-          .mapValues(_.headOption)
-          .filter(_._2.isDefined)
-          .mapValues(_.get)
-
-        // TODO other params
-
-        params.get("q").map { q => // Require at least a query phrase
-          SearchOptions(
-            Some(q),
-            params.get("in").flatMap(Scope.withName).getOrElse(Scope.ALL_OF_RECOGITO),
-            None, None, None
-          ) 
-        }
-
+  private def parseQueryString(params: Map[String, String]) = 
+    params.get("q").map { q => // Require at least a query phrase
+      SearchArgs(
+        Some(q),
+        params.get("in").flatMap(Scope.withName).getOrElse(Scope.ALL),
+        params.get("type").flatMap(DocumentType.withName),
+        params.get("owner"),
+        params.get("max_age").flatMap(parseDate)
+      ) 
     }
+
+  def parseSearchArgs(request: Request[AnyContent]) = request.body.asJson match {
+    case Some(json) =>
+      Try(Json.fromJson[SearchArgs](json).get).toOption
+
+    case None => // Try query string instead
+      val asMap = request.queryString
+        .mapValues(_.headOption)
+        .filter(_._2.isDefined)
+        .mapValues(_.get)
+      parseQueryString(asMap)
+  }
   
   /** Search all of public Recogito, plus my own accessible documents **/
   def search = silhouette.UserAwareAction.async { implicit request =>
-    getSearchOpts(request) match {
+    parseSearchArgs(request) match {
       case Some(opts) => 
         documentService.searchAll(request.identity.map(_.username), opts.query.get).map { documents => 
           val presentation = ConfiguredPresentation.forMyDocument(documents, None, None)
