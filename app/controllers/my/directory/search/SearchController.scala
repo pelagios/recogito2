@@ -62,8 +62,8 @@ class SearchController @Inject() (
   /** Search all of public Recogito, plus my own accessible documents **/
   def search = silhouette.UserAwareAction.async { implicit request =>
     parseSearchArgs(request) match {
-      case Some(opts) => 
-        documentService.searchAll(request.identity.map(_.username), opts.query.get).map { documents => 
+      case Some(args) => 
+        documentService.search(request.identity.map(_.username), args).map { documents => 
           val presentation = ConfiguredPresentation.forMyDocument(documents, None, None)
           jsonOk(Json.toJson(presentation))
         }

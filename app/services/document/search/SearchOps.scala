@@ -9,7 +9,7 @@ import services.generated.Tables.{SHARING_POLICY, DOCUMENT}
 
 trait SearchOps { self: DocumentService => 
 
-  def searchAll(loggedInAs: Option[String], query: String) = db.query { sql => 
+  def search(loggedInAs: Option[String], args: SearchArgs) = db.query { sql => 
     val startTime = System.currentTimeMillis
 
     val q = loggedInAs match {
@@ -35,7 +35,7 @@ trait SearchOps { self: DocumentService =>
               AND lower(document.title) LIKE ?;
             """
 
-        sql.resultQuery(q, s"%${query.toLowerCase}%")
+        sql.resultQuery(q, s"%${args.query.get.toLowerCase}%")
 
       case None => 
         val q = 
@@ -57,7 +57,7 @@ trait SearchOps { self: DocumentService =>
               AND lower(document.title) LIKE ?;
             """
 
-        sql.resultQuery(q, s"%${query.toLowerCase}%")
+        sql.resultQuery(q, s"%${args.query.get.toLowerCase}%")
 
     }
 
@@ -65,6 +65,7 @@ trait SearchOps { self: DocumentService =>
     Page(System.currentTimeMillis - startTime, documents.size, 0, documents.size, documents)
   }
 
+  /*
   def searchMyDocuments(username: String, query: String) = db.query { sql =>
     sql.selectFrom(DOCUMENT)
        .where(DOCUMENT.OWNER.equal(username))
@@ -82,5 +83,6 @@ trait SearchOps { self: DocumentService =>
        .fetchArray.map(_.into(classOf[DocumentRecord]))
        .toSeq
   }
+  */
 
 }
