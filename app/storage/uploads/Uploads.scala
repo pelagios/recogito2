@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Files
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import org.apache.commons.io.FileUtils
 

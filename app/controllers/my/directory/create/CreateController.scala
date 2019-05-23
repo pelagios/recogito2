@@ -202,20 +202,26 @@ class CreateController @Inject() (
           if (doc.owner == request.identity.username)
             None // current user is document owner - just a duplicate, no fork
           else 
-            Some(request.identity.username) // Fork to current user workspace
+            Some(request.identity) // Fork to current user workspace
 
         if (accesslevel.canReadAll) { // At least read access required for forking         
           val f = for {
-            cloned <- documents.cloneDocument(doc.document, doc.fileparts, newOwner)
-            success <- annotations.cloneAnnotationsTo(
-              cloned.docIdBefore,
-              cloned.docIdAfter,
-              cloned.filepartIds)
+            result <- documents.cloneDocument(doc, doc.fileparts, newOwner)
+            success <- result match { 
+              case Right(cloned) =>
+                annotations.cloneAnnotationsTo(
+                  cloned.docIdBefore,
+                  cloned.docIdAfter,
+                  cloned.filepartIds)
+
+              case _ =>
+                Future.successful(false)
+            }
             _ <- Future { Thread.sleep(1000) } // Horrible but ES needs time to reflect the update
           } yield (success)
 
           f.map { success => 
-            if (success) Ok else InternalServerError
+            if (success) Ok else Status(409) // Conflict
           }
         } else {
           Future.successful(Forbidden)

@@ -4,10 +4,12 @@ import java.io.{File, InputStream}
 import java.nio.file.Files
 import java.sql.Timestamp
 import java.util.{Date, UUID}
+import org.apache.commons.io.FileUtils
 import org.jooq.DSLContext
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import services.{ContentType, PublicAccess}
-import services.document.{DocumentService, DocumentIdFactory}
+import services.document.{DocumentService, DocumentIdFactory, ExtendedDocumentMetadata}
+import services.user.User
 import services.generated.Tables.{DOCUMENT, DOCUMENT_FILEPART}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 
@@ -104,7 +106,7 @@ trait CreateOps { self: DocumentService =>
     *
     * Optionally, to a different user's workspace.
     */
-  def cloneDocument(
+  private def executeClone(
     doc: DocumentRecord,
     fileparts: Seq[DocumentFilepartRecord],
     newOwner: Option[String] = None
@@ -167,6 +169,31 @@ trait CreateOps { self: DocumentService =>
       fileparts.zip(clonedParts).map { case (before, after) =>
         before.getId -> after.getId
       }.toMap)
+  }
+
+  def cloneDocument(
+    doc: ExtendedDocumentMetadata,
+    fileparts: Seq[DocumentFilepartRecord],
+    newOwner: Option[User] = None
+  )(implicit ctx: ExecutionContext): Future[Either[Exception, CloneCorrespondence]] = {
+    val sourceDir = uploads.getDocumentDir(doc.ownerName, doc.id).get
+    val filesizeKb = FileUtils.sizeOfDirectory(sourceDir).toDouble / 1024
+
+    val owner = newOwner.map(_.record).getOrElse(doc.owner)
+    val usedDiskspaceKb = uploads.getUsedDiskspaceKB(owner.getUsername)
+
+    val remainingDiskspaceKb = owner.getQuotaMb * 1024 - usedDiskspaceKb
+    val isQuotaExceeded = remainingDiskspaceKb < filesizeKb
+
+    if (isQuotaExceeded) {
+      Future.successful(Left(new Exception("Quota exceeded")))
+    } else {
+      executeClone(
+        doc.document, 
+        fileparts, 
+        newOwner.map(_.username)
+      ).map(Right(_))
+    }
   }
 
 }
