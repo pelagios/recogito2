@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 case class SearchArgs(
   query: Option[String],
   searchIn: Scope,
-  contentType: Option[DocumentType],
+  documentType: Option[DocumentType],
   owner: Option[String], 
   maxAge: Option[DateTime])
 

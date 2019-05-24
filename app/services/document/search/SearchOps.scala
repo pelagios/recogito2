@@ -16,7 +16,7 @@ trait SearchOps { self: DocumentService =>
   }
 
   /** Appends the query phrase, if any */
-  private def appendQueryPhrase(args: SearchArgs): String =>  String = query =>
+  private def setQueryPhrase(args: SearchArgs): String =>  String = query =>
     args.query match {
       case Some(phrase) => render(
         s"""
@@ -29,7 +29,7 @@ trait SearchOps { self: DocumentService =>
     }
 
   /** Appends the scope filter part **/
-  private def appendScope(loggedInAs: Option[String], args: SearchArgs): String => String = query =>
+  private def setScope(loggedInAs: Option[String], args: SearchArgs): String => String = query =>
     (loggedInAs, args.searchIn) match {
       case (None, _) => // No matter what 'searchIn' says, anonymous visitors only get public docs
         s"""
@@ -64,6 +64,32 @@ trait SearchOps { self: DocumentService =>
          """, username)
     }
 
+  private def setDocumentType(args: SearchArgs): String => String = query => {
+
+    import DocumentType._
+
+    args.documentType match {
+      case Some(TEXT) =>
+        s"""
+         $query AND (
+           'TEXT_PLAIN' = ANY(content_types) OR
+           'TEXT_TEIXML' = ANY(content_types)
+         )"""
+
+      case Some(IMAGE) =>
+        s"""
+         $query AND (
+           'IMAGE_UPLOAD' = ANY(content_types) OR
+           'IMAGE_IIIF' = ANY(content_types)
+         )"""
+
+      case Some(TABLE) =>
+        s"$query AND 'DATA_CSV' = ANY(content_types)"
+        
+      case  None => query
+    }
+  }
+
   def search(loggedInAs: Option[String], args: SearchArgs) = db.query { sql => 
     val startTime = System.currentTimeMillis
 
@@ -86,8 +112,9 @@ trait SearchOps { self: DocumentService =>
       """
 
     val buildQuery = 
-      appendScope(loggedInAs, args) andThen 
-      appendQueryPhrase(args)
+      setScope(loggedInAs, args) andThen 
+      setDocumentType(args) andThen
+      setQueryPhrase(args)
 
     // TODO just a hack for now
     val documents = sql.resultQuery(buildQuery(base)).fetchArray.map(MyDocument.build)
