@@ -41,13 +41,14 @@ trait SearchOps { self: DocumentService =>
         s"""
          $query
            LEFT OUTER JOIN sharing_policy
-             ON sharing_policy.document_id = document.id
+             ON sharing_policy.document_id = document.id 
+               AND sharing_policy.shared_with = ?
          WHERE (
            document.owner = ?
            OR document.public_visibility = 'PUBLIC'
            OR sharing_policy.shared_with = ?
          )
-         """, username, username)
+         """, username, username, username)
 
       case (Some(username), Scope.MY) => render(
         s"""
