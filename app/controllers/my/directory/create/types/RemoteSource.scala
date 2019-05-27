@@ -34,7 +34,8 @@ trait RemoteSource { self: CreateController =>
       case (Some(url), Some(typ)) =>
         typ match {
           case "IIIF" => registerIIIFSource(pendingUpload, owner, url)
-          case "CTS" => registerCTSSource(pendingUpload, owner, url)
+          case "CTS" => fetchCTSSource(pendingUpload, owner, url)
+          case "TEI_XML" => fetchTEI(pendingUpload, owner, url)
         }
 
       case _ =>
@@ -45,34 +46,54 @@ trait RemoteSource { self: CreateController =>
   }
 
   /** TODO set proper filename from URL (or CTS XML?) **/
-  private def registerCTSSource(
+  private def fetchCTSSource(
     pendingUpload: UploadRecord, 
     owner: User, 
     url: String
   )(implicit 
-    tmpFile: TemporaryFileCreator,
-    ws: WSClient
-  ): Future[Result] = {
-    // Resolve URL and download temporary file
-    ws.url(url).withFollowRedirects(true).get().flatMap { response => 
-      // Extract TEI to temporary file
-      val tei = (response.xml \\ "TEI")
+      tmpFile: TemporaryFileCreator,
+      ws: WSClient
+  ): Future[Result] = ws.url(url).withFollowRedirects(true).get.flatMap { response => 
+    // Extract TEI to temporary file
+    val tei = (response.xml \\ "TEI")
 
-      val p = Paths.get(TempDir.get(), s"${UUID.randomUUID}.tei.xml")
-      val tmp = tmpFile.create(p)
-      val underlying = p.toFile
+    val p = Paths.get(TempDir.get, s"${UUID.randomUUID}.tei.xml")
+    val tmp = tmpFile.create(p)
+    val underlying = p.toFile
 
-      new PrintWriter(underlying) { write(tei(0).toString); close }
+    new PrintWriter(underlying) { write(tei(0).toString); close }
 
-      // Store TEI filepart 
-      uploads.insertUploadFilepart(pendingUpload.getId, owner, tmp, "cts-import.tei.xml").map { _ match {
-        case Right(filepart) =>
-          Ok(Json.toJson(UploadSuccess(filepart.getId, filepart.getContentType)))
-   
-        case Left(e) =>
-          InternalServerError
-      }}
-    }
+    // Store TEI filepart 
+    uploads.insertUploadFilepart(pendingUpload.getId, owner, tmp, "cts-import.tei.xml").map { _ match {
+      case Right(filepart) =>
+        Ok(Json.toJson(UploadSuccess(filepart.getId, filepart.getContentType)))
+  
+      case Left(e) =>
+        InternalServerError
+    }}
+  }
+
+  private def fetchTEI(
+    pendingUpload: UploadRecord,
+    owner: User,
+    url: String
+  )(implicit
+      tmpFile: TemporaryFileCreator,
+      ws: WSClient
+  ): Future[Result] = ws.url(url).withFollowRedirects(true).get.flatMap { response => 
+    val p = Paths.get(TempDir.get, s"${UUID.randomUUID}.tei.xml")
+    val tmp = tmpFile.create(p)
+    val underlying = p.toFile
+
+    new PrintWriter(underlying) { write(response.body.toString); close }
+
+    uploads.insertUploadFilepart(pendingUpload.getId, owner, tmp, "tei-import.tei.xml").map { _ match {
+      case Right(filepart) => 
+        Ok(Json.toJson(UploadSuccess(filepart.getId, filepart.getContentType)))
+
+      case Left(e) =>
+        BadRequest
+    }}
   }
 
   private def registerIIIFSource(pendingUpload: UploadRecord, owner: User, url: String): Future[Result] = {
