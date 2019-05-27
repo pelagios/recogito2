@@ -35,7 +35,7 @@ trait RemoteSource { self: CreateController =>
         typ match {
           case "IIIF" => registerIIIFSource(pendingUpload, owner, url)
           case "CTS" => fetchCTSSource(pendingUpload, owner, url)
-          case "TEI_XML" => fetchTEI(pendingUpload, owner, url)
+          case "TEI_XML" => fetchFileFromURL(pendingUpload, owner, url, "tei-import.tei.xml")
         }
 
       case _ =>
@@ -73,21 +73,26 @@ trait RemoteSource { self: CreateController =>
     }}
   }
 
-  private def fetchTEI(
+  private def fetchFileFromURL(
     pendingUpload: UploadRecord,
     owner: User,
-    url: String
-  )(implicit
+    url: String,
+    filename: String
+  )(implicit 
       tmpFile: TemporaryFileCreator,
       ws: WSClient
   ): Future[Result] = ws.url(url).withFollowRedirects(true).get.flatMap { response => 
-    val p = Paths.get(TempDir.get, s"${UUID.randomUUID}.tei.xml")
+    val extension = filename.substring(filename.lastIndexOf('.'))
+    val p = Paths.get(TempDir.get, s"${UUID.randomUUID}${extension}")
     val tmp = tmpFile.create(p)
     val underlying = p.toFile
 
-    new PrintWriter(underlying) { write(response.body.toString); close }
+    new PrintWriter(underlying) { 
+      write(response.body.toString)
+      close
+    }
 
-    uploads.insertUploadFilepart(pendingUpload.getId, owner, tmp, "tei-import.tei.xml").map { _ match {
+    uploads.insertUploadFilepart(pendingUpload.getId, owner, tmp, filename).map { _ match {
       case Right(filepart) => 
         Ok(Json.toJson(UploadSuccess(filepart.getId, filepart.getContentType)))
 
