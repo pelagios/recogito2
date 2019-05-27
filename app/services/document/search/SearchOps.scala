@@ -91,6 +91,15 @@ trait SearchOps { self: DocumentService =>
     }
   }
 
+  private def setOwner(args: SearchArgs): String =>  String = query => args.owner match {
+    case Some(username) => render(
+      s"""
+       $query AND document.owner = ?
+       """, username)
+    
+    case None =>  query
+  }
+
   def search(loggedInAs: Option[String], args: SearchArgs) = db.query { sql => 
     val startTime = System.currentTimeMillis
 
@@ -115,6 +124,7 @@ trait SearchOps { self: DocumentService =>
     val buildQuery = 
       setScope(loggedInAs, args) andThen 
       setDocumentType(args) andThen
+      setOwner(args) andThen
       setQueryPhrase(args)
 
     // TODO just a hack for now
