@@ -135,13 +135,16 @@ trait AccessibleDocumentOps { self: DocumentService =>
              document.*,
              sharing_policy.*,
              file_count,
-             content_types
+             content_types,
+             folder_sharing_policy.shared_with AS folder_shared
            FROM document
              LEFT OUTER JOIN sharing_policy 
                ON sharing_policy.document_id = document.id AND
                   sharing_policy.shared_with = ?
              LEFT OUTER JOIN folder_association 
                ON folder_association.document_id = document.id
+             LEFT OUTER JOIN sharing_policy folder_sharing_policy 
+               ON folder_sharing_policy.folder_id = folder_association.folder_id
              JOIN (
                SELECT
                  count(*) AS file_count,
@@ -154,8 +157,10 @@ trait AccessibleDocumentOps { self: DocumentService =>
              AND (
                document.public_visibility = 'PUBLIC' 
                  OR sharing_policy.shared_with = ?
+             ) AND (
+               folder_association.folder_id IS NULL
+                 OR folder_sharing_policy.shared_with IS NULL
              )
-             AND folder_association.folder_id IS NULL
            ORDER BY ${sortBy} ${sortOrder}
            OFFSET ${offset} LIMIT ${limit};
            """
