@@ -22,7 +22,7 @@ trait HasTEISnippets extends HasTextSnippets {
         .replaceAll("teiheader/", "teiHeader/") 
         .replaceAll("filedesc/", "fileDesc/")
         .replaceAll("titlestmt/", "titleStmt/")
-        .replaceAll("publicatoinstmt/", "publicationStmt/")
+        .replaceAll("publicationstmt/", "publicationStmt/")
         .replaceAll("sourcedesc/", "sourceDesc/") // patching uppercase/lowercase inconsistencies (sigh)
       val offset = a.substring(a.indexOf("::") + 2).toInt
       (path, offset)
