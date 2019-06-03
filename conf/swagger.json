@@ -44,6 +44,66 @@
           }
         }
       }
+    },
+    "/api/account/{username}" : {
+      "get" : {
+        "operationId" : "account",
+        "parameters" : [ {
+          "name": "username",
+          "in": "path",
+          "description": "Username",
+          "required": true,
+          "type": "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { }
+          }
+        }
+      }
+    },
+    "/api/directory/{username}" : {
+      "get" : {
+        "operationId" : "directory",
+        "parameters" : [ {
+          "name": "username",
+          "in": "path",
+          "description": "Username",
+          "required": true,
+          "type": "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { }
+          }
+        }
+      }
+    },
+    "/api/directory/{username}/{folderId}" : {
+      "get" : {
+        "operationId" : "directory",
+        "parameters" : [ {
+          "name": "username",
+          "in": "path",
+          "description": "Username",
+          "required": true,
+          "type": "string"
+        }, {
+          "name": "folderId",
+          "in": "path",
+          "description": "Folder/Collection UUID",
+          "required": true,
+          "type": "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "headers" : { }
+          }
+        }
+      }
     }
   },
   "definitions" : {
