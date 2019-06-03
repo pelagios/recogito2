@@ -1,136 +1,12 @@
 {
   "swagger" : "2.0",
   "info" : {
-    "version" : "beta",
-    "title" : "",
-    "contact" : {
-      "name" : ""
-    },
-    "license" : {
-      "name" : "",
-      "url" : "http://licenseUrl"
-    }
+    "version" : "0.1-beta",
+    "title" : "Recogito API"
   },
   "host" : "localhost:9000",
   "basePath" : "/",
   "paths" : {
-    "/api/directory/my/{folderId}" : {
-      "post" : {
-        "operationId" : "getMyDirectory",
-        "parameters" : [ {
-          "name" : "offset",
-          "in" : "query",
-          "required" : false,
-          "type" : "integer",
-          "default" : 0,
-          "format" : "int32"
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "required" : false,
-          "type" : "integer",
-          "default" : 500,
-          "format" : "int32"
-        }, {
-          "name" : "folderId",
-          "in" : "path",
-          "required" : true,
-          "type" : "string",
-          "format" : "uuid"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema" : {
-              "$ref" : "#/definitions/ActionAnyContent"
-            },
-            "headers" : { }
-          }
-        }
-      }
-    },
-    "/api/directory/my/shared/{folderId}" : {
-      "post" : {
-        "operationId" : "getSharedWithMe",
-        "parameters" : [ {
-          "name" : "offset",
-          "in" : "query",
-          "required" : false,
-          "type" : "integer",
-          "default" : 0,
-          "format" : "int32"
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "required" : false,
-          "type" : "integer",
-          "default" : 500,
-          "format" : "int32"
-        }, {
-          "name" : "folderId",
-          "in" : "path",
-          "required" : true,
-          "type" : "string",
-          "format" : "uuid"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema" : {
-              "$ref" : "#/definitions/ActionAnyContent"
-            },
-            "headers" : { }
-          }
-        }
-      }
-    },
-    "/api/directory/{owner}/{folderId}" : {
-      "post" : {
-        "operationId" : "getAccessibleDocuments",
-        "parameters" : [ {
-          "name" : "owner",
-          "in" : "path",
-          "description" : "Username",
-          "required" : true,
-          "type" : "string"
-        }, {
-          "name" : "offset",
-          "in" : "query",
-          "description" : "Page offset",
-          "required" : false,
-          "type" : "integer",
-          "default" : 0,
-          "format" : "int32"
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Page size",
-          "required" : false,
-          "type" : "integer",
-          "default" : 500,
-          "format" : "int32"
-        }, {
-          "name" : "folderId",
-          "in" : "path",
-          "description" : "Folder ID",
-          "required" : true,
-          "type" : "string",
-          "format" : "uuid"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "schema" : {
-              "$ref" : "#/definitions/ActionAnyContent"
-            },
-            "headers" : { }
-          },
-          "404" : {
-            "description" : "Unknown user"
-          }
-        }
-      }
-    },
     "/api/search" : {
       "get" : {
         "operationId" : "search",
@@ -138,7 +14,7 @@
           "name" : "q",
           "in" : "query",
           "description" : "Query phrase",
-          "required" : false,
+          "required" : true,
           "type" : "string"
         }, {
           "name" : "in",
@@ -146,21 +22,24 @@
           "description" : "Search scope",
           "required" : false,
           "type" : "string",
-          "default" : "ALL"
+          "enum" : [ "ALL", "MY", "SHARED" ]
         }, {
           "name" : "type",
           "in" : "query",
           "description" : "Document type",
           "required" : false,
-          "type" : "integer",
-          "format" : "int64"
+          "type" : "string",
+          "enum" : [ "TEXT", "IMAGE", "TABLE" ]
+        }, {
+          "name" : "owner",
+          "in" : "query",
+          "description" : "Owner",
+          "required" : false,
+          "type" : "string"
         } ],
         "responses" : {
           "200" : {
             "description" : "successful operation",
-            "schema" : {
-              "$ref" : "#/definitions/ActionAnyContent"
-            },
             "headers" : { }
           }
         }
