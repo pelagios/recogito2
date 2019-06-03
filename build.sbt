@@ -99,6 +99,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "papa-parse" % "4.1.0-1",
   "org.webjars" % "requirejs" % "2.1.22",
   "org.webjars" % "slick" % "1.6.0",
+  "org.webjars" % "swagger-ui" % "2.2.0",
   "org.webjars" % "typeaheadjs" % "0.11.1",
   "org.webjars" % "velocity" % "1.1.0",
   "org.webjars.npm" % "bootstrap-colorpicker" % "2.5.2" intransitive(),

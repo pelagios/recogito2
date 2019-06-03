@@ -48,7 +48,7 @@ class SignupController @Inject() (
   private val RESERVED_NAMES =
     Set("admin", "annotation", "api", "assets", "document", "favicon.ico", "guest", "help", "login", "logout",
         "part", "pelagios", "recogito", "reset_password", "robots.txt", "signup", "site", "sites", "sitemap.txt",
-        "settings", "stats.json", "status", "webjars")
+        "settings", "stats.json", "status", "swagger.json", "webjars")
 
   private val isNotReserved: Constraint[String] = Constraint("constraints.notreserved")({ username =>
     if (RESERVED_NAMES.contains(username.toLowerCase))

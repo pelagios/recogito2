@@ -33,6 +33,7 @@ GET     /help/terms                                  controllers.help.HelpContro
 GET     /help/tutorial                               controllers.help.HelpController.tutorial
 GET     /help/workspace                              controllers.help.HelpController.workspace
 GET     /help/:lang/tutorial                         controllers.help.HelpController.localizedTutorial(lang: String)
+GET     /help/api-doc                                controllers.help.HelpController.swaggerUi
 GET     /help                                        controllers.help.HelpController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -269,7 +270,8 @@ POST    /my/upload/:id/finalize                      controllers.my.directory.cr
 
 GET     /sitemap.txt                                 controllers.landing.LandingController.sitemap
 GET     /robots.txt                                  controllers.landing.LandingController.robots
-GET     /stats.json                                  controllers.landing.LandingController.getStats()
+GET     /stats.json                                  controllers.landing.LandingController.getStats
+GET     /swagger.json                                controllers.landing.LandingController.swaggerConfig
 GET     /                                            controllers.landing.LandingController.index
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

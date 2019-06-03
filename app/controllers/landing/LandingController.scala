@@ -2,6 +2,7 @@ package controllers.landing
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{ HasConfig, HasUserService, HasVisitLogging, HasPrettyPrintJSON, Security }
+import java.io.FileInputStream
 import javax.inject.{ Inject, Singleton }
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
@@ -77,6 +78,10 @@ class LandingController @Inject() (
   def robots() = Action { implicit request =>
     val sitemapURL = routes.LandingController.sitemap().absoluteURL()
     Ok(s"SITEMAP: ${sitemapURL}").as("text/plain")
+  }
+
+  def swaggerConfig() = Action { implicit request => 
+    jsonOk(Json.parse(new FileInputStream("conf/swagger.json")))
   }
 
 }

@@ -51,7 +51,7 @@ class HelpController @Inject() (
     }
   }
 
-  def index     = Action { implicit request => result(views.html.help.index()) }
+  def index = Action { implicit request => result(views.html.help.index()) }
 
   def about        = Action { implicit request => result(views.html.help.general.about(imprint, adminEmail)) }
   def privacy      = Action { implicit request => result(views.html.help.general.privacy(adminEmail)) }
@@ -60,5 +60,9 @@ class HelpController @Inject() (
   def terms        = Action { implicit request => result(views.html.help.general.terms()) }
   def tutorial     = Action { implicit request => result(views.html.help.tutorial.tutorial()) }
   def workspace    = Action { implicit request => result(views.html.help.workspace()) }
+
+  def swaggerUi = Action {
+    Redirect(url = "/assets/lib/swagger-ui/index.html", queryString = Map("url" -> Seq("/swagger.json")))
+  }
 
 }
