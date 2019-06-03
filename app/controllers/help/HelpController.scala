@@ -62,7 +62,7 @@ class HelpController @Inject() (
   def workspace    = Action { implicit request => result(views.html.help.workspace()) }
 
   def swaggerUi = Action {
-    Redirect(url = "/assets/lib/swagger-ui/index.html", queryString = Map("url" -> Seq("/swagger.json")))
+    Redirect(url = "/webjars/swagger-ui/2.2.0/index.html", queryString = Map("url" -> Seq("/swagger.json")))
   }
 
 }
