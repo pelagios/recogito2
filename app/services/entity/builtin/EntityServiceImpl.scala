@@ -261,7 +261,10 @@ class EntityServiceImpl @Inject()(
           ) size 0
         } map { response =>
           val bounds = response.aggregations.getAs[GeoBounds]("point_bounds")
-          new Envelope(toCoord(bounds.bottomRight), toCoord(bounds.topLeft))
+          if (bounds.bottomRight == null || bounds.topLeft == null) // In case of unlocated places
+            new Envelope()
+          else
+            new Envelope(toCoord(bounds.bottomRight), toCoord(bounds.topLeft))
         }
   
     for {
