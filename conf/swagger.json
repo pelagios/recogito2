@@ -6,14 +6,24 @@
   },
   "host" : "localhost:9000",
   "basePath" : "/",
+  "tags": [{
+    "name": "Workspaces"
+  }, {
+    "name": "Authorities"
+  }, {
+    "name": "Annotations"
+  }],
   "paths" : {
     "/api/search" : {
       "get" : {
+        "tags": [ "Workspaces" ],
+        "summary": "Search documents in Recogito workspaces",
+        "description": "Depending on your current login status (and the setting applied via the `in` parameter) the search can cover your own documents, those shared with you, or all public documents in Recogito.",
         "operationId" : "search",
         "parameters" : [ {
           "name" : "q",
           "in" : "query",
-          "description" : "Query phrase",
+          "description" : "Query phrase (e.g. 'map')",
           "required" : true,
           "type" : "string"
         }, {
@@ -33,38 +43,31 @@
         }, {
           "name" : "owner",
           "in" : "query",
-          "description" : "Owner",
+          "description" : "Owner (e.g. 'pelagios3')",
           "required" : false,
           "type" : "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "headers" : { }
-          }
-        }
+        } ]
       }
     },
     "/api/account/{username}" : {
       "get" : {
+        "tags": [ "Workspaces" ],
+        "summary": "Public account information for a user",
         "operationId" : "account",
         "parameters" : [ {
           "name": "username",
           "in": "path",
-          "description": "Username",
+          "description": "Username (e.g. 'pelagios3')",
           "required": true,
           "type": "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "headers" : { }
-          }
-        }
+        } ]
       }
     },
     "/api/directory/{username}" : {
       "get" : {
+        "tags": [ "Workspaces" ],
+        "summary": "Accessible directory content",
+        "description": "Lists documents and folders in the given users workspace. The response may differ, based on your login status. If not logged in, only the publicly shared directory will be returned. Otherwise, the response will include documents shared with the currently logged in user.",
         "operationId" : "directory",
         "parameters" : [ {
           "name": "username",
@@ -72,17 +75,14 @@
           "description": "Username",
           "required": true,
           "type": "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "headers" : { }
-          }
-        }
+        } ]
       }
     },
     "/api/directory/{username}/{folderId}" : {
       "get" : {
+        "tags": [ "Workspaces" ],
+        "summary": "Accessible folder content",
+        "description": "Identical to the `/api/directory/{username} route, but for listing a specific subdirectory",
         "operationId" : "directory",
         "parameters" : [ {
           "name": "username",
@@ -96,22 +96,120 @@
           "description": "Folder/Collection UUID",
           "required": true,
           "type": "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "successful operation",
-            "headers" : { }
-          }
-        }
+        } ]
       }
-    }
-  },
-  "definitions" : {
-    "Action" : {
-      "type" : "object"
     },
-    "ActionAnyContent" : {
-      "type" : "object"
+    "/api/authorities/gazetteers" : {
+      "get" : {
+        "tags": [ "Authorities" ],
+        "summary": "List available resolution authorities",
+        "operationId": "authorities"
+      }
+    },
+    "/api/place/search" : {
+      "get": {
+        "tags": [ "Authorities" ],
+        "summary": "Search gazetteers",
+        "description": "Gazetteer search is open to all. No need to be logged in to query this API.",
+        "operationId": "gazetteerSearch",
+        "parameters": [ {
+          "name":  "q",
+          "in": "query",
+          "description": "Query phrase",
+          "required": true,
+          "type": "string"
+        }, {
+          "name":  "offset",
+          "in": "query",
+          "description": "Pagination offset",
+          "required": false,
+          "type": "integer",
+          "default": 0
+        }, {
+          "name":  "size",
+          "in": "query",
+          "description": "Pagination page size",
+          "required": false,
+          "type": "integer",
+          "default": 20
+        }, {
+          "name":  "authorities",
+          "in": "query",
+          "description": "Gazetteer IDs to filter by (comma, separated)",
+          "required": false,
+          "type": "string"
+        }  ]
+      }
+    },
+    "/api/document/{doc}/annotations" : {
+      "get" : {
+        "tags": [ "Annotations" ],
+        "summary": "Annotations for document",
+        "description": "Annotations are covered by the access policy of the document (and your login status).",
+        "operationId": "annotationsForDocument",
+        "parameters": [ {
+          "name":  "doc",
+          "in": "path",
+          "description": "Document ID",
+          "required": true,
+          "type": "string"
+        } ]
+      }
+    },
+    "/api/document/{doc}/part/{part}/annotations" : {
+      "get" : {
+        "tags": [ "Annotations" ],
+        "summary": "Annotations for document part",
+        "description": "Annotations are covered by the access policy of the document (and your login status).",
+        "operationId": "annotationsForPart",
+        "parameters": [ {
+          "name":  "doc",
+          "in": "path",
+          "description": "Document ID",
+          "required": true,
+          "type": "string"
+        }, {
+          "name":  "part",
+          "in": "path",
+          "description": "Filepart number",
+          "required": true,
+          "type": "integer",
+          "default": 1
+        } ]
+      }
+    },
+    "/api/annotation/{id}" : {
+      "get" : {
+        "tags": [ "Annotations" ],
+        "summary": "Get specific annotation",
+        "operationId": "annotation",
+        "parameters": [ {
+          "name":  "id",
+          "in": "path",
+          "description": "Annotation ID",
+          "required": true,
+          "type": "string"
+        } ]
+      }
+    },
+    "/api/annotation/{id}.jpg" : {
+      "get" : {
+        "tags": [ "Annotations" ],
+        "summary": "Get annotated image cutout",
+        "operationId": "annotation",
+        "parameters": [ {
+          "name":  "id",
+          "in": "path",
+          "description": "Annotation ID",
+          "required": true,
+          "type": "string"
+        } ],
+        "responses": [{
+          "200": {
+            "content": "image/jpeg"
+          }
+        }]
+      }
     }
   }
 }
