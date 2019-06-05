@@ -8,6 +8,7 @@ import services.generated.tables.records.{FolderRecord, SharingPolicyRecord}
 
 case class FolderItem(
   folder: FolderRecord,
+  subfolderCount: Int,
   sharedVia: Option[SharingPolicyRecord] = None
 ) extends DirectoryItem 
 
@@ -18,13 +19,15 @@ implicit val folderItemWrites: Writes[FolderItem] = (
     (JsPath \ "id").write[UUID] and
     (JsPath \ "title").write[String] and
     (JsPath \ "parent").writeNullable[UUID] and
-    (JsPath \ "owner").write[String] 
+    (JsPath \ "owner").write[String] and
+    (JsPath \ "has_subfolders").writeNullable[Boolean]
   )(f => (
     DirectoryItem.FOLDER.toString,
     f.folder.getId,
     f.folder.getTitle,
     Option(f.folder.getParent),
-    f.folder.getOwner
+    f.folder.getOwner,
+    { if (f.subfolderCount > 0) Some(true) else None }
   ))
 
 }

@@ -113,7 +113,7 @@ class DirectoryController @Inject() (
       val fBreadcrumbs = getBreadcrumbs(Option(folderId))
       val fDirectories = folders.listFolders(request.identity.username, offset, size, Option(folderId))     
       
-      def fDocuments(folders: Page[FolderRecord]) = {
+      def fDocuments(folders: Page[(FolderRecord, Int)]) = {
         val shiftedOffset = Math.max(0l, offset - folders.total)
         val shiftedSize = size - folders.items.size
 
@@ -136,7 +136,7 @@ class DirectoryController @Inject() (
         breadcrumbs <- fBreadcrumbs
         directories <- fDirectories
         documents <- fDocuments(directories)
-      } yield (readme, breadcrumbs, directories.map(FolderItem(_)), documents)
+      } yield (readme, breadcrumbs, directories.map(t => FolderItem(t._1, t._2)), documents)
 
       f.map { case (readme, breadcrumbs, directories, documents) => 
         val result = DirectoryPage.build(readme, breadcrumbs, directories, documents)
@@ -167,7 +167,7 @@ class DirectoryController @Inject() (
         documents <- fDocuments
       } yield (
         breadcrumbs,
-        directories.map(t => FolderItem(t._1, Some(t._2))), 
+        directories.map(t => FolderItem(t._1, t._3, Some(t._2))), 
         documents
       )
 
@@ -214,7 +214,7 @@ class DirectoryController @Inject() (
       } yield (
         owner,
         breadcrumbs,
-        directories.map(t => FolderItem(t._1, t._2)), 
+        directories.map(t => FolderItem(t._1, 0, t._2)), 
         documents)
 
       f.map { case (owner, breadcrumbs, directories, documents) => 

@@ -18,14 +18,29 @@ trait FolderListOps { self: FolderService =>
       val p = record.into(classOf[SharingPolicyRecord])
       Option(p.getId).map(_ => p)
     }
+    val subfolderCount =
+      Option(record.getValue("subfolder_count", classOf[Integer])).map(_.toInt).getOrElse(0)
 
-    (folder, policy)
+    (folder, policy, subfolderCount)
   }
 
   /** 'ls'-like command, lists folders by an owner, in the root or a subdirectory **/
-  def listFolders(owner: String, offset: Int, size: Int, parent: Option[UUID]): Future[Page[FolderRecord]] = 
+  def listFolders(
+    owner: String, 
+    offset: Int, 
+    size: Int, 
+    parent: Option[UUID]
+  ): Future[Page[(FolderRecord, Int)]] = 
     db.query { sql => 
       val startTime = System.currentTimeMillis
+
+      // Helper
+      def asTuple(record: Record) = {
+        val folder = record.into(classOf[FolderRecord])
+        val subfolderCount =
+          Option(record.getValue("subfolder_count", classOf[Integer])).map(_.toInt).getOrElse(0)
+        (folder, subfolderCount)
+      }
 
       val total = parent match {
         case Some(parentId) =>
@@ -45,31 +60,52 @@ trait FolderListOps { self: FolderService =>
 
       val items = parent match {
         case Some(parentId) =>
-          sql.selectFrom(FOLDER)
-            .where(FOLDER.OWNER.equal(owner))
-            .and(FOLDER.PARENT.equal(parentId))
-            .orderBy(FOLDER.TITLE.asc)
-            .limit(size)
-            .offset(offset)
-            .fetch()
-            .into(classOf[FolderRecord])
+          val query = 
+            s"""
+             SELECT
+               folder.*,
+               subfolder_count
+             FROM folder
+               LEFT OUTER JOIN (
+                 SELECT parent, count(*) subfolder_count 
+                 FROM folder
+                 GROUP BY parent
+               ) children ON children.parent = folder.id
+             WHERE folder.owner = ? AND folder.parent = ?
+             ORDER BY title ASC
+             LIMIT $size
+             OFFSET $offset           
+            """
+          sql.resultQuery(query, owner, parentId).fetchArray.map(asTuple)
 
         case None => // Root folder
-          sql.selectFrom(FOLDER)
-            .where(FOLDER.OWNER.equal(owner))
-            .and(FOLDER.PARENT.isNull)
-            .orderBy(FOLDER.TITLE.asc)
-            .limit(size)
-            .offset(offset)
-            .fetch()
-            .into(classOf[FolderRecord])
+          val query = 
+            s"""
+             SELECT
+               folder.*,
+               subfolder_count
+             FROM folder
+               LEFT OUTER JOIN (
+                 SELECT parent, count(*) subfolder_count 
+                 FROM folder
+                 GROUP BY parent
+               ) children ON children.parent = folder.id
+             WHERE folder.owner = ? AND folder.parent IS NULL
+             ORDER BY title ASC
+             LIMIT $size
+             OFFSET $offset           
+            """
+          sql.resultQuery(query, owner).fetchArray.map(asTuple)
       }
 
       Page(System.currentTimeMillis - startTime, total, offset, size, items)
     }  
 
   /** Lists folders Shared with Me, in the root or a subdirectory **/
-  def listFoldersSharedWithMe(username: String, parent: Option[UUID]): Future[Page[(FolderRecord, SharingPolicyRecord)]] =
+  def listFoldersSharedWithMe(
+    username: String, 
+    parent: Option[UUID]
+  ): Future[Page[(FolderRecord, SharingPolicyRecord, Int)]] =
     db.query { sql =>
 
       // TODO implement proper totals count, offset, sorting
@@ -79,33 +115,47 @@ trait FolderListOps { self: FolderService =>
       def asTuple(record: Record) = {
         val folder = record.into(classOf[FolderRecord])
         val policy = record.into(classOf[SharingPolicyRecord])
-        (folder, policy)
+        val subfolderCount =
+          Option(record.getValue("subfolder_count", classOf[Integer])).map(_.toInt).getOrElse(0)
+        (folder, policy, subfolderCount)
       }
 
       val query = parent match {
         case Some(parentId) => 
-          // Subfolder
           val query = 
             """
-            SELECT * 
+            SELECT 
+              folder.*,
+              sharing_policy.*
+              subfolder_count
             FROM sharing_policy
               JOIN folder ON folder.id = sharing_policy.folder_id
-            WHERE shared_with = ? AND parent = ?;
+              LEFT OUTER JOIN (
+                SELECT parent, count(*) subfolder_count
+                FROM folder
+                GROUP BY parent
+              ) children ON children.parent = folder.id
+            WHERE shared_with = ? AND folder.parent = ?;
             """
           sql.resultQuery(query, username, parentId)
 
         case None => 
-          // Root folder
           val query = 
             """
             SELECT 
               sharing_policy.*, 
               folder.*, 
-              parent_sharing_policy.shared_with AS parent_shared
+              parent_sharing_policy.shared_with AS parent_shared,
+              subfolder_count
             FROM sharing_policy
               JOIN folder ON folder.id = sharing_policy.folder_id
               LEFT OUTER JOIN folder parent_folder ON parent_folder.id = folder.parent
               LEFT OUTER JOIN sharing_policy parent_sharing_policy ON parent_sharing_policy.folder_id = parent_folder.id
+              LEFT OUTER JOIN (
+                SELECT parent, count(*) subfolder_count
+                FROM folder
+                GROUP BY parent
+              ) children ON children.parent = folder.id
             WHERE 
               sharing_policy.shared_with = ? AND
               parent_sharing_policy IS NULL;
@@ -121,7 +171,7 @@ trait FolderListOps { self: FolderService =>
     private def listAccessibleFoldersAtRoot(
       username: String, 
       loggedInAs: Option[String]
-    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord])]] = db.query { sql =>
+    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord], Int)]] = db.query { sql =>
       val startTime = System.currentTimeMillis
 
       val query = loggedInAs match {
@@ -129,11 +179,18 @@ trait FolderListOps { self: FolderService =>
         case Some(loggedIn) =>
           val query = 
             """
-            SELECT * 
+            SELECT 
+              folder.*,
+              subfolder_count
             FROM folder
               LEFT OUTER JOIN sharing_policy 
                 ON sharing_policy.folder_id = folder.id 
                   AND sharing_policy.shared_with = ?
+              LEFT OUTER JOIN (
+                SELECT parent, count(*) subfolder_count
+                FROM folder
+                GROUP BY parent
+              ) children ON children.parent = folder.id
             WHERE 
               folder.owner = ?
                 AND
@@ -148,7 +205,15 @@ trait FolderListOps { self: FolderService =>
         case None => 
           val query = 
             """
-            SELECT * FROM folder
+            SELECT
+              folder.*,
+              subfolder_count
+            FROM folder
+              LEFT OUTER JOIN (
+                SELECT parent, count(*) subfolder_count
+                FROM folder
+                GROUP BY parent
+              ) children ON children.parent = folder.id
             WHERE 
               folder.owner = ?
                 AND
@@ -167,7 +232,7 @@ trait FolderListOps { self: FolderService =>
     private def listAccessibleSubFolders(
       loggedInAs: Option[String],
       folder: UUID
-    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord])]] = db.query { sql => 
+    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord], Int)]] = db.query { sql => 
       val startTime = System.currentTimeMillis
       
       val query = loggedInAs match {
@@ -175,11 +240,18 @@ trait FolderListOps { self: FolderService =>
         case Some(loggedIn) =>
           val query = 
             """
-            SELECT * 
+            SELECT 
+              folder.*,
+              subfolder_count 
             FROM folder
               LEFT OUTER JOIN sharing_policy 
                 ON sharing_policy.folder_id = folder.id 
                   AND sharing_policy.shared_with = ?
+              LEFT OUTER JOIN (
+                SELECT parent, count(*) subfolder_count
+                FROM folder
+                GROUP BY parent
+              ) children ON children.parent = folder.id
             WHERE folder.parent = ?
               AND (
                 folder.public_visibility = 'PUBLIC' OR
@@ -191,7 +263,15 @@ trait FolderListOps { self: FolderService =>
         case None =>
           val query = 
             """
-            SELECT * FROM folder
+            SELECT 
+              folder.*,
+              subfolder_count 
+            FROM folder
+              LEFT OUTER JOIN (
+                SELECT parent, count(*) subfolder_count
+                FROM folder
+                GROUP BY parent
+              ) children ON children.parent = folder.id
             WHERE folder.parent = ?
               AND folder.public_visibility = 'PUBLIC';
             """
@@ -210,7 +290,7 @@ trait FolderListOps { self: FolderService =>
       username: String,
       loggedInAs: Option[String],
       parent: Option[UUID]
-    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord])]] = parent match {
+    ): Future[Page[(FolderRecord, Option[SharingPolicyRecord], Int)]] = parent match {
       case Some(folderId) => listAccessibleSubFolders(loggedInAs, folderId)
       case None => listAccessibleFoldersAtRoot(username, loggedInAs)
     }
