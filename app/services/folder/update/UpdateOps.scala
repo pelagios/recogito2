@@ -50,4 +50,12 @@ trait UpdateOps { self: FolderService =>
          .execute == 1
     }
 
+  def moveFolder(id: UUID, newParent: UUID) =
+    db.withTransaction { sql => 
+      sql.update(FOLDER)
+         .set(FOLDER.PARENT, newParent)
+         .where(FOLDER.ID.equal(id))
+         .execute == 1
+    }
+
 }
