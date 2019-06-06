@@ -47,7 +47,13 @@ class UpdateController @Inject() (
     }
   }
 
-  private def moveOneFolder(id: UUID, newParentId: UUID, username: String): Future[Boolean] = {
+  /** Move one folder to the given new parent folder
+    * 
+    * Requires admin rights on both folders, and will not be executed if the new
+    * parent is a child folder (i.e. folders cannot be moved down their own 
+    * hierarchy).
+    */
+  private def moveOneFolder(id: UUID, newParentId: UUID, username: String) = {
     val f = for {
       folder <- folders.getFolder(id, username)
       isChild <- folders.isChildOf(id, newParentId)
@@ -66,11 +72,24 @@ class UpdateController @Inject() (
     }
   }
 
-  /** Move one document to the given folder, or root
+  /** Move one folder to workspace root.
+    * 
+    * Requires admin rights on the folder.
+    */
+  private def moveOneFolderToRoot(id: UUID, username: String) =
+    folders.getFolder(id, username).map { f => 
+      val hasAdminRights = f.map(t => isFolderAdmin(username, t._1, t._2)).getOrElse(false)
+      if (hasAdminRights)
+        folders.moveFolderToRoot(id)
+      else 
+        Future.successful(false)
+    }
+
+  /** Move one document to the given folder
     * 
     * Requires admin rights on the document as well as the folder.
     */
-  private def moveOneDocument(docId: String, folderId: UUID, username: String): Future[Boolean] = {
+  private def moveOneDocument(docId: String, folderId: UUID, username: String) = {
     val f = for {
       d <- documents.getDocumentRecordById(docId, Some(username))
       f <- folders.getFolder(folderId, username)
@@ -86,6 +105,19 @@ class UpdateController @Inject() (
         Future.successful(false)
     }
   }
+
+  /** Move one document to workspace root
+    * 
+    * Requires admin rights on the document.
+    */
+  private def moveOneDocumentToRoot(docId: String, username: String) =
+    documents.getDocumentRecordById(docId, Some(username)).flatMap { t => 
+      val hasAdminRights = t.map(_._2.isAdmin).getOrElse(false)
+      if (hasAdminRights)
+        folders.moveDocumentToRoot(docId)
+      else 
+        Future.successful(false)
+    }
 
   /** General folder update handler.
     * 
@@ -152,6 +184,13 @@ class UpdateController @Inject() (
               if (!successes.contains(false)) Ok else BadRequest
             }
 
+          case (Some("MOVE_TO"), Some(folderIds), None) =>
+            Future.sequence {
+              folderIds.map(id => moveOneFolderToRoot(id, request.identity.username))
+            } map { successes =>
+              if (!successes.contains(false)) Ok else BadRequest
+            }
+
           case _ => Future.successful(BadRequest)
         }
     }
@@ -174,7 +213,11 @@ class UpdateController @Inject() (
             }
 
           case (Some("MOVE_TO"), Some(docIds), None) =>
-            Future.sequence
+            Future.sequence {
+              docIds.map(id => moveOneDocumentToRoot(id, request.identity.username))
+            } map { successes => 
+              if (!successes.contains(false)) Ok else BadRequest 
+            }
 
           case _ => Future.successful(BadRequest)
         }
