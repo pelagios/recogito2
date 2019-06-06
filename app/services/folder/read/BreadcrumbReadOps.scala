@@ -2,9 +2,16 @@ package services.folder.read
 
 import java.util.UUID
 import org.jooq.DSLContext
+import scala.concurrent.ExecutionContext
 import services.folder.{Breadcrumb, FolderService}
 
 trait BreadcrumbReadOps { self: FolderService => 
+
+  /** Tests if folder A is a child of folder B, i.e. if A is somewhere down the hierarchy chain from B **/
+  def isChildOf(folderA: UUID, folderB: UUID)(implicit ctx: ExecutionContext) =
+    getBreadcrumbs(folderA).map { breadcrumbs => 
+      breadcrumbs.exists(_.id == folderB)  
+    }
 
   /** Gets the 'real' breadcrumb trail for the given folder.
     * 

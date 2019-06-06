@@ -50,14 +50,16 @@ class UpdateController @Inject() (
   private def moveOneFolder(id: UUID, newParentId: UUID, username: String): Future[Boolean] = {
     val f = for {
       folder <- folders.getFolder(id, username)
+      isChild <- folders.isChildOf(id, newParentId)
       parent <- folders.getFolder(newParentId, username)
-    } yield (folder, parent)
+    } yield (folder, isChild, parent)
 
-    f.flatMap { case (folder, parent) => 
+    f.flatMap { case (folder, isChild, parent) => 
       val hasFolderAdminRights = folder.map(t => isFolderAdmin(username, t._1, t._2)).getOrElse(false)
       val hasParentAdminRights = parent.map(t => isFolderAdmin(username, t._1, t._2)).getOrElse(false)
 
-      if (hasFolderAdminRights && hasParentAdminRights)
+      // Note: don't move a folder into one of it's own children (loop!)
+      if (hasFolderAdminRights && hasParentAdminRights && !isChild)
         folders.moveFolder(id, newParentId)
       else 
         Future.successful(false)
