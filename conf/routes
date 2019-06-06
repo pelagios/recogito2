@@ -174,9 +174,11 @@ POST    /api/directory/:owner/:folderId              controllers.my.directory.li
 # ~~~ Create, duplicate, delete & unshare (my shared) operations ~~~
 
 POST    /api/folder                                  controllers.my.directory.create.CreateController.createFolder
-PUT     /api/folder/:id                              controllers.my.directory.create.CreateController.renameFolder(id: java.util.UUID, title: String)
-
 POST    /api/clone/document/:id                      controllers.my.directory.create.CreateController.cloneDocument(id: String)
+
+PUT     /api/document/:id                            controllers.my.directory.update.UpdateController.updateDocument(id: String)
+PUT     /api/folder/:id                              controllers.my.directory.update.UpdateController.updateFolder(id: java.util.UUID)
+# PUT     /api/folder/:id                              controllers.my.directory.create.CreateController.renameFolder(id: java.util.UUID, title: String)
 
 DELETE  /api/document/bulk                           controllers.my.directory.delete.DocumentActionsController.bulkDeleteDocuments
 DELETE  /api/document/:id                            controllers.my.directory.delete.DocumentActionsController.deleteDocument(id: String)

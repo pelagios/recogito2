@@ -71,20 +71,6 @@ class CreateController @Inject() (
     }
   }
 
-  def renameFolder(id: UUID, title: String) = silhouette.SecuredAction.async { implicit request => 
-    folders.getFolder(id, request.identity.username).flatMap { _ match {
-      case Some((folder, policy)) =>
-        if (isFolderAdmin(request.identity.username, folder, policy))
-          folders.renameFolder(id, title).map { success =>
-            if (success) Ok else InternalServerError
-          }
-        else 
-          Future.successful(Forbidden)
-
-      case None => Future.successful(NotFound)
-    }}
-  }
-
   def createReadme(folderId: UUID) = silhouette.SecuredAction.async { implicit request =>
     request.body.asJson match {
       case Some(json) =>
