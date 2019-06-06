@@ -38,6 +38,12 @@ trait CreateOps { self: FolderService =>
       insertAssociation(documentId, folderId, sql)
     }
 
+  def moveDocumentToRoot(documentId: String) = db.withTransaction { sql => 
+    sql.deleteFrom(FOLDER_ASSOCIATION)
+       .where(FOLDER_ASSOCIATION.DOCUMENT_ID.equal(documentId))
+       .execute == 1
+  }
+
   def addCollaborator(folderId: UUID, sharedBy: String, sharedWith: String, level: SharingLevel) = 
     db.query { sql => 
       val existing = sql.selectFrom(SHARING_POLICY)

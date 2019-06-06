@@ -66,7 +66,7 @@ class UpdateController @Inject() (
     }
   }
 
-  /** Move one document to the given folder.
+  /** Move one document to the given folder, or root
     * 
     * Requires admin rights on the document as well as the folder.
     */
@@ -172,6 +172,9 @@ class UpdateController @Inject() (
             } map { successes => 
               if (!successes.contains(false)) Ok else BadRequest
             }
+
+          case (Some("MOVE_TO"), Some(docIds), None) =>
+            Future.sequence
 
           case _ => Future.successful(BadRequest)
         }
