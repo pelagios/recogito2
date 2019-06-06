@@ -141,7 +141,7 @@ class UpdateController @Inject() (
                   .recover { case t: Throwable => InternalServerError }
             }
 
-          case None => Future.successful(BadRequest)
+          case _ => Future.successful(BadRequest)
         }
     }
   }
@@ -163,7 +163,7 @@ class UpdateController @Inject() (
                   .recover { case t: Throwable => InternalServerError }
             }
 
-          case None => Future.successful(BadRequest)
+          case _ => Future.successful(BadRequest)
         }
     }
   }
