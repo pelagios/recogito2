@@ -62,7 +62,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
 
       // Commentary notes
       val notes = getCommentBodies(annotation).flatMap { comment => 
-        <note resp={comment.lastModifiedBy.get}>{comment.value.get}</note>
+        <note target={id} resp={comment.lastModifiedBy.get}>{comment.value.get}</note>
       }
       
       // Tags of form @key:value - to be used as XML attributes

@@ -89,6 +89,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     def getNotes(annotation: Annotation) = {
       getCommentBodies(annotation).map { comment => 
         val noteEl = doc.createElement("note")
+        noteEl.setAttribute("target", toTeiId(annotation.annotationId))
         noteEl.setAttribute("resp", comment.lastModifiedBy.get)
         noteEl.appendChild(doc.createTextNode(comment.value.get))
         noteEl
