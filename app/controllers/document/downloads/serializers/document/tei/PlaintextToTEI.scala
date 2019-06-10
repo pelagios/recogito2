@@ -1,5 +1,7 @@
 package controllers.document.downloads.serializers.document.tei
 
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.document.{ExtendedDocumentMetadata, DocumentService}
 import play.api.mvc.{AnyContent, Request}
@@ -13,6 +15,9 @@ trait PlaintextToTEI extends BaseTEISerializer {
   private def escape(str: String) =
     str.replace("<", "&lt;")
        .replace(">", "&gt;")
+
+  private def formatDate(t: Timestamp): String =
+    new SimpleDateFormat("yyyy-MM-dd").format(t)
   
   private def textpartToTEI(text: String, annotations: Seq[Annotation]): Seq[Node] = {
     
@@ -125,7 +130,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
         (divs, relations)
       }
     }
-        
+       
     fDivs.map { case (divs, relations) =>
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
@@ -137,20 +142,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
               }
             </titleStmt>
             <publicationStmt>
-              { 
-                (doc.dateFreeform, doc.dateNumeric) match {
-                  case (Some(df), Some(dn)) =>
-                    <p><date when={ dn.toString }>{ df }</date></p>
-                    
-                  case (Some(df), None) =>
-                    <p>{ df }</p>
-                    
-                  case (None, Some(dn)) =>
-                    <p><date when={ dn.toString}>{ dn.toString }</date></p>
-                    
-                  case _ => <p/>
-                }
-              }              
+              <p><date>{formatDate(doc.uploadedAt)}</date></p>             
             </publicationStmt>
             <sourceDesc>
               <p><link target={ controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL } /></p>
