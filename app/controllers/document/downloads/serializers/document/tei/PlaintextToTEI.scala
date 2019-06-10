@@ -137,15 +137,34 @@ trait PlaintextToTEI extends BaseTEISerializer {
           <fileDesc>
             <titleStmt>
               <title>{ doc.author.map(_ + ": ").getOrElse("") }{ doc.title }</title>
-              { if (doc.author.isDefined)
-                <author>{doc.author.get}</author>
-              }
+              <author>{ doc.ownerName }</author>
             </titleStmt>
             <publicationStmt>
               <p><date>{formatDate(doc.uploadedAt)}</date></p>             
             </publicationStmt>
             <sourceDesc>
-              <p><link target={ controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL } /></p>
+              <bibl source={controllers.document.routes.DocumentController.initialDocumentView(doc.id).absoluteURL } />
+              <biblStruct>
+                <monogr>
+                  { if (doc.author.isDefined) 
+                    <author>{doc.author.get}</author>
+                  }
+                  <title>{ doc.title }</title>
+                  { (doc.dateFreeform, doc.dateNumeric) match {	
+                    
+                    case (Some(df), Some(dn)) =>	
+                      <imprint><date when={ dn.toString }>{ df }</date></imprint>
+
+                    case (Some(df), None) =>	
+                      <imprint><date>{ df }</date></imprint>	
+
+                    case (None, Some(dn)) =>	
+                      <imprint><date when={ dn.toString}>{ dn.toString }</date></imprint>
+
+                    case _ => 	
+                  }}  
+                </monogr>
+              </biblStruct>
             </sourceDesc>
           </fileDesc>
           { if (relations.isDefined)
