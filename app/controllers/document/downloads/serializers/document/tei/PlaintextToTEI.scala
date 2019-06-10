@@ -167,11 +167,18 @@ trait PlaintextToTEI extends BaseTEISerializer {
               </biblStruct>
             </sourceDesc>
           </fileDesc>
-          { if (relations.isDefined)
+          { if (relations.isDefined || doc.language.isDefined)
             <profileDesc>
-              <particDesc>
-                {relations.get}
-              </particDesc>
+              { if (doc.language.isDefined)
+                <langUsage>
+                  <language ident={doc.language.get} />
+                </langUsage>
+              }
+              { if (relations.isDefined)
+                <particDesc>
+                  {relations.get}
+                </particDesc>
+              }
             </profileDesc>
           }
           <encodingDesc>
