@@ -64,15 +64,18 @@ define([
         mapOverlayEl        = element.find('.map-overlay'),
 
         render = function() {
+          var distinctNames = PlaceUtils.getDistinctRecordNames(record, {
+            excludeTitles: true
+          }).join(', ');
+
           titleEl.html(record.title);
           urisEl.html(Card.formatURI(record.uri));
 
           if (record.descriptions)
             descriptionEl.html(record.descriptions[0].description);
 
-          namesEl.html(PlaceUtils.getDistinctRecordNames(record, {
-            excludeTitles : true
-          }).join(', '));
+          namesEl.html(distinctNames);
+          namesEl.attr('title', distinctNames); // For unabbreviated mouseover hint
 
           if (record.temporal_bounds)
             dateEl.html(Formatting.yyyyMMddToYear(record.temporal_bounds.from) + ' - ' +
