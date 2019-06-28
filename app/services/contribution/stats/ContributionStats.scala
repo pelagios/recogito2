@@ -19,7 +19,7 @@ case class ContributionStats(
   
   byItemType: Seq[(ItemType.Value, Long)],
   
-  contributionHistory: Seq[(DateTime, Long)]
+  contributionHistory: Seq[(DateTime, Long, Seq[(String, Long)])]
   
 )
 
@@ -43,7 +43,7 @@ object ContributionStats extends HasDate {
     (JsPath \ "by_user").write[Seq[(String, Long)]] and
     (JsPath \ "by_action").write[Seq[(ContributionAction.Value, Long)]] and
     (JsPath \ "by_item_type").write[Seq[(ItemType.Value, Long)]] and
-    (JsPath \ "contribution_history").write[Seq[(DateTime, Long)]]
+    (JsPath \ "contribution_history").write[Seq[(DateTime, Long, Seq[(String, Long)])]]
   )(unlift(ContributionStats.unapply))
   
 }

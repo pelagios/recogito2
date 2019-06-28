@@ -4,6 +4,7 @@ import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import org.elasticsearch.search.aggregations.bucket.histogram.{DateHistogramInterval, InternalDateHistogram}
 import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
+import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.joda.time.{DateTime, DateTimeZone}
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -103,8 +104,14 @@ trait ContributionStatsService { self: ContributionService =>
         (ContributionAction.withName(bucket.getKeyAsString), bucket.getDocCount)),
       byItemType.getBuckets.asScala.map(bucket =>
         (ItemType.withName(bucket.getKeyAsString), bucket.getDocCount)),
-      contributionHistory.getBuckets.asScala.map(bucket =>
-        (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
+      contributionHistory.getBuckets.asScala.map { bucket =>
+        (
+          new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), 
+          bucket.getDocCount,
+          bucket.getAggregations.get("by_user_over_time").asInstanceOf[Terms].getBuckets.asScala.map(bucket => 
+            (bucket.getKeyAsString, bucket.getDocCount))
+        )
+      })
   }
 
   /** System-wide contribution stats **/
@@ -115,7 +122,9 @@ trait ContributionStatsService { self: ContributionService =>
         termsAggregation("by_action") field "action",
         termsAggregation("by_item_type") field "affects_item.item_type",
         filterAggregation("contribution_history") query rangeQuery("made_at").gt("now-30d") subaggs (
-          dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
+          dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY subaggs (
+            termsAggregation("by_user_over_time") field "made_by"
+          )
         )
       ) limit 0
     } map { toContributionStats }
@@ -129,7 +138,9 @@ trait ContributionStatsService { self: ContributionService =>
         termsAggregation("by_action") field "action",
         termsAggregation("by_item_type") field "affects_item.item_type",
         filterAggregation("contribution_history") query rangeQuery("made_at").gt("now-30d") subaggs (
-          dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
+          dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY subaggs (
+            termsAggregation("by_user_over_time") field "made_by"
+          )
         )
       ) limit 0
     } map { toContributionStats }
