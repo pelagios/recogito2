@@ -6,5 +6,17 @@
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Activity Statistics", doc, currentUser, accessLevel, Some("activity"), p) {
-  <p class="empty">The document annotations stats page is still under construction. Bear with us.</p>
+  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/widgets/1.activity_stats.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/widgets/activity_stats.js")"></script>
+  
+  <div id="app"></div>
+  
+  <script type="text/javascript">
+    (function() {
+      ActivityStats.init({
+        id: 'app',
+        document: '@doc.id'
+      }); 
+    })();
+  </script>
 }
