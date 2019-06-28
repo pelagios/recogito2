@@ -7,7 +7,7 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 /** System-wide contribution stats **/
-case class SystemStats(
+case class ContributionStats(
     
   took: Long,
     
@@ -23,7 +23,7 @@ case class SystemStats(
   
 )
 
-object SystemStats extends HasDate {
+object ContributionStats extends HasDate {
   
   implicit val byUserWrites = Writes[(String, Long)] { case (username, value) => 
     Json.obj("username" -> username, "value" -> value) }
@@ -37,13 +37,13 @@ object SystemStats extends HasDate {
   implicit val contributionHistoryWrites = Writes[(DateTime, Long)] { case (dateTime, value) =>
     Json.obj("date" -> dateTime, "value" -> value) }
   
-  implicit val systemStatsWrites: Writes[SystemStats] = (
+  implicit val systemStatsWrites: Writes[ContributionStats] = (
     (JsPath \ "took").write[Long] and
     (JsPath \ "total_contributions").write[Long] and
     (JsPath \ "by_user").write[Seq[(String, Long)]] and
     (JsPath \ "by_action").write[Seq[(ContributionAction.Value, Long)]] and
     (JsPath \ "by_item_type").write[Seq[(ItemType.Value, Long)]] and
     (JsPath \ "contribution_history").write[Seq[(DateTime, Long)]]
-  )(unlift(SystemStats.unapply))
+  )(unlift(ContributionStats.unapply))
   
 }

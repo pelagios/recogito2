@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.HasDate
-import services.contribution.stats.ContributorStats
+import services.contribution.stats.ContributorActivity
 import services.document.read.AccessibleDocumentsCount
 import services.user.User
 
@@ -13,7 +13,7 @@ import services.user.User
 case class PublicAccountInfo(
   user: User, 
   accessibleDocuments: AccessibleDocumentsCount,
-  stats: ContributorStats)
+  stats: ContributorActivity)
 
 object PublicAccountInfo extends HasDate {
 
@@ -29,7 +29,7 @@ object PublicAccountInfo extends HasDate {
     (JsPath \ "bio").writeNullable[String] and
     (JsPath \ "website").writeNullable[String] and
     (JsPath \ "documents").write[AccessibleDocumentsCount] and
-    (JsPath \ "stats").write[ContributorStats]
+    (JsPath \ "stats").write[ContributorActivity]
   )(v => (
       v.user.username,
       v.user.realName,

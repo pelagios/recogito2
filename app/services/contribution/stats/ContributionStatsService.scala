@@ -26,7 +26,7 @@ trait ContributionStatsService { self: ContributionService =>
       val lastThreeMonths = response.aggregations.getAs[InternalFilter]("over_time")
         .getAggregations.get("last_3_months").asInstanceOf[InternalDateHistogram]
 
-      ContributorStats(
+      ContributorActivity(
         response.totalHits,
         lastThreeMonths.getBuckets.asScala.map(bucket =>
           (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
@@ -87,7 +87,7 @@ trait ContributionStatsService { self: ContributionService =>
   }
 
   /** System-wide contribution stats **/
-  def getSystemStats(): Future[SystemStats] =
+  def getSystemStats(): Future[ContributionStats] =
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) aggs (
         termsAggregation("by_user") field "made_by",
@@ -104,7 +104,7 @@ trait ContributionStatsService { self: ContributionService =>
       val contributionHistory = response.aggregations.getAs[InternalFilter]("contribution_history")
         .getAggregations.get("last_30_days").asInstanceOf[InternalDateHistogram]
 
-      SystemStats(
+      ContributionStats(
         response.tookInMillis,
         response.totalHits,
         byUser.getBuckets.asScala.map(bucket =>
@@ -116,5 +116,7 @@ trait ContributionStatsService { self: ContributionService =>
         contributionHistory.getBuckets.asScala.map(bucket =>
           (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
     }
+
+  def getDocumentStats(): Future[ContributionStats] = ???
 
 }

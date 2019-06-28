@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.{HasDate, HasNullableSeq}
-import services.contribution.stats.ContributorStats
+import services.contribution.stats.ContributorActivity
 import services.user.User
 
 /** Personal account info.
@@ -17,7 +17,7 @@ case class PrivateAccountInfo(
   user: User, 
   myDocumentsCount: Long, 
   sharedWithMeCount: Long,
-  stats: ContributorStats,
+  stats: ContributorActivity,
   usedMb: Double)
 
 object PrivateAccountInfo extends HasDate with HasNullableSeq {
@@ -31,7 +31,7 @@ object PrivateAccountInfo extends HasDate with HasNullableSeq {
     (JsPath \ "feature_toggles").writeNullable[Seq[String]] and
     (JsPath \ "documents").write[JsObject] and
     (JsPath \ "storage").write[JsObject] and
-    (JsPath \ "stats").write[ContributorStats]
+    (JsPath \ "stats").write[ContributorActivity]
   )(p => (
       p.user.username,
       p.user.realName,
