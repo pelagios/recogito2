@@ -1,6 +1,7 @@
 package services.contribution.stats
 
 import com.sksamuel.elastic4s.ElasticDsl._
+import com.sksamuel.elastic4s.searches.RichSearchResponse
 import org.elasticsearch.search.aggregations.bucket.histogram.{DateHistogramInterval, InternalDateHistogram}
 import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
 import org.joda.time.{DateTime, DateTimeZone}
@@ -86,6 +87,26 @@ trait ContributionStatsService { self: ContributionService =>
     } yield (contributors)
   }
 
+  private def toContributionStats(response: RichSearchResponse) = {
+    val byUser = response.aggregations.termsResult("by_user")
+    val byAction = response.aggregations.termsResult("by_action")
+    val byItemType = response.aggregations.termsResult("by_item_type")
+    val contributionHistory = response.aggregations.getAs[InternalFilter]("contribution_history")
+      .getAggregations.get("last_30_days").asInstanceOf[InternalDateHistogram]
+
+    ContributionStats(
+      response.tookInMillis,
+      response.totalHits,
+      byUser.getBuckets.asScala.map(bucket =>
+        (bucket.getKeyAsString, bucket.getDocCount)),
+      byAction.getBuckets.asScala.map(bucket =>
+        (ContributionAction.withName(bucket.getKeyAsString), bucket.getDocCount)),
+      byItemType.getBuckets.asScala.map(bucket =>
+        (ItemType.withName(bucket.getKeyAsString), bucket.getDocCount)),
+      contributionHistory.getBuckets.asScala.map(bucket =>
+        (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
+  }
+
   /** System-wide contribution stats **/
   def getSystemStats(): Future[ContributionStats] =
     es.client execute {
@@ -97,26 +118,20 @@ trait ContributionStatsService { self: ContributionService =>
           dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
         )
       ) limit 0
-    } map { response =>
-      val byUser = response.aggregations.termsResult("by_user")
-      val byAction = response.aggregations.termsResult("by_action")
-      val byItemType = response.aggregations.termsResult("by_item_type")
-      val contributionHistory = response.aggregations.getAs[InternalFilter]("contribution_history")
-        .getAggregations.get("last_30_days").asInstanceOf[InternalDateHistogram]
+    } map { toContributionStats }
 
-      ContributionStats(
-        response.tookInMillis,
-        response.totalHits,
-        byUser.getBuckets.asScala.map(bucket =>
-          (bucket.getKeyAsString, bucket.getDocCount)),
-        byAction.getBuckets.asScala.map(bucket =>
-          (ContributionAction.withName(bucket.getKeyAsString), bucket.getDocCount)),
-        byItemType.getBuckets.asScala.map(bucket =>
-          (ItemType.withName(bucket.getKeyAsString), bucket.getDocCount)),
-        contributionHistory.getBuckets.asScala.map(bucket =>
-          (new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC), bucket.getDocCount)))
-    }
-
-  def getDocumentStats(): Future[ContributionStats] = ???
+  def getDocumentStats(docId: String): Future[ContributionStats] =
+    es.client execute {
+      search (ES.RECOGITO / ES.CONTRIBUTION) query {
+        termQuery("affects_item.document_id" -> docId)
+      } aggs (
+        termsAggregation("by_user") field "made_by",
+        termsAggregation("by_action") field "action",
+        termsAggregation("by_item_type") field "affects_item.item_type",
+        filterAggregation("contribution_history") query rangeQuery("made_at").gt("now-30d") subaggs (
+          dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY
+        )
+      ) limit 0
+    } map { toContributionStats }
 
 }
