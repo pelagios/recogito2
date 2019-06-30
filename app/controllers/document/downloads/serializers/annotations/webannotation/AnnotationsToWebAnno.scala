@@ -8,7 +8,7 @@ import play.api.mvc.{ AnyContent, Request }
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
 
-trait AnotationsToWebAnno extends BaseSerializer {
+trait AnnotationsToWebAnno extends BaseSerializer {
 
   def documentToWebAnnotation(doc: ExtendedDocumentMetadata)(implicit documentService: DocumentService,
       annotationService: AnnotationService, request: Request[AnyContent], ctx: ExecutionContext) = {

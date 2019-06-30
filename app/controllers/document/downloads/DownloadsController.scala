@@ -68,7 +68,8 @@ class DownloadsController @Inject() (
 ) extends BaseOptAuthController(components, config, documents, users)
     with annotations.csv.AnnotationsToCSV
     with annotations.oa.AnnotationsToOA
-    with annotations.webannotation.AnotationsToWebAnno
+    with annotations.webannotation.AnnotationsToWebAnno
+    with annotations.annotationlist.AnnotationsToAnnotationList
     with document.csv.DatatableToCSV
     with document.geojson.DatatableToGazetteer
     with document.tei.PlaintextToTEI
@@ -144,11 +145,20 @@ class DownloadsController @Inject() (
   def downloadTTL(documentId: String) = downloadRDF(documentId, RDFFormat.TTL, "ttl") 
   def downloadRDFXML(documentId: String) = downloadRDF(documentId, RDFFormat.RDFXML, "rdf.xml") 
   
-  def downloadJSONLD(documentId: String) = silhouette.UserAwareAction.async { implicit request =>
+  def downloadJSONLD(documentId: String, flavour: Option[String]) = silhouette.UserAwareAction.async { implicit request =>
     download(documentId, RuntimeAccessLevel.READ_DATA, { doc =>
-      documentToWebAnnotation(doc).map { json =>
-        Ok(Json.prettyPrint(json))
-          .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".jsonld" })
+      flavour match {
+        case Some("iiif2") =>
+          documentToIIIF2(doc).map { json =>
+            Ok(Json.prettyPrint(json))
+              .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".jsonld" })
+          }
+
+        case _ =>
+          documentToWebAnnotation(doc).map { json =>
+            Ok(Json.prettyPrint(json))
+              .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".jsonld" })
+          }
       }
     })
   }

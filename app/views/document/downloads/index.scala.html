@@ -54,7 +54,7 @@
                 <p>@messages("document.downloads.annotations.rdf.text")</p>
               </div>
               <div class="button-container">
-                <a href="@controllers.document.downloads.routes.DownloadsController.downloadJSONLD(doc.id)" class="btn small"><span class="icon">&#xf019;</span> JSON-LD</a>
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadJSONLD(doc.id, None)" class="btn small"><span class="icon">&#xf019;</span> JSON-LD</a>
                 <a href="@controllers.document.downloads.routes.DownloadsController.downloadTTL(doc.id)" class="btn small"><span class="icon">&#xf019;</span> RDF/Turtle</a>
                 <a href="@controllers.document.downloads.routes.DownloadsController.downloadRDFXML(doc.id)" class="btn small"><span class="icon">&#xf019;</span> RDF/XML</a>
               </div>
