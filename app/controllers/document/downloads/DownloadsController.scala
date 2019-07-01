@@ -151,7 +151,7 @@ class DownloadsController @Inject() (
         case Some("iiif2") =>
           documentToIIIF2(doc).map { json =>
             Ok(Json.prettyPrint(json))
-              .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".jsonld" })
+              // .withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".jsonld" })
           }
 
         case _ =>

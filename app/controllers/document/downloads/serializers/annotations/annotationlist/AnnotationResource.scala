@@ -3,7 +3,7 @@ package controllers.document.downloads.serializers.annotations.annotationlist
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-case class AnnotationResource(text: String, on: String)
+case class AnnotationResource(id: String, text: String, on: String)
 
 object AnnotationResource {
 
@@ -11,17 +11,19 @@ object AnnotationResource {
     (JsPath \ "@id").write[String] and
     (JsPath \ "@type").write[String] and
     (JsPath \ "motivation").write[String] and
-    (JsPath \ "resource").write[TextResource]
+    (JsPath \ "resource").write[TextResource] and 
+    (JsPath \ "on").write[String]
   )(a => (
-    "http://localhost:8887/coin/list/1", // TODO
+    a.id,
     "oa:Annotation",
     "sc:painting",
-    TextResource(a.text, a.on)
+    TextResource(a.text),
+    a.on
   ))
 
 }
 
-case class TextResource(chars: String, on: String)
+case class TextResource(chars: String)
 
 object TextResource {
 

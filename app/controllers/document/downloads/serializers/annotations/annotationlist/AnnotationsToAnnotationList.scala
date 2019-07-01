@@ -10,17 +10,22 @@ import scala.concurrent.ExecutionContext
 
 trait AnnotationsToAnnotationList extends BaseSerializer {
 
-  // TODO implement
-  private def toAnnotationResource(annotation: Annotation) = AnnotationResource("foo", "bar")
+  private def toAnnotationResource(baseURI: String, annotation: Annotation) = 
+    AnnotationResource(
+      s"${baseURI}/annotation/${annotation.annotationId}", 
+      "[annotation text goes here]", 
+      s"${baseURI}/document/${annotation.annotates.documentId}"
+    )
 
   def documentToIIIF2(doc: ExtendedDocumentMetadata)(implicit documentService: DocumentService,
       annotationService: AnnotationService, request: Request[AnyContent], ctx: ExecutionContext) = {
 
     // To be used as 'generator' URI
     val recogitoURI = controllers.landing.routes.LandingController.index().absoluteURL
+    val listId = s"${recogitoURI}/api/document/${doc.id}/iiif/annotations"
 
     annotationService.findByDocId(doc.id).map { annotations =>
-      Json.toJson(AnnotationList(recogitoURI, annotations.map(t => toAnnotationResource(t._1))))
+      Json.toJson(AnnotationList(listId, annotations.map(t => toAnnotationResource(recogitoURI, t._1))))
     }
   }
 
