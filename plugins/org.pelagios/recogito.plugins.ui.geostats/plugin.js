@@ -12,7 +12,6 @@ plugins.PlaceStats = function(args) {
 
     return jQuery(
       '<table>' +
-        '<tr><td>Annotations total</td><td>' + annotationsTotal + '</td></tr>' +
         '<tr><td>Places total</td><td>' + placesTotal + '</td></tr>' +
         '<tr><td>Average distance (characters):</td><td>' + avgCharDistance.toFixed(2) + '</td></tr>' +
         '<tr><td>Standard deviation</td><td>' + charDistanceStdDeviation.toFixed(2) + '</td></tr>' +

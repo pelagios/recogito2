@@ -19,4 +19,10 @@
       }); 
     })();
   </script>
+
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/stats/entities.js")))
+  @helper.javascriptRouter("jsRoutes")(	
+    controllers.api.annotation.routes.javascript.AnnotationAPIController.listAnnotationsInDocument,
+    controllers.api.entity.routes.javascript.PlaceAPIController.listPlacesInDocument	
+  )
 }
