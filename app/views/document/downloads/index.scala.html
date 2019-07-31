@@ -83,7 +83,7 @@
                 <p>@messages("document.downloads.annotations.kml.text")</p>
               </div>
               <div class="button-container">
-                <a class="btn small disabled"><span class="icon">&#xf019;</span> KML</a>
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadKML(doc.id)" class="btn small"><span class="icon">&#xf019;</span> KML</a>
               </div>
             </li>
           </ul>

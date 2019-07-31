@@ -87,6 +87,7 @@ GET     /document/:id/downloads/annotations/rdf      controllers.document.downlo
 GET     /document/:id/downloads/annotations/jsonld   controllers.document.downloads.DownloadsController.downloadJSONLD(id: String, flavour: Option[String])
 GET     /document/:id/downloads/places/geojson       controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
 POST    /document/:id/downloads/places/geojson       controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+GET     /document/:id/downloads/places/kml           controllers.document.downloads.DownloadsController.downloadKML(id: String)
 GET     /document/:id/downloads/relations/csv        controllers.document.downloads.DownloadsController.downloadRelationTriples(id: String)
 GET     /document/:id/downloads/relations/node-csv   controllers.document.downloads.DownloadsController.downloadGephiNodes(id: String)
 GET     /document/:id/downloads/relations/edge-csv   controllers.document.downloads.DownloadsController.downloadGephiEdges(id: String)
