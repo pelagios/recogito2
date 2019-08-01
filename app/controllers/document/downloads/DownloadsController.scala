@@ -78,6 +78,7 @@ class DownloadsController @Inject() (
     with document.spacy.PlaintextToSpacy
     with places.PlacesToGeoJSON
     with places.PlacesToKML
+    with places.PlacesToGeoBrowser
     with relations.RelationsToTriplesCSV
     with relations.RelationsToGephi
     with HasPrettyPrintJSON
@@ -164,9 +165,10 @@ class DownloadsController @Inject() (
     })
   }
 
-  def downloadKML(documentId: String) = silhouette.UserAwareAction.async { implicit request => 
+  def downloadKML(documentId: String, forGeoBrowser: Boolean) = silhouette.UserAwareAction.async { implicit request => 
     download(documentId, RuntimeAccessLevel.READ_DATA, { doc =>
-      placesToKML(documentId).map { xml =>
+      val fXml = if (forGeoBrowser) placesToGeoBrowser(documentId) else placesToKML(documentId)
+      fXml.map { xml =>
         Ok(xml).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}.kml" })
       }
     })
