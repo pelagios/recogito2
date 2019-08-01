@@ -17,37 +17,12 @@ import services.entity.builtin.EntityService
 import storage.es.ES 
 import storage.uploads.Uploads
 
-trait PlacesToGeoJSON extends BaseGeoSerializer with HasCSVParsing {
+trait PlacesToGeoJSON extends BaseGeoSerializer 
+  with HasCSVParsing 
+  with HasNullableSeq 
+  with HasGeometry {
   
-  def placesToGeoJSON(documentId: String)(implicit entityService: EntityService, annotationService: AnnotationService, ctx: ExecutionContext) = {
-    getMappableFeatures(documentId).map { features => 
-      val asGeoJSON = features.map(ReferencedPlaceFeature(_))
-      Json.toJson(GeoJSONFeatureCollection(asGeoJSON))
-    }        
-  }
-    
-}
-
-/** Feature representing references to a place in a document **/ 
-case class ReferencedPlaceFeature(baseFeature: BaseFeature) extends GeoJSONFeature {
-  
-  private val bodies = baseFeature.annotations.flatMap(_.bodies) 
-  private def bodiesOfType(t: AnnotationBody.Type) = bodies.filter(_.hasType == t)
-
-  val geometry = baseFeature.geometry
-  val records = baseFeature.records
-  val annotations = baseFeature.annotations
-
-  val titles = records.map(_.title).distinct
-  val quotes = bodiesOfType(AnnotationBody.QUOTE).flatMap(_.value)
-  val comments = bodiesOfType(AnnotationBody.COMMENT).flatMap(_.value)
-  val tags = bodiesOfType(AnnotationBody.TAG).flatMap(_.value)
-  
-}
-
-object ReferencedPlaceFeature extends HasGeometry with HasNullableSeq {
-
-  implicit val referencedPlaceFeatureWrites: Writes[ReferencedPlaceFeature] = (
+  implicit val geoJsonFeatureWrites: Writes[AnnotatedPlaceFeature] = (
     (JsPath \ "type").write[String] and
     (JsPath \ "geometry").write[Geometry] and
     (JsPath \ "properties").write[JsObject] and
@@ -76,8 +51,15 @@ object ReferencedPlaceFeature extends HasGeometry with HasNullableSeq {
       toOptSeq(f.comments)
     )
   )
-  
+
+  def placesToGeoJSON(documentId: String)(implicit entityService: EntityService, annotationService: AnnotationService, ctx: ExecutionContext) = {
+    getMappableFeatures(documentId).map { features => 
+      Json.toJson(GeoJSONFeatureCollection(features))
+    }        
+  }
+    
 }
+
 
 
   

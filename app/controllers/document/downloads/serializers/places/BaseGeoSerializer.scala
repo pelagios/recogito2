@@ -1,17 +1,28 @@
 package controllers.document.downloads.serializers.places
 
 import com.vividsolutions.jts.geom.Geometry
-import controllers.document.downloads.serializers.BaseSerializer
+import controllers.document.downloads.serializers.{BaseSerializer, GeoJSONFeature}
 import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.{Annotation, AnnotationService, AnnotationBody}
 import services.entity.{EntityType, EntityRecord}
 import services.entity.builtin.EntityService
 import storage.es.ES
 
-case class BaseFeature(
+case class AnnotatedPlaceFeature(
   geometry: Geometry,
   records: Seq[EntityRecord],
-  annotations: Seq[Annotation])
+  annotations: Seq[Annotation]
+) extends GeoJSONFeature {
+
+  private val bodies = annotations.flatMap(_.bodies)
+  private def bodiesOfType(t: AnnotationBody.Type) = bodies.filter(_.hasType == t)
+
+  val titles = records.map(_.title.trim).distinct
+  val quotes = bodiesOfType(AnnotationBody.QUOTE).flatMap(_.value)
+  val comments = bodiesOfType(AnnotationBody.COMMENT).flatMap(_.value)
+  val tags = bodiesOfType(AnnotationBody.TAG).flatMap(_.value)
+
+}
 
 trait BaseGeoSerializer extends BaseSerializer {
 
@@ -21,7 +32,7 @@ trait BaseGeoSerializer extends BaseSerializer {
       entityService: EntityService, 
       annotationService: AnnotationService, 
       ctx: ExecutionContext
-  ): Future[Seq[BaseFeature]] = {
+  ): Future[Seq[AnnotatedPlaceFeature]] = {
     val fAnnotations = annotationService.findByDocId(documentId, 0, ES.MAX_SIZE)
     val fPlaces = entityService.listEntitiesInDocument(documentId, Some(EntityType.PLACE), 0, ES.MAX_SIZE)
         
@@ -49,7 +60,7 @@ trait BaseGeoSerializer extends BaseSerializer {
         val referencedRecords = place.isConflationOf.filter(g => placeURIs.contains(g.uri))
         
         place.representativeGeometry.map { geom => 
-          BaseFeature(geom, referencedRecords, annotationsOnThisPlace)
+          AnnotatedPlaceFeature(geom, referencedRecords, annotationsOnThisPlace)
         }
       }
     }        

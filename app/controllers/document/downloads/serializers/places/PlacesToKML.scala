@@ -19,7 +19,34 @@ trait PlacesToKML extends BaseGeoSerializer {
 
     val kmlFeatures = features.map { f => 
       <Placemark>
-        <name>{ f.records.map(_.title).distinct }</name>
+        <name>{f.quotes.distinct.mkString(",")}</name>
+        <ExtendedData>
+          <Data name="Annotations">
+            <value>{f.annotations.length}</value>
+          </Data>
+          <Data name="Place URIs">
+            <value>{f.records.map(_.uri).mkString(", ")}</value>
+          </Data>
+          <Data name="Names (Gazetteer)">
+            <value>{f.titles.mkString(",")}</value>
+          </Data>
+          <Data name="Toponyms (Document)">
+            <value>{f.quotes.distinct.mkString(",")}</value>
+          </Data>
+          { if (!f.tags.isEmpty || !f.comments.isEmpty) {
+            { if (!f.tags.isEmpty) { 
+              <Data name="Tags">
+                <value>{f.tags.mkString(", ")}</value>
+              </Data>
+            }}
+
+            { if (!f.comments.isEmpty) {
+              <Data name="comments">
+                <value>{f.comments.mkString("\n\n")}</value>
+              </Data>
+            }}
+          }}
+        </ExtendedData>
         { f.geometry match {
           case geom: Polygon => 
             <Polygon>
