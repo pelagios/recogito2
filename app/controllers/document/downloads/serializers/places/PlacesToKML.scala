@@ -1,5 +1,6 @@
 package controllers.document.downloads.serializers.places
 
+import com.vividsolutions.jts.geom.{Polygon, LineString}
 import scala.concurrent.ExecutionContext
 import services.annotation.{AnnotationService, AnnotationBody}
 import services.entity.EntityType
@@ -19,9 +20,26 @@ trait PlacesToKML extends BaseGeoSerializer {
     val kmlFeatures = features.map { f => 
       <Placemark>
         <name>{ f.records.map(_.title).distinct }</name>
-        <Point>
-          <coordinates>{f.geometry.getCentroid.getX},{f.geometry.getCentroid.getY},0</coordinates>
-        </Point>
+        { f.geometry match {
+          case geom: Polygon => 
+            <Polygon>
+              <extrude>1</extrude>
+              <altitudeMode>clampToGround</altitudeMode>
+              <outerBoundaryIs>
+                <LinearRing>
+                  <coordinates>
+                    { geom.getCoordinates.map { coord => 
+                      s"${coord.x},${coord.y},0\n"
+                    }}
+                  </coordinates>
+                </LinearRing>
+              </outerBoundaryIs>
+            </Polygon>
+          case geom =>
+            <Point>
+              <coordinates>{f.geometry.getCentroid.getX},{f.geometry.getCentroid.getY},0</coordinates>
+            </Point>
+        }}
       </Placemark>
     }
 

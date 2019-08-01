@@ -79,11 +79,11 @@
 
             <li>
               <div class="description">
-                <h3>KML</h3>
+                <h3>KML <span class="beta">BETA</span></h3>
                 <p>@messages("document.downloads.annotations.kml.text")</p>
               </div>
               <div class="button-container">
-                <a class="disabled btn small"><span class="icon">&#xf019;</span> KML</a>
+                <a href="@controllers.document.downloads.routes.DownloadsController.downloadKML(doc.id, false)" class="btn small"><span class="icon">&#xf019;</span> KML</a>
               </div>
             </li>
           </ul>

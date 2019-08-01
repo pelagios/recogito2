@@ -134,7 +134,7 @@ document.annotation.image.toolbar.help=HILFE
 document.downloads.annotations.csv.text=Herunteraden der Daten für den Import in ein Programm zur Tabellenkalkulation oder in ein GIS.
 document.downloads.annotations.rdf.text=Annotationen und Metadaten in RDF herunterladen, wahlweise als Open Annotation oder Dublin Core.
 document.downloads.annotations.geojson.text=Orte aus dem Dokumente mit bestätigten Koordinaten, als GeoJSON.
-document.downloads.annotations.kml.text=Bestätigte georefenzierte Orte als KML-Datei zur Anzeige in Google-Earth.
+document.downloads.annotations.kml.text=Georefenzierte Orte als KML-Datei zur Anzeige in Google-Earth.
 document.downloads.annotations.tei.text=Annotierten Text als einfaches TEI/XML abspeichern. Bitte \
   beachten: aktuell sind nur die Auszeichnungen von Orten eingeschlossen. Weiterhin werden \
   überlappende Auszeichnungen nicht von TEI unterstützt.
