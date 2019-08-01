@@ -80,7 +80,12 @@
             <li>
               <div class="description">
                 <h3>KML <span class="beta">BETA</span></h3>
-                <p>@messages("document.downloads.annotations.kml.text")</p>
+                <p>
+                  Geo-located places as KML file, for viewing in Google Earth. You can also download a 
+                  <a href="@controllers.document.downloads.routes.DownloadsController.downloadKML(doc.id, true)">slightly 
+                  modified alternative KML serialization</a> which is suited specifically for the 
+                  <a href="https://geobrowser.de.dariah.eu/" target="_blank">DARIAH GeoBrowser</a>.
+                </p>
               </div>
               <div class="button-container">
                 <a href="@controllers.document.downloads.routes.DownloadsController.downloadKML(doc.id, false)" class="btn small"><span class="icon">&#xf019;</span> KML</a>
