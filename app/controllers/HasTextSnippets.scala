@@ -16,7 +16,7 @@ trait HasTextSnippets {
     
     // Likewise, safe to expect the annotation has one QUOTE body, with a defined value
     val quoteLength = annotation.bodies.filter(_.hasType == AnnotationBody.QUOTE).head.value.get.size
-    
+
     snip(text, offset, quoteLength, bufferSize)
   }
   

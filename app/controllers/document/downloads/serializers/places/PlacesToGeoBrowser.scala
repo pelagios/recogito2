@@ -1,11 +1,16 @@
 package controllers.document.downloads.serializers.places
 
-import scala.concurrent.ExecutionContext
+import controllers.HasTextSnippets
+import controllers.document.downloads.serializers.BaseSerializer
+import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 import services.annotation.{Annotation, AnnotationService, AnnotationBody}
 import services.ContentType
+import services.document.ExtendedDocumentMetadata
 import services.entity.{Entity, EntityType}
 import services.entity.builtin.EntityService
 import storage.es.ES
+import storage.uploads.Uploads
 
 /** A KML serializer specific to the needs of the DARIAH GeoBrowser. 
   * 
@@ -14,7 +19,7 @@ import storage.es.ES
   * of the GeoBrowser's animation functionality, we produce "fake timestamps"
   * based on annotation character order (only for plaintext documents).
   */
-trait PlacesToGeoBrowser extends BaseGeoSerializer {
+trait PlacesToGeoBrowser extends BaseSerializer with HasTextSnippets {
 
   private def getLabel(annotation: Annotation) = 
     annotation.bodies
@@ -23,7 +28,11 @@ trait PlacesToGeoBrowser extends BaseGeoSerializer {
       .flatMap(_.value)
       .getOrElse("[missing quote]")
 
-  private def toPlacemark(annotation: Annotation, places: Seq[Entity]) = {
+  private def toPlacemark(annotation: Annotation, places: Seq[Entity], plaintexts: Seq[(UUID, String)]) = {
+    val snippet = plaintexts.find(_._1 == annotation.annotates.filepartId).map { case (id, text) => 
+      snippetFromText(text, annotation)
+    }
+
     val coordinates = places.flatMap(_.representativePoint)
 
     val geom = if (coordinates.length == 1) {
@@ -42,37 +51,41 @@ trait PlacesToGeoBrowser extends BaseGeoSerializer {
 
     // TODO tags, comments
 
-    val maybeTimestamp = annotation.annotates.contentType match {
-      case ContentType.TEXT_PLAIN => 
-        Some(<TimeStamp><when>{annotation.anchor.substring(12)}</when></TimeStamp>)
-
-      case _ => None
-    }
-
     <Placemark>
       <name>{ getLabel(annotation) }</name>
+      { if (snippet.isDefined) <description>{ snippet.get.text } </description> }
       <address>{ getLabel(annotation) }</address>
-      { if (maybeTimestamp.isDefined) maybeTimestamp.get }
+      { if (snippet.isDefined) <TimeStamp><when>{ snippet.get.offset }</when></TimeStamp> }
       { geom }
     </Placemark>
   }
 
   def placesToGeoBrowser(
-    documentId: String
+    documentId: String,
+    doc: ExtendedDocumentMetadata
   )(implicit 
       entityService: EntityService, 
       annotationService: AnnotationService, 
+      uploads: Uploads,
       ctx: ExecutionContext
   ) = {
     val fAnnotations = annotationService.findByDocId(documentId, 0, ES.MAX_SIZE)
     val fPlaces = entityService.listEntitiesInDocument(documentId, Some(EntityType.PLACE), 0, ES.MAX_SIZE)
+    val fPlaintexts = Future.sequence {
+      doc.fileparts.filter(_.getContentType == ContentType.TEXT_PLAIN.toString).map { part => 
+        uploads.readTextfile(doc.owner.getUsername, doc.id, part.getFile).map { maybeText =>
+          maybeText.map((part.getId, _))
+        }
+      }
+    }
         
     val f = for {
       annotations <- fAnnotations
       places <- fPlaces
-    } yield (annotations.map(_._1), places)
+      plaintexts <- fPlaintexts
+    } yield (annotations.map(_._1), places, plaintexts.flatten)
     
-    f.map { case (annotations, p) =>
+    f.map { case (annotations, p, plaintexts) =>
       // All places
       val places = p.items.map { p => p._1.entity }
 
@@ -88,7 +101,7 @@ trait PlacesToGeoBrowser extends BaseGeoSerializer {
         }
 
         (annotation, placesForThisAnnotation)
-      } map { t => toPlacemark(t._1, t._2) }
+      } map { t => toPlacemark(t._1, t._2, plaintexts) }
 
       <kml xmlns="http://www.opengis.net/kml/2.2">
         <Document>
