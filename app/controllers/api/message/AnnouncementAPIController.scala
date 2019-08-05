@@ -4,12 +4,14 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseAuthController, HasPrettyPrintJSON, Security}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.libs.mailer._
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
+import scala.io.Source
+import scala.util.Try
 import services.announcement.AnnouncementService
 import services.document.DocumentService
 import services.user.{User, UserService}
@@ -22,9 +24,14 @@ class AnnouncementAPIController @Inject() (
   val documents: DocumentService,
   val silhouette: Silhouette[Security.Env],
   val users: UserService,
+  val env: Environment,
   val mailerClient: MailerClient,
   implicit val ctx: ExecutionContext
 ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
+
+  private val MESSAGE_TEMPLATE =
+    Try(Source.fromFile(env.getFile("conf/personal-message.template"))).toOption.map { _.getLines.mkString("\n") }
+      .getOrElse("Recogito user {{sender}} sent you a message: \n\n {{message}}")
 
   def myLatest = silhouette.SecuredAction.async { implicit request =>
     announcements.findLatestUnread(request.identity.username).map { _ match {
@@ -48,13 +55,18 @@ class AnnouncementAPIController @Inject() (
 
     // Does the actual sending
     def send(sender: String, recipient: User, message: String) = {
+      val text = MESSAGE_TEMPLATE
+        .replace("{{base}}", "http://recogito.pelagios.org")
+        .replace("{{sender}}", sender)
+        .replace("{{message}}", message)
+
       // TODO this now hard-wires "noreply@pelagios.org" as reply address
       // TODO see if we can take this directly from the config file instead
       val email = Email(
         s"[Recogito] Message from user $sender",
         "Recogito Team <noreply@pelagios.org>",
         Seq(users.decryptEmail(recipient.email)),
-        Some(message) // TODO wrap in styled "envelope"
+        bodyHtml = Some(text)
       )
 
       play.api.Logger.info(s"Message from $sender to ${recipient.username}: $message")      

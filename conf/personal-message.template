@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Assistant&display=swap" rel="stylesheet"> 
+    <style>
+      html, body {
+        padding:10px 0;
+        margin:0;
+        width:100%;
+        background-color:#ecf0f1;
+        font-family: 'Assistant', sans-serif;
+      }
+
+      a {
+        color:#767676;
+      }
+
+      #column  {
+        width:90%;
+        margin:0 auto;
+      }
+
+      #sender {
+        padding:20px 0;
+      }
+
+      #message {
+        background-color:#fff;
+        padding:15px 20px;
+        border-radius:3px;
+      }
+
+      #imprint {
+        padding:10px;
+        text-align:center;
+        font-size:13px;
+        color:#9ca4b1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="column">
+      <div id="sender">
+        Recogito user <a href="{{base}}/{{sender}}">{{sender}}</a> sent you a message:
+      </div>
+
+      <div id="message">
+        <pre>{{message}}</pre>
+      </div>
+
+      <div id="imprint">
+        Recogito. A project of the <a href="https://pelagios.org">Pelagios network</a>.
+      </div>
+    </div>
+  </body>
+</html>
