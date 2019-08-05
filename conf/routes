@@ -211,6 +211,8 @@ POST    /api/search                                  controllers.my.directory.se
 GET     /api/announcements/my/latest                 controllers.api.message.AnnouncementAPIController.myLatest
 PUT     /api/announcements/:id                       controllers.api.message.AnnouncementAPIController.confirm(id: java.util.UUID)
 
+POST    /api/send-message                            controllers.api.message.AnnouncementAPIController.sendMessage
+
 # ~~~ Annotations ~~~
 
 POST    /api/annotation                              controllers.api.annotation.AnnotationAPIController.createAnnotation
