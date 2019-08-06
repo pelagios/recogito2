@@ -108,6 +108,12 @@
             </li>
           </ul>
         </li>
+
+        @if(currentUser.isDefined && currentUser.get.featureToggles.contains("annotation-timefilter")) {
+          <li class="time-filter">
+            <span class="icon">&#xf017;</span>
+          </li>
+        }
       </ul> <!-- .menu -->
     </div> <!-- .header-toolbar -->
 
