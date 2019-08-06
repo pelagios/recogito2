@@ -122,11 +122,36 @@ define([
             relationsLayer.setDrawingEnabled(false);
             editor.setAnnotationMode(m);
           }
+        },
+
+        onTimefilterChanged = function(filter) {
+          var content = jQuery('#content');
+
+          // As a proof of concept, just toggles for the time being
+          var isFiltered = content.hasClass('filtered');
+
+          if (isFiltered) {
+            annotations.forEach(function(annotation) {
+              self.highlighter.removeClass(annotation, 'in-filter');
+            });
+          } else {
+            var newerThan = new Date('2019-06-27T07:50:00+00:00');
+
+            annotations.filter(function(annotation) {
+              var lastModified = new Date(annotation.last_modified_at);
+              return lastModified < newerThan;
+            }).forEach(function(annotation) {
+              self.highlighter.addClass(annotation, 'in-filter');
+            });
+          }
+
+          content.toggleClass('filtered');
         };
 
     // Toolbar events
     toolbar.on('annotationModeChanged', onAnnotationModeChanged);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
+    toolbar.on('timefilterChanged', onTimefilterChanged);
 
     BaseApp.apply(this, [ annotationView, highlighter, selector ]);
 

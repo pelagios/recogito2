@@ -15,8 +15,6 @@ define([
 
         currentMode = { mode: 'NORMAL' },
 
-        currentColorScheme = 'BY_TYPE',
-
         maxScroll = jQuery('.header-infobox').outerHeight() -
           jQuery('.header-iconbar').outerHeight() + 1,
 
@@ -86,6 +84,14 @@ define([
           });
         },
 
+        initTimefilter = function() {
+          var timefilterButton = jQuery('.time-filter');
+          timefilterButton.click(function() {
+            // TODO dialog + settings
+            self.fireEvent('timefilterChanged');
+          });
+        },
+
         getCurrentAnnotationMode = function() {
           return currentMode;
         },
@@ -99,6 +105,9 @@ define([
       initQuickModeMenu();
     else
       disableAnnotationControls();
+
+    if (Config.hasFeature('annotation-timefilter'))
+      initTimefilter();
 
     Behavior.makeElementSticky(rootNode, maxScroll);
     attachClickHandlers();

@@ -28,7 +28,10 @@
     @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/text/app.js")))
     <script>
       window.config = {
-        @if(currentUser.isDefined) { me: '@currentUser.get.username', }
+        @if(currentUser.isDefined) { 
+          me: '@currentUser.get.username', 
+          features: [@Html(currentUser.get.featureToggles.map("'" + _ + "'").mkString(","))],
+        }
         documentId: '@doc.id',
         documentOwner: '@doc.ownerName',
         partId: '@currentPart.getId',
