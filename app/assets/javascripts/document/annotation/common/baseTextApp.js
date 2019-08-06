@@ -1,5 +1,4 @@
 define([
-  'common/ui/alert',
   'common/ui/formatting',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
@@ -14,7 +13,6 @@ define([
   'document/annotation/text/page/toolbar',
   'document/annotation/text/relations/relationsLayer'
 ], function(
-  Alert,
   Formatting,
   AnnotationUtils,
   PlaceUtils,
