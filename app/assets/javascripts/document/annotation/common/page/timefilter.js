@@ -1,18 +1,33 @@
-define([], function() {
+define(['common/hasEvents'], function(HasEvents) {
 
-  var Timefilter = function(containerEl) {
+  var formatDate = function(date) {
+    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  };
 
-    var element = jQuery(
+  var Timefilter = function(containerEl, fromTimestamp, toTimestamp) {
+
+    var self = this,
+
+        element = jQuery(
           '<div class="timefilter-popup">' +
-            '<span class="label">Apr 21</span>' +
-            '<input type="range" step="86400" />' +
-            '<span class="label">Aug 5</span>' +
+            '<div class="hint">Hide annotations older than</div>' +
+            '<div class="slider-container">' +
+              '<span class="label from"></span>' +
+              '<input type="range" min="' + 
+                (fromTimestamp / 1000) + '" max="' + (toTimestamp / 1000) + '" step="86400" value="' + 
+                (fromTimestamp/ 1000) + '" />' +
+              '<span class="label to"></span>' +
+            '</div>' +
             '<div class="current"></div>' +
           '</div>').hide(),
 
-        slider = element.find('input'),
+        labelFrom = element.find('.label.from'),
+
+        labelTo = element.find('.label.to'),
 
         currentValue = element.find('.current'),
+
+        slider = element.find('input'),
 
         toggle = function() {
           if (element.is(':visible'))
@@ -23,31 +38,35 @@ define([], function() {
 
         onInput = function(evt) {
           var currentDate = new Date(evt.target.value * 1000);
-          currentValue.html(currentDate.toLocaleDateString('en-US', {
-            day: 'numeric', month: 'short'
-          }));
+          currentValue.html(formatDate(currentDate));
         },
 
         onChange = function(evt) {
-          console.log('change!');
+          self.fireEvent('change', new Date(evt.target.value * 1000));
         },
 
-        setBounds = function(fromDate, toDate) {
-          slider.attr('min', new Date('2019-04-21').getTime() / 1000);
-          slider.attr('max', new Date('2019-08-05').getTime() / 1000);
-        };
+        init = function() {
+          var fromStr = formatDate(new Date(fromTimestamp)),
+              toStr = formatDate(new Date(toTimestamp));
 
-    slider.on('input', onInput);
-    slider.on('change', onChange);
+          labelFrom.html(fromStr);
+          labelTo.html(toStr);
 
-    // For testing only
-    setBounds();
-    
-    jQuery(containerEl).append(element);
+          currentValue.html(fromStr);
+
+          slider.on('input', onInput);
+          slider.on('change', onChange);
+          
+          jQuery(containerEl).append(element);      
+        }
+
+    init();
 
     this.toggle = toggle;
-    this.setBounds = setBounds;
+
+    HasEvents.apply(this);
   };
+  Timefilter.prototype = Object.create(HasEvents.prototype);
 
   return Timefilter;
 

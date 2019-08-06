@@ -85,15 +85,19 @@ define([
           });
         },
 
-        initTimefilter = function() {
-          var container = jQuery('.time-filter'),
-              button = container.find('span.icon'),
-              popup = new Timefilter(container);
+        initTimefilter = function(annotations) {
+          if (Config.hasFeature('annotation-timefilter')) {
+            const dates = annotations.map(function(a) { return new Date(a.last_modified_at); });
+            const oldest = Math.min.apply(null, dates);
+            const newest= Math.max.apply(null, dates);
 
-          button.click(function() {
-            popup.toggle();
-            // self.fireEvent('timefilterChanged');
-          });
+            var container = jQuery('.time-filter'),
+                button = container.find('span.icon'),
+                popup = new Timefilter(container, oldest, newest);
+
+            popup.on('change', self.forwardEvent('timefilterChanged'));
+            button.click(popup.toggle);
+          }
         },
 
         getCurrentAnnotationMode = function() {
@@ -110,12 +114,10 @@ define([
     else
       disableAnnotationControls();
 
-    if (Config.hasFeature('annotation-timefilter'))
-      initTimefilter();
-
     Behavior.makeElementSticky(rootNode, maxScroll);
     attachClickHandlers();
 
+    this.initTimefilter = initTimefilter;
     this.setCurrentColorscheme = setCurrentColorscheme;
     this.getCurrentAnnotationMode = getCurrentAnnotationMode;
 

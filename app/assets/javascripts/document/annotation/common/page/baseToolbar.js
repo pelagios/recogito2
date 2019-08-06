@@ -1,8 +1,7 @@
 define([
-  'common/ui/behavior',
   'common/config',
   'common/hasEvents'
-], function(Behavior, Config, HasEvents) {
+], function(Config, HasEvents) {
 
   var Toolbar = function(rootNode) {
     var colorschemeButtons = jQuery('.color-scheme'),

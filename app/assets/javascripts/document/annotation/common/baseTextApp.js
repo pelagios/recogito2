@@ -122,28 +122,23 @@ define([
           }
         },
 
-        onTimefilterChanged = function(filter) {
+        onTimefilterChanged = function(newerThan) {
           var content = jQuery('#content');
 
-          // As a proof of concept, just toggles for the time being
-          var isFiltered = content.hasClass('filtered');
+          // Clear filter
+          annotations.forEach(function(annotation) {
+            self.highlighter.removeClass(annotation, 'in-filter');
+          });
 
-          if (isFiltered) {
-            annotations.forEach(function(annotation) {
-              self.highlighter.removeClass(annotation, 'in-filter');
-            });
-          } else {
-            var newerThan = new Date('2019-06-27T07:50:00+00:00');
-
-            annotations.filter(function(annotation) {
-              var lastModified = new Date(annotation.last_modified_at);
-              return lastModified < newerThan;
-            }).forEach(function(annotation) {
-              self.highlighter.addClass(annotation, 'in-filter');
-            });
-          }
-
-          content.toggleClass('filtered');
+          annotations.filter(function(annotation) {
+            var lastModified = new Date(annotation.last_modified_at);
+            return lastModified >= newerThan;
+          }).forEach(function(annotation) {
+            self.highlighter.addClass(annotation, 'in-filter');
+          });
+          
+          // TODO clearing filter completely?
+          content.addClass('filtered');
         };
 
     // Toolbar events
@@ -171,7 +166,10 @@ define([
 
     PlaceUtils.initGazetteers().done(function() {
       API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-         .done(self.onAnnotationsLoaded.bind(self))
+         .done(function(annotations) {
+           toolbar.initTimefilter(annotations);
+           self.onAnnotationsLoaded(annotations);
+         })
          .then(relationsLayer.init)
          .then(loadIndicator.destroy)
          .fail(self.onAnnotationsLoadError.bind(self)).then(loadIndicator.destroy);
