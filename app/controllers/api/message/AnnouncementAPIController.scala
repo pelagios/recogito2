@@ -30,7 +30,7 @@ class AnnouncementAPIController @Inject() (
 ) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
   private val MESSAGE_TEMPLATE =
-    Try(Source.fromFile(env.getFile("conf/personal-message.template"))).toOption.map { _.getLines.mkString("\n") }
+    Try(Source.fromFile(env.getFile("conf/message-template.html"))).toOption.map { _.getLines.mkString("\n") }
       .getOrElse("Recogito user {{sender}} sent you a message: \n\n {{message}}")
 
   def myLatest = silhouette.SecuredAction.async { implicit request =>
