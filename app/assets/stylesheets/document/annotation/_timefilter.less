@@ -1,0 +1,59 @@
+.header-toolbar li.time-filter {
+  position:absolute;
+  right:0;
+
+  .timefilter-popup {
+    position:absolute;
+    top:32px;
+    right:6px;
+    background-color:#fff;
+    padding:10px 15px;
+    .rounded-corners(3px);
+    .box-shadow(1px, 1px, 20px, rgba(0, 0, 0, 0.35));
+
+    input {
+      width:180px;
+      vertical-align:middle;
+      margin:0 10px;
+    }
+
+    input::-webkit-slider-runnable-track {
+      width:100%;
+      height:0;
+      cursor:pointer;
+      border-bottom:1px solid @lightgrey-border-darker;
+    }
+
+    input::-webkit-slider-thumb {
+      height:19px;
+      width:19px;
+      .rounded-corners(100%);
+      background: @ocean;
+      cursor:pointer;
+      -webkit-appearance:none;
+      margin-top:-9px;
+    }
+
+    .label {
+      font-size:12px;
+      color:@form-type;
+    }
+  }
+
+  .timefilter-popup::before {
+    content:'';
+    position:absolute;
+    right:12px;
+    top:-10px;
+    border-top:none;
+    border-right:10px solid transparent;
+    border-left:10px solid transparent;
+    border-bottom:10px solid #fff;
+  }
+
+  span {
+    font-size:14px;
+    vertical-align:middle;
+  }
+
+}

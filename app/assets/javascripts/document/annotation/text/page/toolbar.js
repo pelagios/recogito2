@@ -1,8 +1,9 @@
 define([
   'common/ui/behavior',
   'common/config',
-  'common/hasEvents'
-], function(Behavior, Config, HasEvents) {
+  'common/hasEvents',
+  'document/annotation/common/page/timefilter'
+], function(Behavior, Config, HasEvents, Timefilter) {
 
   var Toolbar = function(rootNode) {
     var self = this,
@@ -85,10 +86,13 @@ define([
         },
 
         initTimefilter = function() {
-          var timefilterButton = jQuery('.time-filter');
-          timefilterButton.click(function() {
-            // TODO dialog + settings
-            self.fireEvent('timefilterChanged');
+          var container = jQuery('.time-filter'),
+              button = container.find('span.icon'),
+              popup = new Timefilter(container);
+
+          button.click(function() {
+            popup.toggle();
+            // self.fireEvent('timefilterChanged');
           });
         },
 
