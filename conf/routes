@@ -290,3 +290,4 @@ GET     /                                            controllers.landing.Landing
 
 GET     /my                                          controllers.my.WorkspaceController.my
 GET     /:username                                   controllers.my.WorkspaceController.workspace(username: String)
+GET     /:username/activity.json                     controllers.my.WorkspaceController.activityFeed(username: String)

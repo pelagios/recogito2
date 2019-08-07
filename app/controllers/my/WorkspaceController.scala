@@ -36,6 +36,13 @@ class WorkspaceController @Inject() (
     }
   }
 
+  private def renderPublicProfile(usernameInPath: String, loggedInUser: Option[User])(implicit request: RequestHeader) = {
+    users.findByUsernameIgnoreCase(usernameInPath).map { _ match {
+      case Some(owner) => Ok(views.html.my.profile())
+      case None => NotFoundPage
+    }}
+  }    
+
   /**  User workspace **/
   def workspace(usernameInPath: String) = silhouette.UserAwareAction.async { implicit request =>    
     // If the user is logged in & the name in the path == username it's the profile owner
@@ -50,11 +57,11 @@ class WorkspaceController @Inject() (
       renderPublicProfile(usernameInPath, request.identity)
   }
 
-  private def renderPublicProfile(usernameInPath: String, loggedInUser: Option[User])(implicit request: RequestHeader) = {
-    users.findByUsernameIgnoreCase(usernameInPath).map { _ match {
-      case Some(owner) => Ok(views.html.my.profile())
-      case None => NotFoundPage
-    }}
-  }    
+  def activityFeed(usernameInPath: String) = Action.async { implicit request =>
+    contributions.getActivityFeed(Seq(usernameInPath, "elton")).map { response => 
+      // TODO
+      Ok(response)
+    } 
+  }
   
 }
