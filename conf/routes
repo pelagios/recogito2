@@ -126,6 +126,7 @@ GET     /document/:id/part/:partNo/raw               controllers.document.Docume
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /document/:id                                controllers.document.DocumentController.initialDocumentView(id: String)
+GET     /document/:id/activity.json                  controllers.document.DocumentController.activityFeed(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Annotation view resolver service

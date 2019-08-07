@@ -4,13 +4,14 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, Security}
 import java.io.File
 import javax.inject.{Inject, Singleton}
-import services.ContentType
-import services.document.DocumentService
-import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
-import services.user.UserService
 import play.api.Configuration
 import play.api.http.FileMimeTypes
 import play.api.mvc.ControllerComponents
+import services.ContentType
+import services.contribution.ContributionService
+import services.document.DocumentService
+import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.user.UserService
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import storage.uploads.Uploads
@@ -19,6 +20,7 @@ import storage.uploads.Uploads
 class DocumentController @Inject() (
   val components: ControllerComponents,
   val config: Configuration,
+  val contributions: ContributionService,
   val documents: DocumentService,
   val silhouette: Silhouette[Security.Env],
   val users: UserService,
@@ -134,6 +136,13 @@ class DocumentController @Inject() (
         }
       }
     })
+  }
+
+  def activityFeed(docId: String) = silhouette.UserAwareAction.async { implicit request => 
+    contributions.getDocumentActivityFeed(docId).map { response =>
+      // TODO filter response to "visible" edits, depending on login status and sharing permissions
+      Ok(response)
+    } 
   }
 
 }

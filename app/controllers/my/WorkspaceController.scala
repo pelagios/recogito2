@@ -57,9 +57,9 @@ class WorkspaceController @Inject() (
       renderPublicProfile(usernameInPath, request.identity)
   }
 
-  def activityFeed(usernameInPath: String) = Action.async { implicit request =>
-    contributions.getActivityFeed(Seq(usernameInPath, "elton")).map { response => 
-      // TODO
+  def activityFeed(usernameInPath: String) = silhouette.UserAwareAction.async { implicit request =>
+    contributions.getUserActivityFeed(Seq(usernameInPath)).map { response => 
+      // TODO filter response to "visible" edits, depending on login status and sharing permissions
       Ok(response)
     } 
   }
