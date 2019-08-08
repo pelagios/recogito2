@@ -1,4 +1,4 @@
-package services.contribution.feed
+package services.contribution.feed.user
 
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
@@ -10,25 +10,6 @@ import services.ContentType
 import services.contribution.{ContributionAction, ItemType}
 
 case class UserActivityFeed(took: Long, activities: Seq[UserActivityPerDay])
-
-/** All users, one day */
-case class UserActivityPerDay(timestamp: DateTime, count: Long, users: Seq[ActivityPerUser])
-
-case class ActivityPerUser(username: String, count: Long, parts: Seq[UserActivityPerDocument])
-
-case class UserActivityPerDocument(documentId: String, count: Long, entries: Seq[UserActivityFeedEntry])
-
-/** Base unit of entry in the user activity feed.
-  * 
-  * { action } { count } { item type } { content type}
-  *
-  * e.g. "Created  5 place bodies on image" or "Deleted 1 tag on TEI"
-  */
-case class UserActivityFeedEntry(
-  action: ContributionAction.Value, 
-  itemType: ItemType.Value, 
-  contentType: ContentType, 
-  count: Long)
 
 object UserActivityFeed {
 

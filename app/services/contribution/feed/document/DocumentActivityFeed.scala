@@ -1,4 +1,4 @@
-package services.contribution.feed
+package services.contribution.feed.document
 
 import com.sksamuel.elastic4s.searches.RichSearchResponse
 import java.util.UUID
@@ -11,23 +11,6 @@ import services.contribution.{ContributionAction, ItemType}
 
 /** Activity feed for a specific document **/
 case class DocumentActivityFeed(documentId: String, took: Long, activities: Seq[DocumentDayActivity])
-
-/** Activity for one day **/
-case class DocumentDayActivity(timestamp: DateTime, count: Long, users: Seq[DocumentActivityByUser])
-
-/** Nesting by document **/
-case class DocumentActivityByUser(username: String, count: Long, parts: Seq[DocumentActivityByPart])
-
-/** Nesting by document part **/
-case class DocumentActivityByPart(partId: UUID, count: Long, entries: Seq[DocumentActivityFeedEntry])
-
-/** Base unit of entry in the document activity feed.
-  * 
-  * { action } { count } { item type }
-  *
-  * e.g. "Created  5 place bodies" or "Deleted 1 tag"
-  */
-case class DocumentActivityFeedEntry(action: ContributionAction.Value, itemType: ItemType.Value, count: Long)
 
 object DocumentActivityFeed {
 
