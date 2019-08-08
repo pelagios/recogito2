@@ -53,7 +53,8 @@ trait ActivityFeedService { self: ContributionService =>
       ) size 0
     } map { response => 
       // TODO
-      response.toString
+      val activityFeed = DocumentActivityFeed.fromSearchResponse(response)
+      activityFeed.toString
     }
 
 }
