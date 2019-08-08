@@ -14,7 +14,7 @@ trait ActivityFeedService { self: ContributionService =>
 
   def getUserActivityFeed(
     usernames: Seq[String], loggedInAs: Option[String]
-  )(implicit documents: DocumentService) = 
+  )(implicit request: Request[AnyContent], documents: DocumentService) = 
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) query {
         boolQuery

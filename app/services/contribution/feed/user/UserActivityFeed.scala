@@ -5,6 +5,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter
 import org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistogram
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.joda.time.{DateTime, DateTimeZone}
+import play.api.mvc.{AnyContent, Request}
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import services.ContentType
@@ -18,7 +19,8 @@ object UserActivityFeed {
     val overTime = response.aggregations.getAs[InternalFilter]("over_time")
       .getAggregations.get("per_day").asInstanceOf[InternalDateHistogram]
 
-    overTime.getBuckets.asScala.toSeq.map { bucket => 
+    // Note: ES result is in ascending order, but we want descending (most recent first)
+    overTime.getBuckets.asScala.toSeq.reverse.map { bucket => 
       val timestamp = new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC)
 
       val byUser: Seq[ActivityPerUser] = bucket.getAggregations.get("by_user").asInstanceOf[Terms]
@@ -47,7 +49,7 @@ object UserActivityFeed {
                         }
                     }
                 }
-              UserActivityPerDocument(bucket.getKeyAsString, bucket.getDocCount, entries)
+              RawUserActivityPerDocument(bucket.getKeyAsString, bucket.getDocCount, entries)
             }
           ActivityPerUser(bucket.getKeyAsString, bucket.getDocCount, byDocument)
         }
@@ -57,22 +59,26 @@ object UserActivityFeed {
 
   def fromSearchResponse(
     loggedInAs: Option[String], response: RichSearchResponse
-  )(implicit documents: DocumentService, ctx: ExecutionContext) = {
+  )(implicit 
+      documents: DocumentService, 
+      request: Request[AnyContent],
+      ctx: ExecutionContext
+  ) = {
     val rawFeed = parseAggregations(response)
     
     // Get all distinct doc IDs in the feed and check if the current user has read permissions
     val docIds = rawFeed.flatMap { perDay => 
       perDay.users.flatMap { perUser => 
-        perUser.documents.map { _.documentId }
+        perUser.documents.map { _.asInstanceOf[RawUserActivityPerDocument].documentId }
       }
     }.toSeq.distinct
 
-    documents.getDocumentRecordsByIdWithAccessLevel(docIds, loggedInAs).map { docs => 
-      // TODO enrich with doc metadata
+    documents.getDocumentRecordsByIdWithAccessLevel(docIds, loggedInAs).map { docsAndPermissions => 
+      val docs = docsAndPermissions.map(_._1)
 
       // TODO filter by permission
       
-      rawFeed
+      rawFeed.map(_.enrich(docs))
     }
   }
 

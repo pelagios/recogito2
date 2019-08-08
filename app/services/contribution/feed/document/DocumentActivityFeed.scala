@@ -40,7 +40,8 @@ object DocumentActivityFeed {
     val overTime = response.aggregations.getAs[InternalFilter]("over_time")
       .getAggregations.get("per_day").asInstanceOf[InternalDateHistogram]
 
-    val activities = overTime.getBuckets.asScala.map { bucket => 
+    // Note: ES result is in ascending order, but we want descending (most recent first)
+    val activities = overTime.getBuckets.asScala.toSeq.reverse.map { bucket => 
       val timestamp = new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC)
 
       val byUser: Seq[DocumentActivityByUser] = bucket.getAggregations.get("by_user").asInstanceOf[Terms]
