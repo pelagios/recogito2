@@ -9,6 +9,8 @@ trait UserActivityPerDocument {
 
   def documentId: String 
 
+  def count: Long
+
   def enrich(doc: DocumentRecord)(implicit request: Request[AnyContent]): UserActivityPerDocument
 
 }

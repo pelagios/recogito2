@@ -74,11 +74,12 @@ object UserActivityFeed {
     }.toSeq.distinct
 
     documents.getDocumentRecordsByIdWithAccessLevel(docIds, loggedInAs).map { docsAndPermissions => 
-      val docs = docsAndPermissions.map(_._1)
+      // Filter the raw feed, so that only documents with sufficient runtime permissions show up
+      val visibleFeed = rawFeed.map(_.filter(docsAndPermissions))
 
-      // TODO filter by permission
-      
-      rawFeed.map(_.enrich(docs))
+      // Inject document metadata (which isn't stored in ElasticSearch)
+      val docs = docsAndPermissions.map(_._1)
+      visibleFeed.map(_.enrich(docs))
     }
   }
 
