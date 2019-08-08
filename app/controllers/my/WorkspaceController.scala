@@ -9,6 +9,7 @@ import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Environment}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{ControllerComponents, RequestHeader}
+import services.document.DocumentService
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -18,6 +19,7 @@ class WorkspaceController @Inject() (
   val users: UserService,
   val config: Configuration,
   val silhouette: Silhouette[Security.Env],
+  implicit val documents: DocumentService,
   implicit val ctx: ExecutionContext,
   implicit val env: Environment,
   implicit val webjars: WebJarsUtil
@@ -58,7 +60,8 @@ class WorkspaceController @Inject() (
   }
 
   def activityFeed(usernameInPath: String) = silhouette.UserAwareAction.async { implicit request =>
-    contributions.getUserActivityFeed(Seq(usernameInPath)).map { response => 
+    val loggedInAs = request.identity.map(_.username)
+    contributions.getUserActivityFeed(Seq(usernameInPath), loggedInAs).map { response => 
       // TODO filter response to "visible" edits, depending on login status and sharing permissions
       Ok
     } 

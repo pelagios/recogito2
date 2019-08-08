@@ -6,18 +6,19 @@ import org.elasticsearch.search.aggregations.bucket.histogram.InternalDateHistog
 import org.elasticsearch.search.aggregations.bucket.terms.Terms
 import org.joda.time.{DateTime, DateTimeZone}
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext
 import services.ContentType
 import services.contribution.{ContributionAction, ItemType}
-
-case class UserActivityFeed(took: Long, activities: Seq[UserActivityPerDay])
+import services.document.DocumentService
+import services.user.User
 
 object UserActivityFeed {
 
-  def fromSearchResponse(response: RichSearchResponse) = {
+  private def parseAggregations(response: RichSearchResponse) = {
     val overTime = response.aggregations.getAs[InternalFilter]("over_time")
       .getAggregations.get("per_day").asInstanceOf[InternalDateHistogram]
 
-    val activities = overTime.getBuckets.asScala.map { bucket => 
+    overTime.getBuckets.asScala.map { bucket => 
       val timestamp = new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC)
 
       val byUser: Seq[ActivityPerUser] = bucket.getAggregations.get("by_user").asInstanceOf[Terms]
@@ -52,7 +53,24 @@ object UserActivityFeed {
         }
       UserActivityPerDay(timestamp, bucket.getDocCount, byUser)
     }
-    UserActivityFeed(response.tookInMillis, activities)
+  }
+
+  def fromSearchResponse(
+    loggedInAs: Option[String], response: RichSearchResponse
+  )(implicit documents: DocumentService, ctx: ExecutionContext) = {
+    val unfiltered = parseAggregations(response)
+    
+    // Get all distinct doc IDs in the feed and check if the current user has read permissions
+    val docIds = unfiltered.flatMap { perDay => 
+      perDay.users.flatMap { perUser => 
+        perUser.documents.map { _.documentId }
+      }
+    }.toSeq.distinct
+
+    documents.getDocumentRecordsByIdWithAccessLevel(docIds, loggedInAs).map { docs => 
+      // TODO filter by permission
+      unfiltered
+    }
   }
 
 }

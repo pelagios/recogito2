@@ -7,11 +7,14 @@ import services.contribution._
 import services.contribution.feed.user.UserActivityFeed
 import services.contribution.feed.document.DocumentActivityFeed
 import services.document.DocumentService
+import services.user.User
 import storage.es.ES
 
 trait ActivityFeedService { self: ContributionService =>
 
-  def getUserActivityFeed(usernames: Seq[String]) = 
+  def getUserActivityFeed(
+    usernames: Seq[String], loggedInAs: Option[String]
+  )(implicit documents: DocumentService) = 
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) query {
         boolQuery
@@ -33,7 +36,7 @@ trait ActivityFeedService { self: ContributionService =>
           )
         )
       ) size 0
-    } map { UserActivityFeed.fromSearchResponse }
+    } flatMap { response => UserActivityFeed.fromSearchResponse(loggedInAs, response) }
 
   def getDocumentActivityFeed(
     docId: String
