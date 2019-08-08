@@ -58,18 +58,21 @@ object UserActivityFeed {
   def fromSearchResponse(
     loggedInAs: Option[String], response: RichSearchResponse
   )(implicit documents: DocumentService, ctx: ExecutionContext) = {
-    val unfiltered = parseAggregations(response)
+    val rawFeed = parseAggregations(response)
     
     // Get all distinct doc IDs in the feed and check if the current user has read permissions
-    val docIds = unfiltered.flatMap { perDay => 
+    val docIds = rawFeed.flatMap { perDay => 
       perDay.users.flatMap { perUser => 
         perUser.documents.map { _.documentId }
       }
     }.toSeq.distinct
 
     documents.getDocumentRecordsByIdWithAccessLevel(docIds, loggedInAs).map { docs => 
+      // TODO enrich with doc metadata
+
       // TODO filter by permission
-      unfiltered
+      
+      rawFeed
     }
   }
 
