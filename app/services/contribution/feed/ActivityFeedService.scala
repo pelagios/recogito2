@@ -2,9 +2,11 @@ package services.contribution.feed
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
+import play.api.mvc.{AnyContent, Request}
 import services.contribution._
 import services.contribution.feed.user.UserActivityFeed
 import services.contribution.feed.document.DocumentActivityFeed
+import services.document.DocumentService
 import storage.es.ES
 
 trait ActivityFeedService { self: ContributionService =>
@@ -31,13 +33,11 @@ trait ActivityFeedService { self: ContributionService =>
           )
         )
       ) size 0
-    } map { response => 
-      // TODO
-      val activityFeed = UserActivityFeed.fromSearchResponse(response)
-      activityFeed.toString
-    }
+    } map { UserActivityFeed.fromSearchResponse }
 
-  def getDocumentActivityFeed(docId: String) = 
+  def getDocumentActivityFeed(
+    docId: String
+  )(implicit request: Request[AnyContent], documents: DocumentService) = 
     es.client execute {
       search (ES.RECOGITO / ES.CONTRIBUTION) query {
         termQuery("affects_item.document_id", docId)
@@ -54,10 +54,6 @@ trait ActivityFeedService { self: ContributionService =>
           )
         )
       ) size 0
-    } map { response => 
-      // TODO
-      val activityFeed = DocumentActivityFeed.fromSearchResponse(docId, response)
-      activityFeed.toString
-    }
+    } flatMap { response => DocumentActivityFeed.fromSearchResponse(docId, response) }
 
 }

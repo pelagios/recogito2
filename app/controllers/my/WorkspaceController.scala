@@ -60,7 +60,7 @@ class WorkspaceController @Inject() (
   def activityFeed(usernameInPath: String) = silhouette.UserAwareAction.async { implicit request =>
     contributions.getUserActivityFeed(Seq(usernameInPath)).map { response => 
       // TODO filter response to "visible" edits, depending on login status and sharing permissions
-      Ok(response)
+      Ok
     } 
   }
   

@@ -1,11 +1,12 @@
 package controllers.document
 
 import com.mohiva.play.silhouette.api.Silhouette
-import controllers.{BaseOptAuthController, Security}
+import controllers.{BaseOptAuthController, Security, HasPrettyPrintJSON}
 import java.io.File
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.http.FileMimeTypes
+import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
 import services.ContentType
 import services.contribution.ContributionService
@@ -21,13 +22,13 @@ class DocumentController @Inject() (
   val components: ControllerComponents,
   val config: Configuration,
   val contributions: ContributionService,
-  val documents: DocumentService,
   val silhouette: Silhouette[Security.Env],
   val users: UserService,
   val uploads: Uploads,
+  implicit val documents: DocumentService,
   implicit val mimeTypes: FileMimeTypes,
   implicit val ctx: ExecutionContext
-) extends BaseOptAuthController(components, config, documents, users) {
+) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
   def initialDocumentView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationView(docId, 1))
@@ -139,10 +140,12 @@ class DocumentController @Inject() (
   }
 
   def activityFeed(docId: String) = silhouette.UserAwareAction.async { implicit request => 
-    contributions.getDocumentActivityFeed(docId).map { response =>
-      // TODO filter response to "visible" edits, depending on login status and sharing permissions
-      Ok(response)
-    } 
+    documentReadResponse(docId, request.identity, { case (document, _) =>
+      contributions.getDocumentActivityFeed(docId).map { response =>
+        // This block is reached only if the current user has at least READ_DATA access
+        jsonOk(Json.toJson(response))
+      } 
+    })
   }
 
 }
