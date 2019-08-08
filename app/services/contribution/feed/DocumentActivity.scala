@@ -9,39 +9,39 @@ import org.joda.time.{DateTime, DateTimeZone}
 import scala.collection.JavaConverters._
 import services.contribution.{ContributionAction, ItemType}
 
-/** Document activity feed **/
-case class DocumentActivityFeed(took: Long, activities: Seq[DayActivity])
+/** Activity feed for a specific document **/
+case class DocumentActivityFeed(documentId: String, took: Long, activities: Seq[DocumentDayActivity])
 
 /** Activity for one day **/
-case class DayActivity(timestamp: DateTime, count: Long, users: Seq[ActivityByUser])
+case class DocumentDayActivity(timestamp: DateTime, count: Long, users: Seq[DocumentActivityByUser])
 
 /** Nesting by document **/
-case class ActivityByUser(username: String, count: Long, parts: Seq[ActivityByPart])
+case class DocumentActivityByUser(username: String, count: Long, parts: Seq[DocumentActivityByPart])
 
 /** Nesting by document part **/
-case class ActivityByPart(partId: UUID, count: Long, entries: Seq[ActivityFeedEntry])
+case class DocumentActivityByPart(partId: UUID, count: Long, entries: Seq[DocumentActivityFeedEntry])
 
-/** Base unit of entry in the activity feed.
+/** Base unit of entry in the document activity feed.
   * 
   * { action } { count } { item type }
   *
   * e.g. "Created  5 place bodies" or "Deleted 1 tag"
   */
-case class ActivityFeedEntry(action: ContributionAction.Value, itemType: ItemType.Value, count: Long)
+case class DocumentActivityFeedEntry(action: ContributionAction.Value, itemType: ItemType.Value, count: Long)
 
 object DocumentActivityFeed {
 
-  def fromSearchResponse(response: RichSearchResponse): DocumentActivityFeed = {
+  def fromSearchResponse(documentId: String, response: RichSearchResponse) = {
     val overTime = response.aggregations.getAs[InternalFilter]("over_time")
       .getAggregations.get("per_day").asInstanceOf[InternalDateHistogram]
 
     val activities = overTime.getBuckets.asScala.map { bucket => 
       val timestamp = new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC)
 
-      val byUser: Seq[ActivityByUser] = bucket.getAggregations.get("by_user").asInstanceOf[Terms]
+      val byUser: Seq[DocumentActivityByUser] = bucket.getAggregations.get("by_user").asInstanceOf[Terms]
         .getBuckets.asScala.map { bucket =>           
 
-          val byPart: Seq[ActivityByPart] = bucket.getAggregations.get("by_part").asInstanceOf[Terms]
+          val byPart: Seq[DocumentActivityByPart] = bucket.getAggregations.get("by_part").asInstanceOf[Terms]
             .getBuckets.asScala.map { bucket => 
               // ActivityEntry is a flattened version of the two last nesting levels (action and type)
               val entries = bucket.getAggregations.get("by_action").asInstanceOf[Terms]
@@ -50,16 +50,16 @@ object DocumentActivityFeed {
 
                   bucket.getAggregations.get("by_item_type").asInstanceOf[Terms]
                     .getBuckets.asScala.map { bucket => 
-                      ActivityFeedEntry(thisAction, ItemType.withName(bucket.getKeyAsString), bucket.getDocCount)
+                      DocumentActivityFeedEntry(thisAction, ItemType.withName(bucket.getKeyAsString), bucket.getDocCount)
                     }              
                 }
-              ActivityByPart(UUID.fromString(bucket.getKeyAsString), bucket.getDocCount, entries)
+              DocumentActivityByPart(UUID.fromString(bucket.getKeyAsString), bucket.getDocCount, entries)
             } 
-          ActivityByUser(bucket.getKeyAsString, bucket.getDocCount, byPart)
+          DocumentActivityByUser(bucket.getKeyAsString, bucket.getDocCount, byPart)
         }
-      DayActivity(timestamp, bucket.getDocCount, byUser)
+      DocumentDayActivity(timestamp, bucket.getDocCount, byUser)
     }
-    DocumentActivityFeed(response.tookInMillis, activities)
+    DocumentActivityFeed(documentId, response.tookInMillis, activities)
   }
 
 }

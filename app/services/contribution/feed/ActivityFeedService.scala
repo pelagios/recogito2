@@ -31,7 +31,8 @@ trait ActivityFeedService { self: ContributionService =>
       ) size 0
     } map { response => 
       // TODO
-      response.toString
+      val activityFeed = UserActivityFeed.fromSearchResponse(response)
+      activityFeed.toString
     }
 
   def getDocumentActivityFeed(docId: String) = 
@@ -53,7 +54,7 @@ trait ActivityFeedService { self: ContributionService =>
       ) size 0
     } map { response => 
       // TODO
-      val activityFeed = DocumentActivityFeed.fromSearchResponse(response)
+      val activityFeed = DocumentActivityFeed.fromSearchResponse(docId, response)
       activityFeed.toString
     }
 
