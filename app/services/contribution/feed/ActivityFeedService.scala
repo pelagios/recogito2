@@ -3,6 +3,8 @@ package services.contribution.feed
 import com.sksamuel.elastic4s.ElasticDsl._
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval
 import services.contribution._
+import services.contribution.feed.user.UserActivityFeed
+import services.contribution.feed.document.DocumentActivityFeed
 import storage.es.ES
 
 trait ActivityFeedService { self: ContributionService =>
