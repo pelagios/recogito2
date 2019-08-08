@@ -2,7 +2,8 @@ package services
 
 import java.io.File
 import play.api.Logger
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import scala.util.Try
 import scala.io.Source
 import scala.language.postfixOps
@@ -50,6 +51,13 @@ object ContentType {
     IMAGE_UPLOAD,
     IMAGE_IIIF,
     DATA_CSV).find(_.name == name)
+
+  /** JSON conversion **/
+  implicit val contentTypeFormat: Format[ContentType] =
+    Format(
+      JsPath.read[String].map(ContentType.withName(_).get),
+      Writes[ContentType](s => JsString(s.toString))
+    )
   
   // Images are only supported if VIPS is installed on the system
   private val VIPS_INSTALLED = {

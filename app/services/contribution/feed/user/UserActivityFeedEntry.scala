@@ -1,5 +1,7 @@
 package services.contribution.feed.user
 
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import services.ContentType
 import services.contribution.{ContributionAction, ItemType}
 
@@ -14,3 +16,14 @@ case class UserActivityFeedEntry(
   itemType: ItemType.Value, 
   contentType: ContentType, 
   count: Long)
+
+object UserActivityFeedEntry {
+
+  implicit val userActivityFeedEntryWrites: Writes[UserActivityFeedEntry] = (
+    (JsPath \ "action").write[ContributionAction.Value] and
+    (JsPath \ "item_type").write[ItemType.Value] and
+    (JsPath \ "content_type").write[ContentType] and
+    (JsPath \ "contributions").write[Long]
+  )(unlift(UserActivityFeedEntry.unapply))
+
+}

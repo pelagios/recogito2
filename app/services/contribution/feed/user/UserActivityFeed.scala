@@ -18,7 +18,7 @@ object UserActivityFeed {
     val overTime = response.aggregations.getAs[InternalFilter]("over_time")
       .getAggregations.get("per_day").asInstanceOf[InternalDateHistogram]
 
-    overTime.getBuckets.asScala.map { bucket => 
+    overTime.getBuckets.asScala.toSeq.map { bucket => 
       val timestamp = new DateTime(bucket.getKey.asInstanceOf[DateTime].getMillis, DateTimeZone.UTC)
 
       val byUser: Seq[ActivityPerUser] = bucket.getAggregations.get("by_user").asInstanceOf[Terms]

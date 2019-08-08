@@ -1,13 +1,14 @@
 package controllers.my
 
 import com.mohiva.play.silhouette.api.Silhouette
-import controllers.{BaseController, Security}
+import controllers.{BaseController, Security, HasPrettyPrintJSON}
 import javax.inject.{Inject, Singleton}
 import services.contribution.{Contribution, ContributionService}
 import services.user.{User, UserService}
 import org.webjars.play.WebJarsUtil
 import play.api.{Configuration, Environment}
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
 import play.api.mvc.{ControllerComponents, RequestHeader}
 import services.document.DocumentService
 import scala.concurrent.{ExecutionContext, Future}
@@ -23,7 +24,7 @@ class WorkspaceController @Inject() (
   implicit val ctx: ExecutionContext,
   implicit val env: Environment,
   implicit val webjars: WebJarsUtil
-) extends BaseController(components, config, users) with I18nSupport {
+) extends BaseController(components, config, users) with I18nSupport with HasPrettyPrintJSON {
 
   /** A convenience '/my' route that redirects to the personal index **/
   def my = silhouette.UserAwareAction { implicit request =>
@@ -62,8 +63,7 @@ class WorkspaceController @Inject() (
   def activityFeed(usernameInPath: String) = silhouette.UserAwareAction.async { implicit request =>
     val loggedInAs = request.identity.map(_.username)
     contributions.getUserActivityFeed(Seq(usernameInPath), loggedInAs).map { response => 
-      // TODO filter response to "visible" edits, depending on login status and sharing permissions
-      Ok
+      jsonOk(Json.toJson(response))
     } 
   }
   
