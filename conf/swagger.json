@@ -9,9 +9,11 @@
   "tags": [{
     "name": "Workspaces"
   }, {
+    "name": "Annotations"
+  }, {
     "name": "Authorities"
   }, {
-    "name": "Annotations"
+    "name": "Activity"
   }],
   "paths" : {
     "/api/search" : {
@@ -183,13 +185,13 @@
         "tags": [ "Annotations" ],
         "summary": "Get specific annotation",
         "operationId": "annotation",
-        "parameters": [ {
+        "parameters": [{
           "name":  "id",
           "in": "path",
           "description": "Annotation ID",
           "required": true,
           "type": "string"
-        } ]
+        }]
       }
     },
     "/api/annotation/{id}.jpg" : {
@@ -197,17 +199,47 @@
         "tags": [ "Annotations" ],
         "summary": "Get annotated image cutout",
         "operationId": "annotation",
-        "parameters": [ {
+        "parameters": [{
           "name":  "id",
           "in": "path",
           "description": "Annotation ID",
           "required": true,
           "type": "string"
-        } ],
+        }],
         "responses": [{
           "200": {
             "content": "image/jpeg"
           }
+        }]
+      }
+    },
+    "/document/{id}/activity.json" : {
+      "get" : {
+        "tags": [ "Activity" ],
+        "summary": "Follow the daily activity on a document",
+        "description": "This operation is covered by the same access restrictions as everything else. The feed is only available if the requesting user has read access to the document.",
+        "operationId": "documentActivity",
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "description": "Document ID",
+          "required": true,
+          "type": "string"
+        }]
+      }
+    },
+    "/{username}/activity.json" : {
+      "get" : {
+        "tags": [ "Activity" ],
+        "summary": "Follow this users' daily activity",
+        "description": "This operation is covered by the same access restrictions as everything else. Activity on documents not visible to the requesting user will be hidden from the feed.",
+        "operationId": "userActivity",
+        "parameters": [{
+          "name": "username",
+          "in": "path",
+          "description": "Username",
+          "required": true,
+          "type": "string"
         }]
       }
     }
