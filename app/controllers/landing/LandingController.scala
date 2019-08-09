@@ -84,7 +84,7 @@ class LandingController @Inject() (
   def swaggerConfig() = Action { implicit request => 
     val json = Json.parse(new FileInputStream("conf/swagger.json"))
     val baseURL = new URI(routes.LandingController.index.absoluteURL)
-    val host = if (baseURL.getPort == 80) baseURL.getHost else s"${baseURL.getHost}:${baseURL.getPort}"
+    val host = if (baseURL.getPort == -1) baseURL.getHost else s"${baseURL.getHost}:${baseURL.getPort}"
     jsonOk(json.as[JsObject] ++ Json.obj("host" -> host))
   }
 
