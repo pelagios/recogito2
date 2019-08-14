@@ -22,6 +22,7 @@ import services.generated.tables.Folder
 import services.generated.tables.FolderAssociation
 import services.generated.tables.ServiceAnnouncement
 import services.generated.tables.SharingPolicy
+import services.generated.tables.Similarity
 import services.generated.tables.Task
 import services.generated.tables.Upload
 import services.generated.tables.UploadFilepart
@@ -36,6 +37,7 @@ import services.generated.tables.records.FolderAssociationRecord
 import services.generated.tables.records.FolderRecord
 import services.generated.tables.records.ServiceAnnouncementRecord
 import services.generated.tables.records.SharingPolicyRecord
+import services.generated.tables.records.SimilarityRecord
 import services.generated.tables.records.TaskRecord
 import services.generated.tables.records.UploadFilepartRecord
 import services.generated.tables.records.UploadRecord
@@ -78,6 +80,7 @@ object Keys {
 	val FOLDER_ASSOCIATION_PKEY = UniqueKeys0.FOLDER_ASSOCIATION_PKEY
 	val SERVICE_ANNOUNCEMENT_PKEY = UniqueKeys0.SERVICE_ANNOUNCEMENT_PKEY
 	val SHARING_POLICY_PKEY = UniqueKeys0.SHARING_POLICY_PKEY
+	val SIMILARITY_PKEY = UniqueKeys0.SIMILARITY_PKEY
 	val TASK_PKEY = UniqueKeys0.TASK_PKEY
 	val UPLOAD_PKEY = UniqueKeys0.UPLOAD_PKEY
 	val UPLOAD_OWNER_KEY = UniqueKeys0.UPLOAD_OWNER_KEY
@@ -128,6 +131,7 @@ object Keys {
 		val FOLDER_ASSOCIATION_PKEY : UniqueKey[FolderAssociationRecord] = AbstractKeys.createUniqueKey(FolderAssociation.FOLDER_ASSOCIATION, FolderAssociation.FOLDER_ASSOCIATION.FOLDER_ID, FolderAssociation.FOLDER_ASSOCIATION.DOCUMENT_ID)
 		val SERVICE_ANNOUNCEMENT_PKEY : UniqueKey[ServiceAnnouncementRecord] = AbstractKeys.createUniqueKey(ServiceAnnouncement.SERVICE_ANNOUNCEMENT, ServiceAnnouncement.SERVICE_ANNOUNCEMENT.ID)
 		val SHARING_POLICY_PKEY : UniqueKey[SharingPolicyRecord] = AbstractKeys.createUniqueKey(SharingPolicy.SHARING_POLICY, SharingPolicy.SHARING_POLICY.ID)
+		val SIMILARITY_PKEY : UniqueKey[SimilarityRecord] = AbstractKeys.createUniqueKey(Similarity.SIMILARITY, Similarity.SIMILARITY.DOC_ID_A, Similarity.SIMILARITY.DOC_ID_B)
 		val TASK_PKEY : UniqueKey[TaskRecord] = AbstractKeys.createUniqueKey(Task.TASK, Task.TASK.ID)
 		val UPLOAD_PKEY : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.ID)
 		val UPLOAD_OWNER_KEY : UniqueKey[UploadRecord] = AbstractKeys.createUniqueKey(Upload.UPLOAD, Upload.UPLOAD.OWNER)
