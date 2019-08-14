@@ -27,18 +27,10 @@ class SimilarityService @Inject() (val db: DB, val documents: DocumentService, i
 
     sql.resultQuery(query, docId, docId).fetchArray.map { row => 
       val r = row.into(classOf[SimilarityRecord])
-      
-      val docA = r.getDocIdA
-      val docB = r.getDocIdB
-
-      // TODO remove the need for Option by adding DEFAULT = 0 to schema
-      val jw = Option(r.getTitleJaroWinkler).map(_.toDouble).getOrElse(0.0)
-      val jc = Option(r.getEntityJaccard).map(_.toDouble).getOrElse(0.0)
-
-      if (docA == docId)
-        Similarity(docB, jw, jc)
+      if (r.getDocIdA == docId)
+        Similarity(r.getDocIdB, r.getTitleJaroWinkler, r.getEntityJaccard)
       else 
-        Similarity(docA, jw, jc)
+        Similarity(r.getDocIdA, r.getTitleJaroWinkler, r.getEntityJaccard)
     }
   }
 
