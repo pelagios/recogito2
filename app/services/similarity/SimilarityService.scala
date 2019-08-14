@@ -17,10 +17,16 @@ class SimilarityService @Inject() (val db: DB, val documents: DocumentService, i
     val query = 
       s"""
        SELECT
-         *,
-        (coalesce(title_jaro_winkler,0) + coalesce(entity_jaccard, 0)) AS sort_score
+         similarity.*,
+        (title_jaro_winkler + entity_jaccard) AS sort_score
        FROM similarity 
+       JOIN document doc_a
+         ON doc_a.id = doc_id_a
+       JOIN document doc_b
+         ON doc_b.id = doc_id_b
        WHERE doc_id_a = ? OR doc_id_b = ? 
+         AND doc_a.public_visibility = 'PUBLIC'
+         AND doc_b.public_visibility = 'PUBLIC'
        ORDER BY sort_score DESC
        LIMIT ${n}
        """
