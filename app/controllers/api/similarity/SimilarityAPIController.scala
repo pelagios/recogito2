@@ -1,4 +1,4 @@
-package controllers.api.contribution
+package controllers.api.similarity
 
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, Security, HasPrettyPrintJSON}
@@ -6,31 +6,25 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents 
-import scala.concurrent.{ExecutionContext, Future}
-import services.contribution.ContributionService
+import scala.concurrent.ExecutionContext
 import services.document.DocumentService
 import services.user.UserService
+import services.similarity.SimilarityService
 
 @Singleton
 class ContributionAPIController @Inject() (
   val components: ControllerComponents,
   val config: Configuration,
-  val contributions: ContributionService,
   val documents: DocumentService,
+  val similarities: SimilarityService,
   val users: UserService,
   val silhouette: Silhouette[Security.Env],
   implicit val ctx: ExecutionContext
 ) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
-  def getDocumentStats(id: String) = silhouette.UserAwareAction.async { implicit request => 
-    documentResponse(id, request.identity, { case (doc, accesslevel) => 
-      if (accesslevel.canReadData) {
-        contributions.getDocumentStats(id).map { stats => 
-          jsonOk(Json.toJson(stats))
-        }
-      } else {
-        Future.successful(Forbidden)
-      }
+  def getSimilar(docId: String) = silhouette.UserAwareAction.async { implicit request => 
+    documentResponse(docId, request.identity, { case (doc, accesslevel) => 
+      ???
     })
   }
   
