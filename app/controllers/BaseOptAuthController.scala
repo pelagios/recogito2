@@ -37,10 +37,10 @@ abstract class BaseOptAuthController(
   
   /** Helper that covers the boilerplate for document views requiring read access **/
   protected def documentReadResponse(
-      documentId: String,
-      maybeUser: Option[User],
-      response: (ExtendedDocumentMetadata, RuntimeAccessLevel) => Future[Result]
-    )(implicit ctx: ExecutionContext, request: Request[AnyContent])  = {
+    documentId: String,
+    maybeUser: Option[User],
+    response: (ExtendedDocumentMetadata, RuntimeAccessLevel) => Future[Result]
+  )(implicit ctx: ExecutionContext, request: Request[AnyContent])  = {
     
     documentResponse(documentId, maybeUser, { case (doc, accesslevel) =>
       if (accesslevel.canReadData)
