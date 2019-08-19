@@ -24,6 +24,7 @@ trait HasTEISnippets extends HasTextSnippets {
         .replaceAll("titlestmt", "titleStmt")
         .replaceAll("respstmt", "respStmt")
         .replaceAll("publicationstmt", "publicationStmt")
+        .replaceAll("settingsdesc", "settingsDesc")
         .replaceAll("sourcedesc", "sourceDesc") // patching uppercase/lowercase inconsistencies (sigh)
       val offset = a.substring(a.indexOf("::") + 2).toInt
       (path, offset)
