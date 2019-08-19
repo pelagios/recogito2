@@ -57,7 +57,7 @@ trait CreateOps { self: DocumentService =>
 
     // Destination filename = new UUID + old file extension
     val sourceExtension = origPart.getFile.substring(origPart.getFile.lastIndexOf('.'))
-    val destinationFilename = s"${clonedPartId}.${sourceExtension}"
+    val destinationFilename = s"${clonedPartId}${sourceExtension}"
 
     val destinationFile = new File(
       uploads.getDocumentDir(clonedDoc.getOwner, clonedDoc.getId, true).get,
@@ -65,8 +65,26 @@ trait CreateOps { self: DocumentService =>
     ).toPath
 
     Files.copy(sourceFile, destinationFile)
-
     destinationFile.getFileName.toString
+  }
+
+  private def copyTileset(
+    origDoc: DocumentRecord,
+    origPart: DocumentFilepartRecord,
+    clonedDoc: DocumentRecord,
+    clonedPartId: UUID
+  ) = {
+    val origTilesetFolder = new File(
+      uploads.getDocumentDir(origDoc.getOwner, origDoc.getId).get,
+      origPart.getId.toString
+    )
+
+    val destFolder = new File(
+      uploads.getDocumentDir(clonedDoc.getOwner, clonedDoc.getId).get,
+      clonedPartId.toString
+    )
+
+    FileUtils.copyDirectory(origTilesetFolder, destFolder)
   }
 
   /** Duplicates the given filepart record, copying the file as needed **/
@@ -84,7 +102,12 @@ trait CreateOps { self: DocumentService =>
     val origContentType = ContentType.withName(origPart.getContentType).get
     val clonedFile = 
       if (origContentType.isLocal) {
-        copyFile(origDoc, origPart, clonedDoc, clonedPartId) 
+        val filename = copyFile(origDoc, origPart, clonedDoc, clonedPartId) 
+        
+        if (origContentType.isImage) // Local image means there's a tileset
+         copyTileset(origDoc, origPart, clonedDoc, clonedPartId)
+        
+        filename
       } else {
         origPart.getFile
       }
