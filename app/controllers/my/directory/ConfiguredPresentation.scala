@@ -121,6 +121,7 @@ object ConfiguredPresentation extends HasDate {
     (JsPath \ "owner").write[String] and 
     (JsPath \ "uploaded_at").write[DateTime] and
     (JsPath \ "title").write[String] and
+    (JsPath \ "public_visibility").writeNullable[String] and
 
     (JsPath \ "filetypes").write[Seq[String]] and
     (JsPath \ "file_count").write[Int] and
@@ -131,7 +132,6 @@ object ConfiguredPresentation extends HasDate {
     (JsPath \ "language").writeNullable[String] and
     (JsPath \ "source").writeNullable[String] and
     (JsPath \ "edition").writeNullable[String] and
-    (JsPath \ "public_visibility").writeNullable[String] and
     (JsPath \ "shared_by").writeNullable[String] and
     (JsPath \ "access_level").writeNullable[String] and
 
@@ -146,6 +146,7 @@ object ConfiguredPresentation extends HasDate {
     p.document.getOwner,
     new DateTime(p.document.getUploadedAt.getTime),
     p.document.getTitle,
+    Option(p.document.getPublicVisibility),
 
     p.contentTypes.map(_.toString),
     p.fileCount,
@@ -156,7 +157,6 @@ object ConfiguredPresentation extends HasDate {
     p.getDBProp[String]("language", p.document.getLanguage),
     p.getDBProp[String]("source", p.document.getSource),
     p.getDBProp[String]("edition", p.document.getEdition),
-    p.getDBProp[String]("public_visibility", p.document.getPublicVisibility),
     p.getOptDBProp[String]("shared_by", p.sharedVia.map(_.getSharedBy)),
     p.getOptDBProp[String]("access_level", p.sharedVia.map(_.getAccessLevel)),
 
