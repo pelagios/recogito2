@@ -29,7 +29,7 @@ trait HasTEISnippets extends HasTextSnippets {
         .replaceAll("particdesc", "particDesc")
         .replaceAll("profiledesc", "profileDesc")
         .replaceAll("publicationstmt", "publicationStmt")
-        .replaceAll("settingsdesc", "settingsDesc")
+        .replaceAll("settingdesc", "settingDesc")
         .replaceAll("sourcedesc", "sourceDesc") // patching uppercase/lowercase inconsistencies (sigh)
       val offset = a.substring(a.indexOf("::") + 2).toInt
       (path, offset)
