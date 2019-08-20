@@ -1,0 +1,66 @@
+@()(implicit request: RequestHeader)
+@_layout(
+  "Cloning Documents",
+  "Cloning Documents",
+  "Learn how to clone documents that other users have made public into your own workspace.",
+  "en"
+) {
+  <h1>Cloning Documents</h1>
+} {
+  <div class="article has-sidebar">
+    <div class="inner">
+      <p>
+        The <strong>Clone</strong> feature allows you to create a copy of another user's document
+        in your own workspace. The copy includes all the annotations from the original, but 
+        is otherwise independent from the source. Think of cloning as a way to build on the work 
+        that other users have created and shared, without the risk of breaking or interfering with
+        anything.   
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/clone.png")">
+
+      <h2>How to Clone</h2>
+      <p>
+        When you visit another user's workspace, you will see a list of documents that this user has:
+      </p>
+
+      <ol>
+        <li>declared to be under an open license</li> 
+        <li>shared with the public, with full access for anyone</li>
+      </ol>
+
+      <p>
+        Both conditions must be fulfilled in order for a document to be available for cloning.
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/cloning-modal.png")">
+
+      <p>
+        Select a document from the list. Click the button labeled <strong>Clone to my workspace</strong> 
+        that appears at the top right of the screen. Cloning may take a while. Once the process has 
+        finished, you will find the document in your workspace.
+      </p>
+
+      <h2>Navigating the Network</h2>
+      <p>
+        When cloning a document, the information about where you cloned the document from (and when) 
+        will be kept.
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/link-to-clone-source.png")">
+
+      <p>
+        In the annotation view, the info box at the top will automatically show a link to the original, if the
+        document was cloned from another source. Likewise, the annotation view of the original document will 
+        display a small label showing the number of clones that exist.
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/link-to-clones.png")">
+
+      <p>
+        Clicking the label will reveal the list of links to the clones, so you can navigate to them.
+      </p>
+
+    </div>
+  </div>
+}
