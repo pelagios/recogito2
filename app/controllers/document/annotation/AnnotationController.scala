@@ -118,7 +118,6 @@ class AnnotationController @Inject() (
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
         f.map { case (count, clonedFrom ) =>
-          play.api.Logger.info(s"$clonedFrom")
           ifAuthorized(Ok(views.html.document.annotation.image(
             doc, 
             currentPart, 

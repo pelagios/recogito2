@@ -251,6 +251,13 @@ trait DocumentReadOps { self: DocumentService =>
          .fetchOne(0, classOf[Int])
   }
 
+  /** Query to retrieve all document records that are clones of the given document ID **/
+  def listClones(docId: String): Future[Seq[DocumentRecord]] = db.query { sql => 
+    sql.selectFrom(DOCUMENT)
+       .where(DOCUMENT.CLONED_FROM.equal(docId))
+       .fetchArray.toSeq
+  }
+
   /** Reads the document preferences for the given document **/
   def getDocumentPreferences(docId: String) = db.query { sql =>
     sql.selectFrom(DOCUMENT_PREFERENCES)
