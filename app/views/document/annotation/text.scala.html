@@ -42,6 +42,7 @@
         isPublic: @doc.isOpenToPublic,
         writeAccess: @accessLevel.canWrite,
         isAdmin: @accessLevel.isAdmin,
+        clones: [@Html(clones.map{ doc => s"{ owner:'${doc.getOwner}', id:'${doc.getId}'}" }.mkString(","))],
         @views.html.document.annotation._prefs(prefs)
       }
     </script>
