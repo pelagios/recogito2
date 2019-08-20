@@ -67,8 +67,10 @@
           @views.html.document.licenseInfo(doc.license.get, doc.attribution)
         }
         @if(clones.size > 0) {
-          &nbsp; &centerdot; &nbsp; <span class="icon">&#xf126;</span>
-          Cloned @clones.size @if(clones.size == 1) { time } else { times }
+          &nbsp; &centerdot; &nbsp; <span class="clones">
+            <span class="icon">&#xf126;</span>
+            Cloned @clones.size @if(clones.size == 1) { time } else { times }
+          </span>
         }
       </p>
     </div> <!-- .header-infobox -->

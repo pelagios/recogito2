@@ -154,6 +154,45 @@
       top:-2px;
     }
 
+    .clones {
+      position:relative;
+      cursor:pointer;
+    }
+
+    .clone-list {
+      position:absolute;
+      top:30px;
+      left:-18px;
+      background-color:#fff;
+      text-align:center;
+      .rounded-corners(3px);
+      .box-shadow(1px, 1px, 20px, rgba(0, 0, 0, 0.35));
+      color:@grey-type;
+
+      a {
+        color:@grey-type;
+      }
+
+      ul {
+        list-style-type:none;
+        padding:0;
+        margin:0;
+        padding:10px 20px;
+      }
+  
+    }
+
+    .clone-list::before {
+      content:'';
+      position:absolute;
+      left:12px;
+      top:-10px;
+      border-top:none;
+      border-right:10px solid transparent;
+      border-left:10px solid transparent;
+      border-bottom:10px solid #fff;
+    }
+  
   }
 
 } /** .header-infobox **/

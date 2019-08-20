@@ -1,7 +1,8 @@
 define([
   'common/config',
-  'document/annotation/common/page/attribution'
-], function(Config, Attribution) {
+  'document/annotation/common/page/attribution',
+  'document/annotation/common/page/cloneList'
+], function(Config, Attribution, CloneList) {
 
   // Duration for showing the 'Save OK'/save error status info
   var SHOW_RESPONSE_STATUS_FOR_MS = 5000;
@@ -86,6 +87,9 @@ define([
 
     // Instantiate attribution popup if attribution text exists
     if (attributionEl.length > 0) new Attribution(attributionEl);
+    
+    // Instantiate clone list
+    new CloneList(jQuery('.clones'), Config.clones),
 
     this.incrementAnnotationCount = incrementAnnotationCount;
     this.updateContributorInfo = updateContributorInfo;

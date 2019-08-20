@@ -1,6 +1,6 @@
 define([], function() {
 
-  var CloneList = function(containerEl, clones) {
+  var CloneList = function(attachedToEl, clones) {
 
     var self = this,
 
@@ -8,9 +8,6 @@ define([], function() {
           '<div class="clone-list">' +
             '<ul>' +
             '</ul>' +
-            '<div class="hint">' + 
-              '<a target="_blank" href="/help/cloning">What is cloning?</a>' +
-            '</div>' +
           '</div>').hide(),
 
         toggle = function() {
@@ -21,7 +18,8 @@ define([], function() {
         },
 
         init = function() {
-          var ul = element.find('ul');
+          var ul = element.find('ul'),
+              trigger = jQuery(attachedToEl);
 
           clones.forEach(function(clone) {
             ul.append(jQuery(
@@ -30,11 +28,11 @@ define([], function() {
             ));
           }); 
 
-          jQuery(containerEl).append(element);      
+          trigger.append(element);      
+          trigger.click(toggle);
         };
 
     init();
-    this.toggle = toggle;
   };
 
   return CloneList;
