@@ -4,6 +4,7 @@
   currentUser: Option[services.user.User],
   accessLevel: services.RuntimeAccessLevel,
   clonedFrom: Option[services.generated.tables.records.DocumentRecord],
+  clones: Seq[services.generated.tables.records.DocumentRecord],
   prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord],
   preview: String,
   annotationCount: Long,
@@ -61,6 +62,10 @@
         @if(doc.license.isDefined) {
           &nbsp; &centerdot; &nbsp;
           @views.html.document.licenseInfo(doc.license.get, doc.attribution)
+        }
+        @if(clones.size > 0) {
+          &nbsp; &centerdot; &nbsp; <span class="icon">&#xf126;</span>
+          Cloned @clones.size @if(clones.size == 1) { time } else { times }
         }
       </p>
     </div> <!-- .header-infobox -->

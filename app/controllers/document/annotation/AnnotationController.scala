@@ -101,11 +101,13 @@ class AnnotationController @Inject() (
     val fCountAnnotations = annotations.countByDocId(doc.id)
     val fGetClonedFrom = doc.clonedFrom.map(origId => documents.getDocumentRecordById(origId))
       .getOrElse(Future.successful(None))
+    val fClones = documents.listClones(doc.id)
 
     val f = for {
       annotationCount <- fCountAnnotations
-      clonedFrom <- fGetClonedFrom
-    } yield (annotationCount, clonedFrom.map(_._1))
+      clonedFrom <- fGetClonedFrom // Source doc this document was cloned from (if any)
+      clones <- fClones // Documents that were cloned from this document (if any)
+    } yield (annotationCount, clonedFrom.map(_._1), clones)
 
     // Needed only for Text and TEI - start on demand (def)
     def fReadTextfile() = uploads.readTextfile(doc.ownerName, doc.id, currentPart.getFile)
@@ -117,13 +119,14 @@ class AnnotationController @Inject() (
     ContentType.withName(currentPart.getContentType) match {
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) =>
-        f.map { case (count, clonedFrom ) =>
+        f.map { case (count, clonedFrom, clones) =>
           ifAuthorized(Ok(views.html.document.annotation.image(
             doc, 
             currentPart, 
             loggedInUser, 
             accesslevel, 
             clonedFrom,
+            clones,
             prefs, 
             count, 
             redirectedVia)), count)
@@ -132,13 +135,14 @@ class AnnotationController @Inject() (
       case Some(ContentType.TEXT_PLAIN) =>
         fReadTextfile() flatMap {
           case Some(content) =>
-            f.map { case (count, clonedFrom) =>
+            f.map { case (count, clonedFrom, clones) =>
               ifAuthorized(Ok(views.html.document.annotation.text(
                 doc, 
                 currentPart, 
                 loggedInUser, 
                 accesslevel, 
                 clonedFrom,
+                clones,
                 prefs, 
                 count, 
                 content, 
@@ -154,7 +158,7 @@ class AnnotationController @Inject() (
       case Some(ContentType.TEXT_TEIXML) =>
         fReadTextfile flatMap {
           case Some(content) =>
-            f.map { case (count, clonedFrom) =>
+            f.map { case (count, clonedFrom, clones) =>
               val preview = previewFromTEI(content)
               ifAuthorized(Ok(views.html.document.annotation.tei(
                 doc, 
@@ -162,6 +166,7 @@ class AnnotationController @Inject() (
                 loggedInUser, 
                 accesslevel, 
                 clonedFrom,
+                clones,
                 prefs, 
                 preview, 
                 count, 
@@ -175,13 +180,14 @@ class AnnotationController @Inject() (
         }
 
       case Some(ContentType.DATA_CSV) =>
-        f.map { case (count, clonedFrom) =>
+        f.map { case (count, clonedFrom, clones) =>
           ifAuthorized(Ok(views.html.document.annotation.table(
             doc, 
             currentPart, 
             loggedInUser, 
             accesslevel, 
-            clonedFrom, 
+            clonedFrom,
+            clones, 
             prefs, 
             count)), count)
         }
