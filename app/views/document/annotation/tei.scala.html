@@ -3,6 +3,7 @@
   currentPart: services.generated.tables.records.DocumentFilepartRecord,
   currentUser: Option[services.user.User],
   accessLevel: services.RuntimeAccessLevel,
+  clonedFrom: Option[services.generated.tables.records.DocumentRecord],
   prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord],
   preview: String,
   annotationCount: Long,
@@ -47,6 +48,7 @@
     <div class="header-infobox">
       <h1>
         @doc.author.map(_ + ": ")@doc.title
+        @views.html.document.annotation._clonedFrom(doc, clonedFrom)
       </h1>
       <h2 class="date">@doc.dateFreeform</h2>
       <p class="source">@views.html.document.sourceLink(doc.source)</p>

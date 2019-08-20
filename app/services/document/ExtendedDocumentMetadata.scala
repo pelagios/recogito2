@@ -40,6 +40,8 @@ case class ExtendedDocumentMetadata(document: DocumentRecord, fileparts: Seq[Doc
   
   lazy val publicAccessLevel: Option[PublicAccess.AccessLevel] =
     PublicAccess.AccessLevel.withName(document.getPublicAccessLevel)
+
+  lazy val clonedFrom: Option[String] = Option(document.getClonedFrom)
     
   // Shorthands
   lazy val isOpenToPublic =

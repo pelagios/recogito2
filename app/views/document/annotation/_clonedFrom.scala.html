@@ -1,0 +1,19 @@
+@(
+  doc: services.document.ExtendedDocumentMetadata,
+  clonedFrom: Option[services.generated.tables.records.DocumentRecord]
+)(implicit request: RequestHeader)
+
+@if(doc.clonedFrom.isDefined) {
+  <span class="cloned-from">cloned from 
+    <a target="_blank" href="@controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.clonedFrom.get, 1)">
+      @if(clonedFrom.isDefined) {
+        @clonedFrom.get.getOwner/@clonedFrom.get.getId
+      } else {
+        @doc.clonedFrom.get
+      }
+    </a>
+  </span>
+}
+
+
+
