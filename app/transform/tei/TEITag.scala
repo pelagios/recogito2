@@ -80,8 +80,7 @@ object TEITag extends {
     val quote = el.getTextContent
     
     val xpath = $(el).xpath
-    val xpathNormalized = xpath.substring(0, xpath.lastIndexOf('/')).toLowerCase
-      .replaceAll("\\[1\\]", "") // Selecting first is redundant (and browser clients don't do it)
+    val xpathNormalized = xpath.substring(0, xpath.lastIndexOf('/'))
 
     s"from=${xpathNormalized}::${offset};to=${xpathNormalized}::${offset + quote.size}"
   }

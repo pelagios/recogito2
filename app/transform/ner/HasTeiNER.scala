@@ -39,7 +39,7 @@ trait HasTeiNER {
     
     textNodes.foldLeft(Seq.empty[(Entity, String)]) { case (results, textNode) =>
       val parentNode = textNode.getParentNode
-      val xpath = $(parentNode).xpath().toLowerCase.replaceAll("\\[1\\]", "")
+      val xpath = $(parentNode).xpath()
         
       val entities = NERService.parseText(textNode.getNodeValue, engine, config)
             
