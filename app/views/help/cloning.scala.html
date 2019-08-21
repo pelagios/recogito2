@@ -21,16 +21,25 @@
 
       <h2>How to Clone</h2>
       <p>
-        When you visit another user's workspace, you will see a list of documents that this user has:
+        When you visit another user's workspace, you will see a list of documents. There are two
+        possible reasons for why the documents are visible to you:
       </p>
-
-      <ol>
-        <li>declared to be under an open license</li> 
-        <li>shared with the public, with full access for anyone</li>
+      
+      <ol> 
+        <li>the owner has <strong>explicitly shared</strong> them with you</li>
+        <li>the owner has declared them to be under an <strong>open license</strong> and
+          enabled <strong>public access</strong></li>
       </ol>
 
       <p>
-        Both conditions must be fulfilled in order for a document to be available for cloning.
+        Only the second category - public documents with an open license - are available for
+        cloning.
+      </p>
+
+      <p class="tip">
+        Important: documents are only available for cloning if they are declared to be 
+        under on open license, and were configured for full public access in the sharing 
+        settings.
       </p>
 
       <img src="@routes.Assets.versioned("images/help/cloning-modal.png")">
@@ -41,24 +50,26 @@
         finished, you will find the document in your workspace.
       </p>
 
-      <h2>Navigating the Network</h2>
+      <h2>Navigating Connections</h2>
       <p>
-        When cloning a document, the information about where you cloned the document from (and when) 
-        will be kept.
+        When a document is cloned, the information about where it was cloned from (and when) 
+        is kept. You can navigate this connection from the 
+        <span class="outline-icon">&#xe86f;</span> annotation view.
       </p>
 
       <img src="@routes.Assets.versioned("images/help/link-to-clone-source.png")">
 
       <p>
-        In the annotation view, the info box at the top will automatically show a link to the original, if the
-        document was cloned from another source. Likewise, the annotation view of the original document will 
-        display a small label showing the number of clones that exist.
+        The page header will automatically show a link to the original if the document
+        was cloned from another source. Likewise, when looking at the original document, 
+        the header will display a small label indicating how many times the document 
+        was cloned.
       </p>
 
       <img src="@routes.Assets.versioned("images/help/link-to-clones.png")">
 
       <p>
-        Clicking the label will reveal the list of links to the clones, so you can navigate to them.
+        Clicking the label reveals a drop-down list of links to the clones.
       </p>
 
     </div>
