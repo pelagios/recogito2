@@ -48,7 +48,12 @@
           "description" : "Owner (e.g. 'pelagios3')",
           "required" : false,
           "type" : "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/account/{username}" : {
@@ -62,7 +67,12 @@
           "description": "Username (e.g. 'pelagios3')",
           "required": true,
           "type": "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/directory/{username}" : {
@@ -77,7 +87,12 @@
           "description": "Username",
           "required": true,
           "type": "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/directory/{username}/{folderId}" : {
@@ -98,14 +113,24 @@
           "description": "Folder/Collection UUID",
           "required": true,
           "type": "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/authorities/gazetteers" : {
       "get" : {
         "tags": [ "Authorities" ],
         "summary": "List available resolution authorities",
-        "operationId": "authorities"
+        "operationId": "authorities",
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/place/search" : {
@@ -121,7 +146,7 @@
           "required": true,
           "type": "string"
         }, {
-          "name":  "offset",
+          "name": "offset",
           "in": "query",
           "description": "Pagination offset",
           "required": false,
@@ -140,7 +165,31 @@
           "description": "Gazetteer IDs to filter by (comma, separated)",
           "required": false,
           "type": "string"
-        }  ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
+      }
+    },
+    "/api/place/{uri}" : {
+      "get": {
+        "tags": [ "Authorities" ],
+        "summary": "Get place information and coordinates for a specific gazetteeer URI.",
+        "operationId": "gazetteerLookup",
+        "parameters": [{
+          "name": "uri",
+          "in": "path",
+          "description": "Gazetteer URI",
+          "required": true,
+          "type": "string"
+        }],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/document/{doc}/annotations" : {
@@ -155,7 +204,12 @@
           "description": "Document ID",
           "required": true,
           "type": "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/document/{doc}/part/{part}/annotations" : {
@@ -177,7 +231,12 @@
           "required": true,
           "type": "integer",
           "default": 1
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/annotation/{id}" : {
@@ -191,6 +250,11 @@
           "description": "Annotation ID",
           "required": true,
           "type": "string"
+        }],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
         }]
       }
     },
@@ -225,6 +289,11 @@
           "description": "Document ID",
           "required": true,
           "type": "string"
+        }],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
         }]
       }
     },
@@ -240,6 +309,11 @@
           "description": "Username",
           "required": true,
           "type": "string"
+        }],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
         }]
       }
     }
