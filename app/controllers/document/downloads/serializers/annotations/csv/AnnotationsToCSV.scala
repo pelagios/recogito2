@@ -19,6 +19,7 @@ import kantan.csv.CsvConfiguration.{Header, QuotePolicy}
 import kantan.csv.ops._
 import kantan.csv.engine.commons._
 import org.w3c.dom.Document
+import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 import play.api.{Configuration, Logger}
 import play.api.libs.Files.TemporaryFileCreator
@@ -47,16 +48,19 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
   private def parseAnchor(anchor:String) = {
 
     def separate(a: String): (String, Int) = {
-      val path = a.substring(0, a.indexOf("::"))
+      var path = a.substring(0, a.indexOf("::"))
         .replaceAll("tei/", "TEI/")
         .replaceAll("teiheader/", "teiHeader/")
         .replaceAll("filedesc/", "fileDesc/")
         .replaceAll("titlestmt/", "titleStmt/")
         .replaceAll("publicationstmt/", "publicationStmt/")
         .replaceAll("sourcedesc/", "sourceDesc/") // patching uppercase/lowercase inconsistencies (sigh)
-        .replaceAll("@id", "@xml:id") // restore id prefix
         .replaceAll("(\\w)(/|$)", "$1[1]$2") // restore positional predicates to prevent ambiguity
-        .replaceAll("/(\\w)","/tei:$1") // add NS prefix so XPath works
+        if (!path.startsWith("/TEI.2")) { // if it's P5, do NS stuff
+          path = path.replaceAll("@id", "@xml:id") // restore id prefix
+            .replaceAll("/(\\w)","/tei:$1") // add NS prefix so XPath works
+        }
+
       val offset = a.substring(a.indexOf("::") + 2).toInt
       (path, offset)
     }
@@ -67,8 +71,9 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
   private def getPosition(ann: Annotation) = {
     val anchor = parseAnchor(ann.anchor)
     xpath.reset()
-    val pos = xpath.evaluate("count(" +  anchor._1 + "/preceding::node())", docs(ann.annotates.filepartId), XPathConstants.NUMBER).asInstanceOf[Double]
-    (pos, anchor._2)
+    val textnodes = xpath.evaluate(anchor._1 + "/preceding::text()", docs(ann.annotates.filepartId), XPathConstants.NODESET).asInstanceOf[NodeList]
+    (for (i <- 0.to(textnodes.getLength - 1))
+      yield textnodes.item(i).getNodeValue.length).reduce((a, b) => a + b) + anchor._2
   }
 
   private def parseXML(source: InputSource) = {
@@ -82,7 +87,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
     parseXML(new InputSource(new StringReader(xml)))
   }
 
-  private def mapIndices(annotations: Seq[Annotation]): Seq[Tuple2[Tuple2[Double,Int],Annotation]] = {
+  private def mapIndices(annotations: Seq[Annotation]) = {
     annotations.map((a) => (getPosition(a), a))
   }
 
@@ -91,7 +96,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
     val groupedByDocument = indexedAnnotations.groupBy(_._2.annotates.filepartId)
     groupedByDocument.values.reduce((a, b) => a ++ b).sortWith {
       (c, d) =>
-        c._1._1 < d._1._1 || c._1._1 == d._1._1 && c._1._2 < d._1._2
+        c._1 < d._1
     }.map(v => v._2)
   }
 
@@ -169,7 +174,6 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
       override def getNamespaceURI(prefix: String): String = {
         prefix match {
           case "tei" => "http://www.tei-c.org/ns/1.0"
-          case XMLConstants.DEFAULT_NS_PREFIX => "http://www.tei-c.org/ns/1.0"
           case "xml" => XMLConstants.XML_NS_URI
           case _ => null
         }
