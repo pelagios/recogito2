@@ -1,5 +1,4 @@
 define([
-  'common/ui/alert',
   'common/ui/formatting',
   'common/utils/annotationUtils',
   'common/utils/placeUtils',
@@ -14,7 +13,6 @@ define([
   'document/annotation/text/page/toolbar',
   'document/annotation/text/relations/relationsLayer'
 ], function(
-  Alert,
   Formatting,
   AnnotationUtils,
   PlaceUtils,
@@ -122,11 +120,31 @@ define([
             relationsLayer.setDrawingEnabled(false);
             editor.setAnnotationMode(m);
           }
+        },
+
+        onTimefilterChanged = function(newerThan) {
+          var content = jQuery('#content');
+
+          // Clear filter
+          annotations.forEach(function(annotation) {
+            self.highlighter.removeClass(annotation, 'in-filter');
+          });
+
+          annotations.filter(function(annotation) {
+            var lastModified = new Date(annotation.last_modified_at);
+            return lastModified >= newerThan;
+          }).forEach(function(annotation) {
+            self.highlighter.addClass(annotation, 'in-filter');
+          });
+          
+          // TODO clearing filter completely?
+          content.addClass('filtered');
         };
 
     // Toolbar events
     toolbar.on('annotationModeChanged', onAnnotationModeChanged);
     toolbar.on('colorschemeChanged', onColorschemeChanged);
+    toolbar.on('timefilterChanged', onTimefilterChanged);
 
     BaseApp.apply(this, [ annotationView, highlighter, selector ]);
 
@@ -148,7 +166,10 @@ define([
 
     PlaceUtils.initGazetteers().done(function() {
       API.listAnnotationsInPart(Config.documentId, Config.partSequenceNo)
-         .done(self.onAnnotationsLoaded.bind(self))
+         .done(function(annotations) {
+           toolbar.initTimefilter(annotations);
+           self.onAnnotationsLoaded(annotations);
+         })
          .then(relationsLayer.init)
          .then(loadIndicator.destroy)
          .fail(self.onAnnotationsLoadError.bind(self)).then(loadIndicator.destroy);

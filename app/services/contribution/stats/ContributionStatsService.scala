@@ -137,7 +137,7 @@ trait ContributionStatsService { self: ContributionService =>
         termsAggregation("by_user") field "made_by",
         termsAggregation("by_action") field "action",
         termsAggregation("by_item_type") field "affects_item.item_type",
-        filterAggregation("contribution_history") query rangeQuery("made_at").gt("now-1y") subaggs (
+        filterAggregation("contribution_history") query rangeQuery("made_at").gt("now-10y") subaggs (
           dateHistogramAggregation("last_30_days") field "made_at" minDocCount 0 interval DateHistogramInterval.DAY subaggs (
             termsAggregation("by_user_over_time") field "made_by"
           )

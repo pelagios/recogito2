@@ -304,6 +304,20 @@ define([
           });
         },
 
+        addClass = function(annotation, className) {
+          var spans = jQuery('[data-id="' + annotation.annotation_id + '"]');
+          jQuery.each(spans, function(idx, span) {
+            spans.addClass(className);
+          });
+        },
+
+        removeClass = function(annotation, className) {
+          var spans = jQuery('[data-id="' + annotation.annotation_id + '"]');
+          jQuery.each(spans, function(idx, span) {
+            spans.removeClass(className);
+          });
+        },
+
         refreshAnnotation = function(annotation) {
           var spans = jQuery('[data-id=' + annotation.annotation_id + ']');
           if (spans.length === 0) {
@@ -404,6 +418,8 @@ define([
     this.refreshAnnotation = refreshAnnotation;
     this.removeAnnotation = removeAnnotation;
     this.removeAnnotations = removeAnnotations;
+    this.addClass = addClass;
+    this.removeClass = removeClass;
     this.setColorscheme = setColorscheme;
     this.updateStyles = updateStyles;
     this.wrapRange = wrapRange;

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
+    <link href="https://fonts.googleapis.com/css?family=Assistant&display=swap" rel="stylesheet"> 
+  </head>
+  <body>
+    <style type="text/css">
+      html, body {
+        padding:10px 0;
+        margin:0;
+        width:100%;
+        background-color:#ecf0f1;
+        font-family: 'Assistant', sans-serif;
+      }
+
+      a {
+        color:#767676;
+      }
+
+      .ExternalClass {width: 100%;}
+    </style>
+    <table style="width:90%; margin:0 auto">
+      <tr>
+        <td>Recogito user <a href="{{base}}/{{sender}}">{{sender}}</a> sent you a message:</td>
+      </tr>
+      <tr><td style="height:10px"/></tr>
+      <tr>
+        <td style="background-color:#fff; padding:10px 15px;">
+          <pre>{{message}}</pre>
+        </td>
+      </tr>
+      <tr><td style="height:10px"/></tr>
+      <tr>
+        <td id="imprint" style="color:#9ca4b1; font-size:13px; text-align:center;">
+          Recogito. A project of the <a href="https://pelagios.org">Pelagios network</a>.
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

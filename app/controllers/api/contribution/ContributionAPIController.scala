@@ -1,12 +1,12 @@
 package controllers.api.contribution
 
 import com.mohiva.play.silhouette.api.Silhouette
-import controllers.{BaseAuthController, Security, HasPrettyPrintJSON}
+import controllers.{BaseOptAuthController, Security, HasPrettyPrintJSON}
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import services.contribution.ContributionService
 import services.document.DocumentService
 import services.user.UserService
@@ -20,12 +20,18 @@ class ContributionAPIController @Inject() (
   val users: UserService,
   val silhouette: Silhouette[Security.Env],
   implicit val ctx: ExecutionContext
-) extends BaseAuthController(components, config, documents, users) with HasPrettyPrintJSON {
+) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
-  def getDocumentStats(id: String) = silhouette.SecuredAction.async { implicit request => 
-    contributions.getDocumentStats(id).map { stats => 
-      jsonOk(Json.toJson(stats))
-    }
+  def getDocumentStats(id: String) = silhouette.UserAwareAction.async { implicit request => 
+    documentResponse(id, request.identity, { case (doc, accesslevel) => 
+      if (accesslevel.canReadData) {
+        contributions.getDocumentStats(id).map { stats => 
+          jsonOk(Json.toJson(stats))
+        }
+      } else {
+        Future.successful(Forbidden)
+      }
+    })
   }
   
 }

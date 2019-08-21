@@ -1,0 +1,77 @@
+@()(implicit request: RequestHeader)
+@_layout(
+  "Cloning Documents",
+  "Cloning Documents",
+  "Learn how to clone documents that other users have made public into your own workspace.",
+  "en"
+) {
+  <h1>Cloning Documents</h1>
+} {
+  <div class="article has-sidebar">
+    <div class="inner">
+      <p>
+        The <strong>Clone</strong> feature allows you to create a copy of another user's document
+        in your own workspace. The copy includes all the annotations from the original, but 
+        is otherwise independent from the source. Think of cloning as a way to build on the work 
+        that other users have created and shared, without the risk of breaking or interfering with
+        anything.   
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/clone.png")">
+
+      <h2>How to Clone</h2>
+      <p>
+        When you visit another user's workspace, you will see a list of documents. There are two
+        possible reasons for why the documents are visible to you:
+      </p>
+      
+      <ol> 
+        <li>the owner has <strong>explicitly shared</strong> them with you</li>
+        <li>the owner has declared them to be under an <strong>open license</strong> and
+          enabled <strong>public access</strong></li>
+      </ol>
+
+      <p>
+        Only the second category - public documents with an open license - are available for
+        cloning.
+      </p>
+
+      <p class="tip">
+        Important: documents are only available for cloning if they are declared to be 
+        under on open license, and were configured for full public access in the sharing 
+        settings.
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/cloning-modal.png")">
+
+      <p>
+        Select a document from the list. Click the button labeled <strong>Clone to my workspace</strong> 
+        that appears at the top right of the screen. Cloning may take a while. Once the process has 
+        finished, you will find the document in your workspace.
+      </p>
+
+      <h2>Navigating Connections</h2>
+      <p>
+        When a document is cloned, the information about where it was cloned from (and when) 
+        is kept. You can navigate this connection from the 
+        <span class="outline-icon">&#xe86f;</span> annotation view.
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/link-to-clone-source.png")">
+
+      <p>
+        The page header will automatically show a link to the original if the document
+        was cloned from another source. Likewise, when looking at the original document, 
+        the header will display a small label indicating how many times the document 
+        was cloned.
+      </p>
+
+      <img src="@routes.Assets.versioned("images/help/link-to-clones.png")">
+
+      <p>
+        Clicking the label reveals a drop-down list of links to the clones.
+      </p>
+
+    </div>
+  </div>
+}

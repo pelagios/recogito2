@@ -1,8 +1,9 @@
 define([
   'common/ui/behavior',
   'common/config',
-  'common/hasEvents'
-], function(Behavior, Config, HasEvents) {
+  'common/hasEvents',
+  'document/annotation/common/page/timefilter'
+], function(Behavior, Config, HasEvents, Timefilter) {
 
   var Toolbar = function(rootNode) {
     var self = this,
@@ -14,8 +15,6 @@ define([
         colorSchemes = jQuery('.color-scheme'),
 
         currentMode = { mode: 'NORMAL' },
-
-        currentColorScheme = 'BY_TYPE',
 
         maxScroll = jQuery('.header-infobox').outerHeight() -
           jQuery('.header-iconbar').outerHeight() + 1,
@@ -86,6 +85,21 @@ define([
           });
         },
 
+        initTimefilter = function(annotations) {
+          if (Config.hasFeature('annotation-timefilter')) {
+            const dates = annotations.map(function(a) { return new Date(a.last_modified_at); });
+            const oldest = Math.min.apply(null, dates);
+            const newest= Math.max.apply(null, dates);
+
+            var container = jQuery('.time-filter'),
+                button = container.find('span.icon'),
+                popup = new Timefilter(container, oldest, newest);
+
+            popup.on('change', self.forwardEvent('timefilterChanged'));
+            button.click(popup.toggle);
+          }
+        },
+
         getCurrentAnnotationMode = function() {
           return currentMode;
         },
@@ -103,6 +117,7 @@ define([
     Behavior.makeElementSticky(rootNode, maxScroll);
     attachClickHandlers();
 
+    this.initTimefilter = initTimefilter;
     this.setCurrentColorscheme = setCurrentColorscheme;
     this.getCurrentAnnotationMode = getCurrentAnnotationMode;
 

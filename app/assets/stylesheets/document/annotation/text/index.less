@@ -52,7 +52,6 @@ body {
 .header-toolbar.fixed {
   position:fixed;
   top:70px;
-  width:100%;
 }
 
 .header-toolbar.sticky {
@@ -150,6 +149,11 @@ body {
   margin-bottom:1px;
   border-bottom-width:2px;
   border-bottom-style:solid;
+}
+
+#content.filtered .annotation:not(.in-filter) {
+  border-color: rgba(76, 76, 76, 0.35);
+  background-color: rgba(82, 82, 82, 0);
 }
 
 .sidebar {

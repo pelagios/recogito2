@@ -9,9 +9,11 @@
   "tags": [{
     "name": "Workspaces"
   }, {
+    "name": "Annotations"
+  }, {
     "name": "Authorities"
   }, {
-    "name": "Annotations"
+    "name": "Activity"
   }],
   "paths" : {
     "/api/search" : {
@@ -46,7 +48,12 @@
           "description" : "Owner (e.g. 'pelagios3')",
           "required" : false,
           "type" : "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/account/{username}" : {
@@ -60,7 +67,12 @@
           "description": "Username (e.g. 'pelagios3')",
           "required": true,
           "type": "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/directory/{username}" : {
@@ -75,7 +87,12 @@
           "description": "Username",
           "required": true,
           "type": "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/directory/{username}/{folderId}" : {
@@ -96,14 +113,24 @@
           "description": "Folder/Collection UUID",
           "required": true,
           "type": "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/authorities/gazetteers" : {
       "get" : {
         "tags": [ "Authorities" ],
         "summary": "List available resolution authorities",
-        "operationId": "authorities"
+        "operationId": "authorities",
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/place/search" : {
@@ -119,7 +146,7 @@
           "required": true,
           "type": "string"
         }, {
-          "name":  "offset",
+          "name": "offset",
           "in": "query",
           "description": "Pagination offset",
           "required": false,
@@ -138,7 +165,31 @@
           "description": "Gazetteer IDs to filter by (comma, separated)",
           "required": false,
           "type": "string"
-        }  ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
+      }
+    },
+    "/api/place/{uri}" : {
+      "get": {
+        "tags": [ "Authorities" ],
+        "summary": "Get place information and coordinates for a specific gazetteeer URI.",
+        "operationId": "gazetteerLookup",
+        "parameters": [{
+          "name": "uri",
+          "in": "path",
+          "description": "Gazetteer URI",
+          "required": true,
+          "type": "string"
+        }],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/document/{doc}/annotations" : {
@@ -153,7 +204,12 @@
           "description": "Document ID",
           "required": true,
           "type": "string"
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/document/{doc}/part/{part}/annotations" : {
@@ -175,7 +231,12 @@
           "required": true,
           "type": "integer",
           "default": 1
-        } ]
+        } ],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/annotation/{id}" : {
@@ -183,13 +244,18 @@
         "tags": [ "Annotations" ],
         "summary": "Get specific annotation",
         "operationId": "annotation",
-        "parameters": [ {
+        "parameters": [{
           "name":  "id",
           "in": "path",
           "description": "Annotation ID",
           "required": true,
           "type": "string"
-        } ]
+        }],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
       }
     },
     "/api/annotation/{id}.jpg" : {
@@ -197,16 +263,56 @@
         "tags": [ "Annotations" ],
         "summary": "Get annotated image cutout",
         "operationId": "annotation",
-        "parameters": [ {
+        "parameters": [{
           "name":  "id",
           "in": "path",
           "description": "Annotation ID",
           "required": true,
           "type": "string"
-        } ],
+        }],
         "responses": [{
           "200": {
             "content": "image/jpeg"
+          }
+        }]
+      }
+    },
+    "/document/{id}/activity.json" : {
+      "get" : {
+        "tags": [ "Activity" ],
+        "summary": "Follow the daily activity on a document",
+        "description": "This operation is covered by the same access restrictions as everything else. The feed is only available if the requesting user has read access to the document.",
+        "operationId": "documentActivity",
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "description": "Document ID",
+          "required": true,
+          "type": "string"
+        }],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
+          }
+        }]
+      }
+    },
+    "/{username}/activity.json" : {
+      "get" : {
+        "tags": [ "Activity" ],
+        "summary": "Follow this users' daily activity",
+        "description": "This operation is covered by the same access restrictions as everything else. Activity on documents not visible to the requesting user will be hidden from the feed.",
+        "operationId": "userActivity",
+        "parameters": [{
+          "name": "username",
+          "in": "path",
+          "description": "Username",
+          "required": true,
+          "type": "string"
+        }],
+        "responses": [{
+          "200": {
+            "description": "Successful response"
           }
         }]
       }

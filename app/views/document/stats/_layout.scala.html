@@ -53,7 +53,7 @@
       @content
 
       @for(plugin <- p) {
-        <div class="panel">
+        <div class="panel w12">
           <h2>@plugin.getString("title")</h2>
           <div class="inner" id="@plugin.getString("id")"></div>
           <script src="@controllers.api.plugin.routes.PluginAPIController.loadPlugin(plugin.getString("extends"), plugin.getString("id"))"></script>

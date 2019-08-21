@@ -6,10 +6,23 @@
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Entity Statistics", doc, currentUser, accessLevel, Some("entities"), p) {
-  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/stats/entities.js")))
+  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/widgets/1.entity_stats.js")"></script>
+  <script type="text/javascript" src="@routes.Assets.versioned("javascripts/widgets/entity_stats.js")"></script>
+  
+  <div id="app"></div>
+  
+  <script type="text/javascript">
+    (function() {
+      EntityStats.init({
+        id: 'app',
+        document: '@doc.id'
+      }); 
+    })();
+  </script>
 
-  @helper.javascriptRouter("jsRoutes")(
+  @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/stats/entities.js")))
+  @helper.javascriptRouter("jsRoutes")(	
     controllers.api.annotation.routes.javascript.AnnotationAPIController.listAnnotationsInDocument,
-    controllers.api.entity.routes.javascript.PlaceAPIController.listPlacesInDocument
+    controllers.api.entity.routes.javascript.PlaceAPIController.listPlacesInDocument	
   )
 }

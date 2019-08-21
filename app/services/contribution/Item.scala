@@ -4,7 +4,6 @@ import java.util.UUID
 import services.{ ContentType, HasContentTypeList }
 import services.annotation.AnnotationBody
 import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import services.HasContentTypeList
 

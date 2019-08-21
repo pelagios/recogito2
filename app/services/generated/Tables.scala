@@ -15,6 +15,7 @@ import services.generated.tables.Folder
 import services.generated.tables.FolderAssociation
 import services.generated.tables.ServiceAnnouncement
 import services.generated.tables.SharingPolicy
+import services.generated.tables.Similarity
 import services.generated.tables.Task
 import services.generated.tables.Upload
 import services.generated.tables.UploadFilepart
@@ -78,6 +79,11 @@ object Tables {
 	 * The table public.sharing_policy
 	 */
 	val SHARING_POLICY = services.generated.tables.SharingPolicy.SHARING_POLICY
+
+	/**
+	 * The table public.similarity
+	 */
+	val SIMILARITY = services.generated.tables.Similarity.SIMILARITY
 
 	/**
 	 * The table public.task

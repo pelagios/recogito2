@@ -16,7 +16,7 @@ trait HasTextSnippets {
     
     // Likewise, safe to expect the annotation has one QUOTE body, with a defined value
     val quoteLength = annotation.bodies.filter(_.hasType == AnnotationBody.QUOTE).head.value.get.size
-    
+
     snip(text, offset, quoteLength, bufferSize)
   }
   
@@ -52,7 +52,7 @@ trait HasTextSnippets {
         else
           (from + len + bufferSize, "...")
       }
-    
+
     val snippet = text.substring(start, end).replace("\n", " ") // Remove newlines in snippets    
     val leadingRemovableChars = snippet.takeWhile(c => CHARS_TO_REMOVE.contains(c)).size
     val trailingRemovableChars = snippet.reverse.takeWhile(c => CHARS_TO_REMOVE.contains(c)).size

@@ -3,6 +3,8 @@
   currentPart: services.generated.tables.records.DocumentFilepartRecord,
   currentUser: Option[services.user.User],
   accessLevel: services.RuntimeAccessLevel,
+  clonedFrom: Option[services.generated.tables.records.DocumentRecord],
+  clones: Seq[services.generated.tables.records.DocumentRecord],
   prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord],
   preview: String,
   annotationCount: Long,
@@ -38,6 +40,7 @@
         isPublic: @doc.isOpenToPublic,
         writeAccess: @accessLevel.canWrite,
         isAdmin: @accessLevel.isAdmin,
+        clones: [@Html(clones.map{ doc => s"{ owner:'${doc.getOwner}', id:'${doc.getId}'}" }.mkString(","))],
         @views.html.document.annotation._prefs(prefs)
       }
     </script>
@@ -47,6 +50,7 @@
     <div class="header-infobox">
       <h1>
         @doc.author.map(_ + ": ")@doc.title
+        @views.html.document.annotation._clonedFrom(doc, clonedFrom)
       </h1>
       <h2 class="date">@doc.dateFreeform</h2>
       <p class="source">@views.html.document.sourceLink(doc.source)</p>
@@ -59,6 +63,12 @@
         @if(doc.license.isDefined) {
           &nbsp; &centerdot; &nbsp;
           @views.html.document.licenseInfo(doc.license.get, doc.attribution)
+        }
+        @if(clones.size > 0) {
+          &nbsp; &centerdot; &nbsp; <span class="clones">
+            <span class="icon">&#xf126;</span>
+            Cloned @clones.size @if(clones.size == 1) { time } else { times }
+          </span>
         }
       </p>
     </div> <!-- .header-infobox -->

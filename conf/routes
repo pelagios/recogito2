@@ -28,6 +28,7 @@ GET     /help/about                                  controllers.help.HelpContro
 GET     /help/faq                                    controllers.help.HelpController.faq
 GET     /help/privacy                                controllers.help.HelpController.privacy
 GET     /help/relations                              controllers.help.HelpController.relations
+GET     /help/cloning                                controllers.help.HelpController.cloning
 GET     /help/sharing-links                          controllers.help.HelpController.sharingLinks
 GET     /help/terms                                  controllers.help.HelpController.terms
 GET     /help/tutorial                               controllers.help.HelpController.tutorial
@@ -87,6 +88,7 @@ GET     /document/:id/downloads/annotations/rdf      controllers.document.downlo
 GET     /document/:id/downloads/annotations/jsonld   controllers.document.downloads.DownloadsController.downloadJSONLD(id: String, flavour: Option[String])
 GET     /document/:id/downloads/places/geojson       controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
 POST    /document/:id/downloads/places/geojson       controllers.document.downloads.DownloadsController.downloadGeoJSON(id: String, as_gazetteer: Boolean ?= false)
+GET     /document/:id/downloads/places/kml           controllers.document.downloads.DownloadsController.downloadKML(id: String, geobrowser: Boolean ?= false)
 GET     /document/:id/downloads/relations/csv        controllers.document.downloads.DownloadsController.downloadRelationTriples(id: String)
 GET     /document/:id/downloads/relations/node-csv   controllers.document.downloads.DownloadsController.downloadGephiNodes(id: String)
 GET     /document/:id/downloads/relations/edge-csv   controllers.document.downloads.DownloadsController.downloadGephiEdges(id: String)
@@ -125,6 +127,7 @@ GET     /document/:id/part/:partNo/raw               controllers.document.Docume
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GET     /document/:id                                controllers.document.DocumentController.initialDocumentView(id: String)
+GET     /document/:id/activity.json                  controllers.document.DocumentController.activityFeed(id: String)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Annotation view resolver service
@@ -210,6 +213,12 @@ POST    /api/search                                  controllers.my.directory.se
 GET     /api/announcements/my/latest                 controllers.api.message.AnnouncementAPIController.myLatest
 PUT     /api/announcements/:id                       controllers.api.message.AnnouncementAPIController.confirm(id: java.util.UUID)
 
+POST    /api/send-message                            controllers.api.message.AnnouncementAPIController.sendMessage
+
+# ~~~ Similarity search ~~~
+
+GET     /api/similar/:id                             controllers.api.similarity.SimilarityAPIController.getSimilar(id: String)
+
 # ~~~ Annotations ~~~
 
 POST    /api/annotation                              controllers.api.annotation.AnnotationAPIController.createAnnotation
@@ -287,3 +296,4 @@ GET     /                                            controllers.landing.Landing
 
 GET     /my                                          controllers.my.WorkspaceController.my
 GET     /:username                                   controllers.my.WorkspaceController.workspace(username: String)
+GET     /:username/activity.json                     controllers.my.WorkspaceController.activityFeed(username: String)

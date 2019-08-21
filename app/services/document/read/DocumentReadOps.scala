@@ -107,6 +107,33 @@ trait DocumentReadOps { self: DocumentService =>
     sql.selectFrom(DOCUMENT).where(DOCUMENT.ID.in(docIds)).fetchArray().toSeq
   }
 
+  /** Batch.retrieves document records along with runtime access level **/
+  def getDocumentRecordsByIdWithAccessLevel(docIds: Seq[String], loggedInUser: Option[String] = None) = db.query { sql =>
+    loggedInUser match {
+      case Some(user) => 
+        sql.selectFrom(DOCUMENT
+             .leftOuterJoin(SHARING_POLICY)
+             .on(SHARING_POLICY.DOCUMENT_ID.equal(DOCUMENT.ID))
+             .and(SHARING_POLICY.SHARED_WITH.equal(user))
+            )
+            .where(DOCUMENT.ID.in(docIds))
+            .fetchArray.toSeq
+            .map { record => 
+              val document = record.into(classOf[DocumentRecord])
+              val policy = record.into(classOf[SharingPolicyRecord])
+              (document, determineAccessLevel(document, Seq(policy), loggedInUser))
+            }
+
+      case None => 
+        sql.selectFrom(DOCUMENT)
+           .where(DOCUMENT.ID.in(docIds))
+           .fetchArray.toSeq
+           .map { document =>
+             (document, determineAccessLevel(document, Seq.empty[SharingPolicyRecord], loggedInUser))
+           }
+    }
+  }
+
   /** Batch-retrieves the documents with the given IDs, adding extra part count
     * and content type Info
     */
@@ -222,6 +249,13 @@ trait DocumentReadOps { self: DocumentService =>
       sql.selectCount().from(DOCUMENT)
          .where(DOCUMENT.OWNER.equal(owner))
          .fetchOne(0, classOf[Int])
+  }
+
+  /** Query to retrieve all document records that are clones of the given document ID **/
+  def listClones(docId: String): Future[Seq[DocumentRecord]] = db.query { sql => 
+    sql.selectFrom(DOCUMENT)
+       .where(DOCUMENT.CLONED_FROM.equal(docId))
+       .fetchArray.toSeq
   }
 
   /** Reads the document preferences for the given document **/

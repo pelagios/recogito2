@@ -172,3 +172,12 @@ CREATE TABLE service_announcement (
 );
 CREATE INDEX idx_service_announcement_for_user ON service_announcement(for_user);
 CREATE INDEX idx_service_announcement_created_at ON service_announcement(created_at);
+
+-- Experimental feature: document similarity metrics 
+CREATE TABLE similarity (
+  doc_id_a TEXT NOT NULL,
+  doc_id_b TEXT NOT NULL,
+  title_jaro_winkler DOUBLE PRECISION DEFAULT 0,
+  entity_jaccard DOUBLE PRECISION DEFAULT 0,
+  PRIMARY KEY (doc_id_a, doc_id_b)
+);

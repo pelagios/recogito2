@@ -1,16 +1,18 @@
 package controllers.document
 
 import com.mohiva.play.silhouette.api.Silhouette
-import controllers.{BaseOptAuthController, Security}
+import controllers.{BaseOptAuthController, Security, HasPrettyPrintJSON}
 import java.io.File
 import javax.inject.{Inject, Singleton}
+import play.api.Configuration
+import play.api.http.FileMimeTypes
+import play.api.libs.json.Json
+import play.api.mvc.ControllerComponents
 import services.ContentType
+import services.contribution.ContributionService
 import services.document.DocumentService
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.user.UserService
-import play.api.Configuration
-import play.api.http.FileMimeTypes
-import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import storage.uploads.Uploads
@@ -19,13 +21,14 @@ import storage.uploads.Uploads
 class DocumentController @Inject() (
   val components: ControllerComponents,
   val config: Configuration,
-  val documents: DocumentService,
+  val contributions: ContributionService,
   val silhouette: Silhouette[Security.Env],
   val users: UserService,
   val uploads: Uploads,
+  implicit val documents: DocumentService,
   implicit val mimeTypes: FileMimeTypes,
   implicit val ctx: ExecutionContext
-) extends BaseOptAuthController(components, config, documents, users) {
+) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
 
   def initialDocumentView(docId: String) = Action {
     Redirect(controllers.document.annotation.routes.AnnotationController.showAnnotationView(docId, 1))
@@ -133,6 +136,15 @@ class DocumentController @Inject() (
           Forbidden
         }
       }
+    })
+  }
+
+  def activityFeed(docId: String) = silhouette.UserAwareAction.async { implicit request => 
+    documentReadResponse(docId, request.identity, { case (document, _) =>
+      contributions.getDocumentActivityFeed(docId).map { response =>
+        // This block is reached only if the current user has at least READ_DATA access
+        jsonOk(Json.toJson(response))
+      } 
     })
   }
 

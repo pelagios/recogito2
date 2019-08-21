@@ -56,6 +56,7 @@ class HelpController @Inject() (
   def about        = Action { implicit request => result(views.html.help.general.about(imprint, adminEmail)) }
   def privacy      = Action { implicit request => result(views.html.help.general.privacy(adminEmail)) }
   def relations    = Action { implicit request => result(views.html.help.relations()) }
+  def cloning      = Action { implicit request => result(views.html.help.cloning()) }
   def sharingLinks = Action { implicit request => result(views.html.help.sharing_links()) }
   def terms        = Action { implicit request => result(views.html.help.general.terms()) }
   def tutorial     = Action { implicit request => result(views.html.help.tutorial.tutorial()) }

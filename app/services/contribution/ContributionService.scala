@@ -13,11 +13,12 @@ import scala.language.reflectiveCalls
 import scala.util.Try
 import storage.es.ES
 import services.HasTryToEither
-import services.contribution.stats.ContributionStatsService
 
 @Singleton
 class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionContext) 
-  extends HasDate with ContributionStatsService {
+  extends HasDate 
+  with feed.ActivityFeedService
+  with stats.ContributionStatsService {
 
   implicit object ContributionIndexable extends Indexable[Contribution] {
     override def json(c: Contribution): String = Json.stringify(Json.toJson(c))

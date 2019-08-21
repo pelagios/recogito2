@@ -4,10 +4,11 @@ import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{ HasConfig, HasUserService, HasVisitLogging, HasPrettyPrintJSON, Security }
 import java.io.FileInputStream
 import javax.inject.{ Inject, Singleton }
+import java.net.URI
 import org.webjars.play.WebJarsUtil
 import play.api.Configuration
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, JsObject}
 import play.api.mvc.{Action, AbstractController, ControllerComponents}
 import scala.concurrent.ExecutionContext
 import services.annotation.AnnotationService
@@ -81,7 +82,10 @@ class LandingController @Inject() (
   }
 
   def swaggerConfig() = Action { implicit request => 
-    jsonOk(Json.parse(new FileInputStream("conf/swagger.json")))
+    val json = Json.parse(new FileInputStream("conf/swagger.json"))
+    val baseURL = new URI(routes.LandingController.index.absoluteURL)
+    val host = if (baseURL.getPort == -1) baseURL.getHost else s"${baseURL.getHost}:${baseURL.getPort}"
+    jsonOk(json.as[JsObject] ++ Json.obj("host" -> host))
   }
 
 }

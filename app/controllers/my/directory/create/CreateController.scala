@@ -11,7 +11,7 @@ import play.api.libs.Files.TemporaryFileCreator
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, ControllerComponents}
 import scala.concurrent.{ExecutionContext, Future}
-import services.{SharingLevel, ContentType}
+import services.{SharingLevel, ContentType, PublicAccess}
 import services.SharingLevel.Utils._
 import services.annotation.AnnotationService
 import services.document.DocumentService
@@ -179,18 +179,21 @@ class CreateController @Inject() (
     * 
     * The operation is either 
     * -) "duplicate" - the owner of the document creates a copy in her/his own workspace
-    * -) "fork" - a visiting user creates a clone of someone else's document into her/his workspace
+    * -) "fork" - a visiting user creates a clone of someone else's public document into her/his workspace
     */
   def cloneDocument(id: String) = silhouette.SecuredAction.async { implicit request => 
     documents.getExtendedMeta(id: String, Some(request.identity.username)).flatMap { _ match { 
       case Some((doc, accesslevel)) =>
+        val isOwner = doc.ownerName == request.identity.username
+        val isPublic = doc.publicVisibility == PublicAccess.PUBLIC
+
         val newOwner = 
-          if (doc.owner.getUsername == request.identity.username)
+          if (isOwner)
             None // current user is document owner - just a duplicate, no fork
           else 
             Some(request.identity) // Fork to current user workspace
 
-        if (accesslevel.canReadAll) { // At least read access required for forking         
+        if (isOwner || isPublic) { // We require the doc to be public for forking         
           val f = for {
             result <- documents.cloneDocument(doc, doc.fileparts, newOwner)
             success <- result match { 

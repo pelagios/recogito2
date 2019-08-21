@@ -23,6 +23,7 @@ import services.generated.tables.Folder
 import services.generated.tables.FolderAssociation
 import services.generated.tables.ServiceAnnouncement
 import services.generated.tables.SharingPolicy
+import services.generated.tables.Similarity
 import services.generated.tables.Task
 import services.generated.tables.Upload
 import services.generated.tables.UploadFilepart
@@ -81,6 +82,7 @@ class Public extends SchemaImpl("public") {
 			FolderAssociation.FOLDER_ASSOCIATION,
 			ServiceAnnouncement.SERVICE_ANNOUNCEMENT,
 			SharingPolicy.SHARING_POLICY,
+			Similarity.SIMILARITY,
 			Task.TASK,
 			Upload.UPLOAD,
 			UploadFilepart.UPLOAD_FILEPART,

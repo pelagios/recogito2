@@ -19,11 +19,18 @@ trait HasTEISnippets extends HasTextSnippets {
     def separate(a: String): (String, Int) = {
       val path = a.substring(0, a.indexOf("::"))
         .replaceAll("tei/", "TEI/")
-        .replaceAll("teiheader/", "teiHeader/") 
-        .replaceAll("filedesc/", "fileDesc/")
-        .replaceAll("titlestmt/", "titleStmt/")
-        .replaceAll("publicationstmt/", "publicationStmt/")
-        .replaceAll("sourcedesc/", "sourceDesc/") // patching uppercase/lowercase inconsistencies (sigh)
+        .replaceAll("teiheader", "teiHeader") 
+        .replaceAll("filedesc", "fileDesc")
+        .replaceAll("geogname", "geogName")
+        .replaceAll("listplace", "listPlace")
+        .replaceAll("listperson", "listPerson")
+        .replaceAll("titlestmt", "titleStmt")
+        .replaceAll("respstmt", "respStmt")
+        .replaceAll("particdesc", "particDesc")
+        .replaceAll("profiledesc", "profileDesc")
+        .replaceAll("publicationstmt", "publicationStmt")
+        .replaceAll("settingdesc", "settingDesc")
+        .replaceAll("sourcedesc", "sourceDesc") // patching uppercase/lowercase inconsistencies (sigh)
       val offset = a.substring(a.indexOf("::") + 2).toInt
       (path, offset)
     }
@@ -80,8 +87,8 @@ trait HasTEISnippets extends HasTextSnippets {
     parseXML(new InputSource(new FileReader(file)))
   
   protected def toRange(anchor: String, doc: Document): Range = {
-    
-    def findPosition(parent: Element, offset: Int): (Node, Int) = {      
+
+    def findPosition(parent: Element, offset: Int): (Node, Int) = {     
       val firstChild = parent.getFirstChild
       val len = Option(firstChild.getNodeValue).map(_.size).getOrElse(0)
       
