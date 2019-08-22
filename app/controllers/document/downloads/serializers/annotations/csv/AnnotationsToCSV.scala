@@ -42,9 +42,6 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
       places.find(_.uris.contains(uri))
     }
 
-  private val docs = new HashMap[UUID,Document]
-  private var xpath :XPath = null
-
   private def parseAnchor(anchor:String) = {
 
     def separate(a: String): (String, Int) = {
@@ -68,7 +65,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
     separate(anchor.substring(5, anchor.indexOf(";")))
   }
 
-  private def getPosition(ann: Annotation) = {
+  private def getXmlPosition(ann: Annotation, xpath: XPath, docs: Map[UUID, Document]) = {
     val anchor = parseAnchor(ann.anchor)
     xpath.reset()
     val textnodes = xpath.evaluate(anchor._1 + "/preceding::text()", docs(ann.annotates.filepartId), XPathConstants.NODESET).asInstanceOf[NodeList]
@@ -87,33 +84,13 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
     parseXML(new InputSource(new StringReader(xml)))
   }
 
-  private def mapIndices(annotations: Seq[Annotation]) = {
-    annotations.map((a) => (getPosition(a), a))
-  }
-
-  private def sortByDocumentPosition(annotations: Seq[Annotation]) = {
-    var indexedAnnotations = mapIndices(annotations)
+  private def sortByDocumentPosition(annotations: Seq[Annotation], xpath: XPath, docs: Map[UUID, Document]) = {
+    var indexedAnnotations = annotations.map((a) => (getXmlPosition(a, xpath, docs), a))
     val groupedByDocument = indexedAnnotations.groupBy(_._2.annotates.filepartId)
     groupedByDocument.values.reduce((a, b) => a ++ b).sortWith {
       (c, d) =>
         c._1 < d._1
     }.map(v => v._2)
-  }
-
-  // Overrides sort in BaseSerializer and adds TEXT_TEIXML
-  override protected def sort (annotations: Seq[Annotation]) = {
-    val groupedByContentType = annotations.groupBy(_.annotates.contentType)
-
-    groupedByContentType.flatMap { case (cType, a) => cType match {
-      case ContentType.TEXT_PLAIN => sortByCharOffset(a)
-      case ContentType.IMAGE_UPLOAD | ContentType.IMAGE_IIIF => sortByXY(a)
-      case ContentType.DATA_CSV => sortByRow(a)
-      case ContentType.TEXT_TEIXML => sortByDocumentPosition(a)
-      case _ => {
-        Logger.warn(s"Can't sort annotations of unsupported content type $cType")
-        a
-      }
-    }}
   }
 
   def annotationsToCSV(doc: ExtendedDocumentMetadata)(
@@ -163,33 +140,66 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
 
     val fPlaces = entityService.listEntitiesInDocument(doc.id, Some(EntityType.PLACE))
 
-    // Set up a Map of partId -> XML Doc
-    doc.fileparts.foreach((part) => uploads.readTextfile(doc.owner.getUsername, doc.id, part.getFile).map(f = maybeText => {
-      docs.put(part.getId, parseXMLString(maybeText.get))
-    }))
+    // For every part that's a TEI file, load the content from the file system
+    val fXmlStrings: Future[Seq[(UUID, String)]] = Future.sequence {  
+      doc.fileparts.map { _ match {
 
-    // Set up XPath resolver
-    xpath = XPathFactory.newInstance().newXPath()
-    xpath.setNamespaceContext(new NamespaceContext {
-      override def getNamespaceURI(prefix: String): String = {
-        prefix match {
-          case "tei" => "http://www.tei-c.org/ns/1.0"
-          case "xml" => XMLConstants.XML_NS_URI
-          case _ => null
-        }
-      }
-      // not needed
-      override def getPrefix(namespaceURI: String): String = ???
-      // not needed
-      override def getPrefixes(namespaceURI: String): util.Iterator[_] = ???
-    })
+        case part if part.getContentType == ContentType.TEXT_TEIXML.toString => 
+          uploads.readTextfile(doc.owner.getUsername, doc.id, part.getFile)
+            .map { _.map(text => (part.getId, text)) }
+
+        case _ => 
+          Future.successful(None)
+      }}
+    } map { _.flatten }
 
     val f = for {
       annotationByPart <- fAnnotationsByPart
       places <- fPlaces
-    } yield (annotationByPart, places.items.map(_._1.entity))
+      xmlStrings <- fXmlStrings
+    } yield (annotationByPart, places.items.map(_._1.entity), xmlStrings)
 
-    f.map { case (annotationsByPart, places) =>
+    f.map { case (annotationsByPart, places, xmlStrings) =>
+      val (xpath, docs) = 
+        if (xmlStrings.size > 0) {
+          // Set up XPath resolver
+          val xpath = XPathFactory.newInstance().newXPath()
+          xpath.setNamespaceContext(new NamespaceContext {
+            override def getNamespaceURI(prefix: String): String = {
+              prefix match {
+                case "tei" => "http://www.tei-c.org/ns/1.0"
+                case "xml" => XMLConstants.XML_NS_URI
+                case _ => null
+              }
+            }
+            // not needed
+            override def getPrefix(namespaceURI: String): String = ???
+            // not needed
+            override def getPrefixes(namespaceURI: String): util.Iterator[_] = ???
+          })
+
+          // Set up a Map of partId -> XML doc
+          val docs = xmlStrings.map(t =>  (t._1, parseXMLString(t._2))).toMap
+          (Some(xpath), Some(docs)) // Hmmm... not idea
+        } else {
+          (None, None)
+        }
+
+      def sort(annotations: Seq[Annotation]) = {
+        val groupedByContentType = annotations.groupBy(_.annotates.contentType)
+
+        groupedByContentType.flatMap { case (cType, a) => cType match {
+          case ContentType.TEXT_PLAIN => sortByCharOffset(a)
+          case ContentType.IMAGE_UPLOAD | ContentType.IMAGE_IIIF => sortByXY(a)
+          case ContentType.DATA_CSV => sortByRow(a)
+          case ContentType.TEXT_TEIXML => sortByDocumentPosition(a, xpath.get, docs.get)
+          case _ => {
+            Logger.warn(s"Can't sort annotations of unsupported content type $cType")
+            a
+          }
+        }}
+      }
+
       scala.concurrent.blocking {
         val header = Seq("UUID", "FILE", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
         
