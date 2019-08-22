@@ -14,16 +14,16 @@ import controllers.document.downloads.DownloadsController
 
 trait BaseSerializer {
 
-  private def sortByCharOffset(annotations: Seq[Annotation]) =
+  protected def sortByCharOffset(annotations: Seq[Annotation]) =
     annotations.sortWith { (a, b) =>
       a.anchor.substring(12).toInt < b.anchor.substring(12).toInt
     }
 
-  private def sortByXY(annotations: Seq[Annotation]) =
+  protected def sortByXY(annotations: Seq[Annotation]) =
     // TODO port nearest-neighbour sorting from Recogito v.1
     annotations
   
-  private def sortByRow(annotations: Seq[Annotation]) =
+  protected def sortByRow(annotations: Seq[Annotation]) =
     annotations.sortWith { (a, b) =>
       a.anchor.substring(4).toInt < b.anchor.substring(4).toInt
     }
