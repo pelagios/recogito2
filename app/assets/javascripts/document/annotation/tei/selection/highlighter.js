@@ -15,9 +15,12 @@ define([
           var offsetIdx = path.indexOf('::'),
 
               // CETEIcean-specific: prefix all path elements with 'tei-'!
-              normalized = path.substring(0, offsetIdx).replace(/\//g, '/tei-'),
+              normalized = path.substring(0, offsetIdx).replace(/\/([^[/]+)/g, function(match, p1){
+                return "/tei-" + p1.toLowerCase();
+              }), //Lowercase path steps
+              normalized = normalized.replace(/xml:/g, '');
 
-              parentNode = document.evaluate(normalized.substring(1),
+              parentNode = document.evaluate("." + normalized,
                 shadowDom, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
 
               node = shadowDom.firstChild,

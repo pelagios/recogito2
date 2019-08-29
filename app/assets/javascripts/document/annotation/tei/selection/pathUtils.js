@@ -24,36 +24,26 @@ define([], function() {
     },
 
     getXPath : function(node, path) {
-      var sibling, count;
+      var count, xpath, predicate;
 
       path = path || [];
-      if(node.parentNode) {
+      if (node.nodeType == Node.ELEMENT_NODE && node.hasAttribute("xml:id")) {
+        path.push("/");
+      }
+      else if (node.parentNode && node.parentNode.nodeName.toLowerCase().startsWith("tei-")) {
         path = this.getXPath(node.parentNode, path);
       }
 
-      if(node.previousSibling) {
-        count = 1;
-        sibling = node.previousSibling;
-        do {
-          if(sibling.nodeType == 1  && sibling.nodeName == node.nodeName) {count++;}
-          sibling = sibling.previousSibling;
-        } while(sibling);
-        if(count == 1) {count = null;}
-      } else if(node.nextSibling) {
-        sibling = node.nextSibling;
-        do {
-          if(sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {
-               count = 1;
-               sibling = null;
-          } else {
-            count = null;
-            sibling = sibling.previousSibling;
-          }
-        } while(sibling);
-      }
-
-      if(node.nodeType == 1) {
-        path.push(node.nodeName.toLowerCase() + (node.id ? "[@id='"+node.id+"']" : count > 0 ? "["+count+"]" : ''));
+      if(node.nodeType == Node.ELEMENT_NODE && node.nodeName.toLowerCase().startsWith("tei-")) {
+        xpath = "count(preceding-sibling::"+node.localName+")";
+        count = document.evaluate(xpath, node, null, XPathResult.NUMBER, null).numberValue + 1;
+        if (node.hasAttribute("xml:id")) {
+          predicate = "[@xml:id='"+node.getAttribute("xml:id")+"']";
+        } else {
+          predicate = "[" + count + "]";
+        }
+        path.push("/");
+        path.push(node.getAttribute("data-origname") + predicate);
       }
 
       return path;
@@ -92,18 +82,8 @@ define([], function() {
             selectedRange.endContainer,
             selectedRange.endOffset),
 
-          // Removes all refs to non-TEI nodes (i.e. those added by the Recogito view)
-          fixPath = function(path) {
-            return path.slice(path.indexOf(pathStart) + 1).reduce(function(xpath, p) {
-                     if (p.indexOf('tei-') === 0)
-                       return xpath + '/' + p.substring(4);
-                     else
-                       return xpath;
-                   }, '');
-          },
-
-          startTEIPath = fixPath(startPath) + '::' + startOffset,
-          endTEIPath = fixPath(endPath) + '::' + endOffset;
+          startTEIPath = startPath.join('') + '::' + startOffset,
+          endTEIPath = endPath.join('') + '::' + endOffset;
 
       return 'from=' + startTEIPath + ';to=' + endTEIPath;
     }

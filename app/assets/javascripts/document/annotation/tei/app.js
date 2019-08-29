@@ -27,6 +27,20 @@ require([
         phraseAnnotator = new PhraseAnnotator(contentNode, highlighter),
 
         CETEIcean = new CETEI();
+        // Override default note and ref behaviors so they don't introduce new stuff into the DOM
+        CETEIcean.addBehaviors({
+          "tei": {
+            "ref": function(elt) {
+              var a = document.createElement("a");
+              while(elt.firstChild) {
+                a.appendChild(elt.removeChild(elt.firstChild));
+              }
+              a.setAttribute("href", this.rw(elt.getAttribute("target")));
+              elt.appendChild(a);
+            },
+            "note": null
+          }
+        });
 
     CETEIcean.getHTML5(teiURL).then(function(data) {
       document.getElementById("content").appendChild(data);

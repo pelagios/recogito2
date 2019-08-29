@@ -1,1 +1,863 @@
-var CETEI=function(){"use strict";var e={};e["typeof"]="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol?"symbol":typeof e},e.classCallCheck=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")},e.createClass=function(){function e(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}return function(t,r,a){return r&&e(t.prototype,r),a&&e(t,a),t}}();var t={handlers:{eg:["<pre>","</pre>"],ptr:['<a href="$rw@target">$@target</a>'],ref:['<a href="$rw@target">',"</a>"],graphic:function(e){var t=new Image;return t.src=this.rw(e.getAttribute("url")),e.hasAttribute("width")&&(t.width=e.getAttribute("width").replace(/[^.0-9]/g,"")),e.hasAttribute("height")&&(t.height=e.getAttribute("height").replace(/[^.0-9]/g,"")),t},list:function(e){if(e.hasAttribute("type")&&"gloss"==e.getAttribute("type")){var t=document.createElement("dl"),r=!0,a=!1,n=void 0;try{for(var i,l=Array.from(e.children)[Symbol.iterator]();!(r=(i=l.next()).done);r=!0){var o=i.value;if(o.nodeType==Node.ELEMENT_NODE){if("tei-label"==o.localName){var s=document.createElement("dt");s.innerHTML=o.innerHTML,t.appendChild(s)}if("tei-item"==o.localName){var u=document.createElement("dd");u.innerHTML=o.innerHTML,t.appendChild(u)}}}}catch(c){a=!0,n=c}finally{try{!r&&l["return"]&&l["return"]()}finally{if(a)throw n}}return t}return null},table:function n(e){var n=document.createElement("table");if(n.innerHTML=e.innerHTML,"tei-head"==n.firstElementChild.localName){var t=n.firstElementChild;t.remove();var r=document.createElement("caption");r.innerHTML=t.innerHTML,n.appendChild(r)}var a=!0,i=!1,l=void 0;try{for(var o,s=Array.from(n.querySelectorAll("tei-row"))[Symbol.iterator]();!(a=(o=s.next()).done);a=!0){var u=o.value,c=document.createElement("tr");c.innerHTML=u.innerHTML;var h=!0,d=!1,f=void 0;try{for(var m,v=Array.from(u.attributes)[Symbol.iterator]();!(h=(m=v.next()).done);h=!0){var y=m.value;c.setAttribute(y.name,y.value)}}catch(p){d=!0,f=p}finally{try{!h&&v["return"]&&v["return"]()}finally{if(d)throw f}}u.parentElement.replaceChild(c,u)}}catch(p){i=!0,l=p}finally{try{!a&&s["return"]&&s["return"]()}finally{if(i)throw l}}var b=!0,g=!1,w=void 0;try{for(var T,E=Array.from(n.querySelectorAll("tei-cell"))[Symbol.iterator]();!(b=(T=E.next()).done);b=!0){var N=T.value,A=document.createElement("td");N.hasAttribute("cols")&&A.setAttribute("colspan",N.getAttribute("cols")),A.innerHTML=N.innerHTML;var S=!0,k=!1,M=void 0;try{for(var L,x=Array.from(N.attributes)[Symbol.iterator]();!(S=(L=x.next()).done);S=!0){var C=L.value;A.setAttribute(C.name,C.value)}}catch(p){k=!0,M=p}finally{try{!S&&x["return"]&&x["return"]()}finally{if(k)throw M}}N.parentElement.replaceChild(A,N)}}catch(p){g=!0,w=p}finally{try{!b&&E["return"]&&E["return"]()}finally{if(g)throw w}}return n},egXML:function(e){var t=document.createElement("pre");return t.innerHTML=this.serialize(e,!0),t}}},r=function(){function r(a){if(e.classCallCheck(this,r),this.els=[],this.behaviors=[],this.hasStyle=!1,this.prefixes=[],a)this.base=a;else try{window&&(this.base=window.location.href.replace(/\/[^\/]*$/,"/"))}catch(n){this.base=""}this.behaviors.push(t),this.shadowCSS,this.supportsShadowDom=document.head.createShadowRoot||document.head.attachShadow}return e.createClass(r,[{key:"getHTML5",value:function(e,t,r){var a=this;window.location.href.startsWith(this.base)&&e.indexOf("/")>=0&&(this.base=e.replace(/\/[^\/]*$/,"/"));var n=new Promise(function(t,r){var a=new XMLHttpRequest;a.open("GET",e),a.send(),a.onload=function(){this.status>=200&&this.status<300?t(this.response):r(this.statusText)},a.onerror=function(){r(this.statusText)}})["catch"](function(e){console.log(e)});return n.then(function(e){return a.makeHTML5(e,t,r)})}},{key:"makeHTML5",value:function(e,t,r){var a=(new DOMParser).parseFromString(e,"text/xml");return this.domToHTML5(a,t,r)}},{key:"domToHTML5",value:function(e,t,r){var a=this;this._fromTEI(e);var n=function i(e){var t=void 0,n=!1;switch(e.namespaceURI){case"http://www.tei-c.org/ns/1.0":t=document.createElement("tei-"+e.tagName);break;case"http://www.tei-c.org/ns/Examples":if("egXML"==e.tagName){t=document.createElement("teieg-"+e.tagName);break}case"http://relaxng.org/ns/structure/1.0":t=document.createElement("rng-"+e.tagName);break;default:t=document.importNode(e,!1),n=!0}var l=!0,o=!1,s=void 0;try{for(var u,c=Array.from(e.attributes)[Symbol.iterator]();!(l=(u=c.next()).done);l=!0){var h=u.value;!h.name.startsWith("xmlns")||n?t.setAttribute(h.name,h.value):"xmlns"==h.name&&t.setAttribute("data-xmlns",h.value),"xml:id"!=h.name||n||t.setAttribute("id",h.value),"xml:lang"!=h.name||n||t.setAttribute("lang",h.value),"rendition"==h.name&&t.setAttribute("class",h.value.replace(/#/g,""))}}catch(d){o=!0,s=d}finally{try{!l&&c["return"]&&c["return"]()}finally{if(o)throw s}}if(t.setAttribute("data-teiname",e.localName),0==e.childNodes.length&&t.setAttribute("data-empty",""),"tagsDecl"==e.localName){var f=document.createElement("style"),m=!0,v=!1,y=void 0;try{for(var p,b=Array.from(e.childNodes)[Symbol.iterator]();!(m=(p=b.next()).done);m=!0){var g=p.value;if(g.nodeType==Node.ELEMENT_NODE&&"rendition"==g.localName&&"css"==g.getAttribute("scheme")){var w="";g.hasAttribute("selector")?(w+=g.getAttribute("selector").replace(/([^#, >]+\w*)/g,"tei-$1").replace(/#tei-/g,"#")+"{\n",w+=g.textContent):(w+="."+g.getAttribute("xml:id")+"{\n",w+=g.textContent),w+="\n}\n",f.appendChild(document.createTextNode(w))}}}catch(d){v=!0,y=d}finally{try{!m&&b["return"]&&b["return"]()}finally{if(v)throw y}}f.childNodes.length>0&&(t.appendChild(f),a.hasStyle=!0)}"prefixDef"==e.localName&&(a.prefixes.push(e.getAttribute("ident")),a.prefixes[e.getAttribute("ident")]={matchPattern:e.getAttribute("matchPattern"),replacementPattern:e.getAttribute("replacementPattern")});var T=!0,E=!1,N=void 0;try{for(var A,S=Array.from(e.childNodes)[Symbol.iterator]();!(T=(A=S.next()).done);T=!0){var k=A.value;k.nodeType==Node.ELEMENT_NODE?t.appendChild(i(k)):t.appendChild(k.cloneNode())}}catch(d){E=!0,N=d}finally{try{!T&&S["return"]&&S["return"]()}finally{if(E)throw N}}return r&&r(t),t};return this.dom=n(e.documentElement),document.registerElement?this.registerAll(this.els):this.fallback(this.els),this.done=!0,t?void t(this.dom,this):this.dom}},{key:"addStyle",value:function(e,t){this.hasStyle&&e.getElementsByTagName("head").item(0).appendChild(t.getElementsByTagName("style").item(0).cloneNode(!0))}},{key:"addShadowStyle",value:function(e){this.shadowCSS&&(e.innerHTML='<style>@import url("'+this.shadowCSS+'");</style>'+e.innerHTML)}},{key:"addBehaviors",value:function(e){e.handlers||e.fallbacks?this.behaviors.push(e):console.log("No handlers or fallback methods found.")}},{key:"setBaseUrl",value:function(e){this.base=e}},{key:"_fromTEI",value:function(e){var t=e.documentElement;this.els=new Set(Array.from(t.getElementsByTagNameNS("http://www.tei-c.org/ns/1.0","*"),function(e){return e.tagName})),this.els.add("egXML"),this.els.add(t.tagName)}},{key:"_insert",value:function(e,t){var r=document.createElement("span");return t.length>1?t[0].includes("<")&&t[1].includes("</")?r.innerHTML=t[0]+e.innerHTML+t[1]:r.innerHTML="<span>"+t[0]+"</span>"+e.innerHTML+"<span>"+t[1]+"</span>":t[0].includes("<")?r.innerHTML=t[0]+e.innerHTML:r.innerHTML="<span>"+t[0]+"</span>"+e.innerHTML,r.children.length>1?r:r.children[0]}},{key:"_template",value:function(e,t){var r=e;if(e.search(/$(\w*)@(\w+)/))for(var a=/\$(\w*)@(\w+)/g,n=void 0;n=a.exec(e);)t.hasAttribute(n[2])&&(r=n[1]&&this[n[1]]?r.replace(n[0],this[n[1]].call(this,t.getAttribute(n[2]))):r.replace(n[0],t.getAttribute(n[2])));return r}},{key:"tagName",value:function(e){return"egXML"==e?"teieg-"+e:"tei-"+e}},{key:"decorator",value:function(e){var t=this;return function(r){for(var a=[],n=0;n<e.length;n++)a.push(t._template(e[n],r));return t._insert(r,a)}}},{key:"getHandler",value:function(e){for(var t=this.behaviors.length-1;t>=0;t--)if(this.behaviors[t].handlers[e])return Array.isArray(this.behaviors[t].handlers[e])?this.append(this.decorator(this.behaviors[t].handlers[e])):this.append(this.behaviors[t].handlers[e])}},{key:"getFallback",value:function(e){for(var t=this.behaviors.length-1;t>=0;t--)if(this.behaviors[t].handlers[e])return Array.isArray(this.behaviors[t].handlers[e])?this.decorator(this.behaviors[t].handlers[e]):this.behaviors[t].handlers[e]}},{key:"append",value:function(t,r){var a=this;if(r){var n=t.call(this,r);n&&!r.querySelector(":scope > "+n.nodeName)&&(this.supportsShadowDom?this._appendShadow(r,n):this._appendBasic(r,n))}else{var i=function(){var e=a;return a.supportsShadowDom?{v:function(){var r=t.call(e,this);r&&e._appendShadow(this,r)}}:{v:function(){var r=t.call(e,this);r&&!this.querySelector(":scope > "+r.nodeName)&&e._appendBasic(this,r)}}}();if("object"===("undefined"==typeof i?"undefined":e["typeof"](i)))return i.v}}},{key:"_appendShadow",value:function(e,t){var r=e.attachShadow({mode:"open"});this.addShadowStyle(r),r.appendChild(t)}},{key:"_appendBasic",value:function(e,t){this.hideContent(e),e.appendChild(t)}},{key:"registerAll",value:function(e){var t=!0,r=!1,a=void 0;try{for(var n,i=e[Symbol.iterator]();!(t=(n=i.next()).done);t=!0){var l=n.value,o=Object.create(HTMLElement.prototype),s=this.getHandler(l);s&&(o.createdCallback=s);var u=this.tagName(l);try{document.registerElement(u,{prototype:o})}catch(c){console.log(u+" couldn't be registered or is already registered."),console.log(c)}}}catch(h){r=!0,a=h}finally{try{!t&&i["return"]&&i["return"]()}finally{if(r)throw a}}}},{key:"fallback",value:function(e){var t=!0,r=!1,a=void 0;try{for(var n,i=e[Symbol.iterator]();!(t=(n=i.next()).done);t=!0){var l=n.value,o=this.getFallback(l);if(o){var s=!0,u=!1,c=void 0;try{for(var h,d=Array.from(this.dom.getElementsByTagName(this.tagName(l)))[Symbol.iterator]();!(s=(h=d.next()).done);s=!0){var f=h.value;this.append(o,f)}}catch(m){u=!0,c=m}finally{try{!s&&d["return"]&&d["return"]()}finally{if(u)throw c}}}}}catch(m){r=!0,a=m}finally{try{!t&&i["return"]&&i["return"]()}finally{if(r)throw a}}}},{key:"rw",value:function(e){return e.match(/^(?:http|mailto|file|\/|#).*$/)?e:this.base+e}},{key:"first",value:function(e){return e.replace(/ .*$/,"")}},{key:"serialize",value:function(e,t){var r="";if(!t){r+="&lt;"+e.getAttribute("data-teiname");var a=!0,n=!1,i=void 0;try{for(var l,o=Array.from(e.attributes)[Symbol.iterator]();!(a=(l=o.next()).done);a=!0){var s=l.value;s.name.startsWith("data-")||["id","lang","class"].includes(s.name)||(r+=" "+s.name+'="'+s.value+'"'),"data-xmlns"==s.name&&(r+=' xmlns="'+s.value+'"')}}catch(u){n=!0,i=u}finally{try{!a&&o["return"]&&o["return"]()}finally{if(n)throw i}}r+=e.childNodes.length>0?">":"/>"}var c=!0,h=!1,d=void 0;try{for(var f,m=Array.from(e.childNodes)[Symbol.iterator]();!(c=(f=m.next()).done);c=!0){var v=f.value;switch(v.nodeType){case Node.ELEMENT_NODE:r+=this.serialize(v);break;case Node.PROCESSING_INSTRUCTION_NODE:r+="&lt;?"+v.nodeValue+"?>";break;case Node.COMMENT_NODE:r+="&lt;!--"+v.nodeValue+"-->";break;default:r+=v.nodeValue.replace(/</g,"&lt;")}}}catch(u){h=!0,d=u}finally{try{!c&&m["return"]&&m["return"]()}finally{if(h)throw d}}return!t&&e.childNodes.length>0&&(r+="&lt;/"+e.getAttribute("data-teiname")+">"),r}},{key:"hideContent",value:function(e){if(e.childNodes.length>0){var t=e.innerHTML;e.innerHTML="";var r=document.createElement("span");r.setAttribute("style","display:none;"),r.setAttribute("class","hide"),r.innerHTML=t,e.appendChild(r)}}},{key:"unEscapeEntities",value:function(e){return e.replace(/&gt;/,">").replace(/&quot;/,'"').replace(/&apos;/,"'").replace(/&amp;/,"&")}},{key:"savePosition",value:function(){localStorage.setItem("scroll",window.scrollY)}},{key:"restorePosition",value:function(){localStorage.getItem("scroll")&&window.scrollTo(0,localStorage.getItem("scroll"))}},{key:"fromODD",value:function(){}}]),r}();try{window&&(window.CETEI=r,window.unload=r.savePosition,window.load=r.restorePosition)}catch(a){}return r}();
+var CETEI = (function () {
+  'use strict';
+
+  var behaviors = {
+    "namespaces": {
+      "tei": "http://www.tei-c.org/ns/1.0",
+      "teieg": "http://www.tei-c.org/ns/Examples",
+      "rng": "http://relaxng.org/ns/structure/1.0"  
+    },
+    "tei": {
+      "eg": ["<pre>","</pre>"],
+      // inserts a link inside <ptr> using the @target; the link in the
+      // @href is piped through the rw (rewrite) function before insertion
+      "ptr": ["<a href=\"$rw@target\">$@target</a>"],
+      // wraps the content of the <ref> in an HTML link
+      "ref": [
+        ["[target]", ["<a href=\"$rw@target\">","</a>"]]
+      ],
+      "graphic": function(elt) {
+        let content = new Image();
+        content.src = this.rw(elt.getAttribute("url"));
+        if (elt.hasAttribute("width")) {
+          content.setAttribute("width",elt.getAttribute("width"));
+        }
+        if (elt.hasAttribute("height")) {
+          content.setAttribute("height",elt.getAttribute("height"));
+        }
+        return content;
+      },
+      "list": [
+        // will only run on a list where @type="gloss"
+        ["[type=gloss]", function(elt) {
+          let dl = document.createElement("dl");
+          for (let child of Array.from(elt.children)) {
+            if (child.nodeType == Node.ELEMENT_NODE) {
+              if (child.localName == "tei-label") {
+                let dt = document.createElement("dt");
+                dt.innerHTML = child.innerHTML;
+                dl.appendChild(dt);
+              }
+              if (child.localName == "tei-item") {
+                let dd = document.createElement("dd");
+                dd.innerHTML = child.innerHTML;
+                dl.appendChild(dd);
+              }
+            }
+          }
+          return dl;
+        }
+      ]],
+      "note": [
+        // Make endnotes
+        ["[place=end]", function(elt){
+          if (!this.noteIndex){
+            this["noteIndex"] = 1;
+          } else {
+            this.noteIndex++;
+          }
+          let id = "_note_" + this.noteIndex;
+          let link = document.createElement("a");
+          link.setAttribute("id", "src" + id);
+          link.setAttribute("href", "#" + id);
+          link.innerHTML = this.noteIndex;
+          let content = document.createElement("sup");
+          content.appendChild(link);
+          let notes = this.dom.querySelector("ol.notes");
+          if (!notes) {
+            notes = document.createElement("ol");
+            notes.setAttribute("class", "notes");
+            this.dom.appendChild(notes);
+          }
+          let note = document.createElement("li");
+          note.id = id;
+          note.innerHTML = elt.innerHTML;
+          notes.appendChild(note);
+          return content;
+        }],
+        ["_", ["(",")"]]
+      ],
+      "table": function(elt) {
+        let table = document.createElement("table");
+        table.innerHTML = elt.innerHTML;
+        if (table.firstElementChild.localName == "tei-head") {
+          let head = table.firstElementChild;
+          head.remove();
+          let caption = document.createElement("caption");
+          caption.innerHTML = head.innerHTML;
+          table.appendChild(caption);
+        }
+        for (let row of Array.from(table.querySelectorAll("tei-row"))) {
+          let tr = document.createElement("tr");
+          tr.innerHTML = row.innerHTML;
+          for (let attr of Array.from(row.attributes)) {
+            tr.setAttribute(attr.name, attr.value);
+          }
+          row.parentElement.replaceChild(tr, row);
+        }
+        for (let cell of Array.from(table.querySelectorAll("tei-cell"))) {
+          let td = document.createElement("td");
+          if (cell.hasAttribute("cols")) {
+            td.setAttribute("colspan", cell.getAttribute("cols"));
+          }
+          td.innerHTML = cell.innerHTML;
+          for (let attr of Array.from(cell.attributes)) {
+            td.setAttribute(attr.name, attr.value);
+          }
+          cell.parentElement.replaceChild(td, cell);
+        }
+        return table;
+      },
+      "teiHeader": function(e) {
+        this.hideContent(e, false);
+      },
+      "title": [
+        ["tei-titlestmt>tei-title", function(elt) {
+          let title = document.createElement("title");
+          title.innerHTML = elt.innerText;
+          document.querySelector("head").appendChild(title);
+        }]
+      ]
+    },
+    "teieg": {
+      "egXML": function(elt) {
+        let pre = document.createElement("pre");
+        pre.innerHTML = this.serialize(elt, true);
+        return pre;
+      }
+    }
+  };
+
+  class CETEI {
+
+      constructor(base){
+          this.els = [];
+          this.namespaces = new Map();
+          this.behaviors = {};
+          this.hasStyle = false;
+          this.prefixDefs = [];
+          if (base) {
+            this.base = base;
+          } else {
+            try {
+              if (window) {
+                this.base = window.location.href.replace(/\/[^\/]*$/, "/");
+              }
+            } catch (e) {
+              this.base = "";
+            }
+          }
+          this.addBehaviors(behaviors);
+          this.shadowCSS;
+          this.supportsShadowDom = document.head.createShadowRoot || document.head.attachShadow;
+      }
+
+      // public method
+      /* Returns a Promise that fetches an XML source document from the URL
+         provided in the first parameter and then calls the makeHTML5 method
+         on the returned document.
+       */
+      getHTML5(XML_url, callback, perElementFn){
+          if (window.location.href.startsWith(this.base) && (XML_url.indexOf("/") >= 0)) {
+            this.base = XML_url.replace(/\/[^\/]*$/, "/");
+          }
+          // Get XML from XML_url and create a promise
+          let promise = new Promise( function (resolve, reject) {
+              let client = new XMLHttpRequest();
+              client.open('GET', XML_url);
+              client.send();
+              client.onload = function () {
+                if (this.status >= 200 && this.status < 300) {
+                  resolve(this.response);
+                } else {
+                  reject(this.statusText);
+                }
+              };
+              client.onerror = function () {
+                reject(this.statusText);
+              };
+          })
+          .catch( function(reason) {
+              // TODO: better error handling?
+              console.log(reason);
+          });
+
+          return promise.then((XML) => {
+              return this.makeHTML5(XML, callback, perElementFn);
+          });
+
+      }
+
+      /* Converts the supplied XML string into HTML5 Custom Elements. If a callback
+         function is supplied, calls it on the result.
+       */
+      makeHTML5(XML, callback, perElementFn){
+        // XML is assumed to be a string
+        let XML_dom = ( new DOMParser() ).parseFromString(XML, "text/xml");
+        return this.domToHTML5(XML_dom, callback, perElementFn);
+      }
+
+      /* Converts the supplied XML DOM into HTML5 Custom Elements. If a callback
+         function is supplied, calls it on the result.
+      */
+      domToHTML5(XML_dom, callback, perElementFn){
+
+        this._learnElementNames(XML_dom);
+
+        let convertEl = (el) => {
+            // Elements with defined namespaces get the prefix mapped to that element. All others keep
+            // their namespaces and are copied as-is.
+            let newElement;
+            if (this.namespaces.has(el.namespaceURI?el.namespaceURI:"")) {
+              let prefix = this.namespaces.get(el.namespaceURI?el.namespaceURI:"");
+              newElement = document.createElement(prefix + "-" + el.localName);
+            } else {
+              newElement = document.importNode(el, false);
+            }
+            // Copy attributes; @xmlns, @xml:id, @xml:lang, and
+            // @rendition get special handling.
+            for (let att of Array.from(el.attributes)) {
+                if (att.name == "xmlns") {
+                  newElement.setAttribute("data-xmlns", att.value); //Strip default namespaces, but hang on to the values
+                } else {
+                  newElement.setAttribute(att.name, att.value);
+                }
+                if (att.name == "xml:id") {
+                  newElement.setAttribute("id", att.value);
+                }
+                if (att.name == "xml:lang") {
+                  newElement.setAttribute("lang", att.value);
+                }
+                if (att.name == "rendition") {
+                  newElement.setAttribute("class", att.value.replace(/#/g, ""));
+                }
+            }
+            // Preserve element name so we can use it later
+            newElement.setAttribute("data-origname", el.localName);
+            // If element is empty, flag it
+            if (el.childNodes.length == 0) {
+              newElement.setAttribute("data-empty", "");
+            }
+            // Turn <rendition scheme="css"> elements into HTML styles
+            if (el.localName == "tagsDecl") {
+              let style = document.createElement("style");
+              for (let node of Array.from(el.childNodes)){
+                if (node.nodeType == Node.ELEMENT_NODE && node.localName == "rendition" && node.getAttribute("scheme") == "css") {
+                  let rule = "";
+                  if (node.hasAttribute("selector")) {
+                    //rewrite element names in selectors
+                    rule += node.getAttribute("selector").replace(/([^#, >]+\w*)/g, "tei-$1").replace(/#tei-/g, "#") + "{\n";
+                    rule += node.textContent;
+                  } else {
+                    rule += "." + node.getAttribute("xml:id") + "{\n";
+                    rule += node.textContent;
+                  }
+                  rule += "\n}\n";
+                  style.appendChild(document.createTextNode(rule));
+                }
+              }
+              if (style.childNodes.length > 0) {
+                newElement.appendChild(style);
+                this.hasStyle = true;
+              }
+            }
+            // Get prefix definitions
+            if (el.localName == "prefixDef") {
+              this.prefixDefs.push(el.getAttribute("ident"));
+              this.prefixDefs[el.getAttribute("ident")] =
+                {"matchPattern": el.getAttribute("matchPattern"),
+                "replacementPattern": el.getAttribute("replacementPattern")};
+            }
+            for (let node of Array.from(el.childNodes)){
+                if (node.nodeType == Node.ELEMENT_NODE) {
+                    newElement.appendChild(  convertEl(node)  );
+                }
+                else {
+                    newElement.appendChild(node.cloneNode());
+                }
+            }
+            if (perElementFn) {
+              perElementFn(newElement, el);
+            }
+            return newElement;
+        };
+
+        this.dom = convertEl(XML_dom.documentElement);
+
+        this.applyBehaviors();
+        this.done = true;
+        if (callback) {
+          callback(this.dom, this);
+          window.dispatchEvent(ceteiceanLoad);
+        } else {
+          window.dispatchEvent(ceteiceanLoad);
+          return this.dom;
+        }
+      }
+
+      /*  Define or apply behaviors for the document
+       *
+       */
+      applyBehaviors() {
+        if (window.customElements) {
+          this.define(this.els);
+        } else {
+          this.fallback(this.els);
+        }
+      }
+
+      /* If the TEI document defines CSS styles in its tagsDecl, this method
+         copies them into the wrapper HTML document's head.
+       */
+      addStyle(doc, data) {
+        if (this.hasStyle) {
+          doc.getElementsByTagName("head").item(0).appendChild(data.getElementsByTagName("style").item(0).cloneNode(true));
+        }
+      }
+
+      /* If a URL where CSS for styling Shadow DOM elements lives has been defined,
+         insert it into the Shadow DOM. DEPRECATED
+       */
+      addShadowStyle(shadow) {
+        if (this.shadowCSS) {
+          shadow.innerHTML = "<style>" + "@import url(\"" + this.shadowCSS + "\");</style>" + shadow.innerHTML;
+        }
+      }
+
+      /* Add a user-defined set of behaviors to CETEIcean's processing
+         workflow. Added behaviors will override predefined behaviors with the
+         same name.
+      */
+      addBehaviors(bhvs){
+        if (bhvs.namespaces) {
+          for (let prefix of Object.keys(bhvs.namespaces)) {
+            if (!this.namespaces.has(bhvs.namespaces[prefix]) && !Array.from(this.namespaces.values()).includes(prefix)) {
+              this.namespaces.set(bhvs.namespaces[prefix], prefix);
+            }
+          }
+        }
+        for (let prefix of this.namespaces.values()) {
+          if (bhvs[prefix]) {
+            for (let b of Object.keys(bhvs[prefix])) {
+              this.behaviors[prefix + ":" + b] = bhvs[prefix][b];
+            }
+          }
+        }
+        // Support old-style TEI-specific behaviors
+        if (bhvs.handlers) {
+          for (let b of Object.keys(bhvs.handlers)) {
+            if (b !== "egXML") {
+              this.behaviors["tei:" + b] = bhvs.handlers[b];
+            } else {
+              this.behaviors["teieg:egXML"] = bhvs.handlers[b];
+            }
+          }
+        } 
+        if (bhvs["fallbacks"]) {
+          console.log("Fallback behaviors are no longer used.");
+        }
+      }
+
+      /* Adds or replaces an individual behavior. Takes a namespace prefix or namespace definition,
+       * the element name, and the behavior. E.g.
+       * addBehavior("tei", "add", ["`","`"]) for an already-declared namespace or
+       * addBehavior({"doc": "http://docbook.org/ns/docbook"}, "note", ["[","]"]) for a new one
+       */
+      addBehavior(ns, element, b) {
+        let p;
+        if (ns === Object(ns)) {
+          for (let prefix of Object.keys(ns)) {
+            if (!this.namespaces.has(ns[prefix])) {
+              this.namespaces.set(ns[prefix], prefix);
+              p = prefix;
+            }
+          }
+        } else {
+          p = ns;
+        }
+        this.behaviors[p + ":" + element] = b;
+      }
+
+      /* To change a namespace -> prefix mapping, the namespace must first be 
+         unset. Takes a namespace URI. In order to process a TEI P4 document, e.g.,
+         the TEI namespace must be unset before it can be set to the empty string.
+      */
+      unsetNamespace(ns) {
+        this.namespaces.delete(ns);
+      }
+
+      /* Sets the base URL for the document. Used to rewrite relative links in the
+         XML source (which may be in a completely different location from the HTML
+         wrapper).
+       */
+      setBaseUrl(base) {
+        this.base = base;
+      }
+
+      // "private" method
+      _learnElementNames(XML_dom) {
+          let root = XML_dom.documentElement;
+          this.els = new Set( Array.from(root.querySelectorAll("*"), e => (this.namespaces.has(e.namespaceURI?e.namespaceURI:"")?this.namespaces.get(e.namespaceURI?e.namespaceURI:"") + ":":"") + e.localName) );
+          this.els.add((this.namespaces.has(root.namespaceURI?root.namespaceURI:"")?this.namespaces.get(root.namespaceURI?root.namespaceURI:"")+":":"") + root.localName); // Add the root element to the array
+      }
+
+      // private method
+      _insert(elt, strings) {
+        let span = document.createElement("span");
+        for (let node of Array.from(elt.childNodes)) {
+          if (node.nodeType === Node.ELEMENT_NODE && !node.hasAttribute("data-processed")) {
+            this._processElement(node);
+          }
+        } 
+        // If we have before and after tags have them parsed by
+        // .innerHTML and then add the content to the resulting child
+        if (strings[0].match("<[^>]+>") && strings[1] && strings[1].match("<[^>]+>")) { 
+          span.innerHTML = strings[0] + (strings[1]?strings[1]:"");
+          for (let node of Array.from(elt.childNodes)) {
+            span.firstElementChild.appendChild(node.cloneNode(true));
+          }
+        } else {
+          span.innerHTML = strings[0];
+          span.setAttribute("data-before", strings[0].replace(/<[^>]+>/g,"").length);
+          for (let node of Array.from(elt.childNodes)) {
+            span.appendChild(node.cloneNode(true));
+          }
+          if (strings.length > 1) {
+            span.innerHTML += strings[1];
+            span.setAttribute("data-after", strings[1].replace(/<[^>]+>/g,"").length);
+          } 
+        }
+        return span;
+      }
+
+      // private method. Runs behaviors recursively on the supplied element and children
+      _processElement(elt) {
+        if (elt.hasAttribute("data-origname") && ! elt.hasAttribute("data-processed")) {
+          let fn = this.getFallback(this._bName(elt));
+          if (fn) {
+            this.append(fn,elt);
+            elt.setAttribute("data-processed","");
+          }
+        }
+        for (let node of Array.from(elt.childNodes)) {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            this._processElement(node);
+          }
+        }
+      }
+
+      // private method
+      _template(str, elt) {
+        let result = str;
+        if (str.search(/\$(\w*)(@([a-zA-Z:]+))/ )) {
+          let re = /\$(\w*)@([a-zA-Z:]+)/g;
+          let replacements;
+          while (replacements = re.exec(str)) {
+            if (elt.hasAttribute(replacements[2])) {
+              if (replacements[1] && this[replacements[1]]) {
+                result = result.replace(replacements[0], this[replacements[1]].call(this, elt.getAttribute(replacements[2])));
+              } else {
+                result = result.replace(replacements[0], elt.getAttribute(replacements[2]));
+              }
+            }
+          }
+        }
+        return result;
+      }
+
+      // Private method. Given a qualified name (e.g. tei:text), return the element name
+      _tagName(name) {
+        if (name.includes(":"), 1) {
+          return name.replace(/:/,"-").toLowerCase();      }
+      }
+
+      // Private method. Given an element, return its qualified name as defined in a behaviors object
+      _bName(e) {
+        return e.tagName.substring(0,e.tagName.indexOf("-")).toLowerCase() + ":" + e.getAttribute("data-origname");
+      }
+
+      /* Takes a template in the form of either an array of 1 or 2 
+         strings or an object with CSS selector keys and either functions
+         or arrays as described above. Returns a closure around a function 
+         that can be called in the element constructor or applied to an 
+         individual element.
+
+         Called by the getHandler() and getFallback() methods
+      */
+      decorator(template) {
+        if (Array.isArray(template) && !Array.isArray(template[0])) {
+          return this._decorator(template)
+        } 
+        let ceteicean = this;
+        return function(elt) {
+          for (let rule of template) {
+            if (elt.matches(rule[0]) || rule[0] === "_") {
+              if (Array.isArray(rule[1])) {
+                return ceteicean._decorator(rule[1]).call(ceteicean, elt);
+              } else {
+                return rule[1].call(ceteicean, elt);
+              }
+            }
+          }
+        }
+      }
+
+      _decorator(strings) {
+        let ceteicean = this;
+        return function (elt) {
+          let copy = [];
+          for (let i = 0; i < strings.length; i++) {
+            copy.push(ceteicean._template(strings[i], elt));
+          }
+          return ceteicean._insert(elt, copy);
+        }
+      }
+
+      /* Returns the handler function for the given element name
+
+         Called by define().
+       */
+      getHandler(fn) {
+        if (this.behaviors[fn]) {
+          if ({}.toString.call(this.behaviors[fn]) === '[object Function]') {
+            return this.append(this.behaviors[fn]);
+          } else {
+            return this.append(this.decorator(this.behaviors[fn]));
+          }
+        }
+      }
+
+      /* Returns the fallback function for the given element name.
+         Called by fallback().
+       */
+      getFallback(fn) {
+        if (this.behaviors[fn]) {
+          if ({}.toString.call(this.behaviors[fn]) === '[object Function]') {
+            return this.behaviors[fn];
+          } else {
+            return this.decorator(this.behaviors[fn]);
+          }
+        }
+      }
+
+      /* Appends any element returned by the function passed in the first
+       * parameter to the element in the second parameter. If the function
+       * returns nothing, this is a no-op aside from any side effects caused
+       * by the provided function.
+
+       * called by getHandler() and fallback()
+       */
+      append(fn, elt) {
+        if (elt) {
+          let content = fn.call(this, elt);
+          if (content && !this._childExists(elt.firstElementChild, content.nodeName)) {
+            this._appendBasic(elt, content);
+          }
+        } else {
+          let self = this;
+          return function() {
+            if (!this.hasAttribute("data-processed")) {
+              let content = fn.call(self, this);
+              if (content && !self._childExists(this.firstElementChild, content.nodeName)) {
+                self._appendBasic(this, content);
+              }
+            }
+          }
+        }
+      }
+
+      attach(elt, fn, node) {
+        elt[fn].call(elt, node);
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          for (let e of Array.from(node.childNodes)) {
+            this._processElement(e);
+          }
+        } 
+      }
+
+      /* Private method called by append(). Takes a child element and a name, and recurses through the
+       * child's siblings until an element with that name is found, returning true if it is and false if not.
+       */
+      _childExists(elt, name) {
+        if (elt && elt.nodeName == name) {
+          return true;
+        } else {
+          return elt && elt.nextElementSibling && this._childExists(elt.nextElementSibling, name);
+        }
+      }
+
+      /* DEPRECATED. Private method called by append() if the browser supports Shadow DOM. 
+       */
+      _appendShadow(elt, content) {
+        var shadow = elt.attachShadow({mode:'open'});
+        this.addShadowStyle(shadow);
+        shadow.appendChild(content);
+      }
+
+      /* Private method called by append() 
+       */
+      _appendBasic(elt, content) {
+        this.hideContent(elt);
+        elt.appendChild(content);
+      }
+
+      /* Wrapper for deprecated method now known as define()
+       */
+      registerAll(names) {
+        this.define(names);
+      }
+
+      /* Registers the list of elements provided with the browser.
+
+         Called by makeHTML5(), but can be called independently if, for example,
+         you've created Custom Elements via an XSLT transformation instead.
+       */
+      define(names) {
+        for (let name of names) {
+          try {
+            let fn = this.getHandler(name);
+            window.customElements.define(this._tagName(name), class extends HTMLElement {
+              constructor() {
+                super(); 
+                if (!this.matches(":defined")) { // "Upgraded" undefined elements can have attributes & children; new elements can't
+                  if (fn) {
+                    fn.call(this);
+                  }
+                  // We don't want to double-process elements, so add a flag
+                  this.setAttribute("data-processed","");
+                }
+              }
+              // Process new elements when they are connected to the browser DOM
+              connectedCallback() {
+                if (!this.hasAttribute("data-processed")) {
+                  if (fn) {
+                    fn.call(this);
+                  }
+                  this.setAttribute("data-processed","");
+                }
+              };
+            });
+          } catch (error) {
+            console.log(this._tagName(name) + " couldn't be registered or is already registered.");
+            console.log(error);
+          }
+
+        }
+      }
+
+      /* Provides fallback functionality for browsers where Custom Elements
+         are not supported.
+
+         Like define(), this is called by makeHTML5(), but can be called
+         independently.
+      */
+      fallback(names) {
+        for (let name of names) {
+          let fn = this.getFallback(name);
+          if (fn) {
+            for (let elt of Array.from((this.dom && !this.done?this.dom:document).getElementsByTagName(this._tagName(name)))) {
+              if (!elt.hasAttribute("data-processed")) {
+                this.append(fn, elt);
+              }
+            }
+          }
+        }
+      }
+
+      /**********************
+       * Utility functions  *
+       **********************/
+
+      /* Takes a relative URL and rewrites it based on the base URL of the
+         HTML document */
+      rw(url) {
+        if (!url.match(/^(?:http|mailto|file|\/|#).*$/)) {
+          return this.base + url;
+        } else {
+          return url;
+        }
+      }
+
+      /* Given a space-separated list of URLs (e.g. in a ref with multiple
+         targets), returns just the first one.
+       */
+      first(urls) {
+        return urls.replace(/ .*$/, "");
+      }
+
+      normalizeURI(urls) {
+        return this.rw(this.first(urls))
+      }
+
+      /* Takes a string and a number and returns the original string
+         printed that number of times.
+      */
+      repeat(str, times) {
+        let result = "";
+        for (let i = 0; i < times; i++) {
+          result += str;
+        }
+        return result;
+      }
+
+      /* Performs a deep copy operation of the input node while stripping
+       * out child elements introduced by CETEIcean.
+       */ 
+      copyAndReset(node) {
+        let _clone = (n) => {
+          let result = n.nodeType === Node.ELEMENT_NODE?document.createElement(n.nodeName):n.cloneNode(true);
+          if (n.attributes) {
+            for (let att of Array.from(n.attributes)) {
+              if (att.name !== "data-processed") {
+                result.setAttribute(att.name,att.value);
+              }
+            }
+          }
+          for (let nd of Array.from(n.childNodes)){
+            if (nd.nodeType == Node.ELEMENT_NODE) {
+              if (!n.hasAttribute("data-empty")) {
+                if (nd.hasAttribute("data-original")) {
+                  for (let childNode of Array.from(nd.childNodes)) {
+                    let child = result.appendChild(_clone(childNode));
+                    if (child.nodeType === Node.ELEMENT_NODE && child.hasAttribute("data-origid")) {
+                      child.setAttribute("id", child.getAttribute("data-origid"));
+                      child.removeAttribute("data-origid");
+                    }
+                  }
+                  return result;
+                } else {
+                  result.appendChild(_clone(nd));
+                }
+              }
+            }
+            else {
+              result.appendChild(nd.cloneNode());
+            }
+          }
+          return result;
+        };
+        return _clone(node);
+      }
+
+      /* Takes an element and serializes it to an XML string or, if the stripElt
+         parameter is set, serializes the element's content.
+       */
+      serialize(el, stripElt) {
+        let str = "";
+        if (!stripElt) {
+          str += "&lt;" + el.getAttribute("data-origname");
+          for (let attr of Array.from(el.attributes)) {
+            if (!attr.name.startsWith("data-") && !(["id", "lang", "class"].includes(attr.name))) {
+              str += " " + attr.name + "=\"" + attr.value + "\"";
+            }
+            if (attr.name == "data-xmlns") {
+              str += " xmlns=\"" + attr.value +"\"";
+            }
+          }
+          if (el.childNodes.length > 0) {
+            str += ">";
+          } else {
+            str += "/>";
+          }
+        }
+        //TODO: Be smarter about skipping generated content with hidden original
+        for (let node of Array.from(el.childNodes)) {
+          switch (node.nodeType) {
+            case Node.ELEMENT_NODE:
+              str += this.serialize(node);
+              break;
+            case Node.PROCESSING_INSTRUCTION_NODE:
+              str += "&lt;?" + node.nodeValue + "?>";
+              break;
+            case Node.COMMENT_NODE:
+              str += "&lt;!--" + node.nodeValue + "-->";
+              break;
+            default:
+              str += node.nodeValue.replace(/</g, "&lt;");
+          }
+        }
+        if (!stripElt && el.childNodes.length > 0) {
+          str += "&lt;/" + el.getAttribute("data-origname") + ">";
+        }
+        return str;
+      }
+
+      /* Wraps the content of the element parameter in a <span data-original>
+       * with display set to "none".
+       */
+      hideContent(elt, rewriteIds = true) {
+        if (elt.childNodes.length > 0) {
+          let hidden = document.createElement("span");
+          elt.appendChild(hidden);
+          hidden.setAttribute("hidden", "");
+          hidden.setAttribute("data-original", "");
+          for (let node of Array.from(elt.childNodes)) {
+            if (node !== hidden) {
+              hidden.appendChild(elt.removeChild(node));
+            }
+          }
+          if (rewriteIds) {
+            for (let e of Array.from(hidden.querySelectorAll("*"))) {
+              if (e.hasAttribute("id")) {
+                e.setAttribute("data-origid", e.getAttribute("id"));
+                e.removeAttribute("id");
+              }
+            }
+          }
+        }
+      }
+
+      unEscapeEntities(str) {
+        return str.replace(/&gt;/, ">")
+                  .replace(/&quot;/, "\"")
+                  .replace(/&apos;/, "'")
+                  .replace(/&amp;/, "&");
+      }
+
+      static savePosition() {
+        window.localStorage.setItem("scroll",window.scrollY);
+      }
+
+      static restorePosition() {
+        if (!window.location.hash) {
+          if (window.localStorage.getItem("scroll")) {
+            setTimeout(function() {
+              window.scrollTo(0, localStorage.getItem("scroll"));
+            }, 100);
+          }
+        } else {
+          setTimeout(function() {
+            document.querySelector(window.location.hash).scrollIntoView();
+          }, 100);
+        }
+      }
+
+      // public method
+      fromODD(){
+          // Place holder for ODD-driven setup.
+          // For example:
+          // Create table of elements from ODD
+          //    * default HTML behaviour mapping on/off (eg tei:div to html:div)
+          //    ** phrase level elements behave like span (can I tell this from ODD classes?)
+          //    * optional custom behaviour mapping
+      }
+
+
+
+  }
+
+  // Make main class available to pre-ES6 browser environments
+  try {
+    if (window) {
+        window.CETEI = CETEI;
+        window.addEventListener("beforeunload", CETEI.savePosition);
+        var ceteiceanLoad = new Event("ceteiceanload");
+        window.addEventListener("ceteiceanload", CETEI.restorePosition);
+    }
+  } catch (e) {
+    // window not defined;
+  }
+
+  return CETEI;
+
+}());
