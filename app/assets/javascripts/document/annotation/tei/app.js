@@ -27,7 +27,7 @@ require([
         phraseAnnotator = new PhraseAnnotator(contentNode, highlighter),
 
         CETEIcean = new CETEI();
-        // Override default note and ref behaviors so they don't introduce new stuff into the DOM
+        // Override default list, note, table, and ref behaviors so they don't introduce new text into the DOM
         CETEIcean.addBehaviors({
           "tei": {
             "ref": function(elt) {
@@ -38,7 +38,9 @@ require([
               a.setAttribute("href", this.rw(elt.getAttribute("target")));
               elt.appendChild(a);
             },
-            "note": null
+            "list": null,
+            "note": null,
+            "table": null
           }
         });
 
