@@ -37,7 +37,10 @@ class UserService @Inject() (
   private val DEFAULT_QUOTA = config.getOptional[Int]("recogito.upload.quota").getOrElse(200) // The default default
 
   // Required by Silhouette auth framework
-  override def retrieve(loginInfo: LoginInfo): Future[Option[User]] = findByUsername(loginInfo.providerKey)
+  override def retrieve(loginInfo: LoginInfo): Future[Option[User]] = {
+    // TODO for social login, we need to branch based on provider ID
+    findByUsername(loginInfo.providerKey)
+  }
   
   def countUsers() = db.query { sql =>
     sql.selectCount().from(USER).fetchOne(0, classOf[Int])

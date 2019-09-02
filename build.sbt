@@ -32,6 +32,8 @@ libraryDependencies ++= Seq(
   filters,
   guice,
 
+  "com.iheart" %% "ficus" % "1.4.3",
+
   "com.mohiva" %% "play-silhouette" % "5.0.7",
   "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.7",
   "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.7",

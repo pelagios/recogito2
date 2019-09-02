@@ -1,6 +1,7 @@
 package controllers.landing
 
 import com.mohiva.play.silhouette.api.{LoginInfo, Silhouette}
+import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import controllers.{HasConfig, HasUserService, Security}
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
@@ -22,6 +23,7 @@ class LoginLogoutController @Inject() (
   val config: Configuration,
   val silhouette: Silhouette[Security.Env],
   val users: UserService,
+  val socialProviderRegistry: SocialProviderRegistry,
   implicit val ctx: ExecutionContext
 ) extends AbstractController(components) with HasConfig with HasUserService with I18nSupport {
 
@@ -40,15 +42,15 @@ class LoginLogoutController @Inject() (
 
   def showLoginForm(destination: Option[String]) = Action { implicit request =>
     destination match {
-      case None => Ok(views.html.landing.login(loginForm))
-      case Some(dest) => Ok(views.html.landing.login(loginForm)).withSession("access_uri" -> dest)
+      case None => Ok(views.html.landing.login(loginForm, socialProviderRegistry))
+      case Some(dest) => Ok(views.html.landing.login(loginForm, socialProviderRegistry)).withSession("access_uri" -> dest)
     }
   }
 
   def processLogin = silhouette.UserAwareAction.async { implicit request =>    
     loginForm.bindFromRequest.fold(
       formWithErrors =>
-        Future(BadRequest(views.html.landing.login(formWithErrors))),
+        Future(BadRequest(views.html.landing.login(formWithErrors, socialProviderRegistry))),
 
       loginData =>
         users.validateUser(loginData.usernameOrPassword, loginData.password).flatMap {

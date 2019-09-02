@@ -11,26 +11,50 @@ import com.mohiva.play.silhouette.api.{Authorization, Environment, EventBus, Sil
 import com.mohiva.play.silhouette.api.actions.SecuredErrorHandler
 import com.mohiva.play.silhouette.crypto.{JcaSigner, JcaSignerSettings, JcaCrypter, JcaCrypterSettings}
 import com.mohiva.play.silhouette.impl.authenticators.{CookieAuthenticator, CookieAuthenticatorSettings, CookieAuthenticatorService}
-import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
+import com.mohiva.play.silhouette.impl.providers.{CredentialsProvider, SocialProviderRegistry, SocialStateHandler, DefaultSocialStateHandler, OAuth2Settings}
+import com.mohiva.play.silhouette.impl.providers.oauth2.GoogleProvider
+import com.mohiva.play.silhouette.impl.providers.state.{CsrfStateItemHandler, CsrfStateSettings}
 import com.mohiva.play.silhouette.impl.util.{DefaultFingerprintGenerator, SecureRandomIDGenerator}
 import com.mohiva.play.silhouette.password.BCryptPasswordHasher
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
+import com.typesafe.config.Config
 import javax.inject.Inject
 import services.user.{User, UserService}
 import services.user.Roles.Role
+import net.ceedubs.ficus.Ficus._
+import net.ceedubs.ficus.readers.ArbitraryTypeReader._
+import net.ceedubs.ficus.readers.ValueReader
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
-import play.api.mvc.{CookieHeaderEncoding, Request, RequestHeader, Results}
+import play.api.mvc.{Cookie, CookieHeaderEncoding, Request, RequestHeader, Results}
+import play.api.libs.ws.WSClient
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import scala.reflect.ClassTag
 
+
 class SilhouetteSecurity extends AbstractModule with ScalaModule {
 
   private def getAppSecret(config: Configuration) =
     config.get[String]("play.http.secret.key")
+
+  implicit val sameSiteReader: ValueReader[Option[Option[Cookie.SameSite]]] = new ValueReader[Option[Option[Cookie.SameSite]]] {
+
+    def read(config: Config, path: String): Option[Option[Cookie.SameSite]] = {
+      if (config.hasPathOrNull(path)) {
+        if (config.getIsNull(path))
+          Some(None)
+        else {
+          Some(Cookie.SameSite.parse(config.getString(path)))
+        }
+      } else {
+        None
+      }
+    }
+
+  }
 
   override def configure(): Unit = {
     bind[Silhouette[Security.Env]].to[SilhouetteProvider[Security.Env]]
@@ -106,6 +130,48 @@ class SilhouetteSecurity extends AbstractModule with ScalaModule {
   def provideAuthenticatorCrypter(configuration: Configuration): Crypter = {
     val settings = JcaCrypterSettings(getAppSecret(configuration))
     new JcaCrypter(settings)
+  }
+
+  @Provides
+  def provideSocialProviderRegistry(googleProvider: GoogleProvider) = {
+    SocialProviderRegistry(Seq(googleProvider))
+  }
+
+  @Provides
+  def provideHTTPLayer(client: WSClient): HTTPLayer = new PlayHTTPLayer(client)
+
+  @Provides
+  def provideGoogleProvider(
+    httpLayer: HTTPLayer,
+    socialStateHandler: SocialStateHandler,
+    configuration: Configuration
+  ) = new GoogleProvider(httpLayer, socialStateHandler, configuration.underlying.as[OAuth2Settings]("silhouette.google"))
+
+  @Provides @Named("social-state-signer")
+  def provideSocialStateSigner(configuration: Configuration): Signer = {
+    val config = configuration.underlying.as[JcaSignerSettings]("silhouette.socialStateHandler.signer")
+    new JcaSigner(config)
+  }
+
+  @Provides
+  def provideSocialStateHandler(
+    @Named("social-state-signer") signer: Signer,
+    csrfStateItemHandler: CsrfStateItemHandler
+  ): SocialStateHandler = new DefaultSocialStateHandler(Set(csrfStateItemHandler), signer)
+
+  @Provides
+  def provideCsrfStateItemHandler(
+    idGenerator: IDGenerator,
+    @Named("csrf-state-item-signer") signer: Signer,
+    configuration: Configuration): CsrfStateItemHandler = {
+    val settings = configuration.underlying.as[CsrfStateSettings]("silhouette.csrfStateItemHandler")
+    new CsrfStateItemHandler(settings, idGenerator, signer)
+  }
+  
+  @Provides @Named("csrf-state-item-signer")
+  def provideCSRFStateItemSigner(configuration: Configuration): Signer = {
+    val config = configuration.underlying.as[JcaSignerSettings]("silhouette.csrfStateItemHandler.signer")
+    new JcaSigner(config)
   }
 
 }

@@ -46,7 +46,7 @@ class SignupController @Inject() (
 
   // We use usernames as first-level URL elements, therefore some are prohibited (cf. routes file)
   private val RESERVED_NAMES =
-    Set("admin", "annotation", "api", "assets", "document", "favicon.ico", "guest", "help", "login", "logout",
+    Set("admin", "annotation", "api", "assets", "authenticate", "document", "favicon.ico", "guest", "help", "login", "logout",
         "part", "pelagios", "recogito", "reset_password", "robots.txt", "signup", "site", "sites", "sitemap.txt",
         "settings", "stats.json", "status", "swagger.json", "webjars")
 

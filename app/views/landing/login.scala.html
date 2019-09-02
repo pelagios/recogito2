@@ -1,4 +1,7 @@
-@(loginForm: Form[controllers.landing.LoginData])(implicit messages: Messages, flash: Flash)
+@(
+  loginForm: Form[controllers.landing.LoginData],
+  socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
+)(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 <html>
   <head>
@@ -30,6 +33,16 @@
       <a href="@controllers.landing.routes.SignupController.showSignupForm()">
         Create one now!
       </a>
+    </div>
+
+    <div class="social">
+      <ul>
+        @for(p <- socialProviders.providers) {
+          <li>
+            <a href="@controllers.landing.routes.SocialAuthController.authenticate(p.id)" title="@p.id">Login via @{p.id.toUpperCase}</a>
+          </li>
+        }
+      </ul>
     </div>
   </body>
 </html>
