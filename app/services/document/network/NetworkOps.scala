@@ -6,7 +6,7 @@ import services.document.DocumentService
 trait NetworkOps { self: DocumentService => 
 
   /** Traverses up the clone hierarchy and gets the top-most ancestor **/
-  private def getNetworkRoot(docId: String): Future[Option[AncestryTreeNode]] = db.query { sql => 
+  private def getNetworkRoot(docId: String): Future[Option[TreeRecord]] = db.query { sql => 
     val query = 
       """
       WITH RECURSIVE path AS (
@@ -39,13 +39,13 @@ trait NetworkOps { self: DocumentService =>
       // there is no ancestor, the result array will have length one, with just 
       // the doc -> discard this result
       if (id != docId)
-        Some(AncestryTreeNode(id, owner))
+        Some(TreeRecord(id, owner))
       else 
         None
     }
   }
 
-  private def getDescendants(docId: String): Future[Seq[AncestryTreeNode]] = db.query { sql => 
+  private def getDescendants(docId: String): Future[Seq[TreeRecord]] = db.query { sql => 
     val query =
       """
       WITH RECURSIVE descendants AS (
@@ -70,7 +70,7 @@ trait NetworkOps { self: DocumentService =>
       val id = row.getValue("id", classOf[String])
       val owner = row.getValue("owner", classOf[String])
       val clonedFrom = row.getValue("cloned_from", classOf[String])
-      AncestryTreeNode(id, owner, Option(clonedFrom))
+      TreeRecord(id, owner, Option(clonedFrom))
     }
   }
 
@@ -79,7 +79,7 @@ trait NetworkOps { self: DocumentService =>
     val f = for {
       maybeRoot <- getNetworkRoot(docId)
       descendants <- maybeRoot.map(rootNode => getDescendants(rootNode.id))
-                       .getOrElse(Future.successful(Seq.empty[AncestryTreeNode]))
+                       .getOrElse(Future.successful(Seq.empty[TreeRecord]))
     } yield (maybeRoot, descendants)
 
     f.map { case (maybeRoot, descendants) => 
