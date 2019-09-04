@@ -5,7 +5,10 @@ import services.document.DocumentService
 
 trait NetworkOps { self: DocumentService => 
 
-  /** Traverses up the clone hierarchy and gets the top-most ancestor **/
+  /** Traverses up the clone hierarchy and gets the top-most ancestor. 
+    *
+    * If there is no network, the document itself is the "root".
+    */
   private def getNetworkRoot(docId: String): Future[Option[TreeRecord]] = db.query { sql => 
     val query = 
       """
@@ -31,17 +34,10 @@ trait NetworkOps { self: DocumentService =>
       FROM path WHERE id = ? ;
       """
 
-    Option(sql.resultQuery(query, docId).fetchOne).flatMap { result => 
+    Option(sql.resultQuery(query, docId).fetchOne).map { result => 
       val id = result.getValue("id", classOf[String])
       val owner = result.getValue("owner", classOf[String])
-
-      // Note that the result always includes the document itself, too. I.e. if
-      // there is no ancestor, the result array will have length one, with just 
-      // the doc -> discard this result
-      if (id != docId)
-        Some(TreeRecord(id, owner))
-      else 
-        None
+      TreeRecord(id, owner)
     }
   }
 
