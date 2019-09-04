@@ -215,6 +215,10 @@ PUT     /api/announcements/:id                       controllers.api.message.Ann
 
 POST    /api/send-message                            controllers.api.message.AnnouncementAPIController.sendMessage
 
+# ~~~ Clone network ~~~
+
+GET     /api/document/:id/network                    controllers.api.network.NetworkAPIController.getNetwork(id: String)
+
 # ~~~ Similarity search ~~~
 
 GET     /api/similar/:id                             controllers.api.similarity.SimilarityAPIController.getSimilar(id: String)

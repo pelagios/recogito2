@@ -21,6 +21,7 @@ class DocumentService @Inject() (
   with read.SharedWithMeReadOps
   with read.AccessibleDocumentOps
   with search.SearchOps
+  with network.NetworkOps
   with update.DocumentUpdateOps
   with update.CollaboratorUpdateOps
   with delete.DeleteOps {
