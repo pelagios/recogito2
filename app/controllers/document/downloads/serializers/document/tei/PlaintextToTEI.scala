@@ -6,11 +6,13 @@ import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.document.{ExtendedDocumentMetadata, DocumentService}
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.{Future, ExecutionContext}
-import scala.xml.{UnprefixedAttribute, Node, Null, Text}
+import scala.xml.{Elem, UnprefixedAttribute, Node, Null, Text}
 import storage.uploads.Uploads
 
 trait PlaintextToTEI extends BaseTEISerializer {
-  
+
+  import AnnotationBody._
+
   /** Simplistic, but should be all we need. If we need more, we can switch to Apache Commons StringEscapeUtils **/
   private def escape(str: String) =
     str.replace("<", "&lt;")
@@ -19,19 +21,17 @@ trait PlaintextToTEI extends BaseTEISerializer {
   private def formatDate(t: Timestamp): String =
     new SimpleDateFormat("yyyy-MM-dd").format(t)
   
-  private def textpartToTEI(text: String, annotations: Seq[Annotation]): Seq[Node] = {
+  /** Shorthands for convenience **/
+  private def getQuote(annotation: Annotation) =
+    annotation.bodies.find(_.hasType == AnnotationBody.QUOTE).head.value.get
     
-    import AnnotationBody._
+  private def getCharOffset(annotation: Annotation) =
+    annotation.anchor.substring(annotation.anchor.indexOf(":") + 1).toInt
     
-    // Shorthands for convenience
-    def getQuote(annotation: Annotation) =
-      annotation.bodies.find(_.hasType == AnnotationBody.QUOTE).head.value.get
-      
-    def getCharOffset(annotation: Annotation) =
-      annotation.anchor.substring(annotation.anchor.indexOf(":") + 1).toInt
-      
-    def getEntityType(annotation: Annotation) = 
-      annotation.bodies.find(b => Set(PLACE, PERSON, EVENT).contains(b.hasType))
+  private def getEntityType(annotation: Annotation) = 
+    annotation.bodies.find(b => Set(PLACE, PERSON, EVENT).contains(b.hasType))
+
+  private def paragraphToTEI(text: String, annotations: Seq[Annotation], runningOffset: Int = 0): Seq[Node] = {
 
     // XML, by nature can't handle overlapping annotations
     val nonOverlappingAnnotations = sort(annotations).foldLeft(Seq.empty[Annotation]) { case (result, next) =>
@@ -57,7 +57,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
     val ranges = nonOverlappingAnnotations.foldLeft((Seq.empty[Node], 0)) { case ((nodes, beginIndex), annotation) =>
       val id = toTeiId(annotation.annotationId)
       val quote = escape(getQuote(annotation))
-      val offset = getCharOffset(annotation)
+      val offset = getCharOffset(annotation) - runningOffset
       val entityType = getEntityType(annotation)  
 
       // Commentary notes
@@ -122,8 +122,31 @@ trait PlaintextToTEI extends BaseTEISerializer {
       
       fAnnotations.map { t =>        
         val annotationsByPart = t.map(_._1).groupBy(_.annotates.filepartId)
+
         val divs = textsAndParts.map { case (text, part) =>
-          <div><p>{ textpartToTEI(text, annotationsByPart.get(part.getId).getOrElse(Seq.empty[Annotation])) }</p></div>
+          // Split text to paragraph
+          val paragraphs = text.split("\n\n")
+
+          val pTags = paragraphs.foldLeft((Seq.empty[Elem], 0)) { case ((elements, runningOffset), text) => {
+            val textLength = text.size
+
+            // Filter annotations for this paragraph
+            val annotationsInParagraph = 
+              annotationsByPart
+                .get(part.getId).getOrElse(Seq.empty[Annotation])
+                .filter(annotation => {
+                  val offset = getCharOffset(annotation)
+                  val quoteLength = getQuote(annotation).size
+
+                  // Keep only annotations contained entirely within this paragraph
+                  offset >= runningOffset && (offset + quoteLength) <= (runningOffset + textLength)
+                })
+
+            val p = <p>{ paragraphToTEI(text, annotationsInParagraph, runningOffset) }</p>
+            (elements :+ p, runningOffset + text.size + 2)
+          }}._1
+
+          <div>{pTags}</div>
         }
         
         val relations = relationsToList(t.map(_._1))
