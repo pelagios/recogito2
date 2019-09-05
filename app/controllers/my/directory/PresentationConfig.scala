@@ -54,7 +54,8 @@ object PresentationConfig {
     "is_public",
     "shared_by",
     "access_level",
-    "cloned_from")
+    "cloned_from",
+    "has_clones")
 
   implicit val presentationConfigReads: Reads[PresentationConfig] = (
     (JsPath \ "columns").readNullable[Seq[String]].map(_.getOrElse(Seq.empty[String])) and

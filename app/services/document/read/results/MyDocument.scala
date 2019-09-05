@@ -8,7 +8,8 @@ case class MyDocument(
   document: DocumentRecord, 
   fileCount: Int,
   contentTypes: Seq[ContentType],
-  clonedFromUser: Option[String])
+  clonedFromUser: Option[String],
+  hasClones: Int)
 
 object MyDocument {
 
@@ -16,13 +17,14 @@ object MyDocument {
     val document = record.into(classOf[DocumentRecord])
     val fileCount = record.getValue("file_count", classOf[Integer]).toInt
     val clonedFromUser = Option(record.getValue("cloned_from_user", classOf[String]))
+    val hasClones = Option(record.getValue("has_clones", classOf[Integer])).map(_.toInt).getOrElse(0)
     val contentTypes = 
       record
         .getValue("content_types", classOf[Array[String]])
         .toSeq
         .flatMap(ContentType.withName)
 
-    MyDocument(document, fileCount, contentTypes, clonedFromUser)
+    MyDocument(document, fileCount, contentTypes, clonedFromUser, hasClones)
   }
 
 }
