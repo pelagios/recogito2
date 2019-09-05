@@ -27,6 +27,7 @@ case class ConfiguredPresentation(
   document: DocumentRecord, 
   fileCount: Int,
   contentTypes: Seq[ContentType],
+  clonedFromUser: Option[String],
   sharedVia: Option[SharingPolicyRecord],
   indexProps: IndexDerivedProperties,
   columnConfig: Seq[String]
@@ -72,6 +73,7 @@ object ConfiguredPresentation extends HasDate {
         myDoc.document, 
         myDoc.fileCount, 
         myDoc.contentTypes,
+        myDoc.clonedFromUser,
         None, 
         props, 
         config)
@@ -90,6 +92,7 @@ object ConfiguredPresentation extends HasDate {
         doc.document,
         doc.fileCount,
         doc.contentTypes,
+        None,
         Some(doc.sharedVia),
         props,
         config)
@@ -108,6 +111,7 @@ object ConfiguredPresentation extends HasDate {
         doc.document,
         doc.fileCount,
         doc.contentTypes,
+        None,
         doc.sharedVia,
         props,
         config)
@@ -134,6 +138,7 @@ object ConfiguredPresentation extends HasDate {
     (JsPath \ "edition").writeNullable[String] and
     (JsPath \ "shared_by").writeNullable[String] and
     (JsPath \ "access_level").writeNullable[String] and
+    (JsPath \ "cloned_from").writeNullable[JsObject] and
 
     // Selectable index properties
     (JsPath \ "last_edit_at").writeNullable[DateTime] and
@@ -159,6 +164,9 @@ object ConfiguredPresentation extends HasDate {
     p.getDBProp[String]("edition", p.document.getEdition),
     p.getOptDBProp[String]("shared_by", p.sharedVia.map(_.getSharedBy)),
     p.getOptDBProp[String]("access_level", p.sharedVia.map(_.getAccessLevel)),
+    p.getOptDBProp[JsObject]("cloned_from", p.clonedFromUser.map { username => 
+      Json.obj("username" -> username, "id" -> p.document.getClonedFrom)
+    }),
 
     // Index-based properties
     p.getIndexProp[DateTime]("last_edit_at", p.indexProps.lastEditAt),

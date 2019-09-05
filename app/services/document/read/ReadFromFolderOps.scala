@@ -89,11 +89,14 @@ trait ReadFromFolderOps { self: DocumentService =>
       s"""
        SELECT 
          document.*,
+         cloned_from.owner AS cloned_from_user,
          file_count,
          content_types
        FROM document
          LEFT OUTER JOIN folder_association 
            ON folder_association.document_id = document.id
+         LEFT OUTER JOIN document cloned_from
+           ON cloned_from.id = document.cloned_from
          JOIN (
            SELECT
              count(*) AS file_count,
@@ -131,11 +134,14 @@ trait ReadFromFolderOps { self: DocumentService =>
       s"""
        SELECT 
          document.*,
+         cloned_from.owner AS cloned_from_user,
          file_count,
          content_types
        FROM document
          LEFT OUTER JOIN folder_association 
            ON folder_association.document_id = document.id
+         LEFT OUTER JOIN document cloned_from
+           ON cloned_from.id = document.cloned_from
          JOIN (
            SELECT
              count(*) AS file_count,
