@@ -11,7 +11,7 @@ import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
 import services.HasDate
 import services.document.DocumentService
-import services.document.network.AncestryTreeNode
+import services.document.network.{AncestryTree, AncestryTreeNode}
 import services.user.UserService
 
 @Singleton
@@ -47,7 +47,22 @@ class NetworkAPIController @Inject() (
       if (accesslevel.canReadData) {
         documents.getNetwork(docId).map { _ match { 
           case Some(tree) => 
-            jsonOk(Json.toJson(tree.rootNode))
+            val thisNode =
+              if (doc.id == tree.rootNode.id) // Network for the root node
+                Json.obj(
+                  "id" -> doc.id,
+                  "title" -> doc.title,
+                  "owner" -> doc.ownerName)
+
+              else // Network for a node inside the tree 
+                Json.obj(
+                  "id" -> doc.id,
+                  "title" -> doc.title,
+                  "owner" -> doc.ownerName,
+                  "cloned_from" -> doc.clonedFrom,
+                  "cloned_at" -> formatDate(new DateTime(doc.uploadedAt.getTime)))
+
+            jsonOk(Json.obj("network_for" -> thisNode, "root" -> tree.rootNode))
 
           case None => NotFound
         }}
