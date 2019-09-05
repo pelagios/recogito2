@@ -1,5 +1,6 @@
 package services.document.network
 
+import java.sql.Timestamp
 import scala.concurrent.{ExecutionContext, Future}
 import services.document.DocumentService
 
@@ -49,11 +50,12 @@ trait NetworkOps { self: DocumentService =>
           document.id,
           document.owner,
           document.cloned_from,
+          document.uploaded_at,
           1 as level
         FROM document
         WHERE cloned_from IS NOT NULL
       UNION ALL
-        SELECT doc.id, doc.owner, doc.cloned_from, parent.level + 1
+        SELECT doc.id, doc.owner, doc.cloned_from, doc.uploaded_at, parent.level + 1
         FROM document doc
         JOIN descendants parent
           ON doc.cloned_from = parent.id
@@ -66,7 +68,8 @@ trait NetworkOps { self: DocumentService =>
       val id = row.getValue("id", classOf[String])
       val owner = row.getValue("owner", classOf[String])
       val clonedFrom = row.getValue("cloned_from", classOf[String])
-      TreeRecord(id, owner, Option(clonedFrom))
+      val uploadedAt = row.getValue("uploaded_at", classOf[Timestamp])
+      TreeRecord(id, owner, Option(clonedFrom), Option(uploadedAt))
     }
   }
 

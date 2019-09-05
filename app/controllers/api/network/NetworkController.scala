@@ -3,11 +3,13 @@ package controllers.api.network
 import com.mohiva.play.silhouette.api.Silhouette
 import controllers.{BaseOptAuthController, Security, HasPrettyPrintJSON}
 import javax.inject.{Inject, Singleton}
+import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.mvc.ControllerComponents
 import scala.concurrent.{ExecutionContext, Future}
+import services.HasDate
 import services.document.DocumentService
 import services.document.network.AncestryTreeNode
 import services.user.UserService
@@ -20,14 +22,19 @@ class NetworkAPIController @Inject() (
   val users: UserService,
   val silhouette: Silhouette[Security.Env],
   implicit val ctx: ExecutionContext
-) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON {
+) extends BaseOptAuthController(components, config, documents, users) with HasPrettyPrintJSON with HasDate {
 
   implicit val ancestryTreeNodeWrites = new Writes[AncestryTreeNode] {
 
     def writes(node: AncestryTreeNode) = { 
-      val obj = Json.obj(
-        "id" -> node.id,
-        "owner" -> node.owner)
+      val obj = node.clonedAt match {
+        case Some(timestamp) =>
+          val dt = new DateTime(timestamp.getTime)
+          Json.obj("id" -> node.id, "owner" -> node.owner, "cloned_at" -> formatDate(dt))
+
+        case None => 
+          Json.obj("id" -> node.id, "owner" -> node.owner)
+      }
 
       if (node.children.isEmpty) obj
       else obj ++ Json.obj("children" -> node.children.map(writes(_)))
