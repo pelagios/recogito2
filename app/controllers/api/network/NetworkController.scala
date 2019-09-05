@@ -56,5 +56,5 @@ class NetworkAPIController @Inject() (
       }
     })
   }
-  
+
 }

@@ -99,6 +99,19 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   def getLastContribution(documentId: String) =
     getHistory(documentId, 0, 1).map(_.items.headOption.map(_._1))
 
+  /** Counts the number of contributions on the given document since the given time **/
+  def countContributionsSince(documentId: String, timestamp: DateTime): Future[Long] =
+    es.client execute {
+      search (ES.RECOGITO / ES.CONTRIBUTION) query (
+        boolQuery
+          must (
+            termQuery("affects_item.document_id" -> documentId)
+          ) filter (
+            rangeQuery("made_at").gt(formatDate(timestamp))
+          )
+      ) limit 0
+    } map { _.totalHits }
+
   private def sortByField[B](docIds: Seq[String], sortOrder: services.SortOrder, offset: Int, limit: Int, field: Option[Contribution] => B)(implicit ordering: Ordering[B]) =
     Future.sequence(docIds.map(id => getLastContribution(id).map(contribution => (id, contribution)))).map { idsAndContributions =>
       val sorted = idsAndContributions.sortBy(t => field(t._2)).map(_._1).reverse

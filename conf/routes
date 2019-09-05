@@ -243,6 +243,7 @@ GET     /api/document/:id/places                     controllers.api.entity.Plac
 # ~~~ Contributions ~~~
 
 GET     /api/document/:id/contributions              controllers.api.contribution.ContributionAPIController.getDocumentStats(id: String)
+GET     /api/document/:id/contributions/count        controllers.api.contribution.ContributionAPIController.countContributionsSince(id: String, since: String)
 
 # ~~~ Authorities ~~~ 
 
