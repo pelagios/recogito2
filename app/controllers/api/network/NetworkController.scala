@@ -30,7 +30,11 @@ class NetworkAPIController @Inject() (
       val obj = node.clonedAt match {
         case Some(timestamp) =>
           val dt = new DateTime(timestamp.getTime)
-          Json.obj("id" -> node.id, "owner" -> node.owner, "cloned_at" -> formatDate(dt))
+          Json.obj(
+            "id" -> node.id, 
+            "owner" -> node.owner, 
+            "cloned_from" -> node.clonedFrom.get,
+            "cloned_at" -> formatDate(dt))
 
         case None => 
           Json.obj("id" -> node.id, "owner" -> node.owner)
