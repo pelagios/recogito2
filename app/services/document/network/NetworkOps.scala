@@ -47,6 +47,7 @@ trait NetworkOps { self: DocumentService =>
       """
       WITH RECURSIVE descendants AS (
         SELECT
+          document.cloned_from AS root_id,
           document.id,
           document.owner,
           document.cloned_from,
@@ -55,13 +56,13 @@ trait NetworkOps { self: DocumentService =>
         FROM document
         WHERE cloned_from IS NOT NULL
       UNION ALL
-        SELECT doc.id, doc.owner, doc.cloned_from, doc.uploaded_at, parent.level + 1
+        SELECT parent.root_id, doc.id, doc.owner, doc.cloned_from, doc.uploaded_at, parent.level + 1
         FROM document doc
         JOIN descendants parent
           ON doc.cloned_from = parent.id
       ) 
-      SELECT * FROM descendants WHERE cloned_from = ?
-      ORDER BY id, level, cloned_from ;
+      SELECT * FROM descendants WHERE root_id = ?
+      ORDER BY root_id, id, level, cloned_from ;
       """
 
     sql.resultQuery(query, docId).fetchArray.map { row => 
