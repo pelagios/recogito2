@@ -4,6 +4,7 @@ import controllers.document.downloads.serializers.BaseSerializer
 import java.util.UUID
 import services.annotation.{Annotation, AnnotationBody}
 import services.annotation.AnnotationStatus._
+import services.entity.Entity
 
 trait BaseTEISerializer extends BaseSerializer {
   
@@ -54,6 +55,33 @@ trait BaseTEISerializer extends BaseSerializer {
       case UNVERIFIED       => "low"
       case NOT_IDENTIFIABLE => "unknown"
     }}
+  }
+
+  def placesToList(annotations: Seq[Annotation], allPlaces: Seq[Entity]): Option[scala.xml.Elem] = {
+    // List of unique place URIs referred to in annotations
+    val placeUris = annotations
+      .flatMap(_.bodies)
+      .filter(_.hasType == AnnotationBody.PLACE)
+      .flatMap(_.uri)
+      .toSet
+
+    val referencedRecords = allPlaces
+      .flatMap(_.isConflationOf)
+      .filter(r => placeUris.contains(r.uri))
+
+    if (referencedRecords.isEmpty) {
+      None
+    } else {
+      Some(
+        <listPlace>
+          { referencedRecords.map { r => 
+            <place xml:id={r.uri}>
+              <placeName>{r.title}</placeName>
+            </place>
+          }}
+        </listPlace>
+      )
+    }
   }
 
   /** Generates a <listRelation> element for relations, if any are contained in the annotations **/

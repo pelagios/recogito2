@@ -3,10 +3,13 @@ package controllers.document.downloads.serializers.document.tei
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import services.annotation.{Annotation, AnnotationBody, AnnotationService}
+import services.entity.EntityType
+import services.entity.builtin.EntityService
 import services.document.{ExtendedDocumentMetadata, DocumentService}
 import play.api.mvc.{AnyContent, Request}
 import scala.concurrent.{Future, ExecutionContext}
 import scala.xml.{Elem, UnprefixedAttribute, Node, Null, Text}
+import storage.es.ES
 import storage.uploads.Uploads
 
 trait PlaintextToTEI extends BaseTEISerializer {
@@ -107,8 +110,15 @@ trait PlaintextToTEI extends BaseTEISerializer {
     ranges._1 :+ new Text(remainder)
   }
   
-  def plaintextToTEI(doc: ExtendedDocumentMetadata)(implicit documentService: DocumentService,
-      uploads: Uploads, annotationService: AnnotationService, request: Request[AnyContent], ctx: ExecutionContext) = {
+  def plaintextToTEI(
+    doc: ExtendedDocumentMetadata
+  )(implicit documentService: DocumentService,
+      annotationService: AnnotationService, 
+      entityService: EntityService,
+      uploads: Uploads, 
+      request: Request[AnyContent], 
+      ctx: ExecutionContext
+  ) = {
     
     val fTexts = Future.sequence {
       doc.fileparts.map { part =>
@@ -119,9 +129,18 @@ trait PlaintextToTEI extends BaseTEISerializer {
     val fDivs = fTexts.flatMap { maybeTextsAndParts => 
       val textsAndParts = maybeTextsAndParts.flatten
       val fAnnotations = annotationService.findByDocId(doc.id)
-      
-      fAnnotations.map { t =>        
-        val annotationsByPart = t.map(_._1).groupBy(_.annotates.filepartId)
+      val fPlaces = entityService.listEntitiesInDocument(doc.id, Some(EntityType.PLACE), 0, ES.MAX_SIZE)
+
+      val f = for {
+        annotations <- fAnnotations
+        places <- fPlaces
+      } yield (
+        annotations.map(_._1),
+        places.items.map(_._1).map(_.entity)
+      )
+
+      f.map { case (annotations, places) =>        
+        val annotationsByPart = annotations.groupBy(_.annotates.filepartId)
 
         val divs = textsAndParts.map { case (text, part) =>
           // Split text to paragraph
@@ -149,12 +168,13 @@ trait PlaintextToTEI extends BaseTEISerializer {
           <div>{pTags}</div>
         }
         
-        val relations = relationsToList(t.map(_._1))
-        (divs, relations)
+        val listPlaces = placesToList(annotations, places)
+        val relations = relationsToList(annotations)
+        (divs, listPlaces, relations)
       }
     }
        
-    fDivs.map { case (divs, relations) =>
+    fDivs.map { case (divs, listPlaces, relations) =>
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
           <fileDesc>
@@ -190,16 +210,17 @@ trait PlaintextToTEI extends BaseTEISerializer {
               </biblStruct>
             </sourceDesc>
           </fileDesc>
-          { if (relations.isDefined || doc.language.isDefined)
+          { if (relations.isDefined || doc.language.isDefined || listPlaces.isDefined)
             <profileDesc>
               { if (doc.language.isDefined)
                 <langUsage>
                   <language ident={doc.language.get} />
                 </langUsage>
               }
-              { if (relations.isDefined)
+              { if (relations.isDefined || listPlaces.isDefined)
                 <particDesc>
-                  {relations.get}
+                  { if (listPlaces.isDefined) listPlaces.get }
+                  { if (relations.isDefined) relations.get }
                 </particDesc>
               }
             </profileDesc>
