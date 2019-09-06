@@ -1,14 +1,17 @@
 package controllers.document.downloads.serializers.document.tei
 
 import controllers.HasTEISnippets
-import services.annotation.{Annotation, AnnotationBody, AnnotationService}
-import services.document.{ExtendedDocumentMetadata, DocumentService}
-import services.generated.tables.records.DocumentFilepartRecord
 import org.joox.Match
 import org.joox.JOOX._
 import org.w3c.dom.Document
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.Elem
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
+import services.entity.{Entity, EntityType}
+import services.entity.builtin.EntityService
+import services.document.{ExtendedDocumentMetadata, DocumentService}
+import services.generated.tables.records.DocumentFilepartRecord
+import storage.es.ES
 import storage.uploads.Uploads
 
 trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
@@ -45,7 +48,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     getOrCreate(profileDesc, "particDesc", false) // append
   }
 
-  def partToTEI(part: DocumentFilepartRecord, xml: String, annotations: Seq[Annotation]) = {
+  def partToTEI(part: DocumentFilepartRecord, xml: String, annotations: Seq[Annotation], places: Seq[Entity]) = {
     val doc = parseXMLString(xml)
    
     def toTag(annotation: Annotation) = {
@@ -113,6 +116,10 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
         }
       }
     }
+
+    val listPlace = placesToList(annotations, places)
+    if (listPlace.isDefined)
+      getOrCreateParticDesc(doc).append($(listPlace.get.toString))
     
     val relations = relationsToList(annotations)
     if (relations.isDefined)
@@ -121,29 +128,46 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     $(doc).toString
   }
 
-  def teiToTEI(docInfo: ExtendedDocumentMetadata)(implicit documentService: DocumentService,
-      uploads: Uploads, annotationService: AnnotationService, ctx: ExecutionContext): Future[Elem] = {
+  def teiToTEI(
+    doc: ExtendedDocumentMetadata
+  )(implicit 
+      annotationService: AnnotationService,
+      entityService: EntityService,
+      documentService: DocumentService,
+      uploads: Uploads,  ctx: ExecutionContext
+  ): Future[Elem] = {
 
     val fParts = Future.sequence(
-      docInfo.fileparts.map { part =>
-        uploads.readTextfile(docInfo.owner.getUsername, docInfo.id, part.getFile).map { maybeText =>
+      doc.fileparts.map { part =>
+        uploads.readTextfile(doc.owner.getUsername, doc.id, part.getFile).map { maybeText =>
           // If maybetext is None, integrity is broken -> let's fail
           (part, maybeText.get)
         }
       })
 
     val fAnnotationsByPart =
-      annotationService.findByDocId(docInfo.id).map(annotations =>
+      annotationService.findByDocId(doc.id).map(annotations =>
         annotations.map(_._1).groupBy(_.annotates.filepartId))
+
+    val fPlaces = 
+      entityService.listEntitiesInDocument(doc.id, Some(EntityType.PLACE), 0, ES.MAX_SIZE)
 
     val f = for {
       parts <- fParts
       annotations <- fAnnotationsByPart
-    } yield (parts, annotations)
+      places <- fPlaces
+    } yield (
+      parts, 
+      annotations, 
+      places.items.map(_._1).map(_.entity)
+    )
 
-    f.map { case (parts, annotationsByPart) =>
+    f.map { case (parts, annotationsByPart, places) =>
       val converted = parts.map { case (part, xml) =>
-        partToTEI(part, xml, annotationsByPart.get(part.getId).getOrElse(Seq.empty[Annotation])) 
+        partToTEI(
+          part, xml, 
+          annotationsByPart.get(part.getId).getOrElse(Seq.empty[Annotation]), 
+          places) 
       }
 
       scala.xml.XML.loadString(converted.head)
