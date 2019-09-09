@@ -8,7 +8,13 @@ import services.HasNullableSeq
 case class Relation(
   relatesTo: UUID,
   relatesVia: Seq[UUID],
-  bodies: Seq[RelationBody])
+  bodies: Seq[RelationBody]
+) {
+
+  def hasSamePath(other: Relation) = 
+    relatesTo == other.relatesTo && relatesVia == other.relatesVia
+
+}
   
 object Relation extends HasNullableSeq {
   

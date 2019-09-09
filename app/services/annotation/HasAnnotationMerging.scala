@@ -1,10 +1,42 @@
 package services.annotation
 
+import java.util.UUID
+import org.joda.time.DateTime
+
 // A pair of matching annotations that should be merged
 case class MatchedPair(my: Annotation, toMerge: Annotation) {
 
-  // TODO merge the individual bits of this matched pair
-  def merge() = ???
+  def merge(): Annotation = {
+
+    val contributors = (my.contributors ++ toMerge.contributors).distinct
+
+    val lastModifiedAt = new DateTime(Seq(my.lastModifiedAt.getMillis, toMerge.lastModifiedAt.getMillis).max)
+    val lastModifiedBy =
+      if (lastModifiedAt == my.lastModifiedAt) my.lastModifiedBy
+      else toMerge.lastModifiedBy
+
+    val bodiesToAppend = toMerge.bodies.filter { body => 
+      val matchingBody = my.bodies.find(_.equalsIgnoreModified(body))
+      matchingBody.isEmpty
+    }
+
+    val relationsToAppend = ???
+
+    /*
+    Annotation(
+      my.annotationId,
+      UUID.randomUUID,
+      my.annotates,
+      contributors,
+      my.anchor, // TODO what to do about "roughly" same anchors on images?
+      lastModifiedBy,
+      lastModifiedAt,
+      my.bodies ++ bodiesToAppend,
+      my.relations ++ relationsToAppend)
+    */
+
+    ???
+  }
 
 }
 
@@ -70,8 +102,7 @@ trait HasAnnotationMerging {
         }
       }
 
-    // TODO merge the matched pairs and return the list of annotations, so the service can upsert
-
+    freshAdditions ++ haveMatch.map(_.merge)
   }
 
 }

@@ -10,7 +10,13 @@ case class RelationBody(
   hasType: AnnotationBody.Type,
   lastModifiedBy: Option[String],
   lastModifiedAt: DateTime,
-  value: String)
+  value: String
+) {
+
+  def equalsIgnoreModified(other: AnnotationBody) =
+    hasType == other.hasType && value == other.value
+
+}
   
 object RelationBody extends HasDate {
   
