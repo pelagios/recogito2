@@ -97,8 +97,10 @@ class NetworkAPIController @Inject() (
     f.map { _ match {
       case (Some((fromDoc, fromAccesslevel)), Some((toDoc, toAccesslevel))) => 
         if (fromAccesslevel.canReadData && toAccesslevel.isAdmin) {
-          
+
           // TODO merge annotations!
+
+          // Q: how to determine which part is which?!? Go directly to the source file and compare?
 
           Ok
         } else {

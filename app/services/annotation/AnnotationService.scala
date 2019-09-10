@@ -229,6 +229,17 @@ class AnnotationService @Inject() (
     }
   }
 
+  def mergeAnnotations(
+    docToMergeTo: String,
+    docToMergeFrom: String,
+    filepartIds: Map[UUID, UUID],
+    fromDateTime: DateTime
+  ): Future[Boolean] = {
+
+    ???
+    
+  }
+
   /** Retrieves annotations on a document last updated after a given timestamp **/
   def findModifiedAfter(documentId: String, after: DateTime): Future[Seq[Annotation]] =
     es.client execute {
