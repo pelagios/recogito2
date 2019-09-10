@@ -20,9 +20,31 @@ case class MatchedPair(my: Annotation, toMerge: Annotation) {
       matchingBody.isEmpty
     }
 
-    val relationsToAppend = ???
+    // Currently, the implementation allows only a single relation per path, 
+    // each with a single body. When there are relations (in my and toMerge)
+    // that have the same path, the newer relation will overwrite the older one.
 
-    /*
+    // Step 1: filter relations in 'toMerge' to those that don't have a 
+    // correspondence in 'my' - we'll later append those
+    val relationsToAppend = toMerge.relations.filter { relation => 
+      val matchingRelation = my.relations.find(_.hasSamePath(relation))
+      matchingRelation.isEmpty
+    }
+
+    // Step 2: Go through all relations in 'my' and replace them 
+    // if there is a matching relation in 'toMerge' which is newer.
+    val relations = my.relations.map { relation => 
+      toMerge.relations.find(_.hasSamePath(relation)) match {
+        case Some(matchingRelation) => 
+          if (matchingRelation.lastModifiedAt.getMillis > relation.lastModifiedAt.getMillis)
+            matchingRelation
+          else 
+            relation
+
+        case None => relation
+      }
+    }
+
     Annotation(
       my.annotationId,
       UUID.randomUUID,
@@ -32,10 +54,7 @@ case class MatchedPair(my: Annotation, toMerge: Annotation) {
       lastModifiedBy,
       lastModifiedAt,
       my.bodies ++ bodiesToAppend,
-      my.relations ++ relationsToAppend)
-    */
-
-    ???
+      relations ++ relationsToAppend)
   }
 
 }

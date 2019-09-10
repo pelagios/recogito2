@@ -1,6 +1,7 @@
 package services.annotation.relation
 
 import java.util.UUID
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.HasNullableSeq
@@ -13,6 +14,10 @@ case class Relation(
 
   def hasSamePath(other: Relation) = 
     relatesTo == other.relatesTo && relatesVia == other.relatesVia
+
+  // Shorthand returning the latest lastModified timestamp from all bodies
+  def lastModifiedAt = 
+    new DateTime(bodies.map(_.lastModifiedAt.getMillis).max)
 
 }
   
