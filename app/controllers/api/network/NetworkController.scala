@@ -46,6 +46,10 @@ class NetworkAPIController @Inject() (
 
   }
 
+  /** Returns the network/tree of clones for the given document ID 
+    *
+    * Requires at least data-read privileges on the document.
+    */
   def getNetwork(docId: String) = silhouette.UserAwareAction.async { implicit request => 
     documentResponse(docId, request.identity, { case (doc, accesslevel) => 
       if (accesslevel.canReadData) {
@@ -74,6 +78,36 @@ class NetworkAPIController @Inject() (
         Future.successful(Forbidden)
       }
     })
+  }
+
+
+  /** Merges the annotations from the given document into the given document. 
+    * 
+    * Requires data-read privileges on fromDoc, and admin privileges on toDoc.
+    */
+  def mergeAnnotations(toDocId: String, fromDocId: String) = silhouette.SecuredAction.async { implicit request => 
+    val fFromDoc = documents.getExtendedMeta(fromDocId, Some(request.identity.username))
+    val fToDoc = documents.getExtendedMeta(toDocId, Some(request.identity.username))
+
+    val f = for {
+      from <- fFromDoc
+      to <- fToDoc
+    } yield (from, to)
+
+    f.map { _ match {
+      case (Some((fromDoc, fromAccesslevel)), Some((toDoc, toAccesslevel))) => 
+        if (fromAccesslevel.canReadData && toAccesslevel.isAdmin) {
+          
+          // TODO merge annotations!
+
+          Ok
+        } else {
+          Forbidden
+        }
+
+      // At least one of the docs wasn't found
+      case _ => NotFound
+    }}
   }
 
 }

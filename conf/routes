@@ -218,6 +218,7 @@ POST    /api/send-message                            controllers.api.message.Ann
 # ~~~ Clone network ~~~
 
 GET     /api/document/:id/network                    controllers.api.network.NetworkAPIController.getNetwork(id: String)
+GET     /api/document/:id/merge                      controllers.api.network.NetworkAPIController.mergeAnnotations(id: String, from: String)
 
 # ~~~ Similarity search ~~~
 
