@@ -123,6 +123,19 @@ class Uploads @Inject() (config: Configuration) {
     }
   }
 
+  /** Helper to get the filesize in bytes.  
+    * 
+    * Returns -1 if the file doesn't exist.
+    */
+  def getFilesize(owner: String, docId: String, filename: String)(implicit ctx: ExecutionContext): Future[Long] = Future {
+    scala.concurrent.blocking {
+      getDocumentDir(owner, docId).map(dir => {
+        val file = new File(dir, filename)
+        if (file.exists) file.length else -1l
+      }).getOrElse(-1l)
+    }
+  }
+
   /** Helper **/
   def openThumbnail(owner: String, docId: String, filename: String)(implicit ctx: ExecutionContext): Future[Option[File]] = Future {
     scala.concurrent.blocking {
