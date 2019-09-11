@@ -86,10 +86,18 @@ class NetworkAPIController @Inject() (
     })
   }
 
+  /** TODO support files where parts were part order/number was modified **/
   private def matchFileparts(toDoc: ExtendedDocumentMetadata, fromDoc: ExtendedDocumentMetadata): Future[Map[UUID, UUID]] = {
     // Helper
     def readSize(f: DocumentFilepartRecord): Future[(DocumentFilepartRecord, Long)] =
       uploads.getFilesize(toDoc.ownerName, toDoc.id, f.getFile).map(size => (f, size))
+
+    def findMatch(f: DocumentFilepartRecord, size: Long, fromDocFilesizes: Seq[(DocumentFilepartRecord, Long)]) = {
+      // If there's a corresponding file with same sequence number and filesize - keep that
+      fromDocFilesizes.find { case (matchedRecord, matchedSize) => 
+        matchedRecord.getSequenceNo == f.getSequenceNo && matchedSize == size
+      }.map(_._1)
+    }
 
     // Step 1: read the filesize for all fileparts, so we have some criterion to compare on
     val f = for {
@@ -98,19 +106,11 @@ class NetworkAPIController @Inject() (
     } yield (toDocFileSizes, fromDocFileSizes)
 
     f.map { case (toDocFileSizes, fromDocFileSizes) =>
-      toDocFileSizes.zipWithIndex.foldLeft(Seq.empty[(UUID, UUID)]) { case (matches, ((filepart, size), idx)) => 
-        val isMatch = // If there is a corresponding filepart in 'from', check if its the same size
-          if (fromDocFileSizes.size > idx)
-            fromDocFileSizes(idx)._2 == size
-          else
-            false
-
-        // TODO find a match based on file hash           
-
-        if (isMatch)
-          matches :+ (filepart.getId, fromDocFileSizes(idx)._1.getId)
-        else 
-          matches
+      toDocFileSizes.foldLeft(Seq.empty[(UUID, UUID)]) { case (matches, (filepart, size)) => 
+        findMatch(filepart, size, fromDocFileSizes) match {
+          case Some(matchedRecord) => matches :+ (filepart.getId, matchedRecord.getId)
+          case None => matches          
+        }
       }.toMap
     }
   }
@@ -130,19 +130,24 @@ class NetworkAPIController @Inject() (
 
     f.flatMap { _ match {
       case (Some((fromDoc, fromAccesslevel)), Some((toDoc, toAccesslevel))) => 
-
         if (fromAccesslevel.canReadData && toAccesslevel.isAdmin) {
+          val f = for {
+            correspondences <- matchFileparts(toDoc, fromDoc)
+            success <- annotations.mergeAnnotations(
+              toDoc.id, 
+              fromDoc.id, 
+              correspondences,
+              toDoc.clonedFrom match {
+                // If this doc is a clone, merge all annotations since time of cloning
+                case Some(_) => new DateTime(toDoc.uploadedAt)
 
-          // TODO build UUID->UUID correspondence table
+                // Otherwise (if it's the root), clone from the other doc's cloning timestamp
+                case _ => new DateTime(fromDoc.uploadedAt)
+              }
+            )
+          } yield success 
           
-          annotations.mergeAnnotations(
-            toDoc.id, 
-            fromDoc.id, 
-            Map.empty[java.util.UUID, java.util.UUID], // TODO
-            new DateTime() // TODO
-          ).map { success => 
-            if (success) Ok else InternalServerError
-          }
+          f.map(success => if (success) Ok else InternalServerError)
         } else {
           Future.successful(Forbidden)
         }

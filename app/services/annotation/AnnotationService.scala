@@ -22,6 +22,7 @@ class AnnotationService @Inject() (
     with AnnotationHistoryService
     with AnnotationStatsService
     with RelationService 
+    with HasAnnotationMerging
     with HasScrollProcessing {
 
   /** Upserts an annotation.
@@ -233,16 +234,25 @@ class AnnotationService @Inject() (
     docToMergeTo: String,
     docToMergeFrom: String,
     filepartIds: Map[UUID, UUID],
-    fromDateTime: DateTime
+    fromTimestamp: DateTime
   ): Future[Boolean] = {
+    val fAnnotationsInThisDocument = findByDocId(docToMergeTo)
+    val fAnnotationsToMerge = findModifiedAfter(docToMergeFrom, fromTimestamp)
 
-    ???
-    
+    val f = for {
+      inThisDoc <- fAnnotationsInThisDocument
+      toMerge <- fAnnotationsToMerge
+    } yield (inThisDoc.map(_._1), toMerge)
+
+    f.flatMap { case (inThisDoc, toMerge) => 
+      val updated = buildMergeSet(inThisDoc, toMerge)
+      upsertAnnotations(updated, true).map(failed => failed.size == 0)
+    }
   }
 
   /** Retrieves annotations on a document last updated after a given timestamp **/
   def findModifiedAfter(documentId: String, after: DateTime): Future[Seq[Annotation]] =
-    es.client execute {
+    scrollIfNeeded {
       search(ES.RECOGITO / ES.ANNOTATION) query {
         boolQuery
           must (
@@ -251,7 +261,7 @@ class AnnotationService @Inject() (
             rangeQuery("last_modified_at").gt(formatDate(after))
           )
       } limit ES.MAX_SIZE
-    } map { _.to[(Annotation, Long)].toSeq.map(_._1) }
+    } map { _.map(_._1) }
 
   /** Retrieves annotations carrying relations to the given ID and removes those relations **/
   def removeRelationsTo(relatedTo: UUID): Future[Boolean] = {
