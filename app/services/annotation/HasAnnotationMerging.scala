@@ -103,7 +103,13 @@ trait HasAnnotationMerging {
     * Likely, this would only incur additional code and indexing overhead, while being 
     * just as messy...
     */
-  def buildMergeSet(myAnnotations: Seq[Annotation], toMerge: Seq[Annotation]) = {
+  def buildMergeSet(
+    myAnnotations: Seq[Annotation], 
+    toMerge: Seq[Annotation], 
+    destinationDoc: String,
+    filepartMap: Map[UUID, UUID]
+  ) = {
+    play.api.Logger.info(filepartMap.toString)
     // Split the 'toMerge' array in two parts:
 
     // 1. the annotations that are fresh additions - they should just be 
@@ -117,7 +123,14 @@ trait HasAnnotationMerging {
             (freshAdditions, haveMatch :+ MatchedPair(matchingAnnotation, next))
 
           case None => 
-            (freshAdditions :+ next, haveMatch)
+            filepartMap.get(next.annotates.filepartId) match {
+              case Some(partId) => 
+                val cloned = next.cloneTo(destinationDoc, partId)
+                (freshAdditions :+ cloned, haveMatch)
+
+              case None => 
+                (freshAdditions, haveMatch)
+            }
         }
       }
 

@@ -236,6 +236,8 @@ class AnnotationService @Inject() (
     filepartIds: Map[UUID, UUID],
     fromTimestamp: DateTime
   ): Future[Boolean] = {
+    // Logger.info(s"Merging annotations from ${docToMergeFrom} into ${docToMergeTo}")
+
     val fAnnotationsInThisDocument = findByDocId(docToMergeTo)
     val fAnnotationsToMerge = findModifiedAfter(docToMergeFrom, fromTimestamp)
 
@@ -245,7 +247,11 @@ class AnnotationService @Inject() (
     } yield (inThisDoc.map(_._1), toMerge)
 
     f.flatMap { case (inThisDoc, toMerge) => 
-      val updated = buildMergeSet(inThisDoc, toMerge)
+      // Logger.info(s"Target document has ${inThisDoc.size} annotations")
+      // Logger.info(s"Merging ${toMerge.size} annotations")
+
+      val updated = buildMergeSet(inThisDoc, toMerge, docToMergeTo, filepartIds)
+      // Logger.info(s"Merge set of ${updated.size} annotations")
       upsertAnnotations(updated, true).map(failed => failed.size == 0)
     }
   }

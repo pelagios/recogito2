@@ -89,26 +89,26 @@ class NetworkAPIController @Inject() (
   /** TODO support files where parts were part order/number was modified **/
   private def matchFileparts(toDoc: ExtendedDocumentMetadata, fromDoc: ExtendedDocumentMetadata): Future[Map[UUID, UUID]] = {
     // Helper
-    def readSize(f: DocumentFilepartRecord): Future[(DocumentFilepartRecord, Long)] =
-      uploads.getFilesize(toDoc.ownerName, toDoc.id, f.getFile).map(size => (f, size))
+    def readSize(owner: String, f: DocumentFilepartRecord): Future[(DocumentFilepartRecord, Long)] =
+      uploads.getFilesize(owner, f.getDocumentId, f.getFile).map(size => (f, size))
 
-    def findMatch(f: DocumentFilepartRecord, size: Long, fromDocFilesizes: Seq[(DocumentFilepartRecord, Long)]) = {
+    def findMatch(toFilepart: DocumentFilepartRecord, size: Long, fromDocFilesizes: Seq[(DocumentFilepartRecord, Long)]) = {
       // If there's a corresponding file with same sequence number and filesize - keep that
       fromDocFilesizes.find { case (matchedRecord, matchedSize) => 
-        matchedRecord.getSequenceNo == f.getSequenceNo && matchedSize == size
+        matchedRecord.getSequenceNo == toFilepart.getSequenceNo && matchedSize == size
       }.map(_._1)
     }
 
     // Step 1: read the filesize for all fileparts, so we have some criterion to compare on
     val f = for {
-      toDocFileSizes <- Future.sequence { toDoc.fileparts.map(readSize) }
-      fromDocFileSizes <- Future.sequence { toDoc.fileparts.map(readSize) }
+      toDocFileSizes <- Future.sequence { toDoc.fileparts.map(readSize(toDoc.ownerName, _)) }
+      fromDocFileSizes <- Future.sequence { fromDoc.fileparts.map(readSize(fromDoc.ownerName, _)) }
     } yield (toDocFileSizes, fromDocFileSizes)
 
     f.map { case (toDocFileSizes, fromDocFileSizes) =>
       toDocFileSizes.foldLeft(Seq.empty[(UUID, UUID)]) { case (matches, (filepart, size)) => 
         findMatch(filepart, size, fromDocFileSizes) match {
-          case Some(matchedRecord) => matches :+ (filepart.getId, matchedRecord.getId)
+          case Some(matchedRecord) => matches :+ (matchedRecord.getId, filepart.getId)
           case None => matches          
         }
       }.toMap
