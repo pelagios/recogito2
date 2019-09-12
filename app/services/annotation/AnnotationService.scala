@@ -219,7 +219,7 @@ class AnnotationService @Inject() (
           (a.cloneTo(docIdAfter, filepartAfter), a.annotationId) // Cloned annotation + ID before cloning
         }
 
-        val idsBeforeAndAfter = cloned.map(t => (t._1.annotationId, t._2)).toMap
+        val idsBeforeAndAfter = cloned.map(t => (t._2, t._1.annotationId)).toMap
 
         // Rewire the relations
         val rewired = cloned.map { case (a, _) => 
