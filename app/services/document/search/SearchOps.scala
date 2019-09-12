@@ -108,17 +108,40 @@ trait SearchOps { self: DocumentService =>
       """
       SELECT
         document.*,
+        cloned_from.owner AS cloned_from_user,
+        has_clones,
         file_count,
         content_types
       FROM document
-        LEFT JOIN (
+      LEFT OUTER JOIN document cloned_from
+        ON cloned_from.id = document.cloned_from
+      LEFT JOIN (
+        SELECT
+          count(*) AS file_count,
+          array_agg(DISTINCT content_type) AS content_types,
+          document_id
+        FROM document_filepart
+        GROUP BY document_id
+      ) AS parts ON parts.document_id = document.id
+      LEFT OUTER JOIN (
+        WITH RECURSIVE descendants AS (
           SELECT
-            count(*) AS file_count,
-            array_agg(DISTINCT content_type) AS content_types,
-            document_id
-          FROM document_filepart
-          GROUP BY document_id
-        ) AS parts ON parts.document_id = document.id
+            document.cloned_from AS root_id,
+            document.id,
+            document.cloned_from
+          FROM document WHERE document.cloned_from IS NOT NULL
+        UNION ALL
+          SELECT parent.root_id, doc.id, doc.cloned_from
+          FROM document doc
+          JOIN descendants parent
+            ON doc.cloned_from = parent.id
+        )  
+        SELECT 
+          root_id, 
+          count(*) AS has_clones 
+        FROM descendants 
+        GROUP BY root_id
+      ) AS clones ON clones.root_id = document.id
       """
 
     val buildQuery = 
