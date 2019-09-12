@@ -1,6 +1,6 @@
 # Recogito
 
-__Current version: [v3.2](https://github.com/pelagios/recogito2/releases/tag/v3.2)__
+__Current version: [v3.3](https://github.com/pelagios/recogito2/releases/tag/v3.3)__
 
 Home of [Recogito](http://recogito.pelagios.org) - a Semantic Annotation tool for texts and
 images, developed by [Pelagios Commons](http://commons.pelagios.org).
