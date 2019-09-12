@@ -216,11 +216,18 @@ class AnnotationService @Inject() (
         val cloned = annotationsAndVersions.map { case (a, _) => 
           val filepartBefore = a.annotates.filepartId
           val filepartAfter = filepartIds.get(filepartBefore).get
-          a.cloneTo(docIdAfter, filepartAfter)
+          (a.cloneTo(docIdAfter, filepartAfter), a.annotationId) // Cloned annotation + ID before cloning
+        }
+
+        val idsBeforeAndAfter = cloned.map(t => (t._1.annotationId, t._2)).toMap
+
+        // Rewire the relations
+        val rewired = cloned.map { case (a, _) => 
+          a.rewriteRelations(idsBeforeAndAfter)
         }
         
         // Logger.info("Cloning...")
-        upsertAnnotations(cloned, false).map { failed => 
+        upsertAnnotations(rewired, false).map { failed => 
           // Logger.info(s"${failed.size} failed inserts")
           failed.size == 0
         }

@@ -31,6 +31,16 @@ case class Annotation(
       annotates = 
         AnnotatedObject(docId, filepartId, this.annotates.contentType))
 
+  def rewriteRelations(annotationIdsBeforeAndAfter: Map[UUID, UUID]) = {
+    val clonedRelations = this.relations.flatMap { relation =>
+      annotationIdsBeforeAndAfter.get(relation.relatesTo).map { newTarget => 
+        relation.copy(relatesTo = newTarget)
+      }
+    }
+
+    this.copy(relations = clonedRelations)
+  }
+
 }
 
 case class AnnotatedObject(documentId: String, filepartId: UUID, contentType: ContentType)
