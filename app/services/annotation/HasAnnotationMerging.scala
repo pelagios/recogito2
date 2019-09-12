@@ -109,7 +109,6 @@ trait HasAnnotationMerging {
     destinationDoc: String,
     filepartMap: Map[UUID, UUID]
   ) = {
-    play.api.Logger.info(filepartMap.toString)
     // Split the 'toMerge' array in two parts:
 
     // 1. the annotations that are fresh additions - they should just be 
