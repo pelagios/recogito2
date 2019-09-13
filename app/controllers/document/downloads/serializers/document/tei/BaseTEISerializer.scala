@@ -57,7 +57,7 @@ trait BaseTEISerializer extends BaseSerializer {
     }}
   }
 
-  def placesToList(annotations: Seq[Annotation], allPlaces: Seq[Entity]): Option[scala.xml.Elem] = {
+  def placesToList(annotations: Seq[Annotation], allPlaces: Seq[Entity]) = {
     // List of unique place URIs referred to in annotations
     val placeUris = annotations
       .flatMap(_.bodies)
@@ -80,6 +80,28 @@ trait BaseTEISerializer extends BaseSerializer {
             </place>
           }}
         </listPlace>
+      )
+    }
+  }
+
+  def tagsToTaxonomy(annotations: Seq[Annotation]): Option[scala.xml.Elem] = {
+    val distinctTags = annotations 
+      .flatMap(_.bodies)
+      .filter(_.hasType == AnnotationBody.TAG)
+      .flatMap(_.value)
+      .toSet
+
+    if (distinctTags.isEmpty) {
+      None
+    } else {
+      Some(
+        <taxonomy>
+          { distinctTags.map { t => 
+            <category xml:id={t}>
+              <catDesc>{t}</catDesc>
+            </category>
+          }}
+        </taxonomy>
       )
     }
   }

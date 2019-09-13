@@ -73,7 +73,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
       
       // All other tags, rolled into one 'ana' attribute
       val tags = getNonAttributeTags(annotation)
-      val ana = { if (tags.isEmpty) None else Some(tags.mkString(",")) }.map { xml.Text(_) }
+      val ana = { if (tags.isEmpty) None else Some(tags.map(t => s"#$t").mkString(" ")) }.map { xml.Text(_) }
       
       // Cert (if any), derived from annotation status
       val cert = getCert(annotation).map(xml.Text(_)) 
@@ -169,12 +169,13 @@ trait PlaintextToTEI extends BaseTEISerializer {
         }
         
         val listPlaces = placesToList(annotations, places)
+        val taxonomy = tagsToTaxonomy(annotations)
         val relations = relationsToList(annotations)
-        (divs, listPlaces, relations)
+        (divs, listPlaces, taxonomy, relations)
       }
     }
        
-    fDivs.map { case (divs, listPlaces, relations) =>
+    fDivs.map { case (divs, listPlaces, taxonomy, relations) =>
       <TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
           <fileDesc>
@@ -227,6 +228,11 @@ trait PlaintextToTEI extends BaseTEISerializer {
           }
           <encodingDesc>
             <projectDesc><p>Downloaded from { controllers.landing.routes.LandingController.index().absoluteURL}</p></projectDesc>
+            { if (taxonomy.isDefined)
+              <classDecl>
+                { taxonomy.get }
+              </classDecl>
+            }
           </encodingDesc>
         </teiHeader>
         <text>

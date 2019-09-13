@@ -27,25 +27,30 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     val startOffset = a.substring(a.indexOf("::") + 2, a.indexOf(";")).toInt
     -startOffset
   }
+
+  private def getOrCreate(parent: Match, childName: String, prepend: Boolean): Match = {
+    val maybeChild = parent.find(childName)
+    if (maybeChild.isEmpty) {
+      if (prepend) parent.prepend($(s"<${childName}/>"))
+      else parent.append($(s"<${childName}/>"))
+      parent.find(childName)
+    } else {
+      maybeChild
+    }
+  }
   
   /** Returns the sourceDesc element of the TEI document, creating it in place if it doesn't exist already **/
-  private[tei] def getOrCreateParticDesc(document: Document) = {
-    
-    def getOrCreate(parent: Match, childName: String, prepend: Boolean): Match = {
-      val maybeChild = parent.find(childName)
-      if (maybeChild.isEmpty) {
-        if (prepend) parent.prepend($(s"<${childName}/>"))
-        else parent.append($(s"<${childName}/>"))
-        parent.find(childName)
-      } else {
-        maybeChild
-      }
-    }
-        
+  private[tei] def getOrCreateParticDesc(document: Document) = {        
     val doc = $(document)
     val teiHeader = getOrCreate(doc, "teiHeader", true) // prepend
     val profileDesc = getOrCreate(teiHeader, "profileDesc", false) // append
     getOrCreate(profileDesc, "particDesc", false) // append
+  }
+
+  private[tei] def getOrCreateEncodingDesc(document: Document) = {
+    val doc = $(document)
+    val teiHeader = getOrCreate(doc, "teiHeader", true)
+    getOrCreate(teiHeader, "encodingDesc", false)
   }
 
   def partToTEI(part: DocumentFilepartRecord, xml: String, annotations: Seq[Annotation], places: Seq[Entity]) = {
@@ -78,7 +83,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
       
       val tags = getNonAttributeTags(annotation)
       if (tags.size > 0)
-        el.setAttribute("ana", tags.mkString(","))
+        el.setAttribute("ana", tags.map(t => s"#$t").mkString(" "))
 
       el.appendChild(doc.createTextNode(quote))
 
@@ -120,6 +125,10 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     val listPlace = placesToList(annotations, places)
     if (listPlace.isDefined)
       getOrCreateParticDesc(doc).append($(listPlace.get.toString))
+
+    val taxonomy = tagsToTaxonomy(annotations)
+    if (taxonomy.isDefined)
+      getOrCreateEncodingDesc(doc).append($(taxonomy.get.toString))
     
     val relations = relationsToList(annotations)
     if (relations.isDefined)
