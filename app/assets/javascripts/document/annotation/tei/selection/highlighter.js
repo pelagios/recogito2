@@ -15,10 +15,14 @@ define([
           var offsetIdx = path.indexOf('::'),
 
               // CETEIcean-specific: prefix all path elements with 'tei-'!
-              normalized = path.substring(0, offsetIdx).replace(/\/([^[/]+)/g, function(match, p1){
-                return "/tei-" + p1.toLowerCase();
-              }), //Lowercase path steps
-              normalized = normalized.replace(/xml:/g, '');
+              normalized = (function() {
+                var normalized = path.substring(0, offsetIdx).replace(/\/([^[/]+)/g, function(match, p1) {
+                  return "/tei-" + p1.toLowerCase();
+                }); //Lowercase path steps
+
+                normalized = normalized.replace('tei-teiheader', 'tei-teiheader/span');
+                return normalized.replace(/xml:/g, '');
+              })(),
 
               parentNode = document.evaluate("." + normalized,
                 shadowDom, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
