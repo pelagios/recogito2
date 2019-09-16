@@ -19,8 +19,7 @@ define([
                 var normalized = path.substring(0, offsetIdx).replace(/\/([^[/]+)/g, function(match, p1) {
                   return "/tei-" + p1.toLowerCase();
                 }); //Lowercase path steps
-
-                normalized = normalized.replace('tei-teiheader', 'tei-teiheader/span');
+                
                 return normalized.replace(/xml:/g, '');
               })(),
 
