@@ -50,7 +50,9 @@ class NERActor(
     taskService.updateTaskProgress(taskId, 50)
     
     val places = phrases.filter(_.entity.entityType == EntityType.LOCATION).map(Some(_))
-    val persons = phrases.filter(_.entity.entityType == EntityType.PERSON)     
+    val persons = phrases.filter(_.entity.entityType == EntityType.PERSON) 
+    val other = phrases.filter(p => 
+      p.entity.entityType != EntityType.LOCATION && p.entity.entityType != EntityType.PERSON)
     
     val resolutionDefinition: GeoresolutionJobDefinition = 
       jobDef.getOrElse(
@@ -58,15 +60,26 @@ class NERActor(
       )
 
     resolve(doc, part, places, resolutionDefinition, places.size, taskId, (50, 80))
-    
-    val fInsertPeople = annotationService.upsertAnnotations(persons.map { r => 
-      Annotation
-        .on(part, r.anchor)
-        .withBody(AnnotationBody.quoteBody(r.entity.chars))
-        .withBody(AnnotationBody.personBody())
-    })
-    Await.result(fInsertPeople, 20.minutes)
-    
+
+    val fInsert = for {
+      // People
+      _ <- annotationService.upsertAnnotations(persons.map { p => 
+        Annotation
+          .on(part, p.anchor)
+          .withBody(AnnotationBody.quoteBody(p.entity.chars))
+          .withBody(AnnotationBody.personBody())
+        })
+
+      // Tags 
+      _ <- annotationService.upsertAnnotations(other.map { p => 
+          Annotation
+            .on(part, p.anchor)
+            .withBody(AnnotationBody.quoteBody(p.entity.chars))
+            .withBody(AnnotationBody.tagBody(p.entity.entityType.toString))
+        })
+    } yield ()
+
+    Await.result(fInsert, 20.minutes)
     taskService.setTaskCompleted(taskId)
   } catch { case t: Throwable =>
     t.printStackTrace()

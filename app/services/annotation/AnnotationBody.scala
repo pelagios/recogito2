@@ -79,13 +79,7 @@ object AnnotationBody extends Enumeration {
       None, // reference
       None, // note
       None) // status
-      
-  def placeBody(reference: Option[String] = None) = 
-    entityBody(AnnotationBody.PLACE, reference)
-      
-  def personBody(reference: Option[String] = None) = 
-    entityBody(AnnotationBody.PERSON, reference)
-    
+
   private def entityBody(hasType: AnnotationBody.Type, reference: Option[String] = None) = 
     AnnotationBody(
       hasType,
@@ -95,7 +89,22 @@ object AnnotationBody extends Enumeration {
       reference,
       None, // note
       None) // status
+  
+  def placeBody(reference: Option[String] = None) = 
+    entityBody(AnnotationBody.PLACE, reference)
+      
+  def personBody(reference: Option[String] = None) = 
+    entityBody(AnnotationBody.PERSON, reference)
 
+  def tagBody(tag: String) =
+    AnnotationBody(
+      AnnotationBody.TAG,
+      None,
+      DateTime.now(),
+      Some(tag),
+      None,
+      None,
+      None)
 }
 
 /** Backend/ES serialization includes the union Id (which is for internal use only) **/

@@ -109,11 +109,11 @@ trait HasTeiNER {
       // Original text + inserted <placeName> and <persName> tags
       val enrichedText = entities.foldLeft(originalText, 0) { case ((text, runningOffset), entity) =>
         entity.entityType match {
-          case EntityType.LOCATION =>
+          case e if e == EntityType.LOCATION =>
             val enriched = insertMarkup(text, entity, runningOffset, "placeName")                    
             (enriched, runningOffset + 23)
             
-          case EntityType.PERSON =>
+          case e if e == EntityType.PERSON =>
             val enriched = insertMarkup(text, entity, runningOffset, "persName")
             (enriched, runningOffset + 21)
 
