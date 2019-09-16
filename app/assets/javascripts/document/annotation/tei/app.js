@@ -40,7 +40,10 @@ require([
             },
             "list": null,
             "note": null,
-            "table": null
+            "table": null,
+            "teiHeader": function(e) {
+              e.hidden = true;
+            }
           }
         });
 
