@@ -218,11 +218,15 @@ trait PlaintextToTEI extends BaseTEISerializer {
                   <language ident={doc.language.get} />
                 </langUsage>
               }
-              { if (relations.isDefined || listPlaces.isDefined)
+              { if (relations.isDefined)
                 <particDesc>
-                  { if (listPlaces.isDefined) listPlaces.get }
-                  { if (relations.isDefined) relations.get }
+                  { relations.get }
                 </particDesc>
+              }
+              { if (listPlaces.isDefined)
+                <settingDesc>
+                  { listPlaces.get }
+                </settingDesc>
               }
             </profileDesc>
           }
