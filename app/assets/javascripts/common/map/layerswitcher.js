@@ -22,7 +22,7 @@ define(['common/hasEvents'], function(HasEvents) {
                     '</li>' +
 
                     '<li data-name="DARE">' +
-                      '<div class="thumb-container"><img class="map-thumb" src="http://pelagios.org/tilesets/imperium/7/68/47.png"></div>' +
+                      '<div class="thumb-container"><img class="map-thumb" src="http://dare.ht.lu.se/tiles/imperium/7/68/47.png"></div>' +
                       '<h3>Ancient Places</h3>' +
                       '<p>Roman Empire base map by the <a href="http://dare.ht.lu.se/" target="_blank">Digital Atlas of the Roman Empire</a>, Lund University, Sweden.</p>' +
                     '</li>' +
