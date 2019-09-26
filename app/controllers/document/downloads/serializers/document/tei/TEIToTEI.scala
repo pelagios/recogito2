@@ -54,10 +54,11 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     getOrCreate(profileDesc, "settingDesc", false)
   }
 
-  private[tei] def getOrCreateEncodingDesc(document: Document) = {
+  private[tei] def getOrCreateClassDecl(document: Document) = {
     val doc = $(document)
     val teiHeader = getOrCreate(doc, "teiHeader", true)
-    getOrCreate(teiHeader, "encodingDesc", false)
+    val encodingDesc = getOrCreate(teiHeader, "encodingDesc", false)
+    getOrCreate(encodingDesc, "classDecl", false)
   }
 
   def partToTEI(part: DocumentFilepartRecord, xml: String, annotations: Seq[Annotation], places: Seq[Entity]) = {
@@ -135,7 +136,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
 
     val taxonomy = tagsToTaxonomy(annotations)
     if (taxonomy.isDefined)
-      getOrCreateEncodingDesc(doc).append($(taxonomy.get.toString))
+      getOrCreateClassDecl(doc).append($(taxonomy.get.toString))
     
     val relations = relationsToList(annotations)
     if (relations.isDefined)
