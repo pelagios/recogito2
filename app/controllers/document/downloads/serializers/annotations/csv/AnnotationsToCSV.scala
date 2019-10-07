@@ -69,8 +69,11 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
     val anchor = parseAnchor(ann.anchor)
     xpath.reset()
     val textnodes = xpath.evaluate(anchor._1 + "/preceding::text()", docs(ann.annotates.filepartId), XPathConstants.NODESET).asInstanceOf[NodeList]
-    (for (i <- 0.to(textnodes.getLength - 1))
-      yield textnodes.item(i).getNodeValue.length).reduce((a, b) => a + b) + anchor._2
+    if (textnodes.getLength > 0)
+      (for (i <- 0.to(textnodes.getLength - 1))
+        yield textnodes.item(i).getNodeValue.length).reduce((a, b) => a + b) + anchor._2
+    else 
+      anchor._2
   }
 
   private def parseXML(source: InputSource) = {
