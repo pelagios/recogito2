@@ -113,10 +113,11 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     }
 
     sortByOffsetDesc(annotations).foreach { annotation =>
-      val range = toRange(annotation.anchor, doc)
+      val anchor = parseAnchor(annotation.anchor)
 
       // We only support TEI export for annotations that don't cross node boundaries
-      if (range.getStartContainer == range.getEndContainer) {
+      if (anchor.startPath == anchor.endPath) {
+        val range = toRange(annotation.anchor, doc)
         val tag = toTag(annotation)
         
         range.deleteContents()
