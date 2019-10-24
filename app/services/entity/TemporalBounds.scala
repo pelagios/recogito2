@@ -6,9 +6,23 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-case class TemporalBounds(from: DateTime, to: DateTime)
+case class TemporalBounds(from: DateTime, to: DateTime) {
+
+  import TemporalBounds._
+
+  // TODO make this smarter - for now, we'll just print to/from years
+  override def toString() = if (from == to) {
+    yearFormatter.print(from)
+  } else {
+    s"${yearFormatter.print(from)}/${yearFormatter.print(to)}"
+  }
+
+}
 
 object TemporalBounds {
+
+  // For convenience
+  private val yearFormatter = DateTimeFormat.forPattern("yyyy").withZone(DateTimeZone.UTC)
 
   private val dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd").withZone(DateTimeZone.UTC)
 

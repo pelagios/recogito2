@@ -125,6 +125,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
           firstEntity.map(_.hasType.toString).getOrElse(EMPTY),
           firstEntity.flatMap(_.uri).getOrElse(EMPTY),
           maybePlace.map(_.titles.mkString("|")).getOrElse(EMPTY),
+          maybePlace.flatMap(_.temporalBoundsUnion.map(_.toString)).getOrElse(EMPTY),
           maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(EMPTY),
           maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY),
           maybePlace.map(_.subjects.map(_._1).mkString(",")).getOrElse(EMPTY),
@@ -204,7 +205,21 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
       }
 
       scala.concurrent.blocking {
-        val header = Seq("UUID", "FILE", "QUOTE_TRANSCRIPTION", "ANCHOR", "TYPE", "URI", "VOCAB_LABEL", "LAT", "LNG", "PLACE_TYPE", "VERIFICATION_STATUS", "TAGS", "COMMENTS")
+        val header = Seq(
+          "UUID",
+          "FILE",
+          "QUOTE_TRANSCRIPTION",
+          "ANCHOR",
+          "TYPE",
+          "URI",
+          "VOCAB_LABEL",
+          "VOCAB_TEMPORAL_BOUNDS",
+          "LAT",
+          "LNG",
+          "PLACE_TYPE",
+          "VERIFICATION_STATUS",
+          "TAGS",
+          "COMMENTS")
         
         val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
         val underlying = tmp.path.toFile
