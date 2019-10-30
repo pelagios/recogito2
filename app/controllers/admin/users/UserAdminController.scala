@@ -104,6 +104,18 @@ class UserAdminController @Inject() (
         Future.successful(BadRequest) // Cannot happen via UI
     }
   }
+
+  def resetPassword(username: String) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request => 
+    users.findByUsername(username).flatMap {
+      case Some(user) => 
+        users.resetPassword(user.username).map { password =>
+          jsonOk(Json.obj("temporary" -> password))
+        }
+                       
+      case None =>
+        Future.successful(NotFound)
+    }
+  }
   
   def deleteAccount(username: String) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
     deleteUserAccount(username).map(_ => Ok)
