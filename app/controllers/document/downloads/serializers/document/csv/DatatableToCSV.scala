@@ -81,11 +81,15 @@ trait DatatableToCSV extends BaseSerializer with HasCSVParsing {
         val maybeFirstEntity = maybeAnnotation.flatMap(getFirstEntityBody(_))
         val maybePlace = maybeFirstEntity.flatMap(body => findPlace(body, places))
         
+        val tags = maybeAnnotation.map(a => getTagBodies(a).flatMap(_.value))
+          .getOrElse(Seq.empty[String])
+
         row ++ Seq(
           maybeFirstEntity.map(_.hasType.toString).getOrElse(""),
           maybeFirstEntity.flatMap(_.uri).getOrElse(""),
           maybePlace.flatMap(_.representativePoint.map(_.y.toString)).getOrElse(""),
-          maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse("")
+          maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(""),
+          tags.mkString("|")
         )
       }
             
@@ -104,7 +108,8 @@ trait DatatableToCSV extends BaseSerializer with HasCSVParsing {
             "recogito_type",
             "recogito_uri",
             "recogito_lat",
-            "recogito_lon")
+            "recogito_lon",
+            "recogito_tags")
      
         val p = Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv")
         val tmp = tmpFile.create(p)
