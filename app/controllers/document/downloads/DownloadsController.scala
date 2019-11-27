@@ -75,6 +75,7 @@ class DownloadsController @Inject() (
     with document.tei.PlaintextToTEI
     with document.tei.TEIToTEI
     with document.iob.PlaintextToIOB
+    with document.markdown.PlaintextToMarkdown
     with document.spacy.PlaintextToSpacy
     with places.PlacesToGeoJSON
     with places.PlacesToKML
@@ -260,13 +261,28 @@ class DownloadsController @Inject() (
     })
   }
 
+  def downloadMarkdown(documentId: String) = silhouette.UserAwareAction.async { implicit request => 
+    download(documentId, RuntimeAccessLevel.READ_ALL, { doc =>
+      // At the moment we only support markdown for single-file plaintext documents
+      if (doc.fileparts.size != 1) {
+        Future.successful(BadRequest("Not supported for multi-part documents"))
+      } else if (doc.fileparts.head.getContentType != ContentType.TEXT_PLAIN.toString) {
+        Future.successful(BadRequest("Unsupported content type"))
+      } else {
+        plaintextToMarkdown(doc).map { md =>
+          Ok(md).withHeaders(CONTENT_DISPOSITION -> { "attachment; filename=" + documentId + ".md" })
+        }
+      }
+    })
+  }
+
   def downloadIOB(documentId: String) = silhouette.UserAwareAction.async { implicit request => 
     download(documentId, RuntimeAccessLevel.READ_ALL, { doc => 
       // At the moment we only support IOB for single-file plaintext documents
       if (doc.fileparts.size != 1) {
-        Future.successful(BadRequest("not supported for multi-part documents"))
+        Future.successful(BadRequest("Not supported for multi-part documents"))
       } else if (doc.fileparts.head.getContentType != ContentType.TEXT_PLAIN.toString) {
-        Future.successful(BadRequest("unsupported content type"))
+        Future.successful(BadRequest("Unsupported content type"))
       } else {
         plaintextToIOB(doc).map { f => 
           Ok.sendFile(f).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}.iob.txt" })
