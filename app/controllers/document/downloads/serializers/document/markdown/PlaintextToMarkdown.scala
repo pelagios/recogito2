@@ -29,7 +29,7 @@ trait PlaintextToMarkdown extends BaseSerializer {
 
       val mdFootnotes = annotations.filter(hasComments).map { a => 
         val comments = getCommentBodies(a).flatMap(_.value).mkString("\n\n")
-        s"[${a.annotationId}]: ${comments}"
+        s"[^${a.annotationId}]: ${comments}"
       }
 
       s"${mdBody}\n\n${mdFootnotes.mkString("\n\n")}\n\n"
@@ -56,11 +56,14 @@ trait PlaintextToMarkdown extends BaseSerializer {
     val fAnnotations = annotationService.findByDocId(doc.id)
 
     val header =
-      """|--------------|-----------|
-        >|              |           |
-        >|--------------|-----------|
-        >
-        >""".stripMargin('>')
+      s"""---
+         >title: ${doc.title}
+         >author: ${doc.author.getOrElse("")}
+         >source: ${doc.source.getOrElse("")}
+         >publication-date: ${doc.dateFreeform.getOrElse("")}
+         >---
+         >
+         >""".stripMargin('>')
 
     val f = for {
       texts <- fTexts

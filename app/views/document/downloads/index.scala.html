@@ -145,6 +145,18 @@
                     <a href="@controllers.document.downloads.routes.DownloadsController.downloadTEI(doc.id)" class="btn small"><span class="icon">&#xf019;</span> TEI/XML</a>
                   </div>
                 </li>
+
+                @if(doc.fileparts.size == 1 && doc.fileparts.head.getContentType == "TEXT_PLAIN") {
+                  <li>
+                    <div class="description">
+                      <h3>Markdown &nbsp;<span class="beta">BETA</span></h3>
+                      <p>A basic markdown serialization. Note: presently, only commentary is included in the export.</p>
+                    </div>
+                    <div class="button-container">
+                      <a href="@controllers.document.downloads.routes.DownloadsController.downloadMarkdown(doc.id)" class="btn small"><span class="icon">&#xf019;</span> Markdown</a>
+                    </div>
+                  </li>
+                }
               </ul>
             } else { @if(doc.hasDataParts) {
               <ul>
