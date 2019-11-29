@@ -24,7 +24,7 @@ trait PlaintextToMarkdown extends BaseSerializer {
           val previousEnd = getEndOffset(previous)          
           val nextStart = getStartOffset(next)
           
-          if (nextStart <= previousEnd)
+          if (nextStart >= previousEnd)
             result :+ next
           else
             result
