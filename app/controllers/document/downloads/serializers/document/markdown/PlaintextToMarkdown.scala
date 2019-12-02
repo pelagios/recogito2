@@ -86,6 +86,7 @@ trait PlaintextToMarkdown extends BaseSerializer {
          >author: ${doc.author.getOrElse("")}
          >source: ${doc.source.getOrElse("")}
          >publication-date: ${doc.dateFreeform.getOrElse("")}
+         >layout: narrative
          >---
          >
          >""".stripMargin('>')
