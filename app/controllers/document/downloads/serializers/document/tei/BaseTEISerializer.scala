@@ -4,7 +4,7 @@ import controllers.document.downloads.serializers.BaseSerializer
 import java.util.UUID
 import services.annotation.{Annotation, AnnotationBody}
 import services.annotation.AnnotationStatus._
-import services.entity.Entity
+import services.entity.{Entity, EntityRecord}
 
 trait BaseTEISerializer extends BaseSerializer {
   
@@ -72,11 +72,29 @@ trait BaseTEISerializer extends BaseSerializer {
     if (referencedRecords.isEmpty) {
       None
     } else {
+      // Use titles for local ID, but catch cases where titles aren't unique
+      val groupedByTitle: Map[String, Seq[EntityRecord]] = referencedRecords.groupBy(_.title)
+
       Some(
         <listPlace>
           { referencedRecords.map { r => 
-            <place xml:id={r.uri}>
+            val recordsWithThisTitle = groupedByTitle.get(r.title).getOrElse(Seq.empty)
+
+            val localId = 
+              if (recordsWithThisTitle.length == 1) {
+                r.title 
+              } else {
+                // Should be a rare case
+                val idx = recordsWithThisTitle.indexOf(r)
+                s"${r.title}_${idx}"
+              }
+
+            val localIdClean = 
+              localId.replaceAll("(\\s+|\\.|\\/)", "_")
+              
+            <place xml:id={localIdClean}>
               <placeName>{r.title}</placeName>
+              <idno type="URI">{r.uri}</idno>
             </place>
           }}
         </listPlace>
