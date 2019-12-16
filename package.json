@@ -14,7 +14,8 @@
     "react-color": "2.14.1",
     "react-dom": ">=16.4.2",
     "react-draggable": "3.0.5",
-    "react-transition-group": "2.4.0"
+    "react-transition-group": "2.4.0",
+    "serialize-javascript": "^2.1.2"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
@@ -28,7 +29,7 @@
     "eslint-plugin-import": "2.13.0",
     "jsx-loader": "0.13.2",
     "lodash": "^4.17.13",
-    "webpack": "4.12.2"
+    "webpack": "^4.41.3"
   },
   "engines": {
     "node": "8.11.3",
