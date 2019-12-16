@@ -109,12 +109,13 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
       val firstEntity = getFirstEntityBody(a)
       val maybePlace = firstEntity.flatMap(body => findPlace(body, places))
       
-      val quoteOrTranscription =
+      val quoteOrTranscription = {
         if (a.annotates.contentType.isText)
           getFirstQuote(a)
         else if (a.annotates.contentType.isImage)
           getFirstTranscription(a)
         else None
+      } map { _.replaceAll("[\\t\\n\\r]+"," ") }
         
       val placeTypes = maybePlace.map(_.subjects.map(_._1).mkString(","))
 
