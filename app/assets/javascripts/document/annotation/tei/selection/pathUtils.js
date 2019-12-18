@@ -27,14 +27,14 @@ define([], function() {
       var count, xpath, predicate;
 
       path = path || [];
+
       if (node.nodeType == Node.ELEMENT_NODE && node.hasAttribute("xml:id")) {
         path.push("/");
-      }
-      else if (node.parentNode && node.parentNode.nodeName.toLowerCase().startsWith("tei-")) {
+      } else if (node.parentNode) { // && node.parentNode.nodeName.toLowerCase().startsWith("tei-")) {
         path = this.getXPath(node.parentNode, path);
       }
 
-      if(node.nodeType == Node.ELEMENT_NODE && node.nodeName.toLowerCase().startsWith("tei-")) {
+      if (node.nodeType == Node.ELEMENT_NODE && node.nodeName.toLowerCase().startsWith("tei-")) {
         xpath = "count(preceding-sibling::"+node.localName+")";
         count = document.evaluate(xpath, node, null, XPathResult.NUMBER, null).numberValue + 1;
         if (node.hasAttribute("xml:id")) {
@@ -45,6 +45,8 @@ define([], function() {
         path.push("/");
         path.push(node.getAttribute("data-origname") + predicate);
       }
+
+      console.log(path);
 
       return path;
     },
