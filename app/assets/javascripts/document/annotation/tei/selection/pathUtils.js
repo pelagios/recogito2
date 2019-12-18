@@ -46,8 +46,6 @@ define([], function() {
         path.push(node.getAttribute("data-origname") + predicate);
       }
 
-      console.log(path);
-
       return path;
     },
 
