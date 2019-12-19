@@ -1,0 +1,168 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.annotations=التفسيرات
+common.users=المستخدمون
+common.logged_in_as=الدخول بإسم آخر
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common document-related labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.document.title=Title
+common.document.author=المؤلف
+common.document.date=التاريخ
+common.document.description=الوصف
+common.document.language=اللغة
+common.document.source=المصدر
+common.document.edition=الطبعة
+common.document.license=الرخصة
+common.document.attribution=الصفة
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common button labels
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+common.buttons.save_changes=إحفظ التعديلات التى أدخلتها
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Landing page
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+landing.index.page_title=أهلا وسهلا بكم فى برنامج ريكوجيتو
+landing.index.header.link.tutorial=التعليمات
+landing.index.header.link.about=About
+landing.index.header.link.login=الدخول
+
+# Jumbotron
+landing.index.jumbotron.tagline.1=تفسيرات البيانات المترابطة
+landing.index.jumbotron.tagline.2=بدون أقواس مدببة
+landing.index.jumbotron.blurb=إنشاء الخرائط من النص. فسر أسماء الأماكن فى الصور. قم بربط بحثك العلمى بمعلومات آخرى متاحة على الإنترنت حتى يصبح معروف و يستخدمه الباحثون الآخرون  وذلك كله بدو الحاجة إلى أن تكون خبير فى الويب الدلالي.
+landing.index.jumbotron.learn_more=تعرف على المزيد
+
+landing.index.registration_form.placeholder.username=إختر إسم مستخدم
+landing.index.registration_form.placeholder.email=أدخل بريدك الإلكترونى
+landing.index.registration_form.placeholder.password=قم بإنشاء كلمة سر
+landing.index.registration_form.placeholder.register=سجل على برنامج ريكوجيتو
+landing.index.registration_form.disclaimer.text=نرجوا أن توافق على قيود وشروط إستخدام وحفظ عنوان بريدك الإلكترونى
+
+# News
+landing.index.news.title=
+landing.index.news.subtitle=
+landing.index.news.text=We are thrilled to announce that Recogito has received the title of <strong>Best Digital \
+  Humanities Tool 2018</strong> in this year''s <a href="http://dhawards.org/dhawards2018/results/">Digital \
+  Humanities Awards</a>. A huge Thank You to everyone who voted!
+
+# Tiles
+landing.index.tiles.1.title=المجموعات المتاحة للمشاركة
+landing.index.tiles.1.text=إرفع نصوصاً أو صوراً.كون مجموعتك الخاصة من النصوص والصور و إدعو الباحثين الآخرون للتعاون معك
+landing.index.tiles.2.title=الشروح والتعليقات بالتعاون مع الآخرين
+landing.index.tiles.2.text=دون ملاحظاتك. ضع الرموز. ناقش. برنامج ريكوجيتو يسجل المصادر ويقوم بحفظ نسخة أصلية قبل تعديلها
+landing.index.tiles.3.title=الدلالات 
+landing.index.tiles.3.text=ضع علامة على أسماء الأماكن والأشخاص ذات المفردات التي يتم التحكم فيها بسهولة باستخدام ميزات الدعم المدمجة فى البرنامج
+landing.index.tiles.4.title=البيانات المفتوحة
+landing.index.tiles.4.text=إعرض شغلك على الإنترنت و أنشر المعلوات التى تستخلصها من النصوص والصور على هيئة بينات مفتوحة المصدر ومترابطة
+
+# Recogito Right Now
+landing.index.right_now=الفعاليات الحالية فى برنامج ريكوجيتو
+landing.index.edits_last_24hrs=التصويبات والتعديلات المدخلة فى آخر أربعة وعشرين ساعة
+
+# About
+landing.index.about=Open Source Software by the <a href="{0}" target="_blank">Austrian Institute \
+  of Technology</a>, <a href="{1}" target="_blank">Exeter University</a>, \
+  <a href="{2}" target="_blank">Humboldt Institute for Internet and Society</a>, \
+  <a href="{3}" target="_blank">The Open University</a> and \
+  <a href="{4}" target="_blank">University of London</a>. Funded by the \
+  <a href="{5}" target="_blank">Andrew W. Mellon Foundation</a>.
+landing.index.visit_us=<span class="icon">{0}</span> Visit us on \
+  <a href="{1}" target="_blank">Github</a> <span class="icon">{2}</span> Follow us on \
+  <a href="{3}" target="_blank">Twitter</a>
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Account settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+account_settings.sidebar.account=حساب
+account_settings.sidebar.password=كلمة سر
+account_settings.sidebar.restore=إستعد من ملفات الإحتياط
+
+account_settings.account.account_settings=إعدادت الحساب
+account_settings.account.email=البريد الإلكترونى
+account_settings.account.name=الإسم
+account_settings.account.about_you=بعض المعلومات عنك
+account_settings.account.website=موقعك الإلكترونى إن وجد
+account_settings.account.optional=إختيارى
+account_settings.account.delete.title=حذف الحساب
+account_settings.account.delete.warning=تحذير: حذف الحساب سوف يحذف أيضاً كل الوثائق والتفسيرات التى قمت بتحريرها. نرجوا أن تقوم بعمل نسخة إحتياطة من كل الوثائق التى تريد أن تحتفظ بها وذلك لأن الحساب المحذوف لا يمكن إسترجاعه
+account_settings.account.delete.button=حذف الحساب
+
+account_settings.password.change_password=تغيير كلمة السر
+account_settings.password.current=كلمة السر الحالية
+account_settings.password.new=كلمة سر جديدة
+account_settings.password.verify=التحقق من كلمة السر
+
+account_settings.restore.instructions=يمكنك أن تستعيد وثيقة من حزمة إحتياطة لملف مضغوط قمت بحفظه من قبل وذلك من خلال خاصية إستعادة النسخ الإحتياطى فى برنامج ريكوجيتو
+account_settings.restore.button=إرفع حزمة إحتياطية لملف مضغوط
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Text annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.text.toolbar.annotation_mode=مستوى التفسير
+document.annotation.text.toolbar.mode.normal=عادى
+document.annotation.text.toolbar.mode.quick=إختيار سريع
+document.annotation.text.toolbar.mode.quick.places=أسماء أماكن
+document.annotation.text.toolbar.mode.quick.persons=أسماء أشخاص
+document.annotation.text.toolbar.mode.quick.tags=علامات
+document.annotation.text.toolbar.mode.relations=RELATIONS
+document.annotation.text.toolbar.color=اللون
+document.annotation.text.toolbar.color.by_type=طبقا للنوع
+document.annotation.text.toolbar.color.by_status=طبقا للحالة
+document.annotation.text.toolbar.color.by_tag=طبقاً للعلامة
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Image annotation
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.annotation.image.toolbar.tools=الأدوات
+document.annotation.image.toolbar.tools.move=حرك
+document.annotation.image.toolbar.tools.point=نقطة
+document.annotation.image.toolbar.tools.rectangle=مربع
+document.annotation.image.toolbar.tools.tilted_box=مستطيل مائل
+
+document.annotation.image.toolbar.image=صورة
+document.annotation.image.toolbar.layers=طبقة
+document.annotation.image.toolbar.help=المساعدة
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Downloads
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.downloads.annotations.csv.text=تحميل التفسيرات على هيئة جدول بيانات ولذلك لنقلها إلى برنامج الجداول spreadsheet  و نظام إدارة المواقع الجغرافية الإلكترونى (GIS)
+document.downloads.annotations.rdf.text=تحميل التفسيرات و صفات الوثائق على هئية RDF مشفرة على هيئة تفسيرات مفتوحة و مصدر دوبلن
+document.downloads.annotations.geojson.text=Confirmed geo-located places in the document as a GeoJSON FeatureCollection.
+document.downloads.annotations.kml.text=أماكن تم تحديدها بدقة على هيئة مللف KML وذلك من أجل تصفحها فى برنامج Google Earth
+document.downloads.annotations.tei.text=النص المفسر فى تسلسل أولى. نرجوا الملاحظة أن التفسيرت المتاحة حاليا هى تفسيرات أسماء الأماكن فقط . و لاحظ أيضاً أن التفسيرات المتداخلة يتم تصفيتها لأن لغة TEI لا تدعم هذه الميزة بعد.
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Document settings
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+document.settings.sidebar.metadata=وصف البيانات
+document.settings.sidebar.preferences=Annotation Preferences
+document.settings.sidebar.sharing=شارك
+document.settings.sidebar.edit_history=حرر تاريخ التعديل
+document.settings.sidebar.backup=حفظ نسخة للطوارئ
+document.settings.sidebar.delete=إحذف
+
+# Metadata
+document.settings.metadata.document_metadata=وصف الوثيقة
+document.settings.metadata.document_parts=أجزاء الوثيقة
+document.settings.metadata.edit_part=عدل بيانات أجزاء الوثيقة
+document.settings.metadata.drag_to_change=إسحب للتعديل
+
+# Sharing
+document.settings.sharing.public_access=يستطيع الكل أن يصل إلى هذا الملف
+document.settings.sharing.visible_to_all=يمكن للجميع أن يراه
+
+document.settings.sharing.collaborators=Collaborators
+document.settings.sharing.collaborators.none=This document doesn''t have any collaborators yet. \
+  Use the form below to add a collaborator.
+document.settings.sharing.collaborators.enter_username=أدخل إسم مستخدم
+
+# Backup
+document.settings.backup.backup=نسخة للتخزين
+document.settings.backup.description=حزمة التخزين تضمن وصف للوثائق بالإضافة إلى الملف والشروح التعليقات. يمكن أن تستخدم هذه الحزمة لإستعادة ما قمت بإدخاله على البرنامج وذلك فى وقت لاحق. نرجوا أن تقوم بإستمرار بحفظ نسخة مما تقوم به بإستخدام البرنامج وذلك بشكل منتظم على سبيل الإحتراز .وهنا لا بد لنا أن ننوه على أن ميزة حفظ نسخة من شغلك لا تتضمن فى الوقت الحالى تاريخ التعديلات التى قمت بها.
+document.settings.backup.button=حمل الملف على هيئة حزمة للتخزين على هيئة ملف مضغوط
