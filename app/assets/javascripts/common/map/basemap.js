@@ -8,7 +8,7 @@ define(['common/map/layerswitcher'], function(LayerSwitcher) {
 
     var Layers =  {
 
-          DARE   : L.tileLayer('http://dare.ht.lu.se/tiles/imperium/{z}/{x}/{y}.png', {
+          DARE   : L.tileLayer('http:///dh.gu.se/tiles/imperium/{z}/{x}/{y}.png', {
                      attribution: 'Tiles: <a href="http://imperium.ahlfeldt.se/">DARE 2014</a>',
                      minZoom:3,
                      maxZoom:11
