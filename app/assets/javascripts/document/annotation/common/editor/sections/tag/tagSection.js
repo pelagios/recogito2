@@ -41,6 +41,16 @@ define([
                 '<span class="delete"><span class="icon">&#xf014;</span></span></li>');
 
           li.data('tag', tag);
+    
+          // Make drag-sortable if write access
+          if (Config.writeAccess) {
+            li.draggable({ 
+              connectToSortable: taglist,
+              revert: 'invalid',
+              revertDuration: 10
+            });
+          }
+
           return li;
         },
 
@@ -168,6 +178,9 @@ define([
 
     if (Config.writeAccess) {
       taglist.on('click', 'li', onTagClicked);
+
+      taglist.sortable({ revert: 10 });
+
       textarea.keydown(onKeyDown);
     }
 
