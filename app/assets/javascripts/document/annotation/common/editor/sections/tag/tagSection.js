@@ -22,7 +22,7 @@ define([
 
         autocomplete = new TagAutocomplete(element, textarea, allAnnotationsOnPage),
 
-        queuedUpdates = [],
+        hasChanged = false,
 
         /**
          * Creates a new tag element and attaches the tag to it as data.
@@ -81,23 +81,16 @@ define([
         /** Adds a new tag to the annotation **/
         addTag = function(chars) {
           if (!exists(chars)) {
-            var li = createTag(chars),
-                tag = li.data('tag');
-
+            var li = createTag(chars);
             taglist.append(li);
-            queuedUpdates.push(function() { annotation.bodies.push(tag); });
+            hasChanged = true;
           }
         },
 
         /** Deletes a tag from the annotation **/
         deleteTag = function(li) {
-          var tag = li.data('tag');
           li.remove();
-          queuedUpdates.push(function() {
-            var idx = annotation.bodies.indexOf(tag);
-            if (idx > -1)
-              annotation.bodies.splice(idx, 1);
-          });
+          hasChanged = true;
         },
 
         /** Shows the delete button on the given tag element **/
@@ -124,8 +117,8 @@ define([
         /** Click toggles the delete button or deletes, depending on state & click target **/
         onTagClicked = function(e) {
           var isDelete = (e.target).closest('.delete'),
-              li = jQuery(e.target).closest('li'),
-              chars = li.find('.label').text();
+              li = jQuery(e.target).closest('li');
+              // chars = li.find('.label').text();
 
           if (isDelete) {
             deleteTag(li);
@@ -139,7 +132,9 @@ define([
         getDraftTags = function() {
           var str = textarea.val().trim(); //.split(',');
           if (str)
-            return str.split(',');
+            return str.split(',').map(function(str) {
+              return { type: 'TAG', last_modified_by: Config.me, value: str.trim() }
+            });
           else
             return [];
         },
@@ -159,14 +154,24 @@ define([
 
         /** @override **/
         hasChanged = function() {
-          return queuedUpdates.length > 0 || getDraftTags().length > 0;
+          return hasChanged | getDraftTags().length > 0;
         },
 
         /** @override **/
         commit = function() {
-          // Add draft tags to the queue as well
-          getDraftTags().forEach(addTag);
-          jQuery.each(queuedUpdates, function(idx, fn) { fn(); });
+          // Other annotation bodies - leave untouched!
+          var nonTagBodies = annotation.bodies.filter(function(b) {
+                return b.type !== 'TAG';
+              }),
+
+              tagBodies = jQuery.map(taglist.find('li').toArray(), function(li) {
+                return jQuery(li).data('tag');
+              }),
+
+              draftTags = getDraftTags();
+
+          // Keep all non-tag bodies and append the rest
+          annotation.bodies = nonTagBodies.concat(tagBodies.concat(draftTags));
         },
 
         /** @override **/
@@ -178,9 +183,12 @@ define([
 
     if (Config.writeAccess) {
       taglist.on('click', 'li', onTagClicked);
-
-      taglist.sortable({ revert: 10 });
-
+      taglist.sortable({
+        revert: 10,
+        beforeStop: function() {
+          hasChanged = true;
+        } 
+      });
       textarea.keydown(onKeyDown);
     }
 
