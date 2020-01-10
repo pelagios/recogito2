@@ -42,6 +42,31 @@ define([
         },
 
         /**
+         * Merges the tag sets, maintaining the order of the toMerge list.
+         */
+        mergeTags = function(bodiesToMerge, origBodies) {
+              // Returns true if the tag is included in the tag list (string val comparison)
+          var includedIn = function(tag, tagList) {
+                return tagList.find(function(t) {
+                  return t.value === tag.value;
+                });
+              },
+
+              toMerge = bodiesToMerge.filter(function(b) { return b.type === 'TAG' }),
+
+              // All original tags
+              origTags = origBodies.filter(function(b) { return b.type === 'TAG'; }),
+              
+              // All original, non-tag bodies
+              nonTagBodies = origBodies.filter(function(b) { return b.type != 'TAG'; }),
+
+              // Original tags that are not in the toMerge set (we want to keep those)
+              origTagsToKeep = origTags.filter(function(t) { return !includedIn(t, toMerge)});
+
+          return nonTagBodies.concat(origTagsToKeep.concat(toMerge));
+        },
+
+        /**
          * Re-applies the annotation to the un-annotated text
          */
         reapplyToUnannotated = function(annotation, matchType) {
@@ -128,6 +153,7 @@ define([
                     }));
 
                 original.bodies = bodiesToKeep.concat(bodiesToAppend);
+                original.bodies = mergeTags(annotation.bodies, original.bodies);
               };
 
           toApply.forEach(mergeOne);
