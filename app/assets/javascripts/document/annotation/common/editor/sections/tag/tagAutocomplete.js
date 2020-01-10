@@ -23,7 +23,7 @@ define([], function() {
         },
 
         hide = function() {
-          textarea.typeahead('close');
+          textarea.typeahead('val', '').typeahead('close');
         };
 
     init();

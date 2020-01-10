@@ -118,7 +118,6 @@ define([
         onTagClicked = function(e) {
           var isDelete = (e.target).closest('.delete'),
               li = jQuery(e.target).closest('li');
-              // chars = li.find('.label').text();
 
           if (isDelete) {
             deleteTag(li);
@@ -130,7 +129,7 @@ define([
 
         /** Tags that are currently in 'draft' in the edit field **/
         getDraftTags = function() {
-          var str = textarea.val().trim(); //.split(',');
+          var str = textarea.val().trim();
           if (str)
             return str.split(',').map(function(str) {
               return { type: 'TAG', last_modified_by: Config.me, value: str.trim() }
@@ -144,7 +143,7 @@ define([
           if (e.keyCode === 13) {
             var tags = getDraftTags();
             jQuery.each(tags, function(idx, chars) {
-              addTag(chars.trim());
+              addTag(chars.value.trim());
             });
             autocomplete.hide();
             textarea.val('');
