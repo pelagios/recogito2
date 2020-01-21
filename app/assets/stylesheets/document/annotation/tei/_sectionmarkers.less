@@ -1,0 +1,21 @@
+#content {
+
+  tei-div[subtype="chapter"]::before {
+    content: "Chapter " attr(n);
+  }
+
+  tei-div[subtype="section"]::before {
+    content: "Section " attr(n);
+  }
+
+  tei-div[subtype]::before, tei-div[subtype]::after {
+    font-family:OpenSans;
+    font-size:11px;
+    padding:0 3px;
+    background-color:#fff;
+    border:1px solid @lightgrey-border-darker;
+    .rounded-corners(2px);
+    margin-right:3px;
+  }
+
+}

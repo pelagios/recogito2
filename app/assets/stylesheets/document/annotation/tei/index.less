@@ -1,4 +1,5 @@
 @import '../text/index.less';
+@import './_sectionmarkers.less';
 
 #content {
   white-space:normal !important;
@@ -818,7 +819,7 @@ tei-sourceDesc tei-list > tei-item {
 
 /* Match only lists that are descendants of tei-text. Otherwise they show up in the header. */
 tei-text {
-  margin-top:40px;
+  margin-top:10px;
 }
 tei-text tei-list[type=simple] {
   list-style-type: none;
@@ -1104,8 +1105,8 @@ tei-origin {
 /* p */
 tei-p {
   display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
+  margin-top: 0.2em;
+  margin-bottom: 1.4em;
 }
 *[data-tei-rendition~="#center"] p {
   text-align: center;
