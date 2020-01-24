@@ -1,13 +1,13 @@
 # We need JDK 8 and SBT 1.0.x
-FROM hseeberger/scala-sbt:8u151-2.12.4-1.0.4 AS build
+FROM hseeberger/scala-sbt:8u222_1.3.3_2.13.1 AS build
 
 # Based on https://github.com/Wadjetz/scala-sbt-nodejs/blob/master/Dockerfile
 # Get node and libvips
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    apt install -y nodejs libvips-tools && \
+    apt-get install -y nodejs libvips-tools && \
     apt-get clean
 
-#For now we work with the master branch
+# For now we work with the master branch
 RUN git clone https://github.com/pelagios/recogito2 /usr/share/recogito
 
 # Move to workdir
@@ -31,8 +31,9 @@ RUN sbt compile
 RUN sbt dist
 
 # And unzip it somewhere useful
-
 RUN unzip target/universal/recogito2-2.2.zip -d /opt/ 
+
+RUN ls -AlFh /opt
 
 # END OF BUILD STAGE
 # To slim down the final production image, we begin a new stage
@@ -43,8 +44,10 @@ FROM openjdk:8-jre
 
 # We still need libvips
 RUN apt-get update && \
-    apt-get install -y libvips-tools && \
+    apt-get install -y libvips-tools sendmail && \
     apt-get clean
+
+RUN ls -AlFh /opt
 
 # But we don't need any of the other build artifacts - just grab the dist
 COPY --from=build /opt/recogito2-2.2/ /opt/recogito/
@@ -57,7 +60,9 @@ WORKDIR /opt/recogito/
 # for persistance - by default that would be /opt/recogito/uploads
 # though it is configurable in application.conf
 
+# This line added by JvB to enable logging
+RUN mkdir /var/log/recogito 
+
 # Open the port we're running on
 EXPOSE 9000
 CMD ["/opt/recogito/bin/recogito2"]
-

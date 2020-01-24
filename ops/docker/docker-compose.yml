@@ -1,6 +1,6 @@
-#Docker-compose for running a Recogito image with the official Elasticsearch
-#image as its ES backend. The database server is assumed to be external to
-#Docker.
+# Docker-compose for running a Recogito image with the official Elasticsearch
+# image as its ES backend. The database server is assumed to be external to
+# Docker.
 
 version: '3.4'
 services:
@@ -13,47 +13,54 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
     container_name: elasticsearch
     volumes:
-      - esdata:/usr/share/elasticsearch/data
+       - esdata:/usr/share/elasticsearch/data
+       - /home/recogito/logs/elasticsearch:/usr/share/elasticsearch/logs
+       - /home/recogito/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+#      - type: bind
+#        source: /home/recogito/esdata/
+#        target: /usr/share/elasticsearch/data
     environment:
       - cluster.name=docker-cluster
       - xpack.security.enabled=false
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms12g -Xmx12g"
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    deploy: 
-      resources:
-        limits:
-          memory: 1g
     networks:
       - intranet
+    ports:
+     - 9200:9200
+     - 9300:9300
 # The recogito image. Nothing terribly special here. We bind mount the
 # configuration from the local file system, expose the right ports, mount a
 # volume for persistent data, and finally we sleep a short time while the
 # ES service gets ready. 
   recogito:
-    image: recogito-slim # Or whatever you have tagged your dockerimage
+    image: recogito-build-2020-01-24
     container_name: recogito
     volumes:
-     - type: bind
-       source: /path/to/application.conf
-       target: /opt/recogito/conf/application.conf
-     - recogitodata:/opt/recogito/uploads/
+      - /home/recogito/application.conf:/opt/recogito/conf/application.conf
+      - /home/recogito/recogitodata/:/opt/recogito/uploads/
+      - /home/recogito/recogitoplugins/:/opt/recogito/plugins/
+      - /home/recogito/logback.xml:/opt/recogito/conf/logback.xml
+      - /home/recogito/logs/:/var/log/recogito/
+#     - type: bind
+#       source: /home/recogito/application.conf
+#       target: /opt/recogito/conf/application.conf
+#     - type: bind
+#       source: /home/recogito/recogitodata/
+#       target: /opt/recogito/uploads/
     ports: 
-     - 9000:9000
+     - 9333:9000
     networks:
       - intranet
-    command: sh -c "sleep 10 && bin/recogito2"
+    command: sh -c "sleep 60 && bin/recogito2"
 
 networks:
   intranet:
 
-# Quick and unoptimized volume configuration. Make sure to backup these
-# volumes for persistence.  
 volumes:
-  recogitodata:
-    driver: local
   esdata:
     driver: local
