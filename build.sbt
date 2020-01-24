@@ -23,6 +23,7 @@ resolvers ++= Seq(
   "Boundless" at "http://repo.boundlessgeo.com/main/",
   "Atlassian Releases" at "https://maven.atlassian.com/public/",
   "Atlassian Maven" at "https://maven.atlassian.com/content/repositories/atlassian-public/",
+  "mvnrepository" at "http://mvnrepository.com/artifact",
   Resolver.jcenterRepo 
 )
 
