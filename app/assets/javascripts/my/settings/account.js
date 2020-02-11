@@ -26,7 +26,7 @@ require(['common/ui/alert'], function(Alert) {
                       Alert.INFO,
                       'Good Bye',
                       'Good Bye &amp; thanks for checking out Recogito. We appreciate your feedback ' +
-                      'via the <a href="http://commons.pelagios.org/groups/recogito-users/">Recogito Users group</a>.'
+                      'via the <a href="https://groups.google.com/forum/#!forum/pelagios-network">Pelagios mailing list</a>.'
                     );
 
                     alert.on('ok', redirectToSplashpage);

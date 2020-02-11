@@ -15,6 +15,7 @@ pc.stdout.log
 .settings
 .cache-*
 **ensime*
+.metals
 pc.stdout.log
 recogito.plugins.ner.flair
 recogito.plugins.ner.herodotus
