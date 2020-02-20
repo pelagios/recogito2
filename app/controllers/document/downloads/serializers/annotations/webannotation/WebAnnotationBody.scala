@@ -1,7 +1,9 @@
 package controllers.document.downloads.serializers.annotations.webannotation
 
-import services.HasDate
+import com.vividsolutions.jts.geom.Geometry
+import services.{HasDate, HasGeometry}
 import services.annotation.AnnotationBody
+import services.entity.Entity
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -12,17 +14,21 @@ case class WebAnnotationBody(
   note    : Option[String],
   creator : Option[String],
   modified: DateTime,
-  purpose : Option[String]
+  purpose : Option[String],
+  entity  : Option[Entity]
 )
+
   
-object WebAnnotationBody extends Enumeration with HasDate {
+object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
   
   val TextualBody = Value("TextualBody")
 
   val SpecificResource = Value("SpecificResource")
+
+  val Feature = Value("Feature")
   
   /** Note we don't explicitely serialize QUOTE bodies **/
-  def fromAnnotationBody(b: AnnotationBody, recogitoBaseURI: String): Option[WebAnnotationBody] = {
+  def fromAnnotationBody(b: AnnotationBody, recogitoBaseURI: String, entities: Seq[Entity]): Seq[WebAnnotationBody] = {
     
     import AnnotationBody._
     
@@ -39,16 +45,34 @@ object WebAnnotationBody extends Enumeration with HasDate {
       case _ => None
     }
     
-    if (b.hasType == QUOTE)
-      None
-    else
-      Some(WebAnnotationBody(
+    if (b.hasType == QUOTE) {
+      Seq.empty[WebAnnotationBody]
+    } else {
+      val body = WebAnnotationBody(
         hasType,
         Seq(b.uri, b.value).flatten.headOption,
         b.note,
         b.lastModifiedBy.map(by => recogitoBaseURI + by),
         b.lastModifiedAt,
-        purpose))
+        purpose,
+        None)
+
+      val maybeGeoReference =
+        if (b.hasType == PLACE)
+          entities.map { e => WebAnnotationBody(
+            Feature,
+            None,
+            None,
+            b.lastModifiedBy.map(by => recogitoBaseURI + by),
+            b.lastModifiedAt,
+            Some("georeferencing"),
+            Some(e)
+          )}
+        else 
+          Seq.empty[WebAnnotationBody]
+
+      body +: maybeGeoReference
+    }
   }
   
   implicit val webAnnotationBodyWrites: Writes[WebAnnotationBody] = (
@@ -57,7 +81,16 @@ object WebAnnotationBody extends Enumeration with HasDate {
     (JsPath \ "note").writeNullable[String] and
     (JsPath \ "creator").writeNullable[String] and
     (JsPath \ "modified").write[DateTime] and
-    (JsPath \ "purpose").writeNullable[String]
-  )(unlift(WebAnnotationBody.unapply))
+    (JsPath \ "purpose").writeNullable[String] and
+    (JsPath \ "geometry").writeNullable[Geometry]
+  )(a => (
+    a.hasType,
+    a.value,
+    a.note,
+    a.creator,
+    a.modified,
+    a.purpose,
+    a.entity.flatMap(_.representativeGeometry)
+  ))
   
 }

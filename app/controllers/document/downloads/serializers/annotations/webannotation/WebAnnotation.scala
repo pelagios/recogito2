@@ -6,9 +6,15 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import services.HasDate
 import services.annotation.Annotation
+import services.entity.Entity
 import services.generated.tables.records.DocumentFilepartRecord
 
-case class WebAnnotation(filepart: DocumentFilepartRecord, recogitoBaseURI: String, annotation: Annotation)
+case class WebAnnotation(
+  filepart: DocumentFilepartRecord,
+  recogitoBaseURI: String,
+  annotation: Annotation,
+  entities: Seq[Entity]
+)
 
 object WebAnnotation extends HasDate {
   
@@ -26,7 +32,7 @@ object WebAnnotation extends HasDate {
     "Annotation",
     Generator(a.recogitoBaseURI),
     DateTime.now,
-    a.annotation.bodies.flatMap(b => WebAnnotationBody.fromAnnotationBody(b, a.recogitoBaseURI)),
+    a.annotation.bodies.flatMap(b => WebAnnotationBody.fromAnnotationBody(b, a.recogitoBaseURI, a.entities)),
     WebAnnotationTarget.fromAnnotation(a.filepart, a.annotation)
   ))
 

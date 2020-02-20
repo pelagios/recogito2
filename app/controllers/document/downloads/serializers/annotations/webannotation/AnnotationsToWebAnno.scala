@@ -2,7 +2,7 @@ package controllers.document.downloads.serializers.annotations.webannotation
 
 import controllers.document.downloads.serializers.BaseSerializer
 import services.ContentType
-import services.annotation.AnnotationService
+import services.annotation.{AnnotationService, AnnotationBody}
 import services.document.{ExtendedDocumentMetadata, DocumentService}
 import services.entity.EntityType
 import services.entity.builtin.EntityService
@@ -31,13 +31,20 @@ trait AnnotationsToWebAnno extends BaseSerializer {
     val f = for {
       annotations <- fAnnotations
       places <- fPlaces
-    } yield (annotations.map(_._1), places)
+    } yield (annotations.map(_._1), places.items.map(_._1.entity))
 
     f.map { case (annotations, places) =>
-      // TODO make use of places when serializing WebAnno
       Json.toJson(annotations.map { annotation =>
         val filepart = doc.fileparts.find(_.getId == annotation.annotates.filepartId).get
-        WebAnnotation(filepart, recogitoURI, annotation)
+
+        val placesOnThisAnnotation = annotation.bodies
+          .filter(_.hasType == AnnotationBody.PLACE)
+          .filter(_.uri.isDefined)
+          .flatMap(body => {
+            places.find(entity => entity.uris.contains(body.uri.get))
+          })
+
+        WebAnnotation(filepart, recogitoURI, annotation, placesOnThisAnnotation)
       })
     }
   }
