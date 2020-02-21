@@ -24,7 +24,7 @@ trait RelationsToTriplesCSV extends BaseSerializer {
       ctx: ExecutionContext
   ) = {
     annotationService.findWithRelationByDocId(documentId, 0, ES.MAX_SIZE).map { annotations => 
-      val header = Seq("from_quote", "relation", "to_quote")
+      val header = Seq("source", "relation", "target")
 
       val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
       val underlying = tmp.path.toFile
