@@ -24,7 +24,12 @@ trait RelationsToTriplesCSV extends BaseSerializer {
       ctx: ExecutionContext
   ) = {
     annotationService.findWithRelationByDocId(documentId, 0, ES.MAX_SIZE).map { annotations => 
-      val header = Seq("source", "relation", "target")
+      val header = Seq(
+        "source", 
+        "relation", 
+        "target",
+        "source_tags",
+        "target_tags")
 
       val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
       val underlying = tmp.path.toFile
@@ -34,13 +39,22 @@ trait RelationsToTriplesCSV extends BaseSerializer {
 
       annotations.foreach { annotation =>
         val fromQuote = getFirstQuoteOrTranscription(annotation)
+        val fromTags = getTagBodies(annotation).flatMap(_.value)
 
         annotation.relations.foreach { relation => 
           val toAnnotation = annotations.find(_.annotationId == relation.relatesTo).get
           val toQuote = getFirstQuoteOrTranscription(toAnnotation)
+          val toTags = getTagBodies(toAnnotation).flatMap(_.value)
         
           relation.bodies.foreach { relationBody => 
-            val row = Seq(fromQuote.get, relationBody.value, toQuote.get)
+            val row = Seq(
+              fromQuote.get, 
+              relationBody.value, 
+              toQuote.get,
+              fromTags.mkString("|"),
+              toTags.mkString("|")
+            )
+            
             writer.write(row)
           }
         }

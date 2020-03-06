@@ -19,7 +19,7 @@ trait RelationsToGephi extends BaseSerializer {
     implicit annotationService: AnnotationService, tmpFile: TemporaryFileCreator, conf: Configuration, ctx: ExecutionContext
   ) = {
     annotationService.findWithRelationByDocId(documentId, 0, ES.MAX_SIZE).map { annotations =>
-      val header = Seq("Id", "Label")
+      val header = Seq("Id", "Label", "Tags")
 
       val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
       val underlying = tmp.path.toFile
@@ -28,7 +28,12 @@ trait RelationsToGephi extends BaseSerializer {
       val writer = underlying.asCsvWriter[Seq[String]](config)
       
       annotations.foreach { annotation =>
-        val row = Seq(annotation.annotationId.toString, getFirstQuote(annotation).getOrElse(""))
+        val tags = getTagBodies(annotation).flatMap(_.value)
+        val row = Seq(
+          annotation.annotationId.toString,
+          getFirstQuote(annotation).getOrElse(""),
+          tags.mkString("|"))
+
         writer.write(row)
       }
       
