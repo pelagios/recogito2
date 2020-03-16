@@ -29,7 +29,9 @@
     "eslint-plugin-import": "2.13.0",
     "jsx-loader": "0.13.2",
     "lodash": "^4.17.13",
-    "webpack": "^4.41.3"
+    "webpack": "^4.41.3",
+    "minimist": ">=1.2.2",
+    "acorn": ">=5.7.4"
   },
   "engines": {
     "node": "8.11.3",
