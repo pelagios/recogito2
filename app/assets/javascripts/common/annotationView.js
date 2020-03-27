@@ -1,6 +1,7 @@
 define([
+  'common/config',
   'common/utils/annotationUtils'
-], function(Utils) {
+], function(Config, Utils) {
 
   var Annotations = function(initial) {
 
@@ -37,9 +38,14 @@ define([
         },
 
         /** Resets the derived sets (uniqueTags, contributors etc.) **/
-        resetDerivedSets = function() {
+        resetDerivedSets = function(annotations) {
           contributors = [];
-          uniqueTags = [];
+
+          var tags = annotations.reduce(function(tags, annotation) {
+            return tags.concat(Utils.getTags(annotation));
+          }, []);
+
+          uniqueTags = Array.from(new Set(uniqueTags.concat(tags)));
         },
 
         /** Add an annotation or array of annotations to the view **/
@@ -51,7 +57,7 @@ define([
           // But before that, we'd need to check if empty (i.e. not a one-liner, and
           // performance increase might be minimal unless for really long lists of
           // annotations
-          resetDerivedSets();
+          resetDerivedSets(newAnnotations);
         },
 
         addOrReplace = function(a) {
@@ -71,7 +77,7 @@ define([
               };
 
           newAnnotations.forEach(addOrReplaceOne);
-          resetDerivedSets();
+          resetDerivedSets(newAnnotations);
         },
 
         /** Removes an annotation or array of annotations to the view **/
@@ -85,7 +91,7 @@ define([
               };
               
           toRemove.forEach(removeOne);
-          resetDerivedSets();
+          resetDerivedSets([]);
         },
 
         /** Filters annotations by any filter function **/
@@ -140,14 +146,21 @@ define([
         },
 
         listUniqueTags = function() {
-          var getTags = function(a) { return Utils.getTags(a); };
-          collectIntoIfEmpty(getTags, uniqueTags);
           return uniqueTags;
         },
 
         listAnnotations = function() {
           return annotations;
+        },
+
+        fetchTags = function() {
+          jsRoutes.controllers.document.stats.StatsController.getTagsAsJSON(Config.documentId)
+            .ajax().then(function(response) {
+              uniqueTags = response.map(function(tag) { return tag.value });
+            });
         };
+
+    fetchTags();
 
     this.add = add;
     this.addOrReplace = addOrReplace;

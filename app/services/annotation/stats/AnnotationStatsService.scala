@@ -24,7 +24,7 @@ trait AnnotationStatsService { self: AnnotationService =>
       } aggregations (
         nestedAggregation("per_body", "bodies") subaggs (
           filterAggregation("tags_only").query(termQuery("bodies.type" -> AnnotationBody.TAG.toString)) subaggs (
-            termsAggregation("by_tag") field ("bodies.value.raw")
+            termsAggregation("by_tag") field ("bodies.value.raw") size 500
           )
         )
       ) size 0 

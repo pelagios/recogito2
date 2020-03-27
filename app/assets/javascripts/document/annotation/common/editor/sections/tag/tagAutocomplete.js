@@ -1,5 +1,5 @@
 define([], function() {
-
+  
   var TagAutocomplete = function(parent, textarea, annotations) {
 
     var init = function() {
