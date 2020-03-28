@@ -17,14 +17,14 @@ case class StatusRatio(verified: Long, unverified: Long, notIdentifiable: Long)
 @Singleton
 trait AnnotationStatsService { self: AnnotationService =>
   
-  def getTagStats(documentId: String) =
+  def getTagStats(documentId: String, size: Integer = ES.MAX_SIZE) =
     es.client execute {
       search (ES.RECOGITO / ES.ANNOTATION) query {
         termQuery("annotates.document_id" -> documentId)
       } aggregations (
         nestedAggregation("per_body", "bodies") subaggs (
           filterAggregation("tags_only").query(termQuery("bodies.type" -> AnnotationBody.TAG.toString)) subaggs (
-            termsAggregation("by_tag") field ("bodies.value.raw") size 500
+            termsAggregation("by_tag") field ("bodies.value.raw") size size
           )
         )
       ) size 0 
