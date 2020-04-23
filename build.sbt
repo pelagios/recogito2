@@ -19,8 +19,9 @@ PlayKeys.devSettings += "play.server.akka.requestTimeout" -> "600s"
 resolvers ++= Seq(
   "Typesafe" at "http://repo.typesafe.com/typesafe/releases/",
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-  "GeoTools" at "http://download.osgeo.org/webdav/geotools/",
-  "Boundless" at "http://repo.boundlessgeo.com/main/",
+  "Geotools" at "https://repo.osgeo.org/repository/geotools-releases/",
+  "Geotoolkit" at "http://maven.geotoolkit.org",
+  "Boundless" at "https://repo.osgeo.org/repository/Geoserver-releases/",
   "Atlassian Releases" at "https://maven.atlassian.com/public/",
   "Atlassian Maven" at "https://maven.atlassian.com/content/repositories/atlassian-public/",
   "mvnrepository" at "http://mvnrepository.com/artifact",
