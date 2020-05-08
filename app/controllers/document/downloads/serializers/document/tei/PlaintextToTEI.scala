@@ -21,20 +21,20 @@ trait PlaintextToTEI extends BaseTEISerializer {
     str.replace("<", "&lt;")
        .replace(">", "&gt;")
 
-  private def formatDate(t: Timestamp): String =
+  protected def formatDate(t: Timestamp): String =
     new SimpleDateFormat("yyyy-MM-dd").format(t)
   
   /** Shorthands for convenience **/
-  private def getQuote(annotation: Annotation) =
+  protected def getQuote(annotation: Annotation) =
     annotation.bodies.find(_.hasType == AnnotationBody.QUOTE).head.value.get
     
-  private def getCharOffset(annotation: Annotation) =
+  protected def getCharOffset(annotation: Annotation) =
     annotation.anchor.substring(annotation.anchor.indexOf(":") + 1).toInt
     
   private def getEntityType(annotation: Annotation) = 
     annotation.bodies.find(b => Set(PLACE, PERSON, EVENT).contains(b.hasType))
 
-  private def paragraphToTEI(text: String, annotations: Seq[Annotation], runningOffset: Int = 0): Seq[Node] = {
+  protected def paragraphToTEI(text: String, annotations: Seq[Annotation], runningOffset: Int = 0): Seq[Node] = {
 
     // XML, by nature can't handle overlapping annotations
     val nonOverlappingAnnotations = sort(annotations).foldLeft(Seq.empty[Annotation]) { case (result, next) =>
