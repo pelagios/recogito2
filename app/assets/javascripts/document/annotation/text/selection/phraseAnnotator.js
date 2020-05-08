@@ -29,6 +29,7 @@ define([
           // Cf. https://superuser.com/questions/903168/how-should-i-write-a-regex-to-match-a-specific-word
           var splitter = (requireFullWord) ?
             new RegExp('(?:^|\\W)' + escapeRegExp(phrase) + '(?:$|\\W)', 'g') : phrase;
+            // Looks like the RegEx should be (?:^|\s) ... (?:^|\s)
 
           return getUnannotatedSegments().reduce(function(sum, textNode) {
             var split = textNode.nodeValue.split(splitter);
