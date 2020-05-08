@@ -28,8 +28,7 @@ define([
         countOccurrences = function(phrase, requireFullWord) {
           // Cf. https://superuser.com/questions/903168/how-should-i-write-a-regex-to-match-a-specific-word
           var splitter = (requireFullWord) ?
-            new RegExp('(?:^|\\W)' + escapeRegExp(phrase) + '(?:$|\\W)', 'g') : phrase;
-            // Looks like the RegEx should be (?:^|\s) ... (?:^|\s)
+            new RegExp('(?:^|\\s)' + escapeRegExp(phrase) + '(?:$|\\s)', 'g') : phrase;
 
           return getUnannotatedSegments().reduce(function(sum, textNode) {
             var split = textNode.nodeValue.split(splitter);
@@ -61,8 +60,8 @@ define([
                     },
 
                     createForFullWordMatch = function() {
-                      var regex = new RegExp('(?:^|\\W)' +
-                            escapeRegExp(quote) + '(?:$|\\W)', 'g'),
+                      var regex = new RegExp('(?:^|\\s)' +
+                            escapeRegExp(quote) + '(?:$|\\s)', 'g'),
 
                           result, idx,
 
