@@ -23,7 +23,7 @@
         documentOwner: '@doc.ownerName',
         parts: [
           @Html(doc.fileparts.map { part =>
-            Html(s"{ title: '${part.getTitle}', id: '${part.getId}' }")
+            Html(s"{ title: '${part.getTitle.replace("'", "\\'")}', id: '${part.getId}' }")
           }.mkString(",\n"))
         ]
       }
