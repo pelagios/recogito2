@@ -189,50 +189,47 @@ class DirectoryController @Inject() (
     silhouette.UserAwareAction.async { implicit request =>
       val loggedIn = request.identity.map(_.username)
 
-      val fOwner = users.findByUsernameIgnoreCase(fromOwner)
+      users.findByUsernameIgnoreCase(fromOwner).flatMap(_ match { 
+        case Some(owner) => 
+          val fBreadcrumbs = Option(folderId).map { id => 
+              folders.getAccessibleDocsBreadcrumbTrail(owner.username, loggedIn, id)
+            } getOrElse { Future.successful(Seq.empty[Breadcrumb]) }
 
-      val fBreadcrumbs = Option(folderId).map { id => 
-          folders.getAccessibleDocsBreadcrumbTrail(fromOwner, loggedIn, id)
-        } getOrElse { Future.successful(Seq.empty[Breadcrumb]) }
+          val fDirectories = folders.listAccessibleFolders(owner.username, loggedIn, Option(folderId))
 
-      val fDirectories = folders.listAccessibleFolders(fromOwner, loggedIn, Option(folderId))
+          val config = request.body.asJson.flatMap(json => 
+            Try(Json.fromJson[PresentationConfig](json).get).toOption)
 
-      val config = request.body.asJson.flatMap(json => 
-        Try(Json.fromJson[PresentationConfig](json).get).toOption)
+          val fDocuments =
+            if (isSortingByIndex(config))
+              getAccessibleDocumentsSortedByIndex(owner.username, Option(folderId), loggedIn, offset, size, config.get)
+            else 
+              getAccessibleDocumentsSortedByDB(owner.username, Option(folderId), loggedIn, offset, size, config)
 
-      val fDocuments =
-        if (isSortingByIndex(config))
-          getAccessibleDocumentsSortedByIndex(fromOwner, Option(folderId), loggedIn, offset, size, config.get)
-        else 
-          getAccessibleDocumentsSortedByDB(fromOwner, Option(folderId), loggedIn, offset, size, config)
+          val f = for {
+            breadcrumbs <- fBreadcrumbs
+            directories <- fDirectories
+            documents <- fDocuments
+          } yield (
+            breadcrumbs,
+            directories.map(t => FolderItem(t._1, 0, t._2)), 
+            documents)
 
-      val f = for {
-        owner <- fOwner
-        breadcrumbs <- fBreadcrumbs
-        directories <- fDirectories
-        documents <- fDocuments
-      } yield (
-        owner,
-        breadcrumbs,
-        directories.map(t => FolderItem(t._1, 0, t._2)), 
-        documents)
-
-      f.map { case (owner, breadcrumbs, directories, documents) => 
-        owner match {
-          case Some(user) =>
+          f.map { case (breadcrumbs, directories, documents) => 
             // Only expose readme if there are shared documents
             val readme = 
-              if (documents.total > 0) user.readme else None
+              if (documents.total > 0) owner.readme else None
               
             jsonOk(Json.toJson(DirectoryPage.build(
               readme,
               breadcrumbs,
               directories, 
               documents)))
+          }
 
-          case None => NotFound
-        }
-      }
+        case None =>
+          Future.successful(NotFound)
+      })
     }
 
 }
