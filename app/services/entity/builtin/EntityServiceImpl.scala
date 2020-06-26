@@ -224,7 +224,14 @@ class EntityServiceImpl @Inject()(
           multiget (
             unionIds.map { id => get(id) from ES.RECOGITO / ES.ENTITY }
           )
-        } map { _.items.map(_.to[IndexedEntity]) }
+        } map { result => 
+          try {
+            // Can throw Nullpointers when containing URIs that are no longer indexed
+            result.items.map(_.to[IndexedEntity])
+          } catch { 
+            case t: Throwable => Seq.empty[IndexedEntity]
+          } 
+        }
 
     val f = for {
       counts <- fAggregateIds
