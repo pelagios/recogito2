@@ -113,8 +113,10 @@ trait HasTEISnippets extends HasTextSnippets {
     }
     
     val ranges = doc.asInstanceOf[DocumentRange]
-    val a = parseAnchor(anchor)
 
+    val normalized = anchor.replace("@xml:id", "@id")
+    val a = parseAnchor(normalized)
+    
     val startParent = $(doc).xpath(a.startPath).get(0)
     val (startNode, startOffset) = findPosition(startParent, a.startOffset)
     
