@@ -6,7 +6,7 @@ define([], function() {
           var prefixMatcher = function(query, responseFn) {
                 var matches = [],
                     qLow = query.toLowerCase();
-
+                
                 annotations.listUniqueTags().forEach(function(tag) {
                   if (tag.toLowerCase().indexOf(qLow) === 0)
                     matches.push(tag);
@@ -16,9 +16,11 @@ define([], function() {
               };
 
           textarea.typeahead({
-            hint:false
+            hint:false,
+            minLength:0
           },{
-            source: prefixMatcher
+            source: prefixMatcher,
+            limit:10
           });
         },
 

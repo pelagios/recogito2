@@ -16,8 +16,6 @@ define([
               endDOMPath = PathUtils.getXPath(selectedRange.endContainer),
               teiPaths = PathUtils.toTEIPaths(rootNode, startDOMPath, endDOMPath, selectedRange);
 
-          console.log(teiPaths);
-
           return {
             annotates: {
               document_id: Config.documentId,
