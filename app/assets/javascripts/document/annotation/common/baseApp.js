@@ -23,19 +23,14 @@ define([
             jQuery('html, body').animate({ scrollTop: scrollTo });
         };
 
-    var annotationsToDisplay;
-
     if (config.features && config.features.includes('just-mine')) {
-      annotationsToDisplay = annotations.filter(function(annotation) {
-        console.log(AnnotationUtils.hasContributionsFrom(annotation, config.me));
+      annotations = annotations.filter(function(annotation) {
+        return AnnotationUtils.hasContributionsFrom(annotation, config.me);
       });
-    } else {
-      annotationsToDisplay = annotations;
     }
 
-    this.annotations.add(annotationsToDisplay);
-    // this.annotations.add(annotations);
-    
+    this.annotations.add(annotations);
+
     this.header.incrementAnnotationCount(annotations.length);
     // var startTime = new Date().getTime();
     this.highlighter.initPage(annotations);
