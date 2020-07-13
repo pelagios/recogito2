@@ -2,8 +2,9 @@
 define([
   'common/api',
   'common/config',
+  'common/utils/annotationUtils',
   'document/annotation/common/page/header'
-], function(API, Config, Header) {
+], function(API, Config, AnnotationUtils, Header) {
 
   var BaseApp = function(annotations, highlighter, selector) {
     this.annotations = annotations;
@@ -22,7 +23,19 @@ define([
             jQuery('html, body').animate({ scrollTop: scrollTo });
         };
 
-    this.annotations.add(annotations);
+    var annotationsToDisplay;
+
+    if (config.features && config.features.includes('just-mine')) {
+      annotationsToDisplay = annotations.filter(function(annotation) {
+        console.log(AnnotationUtils.hasContributionsFrom(annotation, config.me));
+      });
+    } else {
+      annotationsToDisplay = annotations;
+    }
+
+    this.annotations.add(annotationsToDisplay);
+    // this.annotations.add(annotations);
+    
     this.header.incrementAnnotationCount(annotations.length);
     // var startTime = new Date().getTime();
     this.highlighter.initPage(annotations);

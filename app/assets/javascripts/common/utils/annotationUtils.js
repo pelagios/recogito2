@@ -2,6 +2,13 @@ define(function() {
 
   return {
 
+    /** Checks if this annotation has contributions from the given user **/
+    hasContributionsFrom : function(annotation, username) {
+      return annotation.bodies.find(function(b) {
+        return b.last_modified_by && b.last_modified_by == username;
+      });
+    },
+
     /** Returns the number of comments on this annotation **/
     countComments : function(annotation) {
       return this.getBodiesOfType(annotation, 'COMMENT').length;
