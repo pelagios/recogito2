@@ -48,10 +48,17 @@ trait PreferencesActions { self: SettingsController =>
     // JSON is parsed to case class and instantly re-serialized as a security/sanitization measure!
     jsonDocumentAdminAction[GazetteerPreferences](docId, request.identity.username, { case (document, prefs) =>      
       self.documents.upsertPreferences(docId, "authorities.gazetteers", Json.stringify(Json.toJson(prefs))).map { success =>
-        if (success) Ok
-        else InternalServerError
+        if (success) Ok else InternalServerError
       }
     })
+  }
+
+  def setTagVocabulary(docId: String) = self.silhouette.SecuredAction.async { implicit request => 
+    jsonDocumentAdminAction[Seq[String]](docId, request.identity.username, { case (document, vocabulary) => 
+      self.documents.upsertPreferences(docId, "tag.vocabulary", Json.stringify(Json.toJson(vocabulary))).map { success => 
+        if (success) Ok else InternalServerError
+      }
+    }) 
   }
   
 }
