@@ -30,7 +30,7 @@
     "eslint-loader": "2.0.0",
     "eslint-plugin-import": "2.13.0",
     "jsx-loader": "0.13.2",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "webpack": "^4.41.3"
   },
   "engines": {
