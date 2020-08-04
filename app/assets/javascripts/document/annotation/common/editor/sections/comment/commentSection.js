@@ -1,12 +1,10 @@
 define([
   'document/annotation/common/editor/sections/editableTextSection',
   'common/ui/formatting',
-  'common/config'], function(EditableTextSection, Formatting, Config) {
+  'common/config'], function(EditableTextSection, Formatting) {
 
   var CommentSection = function(parent, commentBody) {
-    var self = this,
-
-        element = jQuery(
+    var element = jQuery(
           '<div class="section editable-text comment">' +
             '<div class="text"></div>' +
             '<div class="icon edit">&#xf0dd;</div>' +

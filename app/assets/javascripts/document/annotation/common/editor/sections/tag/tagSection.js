@@ -11,7 +11,9 @@ define([
 
   var TagSection = function(parent, annotation, allAnnotationsOnPage) {
 
-    var element = (Config.writeAccess) ? jQuery(
+    var self = this,
+    
+        element = (Config.writeAccess) ? jQuery(
           '<div class="section tags">' +
             '<ul></ul>' +
             '<input type="text" class="add-tag" placeholder="' + I18N.editor_placeholder_add_tag + '"></input>' +
@@ -147,6 +149,10 @@ define([
             });
             autocomplete.hide();
             textarea.val('');
+            
+            if (e.ctrlKey)
+              self.fireEvent('submit');
+  
             return false;
           }
         },

@@ -179,6 +179,7 @@ define([
           // Note: the tag section makes use of allAnnotations to provide the
           // page-sensitive autocomplete drop-down
           var tagSection = new TagSection(tagSectionEl, annotation, allAnnotations);
+          forwardEvent(tagSection, 'submit'); // Submit event needs to be handled by editor
           sections.push(tagSection);
         },
 
