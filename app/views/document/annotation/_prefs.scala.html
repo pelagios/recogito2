@@ -1,4 +1,5 @@
 @(prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord])
 authorities: {
   gazetteers: @prefs.find(_.getPreferenceName == "authorities.gazetteers").map { pref => @Html(pref.getPreferenceValue) }.getOrElse("{}")
-}
+},
+vocabulary: @prefs.find(_.getPreferenceName == "tag.vocabulary").map { pref => @Html(pref.getPreferenceValue) }.getOrElse("[]")

@@ -154,9 +154,14 @@ define([
         },
 
         fetchTags = function() {
+          // Previously used tags
           jsRoutes.controllers.document.stats.StatsController.getTagsAsJSON(Config.documentId)
             .ajax().then(function(response) {
-              uniqueTags = response.map(function(tag) { return tag.value });
+              // Tags used previously on any part of this document
+              var previouslyUsedTags = response.map(function(tag) { return tag.value });
+              
+              // Unique tags = previously used tags + controlled vocab (if any)
+              uniqueTags = Array.from(new Set(previouslyUsedTags.concat(Config.vocabulary)));
             });
         };
 
