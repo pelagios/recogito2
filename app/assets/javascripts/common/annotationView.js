@@ -160,8 +160,14 @@ define([
               // Tags used previously on any part of this document
               var previouslyUsedTags = response.map(function(tag) { return tag.value });
               
-              // Unique tags = previously used tags + controlled vocab (if any)
-              uniqueTags = Array.from(new Set(previouslyUsedTags.concat(Config.vocabulary)));
+              // Unique tags = controlled vocabulary (if any) + previously used tags
+              // Make sure the controlled vocab comes first, and the order isn't changed
+              uniqueTags = Config.vocabulary;
+              
+              previouslyUsedTags.forEach(function(tag) {
+                if (uniqueTags.indexOf(tag) === -1)
+                  uniqueTags.push(tag);
+              });
             });
         };
 
