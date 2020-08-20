@@ -1,7 +1,9 @@
 package controllers.document.settings.actions
 
 import controllers.document.settings.SettingsController
-import services.{PublicAccess, SharingLevel}
+import java.sql.Timestamp
+import org.joda.time.DateTime
+import services.{PublicAccess, SharingLevel, HasDate}
 import services.document.ExtendedDocumentMetadata
 import services.generated.tables.records.SharingPolicyRecord
 import services.user.Roles._
@@ -29,7 +31,19 @@ object CollaboratorStub {
   
 }
 
-trait SharingActions { self: SettingsController =>
+trait SharingActions extends HasDate { self: SettingsController =>
+
+  implicit val sharingPolicyRecordWrites: Writes[SharingPolicyRecord] = (
+    (JsPath \ "shared_with").write[String] and
+    (JsPath \ "shared_by").write[String] and 
+    (JsPath \ "shared_at").write[DateTime] and 
+    (JsPath \ "access_level").write[SharingLevel]
+  )(r => (
+    r.getSharedWith,
+    r.getSharedBy,
+    new DateTime(r.getSharedAt.getTime),
+    SharingLevel.withName(r.getAccessLevel).get
+  ))
   
   def publicAccessAction(docId: String, username: String, fn: ExtendedDocumentMetadata => Future[Result]) =
     documentAdminAction(docId, username, { doc =>
@@ -77,6 +91,15 @@ trait SharingActions { self: SettingsController =>
         // Submitting an invalid value is not possible through the UI
         Future.successful(BadRequest)
     }  
+  }
+
+  def listCollaborators(documentId: String) = self.silhouette.SecuredAction.async { implicit request => 
+    val currentUser = request.identity.username
+    documentAdminAction(documentId, currentUser, { meta => 
+      documents.listDocumentCollaborators(documentId).map { policies => 
+        jsonOk(Json.toJson(policies))
+      }
+    })
   }
   
   def addCollaborator(documentId: String) = self.silhouette.SecuredAction.async { implicit request =>
