@@ -142,6 +142,17 @@ class AnnotationService @Inject() (
         termQuery("annotates.document_id" -> id)
       } limit 0
     } map { _.totalHits }
+
+  /** Counts number of annotations with contributions by the given user **/
+  def countMineByDocId(username: String, id: String): Future[Long] =
+    es.client execute { 
+      search(ES.RECOGITO / ES.ANNOTATION) query {
+        boolQuery must (
+          termQuery("annotates.document_id" -> id),
+          termQuery("contributors" -> username) // TODO Not sure if sufficent, my need to check nested bodies
+        )
+      }
+    } map { _.totalHits }
     
   private def scrollIfNeeded(query: SearchDefinition, offset: Int = 0, limit: Int = ES.MAX_SIZE): Future[Seq[(Annotation, Long)]] ={
     // Backend serialization format

@@ -41,7 +41,7 @@ trait SortByIndex { self: DirectoryController =>
       allIds <- documents.listIds(folder, username)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
       documents <- documents.getDocumentsById(sortedIds)
-      indexProperties <- fetchIndexProperties(sortedIds, config)      
+      indexProperties <- fetchIndexProperties(username, sortedIds, config)      
     } yield (allIds, sortedIds, documents, indexProperties)
 
     f.map { case (allIds, sortedIds, documents, indexProperties) => 
@@ -63,7 +63,7 @@ trait SortByIndex { self: DirectoryController =>
       allIds <- documents.listIdsSharedWithMe(username, folder)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
       documents <- documents.getDocsSharedWithMeById(sortedIds, username)
-      indexProperties <- fetchIndexProperties(sortedIds, config)
+      indexProperties <- fetchIndexProperties(username, sortedIds, config)
     } yield (allIds, sortedIds, documents, indexProperties)
 
     f.map { case (allIds, sortedIds, documents, indexProperties) =>
@@ -86,7 +86,7 @@ trait SortByIndex { self: DirectoryController =>
       allIds <- documents.listAccessibleIds(owner, folder, loggedIn)
       sortedIds <- sortByIndexProperty(allIds, config.sort.get, offset, size)
       documents <- documents.getDocumentsById(sortedIds)
-      indexProperties <- fetchIndexProperties(sortedIds, config)
+      indexProperties <- fetchIndexProperties(owner, sortedIds, config)
     } yield (allIds, sortedIds, documents, indexProperties)
 
     f.map { case (allIds, sortedIds, documents, indexProperties) =>

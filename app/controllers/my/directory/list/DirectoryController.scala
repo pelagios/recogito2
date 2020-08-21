@@ -49,7 +49,7 @@ class DirectoryController @Inject() (
       .getOrElse(false)
 
   /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
-  protected def fetchIndexProperties(docIds: Seq[String], config: PresentationConfig) = {
+  protected def fetchIndexProperties(currentUser: String, docIds: Seq[String], config: PresentationConfig) = {
     // Helper that wraps the common bits: conditional execution, sequence-ing, mapping to (id -> result) tuple
     def fetchIfRequested[T](field: String*)(fn: String => Future[T]) =
       if (config.hasAnyColumn(field))
@@ -65,6 +65,10 @@ class DirectoryController @Inject() (
       annotations.countByDocId(id)
     }
 
+    val fMyAnnotationCount = fetchIfRequested("my_annotations") { id => 
+      annotations.countMineByDocId(currentUser, id)
+    }
+
     val fStatusRatios =
       if (config.hasColumn("status_ratio")) annotations.getStatusRatios(docIds)
       else Future.successful(Map.empty[String, StatusRatio])
@@ -72,18 +76,21 @@ class DirectoryController @Inject() (
     val f = for {
       lastEdits <- fLastEdits
       annotationCounts <- fAnnotationCount
+      myAnnotationCounts <- fMyAnnotationCount
       statusRatios <- fStatusRatios
-    } yield (lastEdits.toMap, annotationCounts.toMap, statusRatios)   
+    } yield (lastEdits.toMap, annotationCounts.toMap, myAnnotationCounts.toMap, statusRatios)   
     
-    f.map { case (lastEdits, annotationsPerDoc, statusRatios) =>
+    f.map { case (lastEdits, annotationsPerDoc, myAnnotationsPerDoc, statusRatios) =>
       docIds.map { id =>
         val lastEdit = lastEdits.find(_._1 == id).flatMap(_._2)
         val annotations = annotationsPerDoc.find(_._1 == id).map(_._2).getOrElse(0l)
+        val myAnnotations = myAnnotationsPerDoc.find(_._1 == id).map(_._2).getOrElse(0l)
 
         val indexProps = IndexDerivedProperties(
           lastEdit.map(_.madeAt),
           lastEdit.map(_.madeBy),
           Some(annotations),
+          Some(myAnnotations),
           statusRatios.get(id))
 
         (id, indexProps)

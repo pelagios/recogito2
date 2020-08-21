@@ -41,6 +41,7 @@ object PresentationConfig {
     "last_edit_at",
     "last_edit_by",
     "annotations",
+    "my_annotations",
     "status_ratio",
     "activity")
 

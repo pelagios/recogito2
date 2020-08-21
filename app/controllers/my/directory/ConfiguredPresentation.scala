@@ -13,13 +13,14 @@ case class IndexDerivedProperties(
   lastEditAt: Option[DateTime],
   lastEditBy: Option[String],
   annotations: Option[Long],
+  myAnnotations: Option[Long],
   statusRatio: Option[StatusRatio]
 )
 
 object IndexDerivedProperties {
 
   // Shorthand
-  val EMPTY = IndexDerivedProperties(None, None, None, None)
+  val EMPTY = IndexDerivedProperties(None, None, None, None, None)
 
 }
 
@@ -147,6 +148,7 @@ object ConfiguredPresentation extends HasDate {
     (JsPath \ "last_edit_at").writeNullable[DateTime] and
     (JsPath \ "last_edit_by").writeNullable[String] and
     (JsPath \ "annotations").writeNullable[Long] and
+    (JsPath \ "my_annotations").writeNullable[Long] and
     (JsPath \ "status_ratio").writeNullable[JsObject]
   )(p => (
     DirectoryItem.DOCUMENT.toString,
@@ -176,6 +178,7 @@ object ConfiguredPresentation extends HasDate {
     p.getIndexProp[DateTime]("last_edit_at", p.indexProps.lastEditAt),
     p.getIndexProp[String]("last_edit_by", p.indexProps.lastEditBy),
     p.getIndexProp[Long]("annotations", p.indexProps.annotations),
+    p.getIndexProp[Long]("my_annotations", p.indexProps.myAnnotations),
     p.getIndexProp[StatusRatio]("status_ratio", p.indexProps.statusRatio).map { r =>
       Json.obj(
         "verified" -> r.verified,
