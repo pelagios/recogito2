@@ -61,11 +61,15 @@ class DirectoryController @Inject() (
       contributions.getLastContribution(id)
     }
 
-    val fAnnotationCount = fetchIfRequested("annotations") { id =>
+    val fMyLastEdits = fetchIfRequested("my_last_edit_at") { id => 
+      contributions.getMyLastContribution(currentUser, id)
+    }
+
+    val fAnnotationCounts = fetchIfRequested("annotations") { id =>
       annotations.countByDocId(id)
     }
 
-    val fMyAnnotationCount = fetchIfRequested("my_annotations") { id => 
+    val fMyAnnotationCounts = fetchIfRequested("my_annotations") { id => 
       annotations.countMineByDocId(currentUser, id)
     }
 
@@ -75,20 +79,23 @@ class DirectoryController @Inject() (
  
     val f = for {
       lastEdits <- fLastEdits
-      annotationCounts <- fAnnotationCount
-      myAnnotationCounts <- fMyAnnotationCount
+      myLastEdits <- fMyLastEdits
+      annotationCounts <- fAnnotationCounts
+      myAnnotationCounts <- fMyAnnotationCounts
       statusRatios <- fStatusRatios
-    } yield (lastEdits.toMap, annotationCounts.toMap, myAnnotationCounts.toMap, statusRatios)   
+    } yield (lastEdits.toMap, myLastEdits.toMap, annotationCounts.toMap, myAnnotationCounts.toMap, statusRatios)   
     
-    f.map { case (lastEdits, annotationsPerDoc, myAnnotationsPerDoc, statusRatios) =>
+    f.map { case (lastEdits, myLastEdits, annotationsPerDoc, myAnnotationsPerDoc, statusRatios) =>
       docIds.map { id =>
         val lastEdit = lastEdits.find(_._1 == id).flatMap(_._2)
+        val myLastEdit = myLastEdits.find(_._1 == id).flatMap(_._2)
         val annotations = annotationsPerDoc.find(_._1 == id).map(_._2).getOrElse(0l)
         val myAnnotations = myAnnotationsPerDoc.find(_._1 == id).map(_._2).getOrElse(0l)
 
         val indexProps = IndexDerivedProperties(
           lastEdit.map(_.madeAt),
           lastEdit.map(_.madeBy),
+          myLastEdit.map(_.madeAt),
           Some(annotations),
           Some(myAnnotations),
           statusRatios.get(id))

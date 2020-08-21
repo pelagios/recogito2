@@ -12,6 +12,7 @@ import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord
 case class IndexDerivedProperties(
   lastEditAt: Option[DateTime],
   lastEditBy: Option[String],
+  myLastEditAt: Option[DateTime],
   annotations: Option[Long],
   myAnnotations: Option[Long],
   statusRatio: Option[StatusRatio]
@@ -20,7 +21,7 @@ case class IndexDerivedProperties(
 object IndexDerivedProperties {
 
   // Shorthand
-  val EMPTY = IndexDerivedProperties(None, None, None, None, None)
+  val EMPTY = IndexDerivedProperties(None, None, None, None, None, None)
 
 }
 
@@ -121,7 +122,57 @@ object ConfiguredPresentation extends HasDate {
     }
   }
 
-  implicit val configuredPresentationWrites: Writes[ConfiguredPresentation] = (
+  implicit val ConfiguredPresentationWrites = new Writes[ConfiguredPresentation] {
+
+    def writes(p: ConfiguredPresentation) =
+      JsObject(
+        Json.obj(
+          // Write mandatory properties in any case
+          "type" -> DirectoryItem.DOCUMENT.toString,
+          "id" -> p.document.getId,
+          "owner" -> p.document.getOwner,
+          "uploaded_at" -> new DateTime(p.document.getUploadedAt.getTime),
+          "title" -> p.document.getTitle,
+          "public_visibity" -> Option(p.document.getPublicVisibility),
+
+          "filetypes" -> p.contentTypes.map(_.toString),
+          "file_count" -> p.fileCount,
+
+          // DB-based props, based on whether they are defined in the column config
+          "author" -> p.getDBProp[String]("author", p.document.getAuthor),
+          "date_freeform" -> p.getDBProp[String]("date_freeform", p.document.getDateFreeform),
+          "language" -> p.getDBProp[String]("language", p.document.getLanguage),
+          "source" -> p.getDBProp[String]("source", p.document.getSource),
+          "edition" -> p.getDBProp[String]("edition", p.document.getEdition),
+          "shared_by" -> p.getOptDBProp[String]("shared_by", p.sharedVia.map(_.getSharedBy)),
+          "access_level" -> p.getOptDBProp[String]("access_level", p.sharedVia.map(_.getAccessLevel)),
+          "cloned_from" -> p.getOptDBProp[JsObject]("cloned_from", p.clonedFromUser.map { username => 
+            Json.obj("username" -> username, "id" -> p.document.getClonedFrom)
+          }),
+          "has_clones" -> p.getOptDBProp[Int]("has_clones", { if (p.hasClones > 0) Some(p.hasClones) else None }),
+
+          // Index-based properties
+          "last_edit_at" -> p.getIndexProp[DateTime]("last_edit_at", p.indexProps.lastEditAt),
+          "last_edit_by" -> p.getIndexProp[String]("last_edit_by", p.indexProps.lastEditBy),
+          "my_last_edit_at" ->p.getIndexProp[DateTime]("my_last_edit_at", p.indexProps.myLastEditAt),
+          "annotations" -> p.getIndexProp[Long]("annotations", p.indexProps.annotations),
+          "my_annotations" -> p.getIndexProp[Long]("my_annotations", p.indexProps.myAnnotations),
+          "status_ratio" -> p.getIndexProp[StatusRatio]("status_ratio", p.indexProps.statusRatio).map { r =>
+            Json.obj(
+              "verified" -> r.verified,
+              "unverified" -> r.unverified,
+              "not_identifiable" -> r.notIdentifiable)
+          }
+        ).fields.filter(_._2 match { // Filter out undefined props
+          case JsNull => false
+          case _ => true
+        })
+      )
+
+  }
+
+  /*
+  implicit val unusableConfiguredPresentationWrites: Writes[ConfiguredPresentation] = (
     // Write mandatory properties in any case
     (JsPath \ "type").write[String] and
     (JsPath \ "id").write[String] and
@@ -147,6 +198,7 @@ object ConfiguredPresentation extends HasDate {
     // Selectable index properties
     (JsPath \ "last_edit_at").writeNullable[DateTime] and
     (JsPath \ "last_edit_by").writeNullable[String] and
+    (JsPath \ "my_last_edit_at").writeNullable[DateTime] and
     (JsPath \ "annotations").writeNullable[Long] and
     (JsPath \ "my_annotations").writeNullable[Long] and
     (JsPath \ "status_ratio").writeNullable[JsObject]
@@ -177,6 +229,7 @@ object ConfiguredPresentation extends HasDate {
     // Index-based properties
     p.getIndexProp[DateTime]("last_edit_at", p.indexProps.lastEditAt),
     p.getIndexProp[String]("last_edit_by", p.indexProps.lastEditBy),
+    p.getIndexProp[DateTime]("my_last_edit_at", p.indexProps.myLastEditAt),
     p.getIndexProp[Long]("annotations", p.indexProps.annotations),
     p.getIndexProp[Long]("my_annotations", p.indexProps.myAnnotations),
     p.getIndexProp[StatusRatio]("status_ratio", p.indexProps.statusRatio).map { r =>
@@ -186,5 +239,6 @@ object ConfiguredPresentation extends HasDate {
         "not_identifiable" -> r.notIdentifiable)
     }
   ))
+  */
 
 }

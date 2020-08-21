@@ -40,6 +40,7 @@ object PresentationConfig {
   val INDEX_FIELDS = Seq(
     "last_edit_at",
     "last_edit_by",
+    "my_last_edit_at",
     "annotations",
     "my_annotations",
     "status_ratio",
