@@ -99,6 +99,19 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   def getLastContribution(documentId: String) =
     getHistory(documentId, 0, 1).map(_.items.headOption.map(_._1))
 
+  /** Fetches the most recent contribution to the given document by the given user **/
+  def getMyLastContribution(username: String, documentId: String): Future[Option[Contribution]] =
+    es.client execute {
+      search (ES.RECOGITO / ES.CONTRIBUTION) query (
+        boolQuery must (
+          termQuery("affects_item.document_id" -> documentId),
+          termQuery("made_by" -> username)
+        )
+      ) sortBy (
+        fieldSort("made_at") order SortOrder.DESC
+      ) limit 1
+    } map { _.to[(Contribution, String)].headOption.map(_._1) }
+
   /** Counts the number of contributions on the given document since the given time **/
   def countContributionsSince(documentId: String, timestamp: DateTime): Future[Long] =
     es.client execute {
