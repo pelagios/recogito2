@@ -354,8 +354,41 @@ class AnnotationService @Inject() (
     }
   }
 
+  /** Sorts the given list of document IDs by the number of *my* annotations **/
+  def sortDocsByMyAnnotationCount(username: String, docIds: Seq[String], sortOrder: services.SortOrder, offset: Int, limit: Int) =
+    sortDocsByCountWithQuery(
+      docIds,
+      sortOrder,
+      offset,
+      limit,
+      search(ES.RECOGITO / ES.ANNOTATION) query {
+        boolQuery
+          should {
+            docIds.map(id => boolQuery must (
+              termQuery("annotates.document_id" -> id),
+              termQuery("contributors" -> username)
+            ))
+          }
+      }
+    )
+
   /** Sorts the given list of document IDs by the number of annotations on the documents **/
-  def sortDocsByAnnotationCount(docIds: Seq[String], sortOrder: services.SortOrder, offset: Int, limit: Int) = {
+  def sortDocsByAnnotationCount(docIds: Seq[String], sortOrder: services.SortOrder, offset: Int, limit: Int) =
+    sortDocsByCountWithQuery(
+      docIds,
+      sortOrder,
+      offset,
+      limit,
+      search(ES.RECOGITO / ES.ANNOTATION) query {
+        boolQuery
+          should {
+            docIds.map(id => termQuery("annotates.document_id" -> id))
+          }
+      }
+    )
+
+  /** Common code for sortDocsByAnnotationCount and sortDocsByMyAnnotationCount */
+  private def sortDocsByCountWithQuery(docIds: Seq[String], sortOrder: services.SortOrder, offset: Int, limit: Int, query: SearchDefinition) = {
 
     import scala.collection.JavaConverters._
 
@@ -366,12 +399,7 @@ class AnnotationService @Inject() (
         docIds.size
             
     es.client execute {
-      search(ES.RECOGITO / ES.ANNOTATION) query {
-        boolQuery
-          should {
-            docIds.map(id => termQuery("annotates.document_id" -> id))
-          }
-      } aggs {
+      query aggs {
         termsAggregation("by_document") field "annotates.document_id" size numberOfBuckets
       } limit 0
     } map { response =>

@@ -25,6 +25,7 @@ trait SortByIndex { self: DirectoryController =>
         case "last_edit_by" => contributions.sortDocsByLastModifiedBy(docIds, sort.order, offset, size)
         case "my_last_edit_at" => contributions.sortDocsByMyLastModifiedAt(username, docIds, sort.order, offset, size)
         case "annotations" => annotations.sortDocsByAnnotationCount(docIds, sort.order, offset, size)
+        case "my_annotations" => annotations.sortDocsByMyAnnotationCount(username, docIds, sort.order, offset, size)
         case _ => Future.successful(docIds)
       }
     }
