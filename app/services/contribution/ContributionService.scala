@@ -142,6 +142,16 @@ class ContributionService @Inject() (implicit val es: ES, val ctx: ExecutionCont
   def sortDocsByLastModifiedBy(docIds: Seq[String], sortOrder: services.SortOrder, offset: Int, limit: Int) =
     sortByField(docIds, sortOrder, offset, limit, { c => c.map(_.madeBy) })
 
+  /** Sorts the given list by *my* last edit time **/
+  def sortDocsByMyLastModifiedAt(username: String, docIds: Seq[String], sortOrder: services.SortOrder, offset: Int, limit: Int) =
+    Future.sequence(docIds.map(id => getMyLastContribution(username, id).map(contribution => (id, contribution)))).map { idsAndContributions =>
+      val sorted = idsAndContributions.sortBy(t => t._2.map(_.madeAt.getMillis)).map(_._1).reverse
+      if (sortOrder == services.SortOrder.ASC)
+        sorted.drop(offset).take(limit)
+      else
+        sorted.dropRight(offset).takeRight(limit).reverse
+    }
+
   /** Deletes the contribution history after a given timestamp **/
   def deleteHistoryAfter(documentId: String, after: DateTime): Future[Boolean] = {
 

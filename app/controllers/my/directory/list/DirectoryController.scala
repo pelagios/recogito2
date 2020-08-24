@@ -40,7 +40,7 @@ class DirectoryController @Inject() (
 
   // Document properties derived from the index
   private val INDEX_SORT_PROPERTIES = 
-    Seq("last_edit_at", "last_edit_by", "annotations")
+    Seq("last_edit_at", "last_edit_by", "my_last_edit_at", "annotations", "my_annotations")
 
   private def isSortingByIndex(config: Option[PresentationConfig]) =
     config
