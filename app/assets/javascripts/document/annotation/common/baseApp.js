@@ -3,8 +3,9 @@ define([
   'common/api',
   'common/config',
   'common/utils/annotationUtils',
-  'document/annotation/common/page/header'
-], function(API, Config, AnnotationUtils, Header) {
+  'document/annotation/common/page/header',
+  'document/annotation/common/page/fetchRandom'
+], function(API, Config, AnnotationUtils, Header, FetchRandom) {
 
   var BaseApp = function(annotations, highlighter, selector) {
     this.annotations = annotations;
@@ -23,7 +24,7 @@ define([
             jQuery('html, body').animate({ scrollTop: scrollTo });
         };
 
-    if (config.features && config.features.includes('just-mine')) {
+    if (Config.features && Config.features.includes('just-mine')) {
       annotations = annotations.filter(function(annotation) {
         return AnnotationUtils.hasContributionsFrom(annotation, config.me);
       });
@@ -42,6 +43,14 @@ define([
         this.selector.setSelection(preselected);
         scrollIntoView(preselected.bounds);
       }
+    }
+
+    // Experimental 'Jump to random unannotated doc' feature
+    if (Config.features && Config.features.includes('suggest-random')) {
+      FetchRandom.fetch(true).then(function(item) {
+        var button = FetchRandom.createButton(item);
+        jQuery('.header-infobox').append(button);
+      });
     }
 
     // In order to support chaining
