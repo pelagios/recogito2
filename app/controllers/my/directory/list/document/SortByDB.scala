@@ -14,7 +14,7 @@ trait SortByDB { self: DirectoryController =>
 
   /** Boilerplate to fetch documents sorted via a DB property */
   protected def documentsByDB[T <: Product](
-    currentUser: String,
+    currentUser: Option[String],
     config: Option[PresentationConfig],
     fn: () => Future[Page[T]]
   )(implicit ctx: ExecutionContext) = for {
@@ -22,7 +22,7 @@ trait SortByDB { self: DirectoryController =>
     indexProperties <- config match {
       case Some(c) => 
         val ids = documents.items.map(_.productElement(0).asInstanceOf[DocumentRecord].getId)
-        fetchIndexProperties(Some(currentUser), ids, c).map(Some(_))
+        fetchIndexProperties(currentUser, ids, c).map(Some(_))
 
       case None => Future.successful(None)
     }
@@ -37,7 +37,7 @@ trait SortByDB { self: DirectoryController =>
     config: Option[PresentationConfig]
   )(implicit request: Request[AnyContent]) = {
     documentsByDB(
-      username,
+      Some(username),
       config, 
       () => documents.listByOwnerAndFolder(
               username, folder, offset, size,
@@ -57,7 +57,7 @@ trait SortByDB { self: DirectoryController =>
     config: Option[PresentationConfig]
   )(implicit request: Request[AnyContent]) = {   
     documentsByDB(
-      username,
+      Some(username),
       config, 
       () => documents.listDocumentsSharedWithMe(
               username, folder, offset, size,
@@ -77,7 +77,7 @@ trait SortByDB { self: DirectoryController =>
     config: Option[PresentationConfig]
   )(implicit request: Request[AnyContent]) = {
     documentsByDB(
-      owner,
+      loggedIn,
       config,
       () => documents.listAccessibleDocuments(
               owner, folder, loggedIn, offset, size,

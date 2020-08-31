@@ -12,7 +12,7 @@ define(['common/config'], function(Config) {
       return jQuery.ajax({
         url: '/api/directory/' + Config.documentOwner,
         type: 'POST',
-        data: JSON.stringify({ columns: [ 'my_annotations' ], sort: {by: "my_annotations", asc: true} }),
+        data: JSON.stringify({ columns: [ 'my_annotations' ] }),
         contentType: 'application/json'
       }).then(function(response) {
         // Filter for documents != current and (optionally) where my_annotations == 0
