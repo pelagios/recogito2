@@ -49,7 +49,7 @@ class DirectoryController @Inject() (
       .getOrElse(false)
 
   /** Takes a list of document IDs and, for each, fetches last edit and number of annotations from the index **/
-  protected def fetchIndexProperties(currentUser: String, docIds: Seq[String], config: PresentationConfig) = {
+  protected def fetchIndexProperties(currentUser: Option[String], docIds: Seq[String], config: PresentationConfig) = {
     // Helper that wraps the common bits: conditional execution, sequence-ing, mapping to (id -> result) tuple
     def fetchIfRequested[T](field: String*)(fn: String => Future[T]) =
       if (config.hasAnyColumn(field))
@@ -62,7 +62,10 @@ class DirectoryController @Inject() (
     }
 
     val fMyLastEdits = fetchIfRequested("my_last_edit_at") { id => 
-      contributions.getMyLastContribution(currentUser, id)
+      currentUser match {
+        case Some(username) => contributions.getMyLastContribution(username, id)
+        case _ => Future.successful(None)
+      }
     }
 
     val fAnnotationCounts = fetchIfRequested("annotations") { id =>
@@ -70,7 +73,10 @@ class DirectoryController @Inject() (
     }
 
     val fMyAnnotationCounts = fetchIfRequested("my_annotations") { id => 
-      annotations.countMineByDocId(currentUser, id)
+      currentUser match {
+        case Some(username) => annotations.countMineByDocId(username, id)
+        case _ => Future.successful(0l)
+      }
     }
 
     val fStatusRatios =

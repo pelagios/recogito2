@@ -22,7 +22,7 @@ trait SortByDB { self: DirectoryController =>
     indexProperties <- config match {
       case Some(c) => 
         val ids = documents.items.map(_.productElement(0).asInstanceOf[DocumentRecord].getId)
-        fetchIndexProperties(currentUser, ids, c).map(Some(_))
+        fetchIndexProperties(Some(currentUser), ids, c).map(Some(_))
 
       case None => Future.successful(None)
     }

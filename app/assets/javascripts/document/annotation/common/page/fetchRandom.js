@@ -12,7 +12,7 @@ define(['common/config'], function(Config) {
       return jQuery.ajax({
         url: '/api/directory/' + Config.documentOwner,
         type: 'POST',
-        data: JSON.stringify({ columns: [ 'my_annotations' ]}),
+        data: JSON.stringify({ columns: [ 'my_annotations' ], sort: {by: "my_annotations", asc: true} }),
         contentType: 'application/json'
       }).then(function(response) {
         // Filter for documents != current and (optionally) where my_annotations == 0
@@ -20,9 +20,6 @@ define(['common/config'], function(Config) {
               var isDocument = item.type === 'DOCUMENT' && item.id != Config.documentId;
               return requireZero ? isDocument & item.my_annotations === 0 : isDocument;
             });
-
-          console.log(response.items);
-          console.log(candidates);
           
         return candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)] : null;
       });
@@ -35,8 +32,8 @@ define(['common/config'], function(Config) {
             '<div class="suggest-random btn small">' +
               '<a href="' + url + '">Annotate Next</a>' +
             '<div>') : jQuery(
-            '<div class="suggest-random btn small outline>' +
-              '<span>Congratulations! No more documents to annotate.</span>' +
+            '<div class="suggest-random btn small outline">' +
+              '<span>Congratulations! There are no additional documents to annotate.</span>' +
             '</div>');
 
       return el;
