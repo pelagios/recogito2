@@ -162,7 +162,7 @@ define([
               
               // Unique tags = controlled vocabulary (if any) + previously used tags
               // Make sure the controlled vocab comes first, and the order isn't changed
-              uniqueTags = Config.vocabulary;
+              uniqueTags = Config.vocabulary || [];
               
               previouslyUsedTags.forEach(function(tag) {
                 if (uniqueTags.indexOf(tag) === -1)
