@@ -83,8 +83,24 @@
       </table>
 
       <p>
+        <input style="display:none" id="upload-vocabulary" type="file">
+
+        @if(taggingVocab.size > 0) {
+          <button class="btn small" disabled>
+        } else {
+          <button class="btn small">
+        }
+          <label for="upload-vocabulary">
+            <span class="icon">&#xf055;</span> Upload from file
+          </label>
+        </button>
+
         <button id="clear-vocabulary" class="btn small">Clear</button>
-        <input id="upload-vocabulary" type="file">
+      </p>
+      <p class="description">
+        A vocabulary file is a simple text file with one vocabulary term per line.
+        To associate tags with a concept URI, each line should list the vocabulary term and the URI, 
+        separated by comma.
       </p>
     </div>
   </div>
