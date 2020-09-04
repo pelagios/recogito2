@@ -119,6 +119,10 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
         
       val placeTypes = maybePlace.map(_.subjects.map(_._1).mkString(","))
 
+      // Helper to surface either the tag URI (if available) or the label otherwise
+      def tagLabelsOrURIs(): Seq[String] =
+        getTagBodies(a).flatMap(body => Seq(body.uri, body.value).flatten.headOption)
+
       Seq(a.annotationId.toString,
           filename,
           quoteOrTranscription.getOrElse(EMPTY),
@@ -131,7 +135,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
           maybePlace.flatMap(_.representativePoint.map(_.x.toString)).getOrElse(EMPTY),
           maybePlace.map(_.subjects.map(_._1).mkString(",")).getOrElse(EMPTY),
           firstEntity.flatMap(_.status.map(_.value.toString)).getOrElse(EMPTY),
-          getTagBodies(a).flatMap(_.value).mkString("|"),
+          tagLabelsOrURIs().mkString("|"),
           getCommentBodies(a).flatMap(_.value).mkString("|"))
     }
 
