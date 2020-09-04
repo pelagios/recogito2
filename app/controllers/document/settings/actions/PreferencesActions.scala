@@ -23,6 +23,29 @@ object GazetteerPreferences extends HasNullableSeq {
 
 }
 
+case class Tag(label: String, uri: Option[String] = None)
+
+object Tag {
+
+  implicit val tagReads: Reads[Tag] = new Reads[Tag] {
+
+    override def reads(json: JsValue): JsResult[Tag] = json match {
+      case str: JsString => JsSuccess(Tag(str.value)) 
+      case obj: JsObject => JsSuccess(Tag(
+        (obj \ "label").as[String],
+        (obj \ "uri").asOpt[String]
+      ))
+    }
+    
+  }
+
+  implicit val tagWrites: Writes[Tag] = (
+    (JsPath \ "label").write[String] and
+    (JsPath \ "uri").writeNullable[String]
+  )(unlift(Tag.unapply))
+
+}
+
 trait PreferencesActions { self: SettingsController =>
   
   def showAnnotationPreferences(doc: ExtendedDocumentMetadata, user: User)(implicit request: RequestHeader) = {
@@ -54,7 +77,7 @@ trait PreferencesActions { self: SettingsController =>
   }
 
   def setTagVocabulary(docId: String) = self.silhouette.SecuredAction.async { implicit request => 
-    jsonDocumentAdminAction[Seq[String]](docId, request.identity.username, { case (document, vocabulary) => 
+    jsonDocumentAdminAction[Seq[Tag]](docId, request.identity.username, { case (document, vocabulary) => 
       self.documents.upsertPreferences(docId, "tag.vocabulary", Json.stringify(Json.toJson(vocabulary))).map { success => 
         if (success) Ok else InternalServerError
       }
