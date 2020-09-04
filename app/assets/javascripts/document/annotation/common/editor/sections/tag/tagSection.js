@@ -66,14 +66,17 @@ define([
             }
           });
 
-          autocomplete.on('select', function(tag) {
-            addTag({ 
+          autocomplete.on('select', function(tagOrLabel) {
+            var tag = { 
               type: 'TAG', 
               last_modified_by: Config.me, 
-              value: tag.value,
-              uri: tag.uri
-            });
+              value: tagOrLabel.value || tagOrLabel
+            }
 
+            if (tagOrLabel.uri) 
+              tag.uri = tagOrLabel.uri;
+              
+            addTag(tag);
             autocomplete.hide();
             textarea.val('');
           });

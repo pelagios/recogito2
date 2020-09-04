@@ -45,7 +45,13 @@ define([
             return tags.concat(Utils.getTags(annotation));
           }, []);
 
-          uniqueTags = Array.from(new Set(uniqueTags.concat(tags)));
+          var uniqueLabels = uniqueTags.map(function(t) { return t.value || t; });
+
+          tags.forEach(function(t) {
+            if (uniqueLabels.indexOf(t) == -1) {
+              uniqueTags.push(t);
+            }
+          });
         },
 
         /** Add an annotation or array of annotations to the view **/
@@ -158,14 +164,20 @@ define([
           jsRoutes.controllers.document.stats.StatsController.getTagsAsJSON(Config.documentId)
             .ajax().then(function(response) {
               // Tags used previously on any part of this document
+              // HACK - these are always labels, not objects ({ value, uri })
               var previouslyUsedTags = response.map(function(tag) { return tag.value });
-              
+
               // Unique tags = controlled vocabulary (if any) + previously used tags
               // Make sure the controlled vocab comes first, and the order isn't changed
+              // HACK - vocabulary can be list of strings or list of objects
               uniqueTags = Config.vocabulary || [];
               
+              var vocabLabels = uniqueTags.map(function(strOrObj) {
+                return strOrObj.value || strOrObj; 
+              });
+
               previouslyUsedTags.forEach(function(tag) {
-                if (uniqueTags.indexOf(tag) === -1)
+                if (vocabLabels.indexOf(tag) === -1)
                   uniqueTags.push(tag);
               });
             });
