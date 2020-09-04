@@ -22,7 +22,7 @@ define([
         taglist = element.find('ul'),
         textarea = element.find('.add-tag'),
 
-        autocomplete = new TagAutocomplete(element, textarea, allAnnotationsOnPage),
+        autocomplete = new TagAutocomplete(textarea, allAnnotationsOnPage),
 
         hasChanged = false,
 
@@ -64,6 +64,18 @@ define([
               taglist.append(createTag(body));
               tagCount++;
             }
+          });
+
+          autocomplete.on('select', function(tag) {
+            addTag({ 
+              type: 'TAG', 
+              last_modified_by: Config.me, 
+              value: tag.value,
+              uri: tag.uri
+            });
+
+            autocomplete.hide();
+            textarea.val('');
           });
 
           // In read-only mode, hide the list if there are no tags
@@ -142,6 +154,7 @@ define([
 
         /** Text entry field: new tags are created on ENTER **/
         onKeyDown = function(e) {
+          /*
           if (e.keyCode === 13) {
             var tags = getDraftTags();
             jQuery.each(tags, function(idx, chars) {
@@ -155,6 +168,7 @@ define([
   
             return false;
           }
+          */
         },
 
         /** @override **/

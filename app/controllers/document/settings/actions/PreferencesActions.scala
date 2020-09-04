@@ -32,7 +32,7 @@ object Tag {
     override def reads(json: JsValue): JsResult[Tag] = json match {
       case str: JsString => JsSuccess(Tag(str.value)) 
       case obj: JsObject => JsSuccess(Tag(
-        (obj \ "label").as[String],
+        (obj \ "value").as[String],
         (obj \ "uri").asOpt[String]
       ))
     }
@@ -40,7 +40,7 @@ object Tag {
   }
 
   implicit val tagWrites: Writes[Tag] = (
-    (JsPath \ "label").write[String] and
+    (JsPath \ "value").write[String] and
     (JsPath \ "uri").writeNullable[String]
   )(unlift(Tag.unapply))
 

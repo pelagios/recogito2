@@ -1,14 +1,19 @@
-define([], function() {
+define([
+  'common/hasEvents',
+], function(HasEvents) {
   
-  var TagAutocomplete = function(parent, textarea, annotations) {
+  var TagAutocomplete = function(textarea, annotations) {
 
-    var init = function() {
+    var self = this,
+
+        init = function() {
           var prefixMatcher = function(query, responseFn) {
                 var matches = [],
                     qLow = query.toLowerCase();
                 
                 annotations.listUniqueTags().forEach(function(tag) {
-                  if (tag.toLowerCase().indexOf(qLow) === 0)
+                  var label = tag.value || tag;
+                  if (label.toLowerCase().indexOf(qLow) === 0)
                     matches.push(tag);
                 });
 
@@ -17,10 +22,22 @@ define([], function() {
 
           textarea.typeahead({
             hint:false,
-            minLength:0
+            minLength:0,
           },{
             source: prefixMatcher,
-            limit:10
+            limit:10,
+            display: function(tag) {
+              return tag.value || tag;
+            },
+            templates: {
+              suggestion: function(tag) {
+                return tag.value ? '<div>' + tag.value + '</div>' : '<div>' + tag + '</div>';
+              }
+            }
+          });
+
+          textarea.bind('typeahead:select', function(evt, suggestion) {
+            self.fireEvent('select', suggestion);
           });
         },
 
@@ -31,7 +48,10 @@ define([], function() {
     init();
 
     this.hide = hide;
+
+    HasEvents.apply(this);
   };
+  TagAutocomplete.prototype = Object.create(HasEvents.prototype);
 
   return TagAutocomplete;
 
