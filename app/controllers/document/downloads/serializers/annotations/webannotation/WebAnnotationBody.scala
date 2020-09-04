@@ -11,6 +11,7 @@ import play.api.libs.functional.syntax._
 case class WebAnnotationBody(
   hasType : WebAnnotationBody.Value,
   value   : Option[String],
+  id      : Option[String],
   note    : Option[String],
   creator : Option[String],
   modified: DateTime,
@@ -48,9 +49,16 @@ object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
     if (b.hasType == QUOTE) {
       Seq.empty[WebAnnotationBody]
     } else {
+      val (value, id) = if (b.value.isDefined && b.uri.isDefined) {
+          (b.value, b.uri) 
+        } else { 
+          (Seq(b.uri, b.value).flatten.headOption, None)
+        }
+
       val body = WebAnnotationBody(
         hasType,
-        Seq(b.uri, b.value).flatten.headOption,
+        value,
+        id,
         b.note,
         b.lastModifiedBy.map(by => recogitoBaseURI + by),
         b.lastModifiedAt,
@@ -61,6 +69,7 @@ object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
         if (b.hasType == PLACE)
           entities.map { e => WebAnnotationBody(
             Feature,
+            None,
             None,
             None,
             b.lastModifiedBy.map(by => recogitoBaseURI + by),
@@ -77,6 +86,7 @@ object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
   
   implicit val webAnnotationBodyWrites: Writes[WebAnnotationBody] = (
     (JsPath \ "type").write[WebAnnotationBody.Value] and
+    (JsPath \ "id").writeNullable[String] and
     (JsPath \ "value").writeNullable[String] and
     (JsPath \ "note").writeNullable[String] and
     (JsPath \ "creator").writeNullable[String] and
@@ -85,6 +95,7 @@ object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
     (JsPath \ "geometry").writeNullable[Geometry]
   )(a => (
     a.hasType,
+    a.id,
     a.value,
     a.note,
     a.creator,
