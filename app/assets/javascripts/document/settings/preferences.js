@@ -15,6 +15,10 @@ require(['common/config'], function(Config) {
 
         plausibilityWarning = jQuery('.plausibility-warning'),
 
+        btnClearVocabulary = jQuery('#clear-vocabulary'),
+
+        btnUploadVocabulary = jQuery('#upload-vocabulary'),
+
         /** Returns the state of a single input DOM node **/
         getInputState = function(node) {
           var input = jQuery(node),
@@ -89,10 +93,26 @@ require(['common/config'], function(Config) {
           }).fail(function(error) {
             console.log('error');
           });
+        },
+
+        onClearVocabulary = function() {
+          jQuery.ajax({
+            url: '/document/' + Config.documentId + '/settings/prefs/tag-vocab',
+            type: 'DELETE',
+            success: function(result) {
+              location.reload();
+            }
+          })
+        },
+
+        onUploadVocabulary = function() {
+
         };
 
     useAll.change(onToggleUseAll);
     gazetteers.change(onChange);
+
+    btnClearVocabulary.click(onClearVocabulary);
 
     setWarning(toSetting(getState()));
   });

@@ -106,6 +106,7 @@ POST    /document/:id/settings/metadata              controllers.document.settin
 POST    /document/:id/settings/metadata/part/:ptId   controllers.document.settings.SettingsController.updateFilepartMetadata(id: String, ptId: java.util.UUID)
 POST    /document/:id/settings/prefs/gazetteers      controllers.document.settings.SettingsController.setGazetteerPreferences(id: String)
 POST    /document/:id/settings/prefs/tag-vocab       controllers.document.settings.SettingsController.setTagVocabulary(id: String)
+DELETE  /document/:id/settings/prefs/tag-vocab       controllers.document.settings.SettingsController.clearTagVocabulary(id: String)
 PUT     /document/:id/settings/visibility            controllers.document.settings.SettingsController.setPublicVisibility(id: String, visibility: String)
 PUT     /document/:id/settings/accesslevel           controllers.document.settings.SettingsController.setPublicAccessLevel(id: String, accessLevel: String)
 GET     /document/:id/settings/collaborators         controllers.document.settings.SettingsController.listCollaborators(id: String)

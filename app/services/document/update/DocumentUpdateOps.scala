@@ -130,5 +130,12 @@ trait DocumentUpdateOps { self: DocumentService =>
        .set(prefRecord)
        .execute() == 1
   }
+
+  def deletePreferences(docId: String, name: String): Future[Boolean] = db.query { sql => 
+    sql.deleteFrom(DOCUMENT_PREFERENCES)
+       .where(DOCUMENT_PREFERENCES.DOCUMENT_ID.equal(docId)
+         .and(DOCUMENT_PREFERENCES.PREFERENCE_NAME.equal(name)))
+       .execute() == 1
+  }
   
 }

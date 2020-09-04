@@ -35,6 +35,7 @@ object Tag {
         (obj \ "value").as[String],
         (obj \ "uri").asOpt[String]
       ))
+      case _ => throw new Exception()
     }
     
   }
@@ -87,6 +88,14 @@ trait PreferencesActions { self: SettingsController =>
         if (success) Ok else InternalServerError
       }
     }) 
+  }
+
+  def clearTagVocabulary(docId: String) = self.silhouette.SecuredAction.async { implicit request => 
+    documentAdminAction(docId, request.identity.username, { doc => 
+      self.documents.deletePreferences(docId, "tag.vocabulary").map { success => 
+        if (success) Ok else InternalServerError
+      }
+    })
   }
   
 }
