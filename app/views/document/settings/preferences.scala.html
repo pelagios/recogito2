@@ -2,7 +2,8 @@
   doc: services.document.ExtendedDocumentMetadata,
   currentUser: services.user.User,
   gazetteers: Seq[services.generated.tables.records.AuthorityFileRecord],
-  gazetteerPrefs: controllers.document.settings.actions.GazetteerPreferences
+  gazetteerPrefs: controllers.document.settings.actions.GazetteerPreferences,
+  taggingVocab: Seq[controllers.document.settings.actions.Tag]
  )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
 
 @_layout("Settings | Annotation Preferences", doc, currentUser, Some("preferences")) {
@@ -58,6 +59,33 @@
           <a href="mailto:commons@@pelagios.org">Get in touch!</a>
         </p>
       </form>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Tagging Vocabulary</h2>
+    <div class="inner">
+      <table>
+        <thead>
+          <tr>
+            <th>Term</th>
+            <th>URI (optional)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(tag <- taggingVocab) {
+            <tr>
+              <td>@tag.label</td>
+              <td>@tag.uri</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <p>
+        <button class="btn small" disabled>Upload CSV</button>
+        <button class="btn small" disabled>Clear</button>
+      </p>
     </div>
   </div>
 

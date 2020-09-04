@@ -62,8 +62,13 @@ trait PreferencesActions { self: SettingsController =>
         .find(_.getPreferenceName == "authorities.gazetteers")
         .flatMap(str => Json.fromJson[GazetteerPreferences](Json.parse(str.getPreferenceValue)).asOpt)
         .getOrElse(GazetteerPreferences.DEFAULTS)
+
+      val taggingVocab = allPrefs
+        .find(_.getPreferenceName == "tag.vocabulary")
+        .flatMap(p => Json.fromJson[Seq[Tag]](Json.parse(p.getPreferenceValue)).asOpt)
+        .getOrElse(Seq.empty)
         
-      Ok(views.html.document.settings.preferences(doc, user, gazetteers, gazetteerPrefs))
+      Ok(views.html.document.settings.preferences(doc, user, gazetteers, gazetteerPrefs, taggingVocab))
     }
   }
     
