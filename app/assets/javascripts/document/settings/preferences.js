@@ -17,7 +17,7 @@ require(['common/config'], function(Config) {
 
         btnClearVocabulary = jQuery('#clear-vocabulary'),
 
-        btnUploadVocabulary = jQuery('#upload-vocabulary'),
+        inputUploadVocabulary = jQuery('#upload-vocabulary'),
 
         /** Returns the state of a single input DOM node **/
         getInputState = function(node) {
@@ -106,13 +106,59 @@ require(['common/config'], function(Config) {
         },
 
         onUploadVocabulary = function() {
+          var data = new FormData();
+          data.append('file', this.files[0]);
 
+          var f = this.files[0];
+          var reader = new FileReader();
+          
+          reader.addEventListener('load', function (e) {
+              var rows = e.target.result.split('\n'),
+                  tags = [];
+                  
+              rows.forEach(function(row) {
+                var fields = row.split(',').map(function(f) { return f.trim() });
+                if (fields[0].length > 0) {
+                  if (fields.length == 1) {
+                    tags.push(fields[0]);
+                  } else if (fields.length > 1) {
+                    tags.push({ value: fields[0], uri: fields[1] });
+                  }
+                }
+              });
+
+              // Don't allow mixed tag vocabularies 
+              var allStrings = tags.every(function(t) {
+                    return typeof t === 'string' || t instanceof String;
+                  }),
+
+                  allObjects = tags.every(function(t) {
+                    return t.value && t.uri
+                  });
+
+              if (allStrings || allObjects) {
+                jQuery.ajax({
+                  url: '/document/' + Config.documentId + '/settings/prefs/tag-vocab',
+                  type: 'POST',
+                  contentType: "application/json; charset=utf-8",
+                  data: JSON.stringify(tags),
+                  success: function(result) {
+                    location.reload();
+                  }
+                });
+              } else {
+                alert('Mixed vocabularies (with and without URIs) are currently not supported.');
+              }
+          });
+          
+          reader.readAsBinaryString(f);
         };
 
     useAll.change(onToggleUseAll);
     gazetteers.change(onChange);
 
     btnClearVocabulary.click(onClearVocabulary);
+    inputUploadVocabulary.change(onUploadVocabulary);
 
     setWarning(toSetting(getState()));
   });
