@@ -154,7 +154,6 @@ define([
 
         /** Text entry field: new tags are created on ENTER **/
         onKeyDown = function(e) {
-          /*
           if (e.keyCode === 13) {
             var tags = getDraftTags();
             jQuery.each(tags, function(idx, chars) {
@@ -168,7 +167,6 @@ define([
   
             return false;
           }
-          */
         },
 
         /** @override **/

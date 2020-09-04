@@ -37,6 +37,7 @@ define([
           });
 
           textarea.bind('typeahead:select', function(evt, suggestion) {
+            evt.preventDefault();
             self.fireEvent('select', suggestion);
           });
         },
