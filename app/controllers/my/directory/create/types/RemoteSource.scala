@@ -36,6 +36,7 @@ trait RemoteSource { self: CreateController =>
           case "IIIF" => registerIIIFSource(pendingUpload, owner, url)
           case "CTS" => fetchCTSSource(pendingUpload, owner, url)
           case "TEI_XML" => fetchFileFromURL(pendingUpload, owner, url, "tei-import.tei.xml")
+          case "WMTS" => registerWMTSSource(pendingUpload, owner, url)
         }
 
       case _ =>
@@ -99,6 +100,12 @@ trait RemoteSource { self: CreateController =>
       case Left(e) =>
         BadRequest
     }}
+  }
+
+  private def registerWMTSSource(pendingUpload: UploadRecord, owner: User, url: String): Future[Result] = {
+    uploads.insertRemoteFilepart(pendingUpload.getId, owner.username, ContentType.MAP_WMTS, url).map { success => 
+      if (success) Ok else InternalServerError
+    }
   }
 
   private def registerIIIFSource(pendingUpload: UploadRecord, owner: User, url: String): Future[Result] = {

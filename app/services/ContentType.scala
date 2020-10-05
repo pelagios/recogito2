@@ -25,7 +25,7 @@ sealed trait ContentType {
   
   lazy val isLocal =
     // No other remote types supported at present
-    subtype != "IIIF" 
+    subtype != "IIIF" && subtype != "WMTS"
   
 }
 
@@ -42,6 +42,8 @@ object ContentType {
   case object IMAGE_UPLOAD  extends ContentType { val media = "IMAGE" ; val subtype = "UPLOAD" }
   case object IMAGE_IIIF    extends ContentType { val media = "IMAGE" ; val subtype = "IIIF" }
 
+  case object MAP_WMTS      extends ContentType { val media = "MAP"   ; val subtype = "WMTS"}
+
   case object DATA_CSV      extends ContentType { val media = "DATA"  ; val subtype = "CSV" }
 
   def withName(name: String): Option[ContentType] = Seq(
@@ -50,6 +52,7 @@ object ContentType {
     TEXT_MARKDOWN,
     IMAGE_UPLOAD,
     IMAGE_IIIF,
+    MAP_WMTS,
     DATA_CSV).find(_.name == name)
 
   /** JSON conversion **/
