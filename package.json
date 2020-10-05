@@ -23,15 +23,16 @@
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
     "babel-eslint": "8.2.5",
-    "babel-loader": "7.1.4",
+    "babel-loader": "^8.1.0",
     "babel-plugin-transform-class-properties": "6.24.1",
     "babel-preset-react": "6.24.1",
-    "eslint": "4.19.1",
+    "eslint": "^7.10.0",
     "eslint-loader": "2.0.0",
     "eslint-plugin-import": "2.13.0",
     "jsx-loader": "0.13.2",
     "lodash": "^4.17.19",
-    "webpack": "^4.41.3"
+    "node-fetch": ">=2.6.1",
+    "webpack": "^4.44.2"
   },
   "engines": {
     "node": "8.11.3",
