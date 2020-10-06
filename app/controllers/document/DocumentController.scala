@@ -69,6 +69,12 @@ class DocumentController @Inject() (
         case Some(ContentType.IMAGE_IIIF) =>
           Future.successful(Redirect(currentPart.getFile))
 
+        case Some(ContentType.MAP_WMTS) =>
+          // TODO might need to extend that in the future
+          Future.successful(Ok(Json.obj(
+            "url" -> currentPart.getFile
+          )))
+
         case _ =>
           Future.successful(BadRequest)
       }
