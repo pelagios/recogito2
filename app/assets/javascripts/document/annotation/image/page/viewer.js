@@ -46,22 +46,71 @@ define([
 
         resetRotationIcon = controlsEl.find('.reset-rotation span'),
 
-        projection = (Config.contentType === 'IMAGE_UPLOAD') ?
+        projection = Config.contentType === 'IMAGE_UPLOAD' ?
           new ol.proj.Projection({
             code: 'ZOOMIFY',
             units: 'pixels',
             extent: [0, -h, w, 0]
-          }) : new ol.proj.Projection({
-            code: 'IIIF',
-            units: 'pixels',
-            extent: [0, -h, w, 0]
-          }),
+          }) : (
+            Config.contentType === 'MAP_WMTS' ? ol.proj.get('EPSG:3857') : new ol.proj.Projection({
+              code: 'IIIF',
+              units: 'pixels',
+              extent: [0, -h, w, 0]
+            })
+          ),
+
+        // Cf. https://openlayers.org/en/v4.6.5/examples/wmts.html
+        resolutions = (function() {
+          var size = ol.extent.getWidth(projection.getExtent()) / 256,
+              resolutions = new Array(14);
+
+          for (var z = 0; z < 14; ++z) {
+            resolutions[z] = size / Math.pow(2, z);
+          }
+  
+          return resolutions;
+        })(),
+
+        matrixIds = (function() {
+          var matrixIds = new Array(14);
+
+          for (var z = 0; z < 14; ++z) {
+            matrixIds[z] = z;
+          }
+  
+          return matrixIds;
+        })(),
 
         tileSource = (Config.contentType === 'IMAGE_UPLOAD') ?
           new ol.source.Zoomify({
             url: BASE_URL,
             size: [ w, h ]
-          }) : new IIIFSource(imageProperties),
+          }) : ( 
+            // TODO
+            /*
+            Config.contentType === 'MAP_WMTS' ? new ol.source.WMTS({
+              attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/' +
+                  'services/Demographics/USA_Population_Density/MapServer/">ArcGIS</a>',
+              url: imageProperties.url,
+              layer: '0',
+              matrixSet: 'EPSG:3857',
+              format: 'image/jpg',
+              projection: projection,
+              tileGrid: new ol.tilegrid.WMTS({
+                origin: ol.extent.getTopLeft(projection.getExtent()),
+                resolutions: resolutions,
+                matrixIds: matrixIds
+              }),
+              style: 'default',
+              wrapX: true
+            }) */
+
+            Config.contentType === 'MAP_WMTS' ? new ol.source.XYZ({
+              minZoom: 1,
+              maxZoom: 14,
+              crossOrigin: 'anonymous',
+              url: imageProperties.url
+            }) : new IIIFSource(imageProperties) ),
 
         tileLayer = new ol.layer.Tile({
           source: tileSource
