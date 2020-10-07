@@ -5,7 +5,6 @@ import controllers.HasCSVParsing
 import controllers.document.downloads.FieldMapping
 import controllers.document.downloads.serializers._
 import java.io.File
-import org.geotools.geometry.jts.JTSFactoryFinder
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext

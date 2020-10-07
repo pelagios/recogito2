@@ -1,7 +1,10 @@
 package controllers.document.downloads.serializers.annotations.webannotation
 
 import services.image._
-import services.annotation.{ Annotation, AnnotationBody }
+import services.annotation.{Annotation, AnnotationBody}
+import org.geotools.geometry.jts.JTS
+import org.geotools.referencing.CRS
+import com.vividsolutions.jts.geom.{Coordinate, Point, PrecisionModel, GeometryFactory}
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
@@ -17,6 +20,7 @@ object WebAnnotationSelector {
     case s: TextPositionSelector  => Json.toJson(s)
     case s: TextQuoteSelector     => Json.toJson(s)
     case s: ImageFragmentSelector => Json.toJson(s)
+    case s: MapFragmentSelector   => Json.toJson(s)
     case s: TableFragmentSelector => Json.toJson(s)
     case s: XPathRangeSelector    => Json.toJson(s)
   }
@@ -103,6 +107,48 @@ object ImageFragmentSelector {
     (JsPath \ "value").write[String]
   )(s => ("FragmentSelector", "http://www.w3.org/TR/media-frags/", s.value)) 
   
+}
+
+/**
+ * TODO this is just a repurposing of ImageFragmentSelector. Later down the line,
+ * we'll want to give more specific treatment to map fragments
+ */
+case class MapFragmentSelector(value: String) extends WebAnnotationSelector
+
+object MapFragmentSelector {
+
+  private def convert(x: Double, y: Double): Point = {
+    val sourceCRS = CRS.decode("EPSG:3857")
+    val targetCRS = CRS.decode("EPSG:4236")
+    val transform = CRS.findMathTransform(sourceCRS, targetCRS, false)
+
+    val factory = new GeometryFactory(new PrecisionModel(), 4326)
+
+    val pt = factory.createPoint(new Coordinate(x, y))
+
+    return JTS.transform(pt, transform).asInstanceOf[Point]
+  }
+
+  def fromAnnotation(a: Annotation) = ImageAnchor.parse(a.anchor) match {
+    case a: PointAnchor =>
+      val pt = convert(a.x, a.y)
+      MapFragmentSelector(s"xywh=pixel:${pt.getY},${-pt.getX},0,0")
+
+   case a: RectAnchor =>
+     ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},${a.w},${a.h}")
+   
+   case a: TiltedBoxAnchor =>
+     // Tilted boxes are 'dumbed down' to their bounds
+     val b = a.bounds
+     ImageFragmentSelector(s"xywh=pixel:${b.left},${b.top},${b.width},${b.height}")
+  }
+
+  implicit val mapFragmentSelectorWrites: Writes[MapFragmentSelector] = (
+    (JsPath \ "type").write[String] and
+    (JsPath \ "conformsTo").write[String] and
+    (JsPath \ "value").write[String]
+  )(s => ("FragmentSelector", "http://www.w3.org/TR/media-frags/", s.value)) 
+
 }
 
 case class TableFragmentSelector(row: Int) extends WebAnnotationSelector

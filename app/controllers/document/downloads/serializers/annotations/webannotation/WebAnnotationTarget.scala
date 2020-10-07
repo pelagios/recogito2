@@ -49,6 +49,9 @@ object WebAnnotationTarget {
       case DATA_CSV  =>
         WebAnnotationTarget(source, "Dataset", filepart.getTitle, Seq(TableFragmentSelector.fromAnnotation(annotation)))
 
+      case MAP_WMTS =>
+        WebAnnotationTarget(source, "Map", filepart.getTitle, Seq(MapFragmentSelector.fromAnnotation(annotation)))
+
       case c =>
         // Should never happen
         throw new IllegalArgumentException(s"Unable to create Web Annotation target for content type ${c}")

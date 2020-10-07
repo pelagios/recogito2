@@ -17,7 +17,8 @@ updateOptions := updateOptions.value.withGigahorse(false)
 PlayKeys.devSettings += "play.server.akka.requestTimeout" -> "600s"
 
 resolvers ++= Seq(
-  "Typesafe" at "http://repo.typesafe.com/typesafe/releases/",
+  "Maven Central Server" at "https://repo1.maven.org/maven2",
+  "Typesafe" at "https://repo.typesafe.com/typesafe/releases/",
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
   "Geotools" at "https://repo.osgeo.org/repository/geotools-releases/",
   "Geotoolkit" at "http://maven.geotoolkit.org",
@@ -74,6 +75,8 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-to-slf4j" % "2.8.2",
 
   "org.geotools" % "gt-geojson" % "14.3",
+  "org.geotools" % "gt-referencing" % "22.2",
+  "org.geotools" % "gt-epsg-hsql" % "22.2",
 
   "org.jooq" % "jooq" % "3.7.2",
   "org.jooq" % "jooq-codegen-maven" % "3.7.2",
