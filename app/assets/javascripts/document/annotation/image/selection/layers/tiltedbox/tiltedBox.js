@@ -1,7 +1,10 @@
 /**
  * Utility methods for handling/drawing TilteBox shapes.
  */
-define(['document/annotation/image/selection/layers/baseDrawingTool'], function(BaseTool) {
+define([
+  'common/config',
+  'document/annotation/image/selection/layers/baseDrawingTool'
+], function(Config, BaseTool) {
 
       /** Constants **/
   var TWO_PI = 2 * Math.PI,
@@ -46,13 +49,21 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
     SMALL_HANDLE_RADIUS : SMALL_HANDLE_RADIUS,
 
     parseAnchor : function(anchor, opt_minheight) {
-      var min_height = (opt_minheight) ? opt_minheight : 0,
+      
+
+      var isMap = Config.contentType.indexOf('MAP_') === 0,
+      
+          min_height = (opt_minheight) ? opt_minheight : 0,
 
           args = anchor.substring(anchor.indexOf(':') + 1).split(','),
 
           // TODO make this robust against change of argument order
           x = parseInt(args[0].substring(2)),
-          y = parseInt(args[1].substring(2)),
+
+          // Unfortunately, we decided (long ago) to flip the Y direction for IIIF & Zoomify,
+          // which is why we need different treatment for maps
+          y = isMap ? - parseInt(args[1].substring(2)) : parseInt(args[1].substring(2)),
+          
           a = parseFloat(args[2].substring(2)),
           l = parseFloat(args[3].substring(2)),
           h = parseFloat(args[4].substring(2)),
