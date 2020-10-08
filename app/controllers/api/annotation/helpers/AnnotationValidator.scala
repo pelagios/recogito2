@@ -49,10 +49,11 @@ trait AnnotationValidator {
           annotation.annotates.documentId == previous.annotates.documentId &&
           annotation.annotates.filepartId == previous.annotates.filepartId
 
-        // Anchors are only allowed to change on images (= modified shape)
+        // Anchors are only allowed to change on images and maps (= modified shape)
         val isValidAnchor = 
-          annotation.annotates.contentType.isImage ||
-            annotation.anchor == previous.anchor
+          annotation.annotates.contentType.isImage || 
+            annotation.annotates.contentType.isMap ||
+              annotation.anchor == previous.anchor
 
         // Finally, check if all relations point to valid destinations
         allRelationsValid(annotation).map { 

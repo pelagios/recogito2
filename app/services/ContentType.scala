@@ -19,6 +19,8 @@ sealed trait ContentType {
 
   lazy val isImage = media == "IMAGE"
 
+  lazy val isMap = media == "MAP"
+
   lazy val isText  = media == "TEXT"
 
   lazy val isData  = media == "DATA"
