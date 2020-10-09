@@ -1,7 +1,10 @@
 /**
  * Utility methods for handling/drawing PlaceFlag shapes.
  */
-define(['document/annotation/image/selection/layers/baseDrawingTool'], function(BaseTool) {
+define([
+  'common/config',
+  'document/annotation/image/selection/layers/baseDrawingTool'
+], function(Config, BaseTool) {
 
   var TWO_PI = 2 * Math.PI,
 
@@ -59,15 +62,17 @@ define(['document/annotation/image/selection/layers/baseDrawingTool'], function(
   return {
 
     parseAnchor : function(anchor, opt_minheight) {
-      var min_height = (opt_minheight) ? opt_minheight : 0,
+      var isMap = Config.contentType.indexOf('MAP_') === 0,
+      
+          min_height = (opt_minheight) ? opt_minheight : 0,
 
           args = anchor.substring(anchor.indexOf(':') + 1).split(','),
 
           // TODO make this robust against change of argument order
           rx = parseInt(args[0].substring(3)),
-          ry = parseInt(args[1].substring(3)),
+          ry = isMap ? - parseInt(args[1].substring(3)) : parseInt(args[1].substring(3)),
           px = parseInt(args[2].substring(3)),
-          py = parseInt(args[3].substring(3)),
+          py = isMap ? - parseInt(args[3].substring(3)) : parseInt(args[3].substring(3)),
           a  = parseFloat(args[4].substring(2)),
           l  = parseFloat(args[5].substring(2)),
           h  = parseFloat(args[6].substring(2)),

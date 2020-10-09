@@ -50,7 +50,6 @@ define([
 
     parseAnchor : function(anchor, opt_minheight) {
       
-
       var isMap = Config.contentType.indexOf('MAP_') === 0,
       
           min_height = (opt_minheight) ? opt_minheight : 0,
