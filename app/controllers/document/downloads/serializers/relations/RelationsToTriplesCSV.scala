@@ -28,7 +28,9 @@ trait RelationsToTriplesCSV extends BaseSerializer {
         "source", 
         "relation", 
         "target",
+        "source_id",
         "source_tags",
+        "target_id",
         "target_tags")
 
       val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
@@ -51,7 +53,9 @@ trait RelationsToTriplesCSV extends BaseSerializer {
               fromQuote.get, 
               relationBody.value, 
               toQuote.get,
+              annotation.annotationId.toString,
               fromTags.mkString("|"),
+              toAnnotation.annotationId.toString,
               toTags.mkString("|")
             )
             
