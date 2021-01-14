@@ -45,6 +45,7 @@ object ContentType {
   case object IMAGE_IIIF    extends ContentType { val media = "IMAGE" ; val subtype = "IIIF" }
 
   case object MAP_WMTS      extends ContentType { val media = "MAP"   ; val subtype = "WMTS"}
+  case object MAP_XYZ       extends ContentType { val media = "MAP"   ; val subtype = "XYZ" }
 
   case object DATA_CSV      extends ContentType { val media = "DATA"  ; val subtype = "CSV" }
 
@@ -55,6 +56,7 @@ object ContentType {
     IMAGE_UPLOAD,
     IMAGE_IIIF,
     MAP_WMTS,
+    MAP_XYZ,
     DATA_CSV).find(_.name == name)
 
   /** JSON conversion **/

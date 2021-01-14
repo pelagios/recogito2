@@ -36,7 +36,7 @@ trait RemoteSource { self: CreateController =>
           case "IIIF" => registerIIIFSource(pendingUpload, owner, url)
           case "CTS" => fetchCTSSource(pendingUpload, owner, url)
           case "TEI_XML" => fetchFileFromURL(pendingUpload, owner, url, "tei-import.tei.xml")
-          case "WMTS" => registerWMTSSource(pendingUpload, owner, url)
+          case "WEBMAP" => registerWebmapSource(pendingUpload, owner, url)
         }
 
       case _ =>
@@ -102,7 +102,11 @@ trait RemoteSource { self: CreateController =>
     }}
   }
 
-  private def registerWMTSSource(pendingUpload: UploadRecord, owner: User, url: String): Future[Result] = {
+  private def registerWebmapSource(pendingUpload: UploadRecord, owner: User, url: String): Future[Result] = {
+    play.api.Logger.info(url)
+
+    // TODO pick ContentType according to URL
+
     uploads.insertRemoteFilepart(pendingUpload.getId, owner.username, ContentType.MAP_WMTS, url).map { success => 
       if (success) Ok else InternalServerError
     }
