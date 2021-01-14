@@ -14,23 +14,23 @@ define(['common/hasEvents'], function(HasEvents) {
                 '</div>' +
                 '<div class="modal-body">' +
                   '<ul>' +
+                    '<li data-name="OSM">' +
+                      '<div class="thumb-container"><img class="map-thumb" src="http://a.tile.openstreetmap.org/7/68/47.png"></div>' +
+                      '<h3>Modern Places</h3>' +
+                      '<p>Modern places and roads via <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a>.</p>' +
+                    '</li>' +
+                    /*
                     '<li data-name="AWMC">' +
                       '<div class="thumb-container"><img class="map-thumb" src="http://a.tiles.mapbox.com/v3/isawnyu.map-knmctlkh/7/68/47.png"></div>' +
                       '<h3>Empty Basemap</h3>' +
                       '<p><a href="http://awmc.unc.edu/wordpress/tiles/" target="_blank">Geographically accurate basemap of the ancient world by the Ancient World Mapping Center</a>, ' +
                       'University of North Carolina at Chapel Hill.</p>' +
                     '</li>' +
-
+                    */
                     '<li data-name="DARE">' +
                       '<div class="thumb-container"><img class="map-thumb" src="http://dh.gu.se/tiles/imperium/7/68/47.png"></div>' +
                       '<h3>Ancient Places</h3>' +
                       '<p>Roman Empire base map by the <a href="http://dare.ht.lu.se/" target="_blank">Digital Atlas of the Roman Empire</a>, Lund University, Sweden.</p>' +
-                    '</li>' +
-
-                    '<li data-name="OSM">' +
-                      '<div class="thumb-container"><img class="map-thumb" src="http://a.tile.openstreetmap.org/7/68/47.png"></div>' +
-                      '<h3>Modern Places</h3>' +
-                      '<p>Modern places and roads via <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a>.</p>' +
                     '</li>' +
 
                     '<li data-name="AERIAL">' +

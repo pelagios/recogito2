@@ -66,6 +66,17 @@ and help resources. Check the
 [Wiki](https://github.com/pelagios/recogito2/wiki/User-Interface-Translation:-Contributors'-Guide)
 for more information.
 
+## Acknowledgements
+
+Recogito was developed predominantely as part of the Pelagios 6 & 7 research projects. Investigative
+team:
+
+- Elton Barker
+- Leif Isaksen
+- Rebecca Kahn
+- Rainer Simon
+- Valeria Vitale
+
 ## License
 
 Recogito is licensed under the terms of the

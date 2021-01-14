@@ -110,18 +110,25 @@
     </div> <!-- jumbotron -->
 
     <div class="featurette inner"@views.html.dir(messages.lang)>
-      <div class="columns">
+      <div class="columns" style="display:flex; align-items:center">
         <div class="one-third column">
           <h3>
-            <img src="@routes.Assets.versioned("images/DHAwards2018-tool.png")">
+            <img src="@routes.Assets.versioned("images/open-publishing-awards.png")">
             <!-- @Html(messages("landing.index.news.title"))<br/> -->
             <!-- @Html(messages("landing.index.news.subtitle")) -->
           </h3>
         </div>
-        <div class="two-thirds column">
+        <div class="one-third column">
           <p>
-            @Html(messages("landing.index.news.text"))
+            Awarded <strong>Best Open Source Software</strong> in the 
+            <a href="https://openpublishingawards.org/index.php/recogito/">Open Publishing Awards 2019</a> and <strong>Best 
+            DH Tool</strong> in the <a href="http://dhawards.org/dhawards2018/results/">Digital Humanities Awards 2018</a>. 
           </p>
+        </div>
+        <div class="one-third column">
+          <h3>
+            <img src="@routes.Assets.versioned("images/DHAwards2018-tool.png")">
+          </h3>
         </div>
       </div>
     </div>

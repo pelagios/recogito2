@@ -150,8 +150,8 @@ require(['common/config'], function(Config) {
                 alert('Mixed vocabularies (with and without URIs) are currently not supported.');
               }
           });
-          
-          reader.readAsBinaryString(f);
+
+          reader.readAsText(f, 'UTF-8');
         };
 
     useAll.change(onToggleUseAll);
