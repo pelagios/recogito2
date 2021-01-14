@@ -21,16 +21,16 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
+    "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.1.0",
     "babel-plugin-transform-class-properties": "6.24.1",
-    "@babel/preset-react": "^7.0.0",
     "eslint": "^7.10.0",
     "eslint-loader": "2.0.0",
     "eslint-plugin-import": "2.13.0",
     "jsx-loader": "0.13.2",
     "lodash": "^4.17.19",
     "node-fetch": ">=2.6.1",
-    "webpack": "^4.44.2"
+    "webpack": "^5.14.0"
   },
   "engines": {
     "node": "8.11.3",
