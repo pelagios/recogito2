@@ -1,11 +1,10 @@
 package controllers.document.downloads.serializers.document.geojson
 
-import com.vividsolutions.jts.geom.{Coordinate, Geometry}
+import com.vividsolutions.jts.geom.{Coordinate, Geometry, GeometryFactory}
 import controllers.HasCSVParsing
 import controllers.document.downloads.FieldMapping
 import controllers.document.downloads.serializers._
 import java.io.File
-import org.geotools.geometry.jts.JTSFactoryFinder
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext
@@ -41,7 +40,7 @@ trait DatatableToGazetteer extends BaseSerializer with HasCSVParsing {
     uploads: Uploads,
     ctx: ExecutionContext) = exportMergedDocument(doc, { case (annotations, places, documentDir) =>
         
-      val factory = JTSFactoryFinder.getGeometryFactory()
+      val factory = new GeometryFactory()
       
       def toDouble(str: String) = 
         Try(str.trim().replace(",", ".").toDouble).toOption
