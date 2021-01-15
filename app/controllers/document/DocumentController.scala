@@ -66,10 +66,10 @@ class DocumentController @Inject() (
             case None => InternalServerError
           }
 
-        case Some(ContentType.IMAGE_IIIF) =>
+        case Some(ContentType.IMAGE_IIIF) | Some(ContentType.MAP_WMTS) =>
           Future.successful(Redirect(currentPart.getFile))
 
-        case Some(ContentType.MAP_WMTS) | Some (ContentType.MAP_XYZ) =>
+        case Some (ContentType.MAP_XYZ) =>
           Future.successful(Ok(Json.obj(
             "url" -> currentPart.getFile
           )))
