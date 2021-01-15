@@ -83,13 +83,13 @@ define([
           }) ];
         } else if (Config.contentType === 'MAP_WMTS') {
           var config = WMTS.buildTileSourceConfig(imageProperties);
-          
+
           tileSources = config.tileSources;
           projection.setExtent(config.extent);
         }
 
     var tileLayers = tileSources.map(function(source) {
-          return new ol.layer.Tile({ opacity: 1, source: source });
+          return new ol.layer.Tile({ source: source });
         }),
 
         olMap = new ol.Map({
