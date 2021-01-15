@@ -44,22 +44,27 @@ define([
             '<div class="fullscreen control icon">&#xf065;</div>' +
           '</div>'),
 
-        resetRotationIcon = controlsEl.find('.reset-rotation span'),
+        resetRotationIcon = controlsEl.find('.reset-rotation span');
 
-        projection = Config.contentType === 'IMAGE_UPLOAD' ?
-          new ol.proj.Projection({
+    var projection;
+
+        if (Config.contentType === 'IMAGE_UPLOAD') {
+          projection = new ol.proj.Projection({
             code: 'ZOOMIFY',
             units: 'pixels',
             extent: [0, -h, w, 0]
-          }) : (
-            Config.contentType === 'MAP_WMTS' ? ol.proj.get('EPSG:3857') : new ol.proj.Projection({
-              code: 'IIIF',
-              units: 'pixels',
-              extent: [0, -h, w, 0]
-            })
-          ),
+          });
+        } else if (Config.contentType === 'IMAGE_IIIF') {
+          projection = new ol.proj.Projection({
+            code: 'IIIF',
+            units: 'pixels',
+            extent: [0, -h, w, 0]
+          });
+        } else if (Config.contentType.indexOf('MAP_' === 0)) {
+          projection = ol.proj.get('EPSG:3857');
+        }
 
-        // Cf. https://openlayers.org/en/v4.6.5/examples/wmts.html
+        /* Cf. https://openlayers.org/en/v4.6.5/examples/wmts.html
         resolutions = (function() {
           var size = ol.extent.getWidth(projection.getExtent()) / 256,
               resolutions = new Array(14);
@@ -80,39 +85,52 @@ define([
   
           return matrixIds;
         })(),
+        */
 
-        tileSource = (Config.contentType === 'IMAGE_UPLOAD') ?
-          new ol.source.Zoomify({
+    var tileSource;
+    
+        if (Config.contentType === 'IMAGE_UPLOAD') {
+          tileSource = new ol.source.Zoomify({
             url: BASE_URL,
             size: [ w, h ]
-          }) : ( 
-            // TODO
-            /*
-            Config.contentType === 'MAP_WMTS' ? new ol.source.WMTS({
-              attributions: 'Tiles © <a href="https://services.arcgisonline.com/arcgis/rest/' +
-                  'services/Demographics/USA_Population_Density/MapServer/">ArcGIS</a>',
-              url: imageProperties.url,
-              layer: '0',
-              matrixSet: 'EPSG:3857',
-              format: 'image/jpg',
-              projection: projection,
-              tileGrid: new ol.tilegrid.WMTS({
-                origin: ol.extent.getTopLeft(projection.getExtent()),
-                resolutions: resolutions,
-                matrixIds: matrixIds
-              }),
-              style: 'default',
-              wrapX: true
-            }) */
+          });
+        } else if (Config.contentType === 'IMAGE_IIIF') {
+          tileSource = new IIIFSource(imageProperties);
+        } else if (Config.contentType === 'MAP_XYZ') {
+          tileSource = new ol.source.XYZ({
+            minZoom: 1,
+            maxZoom: 14,
+            crossOrigin: 'anonymous',
+            url: imageProperties.url
+          });
+        } else if (Config.contentType === 'MAP_WMTS') {
+          var projectionExtent = projection.getExtent();
+          var size = ol.extent.getWidth(projectionExtent) / 256;
+          var resolutions = new Array(14);
+          var matrixIds = new Array(14);
+          for (var z = 0; z < 14; ++z) {
+            // generate resolutions and matrixIds arrays for this WMTS
+            resolutions[z] = size / Math.pow(2, z);
+            matrixIds[z] = z;
+          }
 
-            Config.contentType === 'MAP_WMTS' ? new ol.source.XYZ({
-              minZoom: 1,
-              maxZoom: 14,
-              crossOrigin: 'anonymous',
-              url: imageProperties.url
-            }) : new IIIFSource(imageProperties) ),
+          tileSource = new ol.source.WMTS({
+            url: imageProperties.url,
+            layer: '0',
+            matrixSet: 'EPSG:3857',
+            format: 'image/png',
+            projection: projection,
+            tileGrid: new ol.tilegrid.WMTS({
+              origin: ol.extent.getTopLeft(projectionExtent),
+              resolutions: resolutions,
+              matrixIds: matrixIds,
+            }),
+            style: 'default',
+            wrapX: true,
+          })
+        }
 
-        tileLayer = new ol.layer.Tile({
+    var tileLayer = new ol.layer.Tile({
           source: tileSource
         }),
 

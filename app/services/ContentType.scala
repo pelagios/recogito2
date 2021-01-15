@@ -27,7 +27,7 @@ sealed trait ContentType {
   
   lazy val isLocal =
     // No other remote types supported at present
-    subtype != "IIIF" && subtype != "WMTS"
+    subtype != "IIIF" && media != "MAP"
   
 }
 

@@ -160,7 +160,7 @@ require([
                   return { width: width, height: height };
                 } else if (Config.contentType === 'IMAGE_IIIF') {
                   return new IIIFImageInfo(response);
-                } else if (Config.contentType === 'MAP_WMTS') {
+                } else if (Config.contentType.indexOf('MAP_') === 0) {
                   return response;
                 }
               });

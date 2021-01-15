@@ -118,7 +118,7 @@ class AnnotationController @Inject() (
 
     ContentType.withName(currentPart.getContentType) match {
 
-      case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) | Some(ContentType.MAP_WMTS) =>
+      case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) | Some(ContentType.MAP_WMTS) | Some(ContentType.MAP_XYZ) =>
         f.map { case (count, clonedFrom, clones) =>
           ifAuthorized(Ok(views.html.document.annotation.image(
             doc, 
