@@ -36,7 +36,7 @@ define([
     this.currentSelection = false;
 
     // Remove 'transcription' container, unless image mode
-    if (Config.contentType.indexOf('IMAGE') < 0)
+    if (Config.contentType.indexOf('IMAGE') < 0 && Config.contentType.indexOf('MAP') < 0)
       element.find('.transcription-sections').remove();
 
     // Monitor key events

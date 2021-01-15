@@ -54,7 +54,7 @@ define([
           currentAnnotation = annotation;
 
           // Transcriptions exist only on image content
-          if (Config.contentType.indexOf('IMAGE') === 0)
+          if (Config.contentType.indexOf('IMAGE') === 0 || Config.contentType.indexOf('MAP') === 0)
             initTranscriptionSections(transcriptionBodies);
 
           jQuery.each(placeBodies, function(idx, placeBody) {

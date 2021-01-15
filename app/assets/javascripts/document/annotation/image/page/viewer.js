@@ -1,8 +1,9 @@
 define([
   'common/config',
   'common/hasEvents',
-  'document/annotation/image/iiif/iiifSource'
-], function(Config, HasEvents, IIIFSource) {
+  'document/annotation/image/iiif/iiifSource',
+  'document/annotation/image/wmts/WMTS'
+], function(Config, HasEvents, IIIFSource, WMTS) {
 
   var FULLSCREEN_SLIDE_DURATION = 200;
 
@@ -64,79 +65,36 @@ define([
           projection = ol.proj.get('EPSG:3857');
         }
 
-        /* Cf. https://openlayers.org/en/v4.6.5/examples/wmts.html
-        resolutions = (function() {
-          var size = ol.extent.getWidth(projection.getExtent()) / 256,
-              resolutions = new Array(14);
-
-          for (var z = 0; z < 14; ++z) {
-            resolutions[z] = size / Math.pow(2, z);
-          }
-  
-          return resolutions;
-        })(),
-
-        matrixIds = (function() {
-          var matrixIds = new Array(14);
-
-          for (var z = 0; z < 14; ++z) {
-            matrixIds[z] = z;
-          }
-  
-          return matrixIds;
-        })(),
-        */
-
-    var tileSource;
+    var tileSources;
     
         if (Config.contentType === 'IMAGE_UPLOAD') {
-          tileSource = new ol.source.Zoomify({
+          tileSources = [ new ol.source.Zoomify({
             url: BASE_URL,
             size: [ w, h ]
-          });
+          }) ];
         } else if (Config.contentType === 'IMAGE_IIIF') {
-          tileSource = new IIIFSource(imageProperties);
+          tileSources = [ new IIIFSource(imageProperties) ];
         } else if (Config.contentType === 'MAP_XYZ') {
-          tileSource = new ol.source.XYZ({
+          tileSources = [ new ol.source.XYZ({
             minZoom: 1,
             maxZoom: 14,
             crossOrigin: 'anonymous',
             url: imageProperties.url
-          });
+          }) ];
         } else if (Config.contentType === 'MAP_WMTS') {
-          var projectionExtent = projection.getExtent();
-          var size = ol.extent.getWidth(projectionExtent) / 256;
-          var resolutions = new Array(14);
-          var matrixIds = new Array(14);
-          for (var z = 0; z < 14; ++z) {
-            // generate resolutions and matrixIds arrays for this WMTS
-            resolutions[z] = size / Math.pow(2, z);
-            matrixIds[z] = z;
-          }
-
-          tileSource = new ol.source.WMTS({
-            url: imageProperties.url,
-            layer: '0',
-            matrixSet: 'EPSG:3857',
-            format: 'image/png',
-            projection: projection,
-            tileGrid: new ol.tilegrid.WMTS({
-              origin: ol.extent.getTopLeft(projectionExtent),
-              resolutions: resolutions,
-              matrixIds: matrixIds,
-            }),
-            style: 'default',
-            wrapX: true,
-          })
+          var config = WMTS.buildTileSourceConfig(imageProperties);
+          
+          tileSources = config.tileSources;
+          projection.setExtent(config.extent);
         }
 
-    var tileLayer = new ol.layer.Tile({
-          source: tileSource
+    var tileLayers = tileSources.map(function(source) {
+          return new ol.layer.Tile({ opacity: 1, source: source });
         }),
 
         olMap = new ol.Map({
           target: 'image-pane',
-          layers: [ tileLayer ],
+          layers: tileLayers,
           controls: [],
           interactions: ol.interaction.defaults().extend([
             new ol.interaction.DragRotateAndZoom({

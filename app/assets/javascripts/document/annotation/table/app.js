@@ -230,8 +230,9 @@ require([
 
         onLoadError = function(error) {
           var title = 'Error',
-              message = 'There was an error loading the CSV file.',
-              alert = new Alert(Alert.ERROR, title, message);
+              message = 'There was an error loading the CSV file.';
+
+          new Alert(Alert.ERROR, title, message);
         };
 
     loadIndicator.init(document.getElementById('table-container'));
