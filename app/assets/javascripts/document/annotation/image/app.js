@@ -199,7 +199,10 @@ require([
         offset: 0,
         container: '.sidebar .menu',
         validateDelay: 200,
-        saveViewportOffsetDelay: 200
+        saveViewportOffsetDelay: 200,
+        success: function() {
+          document.querySelector('.sidebar li.active').scrollIntoView(true);
+        }
       });
 
       setImagePaneTop();
