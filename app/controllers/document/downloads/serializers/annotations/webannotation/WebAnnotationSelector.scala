@@ -119,7 +119,7 @@ object MapFragmentSelector {
 
   private def convert(x: Double, y: Double): Point = {
     val sourceCRS = CRS.decode("EPSG:3857")
-    val targetCRS = CRS.decode("EPSG:4236")
+    val targetCRS = CRS.decode("EPSG:4326")
     val transform = CRS.findMathTransform(sourceCRS, targetCRS, false)
 
     val factory = new GeometryFactory(new PrecisionModel(), 4326)
