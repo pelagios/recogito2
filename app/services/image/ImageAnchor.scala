@@ -29,12 +29,11 @@ case class PointAnchor(x: Int, y: Int) extends ImageAnchor {
 case class RectAnchor(x: Int, y: Int, w: Int, h: Int) extends ImageAnchor {
   
   val bounds = (w, h) match {
-    case (w, h) if w > 0 && h > 0 => Bounds(x, y, x + w, y + h)
-    case (w, h) if w < 0 && h > 0 => Bounds(x + w, y, x, y + h)
-    case (w, h) if w > 0 && h < 0 => Bounds(x, y + h, x + w, y)
+    case (w, h) if w >= 0 && h >= 0 => Bounds(x, y, x + w, y + h)
+    case (w, h) if w < 0 && h >= 0 => Bounds(x + w, y, x, y + h)
+    case (w, h) if w >= 0 && h < 0 => Bounds(x, y + h, x + w, y)
     case (w, h) if w < 0 && h < 0 => Bounds(x + w, y + h, x, y)
   }
-
   
 }
 
