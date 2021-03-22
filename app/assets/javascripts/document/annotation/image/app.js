@@ -193,15 +193,23 @@ require([
 
           init = function(imageProperties) {
             new App(imageProperties);
-          };
+          },
+
+          activeImageLoaded = false;
 
       new Blazy({ // Init image lazy loading lib
         offset: 0,
         container: '.sidebar .menu',
         validateDelay: 200,
         saveViewportOffsetDelay: 200,
-        success: function() {
-          document.querySelector('.sidebar li.active').scrollIntoView(true);
+        success: function(element) {
+          var li = element.parentNode.parentNode;
+
+          if (li.className == 'active')
+            activeImageLoaded = true;
+
+          if (!activeImageLoaded)
+            document.querySelector('.sidebar li.active').scrollIntoView(true);
         }
       });
 
