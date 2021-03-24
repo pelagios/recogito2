@@ -133,7 +133,7 @@ object ConfiguredPresentation extends HasDate {
           "owner" -> p.document.getOwner,
           "uploaded_at" -> new DateTime(p.document.getUploadedAt.getTime),
           "title" -> p.document.getTitle,
-          "public_visibity" -> Option(p.document.getPublicVisibility),
+          "public_visibility" -> Option(p.document.getPublicVisibility),
 
           "filetypes" -> p.contentTypes.map(_.toString),
           "file_count" -> p.fileCount,
