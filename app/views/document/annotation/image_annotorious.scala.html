@@ -1,0 +1,106 @@
+@(
+  doc: services.document.ExtendedDocumentMetadata,
+  currentPart: services.generated.tables.records.DocumentFilepartRecord,
+  currentUser: Option[services.user.User],
+  accessLevel: services.RuntimeAccessLevel,
+  clonedFrom: Option[services.generated.tables.records.DocumentRecord],
+  clones: Seq[services.generated.tables.records.DocumentRecord],
+  prefs: Seq[services.generated.tables.records.DocumentPreferencesRecord],
+  annotationCount: Long,
+  sharedVia: Option[controllers.document.annotation.AnnotationSummary]
+ )(implicit request: RequestHeader, messages: Messages, webJarsUtil: org.webjars.play.WebJarsUtil)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recogito | @doc.author.map(_ + ": ")@doc.title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    @views.html.document.annotation._meta(doc, annotationCount, Some(currentPart), None, sharedVia)
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@recogito/annotorious-openseadragon@@latest/dist/annotorious.min.css">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image/index.css")"/>
+    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    <script>
+      window.config = {
+        @if(currentUser.isDefined) {
+          me: '@currentUser.get.username',
+          features: [@Html(currentUser.get.featureToggles.map("'" + _ + "'").mkString(","))],
+        }
+        documentId: '@doc.id',
+        documentOwner: '@doc.ownerName',
+        partId: '@currentPart.getId',
+        partSequenceNo: @currentPart.getSequenceNo,
+        contentType: '@currentPart.getContentType',
+        isPublic: @doc.isOpenToPublic,
+        writeAccess: @accessLevel.canWrite,
+        isAdmin: @accessLevel.isAdmin,
+        clones: [@Html(clones.map{ doc => s"{ owner:'${doc.getOwner}', id:'${doc.getId}'}" }.mkString(","))],
+        @views.html.document.annotation._prefs(prefs)
+      }
+    </script>
+  </head>
+  <body>
+    @views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit")
+
+    <div class="header-infobox">
+      <h1>
+        @doc.author.map(_ + ": ")@doc.title
+        @views.html.document.annotation._clonedFrom(doc, clonedFrom)
+      </h1>
+      <h2 class="date">@doc.dateFreeform</h2>
+      <p class="source">@views.html.document.sourceLink(doc.source)</p>
+      <p class="quick-stats">
+        <span class="icon comment">&#xf0e5;</span>
+        <span class="annotations">0</span> Annotations
+        &nbsp; &centerdot; &nbsp;
+        <span class="icon">&#xf0c0;</span>
+        <span class="contributors">No Other Contributors</span>
+        @if(doc.license.isDefined) {
+          &nbsp; &centerdot; &nbsp;
+          @views.html.document.licenseInfo(doc.license.get, doc.attribution)
+        }
+        @if(clones.size > 0) {
+          &nbsp; &centerdot; &nbsp; <span class="clones">
+            <span class="icon">&#xf126;</span>
+            Cloned @clones.size @if(clones.size == 1) { time } else { times }
+          </span>
+        }
+      </p>
+    </div> <!-- .header-infobox -->
+
+    <div id="image-pane"></div>
+
+    <div class="sidebar">
+      @views.html.sidebarHeader(doc.owner)
+
+      <ul class="menu">
+        @for(part <- doc.fileparts) {
+          @if(part == currentPart) {
+            <li class="active">
+              <a href="#" onclick="return false;">
+                <img class="b-lazy"
+                     data-src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)"
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAABCAQAAADzhm3tAAAADUlEQVR42mNkGAUUAQACggACpDKLkQAAAABJRU5ErkJggg==">
+                <span class="label">@part.getTitle</span>
+              </a>
+            </li>
+          } else {
+            <li>
+              <a href="@controllers.document.annotation.routes.AnnotationController.showAnnotationView(doc.id, part.getSequenceNo)">
+                <img class="b-lazy"
+                     data-src="@controllers.document.routes.DocumentController.getThumbnail(doc.id, part.getSequenceNo)"
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAAABCAQAAADzhm3tAAAADUlEQVR42mNkGAUUAQACggACpDKLkQAAAABJRU5ErkJggg==">
+                <span class="label">@part.getTitle</span>
+              </a>
+            </li>
+          }
+        }
+      </ul>
+    </div> <!-- .sidebar -->
+
+    <script src="https://cdn.jsdelivr.net/npm/openseadragon@@2.4/build/openseadragon/openseadragon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@recogito/annotorious-openseadragon@@latest/dist/openseadragon-annotorious.min.js"></script>
+    <script src="/assets/javascripts/beta/annotorious/app.js"></script>
+
+    @Html(webJarsUtil.script("blazy.min.js"))
+    @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/beta/annotorious/app.js")))
+  </body>
+</html>
