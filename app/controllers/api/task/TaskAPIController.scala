@@ -16,6 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import transform.JobDefinition
 import transform.georesolution.{GeoresolutionService, TableGeoresolutionJobDefinition}
 import transform.ner.{NERService, NERJobDefinition}
+import transform.mapkurator.{MapkuratorService, MapkuratorJobDefinition}
 
 @Singleton
 class TaskAPIController @Inject() (
@@ -24,6 +25,7 @@ class TaskAPIController @Inject() (
   val documents: DocumentService,
   val users: UserService,
   val ner: NERService,
+  val mapkurator: MapkuratorService,
   val georesolution: GeoresolutionService,
   val silhouette: Silhouette[Security.Env],
   val tasks: TaskService,
@@ -47,6 +49,11 @@ class TaskAPIController @Inject() (
                 val definition = Json.fromJson[NERJobDefinition](request.body.asJson.get).get
                 val jobId = ner.spawnJob(docInfo.document, docInfo.fileparts, definition)
                 jsonOk(Json.obj("job_id" -> jobId))
+
+              case TaskType("MAPKURATOR") =>
+                val definition = Json.fromJson[MapkuratorJobDefinition](request.body.asJson.get).get
+                mapkurator.spawnJob(docInfo.document, docInfo.fileparts, definition)
+                Ok
                 
               case t =>
                 BadRequest(Json.parse("{ \"error\": \"unsupported task type: " + t + "\" }"))
