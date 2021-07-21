@@ -118,7 +118,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
       uploads: Uploads, 
       request: Request[AnyContent], 
       ctx: ExecutionContext
-  ) = {
+  ): Future[Seq[Elem]] = {
     
     val fTexts = Future.sequence {
       doc.fileparts.map { part =>
@@ -176,7 +176,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
     }
        
     fDivs.map { case (divs, listPlaces, taxonomy, relations) =>
-      <TEI xmlns="http://www.tei-c.org/ns/1.0">
+      Seq(<TEI xmlns="http://www.tei-c.org/ns/1.0">
         <teiHeader>
           <fileDesc>
             <titleStmt>
@@ -242,7 +242,7 @@ trait PlaintextToTEI extends BaseTEISerializer {
         <text>
           <body>{ divs }</body>
         </text>
-      </TEI>
+      </TEI>)
     }
   }
   

@@ -6,7 +6,10 @@ import com.mohiva.play.silhouette.api.Silhouette
 import com.mohiva.play.silhouette.api.actions.UserAwareRequest
 import controllers.{BaseOptAuthController, Security, HasPrettyPrintJSON}
 import controllers.document.downloads.serializers._
+import java.io.{BufferedInputStream, ByteArrayInputStream, FileOutputStream}
+import java.nio.file.Paths
 import javax.inject.{Inject, Singleton}
+import java.util.zip.{ZipEntry, ZipOutputStream}
 import services.{ContentType, RuntimeAccessLevel}
 import services.annotation.AnnotationService
 import services.document.{ExtendedDocumentMetadata, DocumentService}
@@ -24,6 +27,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AnyContent, ControllerComponents, Result}
 import play.api.http.{HttpEntity, FileMimeTypes}
 import scala.concurrent.{ExecutionContext, Future}
+import storage.TempDir
 import storage.uploads.Uploads
 
 case class FieldMapping(
@@ -254,8 +258,33 @@ class DownloadsController @Inject() (
           case _ => throw new Exception // Can't happen under current conditions (and should fail in the future if things go wrong)
         }
         
-        f.map { xml => 
-          Ok(xml).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}.tei.xml" })
+        f.map { serialized =>
+          if (serialized.size == 1) {
+            Ok(serialized.head).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}.tei.xml" })
+          } else {
+            val zipFile = tmpFile.create(Paths.get(TempDir.get()(config), s"${doc.id}.zip"))
+            val zip = new ZipOutputStream(new FileOutputStream(zipFile.path.toFile))
+            
+            serialized.zipWithIndex.foreach { case (xml, i) => 
+              zip.putNextEntry(new ZipEntry(i + ".tei.xml"))
+              
+              val stream = new ByteArrayInputStream(xml.toString.getBytes)
+              val in = new BufferedInputStream(stream)
+
+              var b = in.read()
+              while (b > -1) {
+                zip.write(b)
+                b = in.read()
+              }
+
+              in.close()
+              zip.closeEntry()
+            }
+
+            zip.close()
+
+            Ok.sendFile(zipFile).withHeaders(CONTENT_DISPOSITION -> { s"attachment; filename=${documentId}.tei.zip" })
+          }
         }
       }
     })

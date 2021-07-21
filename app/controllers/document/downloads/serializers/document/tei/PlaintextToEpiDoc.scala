@@ -78,7 +78,7 @@ trait PlaintextToEpiDoc extends PlaintextToTEI {
     }
        
     fDivs.map { case (divs, listPlaces, taxonomy, relations) =>
-      <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:space="preserve" xml:lang="en">
+      Seq(<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:space="preserve" xml:lang="en">
         <teiHeader>
           <fileDesc>
             <titleStmt>
@@ -123,7 +123,7 @@ trait PlaintextToEpiDoc extends PlaintextToTEI {
             </div>
           </body>
         </text>
-      </TEI>
+      </TEI>)
     }
   }
 

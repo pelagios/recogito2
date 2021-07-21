@@ -153,7 +153,7 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
       entityService: EntityService,
       documentService: DocumentService,
       uploads: Uploads,  ctx: ExecutionContext
-  ): Future[Elem] = {
+  ): Future[Seq[Elem]] = {
 
     val fParts = Future.sequence(
       doc.fileparts.map { part =>
@@ -181,14 +181,14 @@ trait TEIToTEI extends BaseTEISerializer with HasTEISnippets {
     )
 
     f.map { case (parts, annotationsByPart, places) =>
-      val converted = parts.map { case (part, xml) =>
-        partToTEI(
+      parts.map { case (part, xml) =>
+        val converted = partToTEI(
           part, xml, 
           annotationsByPart.get(part.getId).getOrElse(Seq.empty[Annotation]), 
           places) 
-      }
 
-      scala.xml.XML.loadString(converted.head)
+        scala.xml.XML.loadString(converted)
+      }
     }
   }
 
