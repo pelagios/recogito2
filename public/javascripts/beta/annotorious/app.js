@@ -11,6 +11,14 @@ var init = function(width, height) {
   });
 
   var anno = OpenSeadragon.Annotorious(viewer);
+  
+  anno.setAuthInfo({
+    id: window.config.me,
+    displayName: window.config.me
+  });
+
+  recogito.LegacyStorage(anno, window.config);
+  
 };
 
 (function() {
