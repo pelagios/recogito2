@@ -27,9 +27,14 @@ object MapkuratorService {
   
   private[mapkurator] def callMapkurator(file: File) = {
 
-    play.api.Logger.info("This is where the callout to mapKurator will happen!") 
-    play.api.Logger.info(file.toString)   
+    play.api.Logger.info("Starting mapKurator process") 
+    play.api.Logger.info(s"./plugins/uk.ac.turing.mrm/mocKurator.sh $file")   
+    
+    val result =  s"./plugins/uk.ac.turing.mrm/mocKurator.sh $file" !!
 
+    val resultsPath = result.trim()
+
+    play.api.Logger.info(s"Results at: $resultsPath")
   }
   
 }
