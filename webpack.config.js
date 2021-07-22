@@ -7,9 +7,6 @@ var webpack = require('webpack'),
 
 module.exports = {
   mode: 'production',
-  watchOptions: {
-    poll: true
-  },
   entry: {
     bulkannotation: path.join(srcPath, 'document/annotation/common/bulkannotation/App.jsx')
   },

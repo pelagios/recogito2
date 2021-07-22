@@ -17,7 +17,7 @@
     @views.html.document.annotation._meta(doc, annotationCount, Some(currentPart), None, sharedVia)
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@recogito/annotorious-openseadragon@@latest/dist/annotorious.min.css">
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image/index.css")"/>
-    @Html(webJarsUtil.script("1.12.0/jquery.min.js"))
+    <@Html(webJarsUtil.script("1.12.0/jquery.min.js"))>
     <script>
       window.config = {
         @if(currentUser.isDefined) {
@@ -36,6 +36,26 @@
         @views.html.document.annotation._prefs(prefs)
       }
     </script>
+    <style>
+      body {
+        display:flex;
+        flex-direction:column;
+      }
+
+      .r6o-editor textarea:focus {
+        box-shadow:none;
+      }
+
+      #image-pane {
+        flex:1;
+        position:relative !important;
+        top:auto;
+        right:auto;
+        bottom:auto;
+        left:auto;
+        margin-left:210px;
+      }
+    </style>
   </head>
   <body>
     @views.html.document.iconbar(doc.document, currentUser, accessLevel, "edit")
@@ -97,7 +117,7 @@
     </div> <!-- .sidebar -->
 
     <script src="https://cdn.jsdelivr.net/npm/openseadragon@@2.4/build/openseadragon/openseadragon.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@@recogito/annotorious-openseadragon@@latest/dist/openseadragon-annotorious.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@recogito/annotorious-openseadragon@@2.5.0/dist/openseadragon-annotorious.min.js"></script>
     <script src="/assets/javascripts/beta/annotorious/app.js"></script>
 
     @Html(webJarsUtil.script("blazy.min.js"))
