@@ -52,8 +52,8 @@ class TaskAPIController @Inject() (
 
               case TaskType("MAPKURATOR") =>
                 val definition = Json.fromJson[MapkuratorJobDefinition](request.body.asJson.get).get
-                mapkurator.spawnJob(docInfo.document, docInfo.fileparts, definition)
-                Ok
+                val jobId = mapkurator.spawnJob(docInfo.document, docInfo.fileparts, definition)
+                jsonOk(Json.obj("job_id" -> jobId))
                 
               case t =>
                 BadRequest(Json.parse("{ \"error\": \"unsupported task type: " + t + "\" }"))
