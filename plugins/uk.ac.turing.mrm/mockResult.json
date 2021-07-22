@@ -1,0 +1,169 @@
+[ {
+  "@context" : "http://www.w3.org/ns/anno.jsonld",
+  "id" : "http://localhost:9000/annotation/2828bae0-15e9-4493-9164-14932efbb45f",
+  "type" : "Annotation",
+  "generator" : {
+    "id" : "http://localhost:9000/",
+    "type" : "Software",
+    "name" : "Recogito",
+    "homepage" : "http://localhost:9000/"
+  },
+  "generated" : "2021-07-22T13:27:49+00:00",
+  "body" : [ {
+    "type" : "TextualBody",
+    "value" : "safsadf",
+    "creator" : "http://localhost:9000/rainer",
+    "modified" : "2021-07-22T12:38:19+00:00",
+    "purpose" : "commenting"
+  } ],
+  "target" : {
+    "source" : "http://localhost:9000/part/b7e08a88-6645-42c7-addf-81f81fea1f1b",
+    "type" : "Image",
+    "label" : "LOC_98687206-10.jpg",
+    "selector" : [ {
+      "type" : "FragmentSelector",
+      "conformsTo" : "http://www.w3.org/TR/media-frags/",
+      "value" : "xywh=pixel:2931,631,464,423"
+    } ]
+  }
+}, {
+  "@context" : "http://www.w3.org/ns/anno.jsonld",
+  "id" : "http://localhost:9000/annotation/2a654cea-c130-4d47-8a74-1e9b61dfa493",
+  "type" : "Annotation",
+  "generator" : {
+    "id" : "http://localhost:9000/",
+    "type" : "Software",
+    "name" : "Recogito",
+    "homepage" : "http://localhost:9000/"
+  },
+  "generated" : "2021-07-22T13:27:49+00:00",
+  "body" : [ {
+    "type" : "TextualBody",
+    "value" : "Island",
+    "creator" : "http://localhost:9000/rainer",
+    "modified" : "2021-07-22T13:27:30+00:00",
+    "purpose" : "tagging"
+  } ],
+  "target" : {
+    "source" : "http://localhost:9000/part/b7e08a88-6645-42c7-addf-81f81fea1f1b",
+    "type" : "Image",
+    "label" : "LOC_98687206-10.jpg",
+    "selector" : [ {
+      "type" : "FragmentSelector",
+      "conformsTo" : "http://www.w3.org/TR/media-frags/",
+      "value" : "xywh=pixel:1739,470,158,223"
+    } ]
+  }
+}, {
+  "@context" : "http://www.w3.org/ns/anno.jsonld",
+  "id" : "http://localhost:9000/annotation/a6cbd1ff-4857-461e-93e1-d40a3c4e4513",
+  "type" : "Annotation",
+  "generator" : {
+    "id" : "http://localhost:9000/",
+    "type" : "Software",
+    "name" : "Recogito",
+    "homepage" : "http://localhost:9000/"
+  },
+  "generated" : "2021-07-22T13:27:49+00:00",
+  "body" : [ {
+    "type" : "TextualBody",
+    "value" : "Island",
+    "creator" : "http://localhost:9000/rainer",
+    "modified" : "2021-07-22T13:27:38+00:00",
+    "purpose" : "tagging"
+  } ],
+  "target" : {
+    "source" : "http://localhost:9000/part/b7e08a88-6645-42c7-addf-81f81fea1f1b",
+    "type" : "Image",
+    "label" : "LOC_98687206-10.jpg",
+    "selector" : [ {
+      "type" : "FragmentSelector",
+      "conformsTo" : "http://www.w3.org/TR/media-frags/",
+      "value" : "xywh=pixel:1267,837,149,117"
+    } ]
+  }
+}, {
+  "@context" : "http://www.w3.org/ns/anno.jsonld",
+  "id" : "http://localhost:9000/annotation/65ea47d4-2664-44eb-8d62-38095102668c",
+  "type" : "Annotation",
+  "generator" : {
+    "id" : "http://localhost:9000/",
+    "type" : "Software",
+    "name" : "Recogito",
+    "homepage" : "http://localhost:9000/"
+  },
+  "generated" : "2021-07-22T13:27:49+00:00",
+  "body" : [ {
+    "type" : "TextualBody",
+    "value" : "dsafasd",
+    "creator" : "http://localhost:9000/rainer",
+    "modified" : "2021-07-22T12:38:23+00:00",
+    "purpose" : "commenting"
+  } ],
+  "target" : {
+    "source" : "http://localhost:9000/part/b7e08a88-6645-42c7-addf-81f81fea1f1b",
+    "type" : "Image",
+    "label" : "LOC_98687206-10.jpg",
+    "selector" : [ {
+      "type" : "FragmentSelector",
+      "conformsTo" : "http://www.w3.org/TR/media-frags/",
+      "value" : "xywh=pixel:3126,1758,566,557"
+    } ]
+  }
+}, {
+  "@context" : "http://www.w3.org/ns/anno.jsonld",
+  "id" : "http://localhost:9000/annotation/95abb467-cefd-4200-b45a-5f2f94618f6b",
+  "type" : "Annotation",
+  "generator" : {
+    "id" : "http://localhost:9000/",
+    "type" : "Software",
+    "name" : "Recogito",
+    "homepage" : "http://localhost:9000/"
+  },
+  "generated" : "2021-07-22T13:27:49+00:00",
+  "body" : [ {
+    "type" : "TextualBody",
+    "value" : "Island",
+    "creator" : "http://localhost:9000/rainer",
+    "modified" : "2021-07-22T13:27:18+00:00",
+    "purpose" : "tagging"
+  } ],
+  "target" : {
+    "source" : "http://localhost:9000/part/b7e08a88-6645-42c7-addf-81f81fea1f1b",
+    "type" : "Image",
+    "label" : "LOC_98687206-10.jpg",
+    "selector" : [ {
+      "type" : "FragmentSelector",
+      "conformsTo" : "http://www.w3.org/TR/media-frags/",
+      "value" : "xywh=pixel:1753,682,222,304"
+    } ]
+  }
+}, {
+  "@context" : "http://www.w3.org/ns/anno.jsonld",
+  "id" : "http://localhost:9000/annotation/a0a40cfd-9a7d-45c0-9602-662609bbc757",
+  "type" : "Annotation",
+  "generator" : {
+    "id" : "http://localhost:9000/",
+    "type" : "Software",
+    "name" : "Recogito",
+    "homepage" : "http://localhost:9000/"
+  },
+  "generated" : "2021-07-22T13:27:49+00:00",
+  "body" : [ {
+    "type" : "TextualBody",
+    "value" : "Toponym",
+    "creator" : "http://localhost:9000/rainer",
+    "modified" : "2021-07-22T13:27:45+00:00",
+    "purpose" : "tagging"
+  } ],
+  "target" : {
+    "source" : "http://localhost:9000/part/b7e08a88-6645-42c7-addf-81f81fea1f1b",
+    "type" : "Image",
+    "label" : "LOC_98687206-10.jpg",
+    "selector" : [ {
+      "type" : "FragmentSelector",
+      "conformsTo" : "http://www.w3.org/TR/media-frags/",
+      "value" : "xywh=pixel:1455,835,260,22"
+    } ]
+  }
+} ]
