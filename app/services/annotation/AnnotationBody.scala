@@ -62,6 +62,13 @@ object AnnotationBody extends Enumeration {
 
   val TAG = Value("TAG")
 
+  // MRM Extensions
+  val ENTITY = Value("ENTITY")
+
+  val LABEL = Value("LABEL")
+
+  val SYMBOL = Value("SYMBOL")
+
   val TRANSCRIPTION = Value("TRANSCRIPTION")
   
   implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] =

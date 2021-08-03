@@ -34,7 +34,7 @@ object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
     import AnnotationBody._
     
     val hasType = b.hasType match {
-      case COMMENT | TAG | QUOTE | TRANSCRIPTION => TextualBody
+      case COMMENT | TAG | QUOTE | TRANSCRIPTION | ENTITY | LABEL | SYMBOL => TextualBody
       case _ => SpecificResource
     }
     
@@ -43,6 +43,7 @@ object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
       case TRANSCRIPTION  => Some("transcribing")
       case TAG            => Some("tagging")
       case PLACE | PERSON => Some("identifying")
+      case ENTITY | LABEL | SYMBOL => Some("classifying")
       case _ => None
     }
     
@@ -52,7 +53,7 @@ object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
       val (value, id) = if (b.value.isDefined && b.uri.isDefined) {
           (b.value, b.uri) 
         } else { 
-          (Seq(b.uri, b.value).flatten.headOption, None)
+          (Seq(b.uri, b.value, Option(b.hasType.toString)).flatten.headOption, None)
         }
 
       val body = WebAnnotationBody(

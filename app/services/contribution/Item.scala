@@ -70,6 +70,13 @@ object ItemType extends Enumeration {
   
   val RELATION_TAG = Value("RELATION_TAG")
 
+  // MRM extensions
+  val ENTITY_BODY = Value("ENTITY_BODY")
+
+  val LABEL_BODY = Value("LABEL_BODY")
+
+  val SYMBOL_BODY = Value("SYMBOL_BODY")
+
   def fromBodyType(bodyType: AnnotationBody.Value) = bodyType match {
 
     case AnnotationBody.COMMENT => COMMENT_BODY
@@ -85,6 +92,13 @@ object ItemType extends Enumeration {
     case AnnotationBody.TRANSCRIPTION => TRANSCRIPTION_BODY
     
     case AnnotationBody.TAG => TAG_BODY
+
+    // MRM extensions
+    case AnnotationBody.ENTITY => ENTITY_BODY
+
+    case AnnotationBody.LABEL => LABEL_BODY
+    
+    case AnnotationBody.SYMBOL => SYMBOL_BODY
     
   }
       
