@@ -17,6 +17,7 @@
     @views.html.document.annotation._meta(doc, annotationCount, Some(currentPart), None, sharedVia)
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@recogito/annotorious-openseadragon@@latest/dist/annotorious.min.css">
     <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/document/annotation/image/index.css")"/>
+    <link rel="stylesheet" href="/assets/javascripts/beta/annotorious/recogito-mrm-ui.css">
     <@Html(webJarsUtil.script("1.12.0/jquery.min.js"))>
     <script>
       window.config = {
@@ -117,9 +118,7 @@
     </div> <!-- .sidebar -->
 
     <script src="https://cdn.jsdelivr.net/npm/openseadragon@@2.4/build/openseadragon/openseadragon.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@@recogito/annotorious-openseadragon@@2.5.0/dist/openseadragon-annotorious.min.js"></script>
-    <script src="/assets/javascripts/beta/annotorious/app.js"></script>
-    <script src="/assets/javascripts/beta/annotorious/recogito-legacy-storage.js"></script>
+    <script src="/assets/javascripts/beta/annotorious/recogito-mrm-ui.js"></script>
 
     @Html(webJarsUtil.script("blazy.min.js"))
     @Html(webJarsUtil.requireJs(routes.Assets.versioned("javascripts/document/annotation/beta/annotorious/app.js")))
