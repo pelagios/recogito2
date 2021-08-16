@@ -34,7 +34,7 @@ class WorkerService(
         jobId,
         document,
         part,
-        uploads.getDocumentDir(document.getOwner, document.getId).get,
+        uploads.getDocumentDir(document.getOwner, document.getId).getOrElse(null),
         jobDef)
     }
 

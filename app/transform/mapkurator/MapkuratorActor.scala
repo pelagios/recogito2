@@ -4,6 +4,7 @@ import akka.actor.Props
 import java.io.File
 import java.util.UUID
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.ContentType
 import services.task.TaskService
 import transform.{WorkerActor, SpecificJobDefinition}
 
@@ -15,11 +16,9 @@ class MapkuratorActor(taskService: TaskService) extends WorkerActor(MapkuratorSe
     dir: File, 
     jobDef: Option[SpecificJobDefinition], 
     taskId: UUID
-  ) = {
-    val filename = part.getFile
-    
+  ) = {   
     try {
-      MapkuratorService.callMapkurator(new File(dir, filename))
+      MapkuratorService.callMapkurator(doc, part, dir)
       taskService.setTaskCompleted(taskId)
     } catch { case t: Throwable =>
       taskService.setTaskFailed(taskId, Some(t.getMessage))
