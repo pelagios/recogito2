@@ -8,7 +8,7 @@ import services.ContentType
 import services.task.TaskService
 import transform.{WorkerActor, SpecificJobDefinition}
 
-class MapkuratorActor(taskService: TaskService) extends WorkerActor(MapkuratorService.TASK_TYPE, taskService) {
+class MapKuratorActor(taskService: TaskService) extends WorkerActor(MapKuratorService.TASK_TYPE, taskService) {
 
   override def doWork(
     doc: DocumentRecord, 
@@ -18,7 +18,7 @@ class MapkuratorActor(taskService: TaskService) extends WorkerActor(MapkuratorSe
     taskId: UUID
   ) = {   
     try {
-      MapkuratorService.callMapkurator(doc, part, dir)
+      MapKuratorService.callMapkurator(doc, part, dir, jobDef.get.asInstanceOf[MapKuratorJobDefinition])
       taskService.setTaskCompleted(taskId)
     } catch { case t: Throwable =>
       taskService.setTaskFailed(taskId, Some(t.getMessage))
@@ -27,8 +27,8 @@ class MapkuratorActor(taskService: TaskService) extends WorkerActor(MapkuratorSe
   
 }
 
-object MapkuratorActor {
+object MapKuratorActor {
   
-  def props(taskService: TaskService) = Props(classOf[MapkuratorActor], taskService)
+  def props(taskService: TaskService) = Props(classOf[MapKuratorActor], taskService)
 
 }

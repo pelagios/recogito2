@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import transform.JobDefinition
 import transform.georesolution.{GeoresolutionService, TableGeoresolutionJobDefinition}
 import transform.ner.{NERService, NERJobDefinition}
-import transform.mapkurator.{MapkuratorService, MapkuratorJobDefinition}
+import transform.mapkurator.{MapKuratorService, MapKuratorJobDefinition}
 
 @Singleton
 class TaskAPIController @Inject() (
@@ -25,7 +25,7 @@ class TaskAPIController @Inject() (
   val documents: DocumentService,
   val users: UserService,
   val ner: NERService,
-  val mapkurator: MapkuratorService,
+  val mapkurator: MapKuratorService,
   val georesolution: GeoresolutionService,
   val silhouette: Silhouette[Security.Env],
   val tasks: TaskService,
@@ -51,7 +51,7 @@ class TaskAPIController @Inject() (
                 jsonOk(Json.obj("job_id" -> jobId))
 
               case TaskType("MAPKURATOR") =>
-                val definition = Json.fromJson[MapkuratorJobDefinition](request.body.asJson.get).get
+                val definition = Json.fromJson[MapKuratorJobDefinition](request.body.asJson.get).get
                 val jobId = mapkurator.spawnJob(docInfo.document, docInfo.fileparts, definition)
                 jsonOk(Json.obj("job_id" -> jobId))
                 
