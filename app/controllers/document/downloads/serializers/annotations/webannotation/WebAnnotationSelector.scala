@@ -23,6 +23,7 @@ object WebAnnotationSelector {
     case s: MapFragmentSelector   => Json.toJson(s)
     case s: TableFragmentSelector => Json.toJson(s)
     case s: XPathRangeSelector    => Json.toJson(s)
+    case s: SvgSelector           => Json.toJson(s)
   }
   
 }
@@ -89,16 +90,20 @@ case class ImageFragmentSelector(value: String) extends WebAnnotationSelector
 object ImageFragmentSelector {
   
   def fromAnnotation(a: Annotation) = ImageAnchor.parse(a.anchor) match {
-   case a: PointAnchor =>
-     ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},0,0")
+    case a: PointAnchor =>
+      ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},0,0")
      
-   case a: RectAnchor =>
-     ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},${a.w},${a.h}")
+    case a: RectAnchor =>
+      ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},${a.w},${a.h}")
    
-   case a: TiltedBoxAnchor =>
-     // Tilted boxes are 'dumbed down' to their bounds
-     val b = a.bounds
-     ImageFragmentSelector(s"xywh=pixel:${b.left},${b.top},${b.width},${b.height}")
+    case a: TiltedBoxAnchor =>
+      // Tilted boxes are 'dumbed down' to their bounds
+      val b = a.bounds
+      ImageFragmentSelector(s"xywh=pixel:${b.left},${b.top},${b.width},${b.height}")
+
+    case a: SvgAnchor =>
+      SvgSelector(a.svg)
+   
   }
   
   implicit val imageFragmentSelectorWrites: Writes[ImageFragmentSelector] = (
@@ -107,6 +112,17 @@ object ImageFragmentSelector {
     (JsPath \ "value").write[String]
   )(s => ("FragmentSelector", "http://www.w3.org/TR/media-frags/", s.value)) 
   
+}
+
+case class SvgSelector(value: String) extends WebAnnotationSelector
+
+object SvgSelector {
+
+  implicit val svgSelectorWrites: Writes[SvgSelector] = (
+    (JsPath \ "type").write[String] and 
+    (JsPath \ "value").write[String]
+  )(s => ("SvgSelector", s.value))
+
 }
 
 /**
@@ -134,13 +150,17 @@ object MapFragmentSelector {
       val pt = convert(a.x, a.y)
       MapFragmentSelector(s"xywh=pixel:${pt.getY},${-pt.getX},0,0")
 
-   case a: RectAnchor =>
-     ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},${a.w},${a.h}")
+    case a: RectAnchor =>
+      ImageFragmentSelector(s"xywh=pixel:${a.x},${a.y},${a.w},${a.h}")
    
-   case a: TiltedBoxAnchor =>
-     // Tilted boxes are 'dumbed down' to their bounds
-     val b = a.bounds
-     ImageFragmentSelector(s"xywh=pixel:${b.left},${b.top},${b.width},${b.height}")
+    case a: TiltedBoxAnchor =>
+      // Tilted boxes are 'dumbed down' to their bounds
+      val b = a.bounds
+      ImageFragmentSelector(s"xywh=pixel:${b.left},${b.top},${b.width},${b.height}")
+
+    case a: SvgAnchor =>
+      SvgSelector(a.svg)
+    
   }
 
   implicit val mapFragmentSelectorWrites: Writes[MapFragmentSelector] = (

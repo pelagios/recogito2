@@ -26,6 +26,12 @@ case class PointAnchor(x: Int, y: Int) extends ImageAnchor {
   
 }
 
+case class SvgAnchor(svg: String) extends ImageAnchor {
+
+  val bounds = Bounds(0, 0, 0, 0)
+
+}
+
 case class RectAnchor(x: Int, y: Int, w: Int, h: Int) extends ImageAnchor {
   
   val bounds = (w, h) match {
@@ -150,6 +156,9 @@ object ImageAnchor {
       case "rect"  => parseRectAnchor(anchor)
       case "tbox"  => parseTiltedBoxAnchor(anchor)      
       case "lbox"  => parseLinkedBoxAnchor(anchor)
+
+      // MRM extensions
+      case "svg.polygon" => parsePolygonAnchor(anchor)
     }
   
   private def parseArgs(anchor: String) = 
@@ -192,5 +201,8 @@ object ImageAnchor {
       Math.round(args.get("l").get.toFloat),
       Math.round(args.get("h").get.toFloat))  
   }
+
+  def parsePolygonAnchor(anchor: String) =
+    SvgAnchor(anchor.substring("svg.polygon".size + 1))
 
 }
