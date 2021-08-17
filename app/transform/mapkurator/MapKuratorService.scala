@@ -7,6 +7,7 @@ import javax.inject.{Inject, Singleton}
 import scala.language.postfixOps
 import services.ContentType
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
+import services.annotation.AnnotationService
 import services.task.{TaskService, TaskType}
 import storage.uploads.Uploads
 import sys.process._
@@ -14,12 +15,13 @@ import transform.{WorkerActor, WorkerService}
 
 @Singleton
 class MapKuratorService @Inject() (
+  annotationService: AnnotationService,
   uploads: Uploads,
   taskService: TaskService, 
   system: ActorSystem
 ) extends WorkerService(
   system, uploads,
-  MapKuratorActor.props(taskService), 4
+  MapKuratorActor.props(taskService, annotationService), 4
 )      
 
 object MapKuratorService {
@@ -31,7 +33,7 @@ object MapKuratorService {
     part: DocumentFilepartRecord, 
     dir: File,
     jobDef: MapKuratorJobDefinition
-  ) = {
+  ): File = {
     // TODO config option!
     val TOOL_PATH = "/home/simonr/Workspaces/mrm/map-kurator"
     
@@ -42,15 +44,20 @@ object MapKuratorService {
       case Some(ContentType.IMAGE_IIIF) =>
         play.api.Logger.info("Launching mapKurator - IIIF image")
 
+        /*
         val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py iiif --url=$filename --dst=data/test_imgs/sample_output/"
         // play.api.Logger.info(cli)   
 
         val result =  cli !!
+        */
 
-        play.api.Logger.info(result)
+        // Just for testing
+        val resultFile = new File("/home/simonr/Workspaces/mrm/map-kurator/data/test_imgs/sample_output/bdfc4fd9-14fe-4e1a-8942-52cfd56a0d02_annotations.json")
+        resultFile
 
       case Some(ContentType.IMAGE_UPLOAD) =>
         val f = new File(dir, filename)
+        f
 
       case Some(ContentType.MAP_WMTS) =>
         play.api.Logger.info("Launching mapKurator - WMTS")
@@ -70,6 +77,8 @@ object MapKuratorService {
           val result = cli !!
 
           play.api.Logger.info(result)
+
+          null
         }
 
         throw new Exception(s"Unsupported")

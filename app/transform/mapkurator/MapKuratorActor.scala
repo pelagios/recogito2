@@ -1,14 +1,19 @@
 package transform.mapkurator
 
 import akka.actor.Props
-import java.io.File
+import java.io.{File, FileInputStream}
 import java.util.UUID
+import play.api.libs.json.{Json, JsArray}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.ContentType
+import services.annotation.{Annotation, AnnotationService}
 import services.task.TaskService
 import transform.{WorkerActor, SpecificJobDefinition}
 
-class MapKuratorActor(taskService: TaskService) extends WorkerActor(MapKuratorService.TASK_TYPE, taskService) {
+class MapKuratorActor(
+  taskService: TaskService, 
+  annotationService: AnnotationService
+) extends WorkerActor(MapKuratorService.TASK_TYPE, taskService) {
 
   override def doWork(
     doc: DocumentRecord, 
@@ -18,7 +23,30 @@ class MapKuratorActor(taskService: TaskService) extends WorkerActor(MapKuratorSe
     taskId: UUID
   ) = {   
     try {
-      MapKuratorService.callMapkurator(doc, part, dir, jobDef.get.asInstanceOf[MapKuratorJobDefinition])
+      val result: File = MapKuratorService.callMapkurator(doc, part, dir, jobDef.get.asInstanceOf[MapKuratorJobDefinition])
+
+      play.api.Logger.info("Ingesting results: " + result.toString)
+
+      val json = Json.parse(new FileInputStream(result)).as[JsArray].value
+
+      val annotations: Seq[Annotation] = json.map(obj => {
+        val selector = (obj \ "target" \ "selector").as[JsArray].value.head
+
+        val typ = (selector \ "type").as[String]
+        val value = (selector \ "value").as[String]
+
+        typ match {
+          case "SvgSelector" => 
+            // We're assuming ONLY polygon selectors for now!
+            Annotation.on(part, s"svg.polygon:$value")
+
+          case typ =>
+            play.api.Logger.info(s"Unsupported selector type: $typ")
+            throw new Exception(s"Unsupported selector type: $typ")
+        }
+      })
+
+      annotationService.upsertAnnotations(annotations, false)
       taskService.setTaskCompleted(taskId)
     } catch { case t: Throwable =>
       taskService.setTaskFailed(taskId, Some(t.getMessage))
@@ -29,6 +57,7 @@ class MapKuratorActor(taskService: TaskService) extends WorkerActor(MapKuratorSe
 
 object MapKuratorActor {
   
-  def props(taskService: TaskService) = Props(classOf[MapKuratorActor], taskService)
+  def props(taskService: TaskService, annotationService: AnnotationService) = 
+    Props(classOf[MapKuratorActor], taskService, annotationService)
 
 }
