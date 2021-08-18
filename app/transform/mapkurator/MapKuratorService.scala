@@ -3,6 +3,7 @@ package transform.mapkurator
 import akka.actor.ActorSystem
 import akka.routing.RoundRobinPool
 import java.io.File
+import java.nio.file.{Files, StandardCopyOption} 
 import javax.inject.{Inject, Singleton}
 import scala.language.postfixOps
 import services.ContentType
@@ -34,8 +35,15 @@ object MapKuratorService {
     dir: File,
     jobDef: MapKuratorJobDefinition
   ): File = {
-    // TODO config option!
+    // Supply this via a config option!
     val TOOL_PATH = "/home/simonr/Workspaces/mrm/map-kurator"
+
+    val SOURCE_FOLDER = s"$TOOL_PATH/data/test_imgs/sample_input"
+    val DEST_FOLDER = s"$TOOL_PATH/data/test_imgs/sample_output"
+
+    // The relative path inside the mapKurator Docker container where
+    // uploaded images are copied to
+    val WORKDIR_PATH = "data/test_imgs/sample_input"
     
     val filename = part.getFile
     val contentType = ContentType.withName(part.getContentType)
@@ -44,20 +52,46 @@ object MapKuratorService {
       case Some(ContentType.IMAGE_IIIF) =>
         play.api.Logger.info("Launching mapKurator - IIIF image")
 
-        /*
         val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py iiif --url=$filename --dst=data/test_imgs/sample_output/"
         // play.api.Logger.info(cli)   
 
         val result =  cli !!
-        */
 
         // Just for testing
         val resultFile = new File("/home/simonr/Workspaces/mrm/map-kurator/data/test_imgs/sample_output/bdfc4fd9-14fe-4e1a-8942-52cfd56a0d02_annotations.json")
         resultFile
 
       case Some(ContentType.IMAGE_UPLOAD) =>
-        val f = new File(dir, filename)
-        f
+        // 1. Copy input file to SOURCE_FOLDER
+        val source = new File(dir, filename).toPath().toAbsolutePath() 
+        val destination = new File(SOURCE_FOLDER, filename).toPath().toAbsolutePath()
+
+        val workingCopy = new File(WORKDIR_PATH, filename)
+
+        try {
+          play.api.Logger.info("Copying from file: " + source.toString() + " to " + destination.toString())
+          Files.copy(source, destination)
+          play.api.Logger.info("Starting mapKurator")
+
+          // 2. Run mapKurator
+          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py file --src=$workingCopy --dst=data/test_imgs/sample_output/"
+          play.api.Logger.info(cli)   
+
+          val result =  cli !!
+
+          // 3. Cleanup
+          Files.delete(destination);
+
+          play.api.Logger.info("mapKurator completed: " + result)
+
+          // Just for testing
+          val resultFile = new File("/home/simonr/Workspaces/mrm/map-kurator/data/test_imgs/sample_output/bdfc4fd9-14fe-4e1a-8942-52cfd56a0d02_annotations.json")
+          resultFile
+        } catch { 
+          case t: Throwable => 
+            t.printStackTrace() 
+            throw t
+        }
 
       case Some(ContentType.MAP_WMTS) =>
         play.api.Logger.info("Launching mapKurator - WMTS")
