@@ -58,13 +58,16 @@ object MapKuratorService {
         val result =  cli !!
 
         // Just for testing
-        val resultFile = new File("/home/simonr/Workspaces/mrm/map-kurator/data/test_imgs/sample_output/bdfc4fd9-14fe-4e1a-8942-52cfd56a0d02_annotations.json")
+        val resultFile = new File(s"$TOOL_PATH/data/test_imgs/sample_output/bdfc4fd9-14fe-4e1a-8942-52cfd56a0d02_annotations.json")
         resultFile
 
       case Some(ContentType.IMAGE_UPLOAD) =>
         // 1. Copy input file to SOURCE_FOLDER
         val source = new File(dir, filename).toPath().toAbsolutePath() 
         val destination = new File(SOURCE_FOLDER, filename).toPath().toAbsolutePath()
+        val partId = part.getId
+
+        play.api.Logger.info("part id " + partId)
 
         val workingCopy = new File(WORKDIR_PATH, filename)
 
@@ -74,7 +77,7 @@ object MapKuratorService {
           play.api.Logger.info("Starting mapKurator")
 
           // 2. Run mapKurator
-          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py file --src=$workingCopy --dst=data/test_imgs/sample_output/"
+          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py file --src=$workingCopy --dst=data/test_imgs/sample_output/ --filename=$partId"
           play.api.Logger.info(cli)   
 
           val result =  cli !!
@@ -85,7 +88,7 @@ object MapKuratorService {
           play.api.Logger.info("mapKurator completed: " + result)
 
           // Just for testing
-          val resultFile = new File("/home/simonr/Workspaces/mrm/map-kurator/data/test_imgs/sample_output/bdfc4fd9-14fe-4e1a-8942-52cfd56a0d02_annotations.json")
+          val resultFile = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${partId}_annotations.json")
           resultFile
         } catch { 
           case t: Throwable => 
