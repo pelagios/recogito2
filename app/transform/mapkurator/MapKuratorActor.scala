@@ -2,6 +2,7 @@ package transform.mapkurator
 
 import akka.actor.Props
 import java.io.{File, FileInputStream}
+import java.nio.file.Files
 import java.util.UUID
 import play.api.libs.json.{Json, JsArray}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
@@ -25,7 +26,7 @@ class MapKuratorActor(
     try {
       val result: File = MapKuratorService.callMapkurator(doc, part, dir, jobDef.get.asInstanceOf[MapKuratorJobDefinition])
 
-      play.api.Logger.info("Ingesting results: " + result.toString)
+      play.api.Logger.info("Ingesting results...")
 
       val json = Json.parse(new FileInputStream(result)).as[JsArray].value
 
@@ -47,6 +48,9 @@ class MapKuratorActor(
       })
 
       annotationService.upsertAnnotations(annotations, false)
+
+      Files.delete(result.toPath().toAbsolutePath())
+
       taskService.setTaskCompleted(taskId)
     } catch { case t: Throwable =>
       taskService.setTaskFailed(taskId, Some(t.getMessage))

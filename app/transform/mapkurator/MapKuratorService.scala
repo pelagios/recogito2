@@ -62,34 +62,32 @@ object MapKuratorService {
         resultFile
 
       case Some(ContentType.IMAGE_UPLOAD) =>
-        // 1. Copy input file to SOURCE_FOLDER
-        val source = new File(dir, filename).toPath().toAbsolutePath() 
-        val destination = new File(SOURCE_FOLDER, filename).toPath().toAbsolutePath()
-        val partId = part.getId
-
-        play.api.Logger.info("part id " + partId)
-
-        val workingCopy = new File(WORKDIR_PATH, filename)
-
         try {
-          play.api.Logger.info("Copying from file: " + source.toString() + " to " + destination.toString())
-          Files.copy(source, destination)
+          // 1. Copy file from Recogito upload area to mapKurator staging dir
+          val source = new File(dir, filename).toPath().toAbsolutePath() 
+          val workingCopy = new File(SOURCE_FOLDER, filename).toPath().toAbsolutePath()
+          play.api.Logger.info("Copying from file: " + source.toString() + " to " + workingCopy.toString())
+          Files.copy(source, workingCopy)
+
+          // 2. Start mapKurator processing
           play.api.Logger.info("Starting mapKurator")
 
-          // 2. Run mapKurator
-          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py file --src=$workingCopy --dst=data/test_imgs/sample_output/ --filename=$partId"
-          play.api.Logger.info(cli)   
+          val dockerPath = new File(WORKDIR_PATH, filename)
+          val partId = part.getId
+
+          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py file --src=$dockerPath --dst=data/test_imgs/sample_output/ --filename=$partId"
 
           val result =  cli !!
 
           // 3. Cleanup
-          Files.delete(destination);
+          val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${partId}_predictions.png").toPath().toAbsolutePath() 
+          Files.delete(predictions)
+          Files.delete(workingCopy)
 
-          play.api.Logger.info("mapKurator completed: " + result)
+          play.api.Logger.info("mapKurator completed")
 
-          // Just for testing
-          val resultFile = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${partId}_annotations.json")
-          resultFile
+          // 4. Return result file
+          new File(s"$TOOL_PATH/data/test_imgs/sample_output/${partId}_annotations.json")
         } catch { 
           case t: Throwable => 
             t.printStackTrace() 
