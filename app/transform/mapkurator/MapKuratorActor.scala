@@ -26,8 +26,6 @@ class MapKuratorActor(
     try {
       val result: File = MapKuratorService.callMapkurator(doc, part, dir, jobDef.get.asInstanceOf[MapKuratorJobDefinition])
 
-      play.api.Logger.info("Ingesting results...")
-
       val json = Json.parse(new FileInputStream(result)).as[JsArray].value
 
       val annotations: Seq[Annotation] = json.map(obj => {
@@ -47,12 +45,15 @@ class MapKuratorActor(
         }
       })
 
+      play.api.Logger.info(s"Ingesting results ${annotations.size} annotations")
+
       annotationService.upsertAnnotations(annotations, false)
 
       Files.delete(result.toPath().toAbsolutePath())
 
       taskService.setTaskCompleted(taskId)
     } catch { case t: Throwable =>
+      t.printStackTrace()
       taskService.setTaskFailed(taskId, Some(t.getMessage))
     }    
   }

@@ -50,16 +50,24 @@ object MapKuratorService {
 
     contentType match {
       case Some(ContentType.IMAGE_IIIF) =>
-        play.api.Logger.info("Launching mapKurator - IIIF image")
+        play.api.Logger.info("Starting mapKurator - IIIF harvest")
 
-        val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py iiif --url=$filename --dst=data/test_imgs/sample_output/"
-        // play.api.Logger.info(cli)   
+        // 1. Start mapKurator processing
+        val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py iiif --url=$filename --dst=data/test_imgs/sample_output/ --filename=${part.getId}" 
 
         val result =  cli !!
 
-        // Just for testing
-        val resultFile = new File(s"$TOOL_PATH/data/test_imgs/sample_output/bdfc4fd9-14fe-4e1a-8942-52cfd56a0d02_annotations.json")
-        resultFile
+        // 2. Cleanup
+        val stitched = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId} stitched.png").toPath().toAbsolutePath()
+        val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.png").toPath().toAbsolutePath() 
+
+        Files.delete(stitched)
+        Files.delete(predictions)
+
+        play.api.Logger.info("mapKurator completed")
+
+        // 3. Return result file
+        new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_annotations.json")
 
       case Some(ContentType.IMAGE_UPLOAD) =>
         try {
@@ -70,24 +78,22 @@ object MapKuratorService {
           Files.copy(source, workingCopy)
 
           // 2. Start mapKurator processing
-          play.api.Logger.info("Starting mapKurator")
+          play.api.Logger.info("Starting mapKurator - image upload")
 
           val dockerPath = new File(WORKDIR_PATH, filename)
-          val partId = part.getId
-
-          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py file --src=$dockerPath --dst=data/test_imgs/sample_output/ --filename=$partId"
+          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py file --src=$dockerPath --dst=data/test_imgs/sample_output/ --filename=${part.getId}"
 
           val result =  cli !!
 
           // 3. Cleanup
-          val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${partId}_predictions.png").toPath().toAbsolutePath() 
+          val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.png").toPath().toAbsolutePath() 
           Files.delete(predictions)
           Files.delete(workingCopy)
 
           play.api.Logger.info("mapKurator completed")
 
           // 4. Return result file
-          new File(s"$TOOL_PATH/data/test_imgs/sample_output/${partId}_annotations.json")
+          new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_annotations.json")
         } catch { 
           case t: Throwable => 
             t.printStackTrace() 
@@ -95,32 +101,39 @@ object MapKuratorService {
         }
 
       case Some(ContentType.MAP_WMTS) =>
-        play.api.Logger.info("Launching mapKurator - WMTS")
+        play.api.Logger.info("Starting mapKurator - WMTS harvest")
 
         if (Seq(jobDef.minLon, jobDef.minLat, jobDef.maxLon, jobDef.maxLat).exists(_.isEmpty)) {
-          play.api.Logger.error("Cannot process WMTS map without bbox")
+          throw new Exception("Cannot process WMTS map without bbox")
         } else {
+          // 1. Get geo bounding box
           val minLon = jobDef.minLon.get
           val minLat = jobDef.minLat.get
           val maxLon = jobDef.maxLon.get
           val maxLat = jobDef.maxLat.get
 
+          // 2. Start mapKurator processing
           val bounds = s"""{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[$minLon,$minLat],[$maxLon,$minLat],[$maxLon,$maxLat],[$minLon,$maxLat],[$minLon,$minLat]]]}}"""
-          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm  --workdir=/map-kurator map-kurator python model/predict_annotations.py wmts --url=$filename --boundary=$bounds --zoom=16 --dst=data/test_imgs/sample_output/"
-          play.api.Logger.info(cli)
+          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm  --workdir=/map-kurator map-kurator python model/predict_annotations.py wmts --url=$filename --boundary=$bounds --zoom=16 --dst=data/test_imgs/sample_output/ --filename=${part.getId}"
 
           val result = cli !!
 
-          play.api.Logger.info(result)
+          // 3. Cleanup
+          val stitched = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_stitched.png").toPath().toAbsolutePath() 
+          val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.png").toPath().toAbsolutePath() 
+          
+          Files.delete(stitched)
+          Files.delete(predictions)
 
-          null
+          play.api.Logger.info("mapKurator completed")
+
+          // 4. Return result file
+          new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_annotations.json")
         }
-
-        throw new Exception(s"Unsupported")
-
 
       case _ =>
         throw new Exception(s"Unsupported content type $contentType")
+
     }
 
   }
