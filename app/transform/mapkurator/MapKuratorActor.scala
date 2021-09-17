@@ -4,6 +4,7 @@ import akka.actor.Props
 import java.io.{File, FileInputStream}
 import java.nio.file.Files
 import java.util.UUID
+import play.api.Configuration
 import play.api.libs.json.{Json, JsArray}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.ContentType
@@ -13,7 +14,8 @@ import transform.{WorkerActor, SpecificJobDefinition}
 
 class MapKuratorActor(
   taskService: TaskService, 
-  annotationService: AnnotationService
+  annotationService: AnnotationService,
+  config: Configuration
 ) extends WorkerActor(MapKuratorService.TASK_TYPE, taskService) {
 
   override def doWork(
@@ -24,7 +26,7 @@ class MapKuratorActor(
     taskId: UUID
   ) = {   
     try {
-      val result: File = MapKuratorService.callMapkurator(doc, part, dir, jobDef.get.asInstanceOf[MapKuratorJobDefinition])
+      val result: File = MapKuratorService.callMapkurator(doc, part, dir, jobDef.get.asInstanceOf[MapKuratorJobDefinition], config)
 
       val json = Json.parse(new FileInputStream(result)).as[JsArray].value
 
@@ -62,7 +64,7 @@ class MapKuratorActor(
 
 object MapKuratorActor {
   
-  def props(taskService: TaskService, annotationService: AnnotationService) = 
-    Props(classOf[MapKuratorActor], taskService, annotationService)
+  def props(taskService: TaskService, annotationService: AnnotationService, config: Configuration) = 
+    Props(classOf[MapKuratorActor], taskService, annotationService, config)
 
 }

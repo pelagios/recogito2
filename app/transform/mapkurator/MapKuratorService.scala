@@ -5,6 +5,7 @@ import akka.routing.RoundRobinPool
 import java.io.File
 import java.nio.file.{Files, StandardCopyOption} 
 import javax.inject.{Inject, Singleton}
+import play.api.Configuration
 import scala.language.postfixOps
 import services.ContentType
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
@@ -19,10 +20,11 @@ class MapKuratorService @Inject() (
   annotationService: AnnotationService,
   uploads: Uploads,
   taskService: TaskService, 
-  system: ActorSystem
+  system: ActorSystem,
+  config: Configuration
 ) extends WorkerService(
   system, uploads,
-  MapKuratorActor.props(taskService, annotationService), 4
+  MapKuratorActor.props(taskService, annotationService, config), 4
 )      
 
 object MapKuratorService {
@@ -33,10 +35,11 @@ object MapKuratorService {
     doc: DocumentRecord, 
     part: DocumentFilepartRecord, 
     dir: File,
-    jobDef: MapKuratorJobDefinition
+    jobDef: MapKuratorJobDefinition,
+    config: Configuration
   ): File = {
-    // Supply this via a config option!
-    val TOOL_PATH = "/home/simonr/Workspaces/mrm/map-kurator"
+
+    val TOOL_PATH = config.get[String]("mapkurator.path")
 
     val SOURCE_FOLDER = s"$TOOL_PATH/data/test_imgs/sample_input"
     val DEST_FOLDER = s"$TOOL_PATH/data/test_imgs/sample_output"

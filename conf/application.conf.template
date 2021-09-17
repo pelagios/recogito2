@@ -123,3 +123,6 @@ play.mailer {
 # plugins {
 #  python.executable = python3 # in case your system uses a different python executable alias
 # }
+
+# MapKurator
+mapkurator.path="/home/simonr/Workspaces/mrm/map-kurator"
