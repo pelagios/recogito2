@@ -62,7 +62,7 @@ object MapKuratorService {
 
         // 2. Cleanup
         val stitched = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId} stitched.png").toPath().toAbsolutePath()
-        val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.png").toPath().toAbsolutePath() 
+        val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.jpg").toPath().toAbsolutePath() 
 
         Files.delete(stitched)
         Files.delete(predictions)
@@ -89,7 +89,7 @@ object MapKuratorService {
           val result =  cli !!
 
           // 3. Cleanup
-          val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.png").toPath().toAbsolutePath() 
+          val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.jpg").toPath().toAbsolutePath() 
           Files.delete(predictions)
           Files.delete(workingCopy)
 
@@ -123,7 +123,7 @@ object MapKuratorService {
 
           // 3. Cleanup
           val stitched = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_stitched.png").toPath().toAbsolutePath() 
-          val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.png").toPath().toAbsolutePath() 
+          val predictions = new File(s"$TOOL_PATH/data/test_imgs/sample_output/${part.getId}_predictions.jpg").toPath().toAbsolutePath() 
           
           Files.delete(stitched)
           Files.delete(predictions)
