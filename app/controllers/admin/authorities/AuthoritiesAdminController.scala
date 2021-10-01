@@ -16,6 +16,7 @@ import services.entity.builtin.EntityService
 import services.entity.builtin.importer.crosswalks.geojson._
 import services.entity.builtin.importer.crosswalks.geojson.lpf.LPFCrosswalk
 import services.entity.builtin.importer.crosswalks.rdf._
+import services.entity.builtin.importer.crosswalks.csv._
 import services.entity.builtin.importer.EntityImporterFactory
 import services.generated.tables.records.AuthorityFileRecord
 import services.user.UserService
@@ -140,8 +141,14 @@ class AuthoritiesAdminController @Inject() (
       case f if f.endsWith("json") =>
         Logger.info("Importing Pelagios GeoJSON FeatureCollection")
         val loader = new DumpLoader()
-        loader.importDump(file, filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(identifier), importer)        
-    }    
+        loader.importDump(file, filename, PelagiosGeoJSONCrosswalk.fromGeoJSON(identifier), importer)
+
+      // Yet another hack ("for now" ;-)
+      case f if f.endsWith("csv") && f.contains(".mrm") =>
+          Logger.info("Importing MachinesReadingMaps CSV")
+          val loader = new StreamLoader()
+          loader.importPlaces(getStream(file, filename), MRMCrosswalk.fromCSV, importer)        
+    }
   }
 
   def deleteGazetteer(identifier: String) = silhouette.SecuredAction(Security.WithRole(Admin)).async { implicit request =>
