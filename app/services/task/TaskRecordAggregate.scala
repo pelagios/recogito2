@@ -69,12 +69,14 @@ object TaskRecordAggregate {
     (JsPath \ "task_type").write[String] and
     (JsPath \ "filepart_id").write[UUID] and
     (JsPath \ "status").write[String] and
-    (JsPath \ "progress").write[Int]
+    (JsPath \ "progress").write[Int] and
+    (JsPath \ "message").writeNullable[String]
   )(r => (
      r.getTaskType,
      r.getFilepartId,
      r.getStatus,
-     r.getProgress
+     r.getProgress,
+     Option(r.getStoppedWith)
   ))
   
   implicit val aggregateTaskRecordWrites: Writes[TaskRecordAggregate] = (

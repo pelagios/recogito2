@@ -54,9 +54,14 @@ class MapKuratorActor(
       Files.delete(result.toPath().toAbsolutePath())
 
       taskService.setTaskCompleted(taskId)
-    } catch { case t: Throwable =>
-      t.printStackTrace()
-      taskService.setTaskFailed(taskId, Some(t.getMessage))
+    } catch { 
+      case t: java.nio.file.FileAlreadyExistsException =>
+        t.printStackTrace()
+        taskService.setTaskFailed(taskId, Some("This file is already being processed"))
+
+      case t: Throwable =>
+        t.printStackTrace()
+        taskService.setTaskFailed(taskId, Some(t.getClass().getName()))
     }    
   }
   
