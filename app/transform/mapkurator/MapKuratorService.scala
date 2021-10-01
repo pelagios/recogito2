@@ -117,7 +117,7 @@ object MapKuratorService {
 
           // 2. Start mapKurator processing
           val bounds = s"""{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[$minLon,$minLat],[$maxLon,$minLat],[$maxLon,$maxLat],[$minLon,$maxLat],[$minLon,$minLat]]]}}"""
-          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm  --workdir=/map-kurator map-kurator python model/predict_annotations.py wmts --url=$filename --boundary=$bounds --zoom=16 --dst=data/test_imgs/sample_output/ --filename=${part.getId}"
+          val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm  --workdir=/map-kurator map-kurator python model/predict_annotations.py wmts --url=$filename --boundary=$bounds --zoom=16 --dst=data/test_imgs/sample_output/ --filename=${part.getId} --coord=epsg4326"
 
           val result = cli !!
 
