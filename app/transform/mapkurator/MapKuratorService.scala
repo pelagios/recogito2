@@ -78,7 +78,7 @@ object MapKuratorService {
           val source = new File(dir, filename).toPath().toAbsolutePath() 
           val workingCopy = new File(SOURCE_FOLDER, filename).toPath().toAbsolutePath()
           play.api.Logger.info("Copying from file: " + source.toString() + " to " + workingCopy.toString())
-          Files.copy(source, workingCopy)
+          Files.copy(source, workingCopy, StandardCopyOption.REPLACE_EXISTING)
 
           // 2. Start mapKurator processing
           play.api.Logger.info("Starting mapKurator - image upload")
