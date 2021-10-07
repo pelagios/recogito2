@@ -24,7 +24,8 @@ class MapKuratorService @Inject() (
   config: Configuration
 ) extends WorkerService(
   system, uploads,
-  MapKuratorActor.props(taskService, annotationService, config), 4
+  MapKuratorActor.props(taskService, annotationService, config),
+  2 // Number of max. parallel jobs
 )      
 
 object MapKuratorService {
