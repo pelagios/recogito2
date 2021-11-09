@@ -55,6 +55,7 @@ object MapKuratorService {
     contentType match {
       case Some(ContentType.IMAGE_IIIF) =>
         play.api.Logger.info("Starting mapKurator - IIIF harvest")
+        play.api.Logger.info(filename)
 
         // 1. Start mapKurator processing
         val cli = s"docker run -v $TOOL_PATH/data/:/map-kurator/data -v $TOOL_PATH/model:/map-kurator/model --rm --workdir=/map-kurator map-kurator python model/predict_annotations.py iiif --url=$filename --dst=data/test_imgs/sample_output/ --filename=${part.getId}" 
