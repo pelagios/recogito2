@@ -28,7 +28,7 @@ object MRMCrosswalk {
 
       Some(EntityRecord(
         uri,
-        "https://california.wikidata.org",
+        "http://maps.nls.uk",
         DateTime.now(),
         None, // lastChangedAt
         fields(3), // title
