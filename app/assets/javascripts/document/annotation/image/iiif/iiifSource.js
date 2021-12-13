@@ -191,7 +191,6 @@ define([], function() {
             
             var ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-            // ctx.fillRect(0, 0, img.naturalWidth, img.naturalHeight);
 
             for (var key in tile) {
               var value = tile[key];
