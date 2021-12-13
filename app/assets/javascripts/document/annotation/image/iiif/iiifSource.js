@@ -179,6 +179,7 @@ define([], function() {
     if (ol.has.CANVAS) {
       this.setTileLoadFunction(function(tile, url) {
         var img = tile.getImage();
+        img.crossOrigin = 'anonymous';
 
         img.addEventListener('load', function()  {
           if (img.naturalWidth > 0 &&
@@ -187,14 +188,18 @@ define([], function() {
             var canvas = document.createElement('CANVAS');
             canvas.width = tileSize;
             canvas.height = tileSize;
-
+            
             var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+            // ctx.fillRect(0, 0, img.naturalWidth, img.naturalHeight);
 
             for (var key in tile) {
               var value = tile[key];
-              if (value == img)
-                tile[key] = canvas;
+              if (value == img) {
+                var i = new Image();
+                i.src = canvas.toDataURL();
+                tile[key] = i;
+              }
             }
           }
 
