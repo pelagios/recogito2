@@ -84,6 +84,10 @@ class SharingController @Inject() (
 
   /** API method to set folder visibility. Open to folder admins. **/
   def setFolderVisibility() = silhouette.SecuredAction.async { implicit request =>
+    Future.successful(BadRequest)
+  }
+
+  /*
     request.body.asJson match {
       case Some(json) => 
         val id = (json \ "ids").as[Seq[UUID]].head
@@ -102,6 +106,7 @@ class SharingController @Inject() (
         Future.successful(BadRequest)
     }
   }
+  */
 
   /** API method to add a folder collaborator. Open to folder admins **/
   def addFolderCollaborator() = silhouette.SecuredAction.async { implicit request =>
