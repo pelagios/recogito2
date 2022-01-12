@@ -84,10 +84,6 @@ class SharingController @Inject() (
 
   /** API method to set folder visibility. Open to folder admins. **/
   def setFolderVisibility() = silhouette.SecuredAction.async { implicit request =>
-    Future.successful(BadRequest)
-  }
-
-  /*
     request.body.asJson match {
       case Some(json) => 
         val id = (json \ "ids").as[Seq[UUID]].head
@@ -99,14 +95,13 @@ class SharingController @Inject() (
         // Using method from SetVisibilityHelper (also checks permissions)
         setVisibilityRecursive(id, request.identity.username, visibility, accessLevel)
           .map { success => 
-            if (success) Ok else MultiStatus
+            if (success) Ok else InternalServerError
           }
         
       case None =>
         Future.successful(BadRequest)
     }
   }
-  */
 
   /** API method to add a folder collaborator. Open to folder admins **/
   def addFolderCollaborator() = silhouette.SecuredAction.async { implicit request =>
@@ -121,7 +116,7 @@ class SharingController @Inject() (
         // Using method from AddCollaboratorHelper (also checks permissions)
         addCollaboratorRecursive(id, request.identity.username, collaborator, level)
           .map { success => 
-            if (success) Ok else MultiStatus
+            if (success) Ok else InternalServerError
           }
 
       case None =>
@@ -138,7 +133,7 @@ class SharingController @Inject() (
 
         removeCollaboratorRecursive(id, request.identity.username, collaborator)
           .map { success => 
-            if (success) Ok else MultiStatus
+            if (success) Ok else InternalServerError
           }
 
       case None =>

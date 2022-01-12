@@ -146,6 +146,9 @@ trait SetVisibilityHelper {
         folderSuccess <- fFolderSuccess
         documentSuccess <- fDocumentSuccess
       } yield (folderSuccess && documentSuccess)
+    } map { success =>
+      play.api.Logger.info("Success")
+      success
     }
   }
 
