@@ -53,12 +53,12 @@ object-assign
  * LICENSE file in the root directory of this source tree.
  */
 
-//! Built on 2020-03-05
+//! Built on 2021-12-15
 
-//! Git commit: v2.4.2-0-c450749
+//! Git commit: v3.0.0-0-3eded36
 
 //! License: http://openseadragon.github.io/license/
 
 //! http://openseadragon.github.io
 
-//! openseadragon 2.4.2
+//! openseadragon 3.0.0
