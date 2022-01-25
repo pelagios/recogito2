@@ -45,6 +45,7 @@ object WebAnnotationBody extends Enumeration with HasDate with HasGeometry {
       case PLACE | PERSON => Some("identifying")
       case ENTITY | LABEL | SYMBOL => Some("classifying")
       case GROUPING       => Some("grouping")
+      case ORDERING       => Some("ordering")
       case _ => None
     }
     

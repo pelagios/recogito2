@@ -79,6 +79,8 @@ object ItemType extends Enumeration {
 
   val GROUPING_BODY = Value("GROUPING_BODY")
 
+  val ORDERING_BODY = Value("ORDERING_BODY")
+
   def fromBodyType(bodyType: AnnotationBody.Value) = bodyType match {
 
     case AnnotationBody.COMMENT => COMMENT_BODY
@@ -103,6 +105,8 @@ object ItemType extends Enumeration {
     case AnnotationBody.SYMBOL => SYMBOL_BODY
     
     case AnnotationBody.GROUPING => GROUPING_BODY 
+
+    case AnnotationBody.ORDERING => ORDERING_BODY
 
   }
       

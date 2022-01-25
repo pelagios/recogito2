@@ -72,6 +72,8 @@ object AnnotationBody extends Enumeration {
   val SYMBOL = Value("SYMBOL")
 
   val GROUPING = Value("GROUPING")
+
+  val ORDERING = Value("ORDERING")
   
   implicit val annotationBodyTypeFormat: Format[AnnotationBody.Type] =
     Format(
