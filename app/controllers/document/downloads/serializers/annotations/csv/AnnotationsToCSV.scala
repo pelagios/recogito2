@@ -121,6 +121,8 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
 
       val groupId = a.bodies.find(_.hasType == AnnotationBody.GROUPING).flatMap(_.value)
 
+      val groupOrder = a.bodies.find(_.hasType == AnnotationBody.ORDERING).flatMap(_.value)
+
       // Helper to surface either the tag URI (if available) or the label otherwise
       def tagLabelsOrURIs(): Seq[String] =
         getTagBodies(a).flatMap(body => Seq(body.uri, body.value).flatten.headOption)
@@ -139,7 +141,8 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
           firstEntity.flatMap(_.status.map(_.value.toString)).getOrElse(EMPTY),
           tagLabelsOrURIs().mkString("|"),
           getCommentBodies(a).flatMap(_.value).mkString("|"),
-          groupId.getOrElse(EMPTY))
+          groupId.getOrElse(EMPTY),
+          groupOrder.getOrElse(EMPTY))
     }
 
     val fAnnotationsByPart = Future.sequence {
@@ -228,7 +231,8 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
           "VERIFICATION_STATUS",
           "TAGS",
           "COMMENTS",
-          "GROUP_ID")
+          "GROUP_ID",
+          "GROUP_ORDER")
         
         val tmp = tmpFile.create(Paths.get(TempDir.get(), s"${UUID.randomUUID}.csv"))
         val underlying = tmp.path.toFile
