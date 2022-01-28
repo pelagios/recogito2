@@ -158,10 +158,11 @@ object ImageAnchor {
       case "lbox"  => parseLinkedBoxAnchor(anchor)
 
       // MRM extensions
-      case "svg.polygon" => parsePolygonAnchor(anchor)
+      case "svg.tbox"  => parsePolygonAnchor(anchor)  
+      case "svg.polygon" => SvgAnchor(anchor.substring("svg.tbox".size + 1))
     }
   
-  private def parseArgs(anchor: String) = 
+  private def parseArgs(anchor: String) =
     anchor.substring(anchor.indexOf(':') + 1).split(',').map(arg =>
       (arg.substring(0, arg.indexOf('=')) -> arg.substring(arg.indexOf('=') + 1))).toMap
 
@@ -175,10 +176,10 @@ object ImageAnchor {
   def parseRectAnchor(anchor: String) = {
     val args = parseArgs(anchor)
     RectAnchor(
-      args.get("x").get.toInt,
-      args.get("y").get.toInt,
-      args.get("w").get.toInt,
-      args.get("h").get.toInt)
+      Math.round(args.get("x").get.toFloat),
+      Math.round(args.get("y").get.toFloat),
+      Math.round(args.get("w").get.toFloat),
+      Math.round(args.get("h").get.toFloat))
   }
 
   // Eg. tbox:x=3713,y=4544,a=0.39618258447890137,l=670,h=187
