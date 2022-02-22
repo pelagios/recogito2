@@ -120,7 +120,7 @@ class AnnotationController @Inject() (
 
       case Some(ContentType.IMAGE_UPLOAD) | Some(ContentType.IMAGE_IIIF) | Some(ContentType.MAP_WMTS) | Some(ContentType.MAP_XYZ) =>
 
-        val useAnnotorious = loggedInUser.map(_.featureToggles.contains("mrm")).getOrElse(false);
+        val useAnnotorious = true //loggedInUser.map(_.featureToggles.contains("mrm")).getOrElse(false);
 
         if (useAnnotorious)
           f.map { case (count, clonedFrom, clones) =>
