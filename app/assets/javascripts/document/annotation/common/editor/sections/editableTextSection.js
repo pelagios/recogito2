@@ -111,7 +111,7 @@ define([
 
   EditableTextSection.prototype.hasChanged = function() {
     var initialContent = this.body.value,
-        currentContent = this.textEntryDiv.text().trim();
+        currentContent = this.textEntryDiv[0].innerText.trim(); //text().trim();
 
     return initialContent !== currentContent;
   };
@@ -120,7 +120,7 @@ define([
     if (this.hasChanged()) {
       delete this.body.last_modified_at;
       this.body.last_modified_by = Config.me;
-      this.body.value = this.textEntryDiv.text().trim();
+      this.body.value = this.textEntryDiv[0].innerText.trim(); // .text().trim();
     }
   };
 
