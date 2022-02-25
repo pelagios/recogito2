@@ -35,7 +35,7 @@ define(['common/config', 'common/hasEvents'], function(Config, HasEvents) {
         },
 
         getBody = function() {
-          var val = textarea.text().trim();
+          var val = textarea[0].innerText; // textarea.text().trim();
           if (val)
             return  { type: options.bodyType, last_modified_by: Config.me, value: val };
           else
