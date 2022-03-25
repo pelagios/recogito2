@@ -112,7 +112,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
       val quoteOrTranscription = {
         if (a.annotates.contentType.isText)
           getFirstQuote(a)
-        else if (a.annotates.contentType.isImage)
+        else if (a.annotates.contentType.isImage || a.annotates.contentType.isMap)
           getFirstTranscription(a)
         else None
       } map { _.replaceAll("[\\t\\n\\r]+"," ") }
