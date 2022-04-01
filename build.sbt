@@ -18,11 +18,9 @@ PlayKeys.devSettings += "play.server.akka.requestTimeout" -> "600s"
 
 resolvers ++= Seq(
   "OSGeo" at "http://download.osgeo.org/webdav/geotools/",
-  // "OpenGeo" at "http://repo.opengeo.org/",
   "OpenGeo" at "https://repo.osgeo.org/repository/release/",
   "Maven Central Server" at "https://repo1.maven.org/maven2",
   "Typesafe" at "https://repo.typesafe.com/typesafe/releases/",
-  "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
   "Geotools" at "https://repo.osgeo.org/repository/geotools-releases/",
   "Geotoolkit" at "http://maven.geotoolkit.org",
   "Boundless" at "https://repo.osgeo.org/repository/Geoserver-releases/",
