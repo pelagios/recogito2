@@ -147,7 +147,7 @@ class AuthoritiesAdminController @Inject() (
       case f if f.endsWith("csv") && f.contains(".mrm") =>
           Logger.info("Importing MachinesReadingMaps CSV")
           val loader = new StreamLoader()
-          loader.importPlaces(getStream(file, filename), MRMCrosswalk.fromCSV, importer)        
+          loader.importPlaces(getStream(file, filename), MRMCrosswalk.fromCSV(identifier), importer)        
     }
   }
 
