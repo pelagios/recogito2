@@ -123,8 +123,6 @@ case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends Im
 
     }
     
-    // play.api.Logger.info("a=" + 180 * a / Math.PI)
-    
     ImageAnchor.getQuadrant(a) match {
       case ImageAnchor.QUADRANT_1 => boundsQ1
       case ImageAnchor.QUADRANT_2 => boundsQ2
@@ -176,31 +174,31 @@ object ImageAnchor {
   def parseRectAnchor(anchor: String) = {
     val args = parseArgs(anchor)
     RectAnchor(
-      Math.round(args.get("x").get.toFloat),
-      Math.round(args.get("y").get.toFloat),
-      Math.round(args.get("w").get.toFloat),
-      Math.round(args.get("h").get.toFloat))
+      args.get("x").get.toFloat,
+      args.get("y").get.toFloat,
+      args.get("w").get.toFloat,
+      args.get("h").get.toFloat)
   }
 
   // Eg. tbox:x=3713,y=4544,a=0.39618258447890137,l=670,h=187
   def parseTiltedBoxAnchor(anchor: String) = {
     val args = parseArgs(anchor)
     TiltedBoxAnchor(
-      Math.round(args.get("x").get.toFloat),
-      Math.round(args.get("y").get.toFloat),
+      args.get("x").get.toFloat,
+      args.get("y").get.toFloat,
       args.get("a").get.toDouble,
-      Math.round(args.get("l").get.toFloat),
-      Math.round(args.get("h").get.toFloat))
+      args.get("l").get.toFloat,
+      args.get("h").get.toFloat)
   }
   
   def parseLinkedBoxAnchor(anchor: String) = {
     val args = parseArgs(anchor)
     TiltedBoxAnchor(
-      Math.round(args.get("px").get.toFloat),
-      Math.round(args.get("py").get.toFloat),
+      args.get("px").get.toFloat,
+      args.get("py").get.toFloat,
       args.get("a").get.toDouble,
-      Math.round(args.get("l").get.toFloat),
-      Math.round(args.get("h").get.toFloat))  
+      args.get("l").get.toFloat,
+      args.get("h").get.toFloat)  
   }
 
   def parsePolygonAnchor(anchor: String) =
