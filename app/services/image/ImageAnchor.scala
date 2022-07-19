@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 
 sealed trait ImageAnchor {
   
-  case class Bounds(left: Float, top: Float, right: Float, bottom: Float) {
+  case class Bounds(left: Double, top: Double, right: Double, bottom: Double) {
     
     val width = right - left
     
@@ -32,7 +32,7 @@ case class SvgAnchor(svg: String) extends ImageAnchor {
 
 }
 
-case class RectAnchor(x: Float, y: Float, w: Float, h: Float) extends ImageAnchor {
+case class RectAnchor(x: Double, y: Double, w: Double, h: Double) extends ImageAnchor {
   
   val bounds = (w, h) match {
     case (w, h) if w >= 0 && h >= 0 => Bounds(x, y, x + w, y + h)
@@ -43,7 +43,7 @@ case class RectAnchor(x: Float, y: Float, w: Float, h: Float) extends ImageAncho
   
 }
 
-case class TiltedBoxAnchor(x: Float, y: Float, a: Double, l: Float, h: Float) extends ImageAnchor {
+case class TiltedBoxAnchor(x: Double, y: Double, a: Double, l: Double, h: Double) extends ImageAnchor {
   
   implicit def doubleToInt(d: Double) = d.toInt
     
@@ -174,31 +174,31 @@ object ImageAnchor {
   def parseRectAnchor(anchor: String) = {
     val args = parseArgs(anchor)
     RectAnchor(
-      args.get("x").get.toFloat,
-      args.get("y").get.toFloat,
-      args.get("w").get.toFloat,
-      args.get("h").get.toFloat)
+      args.get("x").get.toDouble,
+      args.get("y").get.toDouble,
+      args.get("w").get.toDouble,
+      args.get("h").get.toDouble)
   }
 
   // Eg. tbox:x=3713,y=4544,a=0.39618258447890137,l=670,h=187
   def parseTiltedBoxAnchor(anchor: String) = {
     val args = parseArgs(anchor)
     TiltedBoxAnchor(
-      args.get("x").get.toFloat,
-      args.get("y").get.toFloat,
+      args.get("x").get.toDouble,
+      args.get("y").get.toDouble,
       args.get("a").get.toDouble,
-      args.get("l").get.toFloat,
-      args.get("h").get.toFloat)
+      args.get("l").get.toDouble,
+      args.get("h").get.toDouble)
   }
   
   def parseLinkedBoxAnchor(anchor: String) = {
     val args = parseArgs(anchor)
     TiltedBoxAnchor(
-      args.get("px").get.toFloat,
-      args.get("py").get.toFloat,
+      args.get("px").get.toDouble,
+      args.get("py").get.toDouble,
       args.get("a").get.toDouble,
-      args.get("l").get.toFloat,
-      args.get("h").get.toFloat)  
+      args.get("l").get.toDouble,
+      args.get("h").get.toDouble)  
   }
 
   def parsePolygonAnchor(anchor: String) =
