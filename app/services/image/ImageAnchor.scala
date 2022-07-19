@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 
 sealed trait ImageAnchor {
   
-  case class Bounds(left: Int, top: Int, right: Int, bottom: Int) {
+  case class Bounds(left: Float, top: Float, right: Float, bottom: Float) {
     
     val width = right - left
     
