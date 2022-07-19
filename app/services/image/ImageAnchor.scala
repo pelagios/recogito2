@@ -43,7 +43,7 @@ case class RectAnchor(x: Float, y: Float, w: Float, h: Float) extends ImageAncho
   
 }
 
-case class TiltedBoxAnchor(x: Int, y: Int, a: Double, l: Int, h: Int) extends ImageAnchor {
+case class TiltedBoxAnchor(x: Float, y: Float, a: Double, l: Float, h: Float) extends ImageAnchor {
   
   implicit def doubleToInt(d: Double) = d.toInt
     
