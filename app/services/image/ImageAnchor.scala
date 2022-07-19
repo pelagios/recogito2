@@ -32,7 +32,7 @@ case class SvgAnchor(svg: String) extends ImageAnchor {
 
 }
 
-case class RectAnchor(x: Int, y: Int, w: Int, h: Int) extends ImageAnchor {
+case class RectAnchor(x: Float, y: Float, w: Float, h: Float) extends ImageAnchor {
   
   val bounds = (w, h) match {
     case (w, h) if w >= 0 && h >= 0 => Bounds(x, y, x + w, y + h)
