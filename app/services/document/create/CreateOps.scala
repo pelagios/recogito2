@@ -199,8 +199,8 @@ trait CreateOps { self: DocumentService =>
     fileparts: Seq[DocumentFilepartRecord],
     newOwner: Option[User] = None
   )(implicit ctx: ExecutionContext): Future[Either[Exception, CloneCorrespondence]] = {
-    val sourceDir = uploads.getDocumentDir(doc.ownerName, doc.id).get
-    val filesizeKb = FileUtils.sizeOfDirectory(sourceDir).toDouble / 1024
+    val maybeSourceDir = uploads.getDocumentDir(doc.ownerName, doc.id)
+    val filesizeKb = maybeSourceDir.map(dir => FileUtils.sizeOfDirectory(dir).toDouble / 1024).getOrElse(0.0)
 
     val owner = newOwner.map(_.record).getOrElse(doc.owner)
     val usedDiskspaceKb = uploads.getUsedDiskspaceKB(owner.getUsername)
