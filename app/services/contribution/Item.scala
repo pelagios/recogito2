@@ -81,6 +81,9 @@ object ItemType extends Enumeration {
 
   val ORDERING_BODY = Value("ORDERING_BODY")
 
+  // SICF extension
+  val COLORING_BODY = Value("COLORING_BODY")
+
   def fromBodyType(bodyType: AnnotationBody.Value) = bodyType match {
 
     case AnnotationBody.COMMENT => COMMENT_BODY
@@ -107,6 +110,9 @@ object ItemType extends Enumeration {
     case AnnotationBody.GROUPING => GROUPING_BODY 
 
     case AnnotationBody.ORDERING => ORDERING_BODY
+
+    // SICF extension
+    case AnnotationBody.COLORING => COLORING_BODY
 
   }
       
