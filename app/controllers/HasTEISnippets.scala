@@ -104,8 +104,10 @@ trait HasTEISnippets extends HasTextSnippets {
           val len = Option(h.getNodeValue).map(_.size).getOrElse(0)
           if (len >= remainingOffset)
             (h, remainingOffset)
-          else 
+          else if (t.size > 0)
             findRecursive(t, remainingOffset - len)
+          else
+            (h, 0)
         }
         
         findRecursive(flattenDOM(parent), offset)
