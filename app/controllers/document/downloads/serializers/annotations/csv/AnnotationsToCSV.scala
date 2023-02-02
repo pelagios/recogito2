@@ -123,7 +123,26 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
 
       val groupOrder = a.bodies.find(_.hasType == AnnotationBody.ORDERING).flatMap(_.value)
 
-      val color = a.bodies.find(_.hasType == AnnotationBody.COLORING).flatMap(_.value)
+      val categories = a.bodies.filter(b => Set(AnnotationBody.ENTITY, AnnotationBody.LABEL, AnnotationBody.SYMBOL).contains(b.hasType)).map(_.hasType)
+
+      val color = a.bodies.find(_.hasType == AnnotationBody.COLORING).flatMap(color => {
+        val value = color.value;
+
+        if (value == Some("#ff0000"))
+          Option("red")
+        else if (value == Some("#0000ff"))
+          Option("blue")
+        else if (value == Some("#008000"))
+          Option("green")
+        else if (value == Some("#ffff00"))
+          Option("yellow")
+        else if (value == Some("#00ffff"))
+          Option("cyan")
+        else if (value == Some("#ffa500"))
+          Option("orange")
+        else
+          color.value
+      })
 
       // Helper to surface either the tag URI (if available) or the label otherwise
       def tagLabelsOrURIs(): Seq[String] =
@@ -143,6 +162,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
           firstEntity.flatMap(_.status.map(_.value.toString)).getOrElse(EMPTY),
           tagLabelsOrURIs().mkString("|"),
           getCommentBodies(a).flatMap(_.value).mkString("|"),
+          categories.mkString("|"),
           groupId.getOrElse(EMPTY),
           groupOrder.getOrElse(EMPTY),
           color.getOrElse(EMPTY))
@@ -234,6 +254,7 @@ trait AnnotationsToCSV extends BaseSerializer with HasCSVParsing {
           "VERIFICATION_STATUS",
           "TAGS",
           "COMMENTS",
+          "CATEGORIES",
           "GROUP_ID",
           "GROUP_ORDER",
           "COLOR")

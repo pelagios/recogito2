@@ -166,7 +166,7 @@ object ImageAnchor {
 
   // Eg. point:1099,1018
   def parsePointAnchor(anchor: String) = {
-    val args = anchor.substring(6).split(',').map(_.toInt)
+    val args = anchor.substring(6).split(',').map(c => Math.round(c.toFloat))
     PointAnchor(args(0), args(1))
   }
 
