@@ -4,11 +4,12 @@ import akka.actor.Props
 import java.io.{File, FileInputStream}
 import java.nio.file.Files
 import java.util.UUID
+import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.libs.json.{Json, JsArray}
 import services.generated.tables.records.{DocumentRecord, DocumentFilepartRecord}
 import services.ContentType
-import services.annotation.{Annotation, AnnotationService}
+import services.annotation.{Annotation, AnnotationBody, AnnotationService}
 import services.task.TaskService
 import transform.{WorkerActor, SpecificJobDefinition}
 
@@ -31,6 +32,17 @@ class MapKuratorActor(
       val json = Json.parse(new FileInputStream(result)).as[JsArray].value
 
       val annotations: Seq[Annotation] = json.map(obj => {
+        val firstBody = (obj \ "body").as[JsArray].value.find { body =>
+          (body \ "purpose").asOpt[String] match {
+            case Some(value) => value == "transcribing"
+            case None => false
+          }
+        }
+
+        val transcription = firstBody.flatMap { body =>
+          (body \ "value").asOpt[String]
+        }
+
         val selector = (obj \ "target" \ "selector").as[JsArray].value.head
 
         val typ = (selector \ "type").as[String]
@@ -39,7 +51,21 @@ class MapKuratorActor(
         typ match {
           case "SvgSelector" => 
             // We're assuming ONLY polygon selectors for now!
-            Annotation.on(part, s"svg.polygon:$value")
+            if (transcription.isDefined)
+              Annotation
+                .on(part, s"svg.polygon:$value")
+                .withBody(AnnotationBody(
+                  AnnotationBody.TRANSCRIPTION,
+                  None, // lastModifiedBy
+                  DateTime.now(),
+                  transcription,
+                  None, // reference
+                  None, // note
+                  None) // status
+                )
+            else
+              Annotation
+                .on(part, s"svg.polygon:$value")
 
           case typ =>
             play.api.Logger.info(s"Unsupported selector type: $typ")
