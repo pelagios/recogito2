@@ -63,5 +63,9 @@ case class ExtendedDocumentMetadata(document: DocumentRecord, fileparts: Seq[Doc
   lazy val dataParts = fileparts.filter(_.getContentType.startsWith("DATA"))
   
   lazy val hasDataParts = dataParts.size > 0
+
+  lazy val mapParts = fileparts.filter(_.getContentType.startsWith("MAP_WMTS"))
+
+  lazy val isWMTSMap = mapParts.size == fileparts.size
   
 }

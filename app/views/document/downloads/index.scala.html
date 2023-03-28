@@ -59,6 +59,103 @@
                 <a href="@controllers.document.downloads.routes.DownloadsController.downloadRDFXML(doc.id)" class="btn small"><span class="icon">&#xf019;</span> RDF/XML</a>
               </div>
             </li>
+
+            @if(doc.isWMTSMap) {
+              <li>
+                <script>
+                  function parseFragmentSelector(fragment) {
+                    var regex = /^(xywh)=(pixel|percent)?:?(.+?),(.+?),(.+?),(.+)*/g;
+
+                    var matches = [...fragment.matchAll(regex)][0];
+                    var [_, prefix, unit, a, b, c, d] = matches;
+
+                    if (prefix !== 'xywh') throw new Error('Unsupported MediaFragment: ' + fragment);
+
+                    if (unit && unit !== 'pixel') throw new Error(`Unsupported MediaFragment unit: ${unit}`);
+
+                    var [x, y, w, h] = [a, b, c, d].map(parseFloat);
+
+                    return {
+                      type: 'Polygon',
+                      coordinates: [[
+                        [x,y], [x+w,y], [x+w,y+h], [x,y+h], [x,y]
+                      ]]
+                    }
+                  }
+
+                  function parseSvgSelector(value) {
+                    var [a, b, str] = value.match(/(<polygon points=")([^"]*)/) || [];
+
+                    if (!str) throw new Error('Unsupported SVG selector: ' + value);
+
+                    var points = str.split(' ').map((p) => p.split(',').map(parseFloat));
+
+                    return {
+                      type: 'Polygon',
+                      coordinates: [
+                        [...points, points[0]]
+                      ]
+                    }
+                  }
+
+                  function downloadGeoJSON() {
+                    var documentId = '@doc.id';
+
+                    fetch(`/document/${documentId}/downloads/annotations/jsonld`)
+                      .then(function(res) { return res.json(); })
+                      .then(function(data) {
+                        const features = data.map(annotation => {
+                          var properties = {};
+
+                          var transcription = annotation.body.find(b => b.purpose === 'transcribing');
+                          if (transcription) {
+                            properties.transcription = transcription.value;
+                            properties.transcriber = transcription.creator;
+                            properties.transcribed_at = transcription.modified;
+                          }
+                          
+                          var tags = annotation.body.filter(b => b.purpose === 'tagging');
+                          if (tags.length > 0)
+                            properties.tags = tags.map(t => t.value).join(', ');
+
+                          var { type, value } = annotation.target.selector[0];
+
+                          let geometry; 
+
+                          if (type === 'SvgSelector') {
+                            geometry = parseSvgSelector(value);
+                          } else if (type === 'FragmentSelector') {
+                            geometry = parseFragmentSelector(value);
+                          } else {
+                            console.warn('Unsuported selector type: ' + type);
+                          }
+
+                          return { type: 'Feature', properties, geometry };
+                        }).filter(f => f.geometry);
+
+                        var collection = {
+                          type: 'FeatureCollection',
+                          features
+                        };
+
+                        var anchor = document.createElement('a');
+                        anchor.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(collection));
+                        anchor.download = `${documentId}.geojson`;
+                        anchor.click();
+                      });
+
+                    return false;
+                  }
+                </script>
+                <div class="description">
+                  <h3>GeoJSON</h3>
+                  <p>Download map annotations as GeoJSON.</p>
+                </div>
+                <div class="button-container">
+                  <a href="#" onclick="return downloadGeoJSON()" class="btn small"><span class="icon">&#xf019;</span> GeoJSON</a>
+                </div>
+              </li>  
+            }
           </ul>
         </div>
       </div>
