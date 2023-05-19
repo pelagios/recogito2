@@ -32,12 +32,12 @@ class MapKuratorActor(
       val json = Json.parse(new FileInputStream(result)).as[JsArray].value
 
       val annotations: Seq[Annotation] = json.map(obj => {
-        val firstBody = (obj \ "body").as[JsArray].value.find { body =>
+        val firstBody = (obj \ "body").asOpt[JsArray].flatMap(_.value.find { body =>
           (body \ "purpose").asOpt[String] match {
             case Some(value) => value == "transcribing"
             case None => false
           }
-        }
+        })
 
         val transcription = firstBody.flatMap { body =>
           (body \ "value").asOpt[String]
