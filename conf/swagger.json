@@ -173,7 +173,7 @@
         }]
       }
     },
-    "/api/place/{uri}" : {
+    ":9000/api/place/{uri}" : {
       "get": {
         "tags": [ "Authorities" ],
         "summary": "Get place information and coordinates for a specific gazetteeer URI.",

@@ -85,7 +85,8 @@ libraryDependencies ++= Seq(
 
   "org.jooq" % "joox" % "1.5.0",
 
-  "org.postgresql" % "postgresql" % "9.4.1208.jre7",
+  //"org.postgresql" % "postgresql" % "9.4.1208.jre7",
+  "org.postgresql" % "postgresql" % "42.6.0",
 
   "org.webjars" %% "webjars-play" % "2.6.2",
 

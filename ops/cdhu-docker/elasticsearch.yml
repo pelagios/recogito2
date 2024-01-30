@@ -1,0 +1,17 @@
+cluster.name: docker-cluster
+node.name: elasticsearch-node
+network.host: 0.0.0.0
+discovery.type: single-node
+
+# Heap size settings (adjust as needed)
+# Remember that these settings depend on your system resources.
+# It's recommended to set the heap size based on available RAM.
+# For example, for a system with 16GB RAM, you might set it to 8GB.
+# Be cautious not to allocate all available RAM to Elasticsearch.
+# See Elasticsearch documentation for more guidance.
+
+# -Xms specifies the initial heap size
+# -Xmx specifies the maximum heap size
+
+# ES_JAVA_OPTS: "-Xms8g -Xmx8g"
+

@@ -1,0 +1,71 @@
+version: '3.4'
+services:
+
+  elasticsearch:
+    image: elasticsearch:5.6.16
+    container_name: elasticsearch
+    volumes:
+      - ./elasticsearch/esdata:/usr/share/elasticsearch/data
+      - ./recogito/elasticsearch/logs:/usr/share/elasticsearch/logs
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    environment:
+      - cluster.name=docker-cluster
+      - xpack.security.enabled=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms12g -Xmx12g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - intranet
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  recogito:
+    #image: cdhu1/recogito:latest
+    image: recogito:1.0
+    container_name: recogito
+    volumes:
+      - ./recogito/application.conf:/opt/recogito/conf/application.conf
+      - ./recogito/data:/opt/recogito/uploads
+      - ./recogito/plugins:/opt/recogito/plugins
+      - ./recogito/logback.xml:/opt/recogito/conf/logback.xml
+      - ./recogito/logs:/var/log/recogito
+    ports:
+      - 9333:9000
+    networks:
+      - intranet
+    command: sh -c "sleep 60 && bin/recogito2"
+
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/ssl/recogito_abm_uu_se_cert.cer:/etc/nginx/recogito_abm_uu_se_cert.cer
+      - ./nginx/ssl/recogito_private.key:/etc/nginx/recogito_private.key
+    ports:
+      - 80:80
+      - 443:443  # Expose port 443 for SSL
+    networks:
+      - intranet
+
+  postgres:
+    image: postgres:14.10
+    container_name: postgres
+    environment:
+      POSTGRES_USER: {{ username }}
+      POSTGRES_PASSWORD: {{ password }}
+      POSTGRES_DB: {{ dbname }}
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - intranet
+
+networks:
+  intranet:
+
